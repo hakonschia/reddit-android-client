@@ -11,6 +11,11 @@ import android.widget.Toast;
 
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
         // Resumed from OAuth authorization
         if (uri.toString().startsWith(OAuthConstants.CALLBACK_URL)) {
             Toast.makeText(this, "nice :-d", Toast.LENGTH_LONG).show();
+
+            Retrofit.Builder builder = new Retrofit.Builder()
+                    .baseUrl(NetworkConstants.REDDIT_API_URL)
+                    .addConverterFactory(GsonConverterFactory.create());
 
             String code = uri.getQueryParameter("code");
             String state = uri.getQueryParameter("state");
