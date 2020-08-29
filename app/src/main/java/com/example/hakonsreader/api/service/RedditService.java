@@ -6,11 +6,13 @@ import com.example.hakonsreader.constants.NetworkConstants;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
 public interface RedditService {
 
     @POST(NetworkConstants.ACCESS_TOKEN_URL)
+    @Headers("Accept: application/json")
     @FormUrlEncoded
     public Call<AccessToken> getAccessToken(
             @Field("grant_type") String grantType,
