@@ -11,7 +11,7 @@ import retrofit2.http.POST;
 
 public interface RedditService {
 
-    @POST(NetworkConstants.ACCESS_TOKEN_URL)
+    @POST(NetworkConstants.ACCESS_TOKEN_PATH)
     @Headers("Accept: application/json")
     @FormUrlEncoded
     public Call<AccessToken> getAccessToken(
