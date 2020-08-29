@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
@@ -16,10 +18,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
 
+    /* ---------------- Event listeners ---------------- */
+    /**
+     * Opens the Reddit OAuth window to log in to Reddit
+     *
+     * @param view
+     */
+    public void btnLogInOnClick(View view) {
         this.requestOAuth();
     }
 
+    /**
+     *
+     */
     private void requestOAuth() {
         // TODO generate random state, make sure it is the same when we get a result in onResume
         String url = String.format(
@@ -47,5 +60,8 @@ public class MainActivity extends AppCompatActivity {
         if (uri == null) {
             return;
         }
+
+        Toast.makeText(this, "nice :-d", Toast.LENGTH_LONG).show();
+
     }
 }

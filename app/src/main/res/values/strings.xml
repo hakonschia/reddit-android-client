@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Hakon\'s Reader</string>
+
+    <string name="btnLogIn">Log in</string>
 </resources>
