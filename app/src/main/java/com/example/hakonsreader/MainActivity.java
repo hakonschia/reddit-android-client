@@ -9,11 +9,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.hakonsreader.api.model.AccessToken;
+import com.example.hakonsreader.api.service.RedditService;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -43,14 +48,33 @@ public class MainActivity extends AppCompatActivity {
 
         // Resumed from OAuth authorization
         if (uri.toString().startsWith(OAuthConstants.CALLBACK_URL)) {
-            Toast.makeText(this, "nice :-d", Toast.LENGTH_LONG).show();
+            String code = uri.getQueryParameter("code");
+            String state = uri.getQueryParameter("state");
 
             Retrofit.Builder builder = new Retrofit.Builder()
                     .baseUrl(NetworkConstants.REDDIT_API_URL)
                     .addConverterFactory(GsonConverterFactory.create());
 
-            String code = uri.getQueryParameter("code");
-            String state = uri.getQueryParameter("state");
+            Retrofit retrofit = builder.build();
+
+            RedditService service = retrofit.create(RedditService.class);
+            Call<AccessToken> accessTokenCall = service.getAccessToken(
+                    "authorization_code",
+                    code,
+                    OAuthConstants.CALLBACK_URL
+            );
+
+            accessTokenCall.enqueue(new Callback<AccessToken>() {
+                @Override
+                public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
+                    Toast.makeText(MainActivity.this, "Nice bruh", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailure(Call<AccessToken> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "not nice bruh", Toast.LENGTH_LONG).show();
+                }
+            });
         }
     }
 
