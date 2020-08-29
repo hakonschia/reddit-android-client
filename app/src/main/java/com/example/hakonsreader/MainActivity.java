@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         Uri uri = getIntent().getData();
-
         if (uri == null) {
             return;
         }
