@@ -18,6 +18,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        boolean loggedIn = false;
+
+        if (loggedIn) {
+            // Go to another activity (with reddit front page or something)
+        }
     }
 
     @Override
