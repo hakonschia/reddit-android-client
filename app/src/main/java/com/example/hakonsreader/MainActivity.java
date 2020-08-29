@@ -20,6 +20,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Uri uri = getIntent().getData();
+
+        if (uri == null) {
+            return;
+        }
+
+        // Resumed from OAuth authorization
+        if (uri.toString().startsWith(OAuthConstants.CALLBACK_URL)) {
+            Toast.makeText(this, "nice :-d", Toast.LENGTH_LONG).show();
+        }
+    }
+
     /* ---------------- Event listeners ---------------- */
     /**
      * Opens the Reddit OAuth window to log in to Reddit
@@ -29,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     public void btnLogInOnClick(View view) {
         this.requestOAuth();
     }
+
 
     /**
      *
@@ -50,18 +67,4 @@ public class MainActivity extends AppCompatActivity {
         startActivity(oauthIntent);
     }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Uri uri = getIntent().getData();
-
-        if (uri == null) {
-            return;
-        }
-
-        Toast.makeText(this, "nice :-d", Toast.LENGTH_LONG).show();
-
-    }
 }
