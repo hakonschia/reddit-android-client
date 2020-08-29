@@ -33,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
         // Resumed from OAuth authorization
         if (uri.toString().startsWith(OAuthConstants.CALLBACK_URL)) {
             Toast.makeText(this, "nice :-d", Toast.LENGTH_LONG).show();
+
+            String code = uri.getQueryParameter("code");
+            String state = uri.getQueryParameter("state");
         }
     }
 
