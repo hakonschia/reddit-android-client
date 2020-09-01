@@ -13,8 +13,6 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -25,7 +23,6 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -45,6 +42,46 @@ public class MainActivity extends AppCompatActivity {
     private AccessToken accessToken;
     private User user;
 
+    private SubredditFragment frontPage = SubredditFragment.newInstance();
+    private SubredditFragment popular = SubredditFragment.newInstance();
+    private SubredditFragment all = SubredditFragment.newInstance();
+
+    private Callback<AccessToken> tokenResponse = new Callback<AccessToken>() {
+        @Override
+        public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
+            if (!response.isSuccessful()) {
+                Toast.makeText(MainActivity.this, "Access not given " + response.code(), Toast.LENGTH_LONG).show();
+
+                return;
+            }
+
+            // Store access token in SharedPreferences
+            accessToken = response.body();
+            if (accessToken == null) {
+                // TODO some error handling
+
+                return;
+            }
+
+            // Assume the token was created when the request was sent
+            accessToken.setRetrievedAt(response.raw().sentRequestAtMillis());
+
+            SharedPreferences.Editor prefsEditor = prefs.edit();
+            Gson gson = new Gson();
+            String tokenJson = gson.toJson(accessToken);
+
+            prefsEditor.putString(SharedPreferencesConstants.ACCESS_TOKEN, tokenJson);
+            prefsEditor.apply();
+
+            Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onFailure(Call<AccessToken> call, Throwable t) {
+            t.printStackTrace();
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,29 +89,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.initViews();
-        //this.setupViewPager(this.viewPager);
+       // this.setupViewPager(this.viewPager);
 
         Gson gson = new Gson();
+
         // Load accesstoken, userinfo
         this.prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
 
         this.accessToken = gson.fromJson(this.prefs.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
         this.user = gson.fromJson(this.prefs.getString(SharedPreferencesConstants.USER_INFO, ""), User.class);
 
+        Log.d(TAG, "onCreate: " + this.accessToken.expiresSoon());
+
         if (this.accessToken != null) {
-            //this.getUserInfo();
+            this.getUserInfo();
         }
+
+        //this.getFrontPagePosts();
 
         // TODO just load front page no matter what (4 fragments: custom sub - front page - popular - all)
         //  Show a nice bar with 4 sections on top under title to indicate that you can swipe (could also be clickable but need to be large enough)
-        boolean loggedIn = false;
 
 
-        if (loggedIn) {
-            // Get new access token if close to expiration or something. This should probably be
-            // its own function that gets a new token that gets called before every request
-        }
-
+        /*
         this.redditApi.getSubredditPosts("GlobalOffensive").enqueue(new Callback<RedditPostResponse>() {
             @Override
             public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
@@ -87,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
 
                     return;
                 }
+
+                frontPage.setPosts(posts);
             }
 
             @Override
@@ -95,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+         */
     }
 
     @Override
@@ -110,41 +150,7 @@ public class MainActivity extends AppCompatActivity {
         if (uri.toString().startsWith(OAuthConstants.CALLBACK_URL)) {
             String code = uri.getQueryParameter("code");
 
-            this.redditApi.getAccessToken(code).enqueue(new Callback<AccessToken>() {
-                @Override
-                public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
-                    if (!response.isSuccessful()) {
-                        Toast.makeText(MainActivity.this, "Access not given " + response.code(), Toast.LENGTH_LONG).show();
-
-                        return;
-                    }
-
-                    // Store access token in SharedPreferences
-                    accessToken = response.body();
-                    if (accessToken == null) {
-                        // TODO some error handling
-
-                        return;
-                    }
-
-                    // Assume the token was created when the request was sent
-                    accessToken.setRetrievedAt(response.raw().sentRequestAtMillis());
-
-                    SharedPreferences.Editor prefsEditor = prefs.edit();
-                    Gson gson = new Gson();
-                    String tokenJson = gson.toJson(accessToken);
-
-                    prefsEditor.putString(SharedPreferencesConstants.ACCESS_TOKEN, tokenJson);
-                    prefsEditor.apply();
-
-                    Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onFailure(Call<AccessToken> call, Throwable t) {
-                    t.printStackTrace();
-                }
-            });
+            this.redditApi.getAccessToken(code).enqueue(this.tokenResponse);
         }
     }
 
@@ -153,8 +159,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initViews() {
         this.activeSubredditName = findViewById(R.id.activeSubredditName);
-        //this.viewPager = findViewById(R.id.container);
-        //this.oauthWebView = findViewById(R.id.oauthWebView);
+        this.viewPager = findViewById(R.id.container);
     }
 
     /**
@@ -165,19 +170,36 @@ public class MainActivity extends AppCompatActivity {
     public void setupViewPager(ViewPager viewPager) {
         SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager(), 0);
 
-        SubredditFragment frontPage = new SubredditFragment();
-        SubredditFragment popular = new SubredditFragment();
-        SubredditFragment all = new SubredditFragment();
-        frontPage.setPosts(this.getDummyPosts());
-        popular.setPosts(this.getDummyPosts());
-        all.setPosts(this.getDummyPosts());
-
        // adapter.addFragment(new SubredditFragment(), "Custom sub");
-        adapter.addFragment(frontPage, "Front page");
-        adapter.addFragment(popular, "Popular");
-        adapter.addFragment(all, "All");
+        adapter.addFragment(this.frontPage, "Front page");
+        adapter.addFragment(this.popular, "Popular");
+        adapter.addFragment(this.all, "All");
 
         viewPager.setAdapter(adapter);
+    }
+
+    /**
+     * Retrieves posts from reddit.com/
+     * <p>Uses the stored access token to retrieve the custom front page if a user is logged in</p>
+     */
+    private void getFrontPagePosts() {
+        this.redditApi.getFrontPagePosts(this.accessToken).enqueue(new Callback<RedditPostResponse>() {
+            @Override
+            public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
+                List<RedditPost> posts = response.body().getPosts();
+                if (!response.isSuccessful() || posts == null) {
+
+                    return;
+                }
+
+                frontPage.setPosts(posts);
+            }
+
+            @Override
+            public void onFailure(Call<RedditPostResponse> call, Throwable t) {
+
+            }
+        });
     }
 
     /**
@@ -213,16 +235,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(oauthIntent);
     }
 
-    private List<RedditPost> getDummyPosts() {
-        List<RedditPost> posts = new ArrayList<>();
-        posts.add(new RedditPost("GlobalOffensive", "FaZe won major", "hakonschia", "ger", false, 2));
-        posts.add(new RedditPost("GlobalOffensive", "FaZe won major3", "hakonschia", "ger", false, 142));
-        posts.add(new RedditPost("GlobalOffensive", "FaZe won major4", "hakonschia", "ger", false, 2222));
-        posts.add(new RedditPost("GlobalOffensive", "FaZe won major5", "hakonschia", "ger", false, 235));
-
-        return posts;
-    }
-
     /* ---------------- Event listeners ---------------- */
     /**
      * Opens the Reddit OAuth window to log in to Reddit
@@ -242,6 +254,10 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (!response.isSuccessful()) {
                     Log.d(TAG, "onResponse: Error!");
+
+                    if (response.code() == 401) {
+                        refreshToken();
+                    }
 
                     return;
                 }
@@ -268,5 +284,9 @@ public class MainActivity extends AppCompatActivity {
                 t.printStackTrace();
             }
         });
+    }
+
+    public void refreshToken() {
+        this.redditApi.refreshToken(this.accessToken).enqueue(this.tokenResponse);
     }
 }

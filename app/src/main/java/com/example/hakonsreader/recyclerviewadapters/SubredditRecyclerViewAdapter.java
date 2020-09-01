@@ -18,11 +18,20 @@ import java.util.List;
  */
 public class SubredditRecyclerViewAdapter extends RecyclerView.Adapter<SubredditRecyclerViewAdapter.ViewHolder> {
 
-    private final List<RedditPost> posts;
+    private List<RedditPost> posts;
+
+    public SubredditRecyclerViewAdapter() {
+    }
 
     public SubredditRecyclerViewAdapter(List<RedditPost> items) {
-        posts = items;
+        this.posts = items;
     }
+
+    public void setPosts(List<RedditPost> posts) {
+        this.posts = posts;
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

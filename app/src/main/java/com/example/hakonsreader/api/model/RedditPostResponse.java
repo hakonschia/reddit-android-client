@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api.model;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 
 

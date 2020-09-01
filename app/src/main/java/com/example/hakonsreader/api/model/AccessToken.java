@@ -3,6 +3,11 @@ package com.example.hakonsreader.api.model;
 import com.google.gson.annotations.SerializedName;
 
 public class AccessToken {
+    /**
+     * The amount of milliseconds that signifies if the token is almost expired
+     */
+    private static final int EXPIRES_SOON_TIME = 5000;
+
 
     @SerializedName("access_token")
     private String accessToken;
@@ -57,8 +62,11 @@ public class AccessToken {
      * @return True if the access token is about to expire
      */
     public boolean expiresSoon() {
+        long currentTime = System.currentTimeMillis();
 
+        // The expiresIn field returned from reddit is in seconds, not milliseconds
+        long expirationTime = this.retrievedAt + this.expiresIn * 1000;
 
-        return true;
+        return expirationTime > currentTime + EXPIRES_SOON_TIME;
     }
 }
