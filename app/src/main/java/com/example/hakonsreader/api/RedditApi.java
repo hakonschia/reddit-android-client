@@ -1,19 +1,20 @@
 package com.example.hakonsreader.api;
 
-import com.example.hakonsreader.R;
+import androidx.annotation.Nullable;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.example.hakonsreader.api.model.AccessToken;
+import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.service.RedditService;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
 
-import java.security.acl.AclEntry;
-
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -23,8 +24,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RedditApi {
     private static RedditApi instance;
 
+    /**
+     * The service object used to communicate with the Reddit API
+     */
+    private RedditService apiService;
+
+    /**
+     * The service object used to communicate only with the part of the Reddit API
+     * that deals with OAuth access tokens
+     */
     private RedditService accessTokenService;
-    private RedditService redditService;
 
     private RedditApi() {
         // TODO maybe possible to add a function that checks if access token is invalid and refreshes
@@ -49,11 +58,11 @@ public class RedditApi {
                 .client(okHttpBuilder.build());
 
         Retrofit retrofit = builder.build();
-        this.redditService = retrofit.create(RedditService.class);
+        this.apiService = retrofit.create(RedditService.class);
 
         // Getting the access token requires a different URL compared to the API calls
         Retrofit.Builder oauthBuilder = new Retrofit.Builder()
-                .baseUrl("https://www.reddit.com/api/")
+                .baseUrl(NetworkConstants.REDDIT_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpBuilder.build());
 
@@ -92,8 +101,27 @@ public class RedditApi {
         return this.accessTokenService.refreshToken(accessToken.getRefreshToken(), "refresh_token");
     }
 
-
+    /**
+     * Retrieves information about the user logged in
+     *
+     * @param accessToken The AccessToken object holding the OAuth access token
+     * @return A Call object ready to be called to retrieve user information
+     */
     public Call<User> getUserInfo(AccessToken accessToken) {
-        return this.redditService.getUserInfo(String.format("%s %s", accessToken.getTokenType(), accessToken.getAccessToken()));
+        return this.apiService.getUserInfo(String.format("%s %s", accessToken.getTokenType(), accessToken.getAccessToken()));
+    }
+
+    public Call<RedditPostResponse> getFrontPagePosts(@Nullable AccessToken accessToken) {
+        if (accessToken == null) {
+            // Retrieve default posts
+            return this.apiService.getPosts(NetworkConstants.REDDIT_URL + ".json");
+        } else {
+            // Send OAuth to get custom front page posts
+            return this.apiService.getPosts(NetworkConstants.REDDIT_OUATH_URL + ".json");
+        }
+    }
+
+    public Call<RedditPostResponse> getSubredditPosts(String subreddit) {
+        return this.apiService.getPosts(NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json");
     }
 }

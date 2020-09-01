@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.recyclerviewadapters.SubredditRecyclerViewAdapter;
 
 import java.util.List;

@@ -23,14 +23,6 @@
         android:onClick="btnLogInOnClick"
         android:text="@string/btnLogIn" />
 
-    <Button
-        android:id="@+id/btnGetUserInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="btnGetUserInfo"
-        android:text="Get info"
-        android:layout_toEndOf="@id/btnLogIn"/>
-
     <!--
     <androidx.viewpager.widget.ViewPager
         android:layout_width="match_parent"

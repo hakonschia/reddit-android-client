@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.service;
 
 import com.example.hakonsreader.api.model.AccessToken;
-import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.NetworkConstants;
 
@@ -36,12 +36,19 @@ public interface RedditService {
     );
 
 
-
-
     @GET("v1/me")
     @Headers("User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)")
     Call<User> getUserInfo(@Header("Authorization") String token);
 
+    /**
+     * Retrieves posts from Reddit
+     * TODO
+     *
+     * @param url The URL to retrieve posts from
+     *            <p>The URL format for front page for not logged in user or a subreddit is: https://reddit.com/.json</p>
+     *            <p>The URL for front page for logged in user is: https://oauth.reddit.com with authentication header</p>
+     * @return
+     */
     @GET
-    Call<List<RedditPost>> getPosts(@Url String url);
+    Call<RedditPostResponse> getPosts(@Url String url);
 }

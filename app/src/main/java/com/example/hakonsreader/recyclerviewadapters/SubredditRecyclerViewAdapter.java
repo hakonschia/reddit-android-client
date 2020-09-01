@@ -9,11 +9,12 @@ import android.widget.TextView;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.RedditPostResponse;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link RedditPost}.
+ * {@link RecyclerView.Adapter} that can display a {@link RedditPostResponse}.
  */
 public class SubredditRecyclerViewAdapter extends RecyclerView.Adapter<SubredditRecyclerViewAdapter.ViewHolder> {
 

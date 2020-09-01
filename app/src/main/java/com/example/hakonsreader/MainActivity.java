@@ -13,9 +13,12 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.OAuthConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
@@ -40,26 +43,58 @@ public class MainActivity extends AppCompatActivity {
     private final RedditApi redditApi = RedditApi.getInstance();
 
     private AccessToken accessToken;
+    private User user;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         this.initViews();
         //this.setupViewPager(this.viewPager);
 
+        Gson gson = new Gson();
         // Load accesstoken, userinfo
-        prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
+        this.prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
+
+        this.accessToken = gson.fromJson(this.prefs.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
+        this.user = gson.fromJson(this.prefs.getString(SharedPreferencesConstants.USER_INFO, ""), User.class);
+
+        if (this.accessToken != null) {
+            //this.getUserInfo();
+        }
 
         // TODO just load front page no matter what (4 fragments: custom sub - front page - popular - all)
         //  Show a nice bar with 4 sections on top under title to indicate that you can swipe (could also be clickable but need to be large enough)
         boolean loggedIn = false;
 
+
         if (loggedIn) {
             // Get new access token if close to expiration or something. This should probably be
             // its own function that gets a new token that gets called before every request
         }
+
+        this.redditApi.getSubredditPosts("GlobalOffensive").enqueue(new Callback<RedditPostResponse>() {
+            @Override
+            public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
+
+                Log.d(TAG, "onResponse: " + response);
+
+                List<RedditPost> posts = response.body().getPosts();
+                if (posts == null) {
+                    Log.d(TAG, "onResponse: posts is null");
+
+                    return;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RedditPostResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
     }
 
     @Override
@@ -122,6 +157,11 @@ public class MainActivity extends AppCompatActivity {
         //this.oauthWebView = findViewById(R.id.oauthWebView);
     }
 
+    /**
+     * Adds the subreddit fragments to the view pager
+     *
+     * @param viewPager The ViewPager to add the fragments to
+     */
     public void setupViewPager(ViewPager viewPager) {
         SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager(), 0);
 
@@ -193,7 +233,10 @@ public class MainActivity extends AppCompatActivity {
         this.requestOAuth();
     }
 
-    public void btnGetUserInfo(View view) {
+    /**
+     * Retrieves user information about the currently logged in user
+     */
+    public void getUserInfo() {
         this.redditApi.getUserInfo(this.accessToken).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {

@@ -14,6 +14,12 @@ public class User {
     @SerializedName("link_karma")
     private int postKarma;
 
+    @SerializedName("pref_video_autoplay")
+    private boolean autoPlayVideos;
+
+    @SerializedName("icon_img")
+    private String profilePictureUrl;
+
 
     public String getName() {
         return name;
