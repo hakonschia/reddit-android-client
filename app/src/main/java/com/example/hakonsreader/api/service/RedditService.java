@@ -26,7 +26,7 @@ public interface RedditService {
      * @return
      */
     @POST(NetworkConstants.ACCESS_TOKEN_PATH)
-    @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6", "User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)"})
+    @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6"})
     @FormUrlEncoded
     Call<AccessToken> getAccessToken(
             @Field("code") String code,
@@ -42,7 +42,7 @@ public interface RedditService {
      * @return
      */
     @POST(NetworkConstants.ACCESS_TOKEN_PATH)
-    @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6", "User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)"})
+    @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6"})
     @FormUrlEncoded
     Call<AccessToken> refreshToken(
             @Field("refresh_token") String refreshToken,
@@ -51,7 +51,7 @@ public interface RedditService {
 
 
     @GET("v1/me")
-    @Headers("User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)")
+   // @Headers("User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)")
     Call<User> getUserInfo(@Header("Authorization") String token);
 
     /**
@@ -65,6 +65,6 @@ public interface RedditService {
      * @return A Call object ready to retrieve posts from a subreddit
      */
     @GET
-    @Headers("User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)")
+  //  @Headers("User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)")
     Call<RedditPostResponse> getPosts(@Url String url, @Header("Authorization") String accessToken);
 }

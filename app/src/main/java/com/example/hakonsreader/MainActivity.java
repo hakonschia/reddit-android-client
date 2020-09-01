@@ -1,6 +1,9 @@
 package com.example.hakonsreader;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -9,7 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.webkit.WebView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +23,8 @@ import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.OAuthConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
+import com.example.hakonsreader.fragments.PostsFragment;
+import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -31,10 +36,15 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
+    private ViewPager viewPager;
+    private PostsFragment frontPage = new PostsFragment();
+    private PostsFragment popular = new PostsFragment();
+    private PostsFragment all = new PostsFragment();
+
     private TextView activeSubredditName;
 
-    private SharedPreferences prefs;
-    private final RedditApi redditApi = RedditApi.getInstance();
+    private static SharedPreferences prefs;
+    private RedditApi redditApi;
 
     private AccessToken accessToken;
     private User user;
@@ -50,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Store access token in SharedPreferences
             accessToken = response.body();
+
             if (accessToken == null) {
                 // TODO some error handling
 
@@ -59,12 +70,8 @@ public class MainActivity extends AppCompatActivity {
             // Assume the token was created when the request was sent
             accessToken.setRetrievedAt(response.raw().sentRequestAtMillis());
 
-            SharedPreferences.Editor prefsEditor = prefs.edit();
-            Gson gson = new Gson();
-            String tokenJson = gson.toJson(accessToken);
-
-            prefsEditor.putString(SharedPreferencesConstants.ACCESS_TOKEN, tokenJson);
-            prefsEditor.apply();
+            saveAccessToken(accessToken);
+            RedditApi.setAccessToken(accessToken);
 
             Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
         }
@@ -84,20 +91,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.initViews();
-       // this.setupViewPager(this.viewPager);
+        this.setupViewPager(this.viewPager);
 
         Gson gson = new Gson();
 
         // Load accesstoken, userinfo
-        this.prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
+        prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
 
         this.accessToken = gson.fromJson(this.prefs.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
         this.user = gson.fromJson(this.prefs.getString(SharedPreferencesConstants.USER_INFO, ""), User.class);
 
-        Log.d(TAG, "onCreate: " + this.accessToken.expiresSoon());
+        redditApi = RedditApi.getInstance(accessToken);
 
+        // If there is a user logged in retrieve updated user information
         if (this.accessToken != null) {
-           // this.getUserInfo();
+            this.getUserInfo();
+        }
+
+        if (this.accessToken.expiresSoon()) {
+            Log.d(TAG, "onCreate: access token about expire");
         }
 
         this.getFrontPagePosts();
@@ -106,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         //  Show a nice bar with 4 sections on top under title to indicate that you can swipe (could also be clickable but need to be large enough)
 
 
+        /*
         this.redditApi.getSubredditPosts("GlobalOffensive").enqueue(new Callback<RedditPostResponse>() {
             @Override
             public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
@@ -123,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, post.getTitle());
                 });
 
-                //frontPage.setPosts(posts);
+                adapter.setPosts(posts);
             }
 
             @Override
@@ -131,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 t.printStackTrace();
             }
         });
+         */
     }
 
     @Override
@@ -151,10 +165,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Saves an AccessToken object to SharedPreferences
+     *
+     * @param accessToken The token to save
+     */
+    public static void saveAccessToken(AccessToken accessToken) {
+        // TODO this is probably bad? No idea if this is guaranteed to be "alive" at all times
+        SharedPreferences.Editor prefsEditor = prefs.edit();
+        Gson gson = new Gson();
+        String tokenJson = gson.toJson(accessToken);
+
+        Log.d(TAG, "saveAccessToken: " + tokenJson);
+
+        prefsEditor.putString(SharedPreferencesConstants.ACCESS_TOKEN, tokenJson);
+        prefsEditor.apply();
+    }
+
+
+    /**
+     * Adds the different subreddit (frontpage, popular, all, and custom) fragments to the view pager
+     *
+     * @param viewPager The view pager to add the fragments to
+     */
+    private void setupViewPager(ViewPager viewPager) {
+        SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager(), 0);
+        adapter.addFragment(this.frontPage);
+        adapter.addFragment(this.popular);
+        adapter.addFragment(this.all);
+
+        viewPager.setAdapter(adapter);
+    }
+
+
+    /**
      * Initializes all UI elements
      */
     private void initViews() {
         this.activeSubredditName = findViewById(R.id.activeSubredditName);
+        this.viewPager = findViewById(R.id.container);
     }
 
     /**
@@ -162,6 +210,12 @@ public class MainActivity extends AppCompatActivity {
      * <p>Uses the stored access token to retrieve the custom front page if a user is logged in</p>
      */
     private void getFrontPagePosts() {
+        /*
+        if (this.accessToken.expiresSoon()) {
+            this.refreshToken();
+        }
+         */
+
         this.redditApi.getFrontPagePosts(this.accessToken).enqueue(new Callback<RedditPostResponse>() {
             @Override
             public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
@@ -171,10 +225,7 @@ public class MainActivity extends AppCompatActivity {
 
                 List<RedditPost> posts = response.body().getPosts();
 
-                posts.forEach(post -> {
-                    Log.d(TAG, post.getTitle());
-                });
-                //frontPage.setPosts(posts);
+                frontPage.setPosts(posts);
             }
 
             @Override
@@ -231,20 +282,18 @@ public class MainActivity extends AppCompatActivity {
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
+        /*
         if (this.accessToken.expiresSoon()) {
             this.refreshToken();
         }
+         */
 
         // Hmm this wont wait for the token to be refreshed
         this.redditApi.getUserInfo(this.accessToken).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (!response.isSuccessful()) {
-                    Log.d(TAG, "onResponse: Error!");
-
-                    if (response.code() == 401) {
-                        refreshToken();
-                    }
+                    Log.d(TAG, "onResponse: Error");
 
                     return;
                 }
@@ -258,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
 
                 activeSubredditName.setText(user.getName());
 
+                // Store the updated user information in SharedPreferences
                 Gson gson = new Gson();
                 String tokenJson = gson.toJson(user);
 
@@ -271,9 +321,5 @@ public class MainActivity extends AppCompatActivity {
                 t.printStackTrace();
             }
         });
-    }
-
-    public void refreshToken() {
-        this.redditApi.refreshToken(this.accessToken).enqueue(this.tokenResponse);
     }
 }

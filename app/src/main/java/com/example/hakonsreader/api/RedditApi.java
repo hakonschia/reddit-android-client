@@ -1,7 +1,12 @@
 package com.example.hakonsreader.api;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
+import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
@@ -9,8 +14,13 @@ import com.example.hakonsreader.api.service.RedditService;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
 
+import java.io.IOException;
+
+import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -20,6 +30,30 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Wrapper for the Reddit API
  */
 public class RedditApi {
+    /**
+     * Authenticator that automatically retrieves a new access token on 401 responses
+     */
+    public class Authenticator implements okhttp3.Authenticator {
+        @Nullable
+        @Override
+        public Request authenticate(@Nullable Route route, Response response) throws IOException {
+            // If we have a previous access token with a refresh token
+            if (accessToken.getRefreshToken() != null) {
+                AccessToken newToken = refreshToken(accessToken)
+                        .execute().body();
+
+                MainActivity.saveAccessToken(accessToken);
+
+                return response.request().newBuilder()
+                        .header("Authorization", newToken.getTokenType() + " " + newToken.getAccessToken())
+                        .build();
+            }
+
+            return null;
+        }
+    }
+
+
     private static RedditApi instance;
 
     /**
@@ -33,23 +67,26 @@ public class RedditApi {
      */
     private RedditService accessTokenService;
 
-    private RedditApi() {
-        // TODO maybe possible to add a function that checks if access token is invalid and refreshes
+    private static AccessToken accessToken;
+
+
+    private RedditApi(AccessToken accessToken) {
+        RedditApi.accessToken = accessToken;
+
+        HttpLoggingInterceptor logger = new HttpLoggingInterceptor();
+        logger.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        // TODO maybe possible to add a funtion that checks if access token is invalid and refreshes
         // Add headers to every request
-        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder().
+                addInterceptor(logger).
+                authenticator(new Authenticator()).
+                addInterceptor(chain -> {
+                    Request request = chain.request();
+                    Request.Builder newRequest = request.newBuilder().addHeader("User-Agent", NetworkConstants.USER_AGENT);
 
-        okHttpBuilder.addInterceptor(interceptor);
-
-        // TODO figure out how to actually add this header to each request automatically
-        okHttpBuilder.addInterceptor(chain -> {
-            Request request = chain.request();
-
-            Request.Builder newRequest = request.newBuilder().addHeader("User-Agent", NetworkConstants.USER_AGENT);
-
-            return chain.proceed(newRequest.build());
-        });
+                    return chain.proceed(newRequest.build());
+                });
 
         // Create the RedditService object used to make API calls
         Retrofit.Builder builder = new Retrofit.Builder()
@@ -71,13 +108,25 @@ public class RedditApi {
     }
 
     /**
+     * If given, sets the OAuth access token
+     *
+     * @param accessToken The Reddit OAuth access token
      * @return The singleton instance
      */
-    public static RedditApi getInstance() {
+    public static RedditApi getInstance(@Nullable AccessToken accessToken) {
         if (instance == null) {
-            instance = new RedditApi();
+            instance = new RedditApi(accessToken);
         }
         return instance;
+    }
+
+    /**
+     * Sets the OAuth access token to be used for API calls
+     *
+     * @param accessToken The token to use for API calls
+     */
+    public static void setAccessToken(AccessToken accessToken) {
+        RedditApi.accessToken = accessToken;
     }
 
 

@@ -73,4 +73,17 @@ public class AccessToken {
 
         return expirationTime - (currentTime + EXPIRES_SOON_TIME) <= 0;
     }
+
+
+    @Override
+    public String toString() {
+        return "AccessToken{" +
+                "accessToken='" + accessToken + '\'' +
+                ", tokenType='" + tokenType + '\'' +
+                ", expiresIn=" + expiresIn +
+                ", retrievedAt=" + retrievedAt +
+                ", scope='" + scope + '\'' +
+                ", refreshToken='" + refreshToken + '\'' +
+                '}';
+    }
 }
