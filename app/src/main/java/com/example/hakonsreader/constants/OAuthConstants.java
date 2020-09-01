@@ -3,14 +3,6 @@ package com.example.hakonsreader.constants;
 public class OAuthConstants {
 
     /**
-     * URL used for OAuth authentication with Reddit
-     * <p>URL parameters needed: client_id, response_type, state, redirect_uri, duration, scope</p>
-     *
-     * @see <a href="https://github.com/reddit-archive/reddit/wiki/OAuth2#authorization">Reddit documentation</a>
-     */
-    public static final String REDDIT_OAUTH_URL = "https://www.reddit.com/api/v1/authorize";
-
-    /**
      * Client ID for OAuth
      *
      */
@@ -25,5 +17,8 @@ public class OAuthConstants {
 
     public static final String DURATION = "permanent";
 
+    /**
+     * A space separated string containing the OAuth scopes available
+     */
     public static final String SCOPE = "identity";
 }
