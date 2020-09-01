@@ -25,7 +25,13 @@
         android:text="@string/btnLogIn" />
 
     <androidx.viewpager.widget.ViewPager
-        android:id="@+id/container"
+        android:id="@+id/fragmentContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/activeSubredditName"/>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/postsContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/activeSubredditName"/>

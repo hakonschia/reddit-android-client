@@ -1,9 +1,6 @@
 package com.example.hakonsreader;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -12,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +20,6 @@ import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.OAuthConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.PostsFragment;
-import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -36,7 +31,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private ViewPager viewPager;
+    private ViewPager fragmentContainer;
     private PostsFragment frontPage = new PostsFragment();
     private PostsFragment popular = new PostsFragment();
     private PostsFragment all = new PostsFragment();
@@ -91,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.initViews();
-        this.setupViewPager(this.viewPager);
+        this.setupViewPager(this.fragmentContainer);
 
         Gson gson = new Gson();
 
@@ -202,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initViews() {
         this.activeSubredditName = findViewById(R.id.activeSubredditName);
-        this.viewPager = findViewById(R.id.container);
+        this.fragmentContainer = findViewById(R.id.fragmentContainer);
     }
 
     /**
@@ -210,12 +205,6 @@ public class MainActivity extends AppCompatActivity {
      * <p>Uses the stored access token to retrieve the custom front page if a user is logged in</p>
      */
     private void getFrontPagePosts() {
-        /*
-        if (this.accessToken.expiresSoon()) {
-            this.refreshToken();
-        }
-         */
-
         this.redditApi.getFrontPagePosts(this.accessToken).enqueue(new Callback<RedditPostResponse>() {
             @Override
             public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
@@ -282,13 +271,6 @@ public class MainActivity extends AppCompatActivity {
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
-        /*
-        if (this.accessToken.expiresSoon()) {
-            this.refreshToken();
-        }
-         */
-
-        // Hmm this wont wait for the token to be refreshed
         this.redditApi.getUserInfo(this.accessToken).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
