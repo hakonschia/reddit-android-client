@@ -18,6 +18,13 @@ import retrofit2.http.Url;
 
 public interface RedditService {
 
+    /**
+     * Retrieves the OAuth access token
+     * @param code
+     * @param grantType
+     * @param redirectUri
+     * @return
+     */
     @POST(NetworkConstants.ACCESS_TOKEN_PATH)
     @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6", "User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)"})
     @FormUrlEncoded
@@ -27,6 +34,13 @@ public interface RedditService {
             @Field("redirect_uri") String redirectUri
     );
 
+    /**
+     * Refreshes the OAuth access token
+     *
+     * @param refreshToken The refresh token received in the initial access token retrieval
+     * @param grantType The grant type (refresh_token)
+     * @return
+     */
     @POST(NetworkConstants.ACCESS_TOKEN_PATH)
     @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6", "User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)"})
     @FormUrlEncoded
@@ -42,13 +56,15 @@ public interface RedditService {
 
     /**
      * Retrieves posts from Reddit
-     * TODO
+     * TODO paging (infinite reading)
      *
      * @param url The URL to retrieve posts from
      *            <p>The URL format for front page for not logged in user or a subreddit is: https://reddit.com/.json</p>
      *            <p>The URL for front page for logged in user is: https://oauth.reddit.com with authentication header</p>
-     * @return
+     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @return A Call object ready to retrieve posts from a subreddit
      */
     @GET
-    Call<RedditPostResponse> getPosts(@Header("Authorization") String accessToken, @Url String url);
+    @Headers("User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)")
+    Call<RedditPostResponse> getPosts(@Url String url, @Header("Authorization") String accessToken);
 }

@@ -20,7 +20,6 @@ import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.OAuthConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
-import com.example.hakonsreader.fragments.SubredditFragment;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -33,18 +32,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private TextView activeSubredditName;
-    private ViewPager viewPager;
-    private WebView oauthWebView;
 
     private SharedPreferences prefs;
     private final RedditApi redditApi = RedditApi.getInstance();
 
     private AccessToken accessToken;
     private User user;
-
-    private SubredditFragment frontPage = SubredditFragment.newInstance();
-    private SubredditFragment popular = SubredditFragment.newInstance();
-    private SubredditFragment all = SubredditFragment.newInstance();
 
     private Callback<AccessToken> tokenResponse = new Callback<AccessToken>() {
         @Override
@@ -113,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         //  Show a nice bar with 4 sections on top under title to indicate that you can swipe (could also be clickable but need to be large enough)
 
 
-        /*
         this.redditApi.getSubredditPosts("GlobalOffensive").enqueue(new Callback<RedditPostResponse>() {
             @Override
             public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
@@ -127,7 +119,11 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                frontPage.setPosts(posts);
+                posts.forEach(post -> {
+                    Log.d(TAG, post.getTitle());
+                });
+
+                //frontPage.setPosts(posts);
             }
 
             @Override
@@ -135,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 t.printStackTrace();
             }
         });
-
-         */
     }
 
     @Override
@@ -161,23 +155,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initViews() {
         this.activeSubredditName = findViewById(R.id.activeSubredditName);
-        this.viewPager = findViewById(R.id.container);
-    }
-
-    /**
-     * Adds the subreddit fragments to the view pager
-     *
-     * @param viewPager The ViewPager to add the fragments to
-     */
-    public void setupViewPager(ViewPager viewPager) {
-        SectionsStatePagerAdapter adapter = new SectionsStatePagerAdapter(getSupportFragmentManager(), 0);
-
-       // adapter.addFragment(new SubredditFragment(), "Custom sub");
-        adapter.addFragment(this.frontPage, "Front page");
-        adapter.addFragment(this.popular, "Popular");
-        adapter.addFragment(this.all, "All");
-
-        viewPager.setAdapter(adapter);
     }
 
     /**

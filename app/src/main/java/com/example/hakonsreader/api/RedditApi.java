@@ -2,8 +2,6 @@ package com.example.hakonsreader.api;
 
 import androidx.annotation.Nullable;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
@@ -43,6 +41,8 @@ public class RedditApi {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         okHttpBuilder.addInterceptor(interceptor);
+
+        // TODO figure out how to actually add this header to each request automatically
         okHttpBuilder.addInterceptor(chain -> {
             Request request = chain.request();
 
@@ -60,7 +60,7 @@ public class RedditApi {
         Retrofit retrofit = builder.build();
         this.apiService = retrofit.create(RedditService.class);
 
-        // Getting the access token requires a different URL compared to the API calls
+        // Access tokens are retrieved by a different URL than API calls
         Retrofit.Builder oauthBuilder = new Retrofit.Builder()
                 .baseUrl(NetworkConstants.REDDIT_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -120,14 +120,23 @@ public class RedditApi {
     public Call<RedditPostResponse> getFrontPagePosts(@Nullable AccessToken accessToken) {
         if (accessToken == null) {
             // Retrieve default posts
-            return this.apiService.getPosts("",NetworkConstants.REDDIT_URL + ".json");
+            return this.apiService.getPosts(NetworkConstants.REDDIT_URL + ".json", "");
         } else {
-            // Send OAuth to get custom front page posts
-            return this.apiService.getPosts("bearer " + accessToken.getAccessToken(), NetworkConstants.REDDIT_OUATH_URL + ".json");
+            // Send with OAuth access token to get custom front page posts
+            return this.apiService.getPosts(
+                    NetworkConstants.REDDIT_OUATH_URL + ".json",
+                    accessToken.getTokenType() + " " + accessToken.getAccessToken()
+            );
         }
     }
 
+    /**
+     * Retrieves posts from a given subreddit
+     *
+     * @param subreddit The subreddit to retrieve posts from (without /r/)
+     * @return A Call object ready to retrieve subreddit posts
+     */
     public Call<RedditPostResponse> getSubredditPosts(String subreddit) {
-        return this.apiService.getPosts("",NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json");
+        return this.apiService.getPosts(NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json", "");
     }
 }
