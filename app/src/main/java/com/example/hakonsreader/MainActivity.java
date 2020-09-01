@@ -1,6 +1,7 @@
 package com.example.hakonsreader;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -19,7 +20,10 @@ import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.OAuthConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
+import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.PostsFragment;
+import com.example.hakonsreader.fragments.ProfileFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -31,12 +35,13 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private ViewPager fragmentContainer;
-    private PostsFragment frontPage = new PostsFragment();
-    private PostsFragment popular = new PostsFragment();
-    private PostsFragment all = new PostsFragment();
-
     private TextView activeSubredditName;
+    private ViewPager fragmentContainer;
+    private BottomNavigationView navBar;
+
+    private PostsContainerFragment postsFragment = new PostsContainerFragment();
+    private ProfileFragment profileFragment = new ProfileFragment();
+
 
     private static SharedPreferences prefs;
     private RedditApi redditApi;
@@ -86,7 +91,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.initViews();
-        this.setupViewPager(this.fragmentContainer);
+        this.setupViewPager();
+        this.setupNavBar();
+
 
         Gson gson = new Gson();
 
@@ -100,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         // If there is a user logged in retrieve updated user information
         if (this.accessToken != null) {
-            this.getUserInfo();
+            //this.getUserInfo();
         }
 
         if (this.accessToken.expiresSoon()) {
@@ -179,18 +186,38 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Adds the different subreddit (frontpage, popular, all, and custom) fragments to the view pager
-     *
-     * @param viewPager The view pager to add the fragments to
      */
-    private void setupViewPager(ViewPager viewPager) {
+    private void setupViewPager() {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager(), 0);
-        adapter.addFragment(this.frontPage);
-        adapter.addFragment(this.popular);
-        adapter.addFragment(this.all);
 
-        viewPager.setAdapter(adapter);
+        adapter.addFragment(this.postsFragment);
+        adapter.addFragment(this.profileFragment);
+
+        this.fragmentContainer.setAdapter(adapter);
     }
 
+    private void setupNavBar() {
+        this.navBar.setOnNavigationItemSelectedListener(item -> {
+            Fragment selected = null;
+
+            switch (item.getItemId()) {
+                case R.id.nav_home:
+                    selected = this.postsFragment;
+                    break;
+
+                case R.id.nav_profile:
+                    selected = this.profileFragment;
+                    break;
+
+                default:
+                    break;
+            }
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selected).commit();
+
+            return true;
+        });
+    }
 
     /**
      * Initializes all UI elements
@@ -198,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         this.activeSubredditName = findViewById(R.id.activeSubredditName);
         this.fragmentContainer = findViewById(R.id.fragmentContainer);
+        this.navBar = findViewById(R.id.bottomNav);
     }
 
     /**
@@ -214,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
 
                 List<RedditPost> posts = response.body().getPosts();
 
-                frontPage.setPosts(posts);
+                postsFragment.setFrontPagePosts(posts);
             }
 
             @Override

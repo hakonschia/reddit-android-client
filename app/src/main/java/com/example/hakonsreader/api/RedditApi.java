@@ -1,9 +1,5 @@
 package com.example.hakonsreader.api;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
-
 import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.MainActivity;
@@ -16,7 +12,6 @@ import com.example.hakonsreader.constants.OAuthConstants;
 
 import java.io.IOException;
 
-import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
