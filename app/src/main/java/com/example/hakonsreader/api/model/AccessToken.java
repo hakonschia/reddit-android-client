@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.model;
 
+import android.util.Log;
+
 import com.google.gson.annotations.SerializedName;
 
 public class AccessToken {
@@ -67,6 +69,8 @@ public class AccessToken {
         // The expiresIn field returned from reddit is in seconds, not milliseconds
         long expirationTime = this.retrievedAt + this.expiresIn * 1000;
 
-        return expirationTime > currentTime + EXPIRES_SOON_TIME;
+        Log.d("AccessToken", "expiresSoon: " + (expirationTime - (currentTime + EXPIRES_SOON_TIME)));
+
+        return expirationTime - (currentTime + EXPIRES_SOON_TIME) <= 0;
     }
 }

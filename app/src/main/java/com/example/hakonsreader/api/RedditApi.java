@@ -111,17 +111,23 @@ public class RedditApi {
         return this.apiService.getUserInfo(String.format("%s %s", accessToken.getTokenType(), accessToken.getAccessToken()));
     }
 
+    /**
+     * Retrieves posts from the front page (reddit.com)
+     *
+     * @param accessToken If present gets posts for the logged in user
+     * @return A Call object ready to be called to retrieve posts from reddit's front page
+     */
     public Call<RedditPostResponse> getFrontPagePosts(@Nullable AccessToken accessToken) {
         if (accessToken == null) {
             // Retrieve default posts
-            return this.apiService.getPosts(NetworkConstants.REDDIT_URL + ".json");
+            return this.apiService.getPosts("",NetworkConstants.REDDIT_URL + ".json");
         } else {
             // Send OAuth to get custom front page posts
-            return this.apiService.getPosts(NetworkConstants.REDDIT_OUATH_URL + ".json");
+            return this.apiService.getPosts("bearer " + accessToken.getAccessToken(), NetworkConstants.REDDIT_OUATH_URL + ".json");
         }
     }
 
     public Call<RedditPostResponse> getSubredditPosts(String subreddit) {
-        return this.apiService.getPosts(NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json");
+        return this.apiService.getPosts("",NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json");
     }
 }

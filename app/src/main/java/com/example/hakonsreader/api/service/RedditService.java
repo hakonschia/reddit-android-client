@@ -50,5 +50,5 @@ public interface RedditService {
      * @return
      */
     @GET
-    Call<RedditPostResponse> getPosts(@Url String url);
+    Call<RedditPostResponse> getPosts(@Header("Authorization") String accessToken, @Url String url);
 }

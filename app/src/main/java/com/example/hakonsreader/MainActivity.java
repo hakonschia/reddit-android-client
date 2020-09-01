@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onFailure(Call<AccessToken> call, Throwable t) {
             t.printStackTrace();
+
+            Toast.makeText(MainActivity.this, "Network error probably", Toast.LENGTH_LONG).show();
         }
     };
 
@@ -102,10 +104,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate: " + this.accessToken.expiresSoon());
 
         if (this.accessToken != null) {
-            this.getUserInfo();
+           // this.getUserInfo();
         }
 
-        //this.getFrontPagePosts();
+        this.getFrontPagePosts();
 
         // TODO just load front page no matter what (4 fragments: custom sub - front page - popular - all)
         //  Show a nice bar with 4 sections on top under title to indicate that you can swipe (could also be clickable but need to be large enough)
@@ -186,13 +188,16 @@ public class MainActivity extends AppCompatActivity {
         this.redditApi.getFrontPagePosts(this.accessToken).enqueue(new Callback<RedditPostResponse>() {
             @Override
             public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
-                List<RedditPost> posts = response.body().getPosts();
-                if (!response.isSuccessful() || posts == null) {
-
+                if (!response.isSuccessful() || response.body() == null) {
                     return;
                 }
 
-                frontPage.setPosts(posts);
+                List<RedditPost> posts = response.body().getPosts();
+
+                posts.forEach(post -> {
+                    Log.d(TAG, post.getTitle());
+                });
+                //frontPage.setPosts(posts);
             }
 
             @Override
@@ -249,6 +254,11 @@ public class MainActivity extends AppCompatActivity {
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
+        if (this.accessToken.expiresSoon()) {
+            this.refreshToken();
+        }
+
+        // Hmm this wont wait for the token to be refreshed
         this.redditApi.getUserInfo(this.accessToken).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
