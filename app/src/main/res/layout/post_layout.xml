@@ -10,34 +10,51 @@
     android:foreground="?attr/selectableItemBackground">
 
     <TextView
+        android:id="@+id/postSubreddit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/linkColor"
+        tools:text="r/GlobalOffensive"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="15dp"/>
+
+    <TextView
         android:id="@+id/postTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
-        android:layout_marginEnd="18dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginBottom="15dp"
+        android:layout_below="@id/postSubreddit"
         android:textColor="@android:color/background_dark"
-        android:textSize="17sp"
+        android:textSize="20sp"
         tools:text="FaZe wins major /s" />
 
     <Button
-        android:id="@+id/imageView"
+        android:id="@+id/btnUpvote"
         android:layout_width="21dp"
         android:layout_height="11dp"
         android:layout_below="@id/postTitle"
         android:layout_marginStart="25dp"
-        android:background="@android:drawable/arrow_down_float"/>
+        android:background="@android:drawable/arrow_up_float"/>
 
     <Button
-        android:id="@+id/imageView2"
+        android:id="@+id/btnDownvote"
         android:layout_width="21dp"
         android:layout_height="11dp"
         android:layout_below="@id/postTitle"
-        android:layout_alignStart="@id/imageView"
+        android:layout_alignStart="@id/btnUpvote"
         android:layout_marginStart="25dp"
         android:background="@android:drawable/arrow_down_float"/>
 
+    <TextView
+        android:id="@+id/postComments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/btnDownvote"
+        android:layout_alignBottom="@id/btnDownvote"
+        android:layout_marginStart="15dp"
+        tools:text="123 comments" />
 
 
 

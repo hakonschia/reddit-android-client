@@ -5,18 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/postTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="35sp"
+        android:layout_centerHorizontal="true" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/posts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/postTitle"
         tools:listitem="@layout/post_layout" />
-
-    <Button
-        android:id="@+id/btnFragmentTest"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/posts" />
 
 </RelativeLayout>

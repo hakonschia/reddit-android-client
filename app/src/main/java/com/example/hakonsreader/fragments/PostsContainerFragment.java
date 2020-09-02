@@ -24,12 +24,9 @@ import java.util.List;
  */
 public class PostsContainerFragment extends Fragment {
 
-    private List<Fragment> fragments;
-    private PostsFragment frontPage = new PostsFragment();
-    private PostsFragment popular = new PostsFragment();
-    private PostsFragment all = new PostsFragment();
-
-    private ViewPager viewPager;
+    private PostsFragment frontPage = new PostsFragment("Front page");
+    private PostsFragment popular = new PostsFragment("Popular");
+    private PostsFragment all = new PostsFragment("All");
 
     public void setFrontPagePosts(List<RedditPost> posts) {
         this.frontPage.setPosts(posts);
@@ -54,7 +51,7 @@ public class PostsContainerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_container, container, false);
 
-        viewPager = view.findViewById(R.id.postsContainer);
+        ViewPager viewPager = view.findViewById(R.id.postsContainer);
         setupViewPager(viewPager);
 
         return view;

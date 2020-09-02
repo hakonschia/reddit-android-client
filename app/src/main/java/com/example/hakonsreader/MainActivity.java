@@ -21,7 +21,6 @@ import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.OAuthConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
-import com.example.hakonsreader.fragments.PostsFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
@@ -35,7 +34,6 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private TextView activeSubredditName;
     private ViewPager fragmentContainer;
     private BottomNavigationView navBar;
 
@@ -192,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
 
         adapter.addFragment(this.postsFragment);
         adapter.addFragment(this.profileFragment);
+        Log.d(TAG, "setupViewPager: " + this.postsFragment.getId());
 
         this.fragmentContainer.setAdapter(adapter);
     }
@@ -205,12 +204,15 @@ public class MainActivity extends AppCompatActivity {
                     selected = this.postsFragment;
                     break;
 
+                case R.id.nav_subreddit:
+                    break;
+
                 case R.id.nav_profile:
                     selected = this.profileFragment;
                     break;
 
                 default:
-                    break;
+                    return false;
             }
 
             getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selected).commit();
@@ -223,7 +225,6 @@ public class MainActivity extends AppCompatActivity {
      * Initializes all UI elements
      */
     private void initViews() {
-        this.activeSubredditName = findViewById(R.id.activeSubredditName);
         this.fragmentContainer = findViewById(R.id.fragmentContainer);
         this.navBar = findViewById(R.id.bottomNav);
     }
@@ -314,8 +315,6 @@ public class MainActivity extends AppCompatActivity {
 
                     return;
                 }
-
-                activeSubredditName.setText(user.getName());
 
                 // Store the updated user information in SharedPreferences
                 Gson gson = new Gson();

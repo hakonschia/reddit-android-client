@@ -7,7 +7,12 @@
         android:title="Home" />
 
     <item
+        android:id="@+id/nav_subreddit"
+        android:icon="@drawable/ic_baseline_wrap_text_24"
+        android:title="Subreddit" />
+
+    <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_baseline_person_24"
-        android:title="Profile"/>
+        android:title="Profile" />
 </menu>

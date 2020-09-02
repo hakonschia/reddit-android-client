@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api;
 
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.MainActivity;
@@ -29,11 +31,15 @@ public class RedditApi {
      * Authenticator that automatically retrieves a new access token on 401 responses
      */
     public class Authenticator implements okhttp3.Authenticator {
+        private static final String TAG = "Authenticator";
+        
         @Nullable
         @Override
         public Request authenticate(@Nullable Route route, Response response) throws IOException {
+            Log.d(TAG, "authenticate: Retrieving new access token");
+            
             // If we have a previous access token with a refresh token
-            if (accessToken.getRefreshToken() != null) {
+            if (accessToken != null && accessToken.getRefreshToken() != null) {
                 AccessToken newToken = refreshToken(accessToken)
                         .execute().body();
 
@@ -71,16 +77,17 @@ public class RedditApi {
         HttpLoggingInterceptor logger = new HttpLoggingInterceptor();
         logger.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        // TODO maybe possible to add a funtion that checks if access token is invalid and refreshes
         // Add headers to every request
-        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder().
-                addInterceptor(logger).
-                authenticator(new Authenticator()).
-                addInterceptor(chain -> {
-                    Request request = chain.request();
-                    Request.Builder newRequest = request.newBuilder().addHeader("User-Agent", NetworkConstants.USER_AGENT);
+        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
+                .authenticator(new Authenticator()) // Automatically refresh access token on authentication errors (401)
+                .addInterceptor(logger)
+                .addInterceptor(chain -> {
+                    Request request = chain.request()
+                            .newBuilder()
+                            .addHeader("User-Agent", NetworkConstants.USER_AGENT)
+                            .build();
 
-                    return chain.proceed(newRequest.build());
+                    return chain.proceed(request);
                 });
 
         // Create the RedditService object used to make API calls

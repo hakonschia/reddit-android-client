@@ -8,15 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/activeSubredditName"
-
-        android:layout_marginTop="16dp"
-        android:text="Front page"
-        android:layout_centerHorizontal="true" />
-
     <Button
         android:id="@+id/btnLogIn"
         android:layout_width="wrap_content"
@@ -28,8 +19,7 @@
         android:id="@+id/fragmentContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/bottomNav"
-        android:layout_below="@id/activeSubredditName"/>
+        android:layout_above="@id/bottomNav"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
