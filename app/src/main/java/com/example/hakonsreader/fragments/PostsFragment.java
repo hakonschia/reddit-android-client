@@ -1,6 +1,7 @@
 package com.example.hakonsreader.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,9 @@ import java.util.List;
  * Fragment containing a list of posts
  */
 public class PostsFragment extends Fragment {
-
+    private static final String TAG = "PostsFragment";
+    
+    
     private List<RedditPost> posts;
     private PostsAdapter adapter;
 
@@ -30,6 +33,12 @@ public class PostsFragment extends Fragment {
     private TextView title;
     private String titleText;
 
+    
+    // Paging variables (where to load posts from etc)
+    private int before;
+    private int after;
+    
+    
     public PostsFragment(String titleText) {
         this.titleText = titleText;
     }
@@ -45,10 +54,15 @@ public class PostsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_posts, container, false);
 
         this.postsList = view.findViewById(R.id.posts);
+        this.title = view.findViewById(R.id.subredditName);
+
+        this.title.setText(this.titleText);
 
         this.adapter = new PostsAdapter();
         this.postsList.setAdapter(this.adapter);
         this.postsList.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        Log.d(TAG, "onCreateView: Creating posts fragment view");
 
         return view;
     }

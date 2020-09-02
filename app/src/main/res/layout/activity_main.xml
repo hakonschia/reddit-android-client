@@ -8,12 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btnLogIn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="btnLogInOnClick"
-        android:text="@string/btnLogIn" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/fragmentContainer"

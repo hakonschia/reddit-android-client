@@ -14,6 +14,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.SectionsPageAdapter;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
 
@@ -21,11 +22,16 @@ import java.util.List;
  * Fragment that contains the subreddit fragments
  */
 public class PostsContainerFragment extends Fragment {
+    private static final String TAG = "PostsContainerFragment";
 
     private PostsFragment frontPage = new PostsFragment("Front page");
     private PostsFragment popular = new PostsFragment("Popular");
     private PostsFragment all = new PostsFragment("All");
 
+    public PostsContainerFragment() {
+        Log.d(TAG, "PostsContainerFragment: Creating PostsContainerFragment");
+    }
+    
     public void setFrontPagePosts(List<RedditPost> posts) {
         this.frontPage.setPosts(posts);
     }
@@ -50,10 +56,13 @@ public class PostsContainerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_container, container, false);
+        View view = inflater.inflate(R.layout.fragment_posts_container, container, false);
 
         ViewPager viewPager = view.findViewById(R.id.postsContainer);
         setupViewPager(viewPager);
+
+
+        Log.d(TAG, "PostsContainerFragment: Creating view PostsContainerFragment");
 
         return view;
     }

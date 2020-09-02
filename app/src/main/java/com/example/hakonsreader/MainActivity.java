@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hakonsreader.api.RedditApi;
@@ -21,6 +20,7 @@ import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.OAuthConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
+import com.example.hakonsreader.fragments.PostsFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
@@ -108,11 +108,7 @@ public class MainActivity extends AppCompatActivity {
             //this.getUserInfo();
         }
 
-        if (this.accessToken.expiresSoon()) {
-            Log.d(TAG, "onCreate: access token about expire");
-        }
-
-        this.getFrontPagePosts();
+        //this.getFrontPagePosts();
 
         // TODO just load front page no matter what (4 fragments: custom sub - front page - popular - all)
         //  Show a nice bar with 4 sections on top under title to indicate that you can swipe (could also be clickable but need to be large enough)
@@ -191,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(this.postsFragment);
         // adapter.addFragment(custom subreddit)
         adapter.addFragment(this.profileFragment);
-        Log.d(TAG, "setupViewPager: " + this.postsFragment.getId());
 
         this.fragmentContainer.setAdapter(adapter);
 
@@ -205,14 +200,14 @@ public class MainActivity extends AppCompatActivity {
 
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    selected = this.postsFragment;
+                    selected = new PostsContainerFragment();
                     break;
 
                 case R.id.nav_subreddit:
                     break;
 
                 case R.id.nav_profile:
-                    selected = this.profileFragment;
+                    selected = new ProfileFragment();
                     break;
 
                 default:
@@ -255,49 +250,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    /**
-     * Opens a web page to log a user in with OAuth
-     */
-    private void requestOAuth() {
-        // TODO generate random state, make sure it is the same when we get a result in onResume
-        String url = String.format(
-                "%s?client_id=%s&response_type=%s&state=%s&redirect_uri=%s&scope=%s&duration=%s",
-                "https://www.reddit.com/api/v1/authorize/",
-                OAuthConstants.CLIENT_ID,
-                OAuthConstants.RESPONSE_TYPE,
-                "randomString", // state
-                OAuthConstants.CALLBACK_URL,
-                OAuthConstants.SCOPE,
-                OAuthConstants.DURATION
-        );
-
-        /*
-        this.oauthWebView.loadUrl(url);
-
-        this.oauthWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                Log.d(TAG, "onPageFinished: View finished: " + url);
-
-                super.onPageFinished(view, url);
-            }
-        });
-*/
-        // Maybe WebView is better so it doesnt open a million web pages?
-        Intent oauthIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        startActivity(oauthIntent);
-    }
-
-    /* ---------------- Event listeners ---------------- */
-    /**
-     * Opens the Reddit OAuth window to log in to Reddit
-     *
-     * @param view
-     */
-    public void btnLogInOnClick(View view) {
-        this.requestOAuth();
     }
 
     /**
