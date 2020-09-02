@@ -14,9 +14,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/linkColor"
-        tools:text="r/GlobalOffensive"
         android:layout_marginTop="5dp"
-        android:layout_marginStart="15dp"/>
+        android:layout_marginStart="15dp"
+
+        tools:text="r/GlobalOffensive" />
 
     <TextView
         android:id="@+id/postTitle"
@@ -32,20 +33,20 @@
 
     <Button
         android:id="@+id/btnUpvote"
-        android:layout_width="21dp"
-        android:layout_height="11dp"
+        android:layout_width="@dimen/upvote_downvote_button_size"
+        android:layout_height="@dimen/upvote_downvote_button_size"
         android:layout_below="@id/postTitle"
         android:layout_marginStart="25dp"
-        android:background="@android:drawable/arrow_up_float"/>
+        android:background="@drawable/ic_baseline_arrow_upward_24"/>
 
     <Button
         android:id="@+id/btnDownvote"
-        android:layout_width="21dp"
-        android:layout_height="11dp"
+        android:layout_width="@dimen/upvote_downvote_button_size"
+        android:layout_height="@dimen/upvote_downvote_button_size"
         android:layout_below="@id/postTitle"
         android:layout_alignStart="@id/btnUpvote"
         android:layout_marginStart="25dp"
-        android:background="@android:drawable/arrow_down_float"/>
+        android:background="@drawable/ic_baseline_arrow_downward_24"/>
 
     <TextView
         android:id="@+id/postComments"
