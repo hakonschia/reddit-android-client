@@ -189,10 +189,14 @@ public class MainActivity extends AppCompatActivity {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager(), 0);
 
         adapter.addFragment(this.postsFragment);
+        // adapter.addFragment(custom subreddit)
         adapter.addFragment(this.profileFragment);
         Log.d(TAG, "setupViewPager: " + this.postsFragment.getId());
 
         this.fragmentContainer.setAdapter(adapter);
+
+        // Make sure all fragments are alive at all times
+        this.fragmentContainer.setOffscreenPageLimit(3);
     }
 
     private void setupNavBar() {
