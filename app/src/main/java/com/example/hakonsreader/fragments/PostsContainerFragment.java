@@ -23,19 +23,31 @@ import java.util.List;
 public class PostsContainerFragment extends Fragment {
     private static final String TAG = "PostsContainerFragment";
 
-    private SubredditFragment frontPage = new SubredditFragment("Front page");
-    private SubredditFragment popular = new SubredditFragment("Popular");
-    private SubredditFragment all = new SubredditFragment("All");
+    private SubredditFragment frontPage;
+    private SubredditFragment popular;
+    private SubredditFragment all;
 
-    private SubredditFragment[] fragments = {frontPage, popular, all};
+    private Bundle data;
+    private SubredditFragment[] fragments;
 
 
     public PostsContainerFragment() {
         Log.d(TAG, "PostsContainerFragment: Creating PostsContainerFragment");
     }
-    
-    public void setFrontPagePosts(List<RedditPost> posts) {
-        this.frontPage.setPosts(posts);
+
+    /**
+     * Creates and initializes the fragments needed. Sets the fragments array
+     */
+    private void setupFragments() {
+        this.frontPage = new SubredditFragment("");
+        this.popular = new SubredditFragment("Popular");
+        this.all = new SubredditFragment("All");
+
+        this.fragments = new SubredditFragment[]{this.frontPage, this.popular, this.all};
+
+        for (SubredditFragment fragment : this.fragments) {
+            fragment.setArguments(this.data);
+        }
     }
 
     /**
@@ -55,6 +67,7 @@ public class PostsContainerFragment extends Fragment {
         // Always keep all fragments alive
         viewPager.setOffscreenPageLimit(3);
 
+        // Listen to changes to let the fragments know they have been selected
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -73,13 +86,20 @@ public class PostsContainerFragment extends Fragment {
         });
     }
 
+    @Override
+    public void setArguments(@Nullable Bundle args) {
+        this.data = args;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_posts_container, container, false);
 
+        this.setupFragments();
+
         ViewPager viewPager = view.findViewById(R.id.postsContainer);
-        setupViewPager(viewPager);
+        this.setupViewPager(viewPager);
 
         return view;
     }

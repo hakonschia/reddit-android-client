@@ -27,6 +27,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Wrapper for the Reddit API
  */
 public class RedditApi {
+    private static final String TAG = "RedditApi";
+    
     /**
      * Authenticator that automatically retrieves a new access token on 401 responses
      */
@@ -40,7 +42,7 @@ public class RedditApi {
             
             // If we have a previous access token with a refresh token
             if (accessToken != null && accessToken.getRefreshToken() != null) {
-                AccessToken newToken = refreshToken(accessToken)
+                AccessToken newToken = refreshToken()
                         .execute().body();
 
                 MainActivity.saveAccessToken(accessToken);
@@ -145,30 +147,44 @@ public class RedditApi {
     /**
      * Gets a call object to refresh the access token from Reddit
      *
-     * @param accessToken The access token object containing the refresh token
      * @return A Call object ready to be called to refresh the access token
      */
-    public Call<AccessToken> refreshToken(AccessToken accessToken) {
+    public Call<AccessToken> refreshToken() {
         return this.accessTokenService.refreshToken(accessToken.getRefreshToken(), "refresh_token");
     }
 
     /**
      * Retrieves information about the user logged in
      *
-     * @param accessToken The AccessToken object holding the OAuth access token
      * @return A Call object ready to be called to retrieve user information
      */
-    public Call<User> getUserInfo(AccessToken accessToken) {
+    public Call<User> getUserInfo() {
         return this.apiService.getUserInfo(String.format("%s %s", accessToken.getTokenType(), accessToken.getAccessToken()));
+    }
+
+
+    /**
+     * Retrieves posts from a given subreddit
+     *
+     * @param subreddit The subreddit to retrieve posts from. For front page use an empty string
+     * @return A Call object ready to retrieve subreddit posts
+     */
+    public Call<RedditPostResponse> getSubredditPosts(String subreddit) {
+        if (subreddit.isEmpty()) { // Load front page posts
+            Log.d(TAG, "getSubredditPosts: Getting front page posts");
+            return this.getFrontPagePosts();
+        }
+
+        Log.d(TAG, "getSubredditPosts: Getting posts from " + subreddit);
+        return this.apiService.getPosts(NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json", "");
     }
 
     /**
      * Retrieves posts from the front page (reddit.com)
      *
-     * @param accessToken If present gets posts for the logged in user
      * @return A Call object ready to be called to retrieve posts from reddit's front page
      */
-    public Call<RedditPostResponse> getFrontPagePosts(@Nullable AccessToken accessToken) {
+    private Call<RedditPostResponse> getFrontPagePosts() {
         if (accessToken == null) {
             // Retrieve default posts
             return this.apiService.getPosts(NetworkConstants.REDDIT_URL + ".json", "");
@@ -179,15 +195,5 @@ public class RedditApi {
                     accessToken.getTokenType() + " " + accessToken.getAccessToken()
             );
         }
-    }
-
-    /**
-     * Retrieves posts from a given subreddit
-     *
-     * @param subreddit The subreddit to retrieve posts from (without /r/)
-     * @return A Call object ready to retrieve subreddit posts
-     */
-    public Call<RedditPostResponse> getSubredditPosts(String subreddit) {
-        return this.apiService.getPosts(NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json", "");
     }
 }

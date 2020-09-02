@@ -24,6 +24,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
+    public List<RedditPost> getPosts() {
+        return posts;
+    }
 
     @NonNull
     @Override

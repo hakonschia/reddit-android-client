@@ -81,32 +81,24 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Load access token, user info etc.
+        this.loadPrefs();
+
         this.initViews();
         this.setupNavBar();
         this.setupFragments();
 
-        Gson gson = new Gson();
-
-        // Load accesstoken, userinfo
-        prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
-
-        this.accessToken = gson.fromJson(this.prefs.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
-        this.user = gson.fromJson(this.prefs.getString(SharedPreferencesConstants.USER_INFO, ""), User.class);
-
-        redditApi = RedditApi.getInstance(accessToken);
+        this.redditApi = RedditApi.getInstance(accessToken);
 
         // If there is a user logged in retrieve updated user information
         if (this.accessToken != null) {
-            //this.getUserInfo();
+            this.getUserInfo();
         }
-
-        //this.getFrontPagePosts();
 
         // TODO just load front page no matter what (4 fragments: custom sub - front page - popular - all)
         //  Show a nice bar with 4 sections on top under title to indicate that you can swipe (could also be clickable but need to be large enough)
@@ -159,6 +151,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Loads access token and user information to member variables
+     */
+    private void loadPrefs() {
+        prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
+
+        Gson gson = new Gson();
+
+        this.accessToken = gson.fromJson(prefs.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
+        this.user = gson.fromJson(prefs.getString(SharedPreferencesConstants.USER_INFO, ""), User.class);
+    }
+
+    /**
      * Saves an AccessToken object to SharedPreferences
      *
      * @param accessToken The token to save
@@ -169,15 +173,24 @@ public class MainActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String tokenJson = gson.toJson(accessToken);
 
-        Log.d(TAG, "saveAccessToken: " + tokenJson);
-
         prefsEditor.putString(SharedPreferencesConstants.ACCESS_TOKEN, tokenJson);
         prefsEditor.apply();
     }
 
+    /**
+     * Creates new fragments and passes along needed information such as the access token
+     */
     private void setupFragments() {
         this.postsFragment = new PostsContainerFragment();
         this.profileFragment = new ProfileFragment();
+
+        Gson gson = new Gson();
+        Bundle data = new Bundle();
+
+        data.putString(SharedPreferencesConstants.ACCESS_TOKEN, gson.toJson(this.accessToken));
+        data.putString(SharedPreferencesConstants.USER_INFO, gson.toJson(this.user));
+        this.postsFragment.setArguments(data);
+        this.profileFragment.setArguments(data);
 
         this.fragmentList = new ArrayList<>();
         this.fragmentList.add(this.postsFragment);
@@ -244,34 +257,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Retrieves posts from reddit.com/
-     * <p>Uses the stored access token to retrieve the custom front page if a user is logged in</p>
-     */
-    private void getFrontPagePosts() {
-        this.redditApi.getFrontPagePosts(this.accessToken).enqueue(new Callback<RedditPostResponse>() {
-            @Override
-            public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    return;
-                }
-
-                List<RedditPost> posts = response.body().getPosts();
-
-                postsFragment.setFrontPagePosts(posts);
-            }
-
-            @Override
-            public void onFailure(Call<RedditPostResponse> call, Throwable t) {
-
-            }
-        });
-    }
-
-    /**
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
-        this.redditApi.getUserInfo(this.accessToken).enqueue(new Callback<User>() {
+        this.redditApi.getUserInfo().enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (!response.isSuccessful()) {

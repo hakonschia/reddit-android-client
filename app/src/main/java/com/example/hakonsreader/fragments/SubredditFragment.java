@@ -14,19 +14,29 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.RedditPostResponse;
+import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
+import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Fragment containing a subreddit
  */
 public class SubredditFragment extends Fragment {
     private static final String TAG = "PostsFragment";
-    
-    
-    private List<RedditPost> posts;
+
+    private RedditApi redditApi;
+
     private PostsAdapter adapter;
 
     private RecyclerView postsList;
@@ -37,40 +47,85 @@ public class SubredditFragment extends Fragment {
     // Paging variables (where to load posts from etc)
     private int before = 0;
     private int after = 0;
-    
-    
+
+    /**
+     * Indicates that posts wants to be loaded, but the API object is not ready yet
+     * <p>When the API is set, posts are automatically loaded</p>
+     */
+    private boolean wantsToLoad = false;
+
+
+    /**
+     * Creates a new subreddit fragment
+     *
+     * @param subreddit The name of the subreddit. For front page use an empty string
+     */
     public SubredditFragment(String subreddit) {
         this.subreddit = subreddit;
-        Log.d(TAG, "PostsFragment: creating PostFragment " + subreddit);
     }
 
-    public void setPosts(List<RedditPost> posts) {
-        this.posts = posts;
-        this.adapter.setPosts(this.posts);
-    }
 
     /**
      * Called when the fragment has been selected.
      * <p>If this is the first time the fragment is selected, posts are loaded</p>
      */
     public void onFragmentSelected() {
-        Log.d(TAG, "onFragmentSelected: " + this.subreddit + " selected");
         // TODO If no posts are loaded, load from start. Otherwise do nothing really I guess
-        this.loadPosts();
+
+        // Starting from scratch
+        if (this.adapter.getPosts().isEmpty()) {
+            this.loadPosts();
+        }
     }
 
     private void loadPosts() {
+        if (this.redditApi == null) {
+            this.wantsToLoad = true;
+
+            return;
+        }
+        Log.d(TAG, "loadPosts: " + this.redditApi);
+
+        this.redditApi.getSubredditPosts(this.subreddit).enqueue(new Callback<RedditPostResponse>() {
+            @Override
+            public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    return;
+                }
+
+                List<RedditPost> posts = response.body().getPosts();
+
+                adapter.setPosts(posts);
+            }
+
+            @Override
+            public void onFailure(Call<RedditPostResponse> call, Throwable t) {
+
+            }
+        });
         // Load more posts :-d
 
         // Set posts on adapter etc etc
     }
 
-
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void setArguments(@Nullable Bundle args) {
+        Log.d(TAG, "setArguments: xdxdxdxd");
+        if (args == null) {
+            return;
+        }
+        Log.d(TAG, "setArguments: xdxdxdxd2313123123");
 
-        Log.d(TAG, "onCreate: creating PostsFragment");
+        Gson gson = new Gson();
+        AccessToken accessToken = gson.fromJson(args.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
+
+        this.redditApi = RedditApi.getInstance(accessToken);
+
+        if (this.wantsToLoad) {
+            this.loadPosts();
+
+            this.wantsToLoad = false;
+        }
     }
 
     @Nullable
@@ -81,13 +136,11 @@ public class SubredditFragment extends Fragment {
         this.postsList = view.findViewById(R.id.posts);
         this.title = view.findViewById(R.id.subredditName);
 
-        this.title.setText(this.subreddit);
+        this.title.setText((this.subreddit.isEmpty() ? "Front page" : this.subreddit));
 
         this.adapter = new PostsAdapter();
         this.postsList.setAdapter(this.adapter);
         this.postsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        Log.d(TAG, "onCreateView: Creating posts fragment view");
 
         return view;
     }
