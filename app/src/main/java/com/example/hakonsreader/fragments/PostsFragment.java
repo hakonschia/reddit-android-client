@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,8 +18,10 @@ import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 
 import java.util.List;
 
+/**
+ * Fragment containing a list of posts
+ */
 public class PostsFragment extends Fragment {
-
 
     private List<RedditPost> posts;
     private PostsAdapter adapter;
