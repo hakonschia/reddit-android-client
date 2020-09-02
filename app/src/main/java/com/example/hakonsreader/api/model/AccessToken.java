@@ -1,14 +1,12 @@
 package com.example.hakonsreader.api.model;
 
-import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Class representing an OAuth access token from Reddit
+ */
 public class AccessToken {
-    /**
-     * The amount of milliseconds that signifies if the token is almost expired
-     */
-    private static final int EXPIRES_SOON_TIME = 5000;
 
 
     @SerializedName("access_token")
@@ -57,22 +55,6 @@ public class AccessToken {
         return refreshToken;
     }
 
-
-    /**
-     * Checks if the access token has less than 5 seconds remaining
-     *
-     * @return True if the access token is about to expire
-     */
-    public boolean expiresSoon() {
-        long currentTime = System.currentTimeMillis();
-
-        // The expiresIn field returned from reddit is in seconds, not milliseconds
-        long expirationTime = this.retrievedAt + this.expiresIn * 1000;
-
-        Log.d("AccessToken", "expiresSoon: " + (expirationTime - (currentTime + EXPIRES_SOON_TIME)));
-
-        return expirationTime - (currentTime + EXPIRES_SOON_TIME) <= 0;
-    }
 
 
     @Override

@@ -11,10 +11,14 @@ import java.util.List;
 public class RedditPostResponse {
     private Data data;
 
-    private class Data {
+    // The JSON structure has a "data" object with the posts in an array called "children"
+    private static class Data {
         private List<RedditPost> children;
     }
 
+    /**
+     * @return The posts retrieved from an API request
+     */
     public List<RedditPost> getPosts() {
         return data.children;
     }

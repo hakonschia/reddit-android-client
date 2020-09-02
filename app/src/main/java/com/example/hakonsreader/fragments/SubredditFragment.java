@@ -22,7 +22,6 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -122,6 +121,7 @@ public class SubredditFragment extends Fragment {
 
         this.redditApi = RedditApi.getInstance(accessToken);
 
+        // Load posts now that we have a valid API object
         if (this.wantsToLoad) {
             this.loadPosts();
 

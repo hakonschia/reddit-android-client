@@ -5,8 +5,6 @@ import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.NetworkConstants;
 
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -20,10 +18,11 @@ public interface RedditService {
 
     /**
      * Retrieves the OAuth access token
-     * @param code
-     * @param grantType
-     * @param redirectUri
-     * @return
+     *
+     * @param code The authorization token retrieved from the initial login process
+     * @param grantType The string "access_token"
+     * @param redirectUri The callback URL for the OAuth application
+     * @return A Call object to be used to retrieve an access token
      */
     @POST(NetworkConstants.ACCESS_TOKEN_PATH)
     @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6"})
@@ -39,7 +38,7 @@ public interface RedditService {
      *
      * @param refreshToken The refresh token received in the initial access token retrieval
      * @param grantType The grant type (refresh_token)
-     * @return
+     * @return A Call object to be used to refresh the access token
      */
     @POST(NetworkConstants.ACCESS_TOKEN_PATH)
     @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6"})

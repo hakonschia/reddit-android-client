@@ -1,5 +1,8 @@
 package com.example.hakonsreader.constants;
 
+/**
+ * Various networking  constants such as header information, URLs, and API access points
+ */
 public class NetworkConstants {
 
     /**

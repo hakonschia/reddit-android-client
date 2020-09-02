@@ -2,6 +2,9 @@ package com.example.hakonsreader.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Class representing a Reddit post
+ */
 public class RedditPost {
 
     // The JSON structure of a post has an internal object called "data"

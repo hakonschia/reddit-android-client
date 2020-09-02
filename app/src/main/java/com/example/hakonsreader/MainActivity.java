@@ -32,18 +32,30 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
+    private static SharedPreferences prefs;
+
+    // The fragments in the home menu (accessible from the nav bar)
     private List<Fragment> fragmentList;
 
+    // The fragments found in fragmentList
     private PostsContainerFragment postsFragment;
     private ProfileFragment profileFragment;
 
-    private static SharedPreferences prefs;
+    // Interface towards the Reddit API
     private RedditApi redditApi;
 
+
+    // The OAuth access token
     private AccessToken accessToken;
+
+    // User object for the currently logged in user
     private User user;
+
+    // The random string generated for OAuth authentication
     private String oauthState;
 
+
+    // Response handler for access token response
     private Callback<AccessToken> tokenResponse = new Callback<AccessToken>() {
         @Override
         public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
@@ -78,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Network error probably", Toast.LENGTH_LONG).show();
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -279,6 +292,9 @@ public class MainActivity extends AppCompatActivity {
      * @param accessToken The token to save
      */
     public static void saveAccessToken(AccessToken accessToken) {
+        // TODO make a workaround so this doesn't have to be static
+        //this.accessToken = accessToken;
+
         // TODO this is probably bad? No idea if this is guaranteed to be "alive" at all times
         SharedPreferences.Editor prefsEditor = prefs.edit();
         Gson gson = new Gson();

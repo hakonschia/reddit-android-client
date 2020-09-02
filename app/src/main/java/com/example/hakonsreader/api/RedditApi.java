@@ -112,7 +112,7 @@ public class RedditApi {
     }
 
     /**
-     * If given, sets the OAuth access token
+     * Retrieves the RedditApi instance and if given sets the OAuth access token
      *
      * @param accessToken The Reddit OAuth access token
      * @return The singleton instance

@@ -8,6 +8,9 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter for fragment states
+ */
 public class SectionsPageAdapter extends FragmentPagerAdapter {
 
     List<Fragment> fragments = new ArrayList<>();

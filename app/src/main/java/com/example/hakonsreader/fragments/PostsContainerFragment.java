@@ -1,7 +1,6 @@
 package com.example.hakonsreader.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.SectionsPageAdapter;
-import com.example.hakonsreader.api.model.RedditPost;
 
-import java.util.List;
 
 /**
  * Fragment that contains the subreddit fragments
@@ -31,10 +27,6 @@ public class PostsContainerFragment extends Fragment {
     private Bundle data;
     private SubredditFragment[] fragments;
 
-
-    public PostsContainerFragment() {
-        Log.d(TAG, "PostsContainerFragment: Creating PostsContainerFragment");
-    }
 
     /**
      * Creates and initializes the fragments needed. Sets the fragments array

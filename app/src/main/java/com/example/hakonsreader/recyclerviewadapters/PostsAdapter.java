@@ -15,6 +15,10 @@ import com.example.hakonsreader.api.model.RedditPost;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Adapter for recycler view of Reddit posts
+ */
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     private List<RedditPost> posts = new ArrayList<>();

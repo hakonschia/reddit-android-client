@@ -88,8 +88,6 @@ public class ProfileFragment extends Fragment {
     /* ---------------- Event listeners ---------------- */
     /**
      * Opens the Reddit OAuth window to log in to Reddit
-     *
-     * @param view
      */
     public void btnLogInOnClick(View view) {
         this.requestOAuth();

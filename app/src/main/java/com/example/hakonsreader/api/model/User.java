@@ -3,7 +3,7 @@ package com.example.hakonsreader.api.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Class representing a reddit user
+ * Class representing a Reddit user
  */
 public class User {
     private String name;
@@ -20,15 +20,23 @@ public class User {
     @SerializedName("icon_img")
     private String profilePictureUrl;
 
-
+    /**
+     * @return The username of the user
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return The amount of comment karma the user has
+     */
     public int getCommentKarma() {
         return commentKarma;
     }
 
+    /**
+     * @return The amount of post karma the user has
+     */
     public int getPostKarma() {
         return postKarma;
     }
