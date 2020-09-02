@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AccessToken accessToken;
     private User user;
+    private String oauthState;
 
     private Callback<AccessToken> tokenResponse = new Callback<AccessToken>() {
         @Override
@@ -159,21 +160,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Saves an AccessToken object to SharedPreferences
-     *
-     * @param accessToken The token to save
-     */
-    public static void saveAccessToken(AccessToken accessToken) {
-        // TODO this is probably bad? No idea if this is guaranteed to be "alive" at all times
-        SharedPreferences.Editor prefsEditor = prefs.edit();
-        Gson gson = new Gson();
-        String tokenJson = gson.toJson(accessToken);
-
-        prefsEditor.putString(SharedPreferencesConstants.ACCESS_TOKEN, tokenJson);
-        prefsEditor.apply();
-    }
-
-    /**
      * Creates new fragments and passes along needed information such as the access token
      */
     private void setupFragments() {
@@ -284,5 +270,21 @@ public class MainActivity extends AppCompatActivity {
                 t.printStackTrace();
             }
         });
+    }
+
+
+    /**
+     * Saves an AccessToken object to SharedPreferences
+     *
+     * @param accessToken The token to save
+     */
+    public static void saveAccessToken(AccessToken accessToken) {
+        // TODO this is probably bad? No idea if this is guaranteed to be "alive" at all times
+        SharedPreferences.Editor prefsEditor = prefs.edit();
+        Gson gson = new Gson();
+        String tokenJson = gson.toJson(accessToken);
+
+        prefsEditor.putString(SharedPreferencesConstants.ACCESS_TOKEN, tokenJson);
+        prefsEditor.apply();
     }
 }
