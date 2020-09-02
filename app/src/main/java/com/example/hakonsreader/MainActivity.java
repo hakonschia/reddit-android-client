@@ -2,6 +2,7 @@ package com.example.hakonsreader;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.hakonsreader.api.RedditApi;
@@ -25,6 +27,8 @@ import com.example.hakonsreader.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -34,11 +38,12 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private ViewPager fragmentContainer;
     private BottomNavigationView navBar;
 
-    private PostsContainerFragment postsFragment = new PostsContainerFragment();
-    private ProfileFragment profileFragment = new ProfileFragment();
+    private List<Fragment> fragmentList;
+
+    private PostsContainerFragment postsFragment;
+    private ProfileFragment profileFragment;
 
 
     private static SharedPreferences prefs;
@@ -89,9 +94,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.initViews();
-        this.setupViewPager();
         this.setupNavBar();
-
+        this.setupFragments();
 
         Gson gson = new Gson();
 
@@ -177,21 +181,27 @@ public class MainActivity extends AppCompatActivity {
         prefsEditor.apply();
     }
 
+    private void setupFragments() {
+        this.postsFragment = new PostsContainerFragment();
+        this.profileFragment = new ProfileFragment();
 
-    /**
-     * Adds the different subreddit (frontpage, popular, all, and custom) fragments to the view pager
-     */
-    private void setupViewPager() {
-        SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager(), 0);
+        this.fragmentList = new ArrayList<>();
+        this.fragmentList.add(this.postsFragment);
+        this.fragmentList.add(this.profileFragment);
 
-        adapter.addFragment(this.postsFragment);
-        // adapter.addFragment(custom subreddit)
-        adapter.addFragment(this.profileFragment);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-        this.fragmentContainer.setAdapter(adapter);
+        // Add all fragments
+        transaction.add(R.id.fragmentContainer, this.postsFragment);
+        //transaction.add(R.id.fragmentContainer, this.subredditFragment);
+        transaction.add(R.id.fragmentContainer, this.profileFragment);
 
-        // Make sure all fragments are alive at all times
-        this.fragmentContainer.setOffscreenPageLimit(3);
+        // Hide all but the front page
+        //transaction.hide(this.subredditFragment);
+        transaction.hide(this.profileFragment);
+
+        // Commit all changes
+        transaction.commit();
     }
 
     private void setupNavBar() {
@@ -200,21 +210,33 @@ public class MainActivity extends AppCompatActivity {
 
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    selected = new PostsContainerFragment();
+                    selected = this.postsFragment;
                     break;
 
                 case R.id.nav_subreddit:
                     break;
 
                 case R.id.nav_profile:
-                    selected = new ProfileFragment();
+                    selected = this.profileFragment;
                     break;
 
                 default:
                     return false;
             }
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, selected).commit();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            // Loop through the list of fragments and show the selected, hide all others
+            for (int i = 0; i < this.fragmentList.size(); i++) {
+                Fragment current = this.fragmentList.get(i);
+                if (current == selected) {
+                    transaction.show(current);
+                } else {
+                    transaction.hide(current);
+                }
+            }
+
+            transaction.commit();
 
             return true;
         });
@@ -224,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
      * Initializes all UI elements
      */
     private void initViews() {
-        this.fragmentContainer = findViewById(R.id.fragmentContainer);
         this.navBar = findViewById(R.id.bottomNav);
     }
 

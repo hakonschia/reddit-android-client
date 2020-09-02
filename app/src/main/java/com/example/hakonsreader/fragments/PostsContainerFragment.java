@@ -14,7 +14,6 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.SectionsPageAdapter;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
 
@@ -43,7 +42,8 @@ public class PostsContainerFragment extends Fragment {
      */
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getActivity().getSupportFragmentManager(), 0);
-        adapter.addFragment(this.frontPage);
+
+        adapter.addFragment(new PostsFragment("Front Page"));
         adapter.addFragment(this.popular);
         adapter.addFragment(this.all);
 
@@ -60,9 +60,6 @@ public class PostsContainerFragment extends Fragment {
 
         ViewPager viewPager = view.findViewById(R.id.postsContainer);
         setupViewPager(viewPager);
-
-
-        Log.d(TAG, "PostsContainerFragment: Creating view PostsContainerFragment");
 
         return view;
     }

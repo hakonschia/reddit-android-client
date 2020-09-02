@@ -41,11 +41,19 @@ public class PostsFragment extends Fragment {
     
     public PostsFragment(String titleText) {
         this.titleText = titleText;
+        Log.d(TAG, "PostsFragment: creating PostFragment " + titleText);
     }
 
     public void setPosts(List<RedditPost> posts) {
         this.posts = posts;
         this.adapter.setPosts(this.posts);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "onCreate: creating PostsFragment");
     }
 
     @Nullable
