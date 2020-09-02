@@ -32,13 +32,10 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private BottomNavigationView navBar;
-
     private List<Fragment> fragmentList;
 
     private PostsContainerFragment postsFragment;
     private ProfileFragment profileFragment;
-
 
     private static SharedPreferences prefs;
     private RedditApi redditApi;
@@ -89,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
         // Load access token, user info etc.
         this.loadPrefs();
 
-        this.initViews();
         this.setupNavBar();
         this.setupFragments();
 
@@ -211,8 +207,12 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
+    /**
+     * Sets up the navbar to be able to switch between the fragments
+     */
     private void setupNavBar() {
-        this.navBar.setOnNavigationItemSelectedListener(item -> {
+        BottomNavigationView navBar = findViewById(R.id.bottomNav);
+        navBar.setOnNavigationItemSelectedListener(item -> {
             Fragment selected = null;
 
             switch (item.getItemId()) {
@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case R.id.nav_subreddit:
+                    // TODO this
                     break;
 
                 case R.id.nav_profile:
@@ -247,13 +248,6 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
         });
-    }
-
-    /**
-     * Initializes all UI elements
-     */
-    private void initViews() {
-        this.navBar = findViewById(R.id.bottomNav);
     }
 
     /**
