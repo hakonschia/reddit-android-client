@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,24 +16,40 @@ import androidx.fragment.app.Fragment;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.OAuthConstants;
+import com.example.hakonsreader.constants.SharedPreferencesConstants;
+import com.google.gson.Gson;
 
 /**
  * Fragment for the user profile
  */
 public class ProfileFragment extends Fragment {
     private User user;
-    private Button btnLogIn;
+
+    private TextView username;
+    private Button logInBtn;
+
+    @Override
+    public void setArguments(@Nullable Bundle args) {
+        this.user = new Gson().fromJson(args.getString(SharedPreferencesConstants.USER_INFO), User.class);
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // TODO if logged in show this, if not show different layout with like "log in" or something
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        if (this.user == null) {
 
-        this.btnLogIn = view.findViewById(R.id.btnLogIn);
-        this.btnLogIn.setOnClickListener(this::btnLogInOnClick);
+            return null;
+            // Show a "log in" screen
+        } else {
+            View view = inflater.inflate(R.layout.fragment_profile, container, false);
+            this.username = view.findViewById(R.id.profileName);
+            this.logInBtn = view.findViewById(R.id.btnLogIn);
 
-        return view;
+            this.username.setText(user.getName());
+            this.logInBtn.setOnClickListener(this::btnLogInOnClick);
+
+            return view;
+        }
     }
 
     /**

@@ -102,7 +102,7 @@ public class PostsContainerFragment extends Fragment {
         ViewPager viewPager = view.findViewById(R.id.postsContainer);
         this.setupViewPager(viewPager);
 
-        this.frontPage.onFragmentSelected();
+       // this.frontPage.onFragmentSelected();
 
         return view;
     }
