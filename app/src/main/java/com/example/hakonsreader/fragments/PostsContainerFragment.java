@@ -23,9 +23,12 @@ import java.util.List;
 public class PostsContainerFragment extends Fragment {
     private static final String TAG = "PostsContainerFragment";
 
-    private PostsFragment frontPage = new PostsFragment("Front page");
-    private PostsFragment popular = new PostsFragment("Popular");
-    private PostsFragment all = new PostsFragment("All");
+    private SubredditFragment frontPage = new SubredditFragment("Front page");
+    private SubredditFragment popular = new SubredditFragment("Popular");
+    private SubredditFragment all = new SubredditFragment("All");
+
+    private SubredditFragment[] fragments = {frontPage, popular, all};
+
 
     public PostsContainerFragment() {
         Log.d(TAG, "PostsContainerFragment: Creating PostsContainerFragment");
@@ -43,14 +46,31 @@ public class PostsContainerFragment extends Fragment {
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getActivity().getSupportFragmentManager(), 0);
 
-        adapter.addFragment(new PostsFragment("Front Page"));
-        adapter.addFragment(this.popular);
-        adapter.addFragment(this.all);
+        for (Fragment fragment : this.fragments) {
+            adapter.addFragment(fragment);
+        }
 
         viewPager.setAdapter(adapter);
 
         // Always keep all fragments alive
         viewPager.setOffscreenPageLimit(3);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                fragments[position].onFragmentSelected();
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                // Not implemented
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                // Not implemented
+            }
+        });
     }
 
     @Nullable
