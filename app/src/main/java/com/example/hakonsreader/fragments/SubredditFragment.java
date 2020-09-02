@@ -62,6 +62,7 @@ public class SubredditFragment extends Fragment {
      */
     public SubredditFragment(String subreddit) {
         this.subreddit = subreddit;
+        this.adapter = new PostsAdapter();
     }
 
 
@@ -138,7 +139,6 @@ public class SubredditFragment extends Fragment {
 
         this.title.setText((this.subreddit.isEmpty() ? "Front page" : this.subreddit));
 
-        this.adapter = new PostsAdapter();
         this.postsList.setAdapter(this.adapter);
         this.postsList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
