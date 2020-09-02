@@ -30,4 +30,15 @@ public class OAuthConstants {
      * A space separated string containing the OAuth scopes available
      */
     public static final String SCOPE = "identity read";
+
+
+    /**
+     * The grant_type used to authorize users (in the initial login process)
+     */
+    public static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
+
+    /**
+     * The grant_type used to refresh access tokens
+     */
+    public static final String GRANT_TYPE_REFRESH = "refresh_token";
 }

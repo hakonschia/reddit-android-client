@@ -8,6 +8,7 @@ import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.service.RedditOauthService;
 import com.example.hakonsreader.api.service.RedditService;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
@@ -68,7 +69,7 @@ public class RedditApi {
      * The service object used to communicate only with the part of the Reddit API
      * that deals with OAuth access tokens
      */
-    private RedditService accessTokenService;
+    private RedditOauthService redditOauthService;
 
     private static AccessToken accessToken;
 
@@ -108,7 +109,7 @@ public class RedditApi {
                 .client(okHttpBuilder.build());
 
         Retrofit oauthRetrofit = oauthBuilder.build();
-        this.accessTokenService = oauthRetrofit.create(RedditService.class);
+        this.redditOauthService = oauthRetrofit.create(RedditOauthService.class);
     }
 
     /**
@@ -141,7 +142,11 @@ public class RedditApi {
      * @return A Call object ready to be called to retrieve an access token
      */
     public Call<AccessToken> getAccessToken(String code) {
-        return this.accessTokenService.getAccessToken(code, "authorization_code", OAuthConstants.CALLBACK_URL);
+        return this.redditOauthService.getAccessToken(
+                code,
+                OAuthConstants.GRANT_TYPE_AUTHORIZATION,
+                OAuthConstants.CALLBACK_URL
+        );
     }
 
     /**
@@ -150,7 +155,10 @@ public class RedditApi {
      * @return A Call object ready to be called to refresh the access token
      */
     public Call<AccessToken> refreshToken() {
-        return this.accessTokenService.refreshToken(accessToken.getRefreshToken(), "refresh_token");
+        return this.redditOauthService.refreshToken(
+                accessToken.getRefreshToken(),
+                OAuthConstants.GRANT_TYPE_REFRESH
+        );
     }
 
     /**
