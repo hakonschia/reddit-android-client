@@ -28,7 +28,10 @@
                     android:scheme="hakonreader" />
             </intent-filter>
         </activity>
-        <activity android:name=".activites.SubredditActivity"/>
+        <activity
+            android:name=".activites.SubredditActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
+
     </application>
 
 </manifest>

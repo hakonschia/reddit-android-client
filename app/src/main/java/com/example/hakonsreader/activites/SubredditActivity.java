@@ -7,13 +7,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.fragments.SubredditFragment;
+import com.r0adkll.slidr.Slidr;
 
 /**
  * Activity for a subreddit (used when a subreddit is clicked from a post)
  */
 public class SubredditActivity extends AppCompatActivity {
-
-    SubredditFragment fragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -23,12 +22,14 @@ public class SubredditActivity extends AppCompatActivity {
         Bundle data = getIntent().getExtras();
         String subreddit = data.getString("subreddit");
 
-        this.fragment = new SubredditFragment(subreddit);
-        this.fragment.setArguments(data);
+        SubredditFragment fragment = new SubredditFragment(subreddit);
+        fragment.setArguments(data);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.subredditActivityFragment, this.fragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.subredditActivityFragment, fragment).commit();
 
         // The fragment needs to be manually called the first time (when no swipe has happened)
-        this.fragment.onFragmentSelected();
+        fragment.onFragmentSelected();
+
+        Slidr.attach(this);
     }
 }
