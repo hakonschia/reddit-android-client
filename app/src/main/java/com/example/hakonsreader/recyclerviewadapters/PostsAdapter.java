@@ -1,11 +1,10 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -152,8 +151,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private TextView title;
         private TextView score;
         private TextView comments;
-        private Button upvote;
-        private Button downvote;
+        private ImageView upvote;
+        private ImageView downvote;
 
         private Resources resources;
 

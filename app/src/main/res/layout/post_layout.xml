@@ -7,8 +7,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 
-    android:paddingBottom="20dp"
+    android:layout_marginBottom="10dp"
 
+    android:background="@drawable/layout_rounded_corner_post"
     android:foreground="?attr/selectableItemBackground">
 
     <TextView
@@ -49,21 +50,21 @@
 
         tools:text="FaZe wins major /s" />
 
-    <Button
+    <ImageView
         android:id="@+id/btnUpvote"
-        android:layout_width="@dimen/upvote_downvote_button_size"
-        android:layout_height="@dimen/upvote_downvote_button_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/postTitle"
-        android:layout_marginStart="25dp"
+        android:layout_marginStart="17dp"
         android:background="@drawable/ic_baseline_arrow_upward_24"/>
 
-    <Button
+    <ImageView
         android:id="@+id/btnDownvote"
-        android:layout_width="@dimen/upvote_downvote_button_size"
-        android:layout_height="@dimen/upvote_downvote_button_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/postTitle"
         android:layout_toEndOf="@id/btnUpvote"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="2dp"
         android:background="@drawable/ic_baseline_arrow_downward_24"/>
 
     <TextView
@@ -72,25 +73,34 @@
         android:layout_height="wrap_content"
 
         android:layout_toEndOf="@id/btnDownvote"
-        android:layout_alignBaseline="@id/btnDownvote"
-
+        android:layout_alignTop="@+id/btnDownvote"
+        android:layout_alignBottom="@id/btnDownvote"
         android:textColor="@color/textColor"
 
         tools:text="1523"/>
+
+
+    <ImageView
+        android:id="@+id/postCommentImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/btnUpvote"
+        android:layout_toEndOf="@id/postScore"
+        android:layout_marginStart="35dp"
+
+        android:src="@drawable/ic_baseline_message_24" />
 
     <TextView
         android:id="@+id/postComments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_toEndOf="@id/postScore"
-        android:layout_alignBottom="@id/postScore"
+        android:layout_toEndOf="@id/postCommentImg"
+        android:layout_alignTop="@+id/postCommentImg"
+        android:layout_alignBottom="@id/postCommentImg"
 
-        android:layout_marginStart="15dp"
         android:textColor="@color/textColor"
 
         tools:text="123 comments" />
 
-
-
-</RelativeLayout>
+ </RelativeLayout>

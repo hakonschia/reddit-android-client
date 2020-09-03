@@ -11,7 +11,7 @@
         android:id="@+id/profileTopLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/layout_rounded_corner_layout"
+        android:background="@drawable/layout_rounded_corner_profile"
         android:layout_marginTop="150dp"
         android:layout_marginBottom="-15dp" />
 
