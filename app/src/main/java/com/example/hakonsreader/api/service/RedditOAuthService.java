@@ -45,4 +45,21 @@ public interface RedditOAuthService {
             @Field("refresh_token") String refreshToken,
             @Field("grant_type") String grantType
     );
+
+    /**
+     * Revokes a token. Can be used for both access and refresh tokens. Revoking a refresh
+     * token will also invalidate any access tokens.
+     *
+     * @param token The token to revoke
+     * @param tokenType The token type, either "refresh_token" or "access_token"
+     * @return A void Call. This API call only returns a status code to indicate if the request
+     * was successful or not
+     */
+    @POST(NetworkConstants.REVOKE_TOKEN_PATH)
+    @Headers({"Authorization: " + OAuthConstants.BASIC_AUTH})
+    @FormUrlEncoded
+    Call<Void> revokeToken(
+            @Field("token") String token,
+            @Field("token_type_hint") String tokenType
+    );
 }

@@ -18,6 +18,9 @@ public class OAuthConstants {
      */
     public static final String BASIC_AUTH = "Basic VVozN3E5VVMwSDJFb1E6";
 
+    public static final String TOKEN_TYPE_ACCESS = "access_token";
+
+    public static final String TOKEN_TYPE_REFRESH = "refresh_token";
 
     /**
      * The callback URL used for OAuth authorization

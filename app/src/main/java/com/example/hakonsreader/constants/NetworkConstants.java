@@ -43,6 +43,12 @@ public class NetworkConstants {
     public static final String ACCESS_TOKEN_PATH = "v1/access_token";
 
     /**
+     * The API path used to revoke access/refresh tokens
+     */
+    public static final String REVOKE_TOKEN_PATH = "v1/revoke_token";
+
+
+    /**
      * The API path used to retrieve user information
      */
     public static final String USER_INFO_PATH = "v1/me";
@@ -51,4 +57,5 @@ public class NetworkConstants {
      * The API path used to vote on things (posts, comments)
      */
     public static final String VOTE_PATH = "vote";
+
 }

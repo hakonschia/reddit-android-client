@@ -162,6 +162,21 @@ public class RedditApi {
     }
 
     /**
+     * Revokes the refresh token. This will also invalidate the corresponding access token,
+     * effectively logging the user out as the client can no longer make calls on behalf of the user
+     *
+     * @return A void Call. The response code says if the operation was successful or not.
+     */
+    public Call<Void> revokeRefreshToken() {
+        return this.redditOauthService.revokeToken(
+                accessToken.getRefreshToken(),
+                OAuthConstants.TOKEN_TYPE_REFRESH
+        );
+    }
+
+
+
+    /**
      * Retrieves information about the user logged in
      *
      * @return A Call object ready to be called to retrieve user information
