@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api.model;
 
-import android.util.Log;
-
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -115,6 +113,10 @@ public class RedditPost {
 
     public String getUrl() {
         return this.data.url;
+    }
+
+    public String getVideoUrl() {
+        return this.data.media.redditVideo.url;
     }
 
     /**

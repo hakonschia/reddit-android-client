@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -121,8 +122,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.downvote.setOnClickListener(v -> this.downvote(post));
 
         this.addPostContent(post, holder);
-
-        // TODO onclicklisteners (check how I did it in hytte app)
     }
 
     private void addPostContent(RedditPost post, ViewHolder holder) {
@@ -132,18 +131,28 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         switch (postHint) {
             case "image":
-                view = new ImageView(holder.itemView.getContext());
-
-                // Scale so the image fits the width of the screen
-                Picasso.get().load(post.getUrl()).resize(MainActivity.SCREEN_WIDTH, 0).into((ImageView) view);
+                // TODO .gif is apparently an image ;p
+                // TODO when clicked open the image so you can ZOOOOOM
+                view = this.loadImage(post, holder);
                 break;
 
             case "hosted:video":
+                VideoView videoView = new VideoView(holder.itemView.getContext());
+                videoView.setVideoPath(post.getVideoUrl());
 
+                videoView.start();
+                view = videoView;
                 break;
 
             case "link":
+                String url = post.getUrl();
 
+                // Check if link ends in an image and then load the image instead of a direct link
+                if (url.endsWith(".png") || url.endsWith(".jpg")) { // etc.. Find a better way to do this
+                    view = this.loadImage(post, holder);
+                } else {
+                    // Do something else for link posts
+                }
                 break;
 
             // Text post
@@ -160,6 +169,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         if (view != null) {
             holder.content.addView(view);
         }
+    }
+
+    private ImageView loadImage(RedditPost post, ViewHolder holder) {
+        ImageView image = new ImageView(holder.itemView.getContext());
+
+        Picasso.get()
+                .load(post.getUrl())
+                .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
+                // Scale so the image fits the width of the screen
+                .resize(MainActivity.SCREEN_WIDTH, 0)
+                .into(image);
+
+        return image;
     }
 
     @Override
