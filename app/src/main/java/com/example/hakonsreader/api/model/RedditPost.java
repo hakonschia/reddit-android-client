@@ -18,6 +18,13 @@ public class RedditPost {
         private String id;
         private int score;
         private boolean spoiler;
+        private String url;
+
+        @SerializedName("over_18")
+        private boolean nsfw;
+
+        @SerializedName("created")
+        private float createdAt;
 
         @SerializedName("is_video")
         private boolean isVideo;
