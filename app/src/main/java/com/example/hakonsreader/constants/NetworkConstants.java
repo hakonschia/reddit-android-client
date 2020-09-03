@@ -34,9 +34,16 @@ public class NetworkConstants {
      */
     public static final String REDDIT_OUATH_API_URL = REDDIT_OUATH_URL + "api/";
 
+
+
+    /* --------------------- API paths --------------------- */
     /**
      * The API path used to retrieve an access token
      */
     public static final String ACCESS_TOKEN_PATH = "v1/access_token";
 
+    /**
+     * The API path used to retrieve user information
+     */
+    public static final String USER_INFO_PATH = "v1/me";
 }

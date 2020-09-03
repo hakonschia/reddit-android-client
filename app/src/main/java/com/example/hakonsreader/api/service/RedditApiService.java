@@ -1,17 +1,12 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.NetworkConstants;
 
 import retrofit2.Call;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
-import retrofit2.http.Headers;
-import retrofit2.http.POST;
 import retrofit2.http.Url;
 
 /**
@@ -20,7 +15,7 @@ import retrofit2.http.Url;
 public interface RedditApiService {
 
 
-    @GET("v1/me")
+    @GET(NetworkConstants.USER_INFO_PATH)
    // @Headers("User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)")
     Call<User> getUserInfo(@Header("Authorization") String token);
 
