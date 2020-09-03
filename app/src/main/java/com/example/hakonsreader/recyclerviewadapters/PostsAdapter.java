@@ -1,6 +1,8 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -129,7 +131,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         switch (postType) {
             case Image:
                 // TODO when clicked open the image so you can ZOOOOOM
-                view = this.loadImage(post, holder);
+                ImageView imageView = new ImageView(holder.itemView.getContext());
+
+                Picasso.get()
+                        .load(post.getUrl())
+                        .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
+                        // Scale so the image fits the width of the screen
+                        .resize(MainActivity.SCREEN_WIDTH, 0)
+                        .into(imageView);
+
+                view = imageView;
                 break;
 
             case Video:
@@ -142,9 +153,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             case Link:
                 String url = post.getUrl();
+
+                TextView textView = new TextView(holder.itemView.getContext());
+                textView.setText(url);
+                // TODO fix this to add a theme
+                textView.setTextColor(holder.resources.getColor(R.color.linkColor));
+                textView.setOnClickListener(v -> {
+                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    holder.itemView.getContext().startActivity(i);
+                });
+
+                view = textView;
                 break;
 
             case Text:
+                // Do nothing special for text posts
                 break;
         }
 
@@ -157,19 +180,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         if (view != null) {
             holder.content.addView(view);
         }
-    }
-
-    private ImageView loadImage(RedditPost post, ViewHolder holder) {
-        ImageView image = new ImageView(holder.itemView.getContext());
-
-        Picasso.get()
-                .load(post.getUrl())
-                .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
-                // Scale so the image fits the width of the screen
-                .resize(MainActivity.SCREEN_WIDTH, 0)
-                .into(image);
-
-        return image;
     }
 
     @Override
