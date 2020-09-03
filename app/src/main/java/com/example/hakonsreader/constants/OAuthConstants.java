@@ -12,6 +12,14 @@ public class OAuthConstants {
     public static final String CLIENT_ID = "UZ37q9US0H2EoQ";
 
     /**
+     * The header value for basic authentication.
+     * <p>The value is generated as: base64(clientId + ":"), but can't be generated at runtime</p>
+     * <p>This is used when retrieving OAuth access tokens</p>
+     */
+    public static final String BASIC_AUTH = "Basic VVozN3E5VVMwSDJFb1E6";
+
+
+    /**
      * The callback URL used for OAuth authorization
      */
     public static final String CALLBACK_URL = "hakonreader://callback";

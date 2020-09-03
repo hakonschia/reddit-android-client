@@ -2,6 +2,7 @@ package com.example.hakonsreader.api.service;
 
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.constants.OAuthConstants;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -22,7 +23,7 @@ public interface RedditOAuthService {
      * @return A Call object to be used to retrieve an access token
      */
     @POST(NetworkConstants.ACCESS_TOKEN_PATH)
-    @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6"})
+    @Headers({"Authorization: " + OAuthConstants.BASIC_AUTH})
     @FormUrlEncoded
     Call<AccessToken> getAccessToken(
             @Field("code") String code,
@@ -38,7 +39,7 @@ public interface RedditOAuthService {
      * @return A Call object to be used to refresh the access token
      */
     @POST(NetworkConstants.ACCESS_TOKEN_PATH)
-    @Headers({"Authorization: Basic VVozN3E5VVMwSDJFb1E6"})
+    @Headers({"Authorization: " + OAuthConstants.BASIC_AUTH})
     @FormUrlEncoded
     Call<AccessToken> refreshToken(
             @Field("refresh_token") String refreshToken,
