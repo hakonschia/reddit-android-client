@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             accessToken.setRetrievedAt(response.raw().sentRequestAtMillis());
 
             saveAccessToken(accessToken);
-            RedditApi.setAccessToken(accessToken);
+            redditApi.setAccessToken(accessToken);
 
             getUserInfo();
 
@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         this.setupNavBar();
         this.setupFragments();
 
-        this.redditApi = RedditApi.getInstance(accessToken);
+        this.redditApi = new RedditApi(this.accessToken);
 
         // If there is a user logged in retrieve updated user information
         if (this.accessToken != null) {

@@ -58,8 +58,6 @@ public class RedditApi {
     }
 
 
-    private static RedditApi instance;
-
     /**
      * The service object used to communicate with the Reddit API
      */
@@ -71,11 +69,11 @@ public class RedditApi {
      */
     private RedditOAuthService redditOauthService;
 
-    private static AccessToken accessToken;
+    private AccessToken accessToken;
 
 
-    private RedditApi(AccessToken accessToken) {
-        RedditApi.accessToken = accessToken;
+    public RedditApi(AccessToken accessToken) {
+        this.accessToken = accessToken;
 
         HttpLoggingInterceptor logger = new HttpLoggingInterceptor();
         logger.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -113,25 +111,12 @@ public class RedditApi {
     }
 
     /**
-     * Retrieves the RedditApi instance and if given sets the OAuth access token
-     *
-     * @param accessToken The Reddit OAuth access token
-     * @return The singleton instance
-     */
-    public static RedditApi getInstance(@Nullable AccessToken accessToken) {
-        if (instance == null) {
-            instance = new RedditApi(accessToken);
-        }
-        return instance;
-    }
-
-    /**
      * Sets the OAuth access token to be used for API calls
      *
      * @param accessToken The token to use for API calls
      */
-    public static void setAccessToken(AccessToken accessToken) {
-        RedditApi.accessToken = accessToken;
+    public void setAccessToken(AccessToken accessToken) {
+        this.accessToken = accessToken;
     }
 
 
