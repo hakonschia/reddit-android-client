@@ -45,6 +45,13 @@ public class User {
     }
 
     /**
+     * @return The URL pointing to the profile picture image
+     */
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    /**
      * @return The Unix timestamp the account was created at (in UTC)
      */
     public long getCreatedAt() {

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -49,6 +51,7 @@ public class ProfileFragment extends Fragment {
         TextView age = view.findViewById(R.id.profileAge);
         TextView commentKarma = view.findViewById(R.id.profileCommentKarma);
         TextView postKarma = view.findViewById(R.id.profilePostKarma);
+        ImageView picture = view.findViewById(R.id.profilePicture);
 
         if (this.user != null) {
             // Format date as "5. September 2012"
@@ -63,6 +66,9 @@ public class ProfileFragment extends Fragment {
             age.setText(ageText);
             commentKarma.setText(commentKarmaText);
             postKarma.setText(postKarmaText);
+
+            // Load the users profile picture
+            Picasso.get().load(this.user.getProfilePictureUrl()).into(picture);
         }
 
         return view;
