@@ -50,11 +50,30 @@
 
         tools:text="FaZe wins major /s" />
 
+    <FrameLayout
+        android:id="@+id/postContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@id/postTitle" >
+
+        <ImageView
+            android:id="@+id/postContentImg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:srcCompat="@tools:sample/avatars" />
+
+    </FrameLayout>
+
+
     <ImageView
         android:id="@+id/btnUpvote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/postTitle"
+        android:layout_below="@id/postContent"
         android:layout_marginStart="17dp"
         android:background="@drawable/ic_baseline_arrow_upward_24"/>
 
@@ -62,8 +81,11 @@
         android:id="@+id/btnDownvote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/postTitle"
+        android:layout_below="@id/postContent"
+
         android:layout_toEndOf="@id/btnUpvote"
+        android:layout_alignBottom="@id/btnUpvote"
+
         android:layout_marginStart="2dp"
         android:background="@drawable/ic_baseline_arrow_downward_24"/>
 
