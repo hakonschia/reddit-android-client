@@ -7,6 +7,7 @@ import com.example.hakonsreader.constants.NetworkConstants;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Query;
 import retrofit2.http.Url;
 
 /**
@@ -31,5 +32,9 @@ public interface RedditApiService {
      */
     @GET
   //  @Headers("User-Agent: android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)")
-    Call<RedditPostResponse> getPosts(@Url String url, @Header("Authorization") String accessToken);
+    Call<RedditPostResponse> getPosts(@Url String url,
+                                      @Query("after") String after,
+                                      @Query("count") int count,
+                                      @Header("Authorization") String accessToken
+    );
 }

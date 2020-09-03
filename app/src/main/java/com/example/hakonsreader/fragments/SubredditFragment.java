@@ -42,11 +42,6 @@ public class SubredditFragment extends Fragment {
     private TextView title;
     private String subreddit;
 
-    
-    // Paging variables (where to load posts from etc)
-    private int before = 0;
-    private int after = 0;
-
     /**
      * Indicates that posts wants to be loaded, but the API object is not ready yet
      * <p>When the API is set, posts are automatically loaded</p>
@@ -84,9 +79,18 @@ public class SubredditFragment extends Fragment {
 
             return;
         }
-        Log.d(TAG, "loadPosts: " + this.redditApi);
 
-        this.redditApi.getSubredditPosts(this.subreddit).enqueue(new Callback<RedditPostResponse>() {
+        // Get the ID of the last post in the list (t3_ signifies to reddit it's posts)
+        String after = "";
+
+        List<RedditPost> previousPosts = this.adapter.getPosts();
+        if (previousPosts.size() > 0) {
+            after = "t3_" + this.adapter.getPosts().get(this.adapter.getItemCount() - 1).getId();
+        }
+
+        int count = this.adapter.getItemCount();
+
+        this.redditApi.getSubredditPosts(this.subreddit, after, count).enqueue(new Callback<RedditPostResponse>() {
             @Override
             public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
                 if (!response.isSuccessful() || response.body() == null) {

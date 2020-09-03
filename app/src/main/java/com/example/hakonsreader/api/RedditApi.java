@@ -175,31 +175,44 @@ public class RedditApi {
      * Retrieves posts from a given subreddit
      *
      * @param subreddit The subreddit to retrieve posts from. For front page use an empty string
+     * @param after The ID of the last post seen (or an empty string if first time loading)
+     * @param count The amount of posts already retrieved
      * @return A Call object ready to retrieve subreddit posts
      */
-    public Call<RedditPostResponse> getSubredditPosts(String subreddit) {
+    public Call<RedditPostResponse> getSubredditPosts(String subreddit, String after, int count) {
         if (subreddit.isEmpty()) { // Load front page posts
-            Log.d(TAG, "getSubredditPosts: Getting front page posts");
-            return this.getFrontPagePosts();
+            return this.getFrontPagePosts(after, count);
         }
 
-        Log.d(TAG, "getSubredditPosts: Getting posts from " + subreddit);
-        return this.apiService.getPosts(NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json", "");
+        String url = NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json";
+
+        // Access token is not required for subreddits as posts aren't personalized (TODO i think at least)
+        return this.apiService.getPosts(url, after, count, "");
     }
 
     /**
      * Retrieves posts from the front page (reddit.com)
      *
+     * @param after The ID of the last post retrieved (where to now get new posts from)
+     * @param count The total amount of already retrieved posts
+     *
      * @return A Call object ready to be called to retrieve posts from reddit's front page
      */
-    private Call<RedditPostResponse> getFrontPagePosts() {
+    private Call<RedditPostResponse> getFrontPagePosts(String after, int count) {
         if (accessToken == null) {
             // Retrieve default posts
-            return this.apiService.getPosts(NetworkConstants.REDDIT_URL + ".json", "");
+            return this.apiService.getPosts(
+                    NetworkConstants.REDDIT_URL + ".json",
+                    after,
+                    count,
+                    ""
+            );
         } else {
             // Send with OAuth access token to get custom front page posts
             return this.apiService.getPosts(
                     NetworkConstants.REDDIT_OUATH_URL + ".json",
+                    after,
+                    count,
                     accessToken.getTokenType() + " " + accessToken.getAccessToken()
             );
         }
