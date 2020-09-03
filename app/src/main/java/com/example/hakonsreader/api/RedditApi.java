@@ -8,8 +8,8 @@ import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
-import com.example.hakonsreader.api.service.RedditOauthService;
-import com.example.hakonsreader.api.service.RedditService;
+import com.example.hakonsreader.api.service.RedditOAuthService;
+import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
 
@@ -63,13 +63,13 @@ public class RedditApi {
     /**
      * The service object used to communicate with the Reddit API
      */
-    private RedditService apiService;
+    private RedditApiService apiService;
 
     /**
      * The service object used to communicate only with the part of the Reddit API
      * that deals with OAuth access tokens
      */
-    private RedditOauthService redditOauthService;
+    private RedditOAuthService redditOauthService;
 
     private static AccessToken accessToken;
 
@@ -100,7 +100,7 @@ public class RedditApi {
                 .client(okHttpBuilder.build());
 
         Retrofit retrofit = builder.build();
-        this.apiService = retrofit.create(RedditService.class);
+        this.apiService = retrofit.create(RedditApiService.class);
 
         // Access tokens are retrieved by a different URL than API calls
         Retrofit.Builder oauthBuilder = new Retrofit.Builder()
@@ -109,7 +109,7 @@ public class RedditApi {
                 .client(okHttpBuilder.build());
 
         Retrofit oauthRetrofit = oauthBuilder.build();
-        this.redditOauthService = oauthRetrofit.create(RedditOauthService.class);
+        this.redditOauthService = oauthRetrofit.create(RedditOAuthService.class);
     }
 
     /**

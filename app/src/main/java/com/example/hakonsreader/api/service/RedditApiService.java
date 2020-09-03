@@ -17,7 +17,7 @@ import retrofit2.http.Url;
 /**
  * Service towards the Reddit API
  */
-public interface RedditService {
+public interface RedditApiService {
 
 
     @GET("v1/me")
