@@ -35,12 +35,16 @@ public class RedditPost {
         // The URL of the post. For images it links to the picture, for link posts it's the link
         private String url;
 
+        // The full link to the comments
+        private String permalink;
+
 
         // Show spoiler tag?
         private boolean spoiler;
 
         // Is the post locked?
         private boolean locked;
+
 
         // Is the post NSFW?
         @SerializedName("over_18")
@@ -64,6 +68,7 @@ public class RedditPost {
 
         @SerializedName("likes")
         private boolean liked;
+
 
 
         private Media media;
@@ -136,6 +141,9 @@ public class RedditPost {
         return this.data.liked;
     }
 
+    /**
+     * @return The type of post (image, video, text, or link)
+     */
     public PostType getPostType() {
         if (data.isVideo) {
             return PostType.Video;
@@ -175,5 +183,14 @@ public class RedditPost {
         }
     }
 
+    /**
+     * Retrieve the link to the comments of a post (full link)
+     *
+     * @return The permalink to the post
+     */
+    public String getPermalink() {
+        // The link given from the Reddit API starts at "/r/..."
+        return "https://reddit.com" + data.permalink;
+    }
 
 }

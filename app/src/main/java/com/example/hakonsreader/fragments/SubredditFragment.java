@@ -1,5 +1,8 @@
 package com.example.hakonsreader.fragments;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -108,6 +112,20 @@ public class SubredditFragment extends Fragment {
         this.lastLoadAttemptCount = 0;
 
         this.adapter.setOnSubredditClickListener(this::openSubredditInActivity);
+        this.adapter.setOnLongClickListener(this::onPostLongClickListener);
+    }
+
+    /**
+     * For long clicks on a reddit post, copy the post URL
+     *
+     * @param post The post clicked on
+     */
+    private void onPostLongClickListener(RedditPost post) {
+        ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("reddit post", post.getPermalink());
+        clipboard.setPrimaryClip(clip);
+
+        Toast.makeText(getActivity(), R.string.linkCopied, Toast.LENGTH_SHORT).show();;
     }
 
 

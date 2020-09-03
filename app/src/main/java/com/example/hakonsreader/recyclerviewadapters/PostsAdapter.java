@@ -46,6 +46,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     // Listener for when a list item has been clicked
     private OnClickListener<RedditPost> onClickListener;
 
+    private OnClickListener<RedditPost> onLongClickListener;
+
     private OnClickListener<String> onSubredditClickListener;
 
 
@@ -65,6 +67,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      */
     public void setOnClickListener(OnClickListener<RedditPost> onClickListener) {
         this.onClickListener = onClickListener;
+    }
+
+    /**
+     * Sets the listener for long clicks
+     *
+     * @param onLongClickListener The listener :-)
+     */
+    public void setOnLongClickListener(OnClickListener<RedditPost> onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
     }
 
     /**
@@ -271,14 +282,22 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             itemView.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
 
-                String json = new Gson().toJson(posts.get(pos));
-                Log.d(TAG, "ViewHolder: " + json);
-
-                Log.d(TAG, "ViewHolder: " + content.getChildCount() + ", sizeX: " + content.getHeight());
-
                 if (onClickListener != null && pos != RecyclerView.NO_POSITION) {
                     onClickListener.onClick(posts.get(pos));
                 }
+            });
+
+            // Call the registered onClick listener when an item is long clicked
+            itemView.setOnLongClickListener(view -> {
+                int pos = getAdapterPosition();
+
+                if (onLongClickListener != null && pos != RecyclerView.NO_POSITION) {
+                    onLongClickListener.onClick(posts.get(pos));
+
+                    return true;
+                }
+
+                return false;
             });
 
             // Call the registered listener for when the text is clicked
