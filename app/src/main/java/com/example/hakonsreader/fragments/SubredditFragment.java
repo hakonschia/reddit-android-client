@@ -223,5 +223,7 @@ public class SubredditFragment extends Fragment {
         intent.putExtra(SharedPreferencesConstants.ACCESS_TOKEN, this.data.getString(SharedPreferencesConstants.ACCESS_TOKEN));
 
         startActivity(intent);
+
+        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 }
