@@ -6,7 +6,8 @@
 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingEnd="10dp"
+
+    android:paddingBottom="20dp"
 
     android:foreground="?attr/selectableItemBackground">
 
@@ -14,11 +15,26 @@
         android:id="@+id/postSubreddit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/linkColor"
         android:layout_marginTop="5dp"
         android:layout_marginStart="15dp"
 
+        android:textColor="@color/linkColor"
+        android:textSize="14sp"
+
         tools:text="r/GlobalOffensive" />
+
+    <TextView
+        android:id="@+id/postAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/postSubreddit"
+        android:layout_alignBottom="@id/postSubreddit"
+
+        android:layout_marginStart="15dp"
+
+        android:textSize="13sp"
+
+        tools:text="u/hakonschia"/>
 
     <TextView
         android:id="@+id/postTitle"
@@ -29,7 +45,7 @@
         android:layout_marginBottom="15dp"
         android:layout_below="@id/postSubreddit"
         android:textColor="@color/textColor"
-        android:textSize="20sp"
+        android:textSize="17sp"
 
         tools:text="FaZe wins major /s" />
 
@@ -51,11 +67,25 @@
         android:background="@drawable/ic_baseline_arrow_downward_24"/>
 
     <TextView
+        android:id="@+id/postScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_toEndOf="@id/btnDownvote"
+        android:layout_alignBaseline="@id/btnDownvote"
+
+        android:textColor="@color/textColor"
+
+        tools:text="1523"/>
+
+    <TextView
         android:id="@+id/postComments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/btnDownvote"
-        android:layout_alignBottom="@id/btnDownvote"
+
+        android:layout_toEndOf="@id/postScore"
+        android:layout_alignBottom="@id/postScore"
+
         android:layout_marginStart="15dp"
         android:textColor="@color/textColor"
 

@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,8 @@ import java.util.List;
  * Adapter for recycler view of Reddit posts
  */
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
+    private static final String TAG = "PostsAdapter";
+    
 
     private List<RedditPost> posts = new ArrayList<>();
 
@@ -54,10 +57,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RedditPost post = this.posts.get(position);
 
+        // TODO move to string literal with placeholder
+
+        holder.subreddit.setText("r/" + post.getSubreddit());
+        holder.author.setText("u/" + post.getAuthor());
+
         holder.title.setText(post.getTitle());
 
-        // TODO move to string literal with placeholder
-        holder.subreddit.setText("r/" + post.getSubreddit());
+        holder.score.setText(Integer.toString(post.getScore()));
         holder.comments.setText(post.getAmountOfComments() + " comments");
 
         // TODO onclicklisteners (check how I did it in hytte app)
@@ -70,8 +77,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView title;
         private TextView subreddit;
+        private TextView author;
+        private TextView title;
+        private TextView score;
         private TextView comments;
         private Button upvote;
         private Button downvote;
@@ -79,8 +88,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            this.title = itemView.findViewById(R.id.postTitle);
             this.subreddit = itemView.findViewById(R.id.postSubreddit);
+            this.author = itemView.findViewById(R.id.postAuthor);
+            this.title = itemView.findViewById(R.id.postTitle);
+            this.score = itemView.findViewById(R.id.postScore);
             this.comments = itemView.findViewById(R.id.postComments);
             this.upvote = itemView.findViewById(R.id.btnUpvote);
             this.downvote = itemView.findViewById(R.id.btnDownvote);
