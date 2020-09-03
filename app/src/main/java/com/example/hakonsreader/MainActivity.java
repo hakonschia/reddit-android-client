@@ -17,6 +17,7 @@ import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.OAuthConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
+import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     // The fragments found in fragmentList
     private PostsContainerFragment postsFragment;
     private ProfileFragment profileFragment;
+    private LogInFragment logInFragment;
 
     // Interface towards the Reddit API
     private RedditApi redditApi;
@@ -178,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupFragments() {
         this.postsFragment = new PostsContainerFragment();
         this.profileFragment = new ProfileFragment();
+        this.logInFragment = new LogInFragment();
 
         Gson gson = new Gson();
         Bundle data = new Bundle();
@@ -190,7 +193,9 @@ public class MainActivity extends AppCompatActivity {
         this.fragmentList = new ArrayList<>();
         this.fragmentList.add(this.postsFragment);
         this.fragmentList.add(this.profileFragment);
+        this.fragmentList.add(this.logInFragment);
 
+        // TODO find a proper way to do this without having all fragments alive (keep state or something to keep posts)
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         // Add all fragments
@@ -201,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
         // Hide all but the front page
         //transaction.hide(this.subredditFragment);
         transaction.hide(this.profileFragment);
+        transaction.hide(this.logInFragment);
 
         // Commit all changes
         transaction.commit();
@@ -224,7 +230,12 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case R.id.nav_profile:
-                    selected = this.profileFragment;
+                    // If not logged in, show log in page
+                    if (this.user == null) {
+                        selected = this.logInFragment;
+                    } else {
+                        selected = this.profileFragment;
+                    }
                     break;
 
                 default:
