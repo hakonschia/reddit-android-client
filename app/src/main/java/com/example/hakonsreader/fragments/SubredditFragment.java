@@ -153,6 +153,7 @@ public class SubredditFragment extends Fragment {
         AccessToken accessToken = gson.fromJson(args.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
 
         this.redditApi = new RedditApi(accessToken);
+        this.adapter.setRedditApi(this.redditApi);
 
         // Load posts now that we have a valid API object
         if (this.wantsToLoad) {

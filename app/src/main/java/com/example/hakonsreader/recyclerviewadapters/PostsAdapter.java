@@ -9,13 +9,19 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /**
@@ -26,7 +32,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     
 
     private List<RedditPost> posts = new ArrayList<>();
+    private RedditApi redditApi = null;
 
+
+    /**
+     * Sets the RedditApi object to use for API calls
+     *
+     * @param api The API object to use
+     */
+    public void setRedditApi(@Nullable RedditApi api) {
+        this.redditApi = api;
+    }
 
     /**
      * Adds a list of posts to the current list of posts
@@ -56,7 +72,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        RedditPost post = this.posts.get(position);
+        final RedditPost post = this.posts.get(position);
 
         String subreddit = String.format(holder.resources.getString(R.string.subredditPrefixed), post.getSubreddit());
         String author = String.format(holder.resources.getString(R.string.authorPrefixed), post.getAuthor());
@@ -68,12 +84,65 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.score.setText(String.format("%d", post.getScore()));
         holder.comments.setText(numComments);
 
+        holder.upvote.setOnClickListener(view -> this.upvote(post));
+        holder.downvote.setOnClickListener(view -> this.downvote(post));
+
         // TODO onclicklisteners (check how I did it in hytte app)
     }
 
     @Override
     public int getItemCount() {
         return this.posts.size();
+    }
+
+    /**
+     * Sends a request to upvote a given post
+     *
+     * @param post The post to upvote
+     */
+    private void upvote(RedditPost post) {
+        if (this.redditApi == null) {
+            return;
+        }
+
+        this.redditApi.vote(post.getId(), RedditApi.VoteType.Upvote, RedditApi.Thing.Post).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // TODO Change color of button
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+
+            }
+        });
+    }
+
+    /**
+     * Sends a request to upvote a given post
+     *
+     * @param post The post to upvote
+     */
+    private void downvote(RedditPost post) {
+        if (this.redditApi == null) {
+            return;
+        }
+
+        this.redditApi.vote(post.getId(), RedditApi.VoteType.Downvote, RedditApi.Thing.Post).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // TODO Change color of button
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+
+            }
+        });
     }
 
 

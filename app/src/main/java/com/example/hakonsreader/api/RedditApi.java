@@ -14,6 +14,8 @@ import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,7 +31,30 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RedditApi {
     private static final String TAG = "RedditApi";
-    
+
+    /**
+     * A Reddit "Thing"
+     */
+    public enum Thing {
+        Post, Comment
+    }
+
+    /**
+     * What type of vote to cast on something
+     */
+    public enum VoteType {
+        Upvote(1),
+        Downvote(-1),
+        Unvote(0);
+
+        private int value;
+
+        private VoteType(int value) {
+            this.value = value;
+        }
+    }
+
+
     /**
      * Authenticator that automatically retrieves a new access token on 401 responses
      */
@@ -67,9 +92,20 @@ public class RedditApi {
      * The service object used to communicate only with the part of the Reddit API
      * that deals with OAuth access tokens
      */
-    private RedditOAuthService redditOauthService;
+    private RedditOAuthService OAuthSerivce;
 
+    /**
+     * The access token to use for API calls
+     */
     private AccessToken accessToken;
+
+    /**
+     * Mapping of the "things" of Reddit to their API string identifier
+     */
+    private final Map<Thing, String> thingMap = new HashMap<Thing, String>() {{
+        put(Thing.Post, "t3_");
+        put(Thing.Comment, "t1_");
+    }};
 
 
     public RedditApi(AccessToken accessToken) {
@@ -107,7 +143,7 @@ public class RedditApi {
                 .client(okHttpBuilder.build());
 
         Retrofit oauthRetrofit = oauthBuilder.build();
-        this.redditOauthService = oauthRetrofit.create(RedditOAuthService.class);
+        this.OAuthSerivce = oauthRetrofit.create(RedditOAuthService.class);
     }
 
     /**
@@ -127,7 +163,7 @@ public class RedditApi {
      * @return A Call object ready to be called to retrieve an access token
      */
     public Call<AccessToken> getAccessToken(String code) {
-        return this.redditOauthService.getAccessToken(
+        return this.OAuthSerivce.getAccessToken(
                 code,
                 OAuthConstants.GRANT_TYPE_AUTHORIZATION,
                 OAuthConstants.CALLBACK_URL
@@ -140,7 +176,7 @@ public class RedditApi {
      * @return A Call object ready to be called to refresh the access token
      */
     public Call<AccessToken> refreshToken() {
-        return this.redditOauthService.refreshToken(
+        return this.OAuthSerivce.refreshToken(
                 accessToken.getRefreshToken(),
                 OAuthConstants.GRANT_TYPE_REFRESH
         );
@@ -153,7 +189,7 @@ public class RedditApi {
      * @return A void Call. The response code says if the operation was successful or not.
      */
     public Call<Void> revokeRefreshToken() {
-        return this.redditOauthService.revokeToken(
+        return this.OAuthSerivce.revokeToken(
                 accessToken.getRefreshToken(),
                 OAuthConstants.TOKEN_TYPE_REFRESH
         );
@@ -167,7 +203,7 @@ public class RedditApi {
      * @return A Call object ready to be called to retrieve user information
      */
     public Call<User> getUserInfo() {
-        return this.apiService.getUserInfo(String.format("%s %s", accessToken.getTokenType(), accessToken.getAccessToken()));
+        return this.apiService.getUserInfo(this.generateTokenString(this.accessToken));
     }
 
 
@@ -213,8 +249,37 @@ public class RedditApi {
                     NetworkConstants.REDDIT_OUATH_URL + ".json",
                     after,
                     count,
-                    accessToken.getTokenType() + " " + accessToken.getAccessToken()
+                    this.generateTokenString(this.accessToken)
             );
         }
+    }
+
+    /**
+     * Cast a vote on a thing (post or comment)
+     *
+     * @param thingId The ID of the thing
+     * @param type The type of vote to cast
+     * @param thing What kind of thing the vote is for (post or comment)
+     * @return A Call object ready to cast a vote
+     */
+    public Call<Void> vote(String thingId, VoteType type, Thing thing) {
+        return this.apiService.vote(
+                this.thingMap.get(thing) + thingId,
+                type.value,
+                this.generateTokenString(this.accessToken)
+        );
+    }
+
+
+    /* -------------------- Util methods -------------------- */
+    /**
+     * Generates the full string (tokenType + tokenValue) for an access token that can be used
+     * in an authorization header
+     *
+     * @param accessToken The token to generate the string for
+     * @return token + " " + value
+     */
+    private String generateTokenString(AccessToken accessToken) {
+        return accessToken.getTokenType() + " " + accessToken.getAccessToken();
     }
 }

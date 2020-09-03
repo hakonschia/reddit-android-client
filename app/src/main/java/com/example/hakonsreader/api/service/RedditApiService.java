@@ -5,8 +5,11 @@ import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.NetworkConstants;
 
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 
@@ -36,5 +39,20 @@ public interface RedditApiService {
                                       @Query("after") String after,
                                       @Query("count") int count,
                                       @Header("Authorization") String accessToken
+    );
+
+    /**
+     * Cast a vote on something
+     *
+     * @param id The ID of the something to vite on
+     * @param dir The direction of the vote (1 = upvote, -1 = downvote, 0 = remove previous vote)
+     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @return A Call object ready to cast a vote
+     */
+    @POST(NetworkConstants.VOTE_PATH)
+    @FormUrlEncoded
+    Call<Void> vote(@Field("id") String id,
+                            @Field("dir") int dir,
+                            @Header("Authorization") String accessToken
     );
 }
