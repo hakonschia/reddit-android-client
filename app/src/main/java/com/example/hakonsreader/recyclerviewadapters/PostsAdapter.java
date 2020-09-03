@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.interfaces.OnClickListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,6 +109,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.score.setText(String.format("%d", post.getScore()));
         holder.comments.setText(numComments);
 
+
+
+        if (post.getPostHint().equals("image")) {
+            Picasso.get().load(post.getUrl()).into(holder.contentImg);
+        }
+
+
         holder.upvote.setOnClickListener(view -> this.upvote(post));
         holder.downvote.setOnClickListener(view -> this.downvote(post));
 
@@ -177,6 +186,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private ImageView upvote;
         private ImageView downvote;
 
+        private FrameLayout content;
+        private ImageView contentImg;
+
+
         private Resources resources;
 
         public ViewHolder(@NonNull View itemView) {
@@ -184,13 +197,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             this.resources = itemView.getResources();
 
-            this.subreddit = itemView.findViewById(R.id.postSubreddit);
-            this.author = itemView.findViewById(R.id.postAuthor);
-            this.title = itemView.findViewById(R.id.postTitle);
-            this.score = itemView.findViewById(R.id.postScore);
-            this.comments = itemView.findViewById(R.id.postComments);
-            this.upvote = itemView.findViewById(R.id.btnUpvote);
-            this.downvote = itemView.findViewById(R.id.btnDownvote);
+            this.subreddit = itemView.findViewById(R.id.listPostSubreddit);
+            this.author = itemView.findViewById(R.id.listPostAuthor);
+            this.title = itemView.findViewById(R.id.listPostTitle);
+            this.score = itemView.findViewById(R.id.listPostScore);
+            this.comments = itemView.findViewById(R.id.listPostComments);
+            this.upvote = itemView.findViewById(R.id.listBtnUpvote);
+            this.downvote = itemView.findViewById(R.id.listBtnDownvote);
+
+            this.content = itemView.findViewById(R.id.listPostContent);
+            this.contentImg = itemView.findViewById(R.id.listPostContentImg);
 
             // Call the registered onClick listener when an item is clicked
             itemView.setOnClickListener(view -> {

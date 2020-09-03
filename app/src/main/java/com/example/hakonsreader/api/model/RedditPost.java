@@ -1,12 +1,15 @@
 package com.example.hakonsreader.api.model;
 
+import android.util.Log;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Class representing a Reddit post
  */
 public class RedditPost {
-
+    private static final String TAG = "RedditPost";
+    
     // The JSON structure of a post has an internal object called "data"
     private Data data;
 
@@ -52,6 +55,9 @@ public class RedditPost {
         // The amount of comments the post has
         @SerializedName("num_comments")
         private int amountOfComments;
+
+        @SerializedName("post_hint")
+        private String postHint;
 
 
         private Media media;
@@ -106,4 +112,19 @@ public class RedditPost {
         return data.spoiler;
     }
 
+
+    public String getUrl() {
+        return this.data.url;
+    }
+
+    /**
+     * Possible values: "image", "hosted:video", "link"
+     * If the post is a text post the hint is an empty string
+     *
+     * @return The hint for the post type
+     */
+    public String getPostHint() {
+        Log.d(TAG, data.title + " has hint " + data.postHint);
+        return (data.postHint != null ? data.postHint : "");
+    }
 }
