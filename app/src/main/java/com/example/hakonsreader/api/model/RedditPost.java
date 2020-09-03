@@ -13,10 +13,11 @@ public class RedditPost {
     private static class Data {
         private String subreddit;
 
-        @SerializedName("title")
         private String title;
         private String author;
         private String id;
+        private int score;
+        private boolean spoiler;
 
         @SerializedName("is_video")
         private boolean isVideo;
@@ -48,4 +49,13 @@ public class RedditPost {
     public int getAmountOfComments() {
         return this.data.amountOfComments;
     }
+
+    public int getScore() {
+        return data.score;
+    }
+
+    public boolean isSpoiler() {
+        return data.spoiler;
+    }
+
 }
