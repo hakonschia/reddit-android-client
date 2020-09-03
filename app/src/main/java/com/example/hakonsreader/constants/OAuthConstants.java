@@ -29,7 +29,7 @@ public class OAuthConstants {
     /**
      * A space separated string containing the OAuth scopes available
      */
-    public static final String SCOPE = "identity read";
+    public static final String SCOPE = "identity read vote";
 
 
     /**
