@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.hakonsreader.api.RedditApi;
@@ -81,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
 
             saveAccessToken(accessToken);
             RedditApi.setAccessToken(accessToken);
+
+            getUserInfo();
 
             Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
         }
@@ -195,18 +198,19 @@ public class MainActivity extends AppCompatActivity {
         this.fragmentList.add(this.profileFragment);
         this.fragmentList.add(this.logInFragment);
 
-        // TODO find a proper way to do this without having all fragments alive (keep state or something to keep posts)
+        // TODO find a proper way to do this without creating all fragments at the start and
+        //  having all fragments alive (keep state or something to keep posts)
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         // Add all fragments
-        transaction.add(R.id.fragmentContainer, this.postsFragment);
-        //transaction.add(R.id.fragmentContainer, this.subredditFragment);
-        transaction.add(R.id.fragmentContainer, this.profileFragment);
+        for (Fragment fragment : this.fragmentList) {
+            transaction.add(R.id.fragmentContainer, fragment);
 
-        // Hide all but the front page
-        //transaction.hide(this.subredditFragment);
-        transaction.hide(this.profileFragment);
-        transaction.hide(this.logInFragment);
+            // Hide all but the posts fragment (home page)
+            if (fragment != this.postsFragment) {
+                transaction.hide(fragment);
+            }
+        }
 
         // Commit all changes
         transaction.commit();
@@ -232,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_profile:
                     // If not logged in, show log in page
                     if (this.user == null) {
+                        Log.d(TAG, "setupNavBar: Showing loginfragment");
                         selected = this.logInFragment;
                     } else {
                         selected = this.profileFragment;
@@ -273,20 +278,20 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                User user = response.body();
-                if (user == null) {
+                User userResponse = response.body();
+                if (userResponse == null) {
                     Log.w(TAG, "onResponse: user is null");
 
                     return;
                 }
 
+                user = userResponse;
+
                 // Store the updated user information in SharedPreferences
                 Gson gson = new Gson();
                 String tokenJson = gson.toJson(user);
 
-                SharedPreferences.Editor prefsEditor = prefs.edit();
-                prefsEditor.putString(SharedPreferencesConstants.USER_INFO, tokenJson);
-                prefsEditor.apply();
+                prefs.edit().putString(SharedPreferencesConstants.USER_INFO, tokenJson).apply();
             }
 
             @Override
@@ -313,5 +318,48 @@ public class MainActivity extends AppCompatActivity {
 
         prefsEditor.putString(SharedPreferencesConstants.ACCESS_TOKEN, tokenJson);
         prefsEditor.apply();
+    }
+
+    /**
+     * Click listener for the "Log out" button
+     * <p>Revokes the access/refresh token and clears any information stored locally</p>
+     *
+     * @param view Ignored
+     */
+    public void btnLogOutOnClick(View view) {
+        // Revoke token
+        this.redditApi.revokeRefreshToken().enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // Show "Logged out" or something
+                } else {
+                    // Idk?
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // If failed because of internet connection try to revoke later
+            }
+        });
+
+        // Clear shared preferences
+        this.clearUserInfoFromPrefs();
+
+
+        // Clear local variables
+        this.accessToken = null;
+        this.user = null;
+    }
+
+    /**
+     * Clears any information stored locally about a logged in user from SharedPreferences
+     */
+    private void clearUserInfoFromPrefs() {
+        prefs.edit()
+                .remove(SharedPreferencesConstants.ACCESS_TOKEN)
+                .remove(SharedPreferencesConstants.USER_INFO)
+                .apply();
     }
 }

@@ -35,18 +35,14 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (this.user == null) {
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        this.username = view.findViewById(R.id.profileName);
 
-            return null;
-            // Show a "log in" screen
-        } else {
-            View view = inflater.inflate(R.layout.fragment_profile, container, false);
-            this.username = view.findViewById(R.id.profileName);
-
+        if (this.user != null) {
             this.username.setText(user.getName());
-
-            return view;
         }
+
+        return view;
     }
 
 }
