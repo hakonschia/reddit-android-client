@@ -203,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
 
                 case R.id.nav_profile:
                     // If not logged in, show log in page
+                    // TODO this should recreate the fragment as a user might have logged in during the application
                     if (this.user == null) {
                         Log.d(TAG, "setupNavBar: Showing loginfragment");
                         selected = this.logInFragment;
@@ -257,9 +258,9 @@ public class MainActivity extends AppCompatActivity {
 
                 // Store the updated user information in SharedPreferences
                 Gson gson = new Gson();
-                String tokenJson = gson.toJson(user);
+                String userJson = gson.toJson(user);
 
-                prefs.edit().putString(SharedPreferencesConstants.USER_INFO, tokenJson).apply();
+                prefs.edit().putString(SharedPreferencesConstants.USER_INFO, userJson).apply();
             }
 
             @Override

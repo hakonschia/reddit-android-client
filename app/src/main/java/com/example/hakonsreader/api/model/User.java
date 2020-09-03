@@ -20,6 +20,9 @@ public class User {
     @SerializedName("icon_img")
     private String profilePictureUrl;
 
+    @SerializedName("created_utc")
+    private float createdAt;
+
     /**
      * @return The username of the user
      */
@@ -39,5 +42,12 @@ public class User {
      */
     public int getPostKarma() {
         return postKarma;
+    }
+
+    /**
+     * @return The Unix timestamp the account was created at (in UTC)
+     */
+    public long getCreatedAt() {
+        return (long) createdAt;
     }
 }

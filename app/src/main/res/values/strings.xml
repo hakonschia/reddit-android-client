@@ -11,4 +11,8 @@
 
     <string name="subredditPrefixed">r/%s</string>
     <string name="authorPrefixed">u/%s</string>
+
+    <string name="profileAge">User since %s</string>
+    <string name="commentKarma">%d comment karma</string>
+    <string name="postKarma">%d post karma</string>
 </resources>
