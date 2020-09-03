@@ -62,6 +62,9 @@ public class RedditPost {
         @SerializedName("post_hint")
         private String postHint;
 
+        @SerializedName("likes")
+        private boolean liked;
+
 
         private Media media;
 
@@ -124,6 +127,14 @@ public class RedditPost {
         return this.data.media.redditVideo.url;
     }
 
+    /**
+     * Retrieve information about the currently logged in users vote on a post
+     *
+     * @return Returns true if the post is upvoted, false if downvoted, null if no vote is cast
+     */
+    public boolean getLiked() {
+        return this.data.liked;
+    }
 
     public PostType getPostType() {
         if (data.isVideo) {
