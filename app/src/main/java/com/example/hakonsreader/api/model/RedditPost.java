@@ -11,26 +11,64 @@ public class RedditPost {
     private Data data;
 
     private static class Data {
+        // Which subreddit the post is in
         private String subreddit;
 
-        private String title;
-        private String author;
+        // The ID of the post
         private String id;
+
+        // The title of the post
+        private String title;
+
+        // The author of the psot
+        private String author;
+
+        // The score of the post
         private int score;
-        private boolean spoiler;
+
+        // The URL of the post. For images it links to the picture, for link posts it's the link
         private String url;
 
+
+        // Show spoiler tag?
+        private boolean spoiler;
+
+        // Is the post locked?
+        private boolean locked;
+
+        // Is the post NSFW?
         @SerializedName("over_18")
         private boolean nsfw;
 
-        @SerializedName("created")
+
+        // The UTC unix timestamp the post was created at
+        @SerializedName("created_utc")
         private float createdAt;
 
+        // Is the post a video?
         @SerializedName("is_video")
         private boolean isVideo;
 
+        // The amount of comments the post has
         @SerializedName("num_comments")
         private int amountOfComments;
+
+
+        private Media media;
+
+        // For video posts
+        private static class Media {
+
+            @SerializedName("reddit_video")
+            private RedditVideo redditVideo;
+
+            private static class RedditVideo {
+                private int duration;
+
+                @SerializedName("scrubber_media_url")
+                private String url;
+            }
+        }
     }
 
     /**
