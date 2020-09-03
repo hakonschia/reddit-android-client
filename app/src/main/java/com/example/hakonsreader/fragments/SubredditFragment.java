@@ -109,8 +109,6 @@ public class SubredditFragment extends Fragment {
      * <p>If this is the first time the fragment is selected, posts are loaded</p>
      */
     public void onFragmentSelected() {
-        // TODO If no posts are loaded, load from start. Otherwise do nothing really I guess
-
         // Starting from scratch
         if (this.adapter.getPosts().isEmpty()) {
             this.loadPosts();

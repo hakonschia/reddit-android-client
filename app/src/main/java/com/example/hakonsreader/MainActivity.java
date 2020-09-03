@@ -114,38 +114,6 @@ public class MainActivity extends AppCompatActivity {
         if (this.accessToken != null) {
             this.getUserInfo();
         }
-
-        // TODO just load front page no matter what (4 fragments: custom sub - front page - popular - all)
-        //  Show a nice bar with 4 sections on top under title to indicate that you can swipe (could also be clickable but need to be large enough)
-
-
-        /*
-        this.redditApi.getSubredditPosts("GlobalOffensive").enqueue(new Callback<RedditPostResponse>() {
-            @Override
-            public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
-
-                Log.d(TAG, "onResponse: " + response);
-
-                List<RedditPost> posts = response.body().getPosts();
-                if (posts == null) {
-                    Log.d(TAG, "onResponse: posts is null");
-
-                    return;
-                }
-
-                posts.forEach(post -> {
-                    Log.d(TAG, post.getTitle());
-                });
-
-                adapter.setPosts(posts);
-            }
-
-            @Override
-            public void onFailure(Call<RedditPostResponse> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-         */
     }
 
     @Override

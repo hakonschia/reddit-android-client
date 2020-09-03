@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,15 +58,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RedditPost post = this.posts.get(position);
 
-        // TODO move to string literal with placeholder
+        String subreddit = String.format(holder.resources.getString(R.string.subredditPrefixed), post.getSubreddit());
+        String author = String.format(holder.resources.getString(R.string.authorPrefixed), post.getAuthor());
+        String numComments = holder.resources.getQuantityString(R.plurals.numComments, post.getAmountOfComments(), post.getAmountOfComments());
 
-        holder.subreddit.setText("r/" + post.getSubreddit());
-        holder.author.setText("u/" + post.getAuthor());
-
+        holder.subreddit.setText(subreddit);
+        holder.author.setText(author);
         holder.title.setText(post.getTitle());
-
-        holder.score.setText(Integer.toString(post.getScore()));
-        holder.comments.setText(post.getAmountOfComments() + " comments");
+        holder.score.setText(String.format("%d", post.getScore()));
+        holder.comments.setText(numComments);
 
         // TODO onclicklisteners (check how I did it in hytte app)
     }
@@ -85,8 +86,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private Button upvote;
         private Button downvote;
 
+        private Resources resources;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            this.resources = itemView.getResources();
 
             this.subreddit = itemView.findViewById(R.id.postSubreddit);
             this.author = itemView.findViewById(R.id.postAuthor);
