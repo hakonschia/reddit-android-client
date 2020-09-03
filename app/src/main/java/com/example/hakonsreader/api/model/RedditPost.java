@@ -7,7 +7,12 @@ import com.google.gson.annotations.SerializedName;
  */
 public class RedditPost {
     private static final String TAG = "RedditPost";
-    
+
+    public enum PostType {
+        Image, Video, Link, Text
+    }
+
+
     // The JSON structure of a post has an internal object called "data"
     private Data data;
 
@@ -119,13 +124,45 @@ public class RedditPost {
         return this.data.media.redditVideo.url;
     }
 
-    /**
-     * Possible values: "image", "hosted:video", "link"
-     * If the post is a text post the hint is an empty string
-     *
-     * @return The hint for the post type
-     */
-    public String getPostHint() {
-        return (data.postHint != null ? data.postHint : "");
+
+    public PostType getPostType() {
+        if (data.isVideo) {
+            return PostType.Video;
+        }
+
+        String hint = data.postHint;
+
+        // Text posts don't have a hint
+        if (hint == null) {
+            return PostType.Text;
+        }
+
+        if (hint.equals("link")) {
+            // Link posts might be images not uploaded to reddit
+            if (hint.matches("(.png|.jpeg|.jpg)$")) {
+                return PostType.Image;
+            }
+
+            return PostType.Link;
+        }
+
+        switch (hint) {
+            case "image":
+                // .gif is treated as image
+                if (data.url.endsWith(".gif")) {
+                    return PostType.Video;
+                }
+
+                return PostType.Image;
+
+            case "hosted:video":
+                return PostType.Video;
+
+            // No hint means it's a text post
+            default:
+                return PostType.Text;
+        }
     }
+
+
 }

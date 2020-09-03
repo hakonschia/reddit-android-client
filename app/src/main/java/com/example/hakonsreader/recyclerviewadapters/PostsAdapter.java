@@ -1,28 +1,24 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
-import android.media.Image;
-import android.provider.ContactsContract;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.RedditPost.PostType;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -126,17 +122,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     private void addPostContent(RedditPost post, ViewHolder holder) {
         // Add the content
-        String postHint = post.getPostHint();
         View view = null;
 
-        switch (postHint) {
-            case "image":
-                // TODO .gif is apparently an image ;p
+        PostType postType = post.getPostType();
+
+        switch (postType) {
+            case Image:
                 // TODO when clicked open the image so you can ZOOOOOM
                 view = this.loadImage(post, holder);
                 break;
 
-            case "hosted:video":
+            case Video:
                 VideoView videoView = new VideoView(holder.itemView.getContext());
                 videoView.setVideoPath(post.getVideoUrl());
 
@@ -144,19 +140,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 view = videoView;
                 break;
 
-            case "link":
+            case Link:
                 String url = post.getUrl();
-
-                // Check if link ends in an image and then load the image instead of a direct link
-                if (url.endsWith(".png") || url.endsWith(".jpg")) { // etc.. Find a better way to do this
-                    view = this.loadImage(post, holder);
-                } else {
-                    // Do something else for link posts
-                }
                 break;
 
-            // Text post
-            default:
+            case Text:
                 break;
         }
 
