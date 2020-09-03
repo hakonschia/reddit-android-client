@@ -189,7 +189,6 @@ public class SubredditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView: sbhertbio");
         View view = inflater.inflate(R.layout.fragment_subreddit, container, false);
 
         this.postsList = view.findViewById(R.id.posts);
