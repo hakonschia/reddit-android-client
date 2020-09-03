@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Hakon\'s Reader</string>
 
+    <string name="navbarHome">Home</string>
+    <string name="navbarSubreddit">Subreddit</string>
+    <string name="navbarProfile">Profile</string>
+
     <string name="btnLogIn">Log in</string>
     <string name="btnLogOut">Log out</string>
 
