@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -33,6 +34,8 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+
+    public static int SCREEN_WIDTH;
 
     private static SharedPreferences prefs;
 
@@ -102,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SCREEN_WIDTH = getScreenWidth();
+
         // Load access token, user info etc.
         this.loadPrefs();
 
@@ -131,6 +136,13 @@ public class MainActivity extends AppCompatActivity {
 
             this.redditApi.getAccessToken(code).enqueue(this.tokenResponse);
         }
+    }
+
+
+    private int getScreenWidth() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics.widthPixels;
     }
 
     /**

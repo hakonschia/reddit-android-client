@@ -124,7 +124,6 @@ public class RedditPost {
      * @return The hint for the post type
      */
     public String getPostHint() {
-        Log.d(TAG, data.title + " has hint " + data.postHint);
         return (data.postHint != null ? data.postHint : "");
     }
 }

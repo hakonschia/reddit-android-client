@@ -1,21 +1,29 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
+import android.media.Image;
+import android.provider.ContactsContract;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.interfaces.OnClickListener;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -109,17 +117,49 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.score.setText(String.format("%d", post.getScore()));
         holder.comments.setText(numComments);
 
+        holder.upvote.setOnClickListener(v -> this.upvote(post));
+        holder.downvote.setOnClickListener(v -> this.downvote(post));
 
-
-        if (post.getPostHint().equals("image")) {
-            Picasso.get().load(post.getUrl()).into(holder.contentImg);
-        }
-
-
-        holder.upvote.setOnClickListener(view -> this.upvote(post));
-        holder.downvote.setOnClickListener(view -> this.downvote(post));
+        this.addPostContent(post, holder);
 
         // TODO onclicklisteners (check how I did it in hytte app)
+    }
+
+    private void addPostContent(RedditPost post, ViewHolder holder) {
+        // Add the content
+        String postHint = post.getPostHint();
+        View view = null;
+
+        switch (postHint) {
+            case "image":
+                view = new ImageView(holder.itemView.getContext());
+
+                // Scale so the image fits the width of the screen
+                Picasso.get().load(post.getUrl()).resize(MainActivity.SCREEN_WIDTH, 0).into((ImageView) view);
+                break;
+
+            case "hosted:video":
+
+                break;
+
+            case "link":
+
+                break;
+
+            // Text post
+            default:
+                break;
+        }
+
+        // Since the ViewHolder is recycled it can still have views from other posts
+        holder.content.removeAllViewsInLayout();
+        // Make sure the view size resets (or it will still have the previous view size)
+        holder.content.forceLayout();
+
+        // A view to add (not text post)
+        if (view != null) {
+            holder.content.addView(view);
+        }
     }
 
     @Override
@@ -177,7 +217,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         });
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView subreddit;
         private TextView author;
         private TextView title;
@@ -187,13 +227,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private ImageView downvote;
 
         private FrameLayout content;
-        private ImageView contentImg;
 
-
+        private View itemView;
         private Resources resources;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.itemView = itemView;
 
             this.resources = itemView.getResources();
 
@@ -206,11 +246,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             this.downvote = itemView.findViewById(R.id.listBtnDownvote);
 
             this.content = itemView.findViewById(R.id.listPostContent);
-            this.contentImg = itemView.findViewById(R.id.listPostContentImg);
 
             // Call the registered onClick listener when an item is clicked
             itemView.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
+
+                String json = new Gson().toJson(posts.get(pos));
+                Log.d(TAG, "ViewHolder: " + json);
+
+                Log.d(TAG, "ViewHolder: " + content.getChildCount() + ", sizeX: " + content.getHeight());
 
                 if (onClickListener != null && pos != RecyclerView.NO_POSITION) {
                     onClickListener.onClick(posts.get(pos));
