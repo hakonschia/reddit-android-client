@@ -46,4 +46,9 @@ public class NetworkConstants {
      * The API path used to retrieve user information
      */
     public static final String USER_INFO_PATH = "v1/me";
+
+    /**
+     * The API path used to vote on things (posts, comments)
+     */
+    public static final String VOTE_PATH = "vote";
 }
