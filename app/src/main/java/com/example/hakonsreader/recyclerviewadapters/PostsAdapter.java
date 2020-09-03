@@ -23,8 +23,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     private List<RedditPost> posts = new ArrayList<>();
 
-    public void setPosts(List<RedditPost> posts) {
-        this.posts = posts;
+
+    /**
+     * Adds a list of posts to the current list of posts
+     *
+     * @param posts The posts to add
+     */
+    public void addPosts(List<RedditPost> posts) {
+        this.posts.addAll(posts);
         notifyDataSetChanged();
     }
 

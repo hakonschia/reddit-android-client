@@ -34,19 +34,62 @@ import retrofit2.Response;
 public class SubredditFragment extends Fragment {
     private static final String TAG = "PostsFragment";
 
+    // The amount of posts left in the list before attempting to load more posts automatically
+    private static final int NUM_REMAINING_POSTS_BEFORE_LOAD = 6;
+
+
     private RedditApi redditApi;
 
     private PostsAdapter adapter;
+    private LinearLayoutManager layoutManager;
 
     private RecyclerView postsList;
     private TextView title;
     private String subreddit;
+
+    // The amount of items in the list at the last attempt at loading more posts
+    private int lastLoadAttemptCount;
 
     /**
      * Indicates that posts wants to be loaded, but the API object is not ready yet
      * <p>When the API is set, posts are automatically loaded</p>
      */
     private boolean wantsToLoad = false;
+
+
+    // Listener for scrolling in the posts list that automatically tries to load more posts
+    private View.OnScrollChangeListener scrollListener = (view, i, i1, i2, i3) -> {
+        // Get the last item visible in the current list
+        int posLastItem = this.layoutManager.findLastVisibleItemPosition();
+
+        // Load more posts before we reach the end to create an "infinite" list
+        if (posLastItem + NUM_REMAINING_POSTS_BEFORE_LOAD > adapter.getItemCount()) {
+
+            // Only load posts if there hasn't been an attempt at loading more posts
+            if (this.lastLoadAttemptCount < adapter.getItemCount()) {
+                this.loadPosts();
+            }
+        }
+    };
+
+    // Response handler for loading posts
+    private Callback<RedditPostResponse> onPostResponse = new Callback<RedditPostResponse>() {
+        @Override
+        public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
+            if (!response.isSuccessful() || response.body() == null) {
+                return;
+            }
+
+            List<RedditPost> posts = response.body().getPosts();
+
+            adapter.addPosts(posts);
+        }
+
+        @Override
+        public void onFailure(Call<RedditPostResponse> call, Throwable t) {
+
+        }
+    };
 
 
     /**
@@ -57,6 +100,7 @@ public class SubredditFragment extends Fragment {
     public SubredditFragment(String subreddit) {
         this.subreddit = subreddit;
         this.adapter = new PostsAdapter();
+        this.lastLoadAttemptCount = 0;
     }
 
 
@@ -73,6 +117,9 @@ public class SubredditFragment extends Fragment {
         }
     }
 
+    /**
+     * Loads more posts. Retrieves posts continuing from the last item in the list
+     */
     private void loadPosts() {
         if (this.redditApi == null) {
             this.wantsToLoad = true;
@@ -90,35 +137,19 @@ public class SubredditFragment extends Fragment {
 
         int count = this.adapter.getItemCount();
 
-        this.redditApi.getSubredditPosts(this.subreddit, after, count).enqueue(new Callback<RedditPostResponse>() {
-            @Override
-            public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    return;
-                }
+        // Store the current attempt to load more posts to avoid attempting many times if it fails
+        this.lastLoadAttemptCount = count;
 
-                List<RedditPost> posts = response.body().getPosts();
+        Log.d(TAG, "Loading more posts, count = " + count + ", last ID = " + after);
 
-                adapter.setPosts(posts);
-            }
-
-            @Override
-            public void onFailure(Call<RedditPostResponse> call, Throwable t) {
-
-            }
-        });
-        // Load more posts :-d
-
-        // Set posts on adapter etc etc
+        this.redditApi.getSubredditPosts(this.subreddit, after, count).enqueue(this.onPostResponse);
     }
 
     @Override
     public void setArguments(@Nullable Bundle args) {
-        Log.d(TAG, "setArguments: xdxdxdxd");
         if (args == null) {
             return;
         }
-        Log.d(TAG, "setArguments: xdxdxdxd2313123123");
 
         Gson gson = new Gson();
         AccessToken accessToken = gson.fromJson(args.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
@@ -143,8 +174,11 @@ public class SubredditFragment extends Fragment {
 
         this.title.setText((this.subreddit.isEmpty() ? "Front page" : this.subreddit));
 
+        this.layoutManager = new LinearLayoutManager(getActivity());
+
         this.postsList.setAdapter(this.adapter);
-        this.postsList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        this.postsList.setLayoutManager(this.layoutManager);
+        this.postsList.setOnScrollChangeListener(this.scrollListener);
 
         return view;
     }
