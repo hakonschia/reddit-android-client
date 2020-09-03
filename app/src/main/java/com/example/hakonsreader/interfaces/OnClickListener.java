@@ -6,5 +6,5 @@ package com.example.hakonsreader.interfaces;
  * @param <T> The object clicked
  */
 public interface OnClickListener<T> {
-    void OnClick(T item);
+    void onClick(T item);
 }

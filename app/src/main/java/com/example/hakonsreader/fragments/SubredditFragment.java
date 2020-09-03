@@ -1,5 +1,6 @@
 package com.example.hakonsreader.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -37,6 +39,8 @@ public class SubredditFragment extends Fragment {
     // The amount of posts left in the list before attempting to load more posts automatically
     private static final int NUM_REMAINING_POSTS_BEFORE_LOAD = 6;
 
+
+    private Bundle data;
 
     private RedditApi redditApi;
 
@@ -98,9 +102,12 @@ public class SubredditFragment extends Fragment {
      * @param subreddit The name of the subreddit. For front page use an empty string
      */
     public SubredditFragment(String subreddit) {
+        Log.d(TAG, "SubredditFragment: new sub frag created lol");
         this.subreddit = subreddit;
         this.adapter = new PostsAdapter();
         this.lastLoadAttemptCount = 0;
+
+        this.adapter.setOnSubredditClickListener(this::openSubredditInActivity);
     }
 
 
@@ -143,14 +150,30 @@ public class SubredditFragment extends Fragment {
         this.redditApi.getSubredditPosts(this.subreddit, after, count).enqueue(this.onPostResponse);
     }
 
+    /**
+     * Sets the extras that this fragment needs
+     * <p>Needed extras are: ACCESS_TOKEN</p>
+     *
+     * @param args
+     */
     @Override
     public void setArguments(@Nullable Bundle args) {
         if (args == null) {
             return;
         }
 
+        this.data = args;
+
         Gson gson = new Gson();
-        AccessToken accessToken = gson.fromJson(args.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
+
+        String json = this.data.getString(SharedPreferencesConstants.ACCESS_TOKEN, "");
+
+        // No token given
+        if (json.isEmpty()) {
+            return;
+        }
+
+        AccessToken accessToken = gson.fromJson(json, AccessToken.class);
 
         this.redditApi = new RedditApi(accessToken);
         this.adapter.setRedditApi(this.redditApi);
@@ -166,6 +189,7 @@ public class SubredditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: sbhertbio");
         View view = inflater.inflate(R.layout.fragment_subreddit, container, false);
 
         this.postsList = view.findViewById(R.id.posts);
@@ -180,5 +204,25 @@ public class SubredditFragment extends Fragment {
         this.postsList.setOnScrollChangeListener(this.scrollListener);
 
         return view;
+    }
+
+    /**
+     * Opens an activity with the selected subreddit
+     *
+     * @param subreddit The subreddit to open
+     */
+    private void openSubredditInActivity(String subreddit) {
+        // Don't open another activity if we are already in that subreddit (because honestly why would you)
+        if (this.subreddit.equals(subreddit)) {
+            return;
+        }
+
+        // Send some data like what sub it is etc etc so it knows what to load
+        Intent intent = new Intent(getActivity(), SubredditActivity.class);
+
+        intent.putExtra("subreddit", subreddit);
+        intent.putExtra(SharedPreferencesConstants.ACCESS_TOKEN, this.data.getString(SharedPreferencesConstants.ACCESS_TOKEN));
+
+        startActivity(intent);
     }
 }

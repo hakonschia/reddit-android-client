@@ -26,6 +26,9 @@ public class RedditPost {
         private int amountOfComments;
     }
 
+    /**
+     * @return The clean name of the subreddit (no r/ prefix)
+     */
     public String getSubreddit() {
         return this.data.subreddit;
     }

@@ -94,7 +94,8 @@ public class PostsContainerFragment extends Fragment {
         ViewPager viewPager = view.findViewById(R.id.postsContainer);
         this.setupViewPager(viewPager);
 
-       // this.frontPage.onFragmentSelected();
+        // onFragmentSelected is called when the ViewPager notices a swipe, so manually call for the first
+        this.fragments[0].onFragmentSelected();
 
         return view;
     }

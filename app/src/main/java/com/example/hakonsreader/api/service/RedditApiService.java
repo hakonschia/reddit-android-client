@@ -30,7 +30,7 @@ public interface RedditApiService {
      * @param url The URL to retrieve posts from
      *            <p>The URL format for front page for not logged in user or a subreddit is: https://reddit.com/.json</p>
      *            <p>The URL for front page for logged in user is: https://oauth.reddit.com with authentication header</p>
-     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
      * @return A Call object ready to retrieve posts from a subreddit
      */
     @GET

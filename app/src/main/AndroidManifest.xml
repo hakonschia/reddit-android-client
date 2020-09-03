@@ -28,6 +28,7 @@
                     android:scheme="hakonreader" />
             </intent-filter>
         </activity>
+        <activity android:name=".activites.SubredditActivity"/>
     </application>
 
 </manifest>

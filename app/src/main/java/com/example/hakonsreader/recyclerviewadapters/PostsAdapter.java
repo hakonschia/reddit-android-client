@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.interfaces.OnClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private List<RedditPost> posts = new ArrayList<>();
     private RedditApi redditApi = null;
 
+    // Listener for when a list item has been clicked
+    private OnClickListener<RedditPost> onClickListener;
+
+    private OnClickListener<String> onSubredditClickListener;
+
 
     /**
      * Sets the RedditApi object to use for API calls
@@ -41,6 +47,24 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      */
     public void setRedditApi(@Nullable RedditApi api) {
         this.redditApi = api;
+    }
+
+    /**
+     * Sets the click listener for when an item in the list has been clicked
+     *
+     * @param onClickListener The listener :)
+     */
+    public void setOnClickListener(OnClickListener<RedditPost> onClickListener) {
+        this.onClickListener = onClickListener;
+    }
+
+    /**
+     * Sets the click listener for when the subreddit text on an item has been clicked
+     *
+     * @param onSubredditClickListener The listener :)
+     */
+    public void setOnSubredditClickListener(OnClickListener<String> onSubredditClickListener) {
+        this.onSubredditClickListener = onSubredditClickListener;
     }
 
     /**
@@ -144,8 +168,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         });
     }
 
-
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder{
         private TextView subreddit;
         private TextView author;
         private TextView title;
@@ -168,6 +191,24 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             this.comments = itemView.findViewById(R.id.postComments);
             this.upvote = itemView.findViewById(R.id.btnUpvote);
             this.downvote = itemView.findViewById(R.id.btnDownvote);
+
+            // Call the registered onClick listener when an item is clicked
+            itemView.setOnClickListener(view -> {
+                int pos = getAdapterPosition();
+
+                if (onClickListener != null && pos != RecyclerView.NO_POSITION) {
+                    onClickListener.onClick(posts.get(pos));
+                }
+            });
+
+            // Call the registered listener for when the text is clicked
+            this.subreddit.setOnClickListener(view -> {
+                int pos = getAdapterPosition();
+
+                if (onSubredditClickListener != null && pos != RecyclerView.NO_POSITION) {
+                    onSubredditClickListener.onClick(posts.get(pos).getSubreddit());
+                }
+            });
         }
     }
 }
