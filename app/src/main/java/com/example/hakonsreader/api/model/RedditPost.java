@@ -145,6 +145,7 @@ public class RedditPost {
      * @return The type of post (image, video, text, or link)
      */
     public PostType getPostType() {
+        // TODO make this less bad
         if (data.isVideo) {
             return PostType.Video;
         }
@@ -160,6 +161,8 @@ public class RedditPost {
             // Link posts might be images not uploaded to reddit
             if (hint.matches("(.png|.jpeg|.jpg)$")) {
                 return PostType.Image;
+            } else if (hint.matches(".gifv")) {
+                return PostType.Video;
             }
 
             return PostType.Link;
