@@ -23,6 +23,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPost.PostType;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -281,7 +282,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             // Call the registered onClick listener when an item is clicked
             itemView.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
-
+                String data = new GsonBuilder().setPrettyPrinting().create().toJson(posts.get(pos));
+                Log.d(TAG, "ViewHolder: " + data);
+                
                 if (onClickListener != null && pos != RecyclerView.NO_POSITION) {
                     onClickListener.onClick(posts.get(pos));
                 }
