@@ -71,7 +71,9 @@ public class RedditApi {
         @Override
         public Request authenticate(@Nullable Route route, Response response) throws IOException {
             Log.d(TAG, "authenticate: Retrieving new access token");
-            
+
+            Log.d(TAG, "authenticate: " + accessToken);
+
             // If we have a previous access token with a refresh token
             if (accessToken != null && accessToken.getRefreshToken() != null) {
                 AccessToken newToken = refreshToken()
@@ -83,6 +85,8 @@ public class RedditApi {
                     return response.request();
                 }
 
+                Log.d(TAG, "authenticate: got new token!");
+                
                 MainActivity.saveAccessToken(newToken);
                 accessToken = newToken;
 
@@ -245,6 +249,7 @@ public class RedditApi {
 
     /**
      * Cast a vote on a thing (post or comment)
+     * <p>Requires a valid access token to be set</p>
      *
      * @param thingId The ID of the thing
      * @param type The type of vote to cast
@@ -252,6 +257,10 @@ public class RedditApi {
      * @return A Call object ready to cast a vote
      */
     public Call<Void> vote(String thingId, VoteType type, Thing thing) {
+        if (this.accessToken == null) {
+            return null;
+        }
+
         return this.apiService.vote(
                 // "t1_gre3" etc. to identify what is being voted on (post or comment)
                 thing.value + thingId,
