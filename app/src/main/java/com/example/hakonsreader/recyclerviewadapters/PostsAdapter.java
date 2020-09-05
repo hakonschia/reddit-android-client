@@ -49,8 +49,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     // Listener for when a list item has been clicked
     private OnClickListener<RedditPost> onClickListener;
 
+    // Listener for when a list item has been long clicked
     private OnClickListener<RedditPost> onLongClickListener;
 
+    // Listener for when the subreddit text in an item has been clicked
     private OnClickListener<String> onSubredditClickListener;
 
 
@@ -104,6 +106,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return posts;
     }
 
+    @Override
+    public int getItemCount() {
+        return this.posts.size();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -133,109 +140,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.upvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Upvote, holder));
         holder.downvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Downvote, holder));
 
-        this.updateVoteButtonColors(post, holder);
-        this.addPostContent(post, holder);
-    }
-
-    private void updateVoteButtonColors(RedditPost post, ViewHolder holder) {
-        RedditApi.VoteType voteType = post.getVoteType();
-
-        int color = R.color.textColor;
-        Context context = holder.itemView.getContext();
-
-        // Reset both buttons as at least one will change
-        // (to avoid keeping the color if going from upvote to downvote and vice versa)
-        holder.upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
-        holder.downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
-
-        switch (voteType) {
-            case Upvote:
-                color = R.color.upvoted;
-                holder.upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
-                break;
-
-            case Downvote:
-                color = R.color.downvoted;
-                holder.downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
-                break;
-
-            case NoVote:
-            default:
-                break;
-        }
-
-        holder.score.setTextColor(context.getColor(color));
-    }
-
-    private void addPostContent(RedditPost post, ViewHolder holder) {
-        Log.d(TAG, "addPostContent: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
-
-        // Add the content
-        View view = null;
-
-        PostType postType = post.getPostType();
-
-        switch (postType) {
-            case Image:
-                // TODO when clicked open the image so you can ZOOOOOM
-                ImageView imageView = new ImageView(holder.itemView.getContext());
-
-                Picasso.get()
-                        .load(post.getUrl())
-                        .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
-                        // Scale so the image fits the width of the screen
-                        .resize(MainActivity.SCREEN_WIDTH, 0)
-                        .into(imageView);
-
-                view = imageView;
-                break;
-
-            case Video:
-                VideoView videoView = new VideoView(holder.itemView.getContext());
-                videoView.setVideoPath(post.getVideoUrl());
-
-                videoView.start();
-                view = videoView;
-                break;
-
-            case RichVideo:
-                // Links such as youtube, gfycat etc are rich video posts
-                break;
-
-            case Link:
-                String url = post.getUrl();
-
-                TextView textView = new TextView(holder.itemView.getContext());
-                textView.setText(url);
-                // TODO fix this to add a theme
-                textView.setTextColor(holder.resources.getColor(R.color.linkColor));
-                textView.setOnClickListener(v -> {
-                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    holder.itemView.getContext().startActivity(i);
-                });
-
-                view = textView;
-                break;
-
-            case Text:
-                // Do nothing special for text posts
-                break;
-        }
-
-        // Since the ViewHolder is recycled it can still have views from other posts
-        holder.content.removeAllViewsInLayout();
-        // Make sure the view size resets (or it will still have the previous view size)
-        holder.content.forceLayout();
-
-        // A view to add (not text post)
-        if (view != null) {
-            holder.content.addView(view);
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        return this.posts.size();
+        holder.updateVoteStatus(post);
+        holder.setPostContent(post);
     }
 
     /**
@@ -262,7 +168,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 if (response.isSuccessful()) {
                      post.setVoteType(finalVoteType);
 
-                     updateVoteButtonColors(post, holder);
+                     holder.updateVoteStatus(post);
                 }
             }
 
@@ -273,6 +179,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         });
     }
 
+    /**
+     * The view for the items in the list
+     */
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView subreddit;
         private TextView author;
@@ -303,14 +212,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             this.content = itemView.findViewById(R.id.listPostContent);
 
-            Log.d(TAG, "ViewHolder: viewholder created");
             // Call the registered onClick listener when an item is clicked
             itemView.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
-                String data = new GsonBuilder().setPrettyPrinting().create().toJson(posts.get(pos));
-                Log.d(TAG, "ViewHolder: " + data);
-                Log.d(TAG, "ViewHolder: " + posts.get(pos).getPostType());
-                
+
                 if (onClickListener != null && pos != RecyclerView.NO_POSITION) {
                     onClickListener.onClick(posts.get(pos));
                 }
@@ -337,6 +242,113 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     onSubredditClickListener.onClick(posts.get(pos).getSubreddit());
                 }
             });
+        }
+
+
+        /**
+         * Sets the content of the post
+         *
+         * @param post The post with the content to set
+         */
+        private void setPostContent(RedditPost post) {
+            Log.d(TAG, "addPostContent: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
+
+            // Add the content
+            View view = null;
+
+            PostType postType = post.getPostType();
+
+            switch (postType) {
+                case Image:
+                    // TODO when clicked open the image so you can ZOOOOOM
+                    ImageView imageView = new ImageView(itemView.getContext());
+
+                    Picasso.get()
+                            .load(post.getUrl())
+                            .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
+                            // Scale so the image fits the width of the screen
+                            .resize(MainActivity.SCREEN_WIDTH, 0)
+                            .into(imageView);
+
+                    view = imageView;
+                    break;
+
+                case Video:
+                    VideoView videoView = new VideoView(itemView.getContext());
+                    videoView.setVideoPath(post.getVideoUrl());
+
+                    videoView.start();
+                    view = videoView;
+                    break;
+
+                case RichVideo:
+                    // Links such as youtube, gfycat etc are rich video posts
+                    break;
+
+                case Link:
+                    String url = post.getUrl();
+
+                    TextView textView = new TextView(itemView.getContext());
+                    textView.setText(url);
+                    // TODO fix this to add a theme
+                    textView.setTextColor(resources.getColor(R.color.linkColor));
+                    textView.setOnClickListener(v -> {
+                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        itemView.getContext().startActivity(i);
+                    });
+
+                    view = textView;
+                    break;
+
+                case Text:
+                    // Do nothing special for text posts
+                    break;
+            }
+
+            // Since the ViewHolder is recycled it can still have views from other posts
+            content.removeAllViewsInLayout();
+            // Make sure the view size resets (or it will still have the previous view size)
+            content.forceLayout();
+
+            // A view to add (not text post)
+            if (view != null) {
+                content.addView(view);
+            }
+        }
+
+        /**
+         * Updates the vote status for a post (button + text colors)
+         *
+         * @param post The post to update for
+         */
+        private void updateVoteStatus(RedditPost post) {
+            RedditApi.VoteType voteType = post.getVoteType();
+
+            int color = R.color.textColor;
+            Context context = itemView.getContext();
+
+            // Reset both buttons as at least one will change
+            // (to avoid keeping the color if going from upvote to downvote and vice versa)
+            upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+            downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+
+            switch (voteType) {
+                case Upvote:
+                    color = R.color.upvoted;
+                    upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+                    break;
+
+                case Downvote:
+                    color = R.color.downvoted;
+                    downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+                    break;
+
+                case NoVote:
+                default:
+                    break;
+            }
+
+            score.setTextColor(context.getColor(color));
         }
     }
 }

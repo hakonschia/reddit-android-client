@@ -106,7 +106,6 @@ public class SubredditFragment extends Fragment {
      * @param subreddit The name of the subreddit. For front page use an empty string
      */
     public SubredditFragment(String subreddit) {
-        Log.d(TAG, "SubredditFragment: new sub frag created lol");
         this.subreddit = subreddit;
         this.adapter = new PostsAdapter();
         this.lastLoadAttemptCount = 0;
@@ -182,8 +181,6 @@ public class SubredditFragment extends Fragment {
 
         this.data = args;
 
-        Gson gson = new Gson();
-
         String json = this.data.getString(SharedPreferencesConstants.ACCESS_TOKEN, "");
 
         // No token given
@@ -191,6 +188,7 @@ public class SubredditFragment extends Fragment {
             return;
         }
 
+        Gson gson = new Gson();
         AccessToken accessToken = gson.fromJson(json, AccessToken.class);
 
         this.redditApi = new RedditApi(accessToken);
