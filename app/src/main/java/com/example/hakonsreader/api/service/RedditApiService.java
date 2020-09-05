@@ -38,6 +38,7 @@ public interface RedditApiService {
     Call<RedditPostResponse> getPosts(@Url String url,
                                       @Query("after") String after,
                                       @Query("count") int count,
+                                      @Query("show") String show,
                                       @Header("Authorization") String accessToken
     );
 

@@ -240,7 +240,7 @@ public class RedditApi {
         // so add it anyways
         url += ".json";
 
-        return this.apiService.getPosts(url, after, count, tokenString);
+        return this.apiService.getPosts(url, after, count, "all", tokenString);
     }
 
     /**

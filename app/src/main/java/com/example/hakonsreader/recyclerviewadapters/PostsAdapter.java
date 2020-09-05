@@ -253,13 +253,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             voteType = RedditApi.VoteType.NoVote;
         }
 
-        Log.d(TAG, "vote: " + post.getVoteType());
-
+        RedditApi.VoteType finalVoteType = voteType;
         this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    // TODO Change color of button
+                     post.setVoteType(finalVoteType);
                 }
             }
 
