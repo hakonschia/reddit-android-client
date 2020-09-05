@@ -8,7 +8,6 @@ import com.google.gson.annotations.SerializedName;
  */
 public class AccessToken {
 
-
     @SerializedName("access_token")
     private String accessToken;
 
@@ -43,18 +42,25 @@ public class AccessToken {
         return tokenType;
     }
 
-    public int getExpiresIn() {
-        return expiresIn;
-    }
-
-    public String getScope() {
-        return scope;
-    }
-
     public String getRefreshToken() {
         return refreshToken;
     }
 
+    /**
+     * Generates a string that can be used directly in an authorization header
+     *
+     * @return "tokenType tokenValue". If either the type or value is null an empty string is returned
+     */
+    public String generateHeaderString() {
+        String ret;
+        if (this.tokenType == null || this.accessToken == null) {
+            ret = "";
+        } else {
+            ret = this.tokenType + " " + this.accessToken;
+        }
+
+        return ret;
+    }
 
 
     @Override

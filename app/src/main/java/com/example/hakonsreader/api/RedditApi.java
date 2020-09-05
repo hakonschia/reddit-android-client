@@ -8,14 +8,12 @@ import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
-import com.example.hakonsreader.api.service.RedditOAuthService;
 import com.example.hakonsreader.api.service.RedditApiService;
+import com.example.hakonsreader.api.service.RedditOAuthService;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -36,7 +34,15 @@ public class RedditApi {
      * A Reddit "Thing"
      */
     public enum Thing {
-        Post, Comment
+        Comment("t1_"),
+        Post("t3_");
+
+
+        private String value;
+
+        Thing(String value) {
+            this.value = value;
+        }
     }
 
     /**
@@ -71,9 +77,14 @@ public class RedditApi {
                 AccessToken newToken = refreshToken()
                         .execute().body();
 
-                MainActivity.saveAccessToken(accessToken);
+                // No new token received
+                if (newToken == null) {
+                    Log.d(TAG, "authenticate: Error retrieving new token");
+                    return response.request();
+                }
 
-
+                MainActivity.saveAccessToken(newToken);
+                accessToken = newToken;
 
                 return response.request().newBuilder()
                         .header("Authorization", newToken.getTokenType() + " " + newToken.getAccessToken())
@@ -100,14 +111,6 @@ public class RedditApi {
      * The access token to use for API calls
      */
     private AccessToken accessToken;
-
-    /**
-     * Mapping of the "things" of Reddit to their API string identifier
-     */
-    private final Map<Thing, String> thingMap = new HashMap<Thing, String>() {{
-        put(Thing.Post, "t3_");
-        put(Thing.Comment, "t1_");
-    }};
 
 
     public RedditApi(AccessToken accessToken) {
@@ -205,7 +208,7 @@ public class RedditApi {
      * @return A Call object ready to be called to retrieve user information
      */
     public Call<User> getUserInfo() {
-        return this.apiService.getUserInfo(this.generateTokenString(this.accessToken));
+        return this.apiService.getUserInfo(this.accessToken.generateHeaderString());
     }
 
 
@@ -224,7 +227,7 @@ public class RedditApi {
         // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
         // customized post information (such as vote status)
         if (this.accessToken != null) {
-            tokenString = this.generateTokenString(this.accessToken);
+            tokenString = this.accessToken.generateHeaderString();
             url = NetworkConstants.REDDIT_OUATH_URL;
         }
 
@@ -251,22 +254,9 @@ public class RedditApi {
     public Call<Void> vote(String thingId, VoteType type, Thing thing) {
         return this.apiService.vote(
                 // "t1_gre3" etc. to identify what is being voted on (post or comment)
-                this.thingMap.get(thing) + thingId,
+                thing.value + thingId,
                 type.value,
-                this.generateTokenString(this.accessToken)
+                this.accessToken.generateHeaderString()
         );
-    }
-
-
-    /* -------------------- Util methods -------------------- */
-    /**
-     * Generates the full string (tokenType + tokenValue) for an access token that can be used
-     * in an authorization header
-     *
-     * @param accessToken The token to generate the string for
-     * @return token + " " + value
-     */
-    private String generateTokenString(AccessToken accessToken) {
-        return accessToken.getTokenType() + " " + accessToken.getAccessToken();
     }
 }
