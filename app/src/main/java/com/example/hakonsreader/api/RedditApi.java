@@ -73,6 +73,8 @@ public class RedditApi {
 
                 MainActivity.saveAccessToken(accessToken);
 
+
+
                 return response.request().newBuilder()
                         .header("Authorization", newToken.getTokenType() + " " + newToken.getAccessToken())
                         .build();
@@ -216,42 +218,26 @@ public class RedditApi {
      * @return A Call object ready to retrieve subreddit posts
      */
     public Call<RedditPostResponse> getSubredditPosts(String subreddit, String after, int count) {
-        if (subreddit.isEmpty()) { // Load front page posts
-            return this.getFrontPagePosts(after, count);
+        String tokenString = "";
+        String url = NetworkConstants.REDDIT_URL;
+
+        // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
+        // customized post information (such as vote status)
+        if (this.accessToken != null) {
+            tokenString = this.generateTokenString(this.accessToken);
+            url = NetworkConstants.REDDIT_OUATH_URL;
         }
 
-        String url = NetworkConstants.REDDIT_URL + "r/" + subreddit + ".json";
-
-        // Access token is not required for subreddits as posts aren't personalized (TODO i think at least)
-        return this.apiService.getPosts(url, after, count, "");
-    }
-
-    /**
-     * Retrieves posts from the front page (reddit.com)
-     *
-     * @param after The ID of the last post retrieved (where to now get new posts from)
-     * @param count The total amount of already retrieved posts
-     *
-     * @return A Call object ready to be called to retrieve posts from reddit's front page
-     */
-    private Call<RedditPostResponse> getFrontPagePosts(String after, int count) {
-        if (accessToken == null) {
-            // Retrieve default posts
-            return this.apiService.getPosts(
-                    NetworkConstants.REDDIT_URL + ".json",
-                    after,
-                    count,
-                    ""
-            );
-        } else {
-            // Send with OAuth access token to get custom front page posts
-            return this.apiService.getPosts(
-                    NetworkConstants.REDDIT_OUATH_URL + ".json",
-                    after,
-                    count,
-                    this.generateTokenString(this.accessToken)
-            );
+        // Load posts for a subreddit
+        if (!subreddit.isEmpty()) {
+            url += "r/" + subreddit;
         }
+
+        // .json isn't strictly needed for requests to oauth.reddit.com, but it is for reddit.com
+        // so add it anyways
+        url += ".json";
+
+        return this.apiService.getPosts(url, after, count, tokenString);
     }
 
     /**
@@ -264,6 +250,7 @@ public class RedditApi {
      */
     public Call<Void> vote(String thingId, VoteType type, Thing thing) {
         return this.apiService.vote(
+                // "t1_gre3" etc. to identify what is being voted on (post or comment)
                 this.thingMap.get(thing) + thingId,
                 type.value,
                 this.generateTokenString(this.accessToken)
