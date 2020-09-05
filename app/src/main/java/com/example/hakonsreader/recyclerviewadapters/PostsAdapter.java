@@ -102,6 +102,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
+    /**
+     * @return The list of posts in the adapter
+     */
     public List<RedditPost> getPosts() {
         return posts;
     }
@@ -260,25 +263,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             switch (postType) {
                 case Image:
-                    // TODO when clicked open the image so you can ZOOOOOM
-                    ImageView imageView = new ImageView(itemView.getContext());
-
-                    Picasso.get()
-                            .load(post.getUrl())
-                            .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
-                            // Scale so the image fits the width of the screen
-                            .resize(MainActivity.SCREEN_WIDTH, 0)
-                            .into(imageView);
-
-                    view = imageView;
+                    view = this.generateImageContent(post);
                     break;
 
                 case Video:
-                    VideoView videoView = new VideoView(itemView.getContext());
-                    videoView.setVideoPath(post.getVideoUrl());
-
-                    videoView.start();
-                    view = videoView;
+                    view = this.generateVideoContent(post);
                     break;
 
                 case RichVideo:
@@ -286,18 +275,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     break;
 
                 case Link:
-                    String url = post.getUrl();
-
-                    TextView textView = new TextView(itemView.getContext());
-                    textView.setText(url);
-                    // TODO fix this to add a theme
-                    textView.setTextColor(resources.getColor(R.color.linkColor));
-                    textView.setOnClickListener(v -> {
-                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                        itemView.getContext().startActivity(i);
-                    });
-
-                    view = textView;
+                    view = this.generateLinkContent(post);
                     break;
 
                 case Text:
@@ -307,7 +285,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             // Since the ViewHolder is recycled it can still have views from other posts
             content.removeAllViewsInLayout();
-            // Make sure the view size resets (or it will still have the previous view size)
+            // Make sure the view size resets (or it will still have size of the previous post in this view holder)
             content.forceLayout();
 
             // A view to add (not text post)
@@ -315,6 +293,56 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 content.addView(view);
             }
         }
+
+        /**
+         * Generates the content for image posts
+         *
+         * @param post The post to generate content for
+         * @return An ImageView with the image of the post set to match the screen width
+         */
+        private ImageView generateImageContent(RedditPost post) {
+            // TODO when clicked open the image so you can ZOOOOOM
+            ImageView imageView = new ImageView(itemView.getContext());
+
+            Picasso.get()
+                    .load(post.getUrl())
+                    .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
+                    // Scale so the image fits the width of the screen
+                    .resize(MainActivity.SCREEN_WIDTH, 0)
+                    .into(imageView);
+
+            return imageView;
+        }
+
+        /**
+         * Generates the content for video posts
+         *
+         * @param post The post to generate content for
+         * @return A VideoView
+         */
+        private VideoView generateVideoContent(RedditPost post) {
+            VideoView videoView = new VideoView(itemView.getContext());
+            //videoView.setVideoPath(post.getVideoUrl());
+
+           // videoView.start();
+            return videoView;
+        }
+
+        private TextView generateLinkContent(RedditPost post) {
+            String url = post.getUrl();
+
+            TextView textView = new TextView(itemView.getContext());
+            textView.setText(url);
+            // TODO fix this to add a theme
+            textView.setTextColor(resources.getColor(R.color.linkColor));
+            textView.setOnClickListener(v -> {
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                itemView.getContext().startActivity(i);
+            });
+
+            return textView;
+        }
+
 
         /**
          * Updates the vote status for a post (button + text colors)
