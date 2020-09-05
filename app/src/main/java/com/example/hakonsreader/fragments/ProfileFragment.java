@@ -1,10 +1,7 @@
 package com.example.hakonsreader.fragments;
 
-import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +14,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.User;
-import com.example.hakonsreader.constants.SharedPreferencesConstants;
-import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -32,13 +27,8 @@ import java.util.Locale;
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
 
-    private User user;
+    private User user = User.getStoredUser();
 
-
-    @Override
-    public void setArguments(@Nullable Bundle args) {
-        this.user = new Gson().fromJson(args.getString(SharedPreferencesConstants.USER_INFO), User.class);
-    }
 
     @Nullable
     @Override

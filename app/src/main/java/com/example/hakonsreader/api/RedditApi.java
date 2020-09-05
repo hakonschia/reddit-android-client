@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
@@ -71,8 +70,11 @@ public class RedditApi {
         @Override
         public Request authenticate(@Nullable Route route, Response response) throws IOException {
             Log.d(TAG, "authenticate: Retrieving new access token");
-
             Log.d(TAG, "authenticate: " + accessToken);
+
+            if (accessToken == null) {
+                accessToken = AccessToken.getStoredToken();
+            }
 
             // If we have a previous access token with a refresh token
             if (accessToken != null && accessToken.getRefreshToken() != null) {
@@ -81,13 +83,10 @@ public class RedditApi {
 
                 // No new token received
                 if (newToken == null) {
-                    Log.d(TAG, "authenticate: Error retrieving new token");
                     return response.request();
                 }
 
-                Log.d(TAG, "authenticate: got new token!");
-                
-                MainActivity.saveAccessToken(newToken);
+                AccessToken.storeToken(newToken);
                 accessToken = newToken;
 
                 return response.request().newBuilder()
@@ -99,6 +98,7 @@ public class RedditApi {
         }
     }
 
+    private static RedditApi instance;
 
     /**
      * The service object used to communicate with the Reddit API
@@ -117,9 +117,7 @@ public class RedditApi {
     private AccessToken accessToken;
 
 
-    public RedditApi(AccessToken accessToken) {
-        this.accessToken = accessToken;
-
+    private RedditApi() {
         HttpLoggingInterceptor logger = new HttpLoggingInterceptor();
         logger.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -156,15 +154,19 @@ public class RedditApi {
     }
 
     /**
-     * Sets the OAuth access token to be used for API calls
-     *
-     * @param accessToken The token to use for API calls
+     * @return The RedditApi instance
      */
-    public void setAccessToken(AccessToken accessToken) {
-        this.accessToken = accessToken;
+    public static RedditApi getInstance() {
+        if (instance == null) {
+            instance = new RedditApi();
+        }
+
+        return instance;
     }
 
 
+
+    /* --------------- Access token calls --------------- */
     /**
      * Gets a call object to retrieve an access token from Reddit
      *
@@ -204,14 +206,25 @@ public class RedditApi {
         );
     }
 
+    /**
+     * Ensures that accessToken is set if one is stored in the application
+     */
+    private void ensureTokenIsSet() {
+        this.accessToken = AccessToken.getStoredToken();
+    }
+    /* --------------- End access token calls --------------- */
+
 
 
     /**
      * Retrieves information about the user logged in
+     * <p>Requires a valid access token</p>
      *
      * @return A Call object ready to be called to retrieve user information
      */
     public Call<User> getUserInfo() {
+        this.ensureTokenIsSet();
+
         return this.apiService.getUserInfo(this.accessToken.generateHeaderString());
     }
 
@@ -249,7 +262,7 @@ public class RedditApi {
 
     /**
      * Cast a vote on a thing (post or comment)
-     * <p>Requires a valid access token to be set</p>
+     * <p>Requires a valid access token</p>
      *
      * @param thingId The ID of the thing
      * @param type The type of vote to cast
@@ -257,9 +270,7 @@ public class RedditApi {
      * @return A Call object ready to cast a vote
      */
     public Call<Void> vote(String thingId, VoteType type, Thing thing) {
-        if (this.accessToken == null) {
-            return null;
-        }
+        this.ensureTokenIsSet();
 
         return this.apiService.vote(
                 // "t1_gre3" etc. to identify what is being voted on (post or comment)

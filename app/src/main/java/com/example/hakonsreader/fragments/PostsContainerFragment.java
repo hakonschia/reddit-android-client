@@ -24,7 +24,6 @@ public class PostsContainerFragment extends Fragment {
     private SubredditFragment popular;
     private SubredditFragment all;
 
-    private Bundle data;
     private SubredditFragment[] fragments;
 
 
@@ -37,10 +36,6 @@ public class PostsContainerFragment extends Fragment {
         this.all = new SubredditFragment("All");
 
         this.fragments = new SubredditFragment[]{this.frontPage, this.popular, this.all};
-
-        for (SubredditFragment fragment : this.fragments) {
-            fragment.setArguments(this.data);
-        }
     }
 
     /**
@@ -79,10 +74,6 @@ public class PostsContainerFragment extends Fragment {
         });
     }
 
-    @Override
-    public void setArguments(@Nullable Bundle args) {
-        this.data = args;
-    }
 
     @Nullable
     @Override

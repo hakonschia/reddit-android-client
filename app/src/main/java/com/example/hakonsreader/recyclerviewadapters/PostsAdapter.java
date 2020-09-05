@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPost.PostType;
 import com.example.hakonsreader.interfaces.OnClickListener;
-import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -254,7 +252,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          * @param post The post with the content to set
          */
         private void setPostContent(RedditPost post) {
-            Log.d(TAG, "addPostContent: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
+            //Log.d(TAG, "addPostContent: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
 
             // Add the content
             View view = null;

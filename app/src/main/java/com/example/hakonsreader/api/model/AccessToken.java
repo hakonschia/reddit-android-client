@@ -1,6 +1,8 @@
 package com.example.hakonsreader.api.model;
 
 
+import com.example.hakonsreader.SharedPreferencesManager;
+import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -73,5 +75,21 @@ public class AccessToken {
                 ", scope='" + scope + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
                 '}';
+    }
+
+    /**
+     * @return The access token stored in SharedPreferences
+     */
+    public static AccessToken getStoredToken() {
+        return SharedPreferencesManager.get(SharedPreferencesConstants.ACCESS_TOKEN, AccessToken.class);
+    }
+
+    /**
+     * Stores a token in SharedPreferences
+     *
+     * @param token The token to store
+     */
+    public static void storeToken(AccessToken token) {
+        SharedPreferencesManager.put(SharedPreferencesConstants.ACCESS_TOKEN, token);
     }
 }

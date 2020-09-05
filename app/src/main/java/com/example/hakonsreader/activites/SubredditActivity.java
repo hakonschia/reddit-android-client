@@ -23,7 +23,6 @@ public class SubredditActivity extends AppCompatActivity {
         String subreddit = data.getString("subreddit");
 
         SubredditFragment fragment = new SubredditFragment(subreddit);
-        fragment.setArguments(data);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.subredditActivityFragment, fragment).commit();
 

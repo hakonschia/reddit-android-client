@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.model;
 
+import com.example.hakonsreader.SharedPreferencesManager;
+import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -56,5 +58,21 @@ public class User {
      */
     public long getCreatedAt() {
         return (long) createdAt;
+    }
+
+    /**
+     * @return Retrieves the user information stored in SharedPreferences
+     */
+    public static User getStoredUser() {
+        return SharedPreferencesManager.get(SharedPreferencesConstants.USER_INFO, User.class);
+    }
+
+    /**
+     * Stores information about a user in SharedPreferences
+     *
+     * @param user The object to store
+     */
+    public static void storeUserInfo(User user) {
+        SharedPreferencesManager.put(SharedPreferencesConstants.USER_INFO, user);
     }
 }

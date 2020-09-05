@@ -21,7 +21,6 @@ import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +47,6 @@ public class MainActivity extends AppCompatActivity {
     // Interface towards the Reddit API
     private RedditApi redditApi;
 
-
-    // The OAuth access token
-    private AccessToken accessToken;
-
-    // User object for the currently logged in user
-    private User user;
-
     // The random string generated for OAuth authentication
     private String oauthState;
 
@@ -69,22 +61,18 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // Store access token in SharedPreferences
-            accessToken = response.body();
-
-            if (accessToken == null) {
+            AccessToken token = response.body();
+            if (token == null) {
                 // TODO some error handling
 
                 return;
             }
 
             // Assume the token was created when the request was sent
-            accessToken.setRetrievedAt(response.raw().sentRequestAtMillis());
+            token.setRetrievedAt(response.raw().sentRequestAtMillis());
 
-            saveAccessToken(accessToken);
-            redditApi.setAccessToken(accessToken);
-
-            getUserInfo();
+            // Store access token
+            AccessToken.storeToken(token);
 
             Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
         }
@@ -105,16 +93,16 @@ public class MainActivity extends AppCompatActivity {
 
         SCREEN_WIDTH = getScreenWidth();
 
-        // Load access token, user info etc.
-        this.loadPrefs();
+        prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
+        SharedPreferencesManager.create(prefs);
 
         this.setupNavBar();
         this.setupFragments();
 
-        this.redditApi = new RedditApi(this.accessToken);
+        this.redditApi = RedditApi.getInstance();
 
         // If there is a user logged in retrieve updated user information
-        if (this.accessToken != null) {
+        if (AccessToken.getStoredToken() != null) {
             this.getUserInfo();
         }
     }
@@ -144,18 +132,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Loads access token and user information to member variables
-     */
-    private void loadPrefs() {
-        prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
-
-        Gson gson = new Gson();
-
-        this.accessToken = gson.fromJson(prefs.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
-        this.user = gson.fromJson(prefs.getString(SharedPreferencesConstants.USER_INFO, ""), User.class);
-    }
-
-    /**
      * Creates new fragments and passes along needed information such as the access token
      */
     private void setupFragments() {
@@ -163,20 +139,12 @@ public class MainActivity extends AppCompatActivity {
         this.profileFragment = new ProfileFragment();
         this.logInFragment = new LogInFragment();
 
-        Gson gson = new Gson();
-        Bundle data = new Bundle();
-
-        data.putString(SharedPreferencesConstants.ACCESS_TOKEN, gson.toJson(this.accessToken));
-        data.putString(SharedPreferencesConstants.USER_INFO, gson.toJson(this.user));
-        this.postsFragment.setArguments(data);
-        this.profileFragment.setArguments(data);
-
         this.fragmentList = new ArrayList<>();
         this.fragmentList.add(this.postsFragment);
         this.fragmentList.add(this.profileFragment);
         this.fragmentList.add(this.logInFragment);
 
-        // TODO find a proper way to do this without creating all fragments at the start and
+        // TODO find a proper way to do this without creating all fragments at the start and-
         //  having all fragments alive (keep state or something to keep posts)
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -214,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_profile:
                     // If not logged in, show log in page
                     // TODO this should recreate the fragment as a user might have logged in during the application
-                    if (this.user == null) {
+                    if (User.getStoredUser() == null) {
                         Log.d(TAG, "setupNavBar: Showing loginfragment");
                         selected = this.logInFragment;
                     } else {
@@ -257,20 +225,15 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                User userResponse = response.body();
-                if (userResponse == null) {
+                User user = response.body();
+                if (user == null) {
                     Log.w(TAG, "onResponse: user is null");
 
                     return;
                 }
 
-                user = userResponse;
-
-                // Store the updated user information in SharedPreferences
-                Gson gson = new Gson();
-                String userJson = gson.toJson(user);
-
-                prefs.edit().putString(SharedPreferencesConstants.USER_INFO, userJson).apply();
+                // Store the updated user information
+                User.storeUserInfo(user);
             }
 
             @Override
@@ -278,25 +241,6 @@ public class MainActivity extends AppCompatActivity {
                 t.printStackTrace();
             }
         });
-    }
-
-
-    /**
-     * Saves an AccessToken object to SharedPreferences
-     *
-     * @param accessToken The token to save
-     */
-    public static void saveAccessToken(AccessToken accessToken) {
-        // TODO make a workaround so this doesn't have to be static
-        //this.accessToken = accessToken;
-
-        // TODO this is probably bad? No idea if this is guaranteed to be "alive" at all times
-        SharedPreferences.Editor prefsEditor = prefs.edit();
-        Gson gson = new Gson();
-        String tokenJson = gson.toJson(accessToken);
-
-        prefsEditor.putString(SharedPreferencesConstants.ACCESS_TOKEN, tokenJson);
-        prefsEditor.apply();
     }
 
     /**
@@ -325,20 +269,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Clear shared preferences
         this.clearUserInfoFromPrefs();
-
-
-        // Clear local variables
-        this.accessToken = null;
-        this.user = null;
     }
 
     /**
      * Clears any information stored locally about a logged in user from SharedPreferences
      */
     private void clearUserInfoFromPrefs() {
-        prefs.edit()
-                .remove(SharedPreferencesConstants.ACCESS_TOKEN)
-                .remove(SharedPreferencesConstants.USER_INFO)
-                .apply();
+        SharedPreferencesManager.remove(SharedPreferencesConstants.ACCESS_TOKEN);
+        SharedPreferencesManager.remove(SharedPreferencesConstants.USER_INFO);
     }
 }
