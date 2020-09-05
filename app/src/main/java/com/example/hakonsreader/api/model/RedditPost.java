@@ -136,6 +136,10 @@ public class RedditPost {
     }
 
     public String getVideoUrl() {
+        // If video not hosted by reddit
+        if (this.data.media == null) {
+            return this.getUrl();
+        }
         return this.data.media.redditVideo.url;
     }
 

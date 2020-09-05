@@ -167,6 +167,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     }
 
     private void addPostContent(RedditPost post, ViewHolder holder) {
+        Log.d(TAG, "addPostContent: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
+
         // Add the content
         View view = null;
 
