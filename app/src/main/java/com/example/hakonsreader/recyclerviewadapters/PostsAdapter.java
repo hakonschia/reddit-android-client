@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.MainActivity;
@@ -130,6 +132,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.upvote.setOnClickListener(v -> this.upvote(post));
         holder.downvote.setOnClickListener(v -> this.downvote(post));
 
+        this.updateVoteButtonColors(post, holder);
         this.addPostContent(post, holder);
     }
 
@@ -137,17 +140,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         boolean liked = post.getLiked();
 
         // No vote cast
-        /*
-        if (liked == null) {
-            return;
-        }*/
+        // TODO no vote cast (api returns null which gson interprets as false :)
+        // score.textcolor = r.color.textcolor ...
 
-        // TODO set text as well..
+
+        int color;
+        Context context = holder.itemView.getContext();
+
         if (liked) {
-            holder.upvote.setBackgroundColor(holder.resources.getColor(R.color.upvoted));
+            color = R.color.upvoted;
+            holder.upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
         } else {
-            holder.downvote.setBackgroundColor(holder.resources.getColor(R.color.downvoted));
+            color = R.color.downvoted;
+            holder.downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
         }
+
+        // Set text as well
+        holder.score.setTextColor(context.getColor(color));
     }
 
     private void addPostContent(RedditPost post, ViewHolder holder) {
@@ -253,6 +262,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         if (this.redditApi == null) {
             return;
         }
+
+
 
         this.redditApi.vote(post.getId(), RedditApi.VoteType.Downvote, RedditApi.Thing.Post).enqueue(new Callback<Void>() {
             @Override
