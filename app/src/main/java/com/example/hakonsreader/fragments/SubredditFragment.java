@@ -214,6 +214,14 @@ public class SubredditFragment extends Fragment {
 
         this.layoutManager = new LinearLayoutManager(getActivity());
 
+        view.findViewById(R.id.subredditRefresh).setOnClickListener(v -> {
+            // Kinda weird to clear the posts here but works I guess?
+            this.adapter.getPosts().clear();
+
+            this.loadPosts();
+        });
+
+
         this.postsList.setAdapter(this.adapter);
         this.postsList.setLayoutManager(this.layoutManager);
         this.postsList.setOnScrollChangeListener(this.scrollListener);
