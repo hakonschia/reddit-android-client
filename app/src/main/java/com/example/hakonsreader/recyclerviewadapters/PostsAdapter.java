@@ -250,8 +250,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         // Ie. if upvote is clicked when the post is already upvoted, unvote the post
         if (voteType == post.getVoteType()) {
-            voteType = RedditApi.VoteType.Upvote;
+            voteType = RedditApi.VoteType.NoVote;
         }
+
+        Log.d(TAG, "vote: " + post.getVoteType());
 
         this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post).enqueue(new Callback<Void>() {
             @Override
