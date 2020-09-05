@@ -73,8 +73,7 @@ public class RedditPost {
         @SerializedName("likes")
         private boolean liked;
 
-
-
+        
         private Media media;
 
         // For video posts

@@ -133,6 +133,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         this.addPostContent(post, holder);
     }
 
+    private void updateVoteButtonColors(RedditPost post, ViewHolder holder) {
+        boolean liked = post.getLiked();
+
+        // No vote cast
+        /*
+        if (liked == null) {
+            return;
+        }*/
+
+        // TODO set text as well..
+        if (liked) {
+            holder.upvote.setBackgroundColor(holder.resources.getColor(R.color.upvoted));
+        } else {
+            holder.downvote.setBackgroundColor(holder.resources.getColor(R.color.downvoted));
+        }
+    }
+
     private void addPostContent(RedditPost post, ViewHolder holder) {
         // Add the content
         View view = null;
