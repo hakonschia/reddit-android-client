@@ -129,8 +129,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.score.setText(String.format("%d", post.getScore()));
         holder.comments.setText(numComments);
 
-        holder.upvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Upvote));
-        holder.downvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Downvote));
+        holder.upvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Upvote, holder));
+        holder.downvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Downvote, holder));
 
         this.updateVoteButtonColors(post, holder);
         this.addPostContent(post, holder);
@@ -139,11 +139,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private void updateVoteButtonColors(RedditPost post, ViewHolder holder) {
         RedditApi.VoteType voteType = post.getVoteType();
 
-        // TODO no vote cast (api returns null which gson interprets as false :))
-
-
-        int color;
+        int color = R.color.textColor;
         Context context = holder.itemView.getContext();
+
+        // Reset both buttons as at least one will change
+        // (to avoid keeping the color if going from upvote to downvote and vice versa)
+        holder.upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+        holder.downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
 
         switch (voteType) {
             case Upvote:
@@ -158,9 +160,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             case NoVote:
             default:
-                color = R.color.textColor;
-                holder.upvote.setBackgroundTintList(null);
-                holder.downvote.setBackgroundTintList(null);
                 break;
         }
 
@@ -243,7 +242,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      * @param voteType The way to vote. If this vote is already what is voted the request is changed
      *                 to VoteType.Unvote
      */
-    private void vote(RedditPost post, RedditApi.VoteType voteType) {
+    private void vote(RedditPost post, RedditApi.VoteType voteType, ViewHolder holder) {
         if (this.redditApi == null) {
             return;
         }
@@ -259,6 +258,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                      post.setVoteType(finalVoteType);
+
+                     updateVoteButtonColors(post, holder);
                 }
             }
 

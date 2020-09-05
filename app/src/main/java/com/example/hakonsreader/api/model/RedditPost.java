@@ -1,9 +1,7 @@
 package com.example.hakonsreader.api.model;
 
-import android.util.Log;
-
-import com.example.hakonsreader.jsonadapters.BooleanNullAdapter;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.jsonadapters.BooleanNullAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -147,10 +145,6 @@ public class RedditPost {
      * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
      */
     public RedditApi.VoteType getVoteType() {
-        // TODO NoVote
-
-        Log.d(TAG, "getVoteType: " + this.data.liked);
-
         if (this.data.liked == null) {
             return RedditApi.VoteType.NoVote;
         }
@@ -224,6 +218,8 @@ public class RedditPost {
      * @param voteType The vote type for this post for the current user
      */
     public void setVoteType(RedditApi.VoteType voteType) {
+        // Update the internal data as that is used in getVoteType
+
         switch (voteType) {
             case Upvote:
                 this.data.liked = true;
