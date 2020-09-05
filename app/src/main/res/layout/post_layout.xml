@@ -119,19 +119,23 @@
 
             tools:text="1523"/>
 
-        <ImageView
+        <ImageButton
             android:id="@+id/listBtnUpvote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:background="@drawable/ic_baseline_arrow_upward_24" />
+            android:background="?android:selectableItemBackground"
 
-        <ImageView
+            android:src="@drawable/ic_baseline_arrow_upward_24" />
+
+        <ImageButton
             android:id="@+id/listBtnDownvote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:background="@drawable/ic_baseline_arrow_downward_24"/>
+            android:background="?android:selectableItemBackground"
+
+            android:src="@drawable/ic_baseline_arrow_downward_24"/>
 
 
     </LinearLayout>

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_scrollFlags="enterAlways|scroll">
 
@@ -23,6 +23,16 @@
                 android:textColor="@color/textColor"
 
                 tools:text="Front page"/>
+
+            <ImageButton
+                android:id="@+id/subredditSort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="end"
+                android:background="?android:selectableItemBackground"
+
+                android:src="@drawable/ic_baseline_sort_24"/>
 
         </androidx.appcompat.widget.Toolbar>
 

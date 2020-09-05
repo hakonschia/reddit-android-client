@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -278,8 +279,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private TextView title;
         private TextView score;
         private TextView comments;
-        private ImageView upvote;
-        private ImageView downvote;
+        private ImageButton upvote;
+        private ImageButton downvote;
 
         private FrameLayout content;
 
