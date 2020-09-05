@@ -30,9 +30,22 @@
                 android:layout_height="wrap_content"
 
                 android:layout_gravity="end"
+                android:layout_marginEnd="10dp"
                 android:background="?android:selectableItemBackground"
 
                 android:src="@drawable/ic_baseline_sort_24"/>
+
+            <ImageButton
+                android:id="@+id/subredditRefresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="end"
+                android:background="?android:selectableItemBackground"
+
+                android:src="@drawable/ic_baseline_autorenew_24" />
+
 
         </androidx.appcompat.widget.Toolbar>
 
