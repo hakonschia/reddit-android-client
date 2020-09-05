@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.hakonsreader.AccessTokenNotSetException;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
@@ -20,6 +21,7 @@ import okhttp3.Response;
 import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -173,12 +175,12 @@ public class RedditApi {
      * @param code The authorization code retrieved from the initial login process
      * @return A Call object ready to be called to retrieve an access token
      */
-    public Call<AccessToken> getAccessToken(String code) {
-        return this.OAuthSerivce.getAccessToken(
+    public void getAccessToken(String code, Callback<AccessToken> callback) {
+        this.OAuthSerivce.getAccessToken(
                 code,
                 OAuthConstants.GRANT_TYPE_AUTHORIZATION,
                 OAuthConstants.CALLBACK_URL
-        );
+        ).enqueue(callback);
     }
 
     /**
@@ -186,7 +188,7 @@ public class RedditApi {
      *
      * @return A Call object ready to be called to refresh the access token
      */
-    public Call<AccessToken> refreshToken() {
+    private Call<AccessToken> refreshToken() {
         return this.OAuthSerivce.refreshToken(
                 accessToken.getRefreshToken(),
                 OAuthConstants.GRANT_TYPE_REFRESH
@@ -208,44 +210,60 @@ public class RedditApi {
 
     /**
      * Ensures that accessToken is set if one is stored in the application
+     *
+     * @throws AccessTokenNotSetException If there isn't any access token set
      */
-    private void ensureTokenIsSet() {
+    private void ensureTokenIsSet() throws AccessTokenNotSetException {
         this.accessToken = AccessToken.getStoredToken();
+
+        if (this.accessToken == null) {
+            throw new AccessTokenNotSetException("Access token was not found");
+        }
     }
     /* --------------- End access token calls --------------- */
 
 
 
     /**
-     * Retrieves information about the user logged in
-     * <p>Requires a valid access token</p>
+     * Asynchronously retrieves information about the user logged in
+     * <p>Requires a valid access token for the request to be made</p>
      *
-     * @return A Call object ready to be called to retrieve user information
+     * @param callback The callback for responses
      */
-    public Call<User> getUserInfo() {
-        this.ensureTokenIsSet();
+    public void getUserInfo(Callback<User> callback) {
+        try {
+            this.ensureTokenIsSet();
 
-        return this.apiService.getUserInfo(this.accessToken.generateHeaderString());
+            this.apiService.getUserInfo(this.accessToken.generateHeaderString())
+                    .enqueue(callback);
+        } catch (AccessTokenNotSetException e) {
+            Log.d(TAG, "getUserInfo: can't get user information without access token");
+        }
     }
 
 
     /**
-     * Retrieves posts from a given subreddit
+     * Asynchronously retrieves posts from a given subreddit
+     * <p>If an access token is set posts are customized for the user</p>
      *
      * @param subreddit The subreddit to retrieve posts from. For front page use an empty string
      * @param after The ID of the last post seen (or an empty string if first time loading)
      * @param count The amount of posts already retrieved
-     * @return A Call object ready to retrieve subreddit posts
+     * @param callback The callback for the response
      */
-    public Call<RedditPostResponse> getSubredditPosts(String subreddit, String after, int count) {
+    public void getSubredditPosts(String subreddit, String after, int count, Callback<RedditPostResponse> callback) {
         String tokenString = "";
         String url = NetworkConstants.REDDIT_URL;
 
         // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
         // customized post information (such as vote status)
-        if (this.accessToken != null) {
+        try {
+            this.ensureTokenIsSet();
+
             tokenString = this.accessToken.generateHeaderString();
             url = NetworkConstants.REDDIT_OUATH_URL;
+        } catch (AccessTokenNotSetException e) {
+            e.printStackTrace();
         }
 
         // Load posts for a subreddit
@@ -257,26 +275,32 @@ public class RedditApi {
         // so add it anyways
         url += ".json";
 
-        return this.apiService.getPosts(url, after, count, "all", tokenString);
+        this.apiService.getPosts(url, after, count, "all", tokenString).enqueue(callback);
     }
 
     /**
-     * Cast a vote on a thing (post or comment)
+     * Send an asynchronous request to cast a vote on a thing (post or comment)
      * <p>Requires a valid access token</p>
      *
      * @param thingId The ID of the thing
      * @param type The type of vote to cast
      * @param thing What kind of thing the vote is for (post or comment)
-     * @return A Call object ready to cast a vote
+     * @param callback The callback for responses
      */
-    public Call<Void> vote(String thingId, VoteType type, Thing thing) {
-        this.ensureTokenIsSet();
+    public void vote(String thingId, VoteType type, Thing thing, Callback<Void> callback) {
+        try {
+            this.ensureTokenIsSet();
 
-        return this.apiService.vote(
-                // "t1_gre3" etc. to identify what is being voted on (post or comment)
-                thing.value + thingId,
-                type.value,
-                this.accessToken.generateHeaderString()
-        );
+            this.apiService.vote(
+                    // "t1_gre3" etc. to identify what is being voted on (post or comment)
+                    thing.value + thingId,
+                    type.value,
+                    this.accessToken.generateHeaderString()
+            ).enqueue(callback);
+        } catch (AccessTokenNotSetException e) {
+            e.printStackTrace();
+            Log.d(TAG, "vote: Can't cast vote without access token");
+        }
     }
+
 }

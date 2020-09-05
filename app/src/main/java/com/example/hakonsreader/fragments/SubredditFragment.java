@@ -23,7 +23,6 @@ import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPostResponse;
-import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 
 import java.util.List;
@@ -162,7 +161,7 @@ public class SubredditFragment extends Fragment {
 
         Log.d(TAG, "Loading more posts, count = " + count + ", last ID = " + after);
 
-        this.redditApi.getSubredditPosts(this.subreddit, after, count).enqueue(this.onPostResponse);
+        this.redditApi.getSubredditPosts(this.subreddit, after, count, this.onPostResponse);
     }
 
     @Nullable

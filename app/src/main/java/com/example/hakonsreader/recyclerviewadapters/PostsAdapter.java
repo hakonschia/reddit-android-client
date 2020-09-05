@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,7 +41,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     
 
     private List<RedditPost> posts = new ArrayList<>();
-    private RedditApi redditApi = null;
+    private RedditApi redditApi = RedditApi.getInstance();
 
     // Listener for when a list item has been clicked
     private OnClickListener<RedditPost> onClickListener;
@@ -53,15 +52,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     // Listener for when the subreddit text in an item has been clicked
     private OnClickListener<String> onSubredditClickListener;
 
-
-    /**
-     * Sets the RedditApi object to use for API calls
-     *
-     * @param api The API object to use
-     */
-    public void setRedditApi(@Nullable RedditApi api) {
-        this.redditApi = api;
-    }
 
     /**
      * Sets the click listener for when an item in the list has been clicked
@@ -153,17 +143,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      *                 to VoteType.Unvote
      */
     private void vote(RedditPost post, RedditApi.VoteType voteType, ViewHolder holder) {
-        if (this.redditApi == null) {
-            return;
-        }
-
         // Ie. if upvote is clicked when the post is already upvoted, unvote the post
         if (voteType == post.getVoteType()) {
             voteType = RedditApi.VoteType.NoVote;
         }
 
         RedditApi.VoteType finalVoteType = voteType;
-        this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post).enqueue(new Callback<Void>() {
+        this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post, new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

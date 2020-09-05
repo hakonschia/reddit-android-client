@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         if (uri.toString().startsWith(OAuthConstants.CALLBACK_URL)) {
             String code = uri.getQueryParameter("code");
 
-            this.redditApi.getAccessToken(code).enqueue(this.tokenResponse);
+            this.redditApi.getAccessToken(code, this.tokenResponse);
         }
     }
 
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
-        this.redditApi.getUserInfo().enqueue(new Callback<User>() {
+        this.redditApi.getUserInfo(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (!response.isSuccessful()) {
