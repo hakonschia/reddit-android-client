@@ -9,7 +9,7 @@ public class RedditPost {
     private static final String TAG = "RedditPost";
 
     public enum PostType {
-        Image, Video, Link, Text
+        Image, Video, RichVideo, Link, Text
     }
 
 
@@ -54,6 +54,10 @@ public class RedditPost {
         // The UTC unix timestamp the post was created at
         @SerializedName("created_utc")
         private float createdAt;
+
+        // Is the post a self post (ie. text post)
+        @SerializedName("is_self")
+        private boolean isText;
 
         // Is the post a video?
         @SerializedName("is_video")
@@ -146,8 +150,11 @@ public class RedditPost {
      */
     public PostType getPostType() {
         // TODO make this less bad
+        // TODO reddit galleries (multiple images)
         if (data.isVideo) {
             return PostType.Video;
+        } else if (data.isText) {
+            return PostType.Text;
         }
 
         String hint = data.postHint;
@@ -179,6 +186,9 @@ public class RedditPost {
 
             case "hosted:video":
                 return PostType.Video;
+
+            case "rich:video":
+                return PostType.RichVideo;
 
             // No hint means it's a text post
             default:
