@@ -51,7 +51,7 @@ public class RedditApi {
     public enum VoteType {
         Upvote(1),
         Downvote(-1),
-        Unvote(0);
+        NoVote(0);
 
         private int value;
 

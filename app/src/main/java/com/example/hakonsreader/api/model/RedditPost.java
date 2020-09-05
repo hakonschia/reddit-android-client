@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.model;
 
+import com.example.hakonsreader.api.RedditApi;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -136,12 +137,13 @@ public class RedditPost {
     }
 
     /**
-     * Retrieve information about the currently logged in users vote on a post
+     * Retrieves the logged in users vote on the post
      *
-     * @return Returns true if the post is upvoted, false if downvoted, null if no vote is cast
+     * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
      */
-    public boolean getLiked() {
-        return this.data.liked;
+    public RedditApi.VoteType getVoteType() {
+        // TODO NoVote
+        return (this.data.liked ? RedditApi.VoteType.Upvote : RedditApi.VoteType.Downvote);
     }
 
     /**
@@ -203,6 +205,14 @@ public class RedditPost {
     public String getPermalink() {
         // The link given from the Reddit API starts at "/r/..."
         return "https://reddit.com" + data.permalink;
+    }
+
+
+    /**
+     * Sets the vote type for this post
+     */
+    public void setLiked(boolean liked) {
+        this.data.liked = liked;
     }
 
 }

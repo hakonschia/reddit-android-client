@@ -129,33 +129,41 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.score.setText(String.format("%d", post.getScore()));
         holder.comments.setText(numComments);
 
-        holder.upvote.setOnClickListener(v -> this.upvote(post));
-        holder.downvote.setOnClickListener(v -> this.downvote(post));
+        holder.upvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Upvote));
+        holder.downvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Downvote));
 
         this.updateVoteButtonColors(post, holder);
         this.addPostContent(post, holder);
     }
 
     private void updateVoteButtonColors(RedditPost post, ViewHolder holder) {
-        boolean liked = post.getLiked();
+        RedditApi.VoteType voteType = post.getVoteType();
 
-        // No vote cast
-        // TODO no vote cast (api returns null which gson interprets as false :)
-        // score.textcolor = r.color.textcolor ...
+        // TODO no vote cast (api returns null which gson interprets as false :))
 
 
         int color;
         Context context = holder.itemView.getContext();
 
-        if (liked) {
-            color = R.color.upvoted;
-            holder.upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
-        } else {
-            color = R.color.downvoted;
-            holder.downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+        switch (voteType) {
+            case Upvote:
+                color = R.color.upvoted;
+                holder.upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+                break;
+
+            case Downvote:
+                color = R.color.downvoted;
+                holder.downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+                break;
+
+            case NoVote:
+            default:
+                color = R.color.textColor;
+                holder.upvote.setBackgroundTintList(null);
+                holder.downvote.setBackgroundTintList(null);
+                break;
         }
 
-        // Set text as well
         holder.score.setTextColor(context.getColor(color));
     }
 
@@ -229,43 +237,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     }
 
     /**
-     * Sends a request to upvote a given post
+     * Sends a request to vote on a given post
      *
      * @param post The post to upvote
+     * @param voteType The way to vote. If this vote is already what is voted the request is changed
+     *                 to VoteType.Unvote
      */
-    private void upvote(RedditPost post) {
+    private void vote(RedditPost post, RedditApi.VoteType voteType) {
         if (this.redditApi == null) {
             return;
         }
 
-        this.redditApi.vote(post.getId(), RedditApi.VoteType.Upvote, RedditApi.Thing.Post).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    // TODO Change color of button
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-
-            }
-        });
-    }
-
-    /**
-     * Sends a request to upvote a given post
-     *
-     * @param post The post to upvote
-     */
-    private void downvote(RedditPost post) {
-        if (this.redditApi == null) {
-            return;
+        // Ie. if upvote is clicked when the post is already upvoted, unvote the post
+        if (voteType == post.getVoteType()) {
+            voteType = RedditApi.VoteType.Upvote;
         }
 
-
-
-        this.redditApi.vote(post.getId(), RedditApi.VoteType.Downvote, RedditApi.Thing.Post).enqueue(new Callback<Void>() {
+        this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
