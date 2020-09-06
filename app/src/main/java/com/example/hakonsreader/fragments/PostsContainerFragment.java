@@ -54,23 +54,6 @@ public class PostsContainerFragment extends Fragment {
 
         // Always keep all fragments alive
         viewPager.setOffscreenPageLimit(3);
-
-        // Listen to changes to let the fragments know they have been selected
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                fragments[position].onFragmentSelected();
-            }
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                // Not implemented
-            }
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                // Not implemented
-            }
-        });
     }
 
 
@@ -83,9 +66,6 @@ public class PostsContainerFragment extends Fragment {
 
         ViewPager viewPager = view.findViewById(R.id.postsContainer);
         this.setupViewPager(viewPager);
-
-        // onFragmentSelected is called when the ViewPager notices a swipe, so manually call for the first
-        this.fragments[0].onFragmentSelected();
 
         return view;
     }

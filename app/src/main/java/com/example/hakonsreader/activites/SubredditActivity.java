@@ -26,9 +26,6 @@ public class SubredditActivity extends AppCompatActivity {
 
         getSupportFragmentManager().beginTransaction().replace(R.id.subredditActivityFragment, fragment).commit();
 
-        // The fragment needs to be manually called the first time (when no swipe has happened)
-        fragment.onFragmentSelected();
-
         Slidr.attach(this);
     }
 

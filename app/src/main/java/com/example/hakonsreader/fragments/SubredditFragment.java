@@ -118,18 +118,6 @@ public class SubredditFragment extends Fragment {
         Toast.makeText(getActivity(), R.string.linkCopied, Toast.LENGTH_SHORT).show();;
     }
 
-
-    /**
-     * Called when the fragment has been selected.
-     * <p>If this is the first time the fragment is selected, posts are loaded</p>
-     */
-    public void onFragmentSelected() {
-        // Starting from scratch
-        if (this.adapter.getPosts().isEmpty()) {
-            this.loadPosts();
-        }
-    }
-
     /**
      * Loads more posts. Retrieves posts continuing from the last item in the list
      */
@@ -177,12 +165,21 @@ public class SubredditFragment extends Fragment {
             this.loadPosts();
         });
 
-
         this.postsList.setAdapter(this.adapter);
         this.postsList.setLayoutManager(this.layoutManager);
         this.postsList.setOnScrollChangeListener(this.scrollListener);
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Called when the fragment is visible, so when the fragment is first selected automatically load posts
+        if (this.adapter.getPosts().isEmpty()) {
+            this.loadPosts();
+        }
     }
 
     /**
