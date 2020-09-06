@@ -46,6 +46,16 @@ public class RedditApi {
         Thing(String value) {
             this.value = value;
         }
+
+        /**
+         * Retrieve the underlying string value of the thing
+         * <p>This value can be used in addition to the things ID to create the fullname of the thing</p>
+         *
+         * @return The string identifier for the thing
+         */
+        public String getValue() {
+            return value;
+        }
     }
 
     /**

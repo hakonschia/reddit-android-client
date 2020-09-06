@@ -33,6 +33,7 @@ public class SubredditActivity extends AppCompatActivity {
     public void finish() {
         super.finish();
 
+        // Slide the activity out
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }
