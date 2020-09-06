@@ -202,6 +202,8 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragmentContainer, selected)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    // When back is pressed go to the last fragment
+                    .addToBackStack(null)
                     .commit();
 
             return true;
