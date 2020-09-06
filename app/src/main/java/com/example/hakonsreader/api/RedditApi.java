@@ -94,7 +94,7 @@ public class RedditApi {
                 accessToken = newToken;
 
                 return response.request().newBuilder()
-                        .header("Authorization", newToken.getTokenType() + " " + newToken.getAccessToken())
+                        .header("Authorization", newToken.generateHeaderString())
                         .build();
             }
 
@@ -132,9 +132,7 @@ public class RedditApi {
                 .addInterceptor(chain -> {
                     Request request = chain.request()
                             .newBuilder()
-                          // .addHeader("User-Agent", NetworkConstants.USER_AGENT)
-                            .addHeader("ab", "123")
-                            .header("baerrg", "f23")
+                            .addHeader("User-Agent", NetworkConstants.USER_AGENT)
                             .build();
 
                     return chain.proceed(request);
@@ -290,9 +288,7 @@ public class RedditApi {
 
             tokenString = this.accessToken.generateHeaderString();
             url = NetworkConstants.REDDIT_OUATH_URL;
-        } catch (AccessTokenNotSetException e) {
-            e.printStackTrace();
-        }
+        } catch (AccessTokenNotSetException ignored) { }
 
         // Load posts for a subreddit
         if (!subreddit.isEmpty()) {
@@ -344,7 +340,6 @@ public class RedditApi {
                     onFailure.onFailure(call, t);
                 }
             });
-
 
         } catch (AccessTokenNotSetException e) {
             Log.d(TAG, "vote: Can't cast vote without access token");
