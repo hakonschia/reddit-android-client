@@ -12,7 +12,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.SectionsPageAdapter;
+import com.example.hakonsreader.misc.SectionsPageAdapter;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.example.hakonsreader;
+package com.example.hakonsreader.misc;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

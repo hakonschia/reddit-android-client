@@ -22,6 +22,7 @@ import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
 import com.example.hakonsreader.interfaces.OnFailure;
 import com.example.hakonsreader.interfaces.OnResponse;
+import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import retrofit2.Call;

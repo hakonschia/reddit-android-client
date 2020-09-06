@@ -8,9 +8,9 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 
 /**
- * Adapter to allow boolean types to be converted to Boolean for null values
+ * Adapter to allow primitive boolean types to be converted to Boolean for null values
  */
-public class BooleanNullAdapter extends TypeAdapter<Boolean> {
+public class BooleanPrimitiveAdapter extends TypeAdapter<Boolean> {
     @Override
     public void write(JsonWriter out, Boolean value) throws IOException {
         if (value == null) {

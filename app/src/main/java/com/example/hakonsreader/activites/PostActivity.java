@@ -1,8 +1,10 @@
-package com.example.hakonsreader;
+package com.example.hakonsreader.activites;
+
+import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
+import com.example.hakonsreader.R;
 
 public class PostActivity extends AppCompatActivity {
 

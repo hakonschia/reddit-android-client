@@ -1,4 +1,4 @@
-package com.example.hakonsreader;
+package com.example.hakonsreader.misc;
 
 import android.content.SharedPreferences;
 

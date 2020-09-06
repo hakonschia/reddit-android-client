@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.model;
 
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.jsonadapters.BooleanNullAdapter;
+import com.example.hakonsreader.jsonadapters.BooleanPrimitiveAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -74,7 +74,7 @@ public class RedditPost {
         private String postHint;
 
         @SerializedName("likes")
-        @JsonAdapter(BooleanNullAdapter.class)
+        @JsonAdapter(BooleanPrimitiveAdapter.class)
         private Boolean liked;
 
 

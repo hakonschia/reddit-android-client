@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.model;
 
 
-import com.example.hakonsreader.SharedPreferencesManager;
+import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.google.gson.annotations.SerializedName;
 
