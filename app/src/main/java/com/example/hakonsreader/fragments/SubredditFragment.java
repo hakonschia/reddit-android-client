@@ -23,13 +23,11 @@ import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPostResponse;
+import com.example.hakonsreader.interfaces.OnFailure;
+import com.example.hakonsreader.interfaces.OnResponse;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Fragment containing a subreddit
@@ -76,22 +74,18 @@ public class SubredditFragment extends Fragment {
     };
 
     // Response handler for loading posts
-    private Callback<RedditPostResponse> onPostResponse = new Callback<RedditPostResponse>() {
-        @Override
-        public void onResponse(Call<RedditPostResponse> call, Response<RedditPostResponse> response) {
-            if (!response.isSuccessful() || response.body() == null) {
-                return;
-            }
-
-            List<RedditPost> posts = response.body().getPosts();
-
-            adapter.addPosts(posts);
+    private OnResponse<RedditPostResponse> onPostResponse = (call, response) -> {
+        if (!response.isSuccessful() || response.body() == null) {
+            return;
         }
 
-        @Override
-        public void onFailure(Call<RedditPostResponse> call, Throwable t) {
+        List<RedditPost> posts = response.body().getPosts();
 
-        }
+        adapter.addPosts(posts);
+    };
+    // Failure handler for loading posts
+    private OnFailure<RedditPostResponse> onPostFailure = (call, t) -> {
+
     };
 
 
@@ -161,7 +155,7 @@ public class SubredditFragment extends Fragment {
 
         Log.d(TAG, "Loading more posts, count = " + count + ", last ID = " + after);
 
-        this.redditApi.getSubredditPosts(this.subreddit, after, count, this.onPostResponse);
+        this.redditApi.getSubredditPosts(this.subreddit, after, count, this.onPostResponse, this.onPostFailure);
     }
 
     @Nullable

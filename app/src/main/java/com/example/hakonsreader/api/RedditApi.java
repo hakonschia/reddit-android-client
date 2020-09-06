@@ -12,6 +12,8 @@ import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
+import com.example.hakonsreader.interfaces.OnFailure;
+import com.example.hakonsreader.interfaces.OnResponse;
 
 import java.io.IOException;
 
@@ -111,17 +113,17 @@ public class RedditApi {
      * The service object used to communicate only with the part of the Reddit API
      * that deals with OAuth access tokens
      */
-    private RedditOAuthService OAuthSerivce;
+    private RedditOAuthService OAuthService;
 
     /**
-     * The access token to use for API calls
+     * The access token to use for authorized API calls
      */
     private AccessToken accessToken;
 
 
     private RedditApi() {
         HttpLoggingInterceptor logger = new HttpLoggingInterceptor();
-        logger.setLevel(HttpLoggingInterceptor.Level.BODY);
+        logger.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
         // Add headers to every request
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
@@ -130,7 +132,9 @@ public class RedditApi {
                 .addInterceptor(chain -> {
                     Request request = chain.request()
                             .newBuilder()
-                            .addHeader("User-Agent", NetworkConstants.USER_AGENT)
+                          // .addHeader("User-Agent", NetworkConstants.USER_AGENT)
+                            .addHeader("ab", "123")
+                            .header("baerrg", "f23")
                             .build();
 
                     return chain.proceed(request);
@@ -152,7 +156,7 @@ public class RedditApi {
                 .client(okHttpBuilder.build());
 
         Retrofit oauthRetrofit = oauthBuilder.build();
-        this.OAuthSerivce = oauthRetrofit.create(RedditOAuthService.class);
+        this.OAuthService = oauthRetrofit.create(RedditOAuthService.class);
     }
 
     /**
@@ -170,17 +174,28 @@ public class RedditApi {
 
     /* --------------- Access token calls --------------- */
     /**
-     * Gets a call object to retrieve an access token from Reddit
+     * Asynchronously retrieves an access token from Reddit
      *
      * @param code The authorization code retrieved from the initial login process
-     * @return A Call object ready to be called to retrieve an access token
+     * @param onResponse The callback for successful requests. Note: The request can still
+     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
+     * @param onFailure The callback for errors caused by issues such as network connection fails
      */
-    public void getAccessToken(String code, Callback<AccessToken> callback) {
-        this.OAuthSerivce.getAccessToken(
+    public void getAccessToken(String code, OnResponse<AccessToken> onResponse, OnFailure<AccessToken> onFailure) {
+        this.OAuthService.getAccessToken(
                 code,
                 OAuthConstants.GRANT_TYPE_AUTHORIZATION,
                 OAuthConstants.CALLBACK_URL
-        ).enqueue(callback);
+        ).enqueue(new Callback<AccessToken>() {
+            @Override
+            public void onResponse(Call<AccessToken> call, retrofit2.Response<AccessToken> response) {
+                onResponse.onResponse(call, response);
+            }
+            @Override
+            public void onFailure(Call<AccessToken> call, Throwable t) {
+                onFailure.onFailure(call, t);
+            }
+        });
     }
 
     /**
@@ -189,7 +204,7 @@ public class RedditApi {
      * @return A Call object ready to be called to refresh the access token
      */
     private Call<AccessToken> refreshToken() {
-        return this.OAuthSerivce.refreshToken(
+        return this.OAuthService.refreshToken(
                 accessToken.getRefreshToken(),
                 OAuthConstants.GRANT_TYPE_REFRESH
         );
@@ -202,14 +217,14 @@ public class RedditApi {
      * @return A void Call. The response code says if the operation was successful or not.
      */
     public Call<Void> revokeRefreshToken() {
-        return this.OAuthSerivce.revokeToken(
+        return this.OAuthService.revokeToken(
                 accessToken.getRefreshToken(),
                 OAuthConstants.TOKEN_TYPE_REFRESH
         );
     }
 
     /**
-     * Ensures that accessToken is set if one is stored in the application
+     * Ensures that {@link RedditApi#accessToken} is set if one is stored in the application
      *
      * @throws AccessTokenNotSetException If there isn't any access token set
      */
@@ -228,14 +243,25 @@ public class RedditApi {
      * Asynchronously retrieves information about the user logged in
      * <p>Requires a valid access token for the request to be made</p>
      *
-     * @param callback The callback for responses
+     * @param onResponse The callback for successful requests. Note: The request can still
+     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
+     * @param onFailure The callback for errors caused by issues such as network connection fails
      */
-    public void getUserInfo(Callback<User> callback) {
+    public void getUserInfo(OnResponse<User> onResponse, OnFailure<User> onFailure) {
         try {
             this.ensureTokenIsSet();
 
             this.apiService.getUserInfo(this.accessToken.generateHeaderString())
-                    .enqueue(callback);
+                    .enqueue(new Callback<User>() {
+                        @Override
+                        public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+                            onResponse.onResponse(call, response);
+                        }
+                        @Override
+                        public void onFailure(Call<User> call, Throwable t) {
+                            onFailure.onFailure(call, t);
+                        }
+                    });
         } catch (AccessTokenNotSetException e) {
             Log.d(TAG, "getUserInfo: can't get user information without access token");
         }
@@ -249,9 +275,11 @@ public class RedditApi {
      * @param subreddit The subreddit to retrieve posts from. For front page use an empty string
      * @param after The ID of the last post seen (or an empty string if first time loading)
      * @param count The amount of posts already retrieved
-     * @param callback The callback for the response
+     * @param onResponse The callback for successful requests. Note: The request can still
+     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
+     * @param onFailure The callback for errors caused by issues such as network connection fails
      */
-    public void getSubredditPosts(String subreddit, String after, int count, Callback<RedditPostResponse> callback) {
+    public void getSubredditPosts(String subreddit, String after, int count, OnResponse<RedditPostResponse> onResponse, OnFailure<RedditPostResponse> onFailure) {
         String tokenString = "";
         String url = NetworkConstants.REDDIT_URL;
 
@@ -275,7 +303,16 @@ public class RedditApi {
         // so add it anyways
         url += ".json";
 
-        this.apiService.getPosts(url, after, count, "all", tokenString).enqueue(callback);
+        this.apiService.getPosts(url, after, count, "all", tokenString).enqueue(new Callback<RedditPostResponse>() {
+            @Override
+            public void onResponse(Call<RedditPostResponse> call, retrofit2.Response<RedditPostResponse> response) {
+                onResponse.onResponse(call, response);
+            }
+            @Override
+            public void onFailure(Call<RedditPostResponse> call, Throwable t) {
+                onFailure.onFailure(call, t);
+            }
+        });
     }
 
     /**
@@ -285,9 +322,10 @@ public class RedditApi {
      * @param thingId The ID of the thing
      * @param type The type of vote to cast
      * @param thing What kind of thing the vote is for (post or comment)
-     * @param callback The callback for responses
-     */
-    public void vote(String thingId, VoteType type, Thing thing, Callback<Void> callback) {
+     * @param onResponse The callback for successful requests. Note: The request can still
+     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
+     * @param onFailure The callback for errors caused by issues such as network connection fails*/
+    public void vote(String thingId, VoteType type, Thing thing, OnResponse<Void> onResponse, OnFailure<Void> onFailure) {
         try {
             this.ensureTokenIsSet();
 
@@ -296,9 +334,19 @@ public class RedditApi {
                     thing.value + thingId,
                     type.value,
                     this.accessToken.generateHeaderString()
-            ).enqueue(callback);
+            ).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
+                    onResponse.onResponse(call, response);
+                }
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    onFailure.onFailure(call, t);
+                }
+            });
+
+
         } catch (AccessTokenNotSetException e) {
-            e.printStackTrace();
             Log.d(TAG, "vote: Can't cast vote without access token");
         }
     }

@@ -28,10 +28,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 
 /**
  * Adapter for recycler view of Reddit posts
@@ -149,21 +145,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         RedditApi.VoteType finalVoteType = voteType;
-        this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post, new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                     post.setVoteType(finalVoteType);
+        this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post, (call, response) -> {
+            if (response.isSuccessful()) {
+                post.setVoteType(finalVoteType);
 
-                     holder.updateVoteStatus(post);
-                }
+                holder.updateVoteStatus(post);
             }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-
-            }
-        });
+        }, (call, t) -> { });
     }
 
     /**
@@ -312,6 +300,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             return videoView;
         }
 
+        /**
+         * Generates the content for link posts
+         *
+         * @param post The post to generate content for
+         * @return A TextView
+         */
         private TextView generateLinkContent(RedditPost post) {
             String url = post.getUrl();
 

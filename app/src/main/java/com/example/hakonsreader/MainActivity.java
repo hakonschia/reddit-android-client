@@ -20,6 +20,8 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
+import com.example.hakonsreader.interfaces.OnFailure;
+import com.example.hakonsreader.interfaces.OnResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -51,38 +53,53 @@ public class MainActivity extends AppCompatActivity {
     private String oauthState;
 
 
-    // Response handler for access token response
-    private Callback<AccessToken> tokenResponse = new Callback<AccessToken>() {
-        @Override
-        public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
-            if (!response.isSuccessful()) {
-                Toast.makeText(MainActivity.this, "Access not given " + response.code(), Toast.LENGTH_LONG).show();
+    // Handler for token responses
+    private OnResponse<AccessToken> onTokenResponse = (call, response) -> {
+        if (!response.isSuccessful()) {
+            Toast.makeText(MainActivity.this, "Access not given " + response.code(), Toast.LENGTH_LONG).show();
 
-                return;
-            }
-
-            AccessToken token = response.body();
-            if (token == null) {
-                // TODO some error handling
-
-                return;
-            }
-
-            // Assume the token was created when the request was sent
-            token.setRetrievedAt(response.raw().sentRequestAtMillis());
-
-            // Store access token
-            AccessToken.storeToken(token);
-
-            Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
+            return;
         }
 
-        @Override
-        public void onFailure(Call<AccessToken> call, Throwable t) {
-            t.printStackTrace();
+        AccessToken token = response.body();
+        if (token == null) {
+            // TODO some error handling
 
-            Toast.makeText(MainActivity.this, "Network error probably", Toast.LENGTH_LONG).show();
+            return;
         }
+
+        // Assume the token was created when the request was sent
+        token.setRetrievedAt(response.raw().sentRequestAtMillis());
+
+        // Store access token
+        AccessToken.storeToken(token);
+
+        Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
+    };
+    private OnFailure<AccessToken> onTokenFailure = (call, t) -> {
+
+    };
+
+    // Response handler for retrieval of user information
+    private OnResponse<User> onUserResponse = (call, response) -> {
+        if (!response.isSuccessful()) {
+            Log.d(TAG, "onResponse: Error");
+
+            return;
+        }
+
+        User user = response.body();
+        if (user == null) {
+            Log.w(TAG, "onResponse: user is null");
+
+            return;
+        }
+
+        // Store the updated user information
+        User.storeUserInfo(user);
+    };
+    private OnFailure<User> onUserFailure = (call, t) -> {
+
     };
 
 
@@ -120,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         if (uri.toString().startsWith(OAuthConstants.CALLBACK_URL)) {
             String code = uri.getQueryParameter("code");
 
-            this.redditApi.getAccessToken(code, this.tokenResponse);
+            this.redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
         }
     }
 
@@ -216,31 +233,7 @@ public class MainActivity extends AppCompatActivity {
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
-        this.redditApi.getUserInfo(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                if (!response.isSuccessful()) {
-                    Log.d(TAG, "onResponse: Error");
-
-                    return;
-                }
-
-                User user = response.body();
-                if (user == null) {
-                    Log.w(TAG, "onResponse: user is null");
-
-                    return;
-                }
-
-                // Store the updated user information
-                User.storeUserInfo(user);
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
+        this.redditApi.getUserInfo(this.onUserResponse, this.onUserFailure);
     }
 
     /**
