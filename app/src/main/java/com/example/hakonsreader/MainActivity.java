@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragmentContainer, selected)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .commit();
 
             return true;
