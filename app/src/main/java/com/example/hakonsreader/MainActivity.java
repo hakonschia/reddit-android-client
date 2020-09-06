@@ -169,6 +169,11 @@ public class MainActivity extends AppCompatActivity {
         navBar.setOnNavigationItemSelectedListener(item -> {
             Fragment selected = null;
 
+            // Item pressed is same as item selected, do nothing as this adds to the backstack
+            if (navBar.getSelectedItemId() == item.getItemId()) {
+                return false;
+            }
+
             switch (item.getItemId()) {
                 case R.id.nav_home:
                     selected = this.postsFragment;
