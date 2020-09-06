@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.hakonsreader.R;
@@ -20,22 +21,21 @@ import com.example.hakonsreader.SectionsPageAdapter;
 public class PostsContainerFragment extends Fragment {
     private static final String TAG = "PostsContainerFragment";
 
-    private SubredditFragment frontPage;
-    private SubredditFragment popular;
-    private SubredditFragment all;
-
     private SubredditFragment[] fragments;
 
 
     /**
      * Creates and initializes the fragments needed. Sets the fragments array
+     * Note: Setup is only done if {@link PostsContainerFragment#fragments} is null
      */
     private void setupFragments() {
-        this.frontPage = new SubredditFragment("");
-        this.popular = new SubredditFragment("Popular");
-        this.all = new SubredditFragment("All");
-
-        this.fragments = new SubredditFragment[]{this.frontPage, this.popular, this.all};
+        if (this.fragments == null) {
+            this.fragments = new SubredditFragment[]{
+                    new SubredditFragment(""),
+                    new SubredditFragment("Popular"),
+                    new SubredditFragment("All")
+            };
+        }
     }
 
     /**
@@ -44,7 +44,7 @@ public class PostsContainerFragment extends Fragment {
      * @param viewPager The view pager to add the fragments to
      */
     private void setupViewPager(ViewPager viewPager) {
-        SectionsPageAdapter adapter = new SectionsPageAdapter(getActivity().getSupportFragmentManager(), 0);
+        SectionsPageAdapter adapter = new SectionsPageAdapter(getChildFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
         for (Fragment fragment : this.fragments) {
             adapter.addFragment(fragment);
@@ -66,7 +66,6 @@ public class PostsContainerFragment extends Fragment {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 // Not implemented
             }
-
             @Override
             public void onPageScrollStateChanged(int state) {
                 // Not implemented

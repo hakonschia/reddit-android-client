@@ -24,9 +24,6 @@ import com.example.hakonsreader.interfaces.OnFailure;
 import com.example.hakonsreader.interfaces.OnResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,14 +31,12 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
+    /**
+     * The width of the screen of the current device
+     */
     public static int SCREEN_WIDTH;
 
-    private static SharedPreferences prefs;
-
-    // The fragments in the home menu (accessible from the nav bar)
-    private List<Fragment> fragmentList;
-
-    // The fragments found in fragmentList
+    // The fragments to show in the nav bar
     private PostsContainerFragment postsFragment;
     private ProfileFragment profileFragment;
     private LogInFragment logInFragment;
@@ -53,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private String oauthState;
 
 
-    // Handler for token responses
+    // Handler for token responses. If an access token is given user information is automatically retrieved
     private OnResponse<AccessToken> onTokenResponse = (call, response) -> {
         if (!response.isSuccessful()) {
             Toast.makeText(MainActivity.this, "Access not given " + response.code(), Toast.LENGTH_LONG).show();
@@ -74,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         // Store access token
         AccessToken.storeToken(token);
 
+        this.getUserInfo();
         Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
     };
     private OnFailure<AccessToken> onTokenFailure = (call, t) -> {
@@ -97,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Store the updated user information
         User.storeUserInfo(user);
+
+        // Make sure the profile fragment is updated next time the profile is selected
+        this.profileFragment = null;
     };
     private OnFailure<User> onUserFailure = (call, t) -> {
 
@@ -110,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         SCREEN_WIDTH = getScreenWidth();
 
-        prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
 
         this.setupNavBar();
@@ -153,29 +152,11 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setupFragments() {
         this.postsFragment = new PostsContainerFragment();
-        this.profileFragment = new ProfileFragment();
-        this.logInFragment = new LogInFragment();
-
-        this.fragmentList = new ArrayList<>();
-        this.fragmentList.add(this.postsFragment);
-        this.fragmentList.add(this.profileFragment);
-        this.fragmentList.add(this.logInFragment);
 
         // TODO find a proper way to do this without creating all fragments at the start and-
         //  having all fragments alive (keep state or something to keep posts)
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        // Add all fragments
-        for (Fragment fragment : this.fragmentList) {
-            transaction.add(R.id.fragmentContainer, fragment);
-
-            // Hide all but the posts fragment (home page)
-            if (fragment != this.postsFragment) {
-                transaction.hide(fragment);
-            }
-        }
-
-        // Commit all changes
+        transaction.replace(R.id.fragmentContainer, this.postsFragment);
         transaction.commit();
     }
 
@@ -198,11 +179,17 @@ public class MainActivity extends AppCompatActivity {
 
                 case R.id.nav_profile:
                     // If not logged in, show log in page
-                    // TODO this should recreate the fragment as a user might have logged in during the application
                     if (User.getStoredUser() == null) {
-                        Log.d(TAG, "setupNavBar: Showing loginfragment");
+                        if (this.logInFragment == null) {
+                            this.logInFragment = new LogInFragment();
+                        }
+
                         selected = this.logInFragment;
                     } else {
+                        if (this.profileFragment == null) {
+                            this.profileFragment = new ProfileFragment();
+                        }
+
                         selected = this.profileFragment;
                     }
                     break;
@@ -211,19 +198,10 @@ public class MainActivity extends AppCompatActivity {
                     return false;
             }
 
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            // Loop through the list of fragments and show the selected, hide all others
-            for (int i = 0; i < this.fragmentList.size(); i++) {
-                Fragment current = this.fragmentList.get(i);
-                if (current == selected) {
-                    transaction.show(current);
-                } else {
-                    transaction.hide(current);
-                }
-            }
-
-            transaction.commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, selected)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .commit();
 
             return true;
         });
