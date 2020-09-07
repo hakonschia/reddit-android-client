@@ -15,7 +15,7 @@
 
     <com.example.hakonsreader.views.PostInfo
         android:id="@+id/post_info"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <!-- Content of the post (image, video etc.) -->
