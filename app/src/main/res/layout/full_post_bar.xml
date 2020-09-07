@@ -34,8 +34,8 @@
             tools:text="123 comments" />
     </LinearLayout>
 
-    <include
-        layout="@layout/vote_bar"
+    <com.example.hakonsreader.views.VoteBar
+        android:id="@+id/vote_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 

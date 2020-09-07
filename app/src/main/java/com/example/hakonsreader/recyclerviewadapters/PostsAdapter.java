@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -18,12 +17,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.Util;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPost.PostType;
-import com.example.hakonsreader.listeners.VoteButtonListener;
 import com.example.hakonsreader.interfaces.OnClickListener;
+import com.example.hakonsreader.views.VoteBar;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -123,23 +121,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.subreddit.setText(subreddit);
         holder.author.setText(author);
         holder.title.setText(post.getTitle());
-        holder.score.setText(String.format("%d", post.getScore()));
         holder.comments.setText(numComments);
 
-        holder.upvote.setOnClickListener(new VoteButtonListener(
-                post,
-                RedditApi.VoteType.Upvote,
-                () -> Util.updateVoteStatus(post, holder.postFullBar, holder.itemView.getContext()))
-        );
-        holder.downvote.setOnClickListener(new VoteButtonListener(
-                post,
-                RedditApi.VoteType.Downvote,
-                () -> Util.updateVoteStatus(post, holder.postFullBar, holder.itemView.getContext()))
-        );
+        holder.voteBar.setPost(post);
 
         // Update to set the initial vote status
-        Util.updateVoteStatus(post, holder.postFullBar, holder.itemView.getContext());
-
         holder.setPostContent();
     }
 
@@ -153,10 +139,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private TextView subreddit;
         private TextView author;
         private TextView title;
-        private TextView score;
         private TextView comments;
-        private ImageButton upvote;
-        private ImageButton downvote;
+
+        private VoteBar voteBar;
 
         private View postInfo;
         private View postFullBar;
@@ -177,11 +162,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             this.subreddit = itemView.findViewById(R.id.post_info_subreddit);
             this.author = itemView.findViewById(R.id.post_info_author);
             this.title = itemView.findViewById(R.id.post_info_title);
-
-            this.score = itemView.findViewById(R.id.vote_bar_score);
             this.comments = itemView.findViewById(R.id.post_comments);
-            this.upvote = itemView.findViewById(R.id.vote_bar_upvote);
-            this.downvote = itemView.findViewById(R.id.vote_bar_downvote);
+
+            this.voteBar = itemView.findViewById(R.id.vote_bar);
 
             this.content = itemView.findViewById(R.id.post_content);
 

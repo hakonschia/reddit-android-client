@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- This layout contains the upvote buttons for a post/comment -->
+    <!-- See VoteBar.java -->
 
     <TextView
         android:id="@+id/vote_bar_score"
@@ -33,7 +34,6 @@
         android:layout_height="wrap_content"
 
         android:background="?android:selectableItemBackground"
-        android:onClick=""
 
         android:src="@drawable/ic_baseline_arrow_downward_24"/>
 </LinearLayout>
