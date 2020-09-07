@@ -13,15 +13,14 @@
     android:background="@drawable/layout_rounded_corner_post"
     android:foreground="?attr/selectableItemBackground">
 
-    <include
+    <include layout="@layout/post_info_layout"
         android:id="@+id/post_info"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        layout="@layout/post_info_layout" />
+        android:layout_height="wrap_content" />
 
     <!-- Content of the post (image, video etc.) -->
     <FrameLayout
-        android:id="@+id/listPostContent"
+        android:id="@+id/post_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -38,74 +37,50 @@
 
     </FrameLayout>
 
-
-    <LinearLayout
-        android:id="@+id/postCommentsContainer"
-        android:layout_width="wrap_content"
+    <!-- Comment + upvote bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/listPostContent"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="15dp">
 
-        <ImageView
-            android:id="@+id/listPostCommentImg"
+        android:layout_below="@id/post_content">
+
+        <LinearLayout
+            android:id="@+id/postCommentsContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:src="@drawable/ic_baseline_message_24" />
+            android:layout_marginStart="15dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/listPostComments"
+            <ImageView
+                android:id="@+id/listPostCommentImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:src="@drawable/ic_baseline_message_24" />
+
+            <TextView
+                android:id="@+id/listPostComments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="center"
+
+                android:textColor="@color/textColor"
+
+                tools:text="123 comments" />
+        </LinearLayout>
+
+        <include
+            layout="@layout/vote_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_gravity="center"
+            android:layout_marginEnd="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            android:textColor="@color/textColor"
-
-            tools:text="123 comments" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/postVoteContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/listPostContent"
-        android:layout_marginRight="20dp"
-        android:layout_alignParentEnd="true">
-
-        <TextView
-            android:id="@+id/listPostScore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:layout_marginEnd="5dp"
-
-            android:textColor="@color/textColor"
-            android:layout_gravity="center"
-
-            tools:text="1523"/>
-
-        <ImageButton
-            android:id="@+id/listBtnUpvote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:background="?android:selectableItemBackground"
-
-            android:src="@drawable/ic_baseline_arrow_upward_24" />
-
-        <ImageButton
-            android:id="@+id/listBtnDownvote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:background="?android:selectableItemBackground"
-
-            android:src="@drawable/ic_baseline_arrow_downward_24"/>
-
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
  </RelativeLayout>

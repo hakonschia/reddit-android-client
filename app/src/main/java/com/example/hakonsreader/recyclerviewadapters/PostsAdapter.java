@@ -181,12 +181,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             this.author = itemView.findViewById(R.id.post_info_author);
             this.title = itemView.findViewById(R.id.post_info_title);
 
-            this.score = itemView.findViewById(R.id.listPostScore);
+            this.score = itemView.findViewById(R.id.vote_bar_score);
             this.comments = itemView.findViewById(R.id.listPostComments);
-            this.upvote = itemView.findViewById(R.id.listBtnUpvote);
-            this.downvote = itemView.findViewById(R.id.listBtnDownvote);
+            this.upvote = itemView.findViewById(R.id.vote_bar_upvote);
+            this.downvote = itemView.findViewById(R.id.vote_bar_downvote);
 
-            this.content = itemView.findViewById(R.id.listPostContent);
+            this.content = itemView.findViewById(R.id.post_content);
 
             // Call the registered onClick listener when an item is clicked
             itemView.setOnClickListener(view -> {
