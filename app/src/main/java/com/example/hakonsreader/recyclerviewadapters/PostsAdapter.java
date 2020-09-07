@@ -177,9 +177,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             this.resources = itemView.getResources();
 
-            this.subreddit = itemView.findViewById(R.id.listPostSubreddit);
-            this.author = itemView.findViewById(R.id.listPostAuthor);
-            this.title = itemView.findViewById(R.id.listPostTitle);
+            this.subreddit = itemView.findViewById(R.id.post_info_subreddit);
+            this.author = itemView.findViewById(R.id.post_info_author);
+            this.title = itemView.findViewById(R.id.post_info_title);
+
             this.score = itemView.findViewById(R.id.listPostScore);
             this.comments = itemView.findViewById(R.id.listPostComments);
             this.upvote = itemView.findViewById(R.id.listBtnUpvote);

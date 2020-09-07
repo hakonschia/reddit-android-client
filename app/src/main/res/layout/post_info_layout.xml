@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- This file contains a layout for the post information, such as what sub it is in, title, author etc -->
+
+    <TextView
+        android:id="@+id/post_info_subreddit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="15dp"
+
+        android:textColor="@color/linkColor"
+        android:textSize="14sp"
+
+        tools:text="r/GlobalOffensive" />
+
+    <TextView
+        android:id="@+id/post_info_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/post_info_subreddit"
+        android:layout_alignBottom="@id/post_info_subreddit"
+
+        android:layout_marginStart="15dp"
+
+        android:textSize="13sp"
+
+        tools:text="u/hakonschia"/>
+
+    <TextView
+        android:id="@+id/post_info_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_below="@id/post_info_subreddit"
+        android:textColor="@color/textColor"
+        android:textSize="17sp"
+
+        tools:text="FaZe wins major /s" />
+
+</RelativeLayout>
