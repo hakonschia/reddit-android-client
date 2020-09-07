@@ -45,9 +45,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     // Listener for when a list item has been long clicked
     private OnClickListener<RedditPost> onLongClickListener;
 
-    // Listener for when the subreddit text in an item has been clicked
-    private OnClickListener<String> onSubredditClickListener;
-
 
     /**
      * Sets the click listener for when an item in the list has been clicked
@@ -67,14 +64,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         this.onLongClickListener = onLongClickListener;
     }
 
-    /**
-     * Sets the click listener for when the subreddit text on an item has been clicked
-     *
-     * @param onSubredditClickListener The listener :)
-     */
-    public void setOnSubredditClickListener(OnClickListener<String> onSubredditClickListener) {
-        this.onSubredditClickListener = onSubredditClickListener;
-    }
 
     /**
      * Adds a list of posts to the current list of posts
@@ -92,6 +81,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public List<RedditPost> getPosts() {
         return posts;
     }
+
 
     @Override
     public int getItemCount() {
@@ -179,18 +169,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
                 return false;
             });
-
-            /*
-            TODO fix this
-            // Call the registered listener for when the text is clicked
-            this.subreddit.setOnClickListener(view -> {
-                int pos = getAdapterPosition();
-
-                if (onSubredditClickListener != null && pos != RecyclerView.NO_POSITION) {
-                    onSubredditClickListener.onClick(posts.get(pos).getSubreddit());
-                }
-            });
-             */
         }
 
         /**

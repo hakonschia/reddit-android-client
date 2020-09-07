@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.PostActivity;
-import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPostResponse;
@@ -100,9 +99,6 @@ public class SubredditFragment extends Fragment {
 
         // Set long clicks to copy the post link
         this.adapter.setOnLongClickListener(this::copyLinkToClipboard);
-
-        // Set the subreddit text to open that subreddit in a new activity
-        this.adapter.setOnSubredditClickListener(this::openSubredditInActivity);
     }
 
     /**
@@ -168,27 +164,6 @@ public class SubredditFragment extends Fragment {
         this.postsList.scrollToPosition(0);
 
         this.loadPosts();
-    }
-
-    /**
-     * Opens an activity with the selected subreddit
-     *
-     * @param subreddit The subreddit to open
-     */
-    private void openSubredditInActivity(String subreddit) {
-        // Don't open another activity if we are already in that subreddit (because honestly why would you)
-        if (this.subreddit.equals(subreddit)) {
-            return;
-        }
-
-        // Send some data like what sub it is etc etc so it knows what to load
-        Intent intent = new Intent(getActivity(), SubredditActivity.class);
-        intent.putExtra("subreddit", subreddit);
-
-        startActivity(intent);
-
-        // Slide the activity in
-        requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     /**

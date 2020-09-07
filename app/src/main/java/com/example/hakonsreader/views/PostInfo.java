@@ -1,13 +1,17 @@
 package com.example.hakonsreader.views;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 
 import java.time.Duration;
@@ -32,6 +36,19 @@ public class PostInfo extends ConstraintLayout {
         this.author = findViewById(R.id.post_info_author);
         this.age = findViewById(R.id.post_info_age);
         this.title = findViewById(R.id.post_info_title);
+
+
+        /*
+        TODO fix this
+        // Call the registered listener for when the text is clicked
+        this.subreddit.setOnClickListener(view -> {
+            int pos = getAdapterPosition();
+
+            if (onSubredditClickListener != null && pos != RecyclerView.NO_POSITION) {
+                onSubredditClickListener.onClick(posts.get(pos).getSubreddit());
+            }
+        });
+         */
     }
 
     /**
@@ -75,5 +92,35 @@ public class PostInfo extends ConstraintLayout {
         author.setText(authorText);
         age.setText(time);
         title.setText(post.getTitle());
+
+        // When the subreddit is clicked, open the selected subreddit in a new activity
+        subreddit.setOnClickListener(view -> openSubredditInActivity(post.getSubreddit()));
+    }
+
+    /**
+     * Opens an activity with the selected subreddit
+     *
+     * @param subreddit The subreddit to open
+     */
+    private void openSubredditInActivity(String subreddit) {
+        Activity activity = (Activity)getContext();
+
+        // TODO find a better way to do this (to not open the sub if we are in the sub before
+        //  this works because we are always in MainActivity when we're at a place where it makes sense
+        //  to be able to click on a subreddit to open it.
+        //  Opening a post from PostActivity doesnt work
+        // Don't open another activity if we are already in that subreddit (because honestly why would you)
+        if (!(activity instanceof MainActivity)) {
+            return;
+        }
+
+        // Send some data like what sub it is etc etc so it knows what to load
+        Intent intent = new Intent(getContext(), SubredditActivity.class);
+        intent.putExtra("subreddit", subreddit);
+
+        activity.startActivity(intent);
+
+        // Slide the activity in
+        activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 }
