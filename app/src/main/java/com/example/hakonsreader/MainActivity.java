@@ -64,18 +64,13 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Assume the token was created when the request was sent
-        token.setRetrievedAt(response.raw().sentRequestAtMillis());
-
         // Store access token
         AccessToken.storeToken(token);
 
         this.getUserInfo();
         Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
     };
-    private OnFailure<AccessToken> onTokenFailure = (call, t) -> {
-
-    };
+    private OnFailure<AccessToken> onTokenFailure = (call, t) -> { };
 
     // Response handler for retrieval of user information
     private OnResponse<User> onUserResponse = (call, response) -> {
@@ -98,9 +93,7 @@ public class MainActivity extends AppCompatActivity {
         // Make sure the profile fragment is updated next time the profile is selected
         this.profileFragment = null;
     };
-    private OnFailure<User> onUserFailure = (call, t) -> {
-
-    };
+    private OnFailure<User> onUserFailure = (call, t) -> { };
 
 
     @Override
@@ -117,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
         this.setupFragments();
 
         this.redditApi = RedditApi.getInstance();
+
+        Log.d(TAG, "onCreate: " + AccessToken.getStoredToken());
 
         // If there is a user logged in retrieve updated user information
         if (AccessToken.getStoredToken() != null) {

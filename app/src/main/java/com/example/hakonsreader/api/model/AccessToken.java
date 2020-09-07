@@ -1,6 +1,8 @@
 package com.example.hakonsreader.api.model;
 
 
+import android.util.Log;
+
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.google.gson.annotations.SerializedName;
@@ -9,6 +11,8 @@ import com.google.gson.annotations.SerializedName;
  * Class representing an OAuth access token from Reddit
  */
 public class AccessToken {
+    private static AccessToken token;
+
 
     @SerializedName("access_token")
     private String accessToken;
@@ -19,22 +23,11 @@ public class AccessToken {
     @SerializedName("expires_in")
     private int expiresIn;
 
-    private long retrievedAt;
-
     private String scope;
 
     @SerializedName("refresh_token")
     private String refreshToken;
 
-
-    /**
-     * Sets the unix timestamp of when the access token was retrieved
-     *
-     * @param unixTimestamp The timestamp the token was retrieved
-     */
-    public void setRetrievedAt(long unixTimestamp) {
-        this.retrievedAt = unixTimestamp;
-    }
 
     public String getAccessToken() {
         return accessToken;
@@ -71,17 +64,22 @@ public class AccessToken {
                 "accessToken='" + accessToken + '\'' +
                 ", tokenType='" + tokenType + '\'' +
                 ", expiresIn=" + expiresIn +
-                ", retrievedAt=" + retrievedAt +
                 ", scope='" + scope + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
                 '}';
     }
 
     /**
+     * Retrieves the current access token for the application
+     *
      * @return The access token stored in SharedPreferences
      */
     public static AccessToken getStoredToken() {
-        return SharedPreferencesManager.get(SharedPreferencesConstants.ACCESS_TOKEN, AccessToken.class);
+        if (AccessToken.token == null) {
+            AccessToken.token = SharedPreferencesManager.get(SharedPreferencesConstants.ACCESS_TOKEN, AccessToken.class);
+        }
+
+        return AccessToken.token;
     }
 
     /**
@@ -90,6 +88,8 @@ public class AccessToken {
      * @param token The token to store
      */
     public static void storeToken(AccessToken token) {
+        Log.d("AccessToken", "storeToken: " + token);
+        AccessToken.token = token;
         SharedPreferencesManager.put(SharedPreferencesConstants.ACCESS_TOKEN, token);
     }
 }

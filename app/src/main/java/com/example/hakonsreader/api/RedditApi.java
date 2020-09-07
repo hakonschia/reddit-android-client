@@ -83,8 +83,7 @@ public class RedditApi {
         @Nullable
         @Override
         public Request authenticate(@Nullable Route route, Response response) throws IOException {
-            Log.d(TAG, "authenticate: Retrieving new access token");
-            Log.d(TAG, "authenticate: " + accessToken);
+            Log.d(TAG, "authenticate retrieving new token: " + accessToken);
 
             if (accessToken == null) {
                 accessToken = AccessToken.getStoredToken();
@@ -135,35 +134,37 @@ public class RedditApi {
         HttpLoggingInterceptor logger = new HttpLoggingInterceptor();
         logger.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
-        // Add headers to every request
-        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
-                .authenticator(new Authenticator()) // Automatically refresh access token on authentication errors (401)
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
+                // Automatically refresh access token on authentication errors (401)
+                .authenticator(new Authenticator())
                 .addInterceptor(logger)
+                // Add User-Agent header to every request
+                // TODO get this to actually work because they dont get added
                 .addInterceptor(chain -> {
-                    Request request = chain.request()
-                            .newBuilder()
-                            .addHeader("User-Agent", NetworkConstants.USER_AGENT)
+                    Request original = chain.request();
+
+                    Request request = original.newBuilder()
+                            .header("User-Agent", NetworkConstants.USER_AGENT)
+                            .method(original.method(), original.body())
                             .build();
 
                     return chain.proceed(request);
                 });
 
-        // Create the RedditService object used to make API calls
-        Retrofit.Builder builder = new Retrofit.Builder()
+        // Create the API service object used to make API calls
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(NetworkConstants.REDDIT_OUATH_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(okHttpBuilder.build());
-
-        Retrofit retrofit = builder.build();
+                .client(clientBuilder.build())
+                .build();
         this.apiService = retrofit.create(RedditApiService.class);
 
-        // Access tokens are retrieved by a different URL than API calls
-        Retrofit.Builder oauthBuilder = new Retrofit.Builder()
+        // Create the service object for OAuth related calls
+        Retrofit oauthRetrofit = new Retrofit.Builder()
                 .baseUrl(NetworkConstants.REDDIT_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(okHttpBuilder.build());
-
-        Retrofit oauthRetrofit = oauthBuilder.build();
+                .client(clientBuilder.build())
+                .build();
         this.OAuthService = oauthRetrofit.create(RedditOAuthService.class);
     }
 
@@ -213,7 +214,7 @@ public class RedditApi {
      */
     private Call<AccessToken> refreshToken() {
         return this.OAuthService.refreshToken(
-                accessToken.getRefreshToken(),
+                this.accessToken.getRefreshToken(),
                 OAuthConstants.GRANT_TYPE_REFRESH
         );
     }
@@ -226,7 +227,7 @@ public class RedditApi {
      */
     public Call<Void> revokeRefreshToken() {
         return this.OAuthService.revokeToken(
-                accessToken.getRefreshToken(),
+                this.accessToken.getRefreshToken(),
                 OAuthConstants.TOKEN_TYPE_REFRESH
         );
     }
