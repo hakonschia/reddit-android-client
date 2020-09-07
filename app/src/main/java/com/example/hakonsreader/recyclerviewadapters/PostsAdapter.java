@@ -201,7 +201,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public Pair<View, String>[] getPostTransitionViews() {
             // TODO possibly add content
            return new Pair[] {
-                Pair.create(this.postInfo, "layout_post_info"),
+                Pair.create(this.postInfo, "post_info"),
                 Pair.create(this.postFullBar, "post_full_bar")
             };
         }

@@ -10,6 +10,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 
+/**
+ * View for info about posts (title, author, subreddit etc)
+ */
 public class PostInfo extends ConstraintLayout {
     private TextView subreddit;
     private TextView author;
