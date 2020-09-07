@@ -63,9 +63,9 @@ public class PostInfo extends ConstraintLayout {
         if (between.toDays() > 0) {
             time = String.format(context.getString(R.string.post_age_days), between.toDays());
         } else if (between.toHours() > 0) {
-            time = String.format(context.getString(R.string.post_age_hours), between.toDays());
+            time = String.format(context.getString(R.string.post_age_hours), between.toHours());
         } else {
-            time = String.format(context.getString(R.string.post_age_minutes), between.toDays());
+            time = String.format(context.getString(R.string.post_age_minutes), between.toMinutes());
         }
 
         String subredditText = String.format(context.getString(R.string.subredditPrefixed), post.getSubreddit());
