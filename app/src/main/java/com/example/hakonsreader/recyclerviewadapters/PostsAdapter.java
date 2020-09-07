@@ -170,6 +170,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private ImageButton downvote;
 
         private View postInfo;
+        private View postFullBar;
 
         private FrameLayout content;
 
@@ -182,6 +183,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             this.resources = itemView.getResources();
 
             this.postInfo = itemView.findViewById(R.id.post_info);
+            this.postFullBar = itemView.findViewById(R.id.post_full_bar);
 
             this.subreddit = itemView.findViewById(R.id.post_info_subreddit);
             this.author = itemView.findViewById(R.id.post_info_author);
@@ -242,6 +244,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         public View getPostInfo() {
             return postInfo;
+        }
+
+        public View getPostFullBar() {
+            return postFullBar;
         }
 
         /**

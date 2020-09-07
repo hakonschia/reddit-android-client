@@ -12,11 +12,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <include layout="@layout/full_post_bar"
+        android:id="@+id/post_full_bar_comments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_info_comments"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/post_comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/post_info_comments" />
+        android:layout_below="@+id/post_full_bar_comments" />
 
 </RelativeLayout>

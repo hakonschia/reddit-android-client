@@ -9,7 +9,6 @@
 
     <!-- This file contains a layout for the post information, such as what sub it is in, title, author etc -->
 
-
     <TextView
         android:id="@+id/post_info_subreddit"
         android:layout_width="wrap_content"
