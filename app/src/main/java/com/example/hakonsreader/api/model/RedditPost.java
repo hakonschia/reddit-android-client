@@ -130,6 +130,12 @@ public class RedditPost {
         return data.spoiler;
     }
 
+    /**
+     * @return The unix timestamp in UTC when the post was created
+     */
+    public long getCreatedAt() {
+        return (long)data.createdAt;
+    }
 
     public String getUrl() {
         return this.data.url;

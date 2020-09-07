@@ -10,6 +10,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 
+import java.time.Duration;
+import java.time.Instant;
+
 /**
  * View for info about posts (title, author, subreddit etc)
  */
@@ -47,14 +50,30 @@ public class PostInfo extends ConstraintLayout {
      * Updates the information based on the post set
      */
     private void updateInfo() {
-        // TODO set age
         Context context = getContext();
+
+        Instant created = Instant.ofEpochSecond(post.getCreatedAt());
+        Instant now = Instant.now();
+
+        String time;
+
+        Duration between = Duration.between(created, now);
+
+        // This is kinda bad but whatever
+        if (between.toDays() > 0) {
+            time = String.format(context.getString(R.string.post_age_days), between.toDays());
+        } else if (between.toHours() > 0) {
+            time = String.format(context.getString(R.string.post_age_hours), between.toDays());
+        } else {
+            time = String.format(context.getString(R.string.post_age_minutes), between.toDays());
+        }
 
         String subredditText = String.format(context.getString(R.string.subredditPrefixed), post.getSubreddit());
         String authorText = String.format(context.getString(R.string.authorPrefixed), post.getAuthor());
 
         subreddit.setText(subredditText);
         author.setText(authorText);
+        age.setText(time);
         title.setText(post.getTitle());
     }
 }

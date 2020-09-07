@@ -38,4 +38,9 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+
+    <string name="post_age_minutes">%d minutes</string>
+    <string name="post_age_hours">%d hours</string>
+    <string name="post_age_days">%d days</string>
 </resources>
