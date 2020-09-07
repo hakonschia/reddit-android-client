@@ -1,6 +1,5 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -19,9 +18,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.Util;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPost.PostType;
+import com.example.hakonsreader.listeners.VoteButtonListener;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.squareup.picasso.Picasso;
 
@@ -125,35 +126,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.score.setText(String.format("%d", post.getScore()));
         holder.comments.setText(numComments);
 
-        holder.upvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Upvote, holder));
-        holder.downvote.setOnClickListener(v -> this.vote(post, RedditApi.VoteType.Downvote, holder));
+        holder.upvote.setOnClickListener(new VoteButtonListener(
+                post,
+                RedditApi.VoteType.Upvote,
+                () -> Util.updateVoteStatus(post, holder.postFullBar, holder.itemView.getContext()))
+        );
+        holder.downvote.setOnClickListener(new VoteButtonListener(
+                post,
+                RedditApi.VoteType.Downvote,
+                () -> Util.updateVoteStatus(post, holder.postFullBar, holder.itemView.getContext()))
+        );
 
-        holder.updateVoteStatus(post);
-        holder.setPostContent(post);
+        // Update to set the initial vote status
+        Util.updateVoteStatus(post, holder.postFullBar, holder.itemView.getContext());
+
+        holder.setPostContent();
     }
 
-    /**
-     * Sends a request to vote on a given post
-     *
-     * @param post The post to upvote
-     * @param voteType The way to vote. If this vote is already what is voted the request is changed
-     *                 to VoteType.Unvote
-     */
-    private void vote(RedditPost post, RedditApi.VoteType voteType, ViewHolder holder) {
-        // Ie. if upvote is clicked when the post is already upvoted, unvote the post
-        if (voteType == post.getVoteType()) {
-            voteType = RedditApi.VoteType.NoVote;
-        }
-
-        RedditApi.VoteType finalVoteType = voteType;
-        this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post, (call, response) -> {
-            if (response.isSuccessful()) {
-                post.setVoteType(finalVoteType);
-
-                holder.updateVoteStatus(post);
-            }
-        }, (call, t) -> { });
-    }
 
     /**
      * The view for the items in the list
@@ -252,10 +241,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         /**
          * Sets the content of the post
-         *
-         * @param post The post with the content to set
          */
-        private void setPostContent(RedditPost post) {
+        private void setPostContent() {
             //Log.d(TAG, "addPostContent: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
 
             // Add the content
@@ -349,42 +336,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             });
 
             return textView;
-        }
-
-
-        /**
-         * Updates the vote status for a post (button + text colors)
-         *
-         * @param post The post to update for
-         */
-        private void updateVoteStatus(RedditPost post) {
-            RedditApi.VoteType voteType = post.getVoteType();
-
-            int color = R.color.textColor;
-            Context context = itemView.getContext();
-
-            // Reset both buttons as at least one will change
-            // (to avoid keeping the color if going from upvote to downvote and vice versa)
-            upvote.getDrawable().setTint(context.getColor(R.color.no_vote));
-            downvote.getDrawable().setTint(context.getColor(R.color.no_vote));
-
-            switch (voteType) {
-                case Upvote:
-                    color = R.color.upvoted;
-                    upvote.getDrawable().setTint(context.getColor(color));
-                    break;
-
-                case Downvote:
-                    color = R.color.downvoted;
-                    downvote.getDrawable().setTint(context.getColor(color));
-                    break;
-
-                case NoVote:
-                default:
-                    break;
-            }
-
-            score.setTextColor(context.getColor(color));
         }
     }
 }

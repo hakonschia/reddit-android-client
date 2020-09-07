@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
 
         android:background="?android:selectableItemBackground"
+        android:onClick=""
 
         android:src="@drawable/ic_baseline_arrow_downward_24"/>
 </LinearLayout>
