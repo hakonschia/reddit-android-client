@@ -6,21 +6,16 @@
     android:layout_height="wrap_content"
     tools:context=".activites.PostActivity">
 
-    <TextView
-        android:id="@+id/postTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <include layout="@layout/post_info_layout"
+        android:id="@+id/post_info_comments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-        android:layout_margin="10dp"
-        android:textSize="25sp"
-        android:textColor="@color/textColor"
-
-        tools:text="FaZe loser major, if you couldn't guess that"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/listPostComments"
+        android:id="@+id/post_comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/postTitle" />
+        android:layout_below="@+id/post_info_comments" />
 
 </RelativeLayout>

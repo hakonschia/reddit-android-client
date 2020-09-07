@@ -40,7 +40,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private RedditApi redditApi = RedditApi.getInstance();
 
     // Listener for when a list item has been clicked
-    private OnClickListener<RedditPost> onClickListener;
+    private OnClickListener<ViewHolder> onClickListener;
 
     // Listener for when a list item has been long clicked
     private OnClickListener<RedditPost> onLongClickListener;
@@ -54,7 +54,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      *
      * @param onClickListener The listener :)
      */
-    public void setOnClickListener(OnClickListener<RedditPost> onClickListener) {
+    public void setOnClickListener(OnClickListener<ViewHolder> onClickListener) {
         this.onClickListener = onClickListener;
     }
 
@@ -113,6 +113,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final RedditPost post = this.posts.get(position);
+        holder.post = post;
 
         String subreddit = String.format(holder.resources.getString(R.string.subredditPrefixed), post.getSubreddit());
         String author = String.format(holder.resources.getString(R.string.authorPrefixed), post.getAuthor());
@@ -158,6 +159,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      * The view for the items in the list
      */
     public class ViewHolder extends RecyclerView.ViewHolder {
+        private RedditPost post;
+
         private TextView subreddit;
         private TextView author;
         private TextView title;
@@ -165,6 +168,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private TextView comments;
         private ImageButton upvote;
         private ImageButton downvote;
+
+        private View postInfo;
 
         private FrameLayout content;
 
@@ -174,15 +179,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             this.itemView = itemView;
-
             this.resources = itemView.getResources();
+
+            this.postInfo = itemView.findViewById(R.id.post_info);
 
             this.subreddit = itemView.findViewById(R.id.post_info_subreddit);
             this.author = itemView.findViewById(R.id.post_info_author);
             this.title = itemView.findViewById(R.id.post_info_title);
 
             this.score = itemView.findViewById(R.id.vote_bar_score);
-            this.comments = itemView.findViewById(R.id.listPostComments);
+            this.comments = itemView.findViewById(R.id.post_comments);
             this.upvote = itemView.findViewById(R.id.vote_bar_upvote);
             this.downvote = itemView.findViewById(R.id.vote_bar_downvote);
 
@@ -193,7 +199,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 int pos = getAdapterPosition();
 
                 if (onClickListener != null && pos != RecyclerView.NO_POSITION) {
-                    onClickListener.onClick(posts.get(pos));
+                    onClickListener.onClick(this);
                 }
             });
 
@@ -220,6 +226,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             });
         }
 
+        /**
+         * The post this view holder currently holds
+         *
+         * @return The Reddit post shown in this view holder
+         */
+        public RedditPost getPost() {
+            return post;
+        }
+
+        /**
+         * Retrieve the full view of the post information
+         *
+         * @return The entire view that holds the title, author etc.
+         */
+        public View getPostInfo() {
+            return postInfo;
+        }
 
         /**
          * Sets the content of the post

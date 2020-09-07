@@ -55,14 +55,13 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/listPostCommentImg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
                 android:src="@drawable/ic_baseline_message_24" />
 
             <TextView
-                android:id="@+id/listPostComments"
+                android:id="@+id/post_comments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 

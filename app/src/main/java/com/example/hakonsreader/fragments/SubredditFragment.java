@@ -13,11 +13,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -25,6 +27,7 @@ import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.interfaces.OnFailure;
 import com.example.hakonsreader.interfaces.OnResponse;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -92,11 +95,28 @@ public class SubredditFragment extends Fragment {
         this.adapter = new PostsAdapter();
         this.lastLoadAttemptCount = 0;
 
-        // Set the subreddit text to open that subreddit in a new activity
-        this.adapter.setOnSubredditClickListener(this::openSubredditInActivity);
+        // Open post with comments when clicked
+        this.adapter.setOnClickListener(this::openPost);
 
         // Set long clicks to copy the post link
         this.adapter.setOnLongClickListener(this::copyLinkToClipboard);
+
+        // Set the subreddit text to open that subreddit in a new activity
+        this.adapter.setOnSubredditClickListener(this::openSubredditInActivity);
+    }
+
+    /**
+     * Opens a Reddit post in a new activity to show comments
+     *
+     * @param view The view holder of the post clicked
+     */
+    private void openPost(PostsAdapter.ViewHolder view) {
+        Intent intent = new Intent(requireActivity(), PostActivity.class);
+        intent.putExtra("post", new Gson().toJson(view.getPost()));
+
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), view.getPostInfo(), "post_info");
+
+        startActivity(intent, options.toBundle());
     }
 
     /**
