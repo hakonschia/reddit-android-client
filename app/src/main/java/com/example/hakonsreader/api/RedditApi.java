@@ -137,7 +137,7 @@ public class RedditApi {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 // Automatically refresh access token on authentication errors (401)
                 .authenticator(new Authenticator())
-                .addInterceptor(logger)
+                //.addInterceptor(logger)
                 // Add User-Agent header to every request
                 // TODO get this to actually work because they dont get added
                 .addInterceptor(chain -> {

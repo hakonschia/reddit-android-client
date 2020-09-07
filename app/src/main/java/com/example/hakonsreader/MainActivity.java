@@ -25,6 +25,8 @@ import com.example.hakonsreader.interfaces.OnResponse;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -105,6 +107,11 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
+
+        Map<String, ?> p = prefs.getAll();
+        p.forEach((k, v) -> {
+            Log.d(TAG, "onCreate: " + k + ": " + v);
+        });
 
         this.setupNavBar();
         this.setupFragments();
