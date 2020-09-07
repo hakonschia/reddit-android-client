@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,34 +18,51 @@
         android:layout_marginStart="15dp"
 
         android:textColor="@color/linkColor"
-        android:textSize="14sp"
 
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="r/GlobalOffensive" />
 
     <TextView
         android:id="@+id/post_info_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/post_info_subreddit"
-        android:layout_alignBottom="@id/post_info_subreddit"
 
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="12dp"
 
         android:textSize="13sp"
 
-        tools:text="u/hakonschia"/>
+        app:layout_constraintStart_toEndOf="@+id/post_info_subreddit"
+        app:layout_constraintTop_toTopOf="@+id/post_info_subreddit"
+        tools:text="u/hakonschia" />
+
+    <TextView
+        android:id="@+id/post_info_age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textSize="13sp"
+        app:layout_constraintStart_toEndOf="@+id/post_info_author"
+
+        app:layout_constraintTop_toTopOf="@+id/post_info_author"
+        tools:text="2h" />
+
 
     <TextView
         android:id="@+id/post_info_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginBottom="15dp"
-        android:layout_below="@id/post_info_subreddit"
+        android:paddingBottom="8dp"
+
         android:textColor="@color/textColor"
         android:textSize="17sp"
 
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_info_subreddit"
         tools:text="FaZe wins major /s" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

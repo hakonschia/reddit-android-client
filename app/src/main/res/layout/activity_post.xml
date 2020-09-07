@@ -7,12 +7,12 @@
     android:background="@color/background"
     tools:context=".activites.PostActivity">
 
-    <include layout="@layout/post_info_layout"
+    <com.example.hakonsreader.views.PostInfo
         android:id="@+id/post_info_comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <include layout="@layout/full_post_bar"
+    <include layout="@layout/layout_full_post_bar"
         android:id="@+id/post_full_bar_comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,6 +24,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/post_full_bar_comments"
 
-        tools:listitem="@layout/layout_comment"/>
+        tools:listitem="@layout/list_layout_comment"/>
 
 </RelativeLayout>

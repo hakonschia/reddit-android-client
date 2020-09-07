@@ -39,7 +39,7 @@
         tools:text="@tools:sample/lorem"/>
 
     <include
-        layout="@layout/vote_bar"
+        layout="@layout/layout_vote_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 

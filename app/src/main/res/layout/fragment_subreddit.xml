@@ -56,6 +56,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbarLayout"
-        tools:listitem="@layout/layout_post" />
+        tools:listitem="@layout/list_layout_post" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

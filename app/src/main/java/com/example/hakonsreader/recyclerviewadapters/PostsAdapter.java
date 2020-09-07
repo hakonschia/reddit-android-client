@@ -21,6 +21,7 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPost.PostType;
 import com.example.hakonsreader.interfaces.OnClickListener;
+import com.example.hakonsreader.views.PostInfo;
 import com.example.hakonsreader.views.VoteBar;
 import com.squareup.picasso.Picasso;
 
@@ -101,7 +102,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.layout_post,
+                R.layout.list_layout_post,
                 parent,
                 false
         );
@@ -114,15 +115,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         final RedditPost post = this.posts.get(position);
         holder.post = post;
 
-        String subreddit = String.format(holder.resources.getString(R.string.subredditPrefixed), post.getSubreddit());
-        String author = String.format(holder.resources.getString(R.string.authorPrefixed), post.getAuthor());
         String numComments = holder.resources.getQuantityString(R.plurals.numComments, post.getAmountOfComments(), post.getAmountOfComments());
-
-        holder.subreddit.setText(subreddit);
-        holder.author.setText(author);
-        holder.title.setText(post.getTitle());
         holder.comments.setText(numComments);
 
+        holder.postInfo.setPost(post);
         holder.voteBar.setPost(post);
 
         // Update to set the initial vote status
@@ -136,14 +132,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private RedditPost post;
 
-        private TextView subreddit;
-        private TextView author;
-        private TextView title;
         private TextView comments;
 
+        private PostInfo postInfo;
         private VoteBar voteBar;
 
-        private View postInfo;
         private View postFullBar;
 
         private FrameLayout content;
@@ -159,9 +152,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             this.postInfo = itemView.findViewById(R.id.post_info);
             this.postFullBar = itemView.findViewById(R.id.post_full_bar);
 
-            this.subreddit = itemView.findViewById(R.id.post_info_subreddit);
-            this.author = itemView.findViewById(R.id.post_info_author);
-            this.title = itemView.findViewById(R.id.post_info_title);
             this.comments = itemView.findViewById(R.id.post_comments);
 
             this.voteBar = itemView.findViewById(R.id.vote_bar);
@@ -190,6 +180,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 return false;
             });
 
+            /*
+            TODO fix this
             // Call the registered listener for when the text is clicked
             this.subreddit.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
@@ -198,6 +190,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     onSubredditClickListener.onClick(posts.get(pos).getSubreddit());
                 }
             });
+             */
         }
 
         /**
@@ -208,7 +201,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public Pair<View, String>[] getPostTransitionViews() {
             // TODO possibly add content
            return new Pair[] {
-                Pair.create(this.postInfo, "post_info"),
+                Pair.create(this.postInfo, "layout_post_info"),
                 Pair.create(this.postFullBar, "post_full_bar")
             };
         }

@@ -17,7 +17,7 @@ import java.util.Locale;
 
 /**
  * Vote bar including buttons to upvote and downvote, and a text holding the current score
- * Layout file: {@code layout/vote_bar.xml}
+ * Layout file: {@code layout/layout_vote_bar.xml}
  */
 public class VoteBar extends ConstraintLayout {
     private RedditApi redditApi = RedditApi.getInstance();
@@ -27,6 +27,19 @@ public class VoteBar extends ConstraintLayout {
     private ImageButton downvote;
 
     private RedditPost post;
+
+
+    public VoteBar(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        inflate(getContext(), R.layout.layout_vote_bar, this);
+
+        this.score = findViewById(R.id.vote_bar_score);
+        this.upvote = findViewById(R.id.vote_bar_upvote);
+        this.downvote = findViewById(R.id.vote_bar_downvote);
+
+        this.upvote.setOnClickListener(v -> this.vote(RedditApi.VoteType.Upvote));
+        this.downvote.setOnClickListener(v -> this.vote(RedditApi.VoteType.Downvote));
+    }
 
     /**
      * Sets the post to use in this VoteBar and sets the initial state of the vote status
@@ -38,19 +51,6 @@ public class VoteBar extends ConstraintLayout {
         // Make sure the initial status is up to date
         this.updateVoteStatus();
     }
-
-    public VoteBar(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        inflate(getContext(), R.layout.vote_bar, this);
-
-        this.score = findViewById(R.id.vote_bar_score);
-        this.upvote = findViewById(R.id.vote_bar_upvote);
-        this.downvote = findViewById(R.id.vote_bar_downvote);
-
-        this.upvote.setOnClickListener(v -> this.vote(RedditApi.VoteType.Upvote));
-        this.downvote.setOnClickListener(v -> this.vote(RedditApi.VoteType.Downvote));
-    }
-
 
     /**
      * Sends a request to vote on a given post
