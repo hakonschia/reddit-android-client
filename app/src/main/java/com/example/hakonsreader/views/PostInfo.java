@@ -36,19 +36,6 @@ public class PostInfo extends ConstraintLayout {
         this.author = findViewById(R.id.post_info_author);
         this.age = findViewById(R.id.post_info_age);
         this.title = findViewById(R.id.post_info_title);
-
-
-        /*
-        TODO fix this
-        // Call the registered listener for when the text is clicked
-        this.subreddit.setOnClickListener(view -> {
-            int pos = getAdapterPosition();
-
-            if (onSubredditClickListener != null && pos != RecyclerView.NO_POSITION) {
-                onSubredditClickListener.onClick(posts.get(pos).getSubreddit());
-            }
-        });
-         */
     }
 
     /**

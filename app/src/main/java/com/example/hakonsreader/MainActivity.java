@@ -3,7 +3,6 @@ package com.example.hakonsreader;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -143,11 +142,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * @return The width of the screen in pixels
+     */
     private int getScreenWidth() {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        return displayMetrics.widthPixels;
+        return getResources().getDisplayMetrics().widthPixels;
     }
 
     /**
@@ -156,11 +155,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupFragments() {
         this.postsFragment = new PostsContainerFragment();
 
-        // TODO find a proper way to do this without creating all fragments at the start and-
-        //  having all fragments alive (keep state or something to keep posts)
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainer, this.postsFragment);
-        transaction.commit();
+        getSupportFragmentManager().beginTransaction()
+            .replace(R.id.fragmentContainer, this.postsFragment)
+            .commit();
     }
 
     /**

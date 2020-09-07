@@ -310,7 +310,7 @@ public class RedditApi {
         // so add it anyways
         url += ".json";
 
-        this.apiService.getPosts(url, after, count, "all", tokenString).enqueue(new Callback<RedditPostResponse>() {
+        this.apiService.getPosts(url, after, count, tokenString).enqueue(new Callback<RedditPostResponse>() {
             @Override
             public void onResponse(Call<RedditPostResponse> call, retrofit2.Response<RedditPostResponse> response) {
                 onResponse.onResponse(call, response);

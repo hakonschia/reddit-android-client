@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -280,10 +281,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private TextView generateLinkContent(RedditPost post) {
             String url = post.getUrl();
 
-            TextView textView = new TextView(itemView.getContext());
+            Context context = itemView.getContext();
+
+            TextView textView = new TextView(context);
             textView.setText(url);
-            // TODO fix this to add a theme
-            textView.setTextColor(resources.getColor(R.color.linkColor));
+            textView.setTextColor(context.getColor(R.color.linkColor));
             textView.setOnClickListener(v -> {
                 Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 itemView.getContext().startActivity(i);

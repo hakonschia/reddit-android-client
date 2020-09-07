@@ -25,7 +25,6 @@ public interface RedditApiService {
 
     /**
      * Retrieves posts from Reddit
-     * TODO paging (infinite reading)
      *
      * @param url The URL to retrieve posts from
      *            <p>The URL format for front page for not logged in user or a subreddit is: https://reddit.com/.json</p>
@@ -38,7 +37,6 @@ public interface RedditApiService {
     Call<RedditPostResponse> getPosts(@Url String url,
                                       @Query("after") String after,
                                       @Query("count") int count,
-                                      @Query("show") String show,
                                       @Header("Authorization") String accessToken
     );
 
