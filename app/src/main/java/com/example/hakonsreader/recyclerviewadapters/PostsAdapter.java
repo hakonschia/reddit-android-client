@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.MainActivity;
@@ -365,18 +364,18 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             // Reset both buttons as at least one will change
             // (to avoid keeping the color if going from upvote to downvote and vice versa)
-            upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
-            downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+            upvote.getDrawable().setTint(context.getColor(R.color.no_vote));
+            downvote.getDrawable().setTint(context.getColor(R.color.no_vote));
 
             switch (voteType) {
                 case Upvote:
                     color = R.color.upvoted;
-                    upvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+                    upvote.getDrawable().setTint(context.getColor(color));
                     break;
 
                 case Downvote:
                     color = R.color.downvoted;
-                    downvote.setBackgroundTintList(ContextCompat.getColorStateList(context, color));
+                    downvote.getDrawable().setTint(context.getColor(color));
                     break;
 
                 case NoVote:

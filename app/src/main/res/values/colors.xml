@@ -13,4 +13,5 @@
     <!-- Upvote/downvote button colors-->
     <color name="upvoted">#FF6130</color>
     <color name="downvoted">#2196F3</color>
+    <color name="no_vote">#818181</color>
 </resources>
