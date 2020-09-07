@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.MainActivity;
@@ -228,25 +229,25 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         /**
+         * Gets a list of pairs of the views that should be transitioned to the post activity
+         *
+         * @return An array of {@link Pair<View, String>} mapping the view to its transition name in the new activity
+         */
+        public Pair<View, String>[] getPostTransitionViews() {
+            // TODO possibly add content
+           return new Pair[] {
+                Pair.create(this.postInfo, "post_info"),
+                Pair.create(this.postFullBar, "post_full_bar")
+            };
+        }
+
+        /**
          * The post this view holder currently holds
          *
          * @return The Reddit post shown in this view holder
          */
         public RedditPost getPost() {
             return post;
-        }
-
-        /**
-         * Retrieve the full view of the post information
-         *
-         * @return The entire view that holds the title, author etc.
-         */
-        public View getPostInfo() {
-            return postInfo;
-        }
-
-        public View getPostFullBar() {
-            return postFullBar;
         }
 
         /**

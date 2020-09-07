@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -115,10 +114,7 @@ public class SubredditFragment extends Fragment {
         Intent intent = new Intent(requireActivity(), PostActivity.class);
         intent.putExtra("post", new Gson().toJson(view.getPost()));
 
-        Pair<View, String> postInfo = Pair.create(view.getPostInfo(), "post_info");
-        Pair<View, String> postBar = Pair.create(view.getPostFullBar(), "post_full_bar");
-
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), postInfo, postBar);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), view.getPostTransitionViews());
 
         startActivity(intent, options.toBundle());
     }
