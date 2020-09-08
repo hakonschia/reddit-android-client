@@ -12,17 +12,27 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.SectionsPageAdapter;
 
 
 /**
  * Fragment that contains the subreddit fragments
  */
-public class PostsContainerFragment extends Fragment {
+public class PostsContainerFragment extends Fragment implements ItemLoadingListener {
     private static final String TAG = "PostsContainerFragment";
 
     private SubredditFragment[] fragments;
+    private ItemLoadingListener loadingListener;
 
+    /**
+     * Sets the listener to be notified for when this listener has started/finished loading something
+     *
+     * @param loadingListener The listener
+     */
+    public void setLoadingListener(ItemLoadingListener loadingListener) {
+        this.loadingListener = loadingListener;
+    }
 
     /**
      * Creates and initializes the fragments needed. Sets the fragments array
@@ -46,8 +56,9 @@ public class PostsContainerFragment extends Fragment {
     private void setupViewPager(ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getChildFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
-        for (Fragment fragment : this.fragments) {
+        for (SubredditFragment fragment : this.fragments) {
             adapter.addFragment(fragment);
+            fragment.setLoadingListener(this);
         }
 
         viewPager.setAdapter(adapter);
@@ -68,5 +79,12 @@ public class PostsContainerFragment extends Fragment {
         this.setupViewPager(viewPager);
 
         return view;
+    }
+
+    @Override
+    public void onCountChange(boolean up) {
+        if (this.loadingListener != null) {
+            this.loadingListener.onCountChange(up);
+        }
     }
 }

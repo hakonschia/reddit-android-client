@@ -26,6 +26,7 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.google.gson.Gson;
 
@@ -35,7 +36,7 @@ import java.util.List;
  * Fragment containing a subreddit
  */
 public class SubredditFragment extends Fragment {
-    private static final String TAG = "PostsFragment";
+    private static final String TAG = "SubredditFragment";
 
     // The amount of posts left in the list before attempting to load more posts automatically
     private static final int NUM_REMAINING_POSTS_BEFORE_LOAD = 6;
@@ -43,11 +44,14 @@ public class SubredditFragment extends Fragment {
 
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
+    private String subreddit;
+
     private PostsAdapter adapter;
     private LinearLayoutManager layoutManager;
-
     private RecyclerView postsList;
-    private String subreddit;
+
+    private ItemLoadingListener loadingListener;
+
 
     // The amount of items in the list at the last attempt at loading more posts
     private int lastLoadAttemptCount;
@@ -71,6 +75,8 @@ public class SubredditFragment extends Fragment {
 
     // Response handler for loading posts
     private OnResponse<RedditPostResponse> onPostResponse = (call, response) -> {
+        this.decreaseLoadingCount();
+
         if (!response.isSuccessful() || response.body() == null) {
             return;
         }
@@ -81,7 +87,7 @@ public class SubredditFragment extends Fragment {
     };
     // Failure handler for loading posts
     private OnFailure<RedditPostResponse> onPostFailure = (call, t) -> {
-
+        this.decreaseLoadingCount();
     };
 
 
@@ -100,6 +106,15 @@ public class SubredditFragment extends Fragment {
 
         // Set long clicks to copy the post link
         this.adapter.setOnLongClickListener(this::copyLinkToClipboard);
+    }
+
+    /**
+     * Sets the listener to be notified for when this listener has started/finished loading something
+     *
+     * @param loadingListener The listener
+     */
+    public void setLoadingListener(ItemLoadingListener loadingListener) {
+        this.loadingListener = loadingListener;
     }
 
     /**
@@ -150,6 +165,7 @@ public class SubredditFragment extends Fragment {
         // Store the current attempt to load more posts to avoid attempting many times if it fails
         this.lastLoadAttemptCount = postsSize;
 
+        this.increaseLoadingCount();
         this.redditApi.getSubredditPosts(this.subreddit, after, postsSize, this.onPostResponse, this.onPostFailure);
     }
 
@@ -179,6 +195,17 @@ public class SubredditFragment extends Fragment {
         this.postsList.setOnScrollChangeListener(this.scrollListener);
     }
 
+    private void increaseLoadingCount() {
+        if (this.loadingListener != null) {
+            this.loadingListener.onCountChange(true);
+        }
+    }
+
+    private void decreaseLoadingCount() {
+        if (this.loadingListener != null) {
+            this.loadingListener.onCountChange(false);
+        }
+    }
 
     @Nullable
     @Override

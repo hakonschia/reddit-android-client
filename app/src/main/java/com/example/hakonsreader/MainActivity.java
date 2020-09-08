@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -19,19 +20,23 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
+import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
+import com.example.hakonsreader.views.LoadingIcon;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ItemLoadingListener {
     private static final String TAG = "MainActivity";
 
     /**
      * The width of the screen of the current device
      */
     public static int SCREEN_WIDTH;
+
+    private LoadingIcon loadingIcon;
 
     // The fragments to show in the nav bar
     private PostsContainerFragment postsFragment;
@@ -47,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Handler for token responses. If an access token is given user information is automatically retrieved
     private OnResponse<AccessToken> onTokenResponse = (call, response) -> {
+        this.loadingIcon.decreaseLoadCount();
+
         if (!response.isSuccessful()) {
             Toast.makeText(MainActivity.this, "Access not given " + response.code(), Toast.LENGTH_LONG).show();
 
@@ -68,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
     };
-    private OnFailure<AccessToken> onTokenFailure = (call, t) -> { };
+    private OnFailure<AccessToken> onTokenFailure = (call, t) -> { this.loadingIcon.decreaseLoadCount(); };
 
 
     @Override
@@ -77,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         SCREEN_WIDTH = getScreenWidth();
+
+        this.loadingIcon = findViewById(R.id.loading_icon);
 
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
@@ -100,9 +109,32 @@ public class MainActivity extends AppCompatActivity {
         if (uri.toString().startsWith(NetworkConstants.CALLBACK_URL)) {
             String code = uri.getQueryParameter("code");
 
+            this.loadingIcon.increaseLoadCount();
             this.redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
         }
     }
+
+    @Override
+    public void onAttachFragment(@NonNull Fragment fragment) {
+        super.onAttachFragment(fragment);
+
+        // When the PostsContainer has been attached, register listener for when it has started/finished loading something
+        if (fragment instanceof PostsContainerFragment) {
+            PostsContainerFragment f = (PostsContainerFragment) fragment;
+
+            f.setLoadingListener(this);
+        }
+    }
+
+    @Override
+    public void onCountChange(boolean up) {
+        if (up) {
+            this.loadingIcon.increaseLoadCount();
+        } else {
+            this.loadingIcon.decreaseLoadCount();
+        }
+    }
+
 
     /**
      * @return The width of the screen in pixels
