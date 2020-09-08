@@ -17,6 +17,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPost.PostType;
+import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.views.FullPostBar;
 import com.example.hakonsreader.views.PostContentLink;
@@ -35,7 +36,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     
 
     private List<RedditPost> posts = new ArrayList<>();
-    private RedditApi redditApi = RedditApi.getInstance();
+    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
     // Listener for when a list item has been clicked
     private OnClickListener<ViewHolder> onClickListener;

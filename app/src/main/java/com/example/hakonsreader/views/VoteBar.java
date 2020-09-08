@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.constants.NetworkConstants;
 
 import java.util.Locale;
 
@@ -20,7 +21,7 @@ import java.util.Locale;
  * Layout file: {@code layout/layout_vote_bar.xml}
  */
 public class VoteBar extends ConstraintLayout {
-    private RedditApi redditApi = RedditApi.getInstance();
+    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
     private TextView score;
     private ImageButton upvote;

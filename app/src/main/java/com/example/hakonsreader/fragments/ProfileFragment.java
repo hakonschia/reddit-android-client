@@ -15,9 +15,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
+import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.constants.NetworkConstants;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -33,7 +34,7 @@ public class ProfileFragment extends Fragment {
 
     private boolean firstLoad = true;
 
-    private RedditApi redditApi = RedditApi.getInstance();
+    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
     private User user;
 
     private TextView username;

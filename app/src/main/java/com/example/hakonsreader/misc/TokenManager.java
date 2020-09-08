@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.AccessToken;
+import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 
 /**
@@ -39,7 +40,7 @@ public class TokenManager {
         token = newToken;
 
         // Notify the API
-        RedditApi.getInstance().setToken(newToken);
+        RedditApi.getInstance(NetworkConstants.USER_AGENT).setToken(newToken);
 
         // Save in shared prefs
         SharedPreferencesManager.put(SharedPreferencesConstants.ACCESS_TOKEN, newToken);

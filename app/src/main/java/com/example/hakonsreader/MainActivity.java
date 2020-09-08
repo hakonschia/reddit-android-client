@@ -117,10 +117,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setupRedditApi() {
         // Set the previously stored token, and the listener for new tokens
-        this.redditApi = RedditApi.getInstance();
+        this.redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
         this.redditApi.setToken(TokenManager.getToken());
         this.redditApi.setOnNewToken(TokenManager::saveToken);
-        this.redditApi.setUserAgent(NetworkConstants.USER_AGENT);
         this.redditApi.setLoggingLevel(HttpLoggingInterceptor.Level.BODY);
         this.redditApi.setCallbackURL(NetworkConstants.CALLBACK_URL);
         this.redditApi.setClientID(NetworkConstants.CLIENT_ID);

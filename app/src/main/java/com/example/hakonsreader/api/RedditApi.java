@@ -152,7 +152,9 @@ public class RedditApi {
 
 
 
-    private RedditApi() {
+    private RedditApi(String userAgent) {
+        this.userAgent = userAgent;
+
         this.logger = new HttpLoggingInterceptor();
 
         OkHttpClient client = new OkHttpClient.Builder()
@@ -161,14 +163,9 @@ public class RedditApi {
                 // Add User-Agent header to every request
                 .addInterceptor(chain -> {
                     Request original = chain.request();
-                    Request request = original;
-
-                    // Set the user agent if available
-                    if (this.userAgent != null) {
-                        request = original.newBuilder()
-                                .header("User-Agent", (this.userAgent == null ? "" : this.userAgent))
-                                .build();
-                    }
+                    Request request = original.newBuilder()
+                            .header("User-Agent", this.userAgent)
+                            .build();
 
                     return chain.proceed(request);
                 })
@@ -195,11 +192,13 @@ public class RedditApi {
 
 
     /**
-     * @return The RedditApi instance
+     * @param userAgent The user agent for the application.
+     * <p>See <a href="https://github.com/reddit-archive/reddit/wiki/API">Reddit documentation</a>
+     * on creating your user agent</p>* @return The RedditApi instance
      */
-    public static RedditApi getInstance() {
+    public static RedditApi getInstance(String userAgent) {
         if (instance == null) {
-            instance = new RedditApi();
+            instance = new RedditApi(userAgent);
         }
 
         return instance;
@@ -229,17 +228,6 @@ public class RedditApi {
      */
     public void setToken(AccessToken token) {
         this.accessToken = token;
-    }
-
-    /**
-     * Sets the value to use in the User-Agent header sent to Reddit
-     * <p>See <a href="https://github.com/reddit-archive/reddit/wiki/API">Reddit documentation</a>
-     * on creating your user agent</p>
-     *
-     * @param userAgent The user agent string for your application
-     */
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
     }
 
     /**
