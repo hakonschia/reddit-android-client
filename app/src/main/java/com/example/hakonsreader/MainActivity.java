@@ -69,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
         AccessToken.storeToken(token);
 
         this.getUserInfo();
+
+        // Re-create the start fragment as it now should load posts for the logged in user
+        this.setupStartFragment();
+
         Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
     };
     private OnFailure<AccessToken> onTokenFailure = (call, t) -> { };
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         this.setupNavBar();
-        this.setupFragments();
+        this.setupStartFragment();
 
         this.redditApi = RedditApi.getInstance();
 
@@ -152,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Creates new fragments and passes along needed information such as the access token
      */
-    private void setupFragments() {
+    private void setupStartFragment() {
         this.postsFragment = new PostsContainerFragment();
 
         getSupportFragmentManager().beginTransaction()
