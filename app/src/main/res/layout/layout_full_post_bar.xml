@@ -6,33 +6,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- The entire bar (comments + upvote etc) shown under posts -->
-    <LinearLayout
-        android:id="@+id/postCommentsContainer"
+    <ImageView
+        android:id="@+id/post_comments_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
+        android:src="@drawable/ic_baseline_message_24"
+
         android:layout_marginStart="15dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+    <TextView
+        android:id="@+id/post_num_comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
 
-            android:src="@drawable/ic_baseline_message_24" />
+        android:layout_gravity="center"
 
-        <TextView
-            android:id="@+id/post_comments"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        android:textColor="@color/textColor"
 
-            android:layout_gravity="center"
-
-            android:textColor="@color/textColor"
-
-            tools:text="123 comments" />
-    </LinearLayout>
+        app:layout_constraintBottom_toBottomOf="@+id/post_comments_img"
+        app:layout_constraintStart_toEndOf="@+id/post_comments_img"
+        app:layout_constraintTop_toTopOf="@+id/post_comments_img"
+        tools:text="123 comments" />
 
     <com.example.hakonsreader.views.VoteBar
         android:id="@+id/vote_bar"

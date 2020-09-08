@@ -38,7 +38,7 @@
     </FrameLayout>
 
 
-    <include layout="@layout/layout_full_post_bar"
+    <com.example.hakonsreader.views.FullPostBar
         android:id="@+id/post_full_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

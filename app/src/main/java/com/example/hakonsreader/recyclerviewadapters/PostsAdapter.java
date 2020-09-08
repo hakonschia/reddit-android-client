@@ -22,8 +22,8 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPost.PostType;
 import com.example.hakonsreader.interfaces.OnClickListener;
+import com.example.hakonsreader.views.FullPostBar;
 import com.example.hakonsreader.views.PostInfo;
-import com.example.hakonsreader.views.VoteBar;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -107,10 +107,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.post = post;
 
         String numComments = holder.resources.getQuantityString(R.plurals.numComments, post.getAmountOfComments(), post.getAmountOfComments());
-        holder.comments.setText(numComments);
 
         holder.postInfo.setPost(post);
-        holder.voteBar.setPost(post);
+        holder.fullPostBar.setPost(post);
 
         // Update to set the initial vote status
         holder.setPostContent();
@@ -123,12 +122,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private RedditPost post;
 
-        private TextView comments;
-
         private PostInfo postInfo;
-        private VoteBar voteBar;
-
-        private View postFullBar;
+        private FullPostBar fullPostBar;
 
         private FrameLayout content;
 
@@ -141,11 +136,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             this.resources = itemView.getResources();
 
             this.postInfo = itemView.findViewById(R.id.post_info);
-            this.postFullBar = itemView.findViewById(R.id.post_full_bar);
-
-            this.comments = itemView.findViewById(R.id.post_comments);
-
-            this.voteBar = itemView.findViewById(R.id.vote_bar);
+            this.fullPostBar = itemView.findViewById(R.id.post_full_bar);
 
             this.content = itemView.findViewById(R.id.post_content);
 
@@ -181,7 +172,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             // TODO possibly add content
            return new Pair[] {
                 Pair.create(this.postInfo, "post_info"),
-                Pair.create(this.postFullBar, "post_full_bar")
+                Pair.create(this.fullPostBar, "post_full_bar")
             };
         }
 

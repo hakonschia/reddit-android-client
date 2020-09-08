@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
 
+
+        Log.d(TAG, "onCreate: " + String.format("%dK Comments", 5));
+
         // Set the previously stored token, and the listener for new tokens
         this.redditApi = RedditApi.getInstance();
         this.redditApi.setToken(TokenManager.getToken());
