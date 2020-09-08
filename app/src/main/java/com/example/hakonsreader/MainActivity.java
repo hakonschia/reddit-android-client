@@ -68,37 +68,12 @@ public class MainActivity extends AppCompatActivity {
         // Store access token
         AccessToken.storeToken(token);
 
-        this.getUserInfo();
-
         // Re-create the start fragment as it now should load posts for the logged in user
-        this.setupStartFragment();
+        //this.setupStartFragment();
 
         Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
     };
     private OnFailure<AccessToken> onTokenFailure = (call, t) -> { };
-
-    // Response handler for retrieval of user information
-    private OnResponse<User> onUserResponse = (call, response) -> {
-        if (!response.isSuccessful()) {
-            Log.d(TAG, "onResponse: Error");
-
-            return;
-        }
-
-        User user = response.body();
-        if (user == null) {
-            Log.w(TAG, "onResponse: user is null");
-
-            return;
-        }
-
-        // Store the updated user information
-        User.storeUserInfo(user);
-
-        // Make sure the profile fragment is updated next time the profile is selected
-        this.profileFragment = null;
-    };
-    private OnFailure<User> onUserFailure = (call, t) -> { };
 
 
     @Override
@@ -111,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
 
+        this.redditApi = RedditApi.getInstance();
+
         Map<String, ?> p = prefs.getAll();
         p.forEach((k, v) -> {
             Log.d(TAG, "onCreate: " + k + ": " + v);
@@ -119,14 +96,8 @@ public class MainActivity extends AppCompatActivity {
         this.setupNavBar();
         this.setupStartFragment();
 
-        this.redditApi = RedditApi.getInstance();
 
         Log.d(TAG, "onCreate: " + AccessToken.getStoredToken());
-
-        // If there is a user logged in retrieve updated user information
-        if (AccessToken.getStoredToken() != null) {
-            this.getUserInfo();
-        }
     }
 
     @Override
@@ -216,13 +187,6 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
         });
-    }
-
-    /**
-     * Retrieves user information about the currently logged in user
-     */
-    public void getUserInfo() {
-        this.redditApi.getUserInfo(this.onUserResponse, this.onUserFailure);
     }
 
     /**
