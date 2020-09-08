@@ -1,15 +1,11 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
@@ -23,6 +19,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPost.PostType;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.views.FullPostBar;
+import com.example.hakonsreader.views.PostContentLink;
 import com.example.hakonsreader.views.PostInfo;
 import com.squareup.picasso.Picasso;
 
@@ -269,20 +266,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          * @param post The post to generate content for
          * @return A TextView
          */
-        private TextView generateLinkContent(RedditPost post) {
-            String url = post.getUrl();
+        private PostContentLink generateLinkContent(RedditPost post) {
+            PostContentLink content = new PostContentLink(itemView.getContext());
+            content.setPost(this.post);
 
-            Context context = itemView.getContext();
-
-            TextView textView = new TextView(context);
-            textView.setText(url);
-            textView.setTextColor(context.getColor(R.color.linkColor));
-            textView.setOnClickListener(v -> {
-                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                itemView.getContext().startActivity(i);
-            });
-
-            return textView;
+            return content;
         }
     }
 }
