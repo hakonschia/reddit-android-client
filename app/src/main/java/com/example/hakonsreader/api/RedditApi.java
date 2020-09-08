@@ -99,6 +99,9 @@ public class RedditApi {
                     return response.request();
                 }
 
+                // The response does not send a new refresh token, so make sure the old one is saved
+                newToken.setRefreshToken(accessToken.getRefreshToken());
+
                 AccessToken.storeToken(newToken);
                 accessToken = newToken;
 
