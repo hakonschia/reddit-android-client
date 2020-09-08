@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.exceptions.AccessTokenNotSetException;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
@@ -12,8 +13,9 @@ import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.OAuthConstants;
-import com.example.hakonsreader.interfaces.OnFailure;
-import com.example.hakonsreader.interfaces.OnResponse;
+import com.example.hakonsreader.api.interfaces.OnFailure;
+import com.example.hakonsreader.api.interfaces.OnResponse;
+import com.example.hakonsreader.misc.TokenManager;
 
 import java.io.IOException;
 
@@ -51,7 +53,7 @@ public class RedditApi {
          * Retrieve the underlying string value of the thing
          * <p>This value can be used in addition to the things ID to create the fullname of the thing</p>
          *
-         * @return The string identifier for the thing
+         * @return The string identifier for the thing (eg. "t1_")
          */
         public String getValue() {
             return value;
@@ -74,45 +76,10 @@ public class RedditApi {
     }
 
 
+
     /**
-     * Authenticator that automatically retrieves a new access token on 401 responses
+     * The instance of the API
      */
-    public class Authenticator implements okhttp3.Authenticator {
-        private static final String TAG = "Authenticator";
-        
-        @Nullable
-        @Override
-        public Request authenticate(@Nullable Route route, Response response) throws IOException {
-            Log.d(TAG, "authenticate retrieving new token: " + accessToken);
-
-            if (accessToken == null) {
-                accessToken = AccessToken.getStoredToken();
-            }
-
-            // If we have a previous access token with a refresh token
-            if (accessToken != null && accessToken.getRefreshToken() != null) {
-                AccessToken newToken = refreshToken();
-
-                // No new token received
-                if (newToken == null) {
-                    return response.request();
-                }
-
-                // The response does not send a new refresh token, so make sure the old one is saved
-                newToken.setRefreshToken(accessToken.getRefreshToken());
-
-                AccessToken.storeToken(newToken);
-                accessToken = newToken;
-
-                return response.request().newBuilder()
-                        .header("Authorization", newToken.generateHeaderString())
-                        .build();
-            }
-
-            return null;
-        }
-    }
-
     private static RedditApi instance;
 
     /**
@@ -130,6 +97,11 @@ public class RedditApi {
      * The access token to use for authorized API calls
      */
     private AccessToken accessToken;
+
+    /**
+     * The listener for when the authenticator retrieves a new token automatically
+     */
+    private OnNewToken onNewToken;
 
 
     private RedditApi() {
@@ -170,6 +142,16 @@ public class RedditApi {
         this.OAuthService = oauthRetrofit.create(RedditOAuthService.class);
     }
 
+
+    /**
+     * Sets the listener for what to do when a new token is received by the API
+     *
+     * @param onNewToken The token listener
+     */
+    public void setOnNewToken(OnNewToken onNewToken) {
+        this.onNewToken = onNewToken;
+    }
+
     /**
      * @return The RedditApi instance
      */
@@ -179,6 +161,17 @@ public class RedditApi {
         }
 
         return instance;
+    }
+
+    /**
+     * Sets the access token to use for authorized API calls
+     *
+     * @param token The token to use
+     */
+    public void setToken(AccessToken token) {
+        Log.d(TAG, "setToken: New token set: " + token);
+
+        this.accessToken = token;
     }
 
 
@@ -277,6 +270,8 @@ public class RedditApi {
                 onFailure.onFailure(call, t);
             }
         });
+
+        this.accessToken = null;
     }
 
     /**
@@ -285,8 +280,6 @@ public class RedditApi {
      * @throws AccessTokenNotSetException If there isn't any access token set
      */
     private void ensureTokenIsSet() throws AccessTokenNotSetException {
-        this.accessToken = AccessToken.getStoredToken();
-
         if (this.accessToken == null) {
             throw new AccessTokenNotSetException("Access token was not found");
         }
@@ -404,4 +397,47 @@ public class RedditApi {
         }
     }
 
+
+
+    /**
+     * Authenticator that automatically retrieves a new access token on 401 responses
+     */
+    public class Authenticator implements okhttp3.Authenticator {
+        private static final String TAG = "Authenticator";
+
+        @Nullable
+        @Override
+        public Request authenticate(@Nullable Route route, Response response) throws IOException {
+            Log.d(TAG, "authenticate retrieving new token: " + accessToken);
+
+            if (accessToken == null) {
+                accessToken = TokenManager.getToken();
+            }
+
+            // If we have a previous access token with a refresh token
+            if (accessToken != null && accessToken.getRefreshToken() != null) {
+                AccessToken newToken = refreshToken();
+
+                // No new token received
+                if (newToken == null) {
+                    return response.request();
+                }
+
+                // The response does not send a new refresh token, so make sure the old one is saved
+                newToken.setRefreshToken(accessToken.getRefreshToken());
+
+                if (onNewToken != null) {
+                    onNewToken.newToken(newToken);
+                } else {
+                    Log.d(TAG, "Warning: New token retrieved without a token listener. Use RedditApi#setOnNewToken(AccessToken) to retrieve the new token");
+                }
+
+                return response.request().newBuilder()
+                        .header("Authorization", newToken.generateHeaderString())
+                        .build();
+            }
+
+            return null;
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.hakonsreader.interfaces;
+package com.example.hakonsreader.api.interfaces;
 
 import retrofit2.Call;
 

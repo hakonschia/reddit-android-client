@@ -19,9 +19,10 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
-import com.example.hakonsreader.interfaces.OnFailure;
-import com.example.hakonsreader.interfaces.OnResponse;
+import com.example.hakonsreader.api.interfaces.OnFailure;
+import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
+import com.example.hakonsreader.misc.TokenManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Map;
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Store access token
-        AccessToken.storeToken(token);
+        TokenManager.saveToken(token);
 
         // Re-create the start fragment as it now should load posts for the logged in user
         //this.setupStartFragment();
@@ -82,7 +83,10 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
 
+        // Set the previously stored token, and the listener for new tokens
         this.redditApi = RedditApi.getInstance();
+        this.redditApi.setToken(TokenManager.getToken());
+        this.redditApi.setOnNewToken(TokenManager::saveToken);
 
         Map<String, ?> p = prefs.getAll();
         p.forEach((k, v) -> {
@@ -92,8 +96,7 @@ public class MainActivity extends AppCompatActivity {
         this.setupNavBar();
         this.setupStartFragment();
 
-
-        Log.d(TAG, "onCreate: " + AccessToken.getStoredToken());
+        Log.d(TAG, "onCreate: " + TokenManager.getToken());
     }
 
     @Override
@@ -204,15 +207,17 @@ public class MainActivity extends AppCompatActivity {
 
         } );
 
+
         // Clear shared preferences
-        this.clearUserInfoFromPrefs();
+        this.clearUserInfo();
     }
 
     /**
-     * Clears any information stored locally about a logged in user from SharedPreferences
+     * Clears any information stored locally about a logged in user
      */
-    private void clearUserInfoFromPrefs() {
-        SharedPreferencesManager.remove(SharedPreferencesConstants.ACCESS_TOKEN);
+    private void clearUserInfo() {
+        TokenManager.removeToken();
+
         SharedPreferencesManager.remove(SharedPreferencesConstants.USER_INFO);
     }
 }

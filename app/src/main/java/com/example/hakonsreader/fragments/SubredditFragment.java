@@ -23,8 +23,8 @@ import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditPostResponse;
-import com.example.hakonsreader.interfaces.OnFailure;
-import com.example.hakonsreader.interfaces.OnResponse;
+import com.example.hakonsreader.api.interfaces.OnFailure;
+import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.google.gson.Gson;
 

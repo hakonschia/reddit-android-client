@@ -16,8 +16,8 @@ import androidx.fragment.app.Fragment;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.User;
-import com.example.hakonsreader.interfaces.OnFailure;
-import com.example.hakonsreader.interfaces.OnResponse;
+import com.example.hakonsreader.api.interfaces.OnFailure;
+import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
