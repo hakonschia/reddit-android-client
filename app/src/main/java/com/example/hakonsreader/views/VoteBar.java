@@ -103,7 +103,18 @@ public class VoteBar extends ConstraintLayout {
                 break;
         }
 
-        score.setText(String.format(Locale.getDefault(), "%d", post.getScore()));
+        int scoreCount = post.getScore();
+
+        // For scores over 10000 show as "10.5k"
+        if (scoreCount > 10000) {
+            score.setText(String.format(
+                    Locale.getDefault(),
+                    getResources().getString(R.string.scoreThousands), scoreCount / 1000f)
+            );
+        } else {
+            score.setText(String.format(Locale.getDefault(), "%d", post.getScore()));
+        }
+
         score.setTextColor(getContext().getColor(color));
     }
 }

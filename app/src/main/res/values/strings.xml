@@ -15,6 +15,9 @@
         <item quantity="other">%d comments</item>
     </plurals>
 
+    <string name="scoreThousands">%.1fK</string>
+
+
     <string name="subredditPrefixed">r/%s</string>
     <string name="authorPrefixed">u/%s</string>
 
