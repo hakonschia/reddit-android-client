@@ -48,6 +48,8 @@ public class RedditPost {
         // Is the post locked?
         private boolean locked;
 
+        private String thumbnail;
+
 
         // Is the post NSFW?
         @SerializedName("over_18")
@@ -128,6 +130,10 @@ public class RedditPost {
 
     public boolean isSpoiler() {
         return data.spoiler;
+    }
+
+    public String getThumbnail() {
+        return data.thumbnail;
     }
 
     /**
