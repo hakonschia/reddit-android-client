@@ -1,21 +1,20 @@
 package com.example.hakonsreader.api;
 
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.api.interfaces.OnNewToken;
-import com.example.hakonsreader.exceptions.AccessTokenNotSetException;
+import com.example.hakonsreader.api.exceptions.AccessTokenNotSetException;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
-import com.example.hakonsreader.constants.NetworkConstants;
-import com.example.hakonsreader.constants.OAuthConstants;
+import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
-import com.example.hakonsreader.misc.TokenManager;
 
 import java.io.IOException;
 
@@ -75,6 +74,27 @@ public class RedditApi {
         }
     }
 
+    public static final String REDDIT_URL = "https://reddit.com/";
+
+    /**
+     *
+     * The standard Reddit API URL.
+     * <p>Do not use this for calls that should be authenticated with OAuth, see {@link RedditApi#REDDIT_OUATH_API_URL}</p>
+     */
+    public static final String REDDIT_API_URL = "https://www.reddit.com/api/";
+
+    /**
+     * The OAuth subdomain URL for Reddit.
+     * <p>This is used to retrieve posts from reddit</p>
+     */
+    public static final String REDDIT_OUATH_URL = "https://oauth.reddit.com/";
+
+    /**
+     * The Reddit API URL used when authenticated with OAuth.
+     * <p>This is used when making calls on behalf of a user with their access token</p>
+     */
+    public static final String REDDIT_OUATH_API_URL = REDDIT_OUATH_URL + "api/";
+
 
 
     /**
@@ -93,6 +113,7 @@ public class RedditApi {
      */
     private RedditOAuthService OAuthService;
 
+
     /**
      * The access token to use for authorized API calls
      */
@@ -103,54 +124,75 @@ public class RedditApi {
      */
     private OnNewToken onNewToken;
 
+    /**
+     * The logger for debug information
+     */
+    private HttpLoggingInterceptor logger;
+
+
+    /* ----------------- Client specific variables ----------------- */
+    /**
+     * The callback URL used for OAuth
+     */
+    private String callbackURL;
+
+    /**
+     * The client ID for the application
+     */
+    private String clientID;
+    /**
+     * The basic authentication header with client ID. Includes "Basic " prefix
+     */
+    private String basicAuthHeader;
+
+    /**
+     * The user agent of the client
+     */
+    private String userAgent;
+
+
 
     private RedditApi() {
-        HttpLoggingInterceptor logger = new HttpLoggingInterceptor();
-        logger.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        this.logger = new HttpLoggingInterceptor();
 
-        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
+        OkHttpClient client = new OkHttpClient.Builder()
                 // Automatically refresh access token on authentication errors (401)
                 .authenticator(new Authenticator())
-                .addInterceptor(logger)
                 // Add User-Agent header to every request
-                // TODO get this to actually work because they dont get added
                 .addInterceptor(chain -> {
                     Request original = chain.request();
+                    Request request = original;
 
-                    Request request = original.newBuilder()
-                            .header("User-Agent", NetworkConstants.USER_AGENT)
-                            .method(original.method(), original.body())
-                            .build();
+                    // Set the user agent if available
+                    if (this.userAgent != null) {
+                        request = original.newBuilder()
+                                .header("User-Agent", (this.userAgent == null ? "" : this.userAgent))
+                                .build();
+                    }
 
                     return chain.proceed(request);
-                });
+                })
+                // Logger has to be at the end or else it won't log what has been added before
+                .addInterceptor(this.logger)
+                .build();
 
         // Create the API service object used to make API calls
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(NetworkConstants.REDDIT_OUATH_API_URL)
+                .baseUrl(REDDIT_OUATH_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(clientBuilder.build())
+                .client(client)
                 .build();
         this.apiService = retrofit.create(RedditApiService.class);
 
         // Create the service object for OAuth related calls
         Retrofit oauthRetrofit = new Retrofit.Builder()
-                .baseUrl(NetworkConstants.REDDIT_API_URL)
+                .baseUrl(REDDIT_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(clientBuilder.build())
+                .client(client)
                 .build();
         this.OAuthService = oauthRetrofit.create(RedditOAuthService.class);
     }
 
-
-    /**
-     * Sets the listener for what to do when a new token is received by the API
-     *
-     * @param onNewToken The token listener
-     */
-    public void setOnNewToken(OnNewToken onNewToken) {
-        this.onNewToken = onNewToken;
-    }
 
     /**
      * @return The RedditApi instance
@@ -164,21 +206,71 @@ public class RedditApi {
     }
 
     /**
+     * Sets the listener for what to do when a new token is received by the API
+     *
+     * @param onNewToken The token listener
+     */
+    public void setOnNewToken(OnNewToken onNewToken) {
+        this.onNewToken = onNewToken;
+    }
+
+    /**
+     * @param loggingLevel The level at what to log
+     */
+    public void setLoggingLevel(HttpLoggingInterceptor.Level loggingLevel) {
+        this.logger.setLevel(loggingLevel);
+    }
+
+
+    /**
      * Sets the access token to use for authorized API calls
      *
      * @param token The token to use
      */
     public void setToken(AccessToken token) {
-        Log.d(TAG, "setToken: New token set: " + token);
-
         this.accessToken = token;
     }
 
+    /**
+     * Sets the value to use in the User-Agent header sent to Reddit
+     * <p>See <a href="https://github.com/reddit-archive/reddit/wiki/API">Reddit documentation</a>
+     * on creating your user agent</p>
+     *
+     * @param userAgent The user agent string for your application
+     */
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
 
+    /**
+     * Sets the callback URL used for OAuth. This is used when retrieving access tokens
+     * <p>This must match the callback URL set in <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
+     *
+     * @param callbackURL The URL to use for OAuth access tokens
+     */
+    public void setCallbackURL(String callbackURL) {
+        this.callbackURL = callbackURL;
+    }
+
+    /**
+     * Sets the client ID of the application
+     * <p>To find your client ID see <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
+
+     * @param clientID The client ID
+     */
+    public void setClientID(String clientID) {
+        this.clientID = clientID;
+
+        // Create the header value now as it is unnecessary to re-create it for every call
+        // The username:password is the client ID + client secret (for installed apps there is no secret)
+        this.basicAuthHeader = "Basic " + Base64.encodeToString((clientID + ":").getBytes(), Base64.NO_WRAP);
+    }
 
     /* --------------- Access token calls --------------- */
     /**
      * Asynchronously retrieves an access token from Reddit
+     * <p>Note: The callback URL must be set with {@link RedditApi#setCallbackURL(String)}</p>
+     * <p>Note: Client ID must be set with {@link RedditApi#setClientID(String)}</p>
      *
      * @param code The authorization code retrieved from the initial login process
      * @param onResponse The callback for successful requests. Note: The request can still
@@ -186,10 +278,21 @@ public class RedditApi {
      * @param onFailure The callback for errors caused by issues such as network connection fails
      */
     public void getAccessToken(String code, OnResponse<AccessToken> onResponse, OnFailure<AccessToken> onFailure) {
+        if (this.callbackURL == null) {
+            onFailure.onFailure(null, new Throwable("Callback URL is not set. Use RedditApi.setCallbackUrl()"));
+            return;
+        }
+        
+        if (this.clientID == null) {
+            onFailure.onFailure(null, new Throwable("Client ID is not set. Use RedditApi.setClientID()"));
+            return;
+        }
+
         this.OAuthService.getAccessToken(
+                this.basicAuthHeader,
                 code,
                 OAuthConstants.GRANT_TYPE_AUTHORIZATION,
-                OAuthConstants.CALLBACK_URL
+                this.callbackURL
         ).enqueue(new Callback<AccessToken>() {
             @Override
             public void onResponse(Call<AccessToken> call, retrofit2.Response<AccessToken> response) {
@@ -211,6 +314,7 @@ public class RedditApi {
      */
     private void refreshToken(OnResponse<AccessToken> onResponse, OnFailure<AccessToken> onFailure) {
         this.OAuthService.refreshToken(
+                this.basicAuthHeader,
                 this.accessToken.getRefreshToken(),
                 OAuthConstants.GRANT_TYPE_REFRESH
         ).enqueue(new Callback<AccessToken>() {
@@ -234,6 +338,7 @@ public class RedditApi {
         AccessToken newToken = null;
         try {
             newToken = this.OAuthService.refreshToken(
+                    this.basicAuthHeader,
                     this.accessToken.getRefreshToken(),
                     OAuthConstants.GRANT_TYPE_REFRESH
             ).execute().body();
@@ -258,6 +363,7 @@ public class RedditApi {
      */
     public void revokeRefreshToken(OnResponse<Void> onResponse, OnFailure<Void> onFailure) {
         this.OAuthService.revokeToken(
+                this.basicAuthHeader,
                 this.accessToken.getRefreshToken(),
                 OAuthConstants.TOKEN_TYPE_REFRESH
         ).enqueue(new Callback<Void>() {
@@ -330,7 +436,7 @@ public class RedditApi {
      */
     public void getSubredditPosts(String subreddit, String after, int count, OnResponse<RedditPostResponse> onResponse, OnFailure<RedditPostResponse> onFailure) {
         String tokenString = "";
-        String url = NetworkConstants.REDDIT_URL;
+        String url = REDDIT_URL;
 
         // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
         // customized post information (such as vote status)
@@ -338,7 +444,7 @@ public class RedditApi {
             this.ensureTokenIsSet();
 
             tokenString = this.accessToken.generateHeaderString();
-            url = NetworkConstants.REDDIT_OUATH_URL;
+            url = REDDIT_OUATH_URL;
         } catch (AccessTokenNotSetException ignored) { }
 
         // Load posts for a subreddit
@@ -403,17 +509,10 @@ public class RedditApi {
      * Authenticator that automatically retrieves a new access token on 401 responses
      */
     public class Authenticator implements okhttp3.Authenticator {
-        private static final String TAG = "Authenticator";
 
         @Nullable
         @Override
         public Request authenticate(@Nullable Route route, Response response) throws IOException {
-            Log.d(TAG, "authenticate retrieving new token: " + accessToken);
-
-            if (accessToken == null) {
-                accessToken = TokenManager.getToken();
-            }
-
             // If we have a previous access token with a refresh token
             if (accessToken != null && accessToken.getRefreshToken() != null) {
                 AccessToken newToken = refreshToken();
@@ -428,8 +527,6 @@ public class RedditApi {
 
                 if (onNewToken != null) {
                     onNewToken.newToken(newToken);
-                } else {
-                    Log.d(TAG, "Warning: New token retrieved without a token listener. Use RedditApi#setOnNewToken(AccessToken) to retrieve the new token");
                 }
 
                 return response.request().newBuilder()

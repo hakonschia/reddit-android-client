@@ -1,8 +1,5 @@
 package com.example.hakonsreader.constants;
 
-/**
- * Various networking  constants such as header information, URLs, and API access points
- */
 public class NetworkConstants {
 
     /**
@@ -11,51 +8,29 @@ public class NetworkConstants {
     public static final String USER_AGENT = "android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)";
 
     /**
-     * The URL for reddit.com
+     * Client ID for OAuth
      */
-    public static final String REDDIT_URL = "https://reddit.com/";
+    public static final String CLIENT_ID = "UZ37q9US0H2EoQ";
 
     /**
-     *
-     * The standard Reddit API URL.
-     * <p>Do not use this for calls that should be authenticated with OAuth, see {@link NetworkConstants.REDDIT_OUATH_API_URL}</p>
+     * The callback URL used for OAuth authorization
      */
-    public static final String REDDIT_API_URL = "https://www.reddit.com/api/";
+    public static final String CALLBACK_URL = "hakonreader://callback";
 
-    /**
-     * The OAuth subdomain URL for Reddit.
-     * <p>This is used to retrieve posts from reddit</p>
-     */
-    public static final String REDDIT_OUATH_URL = "https://oauth.reddit.com/";
-
-    /**
-     * The Reddit API URL used when authenticated with OAuth.
-     * <p>This is used when making calls on behalf of a user with their access token</p>
-     */
-    public static final String REDDIT_OUATH_API_URL = REDDIT_OUATH_URL + "api/";
-
-
-
-    /* --------------------- API paths --------------------- */
-    /**
-     * The API path used to retrieve an access token
-     */
-    public static final String ACCESS_TOKEN_PATH = "v1/access_token";
-
-    /**
-     * The API path used to revoke access/refresh tokens
-     */
-    public static final String REVOKE_TOKEN_PATH = "v1/revoke_token";
 
 
     /**
-     * The API path used to retrieve user information
+     * The response type to retrieve authorization tokens
      */
-    public static final String USER_INFO_PATH = "v1/me";
+    public static final String RESPONSE_TYPE = "code";
 
     /**
-     * The API path used to vote on things (posts, comments)
+     * The duration of the OAuth access token
      */
-    public static final String VOTE_PATH = "vote";
+    public static final String DURATION = "permanent";
 
+    /**
+     * A space separated string containing the OAuth scopes needed for the application
+     */
+    public static final String SCOPE = "identity read vote";
 }

@@ -3,7 +3,6 @@ package com.example.hakonsreader;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,20 +11,20 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.interfaces.OnFailure;
+import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.User;
-import com.example.hakonsreader.constants.OAuthConstants;
+import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
-import com.example.hakonsreader.api.interfaces.OnFailure;
-import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.Map;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -83,23 +82,10 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
 
-
-        Log.d(TAG, "onCreate: " + String.format("%dK Comments", 5));
-
-        // Set the previously stored token, and the listener for new tokens
-        this.redditApi = RedditApi.getInstance();
-        this.redditApi.setToken(TokenManager.getToken());
-        this.redditApi.setOnNewToken(TokenManager::saveToken);
-
-        Map<String, ?> p = prefs.getAll();
-        p.forEach((k, v) -> {
-            Log.d(TAG, "onCreate: " + k + ": " + v);
-        });
+        this.setupRedditApi();
 
         this.setupNavBar();
         this.setupStartFragment();
-
-        Log.d(TAG, "onCreate: " + TokenManager.getToken());
     }
 
     @Override
@@ -112,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Resumed from OAuth authorization
-        if (uri.toString().startsWith(OAuthConstants.CALLBACK_URL)) {
+        if (uri.toString().startsWith(NetworkConstants.CALLBACK_URL)) {
             String code = uri.getQueryParameter("code");
 
             this.redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
@@ -124,6 +110,20 @@ public class MainActivity extends AppCompatActivity {
      */
     private int getScreenWidth() {
         return getResources().getDisplayMetrics().widthPixels;
+    }
+
+    /**
+     * Sets up the reddit API object
+     */
+    private void setupRedditApi() {
+        // Set the previously stored token, and the listener for new tokens
+        this.redditApi = RedditApi.getInstance();
+        this.redditApi.setToken(TokenManager.getToken());
+        this.redditApi.setOnNewToken(TokenManager::saveToken);
+        this.redditApi.setUserAgent(NetworkConstants.USER_AGENT);
+        this.redditApi.setLoggingLevel(HttpLoggingInterceptor.Level.BODY);
+        this.redditApi.setCallbackURL(NetworkConstants.CALLBACK_URL);
+        this.redditApi.setClientID(NetworkConstants.CLIENT_ID);
     }
 
     /**

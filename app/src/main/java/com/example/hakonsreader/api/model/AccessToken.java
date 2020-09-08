@@ -27,15 +27,24 @@ public class AccessToken {
     }
 
     public String getAccessToken() {
-        return accessToken;
+        return this.accessToken;
     }
 
     public String getTokenType() {
-        return tokenType;
+        return this.tokenType;
     }
 
     public String getRefreshToken() {
-        return refreshToken;
+        return this.refreshToken;
+    }
+
+    /**
+     * Retrieves scopes the access token is valid for
+     *
+     * @return An array of the scopes
+     */
+    public String[] getScopes() {
+        return this.scope.split(" ");
     }
 
     /**

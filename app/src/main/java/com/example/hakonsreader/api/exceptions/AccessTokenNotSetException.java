@@ -1,4 +1,4 @@
-package com.example.hakonsreader.exceptions;
+package com.example.hakonsreader.api.exceptions;
 
 /**
  * Exception used to indicate that an access token isn't set
