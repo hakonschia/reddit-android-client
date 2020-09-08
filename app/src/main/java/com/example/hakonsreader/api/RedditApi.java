@@ -91,8 +91,7 @@ public class RedditApi {
 
             // If we have a previous access token with a refresh token
             if (accessToken != null && accessToken.getRefreshToken() != null) {
-                AccessToken newToken = refreshToken()
-                        .execute().body();
+                AccessToken newToken = refreshToken();
 
                 // No new token received
                 if (newToken == null) {
@@ -211,28 +210,73 @@ public class RedditApi {
     }
 
     /**
-     * Gets a call object to refresh the access token from Reddit
+     * Asynchronously refreshes the access token from Reddit
      *
-     * @return A Call object ready to be called to refresh the access token
+     * @param onResponse The callback for successful requests. Note: The request can still
+     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
+     * @param onFailure The callback for errors caused by issues such as network connection fails
      */
-    private Call<AccessToken> refreshToken() {
-        return this.OAuthService.refreshToken(
+    private void refreshToken(OnResponse<AccessToken> onResponse, OnFailure<AccessToken> onFailure) {
+        this.OAuthService.refreshToken(
                 this.accessToken.getRefreshToken(),
                 OAuthConstants.GRANT_TYPE_REFRESH
-        );
+        ).enqueue(new Callback<AccessToken>() {
+            @Override
+            public void onResponse(Call<AccessToken> call, retrofit2.Response<AccessToken> response) {
+                onResponse.onResponse(call, response);
+            }
+            @Override
+            public void onFailure(Call<AccessToken> call, Throwable t) {
+                onFailure.onFailure(call, t);
+            }
+        });
+    }
+
+    /**
+     * Synchronously refreshes the access token
+     *
+     * @return The new access token, or null if it couldn't be refreshed
+     */
+    private AccessToken refreshToken() {
+        AccessToken newToken = null;
+        try {
+            newToken = this.OAuthService.refreshToken(
+                    this.accessToken.getRefreshToken(),
+                    OAuthConstants.GRANT_TYPE_REFRESH
+            ).execute().body();
+
+            if (newToken != null) {
+                newToken.setRefreshToken(this.accessToken.getRefreshToken());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return newToken;
     }
 
     /**
      * Revokes the refresh token. This will also invalidate the corresponding access token,
      * effectively logging the user out as the client can no longer make calls on behalf of the user
      *
-     * @return A void Call. The response code says if the operation was successful or not.
+     * @param onResponse The callback for successful requests. Note: The request can still
+     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
+     * @param onFailure The callback for errors caused by issues such as network connection fails
      */
-    public Call<Void> revokeRefreshToken() {
-        return this.OAuthService.revokeToken(
+    public void revokeRefreshToken(OnResponse<Void> onResponse, OnFailure<Void> onFailure) {
+        this.OAuthService.revokeToken(
                 this.accessToken.getRefreshToken(),
                 OAuthConstants.TOKEN_TYPE_REFRESH
-        );
+        ).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
+                onResponse.onResponse(call, response);
+            }
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                onFailure.onFailure(call, t);
+            }
+        });
     }
 
     /**

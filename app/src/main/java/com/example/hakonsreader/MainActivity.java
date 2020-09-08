@@ -26,10 +26,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Map;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
@@ -197,21 +193,16 @@ public class MainActivity extends AppCompatActivity {
      */
     public void btnLogOutOnClick(View view) {
         // Revoke token
-        this.redditApi.revokeRefreshToken().enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    // Show "Logged out" or something
-                } else {
-                    // Idk?
-                }
+        this.redditApi.revokeRefreshToken((call, response) -> {
+            if (response.isSuccessful()) {
+                // Show "Logged out" or something
+            } else {
+                // Idk?
             }
+        }, (call, t) -> {
+            // If failed because of internet connection try to revoke later
 
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                // If failed because of internet connection try to revoke later
-            }
-        });
+        } );
 
         // Clear shared preferences
         this.clearUserInfoFromPrefs();
