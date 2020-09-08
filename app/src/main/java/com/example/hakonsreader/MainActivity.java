@@ -14,7 +14,6 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
-import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.LogInFragment;
@@ -160,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
                 case R.id.nav_profile:
                     // If not logged in, show log in page
-                    if (User.getStoredUser() == null) {
+                    if (TokenManager.getToken() == null) {
                         if (this.logInFragment == null) {
                             this.logInFragment = new LogInFragment();
                         }
