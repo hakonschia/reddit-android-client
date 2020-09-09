@@ -570,7 +570,7 @@ public class RedditApi {
 
             this.apiService.vote(
                     // "t1_gre3" etc. to identify what is being voted on (post or comment)
-                    thing.value + thingId,
+                    thing.value + "_" + thingId,
                     type.value,
                     this.accessToken.generateHeaderString()
             ).enqueue(new Callback<Void>() {
