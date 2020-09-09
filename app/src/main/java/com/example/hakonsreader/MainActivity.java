@@ -51,23 +51,10 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
 
     // Handler for token responses. If an access token is given user information is automatically retrieved
-    private OnResponse<AccessToken> onTokenResponse = (call, response) -> {
+    private OnResponse<AccessToken> onTokenResponse = token -> {
         this.loadingIcon.decreaseLoadCount();
 
-        if (!response.isSuccessful()) {
-            Toast.makeText(MainActivity.this, "Access not given " + response.code(), Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        AccessToken token = response.body();
-        if (token == null) {
-            // TODO some error handling
-
-            return;
-        }
-
-        // Store access token
+        // Store the new token
         TokenManager.saveToken(token);
 
         // Re-create the start fragment as it now should load posts for the logged in user
@@ -75,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
         Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
     };
-    private OnFailure<AccessToken> onTokenFailure = (call, t) -> { this.loadingIcon.decreaseLoadCount(); };
+    private OnFailure onTokenFailure = (call, t) -> this.loadingIcon.decreaseLoadCount();
 
 
     @Override
@@ -229,16 +216,10 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
      */
     public void btnLogOutOnClick(View view) {
         // Revoke token
-        this.redditApi.revokeRefreshToken((call, response) -> {
-            if (response.isSuccessful()) {
-                // Show "Logged out" or something
-            } else {
-                // Idk?
-            }
+        this.redditApi.revokeRefreshToken(response -> {
         }, (call, t) -> {
             // If failed because of internet connection try to revoke later
-
-        } );
+        });
 
 
         // Clear shared preferences

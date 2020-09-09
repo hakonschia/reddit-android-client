@@ -1,7 +1,9 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.model.RedditPostResponse;
+import com.example.hakonsreader.api.model.RedditListingResponse;
 import com.example.hakonsreader.api.model.User;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -42,10 +44,18 @@ public interface RedditApiService {
      * @return A Call object ready to retrieve posts from a subreddit
      */
     @GET
-    Call<RedditPostResponse> getPosts(@Url String url,
-                                      @Query("after") String after,
-                                      @Query("count") int count,
-                                      @Header("Authorization") String accessToken
+    Call<RedditListingResponse> getPosts(@Url String url,
+                                         @Query("after") String after,
+                                         @Query("count") int count,
+                                         @Header("Authorization") String accessToken
+    );
+
+
+    @GET
+    Call<List<RedditListingResponse>> getComments(@Url String url,
+                                                  @Query("after") String after,
+                                                  @Query("count") int count,
+                                                  @Header("Authorization") String accessToken
     );
 
     /**

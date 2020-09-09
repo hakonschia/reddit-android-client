@@ -24,7 +24,6 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.api.model.RedditPostResponse;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
@@ -74,19 +73,12 @@ public class SubredditFragment extends Fragment {
     };
 
     // Response handler for loading posts
-    private OnResponse<RedditPostResponse> onPostResponse = (call, response) -> {
+    private OnResponse<List<RedditPost>> onPostResponse = posts -> {
         this.decreaseLoadingCount();
-
-        if (!response.isSuccessful() || response.body() == null) {
-            return;
-        }
-
-        List<RedditPost> posts = response.body().getPosts();
-
         adapter.addPosts(posts);
     };
     // Failure handler for loading posts
-    private OnFailure<RedditPostResponse> onPostFailure = (call, t) -> {
+    private OnFailure onPostFailure = (call, t) -> {
         this.decreaseLoadingCount();
     };
 
@@ -159,7 +151,7 @@ public class SubredditFragment extends Fragment {
         int postsSize = previousPosts.size();
 
         if (postsSize > 0) {
-            after = RedditApi.Thing.Post.getValue() + previousPosts.get(postsSize - 1).getId();
+            after = RedditApi.Thing.Post.getValue() + "_" + previousPosts.get(postsSize - 1).getId();
         }
 
         // Store the current attempt to load more posts to avoid attempting many times if it fails

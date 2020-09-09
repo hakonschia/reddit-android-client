@@ -2,7 +2,6 @@ package com.example.hakonsreader.fragments;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,27 +43,14 @@ public class ProfileFragment extends Fragment {
     private ImageView picture;
 
     // Response handler for retrieval of user information
-    private OnResponse<User> onUserResponse = (call, response) -> {
-        if (!response.isSuccessful()) {
-            Log.d(TAG, "onResponse: Error");
-
-            return;
-        }
-
-        User user = response.body();
-        if (user == null) {
-            Log.w(TAG, "onResponse: user is null");
-
-            return;
-        }
-
+    private OnResponse<User> onUserResponse = user -> {
         // Store the updated user information
         User.storeUserInfo(user);
         this.user = user;
 
         this.updateViews();
     };
-    private OnFailure<User> onUserFailure = (call, t) -> { };
+    private OnFailure onUserFailure = (call, t) -> { };
 
 
     @Nullable

@@ -1,18 +1,15 @@
 package com.example.hakonsreader.api.interfaces;
 
-import retrofit2.Call;
-
 /**
  * Interface used for failures (like network issues) from API requests
- * @param <T> The model type of the API request
  */
-public interface OnFailure<T> {
+public interface OnFailure {
 
     /**
      * Called when a request failed due to an issue such as a network failure
      *
-     * @param call The call that was made
+     * @param statusCode The status code of the response
      * @param t A throwable with error information
      */
-    void onFailure(Call<T> call, Throwable t);
+    void onFailure(int statusCode, Throwable t);
 }

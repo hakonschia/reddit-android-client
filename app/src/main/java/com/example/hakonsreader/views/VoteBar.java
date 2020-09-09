@@ -65,12 +65,10 @@ public class VoteBar extends ConstraintLayout {
         }
 
         RedditApi.VoteType finalVoteType = voteType;
-        this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post, (call, response) -> {
-            if (response.isSuccessful()) {
-                post.setVoteType(finalVoteType);
+        this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post, (resp) -> {
+            post.setVoteType(finalVoteType);
 
-                updateVoteStatus();
-            }
+            updateVoteStatus();
         }, (call, t) -> {});
     }
 

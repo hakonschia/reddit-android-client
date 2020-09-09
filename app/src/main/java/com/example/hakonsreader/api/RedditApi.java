@@ -5,18 +5,21 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.hakonsreader.api.interfaces.OnNewToken;
+import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.exceptions.AccessTokenNotSetException;
+import com.example.hakonsreader.api.interfaces.OnFailure;
+import com.example.hakonsreader.api.interfaces.OnNewToken;
+import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
-import com.example.hakonsreader.api.model.RedditPostResponse;
+import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.RedditListingResponse;
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
-import com.example.hakonsreader.api.constants.OAuthConstants;
-import com.example.hakonsreader.api.interfaces.OnFailure;
-import com.example.hakonsreader.api.interfaces.OnResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -27,6 +30,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.internal.EverythingIsNonNull;
 
 /**
  * Wrapper for the Reddit API
@@ -38,8 +42,8 @@ public class RedditApi {
      * A Reddit "Thing"
      */
     public enum Thing {
-        Comment("t1_"),
-        Post("t3_");
+        Comment("t1"),
+        Post("t3");
 
 
         private String value;
@@ -51,8 +55,9 @@ public class RedditApi {
         /**
          * Retrieve the underlying string value of the thing
          * <p>This value can be used in addition to the things ID to create the fullname of the thing</p>
+         * <p>When creating the fullname use a "_" between the thing value and the ID</p>
          *
-         * @return The string identifier for the thing (eg. "t1_")
+         * @return The string identifier for the thing (eg. "t1")
          */
         public String getValue() {
             return value;
@@ -261,18 +266,18 @@ public class RedditApi {
      * <p>Note: Client ID must be set with {@link RedditApi#setClientID(String)}</p>
      *
      * @param code The authorization code retrieved from the initial login process
-     * @param onResponse The callback for successful requests. Note: The request can still
-     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
-     * @param onFailure The callback for errors caused by issues such as network connection fails
+     * @param onResponse The callback for successful requests. Holds the new access token
+     * @param onFailure The callback for failed requests
      */
-    public void getAccessToken(String code, OnResponse<AccessToken> onResponse, OnFailure<AccessToken> onFailure) {
+    @EverythingIsNonNull
+    public void getAccessToken(String code, OnResponse<AccessToken> onResponse, OnFailure onFailure) {
         if (this.callbackURL == null) {
-            onFailure.onFailure(null, new Throwable("Callback URL is not set. Use RedditApi.setCallbackUrl()"));
+            onFailure.onFailure(-1, new Throwable("Callback URL is not set. Use RedditApi.setCallbackUrl()"));
             return;
         }
         
         if (this.clientID == null) {
-            onFailure.onFailure(null, new Throwable("Client ID is not set. Use RedditApi.setClientID()"));
+            onFailure.onFailure(-1, new Throwable("Client ID is not set. Use RedditApi.setClientID()"));
             return;
         }
 
@@ -284,11 +289,18 @@ public class RedditApi {
         ).enqueue(new Callback<AccessToken>() {
             @Override
             public void onResponse(Call<AccessToken> call, retrofit2.Response<AccessToken> response) {
-                onResponse.onResponse(call, response);
+                if (response.isSuccessful()) {
+                    AccessToken token = response.body();
+                    if (token != null) {
+                        onResponse.onResponse(token);
+                    }
+                } else {
+                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                }
             }
             @Override
             public void onFailure(Call<AccessToken> call, Throwable t) {
-                onFailure.onFailure(call, t);
+                onFailure.onFailure(-1, t);
             }
         });
     }
@@ -296,11 +308,11 @@ public class RedditApi {
     /**
      * Asynchronously refreshes the access token from Reddit
      *
-     * @param onResponse The callback for successful requests. Note: The request can still
-     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
-     * @param onFailure The callback for errors caused by issues such as network connection fails
+     * @param onResponse The callback for successful requests. Holds the new access token
+     * @param onFailure The callback for failed requests
      */
-    private void refreshToken(OnResponse<AccessToken> onResponse, OnFailure<AccessToken> onFailure) {
+    @EverythingIsNonNull
+    private void refreshToken(OnResponse<AccessToken> onResponse, OnFailure onFailure) {
         this.OAuthService.refreshToken(
                 this.basicAuthHeader,
                 this.accessToken.getRefreshToken(),
@@ -308,11 +320,19 @@ public class RedditApi {
         ).enqueue(new Callback<AccessToken>() {
             @Override
             public void onResponse(Call<AccessToken> call, retrofit2.Response<AccessToken> response) {
-                onResponse.onResponse(call, response);
+                if (response.isSuccessful()) {
+                    AccessToken body = response.body();
+                    if (body != null) {
+                        onResponse.onResponse(body);
+                    }
+
+                } else {
+                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                }
             }
             @Override
             public void onFailure(Call<AccessToken> call, Throwable t) {
-                onFailure.onFailure(call, t);
+                onFailure.onFailure(-1, t);
             }
         });
     }
@@ -345,11 +365,11 @@ public class RedditApi {
      * Revokes the refresh token. This will also invalidate the corresponding access token,
      * effectively logging the user out as the client can no longer make calls on behalf of the user
      *
-     * @param onResponse The callback for successful requests. Note: The request can still
-     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
-     * @param onFailure The callback for errors caused by issues such as network connection fails
+     * @param onResponse The callback for successful requests. Doesn't return anything, but is called when successful
+     * @param onFailure The callback for failed requests
      */
-    public void revokeRefreshToken(OnResponse<Void> onResponse, OnFailure<Void> onFailure) {
+    @EverythingIsNonNull
+    public void revokeRefreshToken(OnResponse<Void> onResponse, OnFailure onFailure) {
         this.OAuthService.revokeToken(
                 this.basicAuthHeader,
                 this.accessToken.getRefreshToken(),
@@ -357,11 +377,15 @@ public class RedditApi {
         ).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
-                onResponse.onResponse(call, response);
+                if (response.isSuccessful()) {
+                    onResponse.onResponse(null);
+                } else {
+                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                }
             }
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                onFailure.onFailure(call, t);
+                onFailure.onFailure(-1, t);
             }
         });
 
@@ -386,11 +410,11 @@ public class RedditApi {
      * Asynchronously retrieves information about the user logged in
      * <p>Requires a valid access token for the request to be made</p>
      *
-     * @param onResponse The callback for successful requests. Note: The request can still
-     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
-     * @param onFailure The callback for errors caused by issues such as network connection fails
+     * @param onResponse The callback for successful requests. Holds the {@link User} object representing the logged in user
+     * @param onFailure The callback for failed requests
      */
-    public void getUserInfo(OnResponse<User> onResponse, OnFailure<User> onFailure) {
+    @EverythingIsNonNull
+    public void getUserInfo(OnResponse<User> onResponse, OnFailure onFailure) {
         try {
             this.ensureTokenIsSet();
 
@@ -398,11 +422,18 @@ public class RedditApi {
                     .enqueue(new Callback<User>() {
                         @Override
                         public void onResponse(Call<User> call, retrofit2.Response<User> response) {
-                            onResponse.onResponse(call, response);
+                            if (response.isSuccessful()) {
+                                User body = response.body();
+                                if (body != null) {
+                                    onResponse.onResponse(body);
+                                }
+                            } else {
+                                onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                            }
                         }
                         @Override
                         public void onFailure(Call<User> call, Throwable t) {
-                            onFailure.onFailure(call, t);
+                            onFailure.onFailure(-1, t);
                         }
                     });
         } catch (AccessTokenNotSetException e) {
@@ -418,11 +449,12 @@ public class RedditApi {
      * @param subreddit The subreddit to retrieve posts from. For front page use an empty string
      * @param after The ID of the last post seen (or an empty string if first time loading)
      * @param count The amount of posts already retrieved
-     * @param onResponse The callback for successful requests. Note: The request can still
-     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
-     * @param onFailure The callback for errors caused by issues such as network connection fails
+     *
+     * @param onResponse The callback for successful requests. Holds the list of posts
+     * @param onFailure The callback for failed requests
      */
-    public void getSubredditPosts(String subreddit, String after, int count, OnResponse<RedditPostResponse> onResponse, OnFailure<RedditPostResponse> onFailure) {
+    @EverythingIsNonNull
+    public void getSubredditPosts(String subreddit, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
         String tokenString = "";
         String url = REDDIT_URL;
 
@@ -444,17 +476,82 @@ public class RedditApi {
         // so add it anyways
         url += ".json";
 
-        this.apiService.getPosts(url, after, count, tokenString).enqueue(new Callback<RedditPostResponse>() {
+        this.apiService.getPosts(url, after, count, tokenString).enqueue(new Callback<RedditListingResponse>() {
             @Override
-            public void onResponse(Call<RedditPostResponse> call, retrofit2.Response<RedditPostResponse> response) {
-                onResponse.onResponse(call, response);
+            public void onResponse(Call<RedditListingResponse> call, retrofit2.Response<RedditListingResponse> response) {
+                if (response.isSuccessful()) {
+                    RedditListingResponse body = response.body();
+
+                    if (body != null) {
+                        List<RedditPost> posts = body.getPosts();
+
+                        onResponse.onResponse(posts);
+                    }
+                } else {
+                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                }
             }
             @Override
-            public void onFailure(Call<RedditPostResponse> call, Throwable t) {
-                onFailure.onFailure(call, t);
+            public void onFailure(Call<RedditListingResponse> call, Throwable t) {
+                onFailure.onFailure(-1, t);
             }
         });
     }
+
+
+    /**
+     * Asynchronously retrieves posts from a given subreddit
+     * <p>If an access token is set posts are customized for the user</p>
+     *
+     * @param postID The post ID to retrieve comments from
+     * @param after The ID of the last post seen (or an empty string if first time loading)
+     * @param count The amount of posts already retrieved
+     *
+     * @param onResponse The callback for successful requests. Holds the list of posts
+     * @param onFailure The callback for failed requests
+     */
+    @EverythingIsNonNull
+    public void getComments(String postID, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
+        String tokenString = "";
+        String url = REDDIT_URL;
+
+        // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
+        // customized post information (such as vote status)
+        try {
+            this.ensureTokenIsSet();
+
+            tokenString = this.accessToken.generateHeaderString();
+            url = REDDIT_OUATH_URL;
+        } catch (AccessTokenNotSetException ignored) { }
+
+        // .json isn't strictly needed for requests to oauth.reddit.com, but it is for reddit.com
+        // so add it anyways
+        url += "comments/" + postID + ".json";
+
+        this.apiService.getComments(url, "", 0, tokenString).enqueue(new Callback<List<RedditListingResponse>>() {
+            @Override
+            public void onResponse(Call<List<RedditListingResponse>> call, retrofit2.Response<List<RedditListingResponse>> response) {
+                if (response.isSuccessful()) {
+                    List<RedditListingResponse> body = response.body();
+
+                    if (body != null) {
+                        // For comments the first listing object is the post itself and the second its comments
+                        List<RedditComment> comments = body.get(1).getComments();
+
+                        onResponse.onResponse(comments);
+                    }
+                } else {
+                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                }
+            }
+            @Override
+            public void onFailure(Call<List<RedditListingResponse>> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
+    }
+
+
 
     /**
      * Send an asynchronous request to cast a vote on a thing (post or comment)
@@ -463,10 +560,11 @@ public class RedditApi {
      * @param thingId The ID of the thing
      * @param type The type of vote to cast
      * @param thing What kind of thing the vote is for (post or comment)
-     * @param onResponse The callback for successful requests. Note: The request can still
-     *                         fail in this callback (such as 400 error codes), use {@link Response#isSuccessful()}
-     * @param onFailure The callback for errors caused by issues such as network connection fails*/
-    public void vote(String thingId, VoteType type, Thing thing, OnResponse<Void> onResponse, OnFailure<Void> onFailure) {
+     * @param onResponse The callback for successful requests. Doesn't return anything but is called if successful
+     * @param onFailure The callback for failed requests
+     */
+    @EverythingIsNonNull
+    public void vote(String thingId, VoteType type, Thing thing, OnResponse<Void> onResponse, OnFailure onFailure) {
         try {
             this.ensureTokenIsSet();
 
@@ -478,11 +576,15 @@ public class RedditApi {
             ).enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
-                    onResponse.onResponse(call, response);
+                    if (response.isSuccessful()) {
+                        onResponse.onResponse(null);
+                    } else {
+                        onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                    }
                 }
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    onFailure.onFailure(call, t);
+                    onFailure.onFailure(-1, t);
                 }
             });
 
