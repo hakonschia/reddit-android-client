@@ -502,11 +502,10 @@ public class RedditApi {
 
                         List<RedditComment> allComments = new ArrayList<>();
                         topLevelComments.forEach(comment -> {
+                            // Add the comment itself and all its replies
                             allComments.add(comment);
                             allComments.addAll(comment.getReplies());
                         });
-
-                        Log.d(TAG, "onResponse: # of comments: " + allComments.size());
 
                         onResponse.onResponse(allComments);
                     }
@@ -520,7 +519,6 @@ public class RedditApi {
             }
         });
     }
-
 
 
     /**

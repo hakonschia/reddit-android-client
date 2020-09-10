@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RedditComment implements RedditListing {
+    private static final String TAG = "RedditComment";
 
     private Data data;
 
@@ -146,7 +147,17 @@ public class RedditComment implements RedditListing {
             return new ArrayList<>();
         }
 
-        return this.data.replies.getComments();
+        // All the comments from the current and its replies
+        List<RedditComment> all = new ArrayList<>();
+
+        // Loop through the list of replies and add the reply and the replies to the reply
+        List<RedditComment> replies = this.data.replies.getComments();
+        for (RedditComment reply : replies) {
+            all.add(reply);
+            all.addAll(reply.getReplies());
+        }
+
+        return all;
     }
 
 }

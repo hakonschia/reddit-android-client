@@ -51,9 +51,6 @@ public class PostActivity extends AppCompatActivity {
         this.fullPostBar.setPost(post);
 
         this.redditApi.getComments(post.getId(), (comments -> {
-            comments.forEach(comment -> {
-                Log.d(TAG, "onCreate: " + comment.getBody());
-            });
             adapter.addComments(comments);
         }), ((call, t) -> {
             Log.d(TAG, "onCreate: ERROR");

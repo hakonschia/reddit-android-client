@@ -16,6 +16,12 @@ public class RedditCommentsResponse {
     }
 
 
+    /**
+     * Retrieves the list of top level comments
+     * Note: Only the direct top level comments are received here, the rest are as replies within the comments
+     *
+     * @return The list of comments from the response
+     */
     public List<RedditComment> getComments() {
         return this.data.comments;
     }
