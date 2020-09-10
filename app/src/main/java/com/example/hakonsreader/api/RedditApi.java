@@ -555,7 +555,7 @@ public class RedditApi {
                 }
             });
         } catch (AccessTokenNotSetException e) {
-            onFailure.onFailure(-1, new AccessTokenNotSetException("Can't get user information without access token", e));
+            onFailure.onFailure(-1, new AccessTokenNotSetException("Can't cast vote without access token", e));
         }
     }
 
