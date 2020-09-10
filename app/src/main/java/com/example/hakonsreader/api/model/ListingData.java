@@ -91,6 +91,10 @@ public abstract class ListingData {
     }
 
     public boolean isMod() {
+        if (distinguished == null) {
+            return false;
+        }
+
         // TODO fix magic string
         return distinguished.equals("moderator");
     }

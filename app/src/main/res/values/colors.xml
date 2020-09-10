@@ -9,6 +9,7 @@
 
     <color name="textColor">#000000</color>
     <color name="linkColor">#03A9F4</color>
+    <color name="modTextColor">#00C130</color>
 
     <!-- Upvote/downvote button colors-->
     <color name="upvoted">#FF6130</color>

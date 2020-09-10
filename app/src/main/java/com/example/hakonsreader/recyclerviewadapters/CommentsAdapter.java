@@ -124,6 +124,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             holder.voteBar.setListing(comment);
             holder.voteBar.setVisibility(View.VISIBLE);
+
+            if (comment.isMod()) {
+                holder.author.setTextColor(holder.itemView.getResources().getColor(R.color.modTextColor));
+            } else {
+                holder.author.setTextColor(holder.itemView.getResources().getColor(R.color.linkColor));
+            }
         }
 
         // Indent the entire view based on how far in the chain we are
