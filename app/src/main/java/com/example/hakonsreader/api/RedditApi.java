@@ -1,7 +1,6 @@
 package com.example.hakonsreader.api;
 
 import android.util.Base64;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -401,7 +400,7 @@ public class RedditApi {
                         }
                     });
         } catch (AccessTokenNotSetException e) {
-            Log.d(TAG, "getUserInfo: can't get user information without access token");
+            onFailure.onFailure(-1, new AccessTokenNotSetException("Can't get user information without access token", e));
         }
     }
 
@@ -555,9 +554,8 @@ public class RedditApi {
                     onFailure.onFailure(-1, t);
                 }
             });
-
         } catch (AccessTokenNotSetException e) {
-            Log.d(TAG, "vote: Can't cast vote without access token");
+            onFailure.onFailure(-1, new AccessTokenNotSetException("Can't get user information without access token", e));
         }
     }
 

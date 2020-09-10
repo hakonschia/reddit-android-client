@@ -8,4 +8,8 @@ public class AccessTokenNotSetException extends Exception {
     public AccessTokenNotSetException(String message) {
         super(message);
     }
+
+    public AccessTokenNotSetException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

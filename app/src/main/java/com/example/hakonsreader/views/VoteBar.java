@@ -75,7 +75,9 @@ public class VoteBar extends ConstraintLayout {
             listing.setVoteType(finalVoteType);
 
             updateVoteStatus();
-        }, (call, t) -> {});
+        }, (code, t) -> {
+            t.printStackTrace();
+        });
     }
 
 
