@@ -7,6 +7,15 @@
     android:background="@color/background"
     tools:context=".activites.PostActivity">
 
+    <com.example.hakonsreader.views.LoadingIcon
+        android:id="@+id/loading_icon"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+
+        tools:visibility="visible"/>
+
     <com.example.hakonsreader.views.PostInfo
         android:id="@+id/post_info_comments"
         android:layout_width="match_parent"

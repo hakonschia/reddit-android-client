@@ -13,6 +13,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.views.FullPostBar;
+import com.example.hakonsreader.views.LoadingIcon;
 import com.example.hakonsreader.views.PostInfo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
@@ -25,9 +26,12 @@ public class PostActivity extends AppCompatActivity {
 
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
+    private LoadingIcon loadingIcon;
     private PostInfo postInfo;
     private FullPostBar fullPostBar;
     private RecyclerView commentsList;
+
+    private CommentsAdapter commentsAdapter;
 
 
     @Override
@@ -37,23 +41,19 @@ public class PostActivity extends AppCompatActivity {
         Slidr.attach(this);
 
         this.initViews();
-
-        CommentsAdapter adapter = new CommentsAdapter();
-        this.commentsList.setAdapter(adapter);
-        this.commentsList.setLayoutManager(new LinearLayoutManager(this));
-
-
-
+        this.setupCommentsList();
 
         RedditPost post = new Gson().fromJson(getIntent().getExtras().getString("post"), RedditPost.class);
 
         this.postInfo.setPost(post);
         this.fullPostBar.setPost(post);
 
+        this.loadingIcon.increaseLoadCount();
         this.redditApi.getComments(post.getId(), (comments -> {
-            adapter.addComments(comments);
+            this.commentsAdapter.addComments(comments);
+            this.loadingIcon.decreaseLoadCount();
         }), ((call, t) -> {
-            Log.d(TAG, "onCreate: ERROR");
+            this.loadingIcon.decreaseLoadCount();
             t.printStackTrace();
         }));
     }
@@ -62,8 +62,18 @@ public class PostActivity extends AppCompatActivity {
      * Initializes all the views of the activity
      */
     private void initViews() {
+        this.loadingIcon = findViewById(R.id.loading_icon);
         this.postInfo = findViewById(R.id.post_info_comments);
         this.fullPostBar = findViewById(R.id.post_full_bar_comments);
         this.commentsList = findViewById(R.id.post_comments);
+    }
+
+    /**
+     * Sets up {@link PostActivity#commentsList}
+     */
+    private void setupCommentsList() {
+        this.commentsAdapter = new CommentsAdapter();
+        this.commentsList.setAdapter(this.commentsAdapter);
+        this.commentsList.setLayoutManager(new LinearLayoutManager(this));
     }
 }
