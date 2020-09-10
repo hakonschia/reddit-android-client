@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,54 +7,90 @@
     android:background="@color/background"
     tools:context=".activites.PostActivity">
 
-    <com.example.hakonsreader.views.LoadingIcon
-        android:id="@+id/loading_icon"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-
-        tools:visibility="visible"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:onClick="goToNextTopLevelComment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:onClick="goToPreviousTopLevelComment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
     <com.example.hakonsreader.views.PostInfo
         android:id="@+id/post_info_comments"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.example.hakonsreader.views.FullPostBar
         android:id="@+id/post_full_bar_comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/post_info_comments"/>
+        android:layout_below="@id/post_info_comments"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/post_info_comments" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/post_comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/post_full_bar_comments"
 
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
 
-        tools:listitem="@layout/list_layout_comment"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_full_bar_comments"
 
-</RelativeLayout>
+        tools:listitem="@layout/list_layout_comment" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="5dp"
+
+        android:layout_marginBottom="5dp"
+
+        android:background="@drawable/rounded_square"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/go_to_previous_top_level_comment"
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/mainBackground"
+
+            android:onClick="goToPreviousTopLevelComment"
+            android:src="@drawable/ic_baseline_arrow_upward_24" />
+
+        <ImageButton
+            android:id="@+id/go_to_next_top_level_comment"
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content"
+
+            android:backgroundTint="@color/mainBackground"
+
+            android:onClick="goToNextTopLevelComment"
+            android:src="@drawable/ic_baseline_arrow_downward_24" />
+
+
+    </LinearLayout>
+
+    <com.example.hakonsreader.views.LoadingIcon
+        android:id="@+id/loading_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
