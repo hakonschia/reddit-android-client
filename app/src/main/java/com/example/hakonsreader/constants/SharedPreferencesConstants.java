@@ -21,4 +21,8 @@ public class SharedPreferencesConstants {
      */
     public static final String USER_INFO = "userInfo";
 
+    /**
+     * If the app should be in night mode or not
+     */
+    public static final String NIGHT_MODE = "nightMode";
 }

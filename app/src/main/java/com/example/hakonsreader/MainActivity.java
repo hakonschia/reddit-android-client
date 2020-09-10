@@ -83,7 +83,11 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         this.setupNavBar();
         this.setupStartFragment();
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        if (prefs.getBoolean(SharedPreferencesConstants.NIGHT_MODE, false)) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 
     @Override
