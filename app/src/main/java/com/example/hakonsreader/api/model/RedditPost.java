@@ -1,25 +1,145 @@
 package com.example.hakonsreader.api.model;
 
+import com.example.hakonsreader.api.RedditApi;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Class representing a Reddit post
  */
-public class RedditPost extends RedditListing {
+public class RedditPost {
     private static final String TAG = "RedditPost";
 
     public enum PostType {
         Image, Video, RichVideo, Link, Text
     }
 
-    /**
-     * Create a post object from a base listing
-     *
-     * @param base The base listing to create from
-     * @return A post object with the values from {@code base}
-     */
-    public static RedditPost createFromListing(RedditListing base) {
-        return base.createFromListing(RedditPost.class);
+
+    public Data data;
+    public static class Data extends ListingData {
+
+        // The URL of the post. For images it links to the picture, for link posts it's the link
+        protected String url;
+
+        // The amount of comments the post has
+        @SerializedName("num_comments")
+        protected int amountOfComments;
+
+        // Is the post a self post (ie. text post)
+        @SerializedName("is_self")
+        protected boolean isText;
+
+        // Is the post a video?
+        @SerializedName("is_video")
+        protected boolean isVideo;
+
+
+        protected String thumbnail;
+
+        // Is the post NSFW?
+        @SerializedName("over_18")
+        protected boolean nsfw;
+
+        @SerializedName("post_hint")
+        protected String postHint;
+
+
+        // For video posts
+        protected Media media;
+        private static class Media {
+
+            @SerializedName("reddit_video")
+            protected RedditVideo redditVideo;
+
+            protected static class RedditVideo {
+                protected int duration;
+
+                @SerializedName("scrubber_media_url")
+                protected String url;
+            }
+        }
     }
 
+
+    /**
+     * @return The clean name of the subreddit (no r/ prefix)
+     */
+    public String getSubreddit() {
+        return this.data.subreddit;
+    }
+
+    public String getTitle() {
+        return this.data.title;
+    }
+
+    public String getAuthor() {
+        return this.data.author;
+    }
+
+    public String getId() {
+        return this.data.id;
+    }
+
+    public boolean isVideo() {
+        return this.data.isVideo;
+    }
+
+    public int getAmountOfComments() {
+        return this.data.amountOfComments;
+    }
+
+    public int getScore() {
+        return this.data.score;
+    }
+
+    public boolean isSpoiler() {
+        return this.data.spoiler;
+    }
+
+    public String getThumbnail() {
+        return this.data.thumbnail;
+    }
+
+    /**
+     * @return The unix timestamp in UTC when the post was created
+     */
+    public long getCreatedAt() {
+        return (long)data.createdAt;
+    }
+
+    public String getUrl() {
+        return this.data.url;
+    }
+
+    public String getVideoUrl() {
+        // If video not hosted by reddit
+        if (this.data.media == null) {
+            return this.getUrl();
+        }
+        return this.data.media.redditVideo.url;
+    }
+
+    /**
+     * Retrieves the logged in users vote on the post
+     *
+     * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
+     */
+    public RedditApi.VoteType getVoteType() {
+        if (this.data.liked == null) {
+            return RedditApi.VoteType.NoVote;
+        }
+
+        return (this.data.liked ? RedditApi.VoteType.Upvote : RedditApi.VoteType.Downvote);
+    }
+
+    /**
+     * Retrieve the link to the comments of a post (full link)
+     *
+     * @return The permalink to the post
+     */
+    public String getPermalink() {
+        // The link given from the Reddit API starts at "/r/..."
+        return "https://reddit.com" + this.data.permalink;
+    }
     /**
      * @return The type of post (image, video, text, or link)
      */
@@ -68,6 +188,26 @@ public class RedditPost extends RedditListing {
             // No hint means it's a text post
             default:
                 return PostType.Text;
+        }
+    }
+
+    /**
+     * @param voteType The vote type for this post for the current user
+     */
+    public void setVoteType(RedditApi.VoteType voteType) {
+        // Update the internal data as that is used in getVoteType
+
+        switch (voteType) {
+            case Upvote:
+                this.data.liked = true;
+                break;
+            case Downvote:
+                this.data.liked = false;
+                break;
+
+            case NoVote:
+                this.data.liked = null;
+                break;
         }
     }
 

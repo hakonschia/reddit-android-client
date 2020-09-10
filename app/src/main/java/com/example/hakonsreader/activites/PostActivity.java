@@ -7,15 +7,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.views.FullPostBar;
 import com.example.hakonsreader.views.PostInfo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
-
-import java.util.List;
 
 /**
  * Activity to show a Reddit post with its comments
@@ -43,17 +40,9 @@ public class PostActivity extends AppCompatActivity {
         this.fullPostBar.setPost(post);
 
         this.redditApi.getComments(post.getId(), (comments -> {
-            int totalComments = 0;
-
-            for (RedditComment comment : comments) {
-                List<RedditComment> replies = comment.getReplies();
-
-                if (replies != null) {
-                    totalComments += replies.size();
-                }
-            }
-
-            Log.d(TAG, "onCreate: # comments: " + totalComments);
+            comments.forEach(comment -> {
+                Log.d(TAG, "onCreate: " + comment.getBody());
+            });
         }), ((call, t) -> {
             Log.d(TAG, "onCreate: ERROR");
             t.printStackTrace();

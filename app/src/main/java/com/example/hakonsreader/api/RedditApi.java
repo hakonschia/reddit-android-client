@@ -12,9 +12,10 @@ import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
-import com.example.hakonsreader.api.model.RedditListingResponse;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.responses.RedditCommentsResponse;
+import com.example.hakonsreader.api.responses.RedditPostsResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
 
@@ -476,11 +477,11 @@ public class RedditApi {
         // so add it anyways
         url += ".json";
 
-        this.apiService.getPosts(url, after, count, tokenString).enqueue(new Callback<RedditListingResponse>() {
+        this.apiService.getPosts(url, after, count, tokenString).enqueue(new Callback<RedditPostsResponse>() {
             @Override
-            public void onResponse(Call<RedditListingResponse> call, retrofit2.Response<RedditListingResponse> response) {
+            public void onResponse(Call<RedditPostsResponse> call, retrofit2.Response<RedditPostsResponse> response) {
                 if (response.isSuccessful()) {
-                    RedditListingResponse body = response.body();
+                    RedditPostsResponse body = response.body();
 
                     if (body != null) {
                         List<RedditPost> posts = body.getPosts();
@@ -492,7 +493,7 @@ public class RedditApi {
                 }
             }
             @Override
-            public void onFailure(Call<RedditListingResponse> call, Throwable t) {
+            public void onFailure(Call<RedditPostsResponse> call, Throwable t) {
                 onFailure.onFailure(-1, t);
             }
         });
@@ -528,11 +529,11 @@ public class RedditApi {
         // so add it anyways
         url += "comments/" + postID + ".json";
 
-        this.apiService.getComments(url, "", 0, tokenString).enqueue(new Callback<List<RedditListingResponse>>() {
+        this.apiService.getComments(url, "", 0, tokenString).enqueue(new Callback<List<RedditCommentsResponse>>() {
             @Override
-            public void onResponse(Call<List<RedditListingResponse>> call, retrofit2.Response<List<RedditListingResponse>> response) {
+            public void onResponse(Call<List<RedditCommentsResponse>> call, retrofit2.Response<List<RedditCommentsResponse>> response) {
                 if (response.isSuccessful()) {
-                    List<RedditListingResponse> body = response.body();
+                    List<RedditCommentsResponse> body = response.body();
 
                     if (body != null) {
                         // For comments the first listing object is the post itself and the second its comments
@@ -545,7 +546,7 @@ public class RedditApi {
                 }
             }
             @Override
-            public void onFailure(Call<List<RedditListingResponse>> call, Throwable t) {
+            public void onFailure(Call<List<RedditCommentsResponse>> call, Throwable t) {
                 onFailure.onFailure(-1, t);
             }
         });

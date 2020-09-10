@@ -104,8 +104,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         final RedditPost post = this.posts.get(position);
         holder.post = post;
 
-        String numComments = holder.resources.getQuantityString(R.plurals.numComments, post.getAmountOfComments(), post.getAmountOfComments());
-
         holder.postInfo.setPost(post);
         holder.fullPostBar.setPost(post);
 

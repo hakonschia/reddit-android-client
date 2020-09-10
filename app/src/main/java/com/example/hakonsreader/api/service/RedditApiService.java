@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.model.RedditListingResponse;
+import com.example.hakonsreader.api.responses.RedditCommentsResponse;
+import com.example.hakonsreader.api.responses.RedditPostsResponse;
 import com.example.hakonsreader.api.model.User;
 
 import java.util.List;
@@ -44,18 +45,18 @@ public interface RedditApiService {
      * @return A Call object ready to retrieve posts from a subreddit
      */
     @GET
-    Call<RedditListingResponse> getPosts(@Url String url,
-                                         @Query("after") String after,
-                                         @Query("count") int count,
-                                         @Header("Authorization") String accessToken
+    Call<RedditPostsResponse> getPosts(@Url String url,
+                                       @Query("after") String after,
+                                       @Query("count") int count,
+                                       @Header("Authorization") String accessToken
     );
 
 
     @GET
-    Call<List<RedditListingResponse>> getComments(@Url String url,
-                                                  @Query("after") String after,
-                                                  @Query("count") int count,
-                                                  @Header("Authorization") String accessToken
+    Call<List<RedditCommentsResponse>> getComments(@Url String url,
+                                                   @Query("after") String after,
+                                                   @Query("count") int count,
+                                                   @Header("Authorization") String accessToken
     );
 
     /**

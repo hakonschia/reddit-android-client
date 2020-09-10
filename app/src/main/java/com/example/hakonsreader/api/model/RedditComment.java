@@ -1,22 +1,16 @@
 package com.example.hakonsreader.api.model;
 
-import java.util.List;
+public class RedditComment {
 
-public class RedditComment extends RedditListing {
+    private Data data;
 
-    /**
-     * Create a comment object from a base listing
-     *
-     * @param base The base listing to create from
-     * @return A post object with the values from {@code base}
-     */
-    public static RedditComment createFromListing(RedditListing base) {
-        return base.createFromListing(RedditComment.class);
+    private static class Data extends ListingData {
+        private String body;
     }
 
-    private List<RedditComment> replies;
-
-    public List<RedditComment> getReplies() {
-        return replies;
+    public String getBody() {
+        return this.data.body;
     }
+
+
 }
