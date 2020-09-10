@@ -114,8 +114,8 @@ public class RedditComment implements RedditListing {
     }
 
     @Override
-    public String getDistinguished() {
-        return this.data.getDistinguished();
+    public boolean isMod() {
+        return this.data.isMod();
     }
 
     /**

@@ -90,8 +90,9 @@ public abstract class ListingData {
         return stickied;
     }
 
-    public String getDistinguished() {
-        return distinguished;
+    public boolean isMod() {
+        // TODO fix magic string
+        return distinguished.equals("moderator");
     }
 
 

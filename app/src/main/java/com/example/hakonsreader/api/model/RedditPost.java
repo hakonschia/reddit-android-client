@@ -145,8 +145,8 @@ public class RedditPost implements RedditListing {
     }
 
     @Override
-    public String getDistinguished() {
-        return data.getDistinguished();
+    public boolean isMod() {
+        return data.isMod();
     }
 
     /**

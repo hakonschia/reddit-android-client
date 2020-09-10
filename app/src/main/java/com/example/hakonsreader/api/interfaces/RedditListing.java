@@ -23,16 +23,15 @@ public interface RedditListing {
 
     long getCreatedAt();
 
-    boolean isLocked();
-
     Boolean getLiked();
+
+    boolean isLocked();
 
     boolean isScoreHidden();
 
     boolean isStickied();
 
-    String getDistinguished();
-
+    boolean isMod();
 
     VoteType getVoteType();
 
