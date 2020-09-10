@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 
@@ -27,7 +28,7 @@ public class VoteBar extends ConstraintLayout {
     private ImageButton upvote;
     private ImageButton downvote;
 
-    private RedditPost post;
+    private RedditListing listing;
 
 
     public VoteBar(Context context, @Nullable AttributeSet attrs) {
@@ -43,30 +44,33 @@ public class VoteBar extends ConstraintLayout {
     }
 
     /**
-     * Sets the post to use in this VoteBar and sets the initial state of the vote status
+     * Sets the listing to use in this VoteBar and sets the initial state of the vote status
      *
-     * @param post The post to set
+     * @param listing The listing to set
      */
-    public void setPost(@NonNull RedditPost post) {
-        this.post = post;
+    public void setListing(@NonNull RedditListing listing) {
+        this.listing = listing;
         // Make sure the initial status is up to date
         this.updateVoteStatus();
     }
 
     /**
-     * Sends a request to vote on a given post
+     * Sends a request to vote on a given listing
      *
      * @param voteType The vote type to cast
      */
     private void vote(RedditApi.VoteType voteType) {
-        // Ie. if upvote is clicked when the post is already upvoted, unvote the post
-        if (voteType == post.getVoteType()) {
+        // Ie. if upvote is clicked when the listing is already upvoted, unvote the listing
+        if (voteType == listing.getVoteType()) {
             voteType = RedditApi.VoteType.NoVote;
         }
 
         RedditApi.VoteType finalVoteType = voteType;
-        this.redditApi.vote(post.getId(), voteType, RedditApi.Thing.Post, (resp) -> {
-            post.setVoteType(finalVoteType);
+
+        RedditApi.Thing thing = (listing instanceof RedditPost ? RedditApi.Thing.Post : RedditApi.Thing.Comment);
+
+        this.redditApi.vote(listing.getId(), voteType, thing, (resp) -> {
+            listing.setVoteType(finalVoteType);
 
             updateVoteStatus();
         }, (call, t) -> {});
@@ -74,10 +78,10 @@ public class VoteBar extends ConstraintLayout {
 
 
     /**
-     * Updates the vote status for a post (button + text colors)
+     * Updates the vote status for a listing (button + text colors)
      */
     public void updateVoteStatus() {
-        RedditApi.VoteType voteType = post.getVoteType();
+        RedditApi.VoteType voteType = listing.getVoteType();
 
         int color = R.color.textColor;
 
@@ -102,7 +106,7 @@ public class VoteBar extends ConstraintLayout {
                 break;
         }
 
-        int scoreCount = post.getScore();
+        int scoreCount = listing.getScore();
 
         // For scores over 10000 show as "10.5k"
         if (scoreCount > 10000) {
@@ -111,7 +115,7 @@ public class VoteBar extends ConstraintLayout {
                     getResources().getString(R.string.scoreThousands), scoreCount / 1000f)
             );
         } else {
-            score.setText(String.format(Locale.getDefault(), "%d", post.getScore()));
+            score.setText(String.format(Locale.getDefault(), "%d", listing.getScore()));
         }
 
         score.setTextColor(getContext().getColor(color));

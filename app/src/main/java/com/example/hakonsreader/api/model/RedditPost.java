@@ -1,12 +1,13 @@
 package com.example.hakonsreader.api.model;
 
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Class representing a Reddit post
  */
-public class RedditPost {
+public class RedditPost implements RedditListing {
     private static final String TAG = "RedditPost";
 
     public enum PostType {
@@ -66,30 +67,37 @@ public class RedditPost {
     /**
      * @return The clean name of the subreddit (no r/ prefix)
      */
+    @Override
     public String getSubreddit() {
         return this.data.getSubreddit();
     }
 
+    @Override
     public String getId() {
         return this.data.getId();
     }
 
+    @Override
     public String getTitle() {
         return this.data.getTitle();
     }
 
+    @Override
     public String getAuthor() {
         return this.data.getAuthor();
     }
 
+    @Override
     public int getScore() {
         return this.data.getScore();
     }
 
+    @Override
     public Boolean getLiked() {
         return this.data.getLiked();
     }
 
+    @Override
     public boolean isLocked() {
         return this.data.isLocked();
     }
@@ -99,6 +107,7 @@ public class RedditPost {
      *
      * @return The permalink to the post
      */
+    @Override
     public String getPermalink() {
         return this.data.getPermalink();
     }
@@ -106,6 +115,7 @@ public class RedditPost {
     /**
      * @return The unix timestamp in UTC when the post was created
      */
+    @Override
     public long getCreatedAt() {
         return (long)data.getCreatedAt();
     }
@@ -116,12 +126,14 @@ public class RedditPost {
      *
      * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
      */
+    @Override
     public RedditApi.VoteType getVoteType() {
         return this.data.getVoteType();
     }
     /**
      * @param voteType The vote type for this post for the current user
      */
+    @Override
     public void setVoteType(RedditApi.VoteType voteType) {
         this.data.setVoteType(voteType);
     }

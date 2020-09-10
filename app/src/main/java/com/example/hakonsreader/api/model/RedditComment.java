@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.model;
 
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
 import com.google.gson.annotations.JsonAdapter;
@@ -9,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RedditComment {
+public class RedditComment implements RedditListing {
 
     private Data data;
 
@@ -32,30 +33,37 @@ public class RedditComment {
     /**
      * @return The clean name of the subreddit (no r/ prefix)
      */
+    @Override
     public String getSubreddit() {
         return this.data.getSubreddit();
     }
 
+    @Override
     public String getId() {
         return this.data.getId();
     }
 
+    @Override
     public String getTitle() {
         return this.data.getTitle();
     }
 
+    @Override
     public String getAuthor() {
         return this.data.getAuthor();
     }
 
+    @Override
     public int getScore() {
         return this.data.getScore();
     }
 
+    @Override
     public Boolean getLiked() {
         return this.data.getLiked();
     }
 
+    @Override
     public boolean isLocked() {
         return this.data.isLocked();
     }
@@ -65,6 +73,7 @@ public class RedditComment {
      *
      * @return The permalink to the post
      */
+    @Override
     public String getPermalink() {
         return this.data.getPermalink();
     }
@@ -72,6 +81,7 @@ public class RedditComment {
     /**
      * @return The unix timestamp in UTC when the post was created
      */
+    @Override
     public long getCreatedAt() {
         return (long)data.getCreatedAt();
     }
@@ -82,12 +92,14 @@ public class RedditComment {
      *
      * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
      */
+    @Override
     public RedditApi.VoteType getVoteType() {
         return this.data.getVoteType();
     }
     /**
      * @param voteType The vote type for this post for the current user
      */
+    @Override
     public void setVoteType(RedditApi.VoteType voteType) {
         this.data.setVoteType(voteType);
     }

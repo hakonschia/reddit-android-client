@@ -35,7 +35,7 @@ public class FullPostBar extends ConstraintLayout {
      */
     public void setPost(RedditPost post) {
         this.post = post;
-        this.voteBar.setPost(post);
+        this.voteBar.setListing(post);
 
         this.updateView();
     }
