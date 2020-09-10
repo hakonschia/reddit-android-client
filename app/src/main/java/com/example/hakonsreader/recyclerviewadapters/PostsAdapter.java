@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.api.model.RedditPost.PostType;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.views.FullPostBar;
@@ -193,23 +193,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             PostType postType = post.getPostType();
 
             switch (postType) {
-                case Image:
+                case IMAGE:
                     view = this.generateImageContent(post);
                     break;
 
-                case Video:
+                case VIDEO:
                     view = this.generateVideoContent(post);
                     break;
 
-                case RichVideo:
+                case RICH_VIDEO:
                     // Links such as youtube, gfycat etc are rich video posts
                     break;
 
-                case Link:
+                case LINK:
                     view = this.generateLinkContent(post);
                     break;
 
-                case Text:
+                case TEXT:
                     // Do nothing special for text posts
                     break;
             }

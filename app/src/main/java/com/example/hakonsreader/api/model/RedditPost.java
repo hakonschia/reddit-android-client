@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.model;
 
+import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.google.gson.annotations.SerializedName;
@@ -9,10 +10,6 @@ import com.google.gson.annotations.SerializedName;
  */
 public class RedditPost implements RedditListing {
     private static final String TAG = "RedditPost";
-
-    public enum PostType {
-        Image, Video, RichVideo, Link, Text
-    }
 
     private String kind;
     public Data data;
@@ -204,47 +201,47 @@ public class RedditPost implements RedditListing {
         // TODO make this less bad
         // TODO reddit galleries (multiple images)
         if (data.isVideo) {
-            return PostType.Video;
+            return PostType.VIDEO;
         } else if (data.isText) {
-            return PostType.Text;
+            return PostType.TEXT;
         }
 
         String hint = data.postHint;
 
         // Text posts don't have a hint
         if (hint == null) {
-            return PostType.Text;
+            return PostType.TEXT;
         }
 
         if (hint.equals("link")) {
             // Link posts might be images not uploaded to reddit
             if (hint.matches("(.png|.jpeg|.jpg)$")) {
-                return PostType.Image;
+                return PostType.IMAGE;
             } else if (hint.matches(".gifv")) {
-                return PostType.Video;
+                return PostType.VIDEO;
             }
 
-            return PostType.Link;
+            return PostType.LINK;
         }
 
         switch (hint) {
             case "image":
                 // .gif is treated as image
                 if (data.url.endsWith(".gif")) {
-                    return PostType.Video;
+                    return PostType.VIDEO;
                 }
 
-                return PostType.Image;
+                return PostType.IMAGE;
 
             case "hosted:video":
-                return PostType.Video;
+                return PostType.VIDEO;
 
             case "rich:video":
-                return PostType.RichVideo;
+                return PostType.RICH_VIDEO;
 
             // No hint means it's a text post
             default:
-                return PostType.Text;
+                return PostType.TEXT;
         }
     }
 }
