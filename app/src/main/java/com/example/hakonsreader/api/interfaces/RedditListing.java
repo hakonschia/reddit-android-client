@@ -7,6 +7,8 @@ import com.example.hakonsreader.api.enums.VoteType;
  */
 public interface RedditListing {
 
+    String getKind();
+
     String getSubreddit();
 
     String getId();

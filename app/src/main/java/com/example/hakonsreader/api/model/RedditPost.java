@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.model;
 
-import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.google.gson.annotations.SerializedName;
@@ -15,8 +14,9 @@ public class RedditPost implements RedditListing {
         Image, Video, RichVideo, Link, Text
     }
 
-
+    private String kind;
     public Data data;
+
     public static class Data extends ListingData {
 
         // The URL of the post. For images it links to the picture, for link posts it's the link
@@ -65,6 +65,11 @@ public class RedditPost implements RedditListing {
 
 
     /* --------------------- Inherited from ListingData --------------------- */
+    @Override
+    public String getKind() {
+        return this.kind;
+    }
+
     /**
      * @return The clean name of the subreddit (no r/ prefix)
      */

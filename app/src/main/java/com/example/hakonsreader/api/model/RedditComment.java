@@ -13,6 +13,7 @@ import java.util.List;
 public class RedditComment implements RedditListing {
     private static final String TAG = "RedditComment";
 
+    private String kind;
     private Data data;
 
     private static class Data extends ListingData {
@@ -31,6 +32,16 @@ public class RedditComment implements RedditListing {
     }
 
     /* --------------------- Inherited from ListingData --------------------- */
+
+    /**
+     * Retrieves the kind of listing
+     * @return
+     */
+    @Override
+    public String getKind() {
+        return this.kind;
+    }
+
     /**
      * @return The clean name of the subreddit (no r/ prefix)
      */

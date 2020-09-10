@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.views.VoteBar;
+import com.google.gson.GsonBuilder;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
+    private static final String TAG = "CommentsAdapter";
 
     private List<RedditComment> comments = new ArrayList<>();
 
@@ -76,6 +79,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         );
         // Update the layout
         holder.itemView.requestLayout();
+
+
+        holder.itemView.setOnClickListener(view -> {
+            Log.d(TAG, "onBindViewHolder: " + new GsonBuilder().setPrettyPrinting().create().toJson(comment));
+        });
     }
 
     @Override
