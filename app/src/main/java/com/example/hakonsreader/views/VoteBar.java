@@ -91,8 +91,8 @@ public class VoteBar extends ConstraintLayout {
 
         // Reset both buttons as at least one will change
         // (to avoid keeping the color if going from upvote to downvote and vice versa)
-        upvote.getDrawable().setTint(getContext().getColor(R.color.no_vote));
-        downvote.getDrawable().setTint(getContext().getColor(R.color.no_vote));
+        upvote.getDrawable().setTint(getContext().getColor(R.color.noVote));
+        downvote.getDrawable().setTint(getContext().getColor(R.color.noVote));
 
         switch (voteType) {
             case UPVOTE:

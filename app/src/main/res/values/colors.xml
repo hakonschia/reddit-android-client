@@ -4,18 +4,19 @@
     <color name="colorPrimaryDark">#006C7A</color>
     <color name="colorAccent">#80FFF3</color>
 
-    <color name="dark_background">#EAEAEA</color>
+    <color name="darkBackground">#EAEAEA</color>
     <color name="background">#FFFFFF</color>
 
     <color name="textColor">#000000</color>
+    <color name="secondaryTextColor">#5A5A5A</color>
     <color name="linkColor">#03A9F4</color>
     <color name="modTextColor">#00C130</color>
 
     <!-- Upvote/downvote button colors-->
     <color name="upvoted">#FF6130</color>
     <color name="downvoted">#2196F3</color>
-    <color name="no_vote">#818181</color>
+    <color name="noVote">#818181</color>
 
 
-    <color name="navigate_comment_divider">#959595</color>
+    <color name="navigateCommentDivider">#959595</color>
 </resources>

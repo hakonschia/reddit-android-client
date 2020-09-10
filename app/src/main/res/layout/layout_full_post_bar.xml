@@ -14,6 +14,7 @@
         android:src="@drawable/ic_baseline_message_24"
 
         android:layout_marginStart="15dp"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -29,6 +30,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/post_comments_img"
         app:layout_constraintStart_toEndOf="@+id/post_comments_img"
         app:layout_constraintTop_toTopOf="@+id/post_comments_img"
+
         tools:text="123 comments" />
 
     <com.example.hakonsreader.views.VoteBar
@@ -37,6 +39,7 @@
         android:layout_height="wrap_content"
 
         android:layout_marginEnd="15dp"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

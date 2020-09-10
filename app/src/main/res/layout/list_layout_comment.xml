@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/background"
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
@@ -27,7 +28,6 @@
 
         tools:text="2h ago" />
 
-    <!-- Should be its own recycler view with comments -->
     <TextView
         android:id="@+id/comment_content"
         android:layout_width="match_parent"
@@ -49,7 +49,6 @@
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/comment_content" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

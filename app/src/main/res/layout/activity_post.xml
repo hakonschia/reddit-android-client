@@ -4,34 +4,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/darkBackground"
     tools:context=".activites.PostActivity">
 
-    <com.example.hakonsreader.views.PostInfo
-        android:id="@+id/post_info_comments"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.example.hakonsreader.views.FullPostBar
-        android:id="@+id/post_full_bar_comments"
+    <LinearLayout
+        android:id="@+id/post_info_comments_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/post_info_comments"/>
+        android:orientation="vertical"
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/post_comments"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/post_full_bar_comments"
+        android:background="@color/background"
+        android:elevation="2dp">
 
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginStart="5dp"
+        <com.example.hakonsreader.views.PostInfo
+            android:id="@+id/post_info_comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-        tools:listitem="@layout/list_layout_comment" />
+        <com.example.hakonsreader.views.FullPostBar
+            android:id="@+id/post_full_bar_comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/post_info_comments_container"
+        android:background="@color/background"
+
+        android:layout_marginTop="10dp"
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/post_comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            tools:listitem="@layout/list_layout_comment" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -48,7 +62,7 @@
             android:layout_width="wrap_content"
 
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/dark_background"
+            android:backgroundTint="@color/darkBackground"
 
             android:onClick="goToPreviousTopLevelComment"
             android:src="@drawable/ic_baseline_arrow_upward_24" />
@@ -56,7 +70,7 @@
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/navigate_comment_divider"
+            android:background="@color/navigateCommentDivider"
 
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp" />
@@ -68,7 +82,7 @@
 
             android:layout_height="wrap_content"
 
-            android:backgroundTint="@color/dark_background"
+            android:backgroundTint="@color/darkBackground"
 
             android:onClick="goToNextTopLevelComment"
             android:src="@drawable/ic_baseline_arrow_downward_24" />
