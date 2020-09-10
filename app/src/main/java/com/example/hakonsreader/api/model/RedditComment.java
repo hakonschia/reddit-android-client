@@ -30,9 +30,6 @@ public class RedditComment implements RedditListing {
         @JsonAdapter(EmptyStringAsNullAdapter.class)
         private RedditCommentsResponse replies;
 
-        // Comment is stickied by a mod
-        private boolean stickied;
-
         @SerializedName("score_hidden")
         private boolean scoreHidden;
 
@@ -111,6 +108,11 @@ public class RedditComment implements RedditListing {
         return (long)data.getCreatedAt();
     }
 
+    @Override
+    public boolean isStickied() {
+        return this.data.getStickied();
+    }
+
     /**
      * Should the score be hidden?
      *
@@ -169,11 +171,6 @@ public class RedditComment implements RedditListing {
     public int getDepth() {
         return this.data.depth;
     }
-
-    public boolean isStickied() {
-        return this.data.stickied;
-    }
-
 
 
     /**
