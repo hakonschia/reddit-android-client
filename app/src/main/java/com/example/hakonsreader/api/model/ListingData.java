@@ -41,24 +41,26 @@ public abstract class ListingData {
 
     private boolean stickied;
 
+    private String distinguished;
 
-    protected String getSubreddit() {
+
+    public String getSubreddit() {
         return subreddit;
     }
 
-    protected String getId() {
+    public String getId() {
         return id;
     }
 
-    protected String getTitle() {
+    public String getTitle() {
         return title;
     }
 
-    protected String getAuthor() {
+    public String getAuthor() {
         return author;
     }
 
-    protected int getScore() {
+    public int getScore() {
         return score;
     }
 
@@ -67,25 +69,29 @@ public abstract class ListingData {
      *
      * @return The permalink to the post
      */
-    protected String getPermalink() {
+    public String getPermalink() {
         // The link given from the Reddit API starts at "/r/..."
         return "https://reddit.com" + permalink;
     }
 
-    protected boolean isLocked() {
+    public boolean isLocked() {
         return locked;
     }
 
-    protected float getCreatedAt() {
+    public float getCreatedAt() {
         return createdAt;
     }
 
-    protected Boolean getLiked() {
+    public Boolean getLiked() {
         return liked;
     }
 
-    protected boolean getStickied() {
+    public boolean getStickied() {
         return stickied;
+    }
+
+    public String getDistinguished() {
+        return distinguished;
     }
 
 
@@ -94,7 +100,7 @@ public abstract class ListingData {
      *
      * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
      */
-    protected VoteType getVoteType() {
+    public VoteType getVoteType() {
         if (liked == null) {
             return VoteType.NO_VOTE;
         }
@@ -106,7 +112,7 @@ public abstract class ListingData {
     /**
      * @param voteType The vote type for this post for the current user
      */
-    protected void setVoteType(VoteType voteType) {
+    public void setVoteType(VoteType voteType) {
         // Update the internal data as that is used in getVoteType
         switch (voteType) {
             case UPVOTE:

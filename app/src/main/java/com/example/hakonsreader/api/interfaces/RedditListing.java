@@ -31,6 +31,8 @@ public interface RedditListing {
 
     boolean isStickied();
 
+    String getDistinguished();
+
 
     VoteType getVoteType();
 

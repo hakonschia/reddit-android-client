@@ -144,6 +144,11 @@ public class RedditPost implements RedditListing {
         return data.getStickied();
     }
 
+    @Override
+    public String getDistinguished() {
+        return data.getDistinguished();
+    }
+
     /**
      * Retrieves the logged in users vote on the post
      *

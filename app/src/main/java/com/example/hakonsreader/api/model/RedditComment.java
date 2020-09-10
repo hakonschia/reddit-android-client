@@ -113,6 +113,11 @@ public class RedditComment implements RedditListing {
         return this.data.getStickied();
     }
 
+    @Override
+    public String getDistinguished() {
+        return this.data.getDistinguished();
+    }
+
     /**
      * Should the score be hidden?
      *
