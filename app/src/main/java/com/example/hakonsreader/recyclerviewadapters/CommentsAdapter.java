@@ -50,7 +50,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     }
 
     public int getPreviousTopLevelCommentPos(int currentPos) {
-        for(int i = currentPos; i > 0; i--) {
+        for(int i = currentPos; i >= 0; i--) {
             RedditComment comment = comments.get(i);
 
             if (comment.getDepth() == 0) {
