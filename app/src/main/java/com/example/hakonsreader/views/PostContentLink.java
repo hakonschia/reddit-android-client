@@ -14,6 +14,9 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.squareup.picasso.Picasso;
 
 public class PostContentLink extends ConstraintLayout {
+    private static final int THUMBNAIL_SIZE_NOT_SET = -1;
+    private static int thumbnailSize = THUMBNAIL_SIZE_NOT_SET;
+
     private RedditPost post;
 
     private ImageView thumbnail;
@@ -29,6 +32,10 @@ public class PostContentLink extends ConstraintLayout {
 
         this.thumbnail.setOnClickListener(v -> this.openLink());
         this.link.setOnClickListener(v -> this.openLink());
+
+        if (thumbnailSize == THUMBNAIL_SIZE_NOT_SET) {
+            thumbnailSize = (int)getResources().getDimension(R.dimen.post_link_thumnail_size);
+        }
     }
 
     public void setPost(RedditPost post) {
@@ -38,7 +45,10 @@ public class PostContentLink extends ConstraintLayout {
     }
 
     private void updateView() {
-        Picasso.get().load(this.post.getThumbnail()).into(this.thumbnail);
+        Picasso.get()
+                .load(this.post.getThumbnail())
+                .resize(thumbnailSize, thumbnailSize)
+                .into(this.thumbnail);
 
         this.link.setText(post.getUrl());
     }
