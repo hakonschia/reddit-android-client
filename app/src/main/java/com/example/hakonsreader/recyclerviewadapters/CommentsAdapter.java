@@ -63,19 +63,25 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
         String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
 
-        holder.content.setText("DEPTH: " + comment.getDepth() + "... " + comment.getBody());
+        holder.content.setText(comment.getBody());
         holder.author.setText(authorText);
         holder.age.setText(time);
 
         holder.voteBar.setListing(comment);
+
+        // Indent the entire view based on how far in the chain we are
+        RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+        params.setMarginStart(
+                comment.getDepth() * (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent)
+        );
+        // Update the layout
+        holder.itemView.requestLayout();
     }
 
     @Override
     public int getItemCount() {
         return this.comments.size();
     }
-
-
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView author;
