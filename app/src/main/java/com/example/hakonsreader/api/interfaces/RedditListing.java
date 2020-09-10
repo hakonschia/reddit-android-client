@@ -1,6 +1,6 @@
 package com.example.hakonsreader.api.interfaces;
 
-import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.VoteType;
 
 /**
  * Interface for all common attributes for a Reddit listing
@@ -26,7 +26,7 @@ public interface RedditListing {
     Boolean getLiked();
 
 
-    RedditApi.VoteType getVoteType();
+    VoteType getVoteType();
 
-    void setVoteType(RedditApi.VoteType voteType);
+    void setVoteType(VoteType voteType);
 }

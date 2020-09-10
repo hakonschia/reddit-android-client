@@ -6,6 +6,8 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.api.constants.OAuthConstants;
+import com.example.hakonsreader.api.enums.Thing;
+import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.exceptions.AccessTokenNotSetException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
@@ -40,46 +42,6 @@ import retrofit2.internal.EverythingIsNonNull;
 public class RedditApi {
     private static final String TAG = "RedditApi";
 
-    /**
-     * A Reddit "Thing"
-     */
-    public enum Thing {
-        Comment("t1"),
-        Post("t3");
-
-
-        private String value;
-
-        Thing(String value) {
-            this.value = value;
-        }
-
-        /**
-         * Retrieve the underlying string value of the thing
-         * <p>This value can be used in addition to the things ID to create the fullname of the thing</p>
-         * <p>When creating the fullname use a "_" between the thing value and the ID</p>
-         *
-         * @return The string identifier for the thing (eg. "t1")
-         */
-        public String getValue() {
-            return value;
-        }
-    }
-
-    /**
-     * What type of vote to cast on something
-     */
-    public enum VoteType {
-        Upvote(1),
-        Downvote(-1),
-        NoVote(0);
-
-        private int value;
-
-        private VoteType(int value) {
-            this.value = value;
-        }
-    }
 
     public static final String REDDIT_URL = "https://reddit.com/";
 
@@ -578,8 +540,8 @@ public class RedditApi {
 
             this.apiService.vote(
                     // "t1_gre3" etc. to identify what is being voted on (post or comment)
-                    thing.value + "_" + thingId,
-                    type.value,
+                    thing.getValue() + "_" + thingId,
+                    type.getValue(),
                     this.accessToken.generateHeaderString()
             ).enqueue(new Callback<Void>() {
                 @Override

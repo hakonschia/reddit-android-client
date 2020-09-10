@@ -1,6 +1,6 @@
 package com.example.hakonsreader.api.model;
 
-import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
@@ -88,29 +88,29 @@ public abstract class ListingData {
      *
      * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
      */
-    protected RedditApi.VoteType getVoteType() {
+    protected VoteType getVoteType() {
         if (liked == null) {
-            return RedditApi.VoteType.NoVote;
+            return VoteType.NO_VOTE;
         }
 
-        return (liked ? RedditApi.VoteType.Upvote : RedditApi.VoteType.Downvote);
+        return (liked ? VoteType.UPVOTE : VoteType.DOWNVOTE);
     }
 
 
     /**
      * @param voteType The vote type for this post for the current user
      */
-    protected void setVoteType(RedditApi.VoteType voteType) {
+    protected void setVoteType(VoteType voteType) {
         // Update the internal data as that is used in getVoteType
         switch (voteType) {
-            case Upvote:
+            case UPVOTE:
                 liked = true;
                 break;
-            case Downvote:
+            case DOWNVOTE:
                 liked = false;
                 break;
 
-            case NoVote:
+            case NO_VOTE:
                 liked = null;
                 break;
         }

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -151,7 +152,7 @@ public class SubredditFragment extends Fragment {
         int postsSize = previousPosts.size();
 
         if (postsSize > 0) {
-            after = RedditApi.Thing.Post.getValue() + "_" + previousPosts.get(postsSize - 1).getId();
+            after = Thing.POST.getValue() + "_" + previousPosts.get(postsSize - 1).getId();
         }
 
         // Store the current attempt to load more posts to avoid attempting many times if it fails

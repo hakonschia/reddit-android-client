@@ -1,6 +1,6 @@
 package com.example.hakonsreader.api.model;
 
-import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
@@ -93,14 +93,14 @@ public class RedditComment implements RedditListing {
      * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
      */
     @Override
-    public RedditApi.VoteType getVoteType() {
+    public VoteType getVoteType() {
         return this.data.getVoteType();
     }
     /**
      * @param voteType The vote type for this post for the current user
      */
     @Override
-    public void setVoteType(RedditApi.VoteType voteType) {
+    public void setVoteType(VoteType voteType) {
         this.data.setVoteType(voteType);
     }
     /* --------------------- End inherited from ListingData --------------------- */

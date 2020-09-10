@@ -11,6 +11,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.Thing;
+import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
@@ -39,8 +41,8 @@ public class VoteBar extends ConstraintLayout {
         this.upvote = findViewById(R.id.vote_bar_upvote);
         this.downvote = findViewById(R.id.vote_bar_downvote);
 
-        this.upvote.setOnClickListener(v -> this.vote(RedditApi.VoteType.Upvote));
-        this.downvote.setOnClickListener(v -> this.vote(RedditApi.VoteType.Downvote));
+        this.upvote.setOnClickListener(v -> this.vote(VoteType.UPVOTE));
+        this.downvote.setOnClickListener(v -> this.vote(VoteType.DOWNVOTE));
     }
 
     /**
@@ -59,15 +61,15 @@ public class VoteBar extends ConstraintLayout {
      *
      * @param voteType The vote type to cast
      */
-    private void vote(RedditApi.VoteType voteType) {
+    private void vote(VoteType voteType) {
         // Ie. if upvote is clicked when the listing is already upvoted, unvote the listing
         if (voteType == listing.getVoteType()) {
-            voteType = RedditApi.VoteType.NoVote;
+            voteType = VoteType.NO_VOTE;
         }
 
-        RedditApi.VoteType finalVoteType = voteType;
+        VoteType finalVoteType = voteType;
 
-        RedditApi.Thing thing = (listing instanceof RedditPost ? RedditApi.Thing.Post : RedditApi.Thing.Comment);
+        Thing thing = (listing instanceof RedditPost ? Thing.POST : Thing.COMMENT);
 
         this.redditApi.vote(listing.getId(), voteType, thing, (resp) -> {
             listing.setVoteType(finalVoteType);
@@ -81,7 +83,7 @@ public class VoteBar extends ConstraintLayout {
      * Updates the vote status for a listing (button + text colors)
      */
     public void updateVoteStatus() {
-        RedditApi.VoteType voteType = listing.getVoteType();
+        VoteType voteType = listing.getVoteType();
 
         int color = R.color.textColor;
 
@@ -91,17 +93,17 @@ public class VoteBar extends ConstraintLayout {
         downvote.getDrawable().setTint(getContext().getColor(R.color.no_vote));
 
         switch (voteType) {
-            case Upvote:
+            case UPVOTE:
                 color = R.color.upvoted;
                 upvote.getDrawable().setTint(getContext().getColor(color));
                 break;
 
-            case Downvote:
+            case DOWNVOTE:
                 color = R.color.downvoted;
                 downvote.getDrawable().setTint(getContext().getColor(color));
                 break;
 
-            case NoVote:
+            case NO_VOTE:
             default:
                 break;
         }
