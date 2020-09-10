@@ -4,22 +4,22 @@
     <color name="colorPrimaryDark">#005560</color>
     <color name="colorAccent">#000000</color>
 
-    <color name="toolbar">#FFFFFF</color>
+    <color name="toolbar">#000000</color>
 
-    <color name="secondaryBackground">#EAEAEA</color>
-    <color name="background">#FFFFFF</color>
+    <color name="secondaryBackground">#222222</color>
+    <color name="background">#121212</color>
 
-    <color name="textColor">#000000</color>
-    <color name="secondaryTextColor">#5A5A5A</color>
+    <color name="textColor">#FFFFFF</color>
+    <color name="secondaryTextColor">#BDBDBD</color>
     <color name="linkColor">#03A9F4</color>
     <color name="modTextColor">#00C130</color>
 
     <!-- Upvote/downvote button colors-->
     <color name="upvoted">#FF6130</color>
     <color name="downvoted">#2196F3</color>
-    <color name="noVote">#818181</color>
+    <color name="noVote">#D3D3D3</color>
 
 
-    <color name="divider">#959595</color>
-    <color name="iconColor">#3A3A3A</color>
+    <color name="divider">#434343</color>
+    <color name="iconColor">#DADADA</color>
 </resources>

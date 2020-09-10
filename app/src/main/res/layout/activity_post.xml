@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkBackground"
+    android:background="@color/secondaryBackground"
     tools:context=".activites.PostActivity">
 
     <LinearLayout
@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
 
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/darkBackground"
+            android:backgroundTint="@color/secondaryBackground"
 
             android:onClick="goToPreviousTopLevelComment"
             android:src="@drawable/ic_baseline_arrow_upward_24" />
@@ -70,7 +70,7 @@
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/navigateCommentDivider"
+            android:background="@color/divider"
 
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp" />
@@ -82,7 +82,7 @@
 
             android:layout_height="wrap_content"
 
-            android:backgroundTint="@color/darkBackground"
+            android:backgroundTint="@color/secondaryBackground"
 
             android:onClick="goToNextTopLevelComment"
             android:src="@drawable/ic_baseline_arrow_downward_24" />
@@ -97,6 +97,7 @@
         android:visibility="gone"
 
         android:layout_centerInParent="true"
+        android:indeterminateTint="@color/iconColor"
 
         tools:visibility="visible" />
 

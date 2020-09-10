@@ -25,6 +25,7 @@
         app:layout_constraintTop_toTopOf="parent"
 
         android:layout_marginStart="15dp"
+        android:textColor="@color/secondaryTextColor"
 
         tools:text="2h ago" />
 
