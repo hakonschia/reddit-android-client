@@ -36,6 +36,9 @@ public class RedditPost implements RedditListing {
 
         protected boolean spoiler;
 
+        @SerializedName("hide_score")
+        private boolean scoreHidden;
+
 
         protected String thumbnail;
 
@@ -109,6 +112,16 @@ public class RedditPost implements RedditListing {
     }
 
     /**
+     * Should the score be hidden?
+     *
+     * @return True if the score should be hidden
+     */
+    @Override
+    public boolean isScoreHidden() {
+        return this.data.scoreHidden;
+    }
+
+    /**
      * Retrieve the link to the comments of a post (full link)
      *
      * @return The permalink to the post
@@ -126,6 +139,10 @@ public class RedditPost implements RedditListing {
         return (long)data.getCreatedAt();
     }
 
+    @Override
+    public boolean isStickied() {
+        return data.getStickied();
+    }
 
     /**
      * Retrieves the logged in users vote on the post

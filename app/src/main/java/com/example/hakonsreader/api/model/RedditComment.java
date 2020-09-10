@@ -30,8 +30,15 @@ public class RedditComment implements RedditListing {
         @JsonAdapter(EmptyStringAsNullAdapter.class)
         private RedditCommentsResponse replies;
 
+        // Comment is stickied by a mod
+        private boolean stickied;
 
-        /* Fields for when the comment is an "load more comments" comment */
+        @SerializedName("score_hidden")
+        private boolean scoreHidden;
+
+
+
+        /* Fields for when the comment is a "load more comments" comment */
         @SerializedName("count")
         private int extraCommentsCount;
 
@@ -104,6 +111,16 @@ public class RedditComment implements RedditListing {
         return (long)data.getCreatedAt();
     }
 
+    /**
+     * Should the score be hidden?
+     *
+     * @return True if the score should be hidden
+     */
+    @Override
+    public boolean isScoreHidden() {
+        return this.data.scoreHidden;
+    }
+
 
     /**
      * Retrieves the logged in users vote on the post
@@ -152,6 +169,12 @@ public class RedditComment implements RedditListing {
     public int getDepth() {
         return this.data.depth;
     }
+
+    public boolean isStickied() {
+        return this.data.stickied;
+    }
+
+
 
     /**
      * Retrieves the list of replies this comment has

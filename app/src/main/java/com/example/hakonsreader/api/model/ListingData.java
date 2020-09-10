@@ -39,6 +39,8 @@ public abstract class ListingData {
     @JsonAdapter(BooleanPrimitiveAdapter.class)
     private Boolean liked;
 
+    private boolean stickied;
+
 
     protected String getSubreddit() {
         return subreddit;
@@ -80,6 +82,10 @@ public abstract class ListingData {
 
     protected Boolean getLiked() {
         return liked;
+    }
+
+    protected boolean getStickied() {
+        return stickied;
     }
 
 

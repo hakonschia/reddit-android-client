@@ -27,6 +27,10 @@ public interface RedditListing {
 
     Boolean getLiked();
 
+    boolean isScoreHidden();
+
+    boolean isStickied();
+
 
     VoteType getVoteType();
 
