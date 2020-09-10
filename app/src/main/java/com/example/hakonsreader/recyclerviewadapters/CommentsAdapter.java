@@ -47,6 +47,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RedditComment comment = this.comments.get(position);
 
+        // TODO if author of comment == author of post
+
         // TODO make this cleaner
 
         // TODO remove magic string and create "listing" enum or something
@@ -61,7 +63,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             );
 
             // TODO add listener to actually fetch the comments
+            // Clear everything except the author field which now holds the amount of extra comments
             holder.author.setText(extraCommentsText);
+            holder.age.setText("");
+            holder.content.setText("");
             holder.voteBar.setVisibility(View.GONE);
         } else {
             Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
