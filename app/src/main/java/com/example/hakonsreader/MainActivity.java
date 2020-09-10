@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
@@ -21,6 +22,7 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
+import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     private PostsContainerFragment postsFragment;
     private ProfileFragment profileFragment;
     private LogInFragment logInFragment;
+    private SettingsFragment settingsFragment;
 
     // Interface towards the Reddit API
     private RedditApi redditApi;
@@ -83,7 +86,8 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         this.setupNavBar();
         this.setupStartFragment();
 
-        if (prefs.getBoolean(SharedPreferencesConstants.NIGHT_MODE, false)) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        if (settings.getBoolean(SharedPreferencesConstants.NIGHT_MODE, false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -198,6 +202,14 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
                         selected = this.profileFragment;
                     }
+                    break;
+
+                case R.id.nav_settings:
+                    if (this.settingsFragment == null) {
+                        this.settingsFragment = new SettingsFragment();
+                    }
+
+                    selected = this.settingsFragment;
                     break;
 
                 default:

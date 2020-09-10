@@ -24,5 +24,5 @@ public class SharedPreferencesConstants {
     /**
      * If the app should be in night mode or not
      */
-    public static final String NIGHT_MODE = "nightMode";
+    public static final String NIGHT_MODE = "theme";
 }
