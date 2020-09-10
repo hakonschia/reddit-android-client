@@ -31,6 +31,36 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         notifyDataSetChanged();
     }
 
+    /**
+     * Find the next top level comment of the comment chain
+     *
+     * @param currentPos The position to start looking at
+     * @return The position of the next top level comment, or {@code currentPos} if there are no more top level comments
+     */
+    public int getNextTopLevelCommentPos(int currentPos) {
+        for(int i = currentPos; i < comments.size(); i++) {
+            RedditComment comment = comments.get(i);
+
+            if (comment.getDepth() == 0) {
+                return i;
+            }
+        }
+
+        return currentPos;
+    }
+
+    public int getPreviousTopLevelCommentPos(int currentPos) {
+        for(int i = currentPos; i > 0; i--) {
+            RedditComment comment = comments.get(i);
+
+            if (comment.getDepth() == 0) {
+                return i;
+            }
+        }
+
+        return currentPos;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

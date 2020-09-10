@@ -1,7 +1,7 @@
 package com.example.hakonsreader.activites;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +32,7 @@ public class PostActivity extends AppCompatActivity {
     private RecyclerView commentsList;
 
     private CommentsAdapter commentsAdapter;
+    private LinearLayoutManager layoutManager;
 
 
     @Override
@@ -73,7 +74,35 @@ public class PostActivity extends AppCompatActivity {
      */
     private void setupCommentsList() {
         this.commentsAdapter = new CommentsAdapter();
+        this.layoutManager = new LinearLayoutManager(this);
+
         this.commentsList.setAdapter(this.commentsAdapter);
-        this.commentsList.setLayoutManager(new LinearLayoutManager(this));
+        this.commentsList.setLayoutManager(this.layoutManager);
+    }
+
+    /**
+     * Scrolls to the next top level comment
+     * @param view Ignored
+     */
+    public void goToNextTopLevelComment(View view) {
+        int currentPos = layoutManager.findFirstCompletelyVisibleItemPosition();
+        // Add 1 so that we can go directly from a top level to the next without scrolling
+        int next = this.commentsAdapter.getNextTopLevelCommentPos(currentPos + 1);
+
+        // Scroll to the position, with 0 pixels offset from the top
+        // TODO smooth scroll
+        this.layoutManager.scrollToPositionWithOffset(next, 0);
+    }
+
+    /**
+     * Scrolls to the previous top level comment
+     * @param view Ignored
+     */
+    public void goToPreviousTopLevelComment(View view) {
+        int currentPos = layoutManager.findFirstCompletelyVisibleItemPosition();
+        // Subtract 1 so that we can go directly from a top level to the previous without scrolling
+        int previous = this.commentsAdapter.getPreviousTopLevelCommentPos(currentPos - 1);
+
+        this.layoutManager.scrollToPositionWithOffset(previous, 0);
     }
 }
