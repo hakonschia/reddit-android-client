@@ -20,6 +20,7 @@ import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -527,7 +528,7 @@ public class RedditApi {
         // so add it anyways
         url += "comments/" + postID + ".json";
 
-        this.apiService.getComments(url, tokenString).enqueue(new Callback<List<RedditCommentsResponse>>() {
+        this.apiService.getComments(url, "all", tokenString).enqueue(new Callback<List<RedditCommentsResponse>>() {
             @Override
             public void onResponse(Call<List<RedditCommentsResponse>> call, retrofit2.Response<List<RedditCommentsResponse>> response) {
                 if (response.isSuccessful()) {
@@ -535,9 +536,17 @@ public class RedditApi {
 
                     if (body != null) {
                         // For comments the first listing object is the post itself and the second its comments
-                        List<RedditComment> comments = body.get(1).getComments();
+                        List<RedditComment> topLevelComments = body.get(1).getComments();
 
-                        onResponse.onResponse(comments);
+                        List<RedditComment> allComments = new ArrayList<>();
+                        topLevelComments.forEach(comment -> {
+                            allComments.add(comment);
+                            allComments.addAll(comment.getReplies());
+                        });
+
+                        Log.d(TAG, "onResponse: # of comments: " + allComments.size());
+
+                        onResponse.onResponse(allComments);
                     }
                 } else {
                     onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));

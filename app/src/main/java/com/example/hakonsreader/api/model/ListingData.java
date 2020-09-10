@@ -1,6 +1,6 @@
 package com.example.hakonsreader.api.model;
 
-import com.example.hakonsreader.jsonadapters.BooleanPrimitiveAdapter;
+import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 

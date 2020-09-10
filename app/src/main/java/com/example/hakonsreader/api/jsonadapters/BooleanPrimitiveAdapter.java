@@ -1,4 +1,4 @@
-package com.example.hakonsreader.jsonadapters;
+package com.example.hakonsreader.api.jsonadapters;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

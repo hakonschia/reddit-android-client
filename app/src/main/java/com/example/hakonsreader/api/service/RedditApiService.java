@@ -66,6 +66,7 @@ public interface RedditApiService {
      */
     @GET
     Call<List<RedditCommentsResponse>> getComments(@Url String url,
+                                                   @Query("show") String show,
                                                    @Header("Authorization") String accessToken
     );
 
