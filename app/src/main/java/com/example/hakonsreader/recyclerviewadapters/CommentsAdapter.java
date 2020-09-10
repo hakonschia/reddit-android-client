@@ -47,40 +47,59 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RedditComment comment = this.comments.get(position);
 
-        Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
-        Instant now = Instant.now();
+        // TODO make this cleaner
 
-        String time;
+        // TODO remove magic string and create "listing" enum or something
+        // The comment is a "12 more comments"
+        if (comment.getKind().equals("more")) {
+            int extraComments = comment.getExtraCommentsCount();
 
-        Duration between = Duration.between(created, now);
-        Context context = holder.itemView.getContext();
+            String extraCommentsText = holder.itemView.getResources().getQuantityString(
+                    R.plurals.extraComments,
+                    extraComments,
+                    extraComments
+            );
 
-        // This is kinda bad but whatever
-        if (between.toDays() > 0) {
-            time = String.format(context.getString(R.string.post_age_days), between.toDays());
-        } else if (between.toHours() > 0) {
-            time = String.format(context.getString(R.string.post_age_hours), between.toHours());
+            // TODO add listener to actually fetch the comments
+            holder.author.setText(extraCommentsText);
+            holder.voteBar.setVisibility(View.GONE);
         } else {
-            time = String.format(context.getString(R.string.post_age_minutes), between.toMinutes());
+            Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
+            Instant now = Instant.now();
+
+            String time;
+
+            Duration between = Duration.between(created, now);
+            Context context = holder.itemView.getContext();
+
+            // This is kinda bad but whatever
+            if (between.toDays() > 0) {
+                time = String.format(context.getString(R.string.post_age_days), between.toDays());
+            } else if (between.toHours() > 0) {
+                time = String.format(context.getString(R.string.post_age_hours), between.toHours());
+            } else {
+                time = String.format(context.getString(R.string.post_age_minutes), between.toMinutes());
+            }
+
+            String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
+
+            holder.content.setText(comment.getBody());
+            holder.author.setText(authorText);
+            holder.age.setText(time);
+
+            holder.voteBar.setListing(comment);
+            holder.voteBar.setVisibility(View.VISIBLE);
         }
-
-        String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
-
-        holder.content.setText(comment.getBody());
-        holder.author.setText(authorText);
-        holder.age.setText(time);
-
-        holder.voteBar.setListing(comment);
 
         // Indent the entire view based on how far in the chain we are
         RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
         params.setMarginStart(
                 comment.getDepth() * (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent)
         );
-        // Update the layout
+        // Update the layout with new margin
         holder.itemView.requestLayout();
 
-
+        // DEBUG
         holder.itemView.setOnClickListener(view -> {
             Log.d(TAG, "onBindViewHolder: " + new GsonBuilder().setPrettyPrinting().create().toJson(comment));
         });

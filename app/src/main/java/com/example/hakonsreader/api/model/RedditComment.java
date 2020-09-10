@@ -29,8 +29,14 @@ public class RedditComment implements RedditListing {
         // as gson tries to convert it to a string, so convert to null instead
         @JsonAdapter(EmptyStringAsNullAdapter.class)
         private RedditCommentsResponse replies;
-    }
 
+
+        /* Fields for when the comment is an "load more comments" comment */
+        @SerializedName("count")
+        private int extraCommentsCount;
+
+        private List<String> children;
+    }
     /* --------------------- Inherited from ListingData --------------------- */
 
     /**
@@ -171,4 +177,24 @@ public class RedditComment implements RedditListing {
         return all;
     }
 
+
+    /**
+     * Retrieves the children of the comment (for loading more comments)
+     * <p>Note that if {@link RedditComment#getKind()} isn't "more" this will null</p>
+     *
+     * @return The list of ID's of the child comments
+     */
+    public List<String> getChildren() {
+        return this.data.children;
+    }
+
+    /**
+     * The amount of extra child comments
+     * <p>Note that if {@link RedditComment#getKind()} isn't "more" this will always be 0</p>
+     *
+     * @return
+     */
+    public int getExtraCommentsCount() {
+        return this.data.extraCommentsCount;
+    }
 }
