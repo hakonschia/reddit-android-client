@@ -505,8 +505,6 @@ public class RedditApi {
      * <p>If an access token is set posts are customized for the user</p>
      *
      * @param postID The post ID to retrieve comments from
-     * @param after The ID of the last post seen (or an empty string if first time loading)
-     * @param count The amount of posts already retrieved
      *
      * @param onResponse The callback for successful requests. Holds the list of posts
      * @param onFailure The callback for failed requests
@@ -529,7 +527,7 @@ public class RedditApi {
         // so add it anyways
         url += "comments/" + postID + ".json";
 
-        this.apiService.getComments(url, "", 0, tokenString).enqueue(new Callback<List<RedditCommentsResponse>>() {
+        this.apiService.getComments(url, tokenString).enqueue(new Callback<List<RedditCommentsResponse>>() {
             @Override
             public void onResponse(Call<List<RedditCommentsResponse>> call, retrofit2.Response<List<RedditCommentsResponse>> response) {
                 if (response.isSuccessful()) {

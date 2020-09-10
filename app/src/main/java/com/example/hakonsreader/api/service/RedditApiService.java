@@ -1,8 +1,8 @@
 package com.example.hakonsreader.api.service;
 
+import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditPostsResponse;
-import com.example.hakonsreader.api.model.User;
 
 import java.util.List;
 
@@ -42,6 +42,7 @@ public interface RedditApiService {
      *            <p>The URL format for front page for not logged in user or a subreddit is: https://reddit.com/.json</p>
      *            <p>The URL for front page for logged in user is: https://oauth.reddit.com with an authentication header</p>
      * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
+     *                    to retrieve posts without a logged in user
      * @return A Call object ready to retrieve posts from a subreddit
      */
     @GET
@@ -52,10 +53,19 @@ public interface RedditApiService {
     );
 
 
+    /**
+     * Retrieves comments for a post
+     *
+     * @param url The URL to retrieve comments for
+     *            <p>Format: reddit.com/{post ID}.json</p>
+     *            <p>For upvote status for a user use oauth.reddit.com</p>
+     * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
+     *                    to retrieve comments without a logged in user
+     * @return A list of {@link RedditCommentsResponse}. Note that this is a list since the first element
+     * returned is the post itself. The actual comments is found in the second element of the list
+     */
     @GET
     Call<List<RedditCommentsResponse>> getComments(@Url String url,
-                                                   @Query("after") String after,
-                                                   @Query("count") int count,
                                                    @Header("Authorization") String accessToken
     );
 
