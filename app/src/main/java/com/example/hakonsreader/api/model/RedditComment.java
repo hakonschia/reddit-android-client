@@ -21,6 +21,8 @@ public class RedditComment {
         // How far in we are in a comment chain
         private int depth;
 
+        // If there are no replies the replies is {"replies" : ""} which would cause an error
+        // as gson tries to convert it to a string, so convert to null instead
         @JsonAdapter(EmptyStringAsNullAdapter.class)
         private RedditCommentsResponse replies;
     }
@@ -58,6 +60,7 @@ public class RedditComment {
      * @return The list of replies
      */
     public List<RedditComment> getReplies() {
+        // No replies
         if (this.data.replies == null) {
             return new ArrayList<>();
         }
