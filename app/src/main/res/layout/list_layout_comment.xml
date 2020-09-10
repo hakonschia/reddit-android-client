@@ -17,7 +17,7 @@
         tools:text="u/hakonschia" />
 
     <TextView
-        android:id="@+id/comment_time_posted"
+        android:id="@+id/comment_age"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/comment_author"

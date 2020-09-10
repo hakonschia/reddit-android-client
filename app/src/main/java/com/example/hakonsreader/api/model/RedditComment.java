@@ -1,7 +1,8 @@
 package com.example.hakonsreader.api.model;
 
-import com.example.hakonsreader.api.responses.RedditCommentsResponse;
+import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter;
+import com.example.hakonsreader.api.responses.RedditCommentsResponse;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -26,6 +27,74 @@ public class RedditComment {
         @JsonAdapter(EmptyStringAsNullAdapter.class)
         private RedditCommentsResponse replies;
     }
+
+    /* --------------------- Inherited from ListingData --------------------- */
+    /**
+     * @return The clean name of the subreddit (no r/ prefix)
+     */
+    public String getSubreddit() {
+        return this.data.getSubreddit();
+    }
+
+    public String getId() {
+        return this.data.getId();
+    }
+
+    public String getTitle() {
+        return this.data.getTitle();
+    }
+
+    public String getAuthor() {
+        return this.data.getAuthor();
+    }
+
+    public int getScore() {
+        return this.data.getScore();
+    }
+
+    public Boolean getLiked() {
+        return this.data.getLiked();
+    }
+
+    public boolean isLocked() {
+        return this.data.isLocked();
+    }
+
+    /**
+     * Retrieve the link to the comments of a post (full link)
+     *
+     * @return The permalink to the post
+     */
+    public String getPermalink() {
+        return this.data.getPermalink();
+    }
+
+    /**
+     * @return The unix timestamp in UTC when the post was created
+     */
+    public long getCreatedAt() {
+        return (long)data.getCreatedAt();
+    }
+
+
+    /**
+     * Retrieves the logged in users vote on the post
+     *
+     * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
+     */
+    public RedditApi.VoteType getVoteType() {
+        return this.data.getVoteType();
+    }
+    /**
+     * @param voteType The vote type for this post for the current user
+     */
+    public void setVoteType(RedditApi.VoteType voteType) {
+        this.data.setVoteType(voteType);
+    }
+    /* --------------------- End inherited from ListingData --------------------- */
+
+
+
 
     /**
      * Retrieves the raw body. For HTML use {@link RedditComment#getBodyHtml()}

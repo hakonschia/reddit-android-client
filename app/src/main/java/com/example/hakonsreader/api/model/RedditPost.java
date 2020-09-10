@@ -32,6 +32,8 @@ public class RedditPost {
         @SerializedName("is_video")
         protected boolean isVideo;
 
+        protected boolean spoiler;
+
 
         protected String thumbnail;
 
@@ -60,23 +62,83 @@ public class RedditPost {
     }
 
 
+    /* --------------------- Inherited from ListingData --------------------- */
     /**
      * @return The clean name of the subreddit (no r/ prefix)
      */
     public String getSubreddit() {
-        return this.data.subreddit;
-    }
-
-    public String getTitle() {
-        return this.data.title;
-    }
-
-    public String getAuthor() {
-        return this.data.author;
+        return this.data.getSubreddit();
     }
 
     public String getId() {
-        return this.data.id;
+        return this.data.getId();
+    }
+
+    public String getTitle() {
+        return this.data.getTitle();
+    }
+
+    public String getAuthor() {
+        return this.data.getAuthor();
+    }
+
+    public int getScore() {
+        return this.data.getScore();
+    }
+
+    public Boolean getLiked() {
+        return this.data.getLiked();
+    }
+
+    public boolean isLocked() {
+        return this.data.isLocked();
+    }
+
+    /**
+     * Retrieve the link to the comments of a post (full link)
+     *
+     * @return The permalink to the post
+     */
+    public String getPermalink() {
+        return this.data.getPermalink();
+    }
+
+    /**
+     * @return The unix timestamp in UTC when the post was created
+     */
+    public long getCreatedAt() {
+        return (long)data.getCreatedAt();
+    }
+
+
+    /**
+     * Retrieves the logged in users vote on the post
+     *
+     * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
+     */
+    public RedditApi.VoteType getVoteType() {
+        return this.data.getVoteType();
+    }
+    /**
+     * @param voteType The vote type for this post for the current user
+     */
+    public void setVoteType(RedditApi.VoteType voteType) {
+        this.data.setVoteType(voteType);
+    }
+    /* --------------------- End inherited from ListingData --------------------- */
+
+
+
+    public String getThumbnail() {
+        return this.data.thumbnail;
+    }
+
+    public String getUrl() {
+        return this.data.url;
+    }
+
+    public boolean isSpoiler() {
+        return this.data.spoiler;
     }
 
     public boolean isVideo() {
@@ -87,29 +149,6 @@ public class RedditPost {
         return this.data.amountOfComments;
     }
 
-    public int getScore() {
-        return this.data.score;
-    }
-
-    public boolean isSpoiler() {
-        return this.data.spoiler;
-    }
-
-    public String getThumbnail() {
-        return this.data.thumbnail;
-    }
-
-    /**
-     * @return The unix timestamp in UTC when the post was created
-     */
-    public long getCreatedAt() {
-        return (long)data.createdAt;
-    }
-
-    public String getUrl() {
-        return this.data.url;
-    }
-
     public String getVideoUrl() {
         // If video not hosted by reddit
         if (this.data.media == null) {
@@ -118,28 +157,6 @@ public class RedditPost {
         return this.data.media.redditVideo.url;
     }
 
-    /**
-     * Retrieves the logged in users vote on the post
-     *
-     * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
-     */
-    public RedditApi.VoteType getVoteType() {
-        if (this.data.liked == null) {
-            return RedditApi.VoteType.NoVote;
-        }
-
-        return (this.data.liked ? RedditApi.VoteType.Upvote : RedditApi.VoteType.Downvote);
-    }
-
-    /**
-     * Retrieve the link to the comments of a post (full link)
-     *
-     * @return The permalink to the post
-     */
-    public String getPermalink() {
-        // The link given from the Reddit API starts at "/r/..."
-        return "https://reddit.com" + this.data.permalink;
-    }
     /**
      * @return The type of post (image, video, text, or link)
      */
@@ -190,25 +207,4 @@ public class RedditPost {
                 return PostType.Text;
         }
     }
-
-    /**
-     * @param voteType The vote type for this post for the current user
-     */
-    public void setVoteType(RedditApi.VoteType voteType) {
-        // Update the internal data as that is used in getVoteType
-
-        switch (voteType) {
-            case Upvote:
-                this.data.liked = true;
-                break;
-            case Downvote:
-                this.data.liked = false;
-                break;
-
-            case NoVote:
-                this.data.liked = null;
-                break;
-        }
-    }
-
 }

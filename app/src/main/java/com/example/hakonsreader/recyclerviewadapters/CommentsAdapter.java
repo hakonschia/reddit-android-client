@@ -52,11 +52,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        private TextView author;
+        private TextView age;
         private TextView content;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            this.author = itemView.findViewById(R.id.comment_author);
+            this.age = itemView.findViewById(R.id.comment_age);
             this.content = itemView.findViewById(R.id.comment_content);
         }
     }
