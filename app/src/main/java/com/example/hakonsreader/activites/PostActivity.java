@@ -85,7 +85,8 @@ public class PostActivity extends AppCompatActivity {
      * @param view Ignored
      */
     public void goToNextTopLevelComment(View view) {
-        int currentPos = layoutManager.findFirstCompletelyVisibleItemPosition();
+        //TODO figure out which findFirst to use
+        int currentPos = layoutManager.findFirstVisibleItemPosition();
         // Add 1 so that we can go directly from a top level to the next without scrolling
         int next = this.commentsAdapter.getNextTopLevelCommentPos(currentPos + 1);
 
