@@ -41,6 +41,11 @@ import retrofit2.internal.EverythingIsNonNull;
 public class RedditApi {
     private static final String TAG = "RedditApi";
 
+    /**
+     * Flag set to give back raw json (> instead of &gt; etc)
+     */
+    private static final int RAW_JSON = 1;
+
 
     public static final String REDDIT_URL = "https://reddit.com/";
 
@@ -439,7 +444,7 @@ public class RedditApi {
         // so add it anyways
         url += ".json";
 
-        this.apiService.getPosts(url, after, count, tokenString).enqueue(new Callback<RedditPostsResponse>() {
+        this.apiService.getPosts(url, after, count, RAW_JSON, tokenString).enqueue(new Callback<RedditPostsResponse>() {
             @Override
             public void onResponse(Call<RedditPostsResponse> call, retrofit2.Response<RedditPostsResponse> response) {
                 if (response.isSuccessful()) {
@@ -489,7 +494,7 @@ public class RedditApi {
         // so add it anyways
         url += "comments/" + postID + ".json";
 
-        this.apiService.getComments(url, "all", tokenString).enqueue(new Callback<List<RedditCommentsResponse>>() {
+        this.apiService.getComments(url, "all", RAW_JSON, tokenString).enqueue(new Callback<List<RedditCommentsResponse>>() {
             @Override
             public void onResponse(Call<List<RedditCommentsResponse>> call, retrofit2.Response<List<RedditCommentsResponse>> response) {
                 if (response.isSuccessful()) {

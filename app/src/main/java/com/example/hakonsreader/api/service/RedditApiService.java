@@ -49,6 +49,7 @@ public interface RedditApiService {
     Call<RedditPostsResponse> getPosts(@Url String url,
                                        @Query("after") String after,
                                        @Query("count") int count,
+                                       @Query("raw_json") int rawJson,
                                        @Header("Authorization") String accessToken
     );
 
@@ -67,6 +68,7 @@ public interface RedditApiService {
     @GET
     Call<List<RedditCommentsResponse>> getComments(@Url String url,
                                                    @Query("show") String show,
+                                                   @Query("raw_json") int rawJson,
                                                    @Header("Authorization") String accessToken
     );
 
