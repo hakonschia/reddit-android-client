@@ -87,22 +87,24 @@ public class VoteBar extends ConstraintLayout {
     public void updateVoteStatus() {
         VoteType voteType = listing.getVoteType();
 
+        Context context = getContext();
+
         int color = R.color.textColor;
 
         // Reset both buttons as at least one will change
         // (to avoid keeping the color if going from upvote to downvote and vice versa)
-        upvote.getDrawable().setTint(getContext().getColor(R.color.noVote));
-        downvote.getDrawable().setTint(getContext().getColor(R.color.noVote));
+        upvote.setColorFilter(context.getColor(R.color.noVote));
+        downvote.setColorFilter(context.getColor(R.color.noVote));
 
         switch (voteType) {
             case UPVOTE:
                 color = R.color.upvoted;
-                upvote.getDrawable().setTint(getContext().getColor(color));
+                upvote.setColorFilter(context.getColor(color));
                 break;
 
             case DOWNVOTE:
                 color = R.color.downvoted;
-                downvote.getDrawable().setTint(getContext().getColor(color));
+                downvote.setColorFilter(context.getColor(color));
                 break;
 
             case NO_VOTE:
@@ -122,6 +124,6 @@ public class VoteBar extends ConstraintLayout {
             score.setText(String.format(Locale.getDefault(), "%d", listing.getScore()));
         }
 
-        score.setTextColor(getContext().getColor(color));
+        score.setTextColor(context.getColor(color));
     }
 }
