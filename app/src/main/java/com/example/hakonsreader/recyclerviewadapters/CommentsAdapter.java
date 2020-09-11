@@ -126,9 +126,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             holder.voteBar.setVisibility(View.VISIBLE);
 
             if (comment.isMod()) {
-                holder.author.setTextColor(holder.itemView.getResources().getColor(R.color.modTextColor));
+                holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.modTextColor));
             } else {
-                holder.author.setTextColor(holder.itemView.getResources().getColor(R.color.linkColor));
+                holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.linkColor));
             }
         }
 
