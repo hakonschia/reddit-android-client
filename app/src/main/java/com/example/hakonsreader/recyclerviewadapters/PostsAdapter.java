@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -66,11 +68,27 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     /**
      * Adds a list of posts to the current list of posts
+     * <p>Duplicate posts are filtered out</p>
      *
-     * @param posts The posts to add
+     * @param newPosts The posts to add
      */
-    public void addPosts(List<RedditPost> posts) {
-        this.posts.addAll(posts);
+    public void addPosts(List<RedditPost> newPosts) {
+        // The newly retrieved posts might include posts that have been "pushed down" by Reddit
+        // so filter out any posts that are already in the list
+        List<RedditPost> filtered = newPosts.stream()
+                .filter(post -> {
+                    for (RedditPost p : this.posts) {
+                        // Filter out the post on matching ID
+                        if (p.getId().equals(post.getId())) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        this.posts.addAll(filtered);
         notifyDataSetChanged();
     }
 
