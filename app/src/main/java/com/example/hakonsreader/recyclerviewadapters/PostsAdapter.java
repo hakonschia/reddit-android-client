@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.interfaces.OnClickListener;
@@ -198,8 +199,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          * Sets the content of the post
          */
         private void setPostContent() {
-            //Log.d(TAG, "addPostContent: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
-
             View view = Util.generatePostContent(post, itemView.getContext());
 
             // Since the ViewHolder is recycled it can still have views from other posts
@@ -207,8 +206,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             // Make sure the view size resets (or it will still have size of the previous post in this view holder)
             content.forceLayout();
 
-            // A view to add (not text post)
-            if (view != null) {
+            // A view to add and not text post (don't add text posts to the list)
+            if (view != null && post.getPostType() != PostType.TEXT) {
                 content.addView(view);
             }
         }

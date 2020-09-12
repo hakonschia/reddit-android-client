@@ -23,9 +23,11 @@ public class PostContentLink extends ConstraintLayout {
     private TextView link;
 
 
-    public PostContentLink(@NonNull Context context) {
+    public PostContentLink(@NonNull Context context, RedditPost post) {
         super(context);
         inflate(getContext(), R.layout.layout_post_content_link, this);
+
+        this.post = post;
 
         this.thumbnail = findViewById(R.id.link_content_thumbnail);
         this.link = findViewById(R.id.link_content_link);
@@ -36,13 +38,14 @@ public class PostContentLink extends ConstraintLayout {
         if (thumbnailSize == THUMBNAIL_SIZE_NOT_SET) {
             thumbnailSize = (int)getResources().getDimension(R.dimen.post_link_thumnail_size);
         }
-    }
-
-    public void setPost(RedditPost post) {
-        this.post = post;
 
         this.updateView();
     }
+
+    public PostContentLink(@NonNull Context context) {
+        super(context);
+    }
+
 
     private void updateView() {
         Picasso.get()

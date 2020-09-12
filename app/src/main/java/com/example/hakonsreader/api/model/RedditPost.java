@@ -46,6 +46,9 @@ public class RedditPost implements RedditListing {
         @SerializedName("post_hint")
         protected String postHint;
 
+        @SerializedName("selftext_html")
+        protected String selftextHtml;
+
 
         // For video posts
         protected Media media;
@@ -59,6 +62,9 @@ public class RedditPost implements RedditListing {
 
                 @SerializedName("fallback_url")
                 protected String url;
+
+                protected int height;
+                protected int width;
             }
         }
     }
@@ -193,6 +199,38 @@ public class RedditPost implements RedditListing {
         }
         return this.data.media.redditVideo.url;
     }
+
+    public String getSelftextHtml() {
+        return this.data.selftextHtml;
+    }
+
+
+    /**
+     * Retrieves the height of the video
+     *
+     * @return The height of the video, or -1 if there is no video
+     */
+    public int getVideoHeight() {
+        if (this.data.media == null) {
+            return -1;
+        }
+
+        return this.data.media.redditVideo.height;
+    }
+
+    /**
+     * Retrieves the width of the video
+     *
+     * @return The width of the video, or -1 if there is no video
+     */public int getVideoWidth() {
+        if (this.data.media == null) {
+            return -1;
+        }
+
+        return this.data.media.redditVideo.width;
+    }
+
+
 
     /**
      * @return The type of post (image, video, text, or link)
