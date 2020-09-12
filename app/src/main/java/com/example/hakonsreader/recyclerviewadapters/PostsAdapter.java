@@ -1,30 +1,23 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.interfaces.OnClickListener;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.FullPostBar;
-import com.example.hakonsreader.views.PostContentLink;
 import com.example.hakonsreader.views.PostInfo;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -187,7 +180,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             // TODO possibly add content
            return new Pair[] {
                 Pair.create(this.postInfo, "post_info"),
-                Pair.create(this.fullPostBar, "post_full_bar")
+                Pair.create(this.fullPostBar, "post_full_bar"),
+                Pair.create(this.content, "post_content")
             };
         }
 
@@ -206,32 +200,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private void setPostContent() {
             //Log.d(TAG, "addPostContent: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
 
-            // Add the content
-            View view = null;
-
-            PostType postType = post.getPostType();
-
-            switch (postType) {
-                case IMAGE:
-                    view = this.generateImageContent(post);
-                    break;
-
-                case VIDEO:
-                    view = this.generateVideoContent(post);
-                    break;
-
-                case RICH_VIDEO:
-                    // Links such as youtube, gfycat etc are rich video posts
-                    break;
-
-                case LINK:
-                    view = this.generateLinkContent(post);
-                    break;
-
-                case TEXT:
-                    // Do nothing special for text posts
-                    break;
-            }
+            View view = Util.generatePostContent(post, itemView.getContext());
 
             // Since the ViewHolder is recycled it can still have views from other posts
             content.removeAllViewsInLayout();
@@ -242,55 +211,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             if (view != null) {
                 content.addView(view);
             }
-        }
-
-        /**
-         * Generates the content for image posts
-         *
-         * @param post The post to generate content for
-         * @return An ImageView with the image of the post set to match the screen width
-         */
-        private ImageView generateImageContent(RedditPost post) {
-            // TODO when clicked open the image so you can ZOOOOOM
-            ImageView imageView = new ImageView(itemView.getContext());
-
-            Picasso.get()
-                    .load(post.getUrl())
-                    .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
-                    // Scale so the image fits the width of the screen
-                    .resize(MainActivity.SCREEN_WIDTH, 0)
-                    .into(imageView);
-
-            return imageView;
-        }
-
-        /**
-         * Generates the content for video posts
-         *
-         * @param post The post to generate content for
-         * @return A VideoView
-         */
-        private VideoView generateVideoContent(RedditPost post) {
-            VideoView videoView = new VideoView(itemView.getContext());
-            videoView.setMinimumWidth(MainActivity.SCREEN_WIDTH);
-            videoView.setVideoURI(Uri.parse(post.getVideoUrl()));
-            videoView.start();
-
-            Log.d(TAG, "generateVideoContent: " + post);
-            return videoView;
-        }
-
-        /**
-         * Generates the content for link posts
-         *
-         * @param post The post to generate content for
-         * @return A TextView
-         */
-        private PostContentLink generateLinkContent(RedditPost post) {
-            PostContentLink content = new PostContentLink(itemView.getContext());
-            content.setPost(this.post);
-
-            return content;
         }
     }
 }

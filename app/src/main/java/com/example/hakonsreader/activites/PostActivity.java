@@ -2,6 +2,7 @@ package com.example.hakonsreader.activites;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.views.FullPostBar;
 import com.example.hakonsreader.views.LoadingIcon;
@@ -28,6 +30,7 @@ public class PostActivity extends AppCompatActivity {
 
     private LoadingIcon loadingIcon;
     private PostInfo postInfo;
+    private FrameLayout postContent;
     private FullPostBar fullPostBar;
     private RecyclerView commentsList;
 
@@ -48,6 +51,7 @@ public class PostActivity extends AppCompatActivity {
         this.setupCommentsList();
 
         this.postInfo.setPost(post);
+        this.postContent.addView(Util.generatePostContent(this.post, this));
         this.fullPostBar.setPost(post);
 
         this.loadingIcon.increaseLoadCount();
@@ -66,6 +70,7 @@ public class PostActivity extends AppCompatActivity {
     private void initViews() {
         this.loadingIcon = findViewById(R.id.loading_icon);
         this.postInfo = findViewById(R.id.post_info_comments);
+        this.postContent = findViewById(R.id.post_content);
         this.fullPostBar = findViewById(R.id.post_full_bar_comments);
         this.commentsList = findViewById(R.id.post_comments);
     }
