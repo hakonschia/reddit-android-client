@@ -32,8 +32,14 @@ public class PostContentText extends androidx.appcompat.widget.AppCompatTextView
 
 
     private void updateView() {
-        this.setTextColor(getContext().getColor(R.color.secondaryTextColor));
-        this.setText(Html.fromHtml(post.getSelftextHtml(), Html.FROM_HTML_MODE_COMPACT));
+        this.setTextColor(getContext().getColor(R.color.textColorTextPosts));
+
+        String html = post.getSelftextHtml();
+
+        // Self text posts with only a title won't have a body
+        if (html != null) {
+            this.setText(Html.fromHtml(post.getSelftextHtml(), Html.FROM_HTML_MODE_LEGACY));
+        }
     }
 
 }

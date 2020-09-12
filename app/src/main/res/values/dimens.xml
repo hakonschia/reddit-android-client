@@ -5,5 +5,5 @@
 
     <dimen name="post_link_thumnail_size">60dp</dimen>
 
-    <dimen name="comment_depth_indent">8dp</dimen>
+    <dimen name="comment_depth_indent">10dp</dimen>
 </resources>

@@ -1,8 +1,10 @@
 package com.example.hakonsreader.activites;
 
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -56,6 +58,18 @@ public class PostActivity extends AppCompatActivity {
         View content = Util.generatePostContent(this.post, this);
         if (content != null) {
             this.postContent.addView(content);
+            LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) content.getLayoutParams();
+
+            // Convert dp to pixels
+            int pixels = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    20,
+                    getResources().getDisplayMetrics()
+            );
+
+            params.setMarginStart(pixels);
+            params.setMarginEnd(pixels);
+            content.requestLayout();
         }
 
         this.loadingIcon.increaseLoadCount();

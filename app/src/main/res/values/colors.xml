@@ -10,6 +10,7 @@
     <color name="background">#FFFFFF</color>
 
     <color name="textColor">#000000</color>
+    <color name="textColorTextPosts">#202020</color>
     <color name="secondaryTextColor">#5A5A5A</color>
     <color name="linkColor">#03A9F4</color>
     <color name="modTextColor">#00C130</color>
