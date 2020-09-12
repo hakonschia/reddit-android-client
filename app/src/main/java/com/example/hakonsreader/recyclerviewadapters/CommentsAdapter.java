@@ -135,11 +135,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             holder.voteBar.setListing(comment);
             holder.voteBar.setVisibility(View.VISIBLE);
 
-            if (comment.isMod()) {
-                holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.modTextColor));
-            } else {
-                holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.linkColor));
-            }
+        }
+
+        if (comment.isMod()) {
+            holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.modTextColor));
+        } else {
+            holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.linkColor));
         }
 
         int paddingStart = comment.getDepth() * (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
