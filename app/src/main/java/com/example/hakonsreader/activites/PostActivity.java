@@ -51,8 +51,12 @@ public class PostActivity extends AppCompatActivity {
         this.setupCommentsList();
 
         this.postInfo.setPost(post);
-        this.postContent.addView(Util.generatePostContent(this.post, this));
         this.fullPostBar.setPost(post);
+
+        View content = Util.generatePostContent(this.post, this);
+        if (content != null) {
+            this.postContent.addView(content);
+        }
 
         this.loadingIcon.increaseLoadCount();
         this.redditApi.getComments(post.getId(), (comments -> {
