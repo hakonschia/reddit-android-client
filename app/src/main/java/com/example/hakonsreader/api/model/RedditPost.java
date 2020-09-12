@@ -57,7 +57,7 @@ public class RedditPost implements RedditListing {
             protected static class RedditVideo {
                 protected int duration;
 
-                @SerializedName("scrubber_media_url")
+                @SerializedName("fallback_url")
                 protected String url;
             }
         }

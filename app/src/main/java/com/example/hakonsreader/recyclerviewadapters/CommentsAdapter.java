@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.views.VoteBar;
 import com.google.gson.GsonBuilder;
 
@@ -24,7 +26,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     private static final String TAG = "CommentsAdapter";
 
     private List<RedditComment> comments = new ArrayList<>();
+    private RedditPost post;
 
+
+    /**
+     * @param post The post the comment is for
+     */
+    public CommentsAdapter(RedditPost post) {
+        this.post = post;
+    }
 
     public void addComments(List<RedditComment> comments) {
         this.comments.addAll(comments);
@@ -118,8 +128,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
 
-            holder.content.setText(comment.getBody());
-            holder.author.setText(authorText);
+            holder.content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
+            holder.author.setText(authorText + (comment.getAuthor().equals(post.getAuthor()) ? "OP" : ""));
             holder.age.setText(time);
 
             holder.voteBar.setListing(comment);

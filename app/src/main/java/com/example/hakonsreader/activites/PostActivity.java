@@ -34,6 +34,7 @@ public class PostActivity extends AppCompatActivity {
     private CommentsAdapter commentsAdapter;
     private LinearLayoutManager layoutManager;
 
+    private RedditPost post;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +42,10 @@ public class PostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post);
         Slidr.attach(this);
 
+        this.post = new Gson().fromJson(getIntent().getExtras().getString("post"), RedditPost.class);
+
         this.initViews();
         this.setupCommentsList();
-
-        RedditPost post = new Gson().fromJson(getIntent().getExtras().getString("post"), RedditPost.class);
 
         this.postInfo.setPost(post);
         this.fullPostBar.setPost(post);
@@ -73,7 +74,7 @@ public class PostActivity extends AppCompatActivity {
      * Sets up {@link PostActivity#commentsList}
      */
     private void setupCommentsList() {
-        this.commentsAdapter = new CommentsAdapter();
+        this.commentsAdapter = new CommentsAdapter(this.post);
         this.layoutManager = new LinearLayoutManager(this);
 
         this.commentsList.setAdapter(this.commentsAdapter);

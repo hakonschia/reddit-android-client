@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -271,9 +272,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         private VideoView generateVideoContent(RedditPost post) {
             VideoView videoView = new VideoView(itemView.getContext());
-            //videoView.setVideoPath(post.getVideoUrl());
+            videoView.setMinimumWidth(MainActivity.SCREEN_WIDTH);
+            videoView.setVideoURI(Uri.parse(post.getVideoUrl()));
+            videoView.start();
 
-           // videoView.start();
+            Log.d(TAG, "generateVideoContent: " + post);
             return videoView;
         }
 
