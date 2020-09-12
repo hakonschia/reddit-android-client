@@ -142,12 +142,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             }
         }
 
-        // Indent the entire view based on how far in the chain we are
-        RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
-        params.setMarginStart(
-                comment.getDepth() * (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent)
-        );
-        // Update the layout with new margin
+        int paddingStart = comment.getDepth() * (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
+        holder.itemView.setPadding(paddingStart, 0, 0, 0);
+        // Update the layout with new padding
         holder.itemView.requestLayout();
 
         // DEBUG
