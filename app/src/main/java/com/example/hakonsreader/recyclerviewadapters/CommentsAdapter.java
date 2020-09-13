@@ -2,6 +2,7 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -129,6 +130,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
 
             holder.content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
+            holder.content.setMovementMethod(LinkMovementMethod.getInstance());
             holder.author.setText(authorText + (comment.getAuthor().equals(post.getAuthor()) ? "OP" : ""));
             holder.age.setText(time);
 
