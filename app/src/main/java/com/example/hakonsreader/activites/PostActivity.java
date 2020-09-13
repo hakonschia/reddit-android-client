@@ -100,11 +100,9 @@ public class PostActivity extends AppCompatActivity {
                     // Remove listener to avoid an infinite loop of layout changes
                     postContent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                    // This is so bad, but apparently calling startPostponed doesn't work as we still need
-                    //  to wait until calling the transition because the UI still isn't drawn (probably
-                    new Thread(() -> {
-                        runOnUiThread(() -> startPostponedEnterTransition());
-                    }).start();
+                    // The runnable in post is called after the UI is (apparently) drawn, so it
+                    // is then safe to start the transition
+                    postContent.post(() -> startPostponedEnterTransition());
                 }
             });
         } else {
