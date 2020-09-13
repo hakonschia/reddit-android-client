@@ -3,6 +3,7 @@ package com.example.hakonsreader.activites;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -27,6 +28,7 @@ import com.r0adkll.slidr.Slidr;
  */
 public class PostActivity extends AppCompatActivity {
     private static final String TAG = "PostActivity";
+    private static int MAX_CONTENT_HEIGHT = -1;
 
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
@@ -47,6 +49,10 @@ public class PostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post);
         Slidr.attach(this);
 
+        if (MAX_CONTENT_HEIGHT == -1) {
+            MAX_CONTENT_HEIGHT = (int) getResources().getDimension(R.dimen.postContentMaxHeight);
+        }
+
         this.post = new Gson().fromJson(getIntent().getExtras().getString("post"), RedditPost.class);
 
         this.initViews();
@@ -54,6 +60,7 @@ public class PostActivity extends AppCompatActivity {
 
         this.postInfo.setPost(post);
         this.fullPostBar.setPost(post);
+
 
         View content = Util.generatePostContent(this.post, this);
         if (content != null) {
@@ -67,9 +74,30 @@ public class PostActivity extends AppCompatActivity {
                     getResources().getDisplayMetrics()
             );
 
-            params.setMarginStart(pixels);
-            params.setMarginEnd(pixels);
-            content.requestLayout();
+            // TODO this makes transitions look weird
+            //params.setMarginStart(pixels);
+            //params.setMarginEnd(pixels);
+            //content.requestLayout();
+
+            // Ensure the content doesn't go over the set limit
+            this.postContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    int height = content.getMeasuredHeight();
+
+                    // Content is too large, set new height
+                    if (height >= MAX_CONTENT_HEIGHT) {
+                        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) postContent.getLayoutParams();
+                        layoutParams.height = MAX_CONTENT_HEIGHT;
+                        postContent.setLayoutParams(layoutParams);
+                    }
+
+                    // Remove listener to avoid an infinite loop of layout changes
+                    postContent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
+        } else {
+            this.postContent.setVisibility(View.GONE);
         }
 
         this.loadingIcon.increaseLoadCount();

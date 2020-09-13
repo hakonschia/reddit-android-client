@@ -6,4 +6,6 @@
     <dimen name="post_link_thumnail_size">60dp</dimen>
 
     <dimen name="comment_depth_indent">10dp</dimen>
+
+    <dimen name="postContentMaxHeight">150dp</dimen>
 </resources>

@@ -21,7 +21,6 @@ public class PostContentText extends ScrollView {
         super(context);
 
         this.setScrollbarFadingEnabled(false);
-        this.setBackgroundColor(context.getColor(R.color.iconColor));
 
         this.textView = new TextView(context);
         this.addView(this.textView);
