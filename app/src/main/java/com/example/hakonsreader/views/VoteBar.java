@@ -114,14 +114,18 @@ public class VoteBar extends ConstraintLayout {
 
         int scoreCount = listing.getScore();
 
-        // For scores over 10000 show as "10.5k"
-        if (scoreCount > 10000) {
-            score.setText(String.format(
-                    Locale.getDefault(),
-                    getResources().getString(R.string.scoreThousands), scoreCount / 1000f)
-            );
+        if (listing.isScoreHidden()) {
+            score.setText(getResources().getString(R.string.scoreHidden));
         } else {
-            score.setText(String.format(Locale.getDefault(), "%d", listing.getScore()));
+            // For scores over 10000 show as "10.5k"
+            if (scoreCount > 10000) {
+                score.setText(String.format(
+                        Locale.getDefault(),
+                        getResources().getString(R.string.scoreThousands), scoreCount / 1000f)
+                );
+            } else {
+                score.setText(String.format(Locale.getDefault(), "%d", listing.getScore()));
+            }
         }
 
         score.setTextColor(context.getColor(color));
