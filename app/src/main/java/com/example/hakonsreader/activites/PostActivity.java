@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -37,6 +38,7 @@ public class PostActivity extends AppCompatActivity {
     private FrameLayout postContent;
     private FullPostBar fullPostBar;
     private RecyclerView commentsList;
+    private View content;
 
     private CommentsAdapter commentsAdapter;
     private LinearLayoutManager layoutManager;
@@ -48,6 +50,9 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
         Slidr.attach(this);
+
+        // Postpone transition until the height of the content is known
+        postponeEnterTransition();
 
         if (MAX_CONTENT_HEIGHT == -1) {
             MAX_CONTENT_HEIGHT = (int) getResources().getDimension(R.dimen.postContentMaxHeight);
@@ -62,7 +67,7 @@ public class PostActivity extends AppCompatActivity {
         this.fullPostBar.setPost(post);
 
 
-        View content = Util.generatePostContent(this.post, this);
+        content = Util.generatePostContent(this.post, this);
         if (content != null) {
             this.postContent.addView(content);
             LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) content.getLayoutParams();
@@ -79,7 +84,7 @@ public class PostActivity extends AppCompatActivity {
             //params.setMarginEnd(pixels);
             //content.requestLayout();
 
-            // Ensure the content doesn't go over the set limit
+            // Ensure the content doesn't go over the set height limit
             this.postContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
@@ -87,17 +92,23 @@ public class PostActivity extends AppCompatActivity {
 
                     // Content is too large, set new height
                     if (height >= MAX_CONTENT_HEIGHT) {
-                        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) postContent.getLayoutParams();
+                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) postContent.getLayoutParams();
                         layoutParams.height = MAX_CONTENT_HEIGHT;
                         postContent.setLayoutParams(layoutParams);
                     }
 
                     // Remove listener to avoid an infinite loop of layout changes
                     postContent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                    // This is so bad, but apparently calling startPostponed doesn't work as we still need
+                    //  to wait until calling the transition because the UI still isn't drawn (probably
+                    new Thread(() -> {
+                        runOnUiThread(() -> startPostponedEnterTransition());
+                    }).start();
                 }
             });
         } else {
-            this.postContent.setVisibility(View.GONE);
+            startPostponedEnterTransition();
         }
 
         this.loadingIcon.increaseLoadCount();
