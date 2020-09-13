@@ -2,6 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 
 import androidx.annotation.Nullable;
@@ -38,6 +39,8 @@ public class PostContentText extends androidx.appcompat.widget.AppCompatTextView
 
         // Self text posts with only a title won't have a body
         if (html != null) {
+            this.setMovementMethod(LinkMovementMethod.getInstance());
+            this.setLinkTextColor(getContext().getColor(R.color.linkColor));
             this.setText(Html.fromHtml(post.getSelftextHtml(), Html.FROM_HTML_MODE_LEGACY));
         }
     }
