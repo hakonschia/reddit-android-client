@@ -41,9 +41,9 @@ public class PostsContainerFragment extends Fragment implements ItemLoadingListe
     private void setupFragments() {
         if (this.fragments == null) {
             this.fragments = new SubredditFragment[]{
-                    new SubredditFragment(""),
-                    new SubredditFragment("Popular"),
-                    new SubredditFragment("All")
+                    SubredditFragment.newInstance(""),
+                    SubredditFragment.newInstance("Popular"),
+                    SubredditFragment.newInstance("All")
             };
         }
     }

@@ -85,20 +85,20 @@ public class SubredditFragment extends Fragment {
 
 
     /**
-     * Creates a new subreddit fragment
+     * Creates a new instance of the fragment
      *
-     * @param subreddit The name of the subreddit. For front page use an empty string
+     * @param subreddit The subreddit to instantiate
+     * @return The newly created fragment
      */
-    public SubredditFragment(String subreddit) {
-        this.subreddit = subreddit;
-        this.adapter = new PostsAdapter();
-        this.lastLoadAttemptCount = 0;
+    public static SubredditFragment newInstance(String subreddit) {
+        Bundle args = new Bundle();
 
-        // Open post with comments when clicked
-        this.adapter.setOnClickListener(this::openPost);
+        args.putString("subreddit", subreddit);
 
-        // Set long clicks to copy the post link
-        this.adapter.setOnLongClickListener(this::copyLinkToClipboard);
+        SubredditFragment fragment = new SubredditFragment();
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     /**
@@ -205,9 +205,24 @@ public class SubredditFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_subreddit, container, false);
 
+        this.lastLoadAttemptCount = 0;
+
+        this.adapter = new PostsAdapter();
+
+        // Open post with comments when clicked
+        this.adapter.setOnClickListener(this::openPost);
+
+        // Set long clicks to copy the post link
+        this.adapter.setOnLongClickListener(this::copyLinkToClipboard);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            this.subreddit = args.getString("subreddit");
+        }
+
         // Set title in toolbar
         TextView title = view.findViewById(R.id.subredditName);
-        title.setText((this.subreddit.isEmpty() ? "Front page" : "r/" + this.subreddit));
+        title.setText(this.subreddit.isEmpty() ? "Front page" : "r/" + this.subreddit);
 
         // Bind the refresh button in the toolbar
         view.findViewById(R.id.subredditRefresh).setOnClickListener(this::onRefreshPostsClicked);

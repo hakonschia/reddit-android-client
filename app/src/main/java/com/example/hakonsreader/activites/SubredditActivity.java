@@ -28,7 +28,7 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
         Bundle data = getIntent().getExtras();
         String subreddit = data.getString("subreddit");
 
-        SubredditFragment fragment = new SubredditFragment(subreddit);
+        SubredditFragment fragment = SubredditFragment.newInstance(subreddit);
         fragment.setLoadingListener(this);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.subredditActivityFragment, fragment).commit();
