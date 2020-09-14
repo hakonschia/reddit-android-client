@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.responses;
 
 import com.example.hakonsreader.api.model.RedditComment;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
@@ -12,10 +13,8 @@ public class MoreCommentsResponse {
         private Data data;
         private static class Data {
 
-            private Things things;
-            private static class Things {
-                private List<RedditComment> comments;
-            }
+            @SerializedName("things")
+            private List<RedditComment> comments;
         }
     }
 
@@ -23,6 +22,6 @@ public class MoreCommentsResponse {
      * @return The list of more comments
      */
     public List<RedditComment> getComments() {
-        return this.json.data.things.comments;
+        return this.json.data.comments;
     }
 }

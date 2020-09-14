@@ -13,8 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.VoteBar;
 import com.google.gson.GsonBuilder;
@@ -27,6 +29,8 @@ import java.util.Locale;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
+
+    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
     private List<RedditComment> comments = new ArrayList<>();
     private RedditPost post;
@@ -42,6 +46,23 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public void addComments(List<RedditComment> comments) {
         this.comments.addAll(comments);
         notifyDataSetChanged();
+    }
+
+    /**
+     * Inserts a sublist of new comments into a given position
+     *
+     * @param newComments The comments to add
+     * @param at The position to insert the comments
+     */
+    public void insertComments(List<RedditComment> newComments, int at) {
+        this.comments.addAll(at, newComments);
+        notifyItemRangeInserted(at, newComments.size());
+    }
+
+    public void removeComment(RedditComment comment) {
+        int pos = this.comments.indexOf(comment);
+        this.comments.remove(pos);
+        notifyItemRemoved(pos);
     }
 
     /**
@@ -73,6 +94,25 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
         return currentPos;
     }
+
+    /**
+     * Loads more comments and adds them to {@link CommentsAdapter#comments}
+     *
+     * @param parent The comments to start at
+     */
+    private void getMoreComments(RedditComment parent) {
+        this.redditApi.getMoreComments(post.getId(), parent.getChildren(), comments -> {
+            // Find the parent index to know where to insert the new comments
+            int commentPos = this.comments.indexOf(parent);
+            this.insertComments(comments, commentPos);
+
+            // Remove the parent comment (this is the "2 more comments" comment)
+            this.removeComment(parent);
+        }, (code, t) -> {
+
+        });
+    }
+
 
     @NonNull
     @Override
@@ -106,6 +146,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             // TODO add listener to actually fetch the comments
             // Clear everything except the author field which now holds the amount of extra comments
             holder.author.setText(extraCommentsText);
+            holder.author.setOnClickListener((view) -> this.getMoreComments(comment));
+
             holder.age.setText("");
             holder.content.setText("");
             holder.voteBar.setVisibility(View.GONE);
