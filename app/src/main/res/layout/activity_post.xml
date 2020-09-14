@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"/>
 
                 <FrameLayout
-                    android:id="@+id/post_content"
+                    android:id="@+id/postContent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -52,7 +52,7 @@
                     android:id="@+id/post_full_bar_comments"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/post_content"/>
+                    android:layout_below="@id/postContent"/>
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -116,7 +116,7 @@
     </LinearLayout>
 
     <com.example.hakonsreader.views.LoadingIcon
-        android:id="@+id/loading_icon"
+        android:id="@+id/loadingIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"

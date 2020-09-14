@@ -7,7 +7,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <ImageView
-        android:id="@+id/post_comments_img"
+        android:id="@+id/postCommentsImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/post_num_comments"
+        android:id="@+id/postNumComments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -27,14 +27,14 @@
 
         android:textColor="@color/textColor"
 
-        app:layout_constraintBottom_toBottomOf="@+id/post_comments_img"
-        app:layout_constraintStart_toEndOf="@+id/post_comments_img"
-        app:layout_constraintTop_toTopOf="@+id/post_comments_img"
+        app:layout_constraintBottom_toBottomOf="@+id/postCommentsImg"
+        app:layout_constraintStart_toEndOf="@+id/postCommentsImg"
+        app:layout_constraintTop_toTopOf="@+id/postCommentsImg"
 
         tools:text="123 comments" />
 
     <com.example.hakonsreader.views.VoteBar
-        android:id="@+id/vote_bar"
+        android:id="@+id/voteBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 

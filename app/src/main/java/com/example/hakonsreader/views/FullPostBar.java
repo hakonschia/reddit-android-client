@@ -24,8 +24,8 @@ public class FullPostBar extends ConstraintLayout {
         super(context, attrs);
         inflate(getContext(), R.layout.layout_full_post_bar, this);
 
-        this.voteBar = findViewById(R.id.vote_bar);
-        this.numComments = findViewById(R.id.post_num_comments);
+        this.voteBar = findViewById(R.id.voteBar);
+        this.numComments = findViewById(R.id.postNumComments);
     }
 
     /**

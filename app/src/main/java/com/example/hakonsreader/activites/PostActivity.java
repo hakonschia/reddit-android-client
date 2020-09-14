@@ -129,9 +129,9 @@ public class PostActivity extends AppCompatActivity {
      */
     private void initViews() {
         this.parentLayout = findViewById(R.id.postParentLayout);
-        this.loadingIcon = findViewById(R.id.loading_icon);
+        this.loadingIcon = findViewById(R.id.loadingIcon);
         this.postInfo = findViewById(R.id.post_info_comments);
-        this.postContent = findViewById(R.id.post_content);
+        this.postContent = findViewById(R.id.postContent);
         this.fullPostBar = findViewById(R.id.post_full_bar_comments);
         this.commentsList = findViewById(R.id.post_comments);
     }

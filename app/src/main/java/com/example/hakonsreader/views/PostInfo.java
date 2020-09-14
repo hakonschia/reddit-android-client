@@ -33,10 +33,10 @@ public class PostInfo extends ConstraintLayout {
         super(context, attrs);
         inflate(context, R.layout.layout_post_info, this);
 
-        this.subreddit = findViewById(R.id.post_info_subreddit);
-        this.author = findViewById(R.id.post_info_author);
-        this.age = findViewById(R.id.post_info_age);
-        this.title = findViewById(R.id.post_info_title);
+        this.subreddit = findViewById(R.id.postInfoSubreddit);
+        this.author = findViewById(R.id.postInfoAuthor);
+        this.age = findViewById(R.id.postInfoAge);
+        this.title = findViewById(R.id.postInfoTitle);
     }
 
     /**

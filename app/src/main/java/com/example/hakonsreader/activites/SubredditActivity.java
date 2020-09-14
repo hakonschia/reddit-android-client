@@ -23,7 +23,7 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subreddit);
 
-        this.loadingIcon = findViewById(R.id.loading_icon);
+        this.loadingIcon = findViewById(R.id.loadingIcon);
 
         Bundle data = getIntent().getExtras();
         String subreddit = data.getString("subreddit");

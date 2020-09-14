@@ -24,6 +24,7 @@ import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
 import com.example.hakonsreader.fragments.SettingsFragment;
+import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
@@ -34,6 +35,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 public class MainActivity extends AppCompatActivity implements ItemLoadingListener {
+    private SubredditFragment globalOffensive;
+
+
     private static final String TAG = "MainActivity";
 
     /**
@@ -86,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         SCREEN_WIDTH = getScreenWidth();
 
         this.parentLayout = findViewById(R.id.mainParentLayout);
-        this.loadingIcon = findViewById(R.id.loading_icon);
+        this.loadingIcon = findViewById(R.id.loadingIcon);
 
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
@@ -195,6 +199,10 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
                 case R.id.nav_subreddit:
                     // TODO this
+                    if (this.globalOffensive == null) {
+                        this.globalOffensive = SubredditFragment.newInstance("GlobalOffensive");
+                    }
+                    selected = this.globalOffensive;
                     break;
 
                 case R.id.nav_profile:

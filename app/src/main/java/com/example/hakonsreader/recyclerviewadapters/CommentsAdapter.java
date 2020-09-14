@@ -209,10 +209,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            this.author = itemView.findViewById(R.id.comment_author);
-            this.age = itemView.findViewById(R.id.comment_age);
-            this.content = itemView.findViewById(R.id.comment_content);
-            this.voteBar = itemView.findViewById(R.id.comment_vote_bar);
+            this.author = itemView.findViewById(R.id.commentAuthor);
+            this.age = itemView.findViewById(R.id.commentAge);
+            this.content = itemView.findViewById(R.id.commentContent);
+            this.voteBar = itemView.findViewById(R.id.commentVoteBar);
         }
     }
 }

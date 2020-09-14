@@ -38,9 +38,9 @@ public class VoteBar extends ConstraintLayout {
         super(context, attrs);
         inflate(getContext(), R.layout.layout_vote_bar, this);
 
-        this.score = findViewById(R.id.vote_bar_score);
-        this.upvote = findViewById(R.id.vote_bar_upvote);
-        this.downvote = findViewById(R.id.vote_bar_downvote);
+        this.score = findViewById(R.id.voteBarScore);
+        this.upvote = findViewById(R.id.voteBarUpvote);
+        this.downvote = findViewById(R.id.voteBarDownvote);
 
         this.upvote.setOnClickListener(v -> this.vote(VoteType.UPVOTE));
         this.downvote.setOnClickListener(v -> this.vote(VoteType.DOWNVOTE));

@@ -29,8 +29,8 @@ public class PostContentLink extends ConstraintLayout {
 
         this.post = post;
 
-        this.thumbnail = findViewById(R.id.link_content_thumbnail);
-        this.link = findViewById(R.id.link_content_link);
+        this.thumbnail = findViewById(R.id.linkContentThumbnail);
+        this.link = findViewById(R.id.linkContentLink);
 
         this.thumbnail.setOnClickListener(v -> this.openLink());
         this.link.setOnClickListener(v -> this.openLink());

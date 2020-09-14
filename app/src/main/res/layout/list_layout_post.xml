@@ -16,37 +16,27 @@
     android:elevation="2dp">
 
     <com.example.hakonsreader.views.PostInfo
-        android:id="@+id/post_info"
+        android:id="@+id/postInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <!-- Content of the post (image, video etc.) -->
     <FrameLayout
-        android:id="@+id/post_content"
+        android:id="@+id/postContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         android:layout_alignParentStart="true"
         android:layout_marginBottom="10dp"
-        android:layout_below="@id/post_info"
+        android:layout_below="@id/postInfo"
 
-        android:transitionName="post_content" >
-
-        <ImageView
-            android:id="@+id/listPostContentImg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            tools:srcCompat="@tools:sample/avatars" />
-
-    </FrameLayout>
-
+        android:transitionName="post_content" />
 
     <com.example.hakonsreader.views.FullPostBar
-        android:id="@+id/post_full_bar"
+        android:id="@+id/postFullBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:layout_below="@id/post_content"/>
+        android:layout_below="@id/postContent"/>
 
  </RelativeLayout>

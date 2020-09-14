@@ -10,7 +10,7 @@
     <!-- This file contains a layout for the post information, such as what sub it is in, title, author etc -->
 
     <TextView
-        android:id="@+id/post_info_subreddit"
+        android:id="@+id/postInfoSubreddit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -25,7 +25,7 @@
         tools:text="r/GlobalOffensive" />
 
     <TextView
-        android:id="@+id/post_info_author"
+        android:id="@+id/postInfoAuthor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -34,13 +34,13 @@
         android:textSize="13sp"
         android:textColor="@color/secondaryTextColor"
 
-        app:layout_constraintStart_toEndOf="@+id/post_info_subreddit"
-        app:layout_constraintTop_toTopOf="@+id/post_info_subreddit"
+        app:layout_constraintStart_toEndOf="@+id/postInfoSubreddit"
+        app:layout_constraintTop_toTopOf="@+id/postInfoSubreddit"
 
         tools:text="u/hakonschia" />
 
     <TextView
-        android:id="@+id/post_info_age"
+        android:id="@+id/postInfoAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -48,14 +48,14 @@
         android:textSize="13sp"
         android:textColor="@color/secondaryTextColor"
 
-        app:layout_constraintStart_toEndOf="@+id/post_info_author"
-        app:layout_constraintTop_toTopOf="@+id/post_info_author"
+        app:layout_constraintStart_toEndOf="@+id/postInfoAuthor"
+        app:layout_constraintTop_toTopOf="@+id/postInfoAuthor"
 
         tools:text="2h" />
 
 
     <TextView
-        android:id="@+id/post_info_title"
+        android:id="@+id/postInfoTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -67,7 +67,7 @@
         android:textSize="17sp"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/post_info_subreddit"
+        app:layout_constraintTop_toBottomOf="@+id/postInfoSubreddit"
         tools:text="FaZe wins major /s" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
