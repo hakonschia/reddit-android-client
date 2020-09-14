@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,6 +29,7 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.google.gson.Gson;
 
@@ -46,6 +48,8 @@ public class SubredditFragment extends Fragment {
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
     private String subreddit;
+
+    private CoordinatorLayout parentLayout;
 
     private PostsAdapter adapter;
     private LinearLayoutManager layoutManager;
@@ -80,8 +84,12 @@ public class SubredditFragment extends Fragment {
         adapter.addPosts(posts);
     };
     // Failure handler for loading posts
-    private OnFailure onPostFailure = (call, t) -> {
+    private OnFailure onPostFailure = (code, t) -> {
         this.decreaseLoadingCount();
+
+        if (code == 503) {
+            Util.showGenericServerErrorSnackbar(this.parentLayout);
+        }
     };
 
 
@@ -226,6 +234,8 @@ public class SubredditFragment extends Fragment {
         if (args != null) {
             this.subreddit = args.getString("subreddit");
         }
+
+        this.parentLayout = view.findViewById(R.id.subredditParentLayout);
 
         // Set title in toolbar
         TextView title = view.findViewById(R.id.subredditName);

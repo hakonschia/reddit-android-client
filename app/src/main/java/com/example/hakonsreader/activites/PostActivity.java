@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,6 +34,7 @@ public class PostActivity extends AppCompatActivity {
 
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
+    private CoordinatorLayout parentLayout;
     private LoadingIcon loadingIcon;
     private PostInfo postInfo;
     private FrameLayout postContent;
@@ -113,7 +115,10 @@ public class PostActivity extends AppCompatActivity {
         this.redditApi.getComments(post.getId(), (comments -> {
             this.commentsAdapter.addComments(comments);
             this.loadingIcon.decreaseLoadCount();
-        }), ((call, t) -> {
+        }), ((code, t) -> {
+            if (code == 503) {
+                Util.showGenericServerErrorSnackbar(this.parentLayout);
+            }
             this.loadingIcon.decreaseLoadCount();
             t.printStackTrace();
         }));
@@ -123,6 +128,7 @@ public class PostActivity extends AppCompatActivity {
      * Initializes all the views of the activity
      */
     private void initViews() {
+        this.parentLayout = findViewById(R.id.postParentLayout);
         this.loadingIcon = findViewById(R.id.loading_icon);
         this.postInfo = findViewById(R.id.post_info_comments);
         this.postContent = findViewById(R.id.post_content);

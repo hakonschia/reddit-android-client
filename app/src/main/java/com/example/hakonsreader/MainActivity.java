@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.LoadingIcon;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
      */
     public static int SCREEN_WIDTH;
 
+    private RelativeLayout parentLayout;
     private LoadingIcon loadingIcon;
 
     // The fragments to show in the nav bar
@@ -66,7 +69,13 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
         Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
     };
-    private OnFailure onTokenFailure = (call, t) -> this.loadingIcon.decreaseLoadCount();
+    private OnFailure onTokenFailure = (code, t) -> {
+        this.loadingIcon.decreaseLoadCount();
+
+        if (code == 503) {
+            Util.showGenericServerErrorSnackbar(this.parentLayout);
+        }
+    };
 
 
     @Override
@@ -76,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
         SCREEN_WIDTH = getScreenWidth();
 
+        this.parentLayout = findViewById(R.id.mainParentLayout);
         this.loadingIcon = findViewById(R.id.loading_icon);
 
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);

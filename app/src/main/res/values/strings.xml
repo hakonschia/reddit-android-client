@@ -49,4 +49,6 @@
     <string name="post_age_minutes">%d minutes</string>
     <string name="post_age_hours">%d hours</string>
     <string name="post_age_days">%d days</string>
+    <string name="genericServerError">Can\'t connect to Reddit servers</string>
+    <string name="tooManyRequestsError">Too many request sent. Try again in a few seconds</string>
 </resources>

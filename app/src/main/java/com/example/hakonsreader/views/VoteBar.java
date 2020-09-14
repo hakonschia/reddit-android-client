@@ -16,6 +16,7 @@ import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.misc.Util;
 
 import java.util.Locale;
 
@@ -76,6 +77,11 @@ public class VoteBar extends ConstraintLayout {
 
             updateVoteStatus();
         }, (code, t) -> {
+            if (code == 503) {
+                Util.showGenericServerErrorSnackbar(this);
+            } else if (code == 429) {
+                Util.showTooManyRequestsSnackbar(this);
+            }
             t.printStackTrace();
         });
     }
