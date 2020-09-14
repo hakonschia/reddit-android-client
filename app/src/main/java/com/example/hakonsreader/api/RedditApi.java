@@ -542,7 +542,7 @@ public class RedditApi {
             }
         }
 
-        this.apiService.getMoreComments("json", childrenBuilder.toString(), postFullname, tokenString)
+        this.apiService.getMoreComments("json", childrenBuilder.toString(), postFullname, RAW_JSON, tokenString)
                 .enqueue(new Callback<MoreCommentsResponse>() {
                     @Override
                     public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {

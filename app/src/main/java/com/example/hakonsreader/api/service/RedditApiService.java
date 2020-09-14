@@ -94,6 +94,7 @@ public interface RedditApiService {
             @Field("api_type") String apiType,
             @Field("children") String children,
             @Field("link_id") String linkId,
+            @Field("raw_json") int rawJson,
 
             @Header("Authorization") String accessToken
     );
