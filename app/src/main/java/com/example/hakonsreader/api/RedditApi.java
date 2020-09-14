@@ -16,6 +16,7 @@ import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditPostsResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
@@ -262,6 +263,8 @@ public class RedditApi {
                     AccessToken token = response.body();
                     if (token != null) {
                         onResponse.onResponse(token);
+                    } else {
+                        onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
                     }
                 } else {
                     onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
@@ -395,6 +398,8 @@ public class RedditApi {
                                 User body = response.body();
                                 if (body != null) {
                                     onResponse.onResponse(body);
+                                } else {
+                                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
                                 }
                             } else {
                                 onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
@@ -447,6 +452,8 @@ public class RedditApi {
                         List<RedditPost> posts = body.getPosts();
 
                         onResponse.onResponse(posts);
+                    } else {
+                        onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
                     }
                 } else {
                     onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
@@ -497,6 +504,8 @@ public class RedditApi {
                         });
 
                         onResponse.onResponse(allComments);
+                    } else {
+                        onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
                     }
                 } else {
                     onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
@@ -509,10 +518,51 @@ public class RedditApi {
         });
     }
 
-    public void moreComments(String postId, List<String> children, OnResponse<Void> onResponse, OnFailure onFailure) {
+    /**
+     * Retrieves comments initially hidden (from "2 more comments" comments)
+     *
+     * @param postId The ID of the post the comments are in
+     * @param children The list of IDs of comments to get
+     * @param onResponse
+     * @param onFailure
+     */
+    public void getMoreComments(String postId, List<String> children, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
         Pair<String, String> urlAndToken = this.getCorrectApiUrl(true);
         String url = urlAndToken.first;
         String tokenString = urlAndToken.second;
+
+        String postFullname = Thing.POST.getValue() + "_" + postId;
+
+        StringBuilder childrenBuilder = new StringBuilder();
+        for (int i = 0; i < children.size(); i++) {
+            childrenBuilder.append(children.get(i));
+
+            if (i != children.size() - 1) {
+                childrenBuilder.append(",");
+            }
+        }
+
+        this.apiService.getMoreComments("json", childrenBuilder.toString(), postFullname, tokenString)
+                .enqueue(new Callback<MoreCommentsResponse>() {
+                    @Override
+                    public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {
+                        if (response.isSuccessful()) {
+                            MoreCommentsResponse body = response.body();
+                            if (body != null) {
+                                onResponse.onResponse(body.getComments());
+                            } else {
+                                onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                            }
+                        } else {
+                            onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
+                        onFailure.onFailure(-1, t);
+                    }
+                });
     }
 
 

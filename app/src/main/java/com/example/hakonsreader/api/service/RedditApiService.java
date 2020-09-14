@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.service;
 
 import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditPostsResponse;
 
@@ -30,6 +31,11 @@ public interface RedditApiService {
      * The API path used to vote on things (posts, comments)
      */
     String VOTE_PATH = "vote";
+
+    /**
+     * The API path used to get more comments
+     */
+    String MORE_COMMENTS_PATH = "morechildren";
 
 
     @GET(USER_INFO_PATH)
@@ -71,6 +77,27 @@ public interface RedditApiService {
                                                    @Query("raw_json") int rawJson,
                                                    @Header("Authorization") String accessToken
     );
+
+    /**
+     * Retrieves more comments (from "4 more comments" comments)
+     *
+     * @param apiType The string "json"
+     * @param children A comma separated string of the IDs of the comments to load
+     * @param linkId The fullname of the post the comments are in
+     * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
+     *                    to retrieve comments without a logged in user
+     * @return
+     */
+    @POST(MORE_COMMENTS_PATH)
+    @FormUrlEncoded
+    Call<MoreCommentsResponse> getMoreComments(
+            @Field("api_type") String apiType,
+            @Field("children") String children,
+            @Field("link_id") String linkId,
+
+            @Header("Authorization") String accessToken
+    );
+
 
     /**
      * Cast a vote on something
