@@ -3,6 +3,7 @@ package com.example.hakonsreader.api;
 import android.util.Base64;
 
 import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
 
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.Thing;
@@ -423,17 +424,9 @@ public class RedditApi {
      */
     @EverythingIsNonNull
     public void getSubredditPosts(String subreddit, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        String tokenString = "";
-        String url = REDDIT_URL;
-
-        // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
-        // customized post information (such as vote status)
-        try {
-            this.ensureTokenIsSet();
-
-            tokenString = this.accessToken.generateHeaderString();
-            url = REDDIT_OUATH_URL;
-        } catch (AccessTokenNotSetException ignored) { }
+        Pair<String, String> urlAndToken = this.getCorrectApiUrl(false);
+        String url = urlAndToken.first;
+        String tokenString = urlAndToken.second;
 
         // Load posts for a subreddit
         if (!subreddit.isEmpty()) {
@@ -478,17 +471,9 @@ public class RedditApi {
      */
     @EverythingIsNonNull
     public void getComments(String postID, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
-        String tokenString = "";
-        String url = REDDIT_URL;
-
-        // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
-        // customized post information (such as vote status)
-        try {
-            this.ensureTokenIsSet();
-
-            tokenString = this.accessToken.generateHeaderString();
-            url = REDDIT_OUATH_URL;
-        } catch (AccessTokenNotSetException ignored) { }
+        Pair<String, String> urlAndToken = this.getCorrectApiUrl(false);
+        String url = urlAndToken.first;
+        String tokenString = urlAndToken.second;
 
         // .json isn't strictly needed for requests to oauth.reddit.com, but it is for reddit.com
         // so add it anyways
@@ -522,6 +507,12 @@ public class RedditApi {
                 onFailure.onFailure(-1, t);
             }
         });
+    }
+
+    public void moreComments(String postId, List<String> children, OnResponse<Void> onResponse, OnFailure onFailure) {
+        Pair<String, String> urlAndToken = this.getCorrectApiUrl(true);
+        String url = urlAndToken.first;
+        String tokenString = urlAndToken.second;
     }
 
 
@@ -565,6 +556,24 @@ public class RedditApi {
     }
 
 
+    /**
+     * Retrieves the correct API url to retrieve, based on if there is a logged in user
+     *
+     * @param api If true returns the API url instead of the standard reddit.com URL
+     * @return A pair of strings where the first string is either www.reddit... or oauth.reddit...
+     * and the second string is the access token header (if a user is logged in)
+     */
+    private Pair<String, String> getCorrectApiUrl(boolean api) {
+        // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
+        // customized post information (such as vote status)
+        try {
+            this.ensureTokenIsSet();
+
+            return new Pair<> ((api ? REDDIT_OUATH_API_URL : REDDIT_OUATH_URL), this.accessToken.generateHeaderString());
+        } catch (AccessTokenNotSetException ignored) {
+            return new Pair<> ((api ? REDDIT_API_URL : REDDIT_URL), "");
+        }
+    }
 
     /**
      * Authenticator that automatically retrieves a new access token on 401 responses
