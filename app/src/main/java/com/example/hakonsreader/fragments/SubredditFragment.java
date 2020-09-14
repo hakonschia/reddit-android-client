@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,6 +95,7 @@ public class SubredditFragment extends Fragment {
         Bundle args = new Bundle();
 
         args.putString("subreddit", subreddit);
+        Log.d(TAG, "newInstance called");
 
         SubredditFragment fragment = new SubredditFragment();
         fragment.setArguments(args);
@@ -200,11 +202,9 @@ public class SubredditFragment extends Fragment {
         }
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_subreddit, container, false);
-
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         this.lastLoadAttemptCount = 0;
 
         this.adapter = new PostsAdapter();
@@ -214,6 +214,13 @@ public class SubredditFragment extends Fragment {
 
         // Set long clicks to copy the post link
         this.adapter.setOnLongClickListener(this::copyLinkToClipboard);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_subreddit, container, false);
+
 
         Bundle args = getArguments();
         if (args != null) {
