@@ -13,6 +13,7 @@ import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.misc.Util;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -59,25 +60,14 @@ public class PostInfo extends ConstraintLayout {
         Instant created = Instant.ofEpochSecond(post.getCreatedAt());
         Instant now = Instant.now();
 
-        String time;
-
         Duration between = Duration.between(created, now);
-
-        // This is kinda bad but whatever
-        if (between.toDays() > 0) {
-            time = String.format(context.getString(R.string.post_age_days), between.toDays());
-        } else if (between.toHours() > 0) {
-            time = String.format(context.getString(R.string.post_age_hours), between.toHours());
-        } else {
-            time = String.format(context.getString(R.string.post_age_minutes), between.toMinutes());
-        }
 
         String subredditText = String.format(context.getString(R.string.subredditPrefixed), post.getSubreddit());
         String authorText = String.format(context.getString(R.string.authorPrefixed), post.getAuthor());
 
         subreddit.setText(subredditText);
         author.setText(authorText);
-        age.setText(time);
+        age.setText(Util.createAgeText(getResources(), between));
         title.setText(post.getTitle());
 
         // When the subreddit is clicked, open the selected subreddit in a new activity

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.VoteBar;
 import com.google.gson.GsonBuilder;
 
@@ -22,6 +23,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
@@ -88,8 +90,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RedditComment comment = this.comments.get(position);
 
-        // TODO if author of comment == author of post
-
         // TODO make this cleaner
 
         // TODO remove magic string and create "listing" enum or something
@@ -110,33 +110,29 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             holder.content.setText("");
             holder.voteBar.setVisibility(View.GONE);
         } else {
-            Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
-            Instant now = Instant.now();
-
-            String time;
-
-            Duration between = Duration.between(created, now);
             Context context = holder.itemView.getContext();
-
-            // This is kinda bad but whatever
-            if (between.toDays() > 0) {
-                time = String.format(context.getString(R.string.post_age_days), between.toDays());
-            } else if (between.toHours() > 0) {
-                time = String.format(context.getString(R.string.post_age_hours), between.toHours());
-            } else {
-                time = String.format(context.getString(R.string.post_age_minutes), between.toMinutes());
-            }
 
             String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
 
             holder.content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
             holder.content.setMovementMethod(LinkMovementMethod.getInstance());
-            holder.author.setText(authorText + (comment.getAuthor().equals(post.getAuthor()) ? "OP" : ""));
-            holder.age.setText(time);
+
+            // TODO create something around the text to highlight better the post is from OP
+            if (comment.getAuthor().equals(post.getAuthor())) {
+                holder.author.setText(
+                        String.format(Locale.getDefault(), context.getString(R.string.commentByPoster), comment.getAuthor())
+                );
+            } else {
+                holder.author.setText(authorText);
+            }
+
+            // Calculate the time since the comment was posted
+            Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
+            Duration between = Duration.between(created, Instant.now());
+            holder.age.setText(Util.createAgeText(context.getResources(), between));
 
             holder.voteBar.setListing(comment);
             holder.voteBar.setVisibility(View.VISIBLE);
-
         }
 
         if (comment.isMod()) {
@@ -160,6 +156,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public int getItemCount() {
         return this.comments.size();
     }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView author;

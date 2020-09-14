@@ -16,9 +16,7 @@
     </plurals>
 
     <string name="scoreHidden">•</string>
-
     <string name="scoreThousands">%.1fK</string>
-
 
     <string name="subredditPrefixed">r/%s</string>
     <string name="authorPrefixed">u/%s</string>
@@ -46,9 +44,21 @@
     <string name="theme_key">theme</string>
 
 
-    <string name="post_age_minutes">%d minutes</string>
-    <string name="post_age_hours">%d hours</string>
-    <string name="post_age_days">%d days</string>
+    <plurals name="postAgeMinutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="postAgeHours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="postAgeDays">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+
     <string name="genericServerError">Can\'t connect to Reddit servers</string>
     <string name="tooManyRequestsError">Too many request sent. Try again in a few seconds</string>
+
+    <string name="commentByPoster">%s (OP)</string>
 </resources>

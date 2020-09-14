@@ -40,11 +40,22 @@
     <string name="theme_header">Theme</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <string name="dark_mode_title">Dark Mode</string>
+
+    <!-- Preferences keys -->
+    <string name="theme_key">theme</string>
 
 
-    <string name="post_age_minutes">%d minutes</string>
-    <string name="post_age_hours">%d hours</string>
-    <string name="post_age_days">%d days</string>
+    <plurals name="postAgeMinutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="postAgeHours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="postAgeDays">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
 </resources>
