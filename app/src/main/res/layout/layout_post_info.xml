@@ -10,7 +10,7 @@
     <!-- This file contains a layout for the post information, such as what sub it is in, title, author etc -->
 
     <TextView
-        android:id="@+id/postInfoSubreddit"
+        android:id="@+id/subreddit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -25,7 +25,7 @@
         tools:text="r/GlobalOffensive" />
 
     <TextView
-        android:id="@+id/postInfoAuthor"
+        android:id="@+id/author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -34,13 +34,13 @@
         android:textSize="13sp"
         android:textColor="@color/secondaryTextColor"
 
-        app:layout_constraintStart_toEndOf="@+id/postInfoSubreddit"
-        app:layout_constraintTop_toTopOf="@+id/postInfoSubreddit"
+        app:layout_constraintStart_toEndOf="@+id/subreddit"
+        app:layout_constraintTop_toTopOf="@+id/subreddit"
 
         tools:text="u/hakonschia" />
 
     <TextView
-        android:id="@+id/postInfoAge"
+        android:id="@+id/age"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -48,14 +48,14 @@
         android:textSize="13sp"
         android:textColor="@color/secondaryTextColor"
 
-        app:layout_constraintStart_toEndOf="@+id/postInfoAuthor"
-        app:layout_constraintTop_toTopOf="@+id/postInfoAuthor"
+        app:layout_constraintStart_toEndOf="@+id/author"
+        app:layout_constraintTop_toTopOf="@+id/author"
 
         tools:text="2h" />
 
 
     <TextView
-        android:id="@+id/postInfoTitle"
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -67,7 +67,7 @@
         android:textSize="17sp"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/postInfoSubreddit"
+        app:layout_constraintTop_toBottomOf="@+id/subreddit"
         tools:text="FaZe wins major /s" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

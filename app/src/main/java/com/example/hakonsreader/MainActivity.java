@@ -4,8 +4,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +18,7 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
+import com.example.hakonsreader.databinding.ActivityMainBinding;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
@@ -29,8 +28,8 @@ import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
-import com.example.hakonsreader.views.LoadingIcon;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -45,8 +44,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
      */
     public static int SCREEN_WIDTH;
 
-    private RelativeLayout parentLayout;
-    private LoadingIcon loadingIcon;
+    private ActivityMainBinding binding;
 
     // The fragments to show in the nav bar
     private PostsContainerFragment postsFragment;
@@ -63,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
     // Handler for token responses. If an access token is given user information is automatically retrieved
     private OnResponse<AccessToken> onTokenResponse = token -> {
-        this.loadingIcon.decreaseLoadCount();
+        this.binding.loadingIcon.decreaseLoadCount();
 
         // Store the new token
         TokenManager.saveToken(token);
@@ -71,13 +69,13 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         // Re-create the start fragment as it now should load posts for the logged in user
         //this.setupStartFragment();
 
-        Toast.makeText(MainActivity.this, "Logged in", Toast.LENGTH_LONG).show();
+        Snackbar.make(this.binding.parentLayout, R.string.loggedIn, Snackbar.LENGTH_SHORT).show();
     };
     private OnFailure onTokenFailure = (code, t) -> {
-        this.loadingIcon.decreaseLoadCount();
+        this.binding.loadingIcon.decreaseLoadCount();
 
         if (code == 503) {
-            Util.showGenericServerErrorSnackbar(this.parentLayout);
+            Util.showGenericServerErrorSnackbar(this.binding.parentLayout);
         }
     };
 
@@ -85,12 +83,10 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        this.binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         SCREEN_WIDTH = getScreenWidth();
-
-        this.parentLayout = findViewById(R.id.mainParentLayout);
-        this.loadingIcon = findViewById(R.id.loadingIcon);
 
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
@@ -121,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         if (uri.toString().startsWith(NetworkConstants.CALLBACK_URL)) {
             String code = uri.getQueryParameter("code");
 
-            this.loadingIcon.increaseLoadCount();
+            this.binding.loadingIcon.increaseLoadCount();
             this.redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
         }
     }
@@ -141,9 +137,9 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     @Override
     public void onCountChange(boolean up) {
         if (up) {
-            this.loadingIcon.increaseLoadCount();
+            this.binding.loadingIcon.increaseLoadCount();
         } else {
-            this.loadingIcon.decreaseLoadCount();
+            this.binding.loadingIcon.decreaseLoadCount();
         }
     }
 
@@ -193,11 +189,11 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
             }
 
             switch (item.getItemId()) {
-                case R.id.nav_home:
+                case R.id.navHome:
                     selected = this.postsFragment;
                     break;
 
-                case R.id.nav_subreddit:
+                case R.id.navSubreddit:
                     // TODO this
                     if (this.globalOffensive == null) {
                         this.globalOffensive = SubredditFragment.newInstance("GlobalOffensive");
@@ -205,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
                     selected = this.globalOffensive;
                     break;
 
-                case R.id.nav_profile:
+                case R.id.navProfile:
                     // If not logged in, show log in page
                     if (TokenManager.getToken() == null) {
                         if (this.logInFragment == null) {
@@ -222,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
                     }
                     break;
 
-                case R.id.nav_settings:
+                case R.id.navSettings:
                     if (this.settingsFragment == null) {
                         this.settingsFragment = new SettingsFragment();
                     }

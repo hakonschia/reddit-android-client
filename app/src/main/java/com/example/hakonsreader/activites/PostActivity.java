@@ -4,24 +4,19 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
-import com.example.hakonsreader.views.FullPostBar;
-import com.example.hakonsreader.views.LoadingIcon;
-import com.example.hakonsreader.views.PostInfo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
 
@@ -30,17 +25,17 @@ import com.r0adkll.slidr.Slidr;
  */
 public class PostActivity extends AppCompatActivity {
     private static final String TAG = "PostActivity";
+
+    /**
+     * The max height the content of the post can have (the image, video etc.)
+     * Set during initialization
+     */
     private static int MAX_CONTENT_HEIGHT = -1;
+
 
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
-    private CoordinatorLayout parentLayout;
-    private LoadingIcon loadingIcon;
-    private PostInfo postInfo;
-    private FrameLayout postContent;
-    private FullPostBar fullPostBar;
-    private RecyclerView commentsList;
-    private View content;
+    private ActivityPostBinding binding;
 
     private CommentsAdapter commentsAdapter;
     private LinearLayoutManager layoutManager;
@@ -50,7 +45,9 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post);
+        this.binding = ActivityPostBinding.inflate(getLayoutInflater());
+        setContentView(this.binding.getRoot());
+
         Slidr.attach(this);
 
         // Postpone transition until the height of the content is known
@@ -62,17 +59,15 @@ public class PostActivity extends AppCompatActivity {
 
         this.post = new Gson().fromJson(getIntent().getExtras().getString("post"), RedditPost.class);
 
-        this.initViews();
         this.setupCommentsList();
 
-        this.postInfo.setPost(post);
-        this.fullPostBar.setPost(post);
+        this.binding.postInfo.setPost(post);
+        this.binding.postFullBar.setPost(post);
 
-
-        content = Util.generatePostContent(this.post, this);
-        if (content != null) {
-            this.postContent.addView(content);
-            LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) content.getLayoutParams();
+        View postContent = Util.generatePostContent(this.post, this);
+        if (postContent != null) {
+            this.binding.content.addView(postContent);
+            LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) postContent.getLayoutParams();
 
             // Convert dp to pixels
             int pixels = (int) TypedValue.applyDimension(
@@ -87,64 +82,52 @@ public class PostActivity extends AppCompatActivity {
             //content.requestLayout();
 
             // Ensure the content doesn't go over the set height limit
-            this.postContent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            this.binding.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    int height = content.getMeasuredHeight();
+                    int height = postContent.getMeasuredHeight();
 
                     // Content is too large, set new height
                     if (height >= MAX_CONTENT_HEIGHT) {
-                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) postContent.getLayoutParams();
+                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.content.getLayoutParams();
                         layoutParams.height = MAX_CONTENT_HEIGHT;
-                        postContent.setLayoutParams(layoutParams);
+                        binding.content.setLayoutParams(layoutParams);
                     }
 
                     // Remove listener to avoid an infinite loop of layout changes
-                    postContent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    binding.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                     // The runnable in post is called after the UI is (apparently) drawn, so it
                     // is then safe to start the transition
-                    postContent.post(() -> startPostponedEnterTransition());
+                    binding.content.post(() -> startPostponedEnterTransition());
                 }
             });
         } else {
             startPostponedEnterTransition();
         }
 
-        this.loadingIcon.increaseLoadCount();
+        this.binding.loadingIcon.increaseLoadCount();
         this.redditApi.getComments(post.getId(), (comments -> {
             this.commentsAdapter.addComments(comments);
-            this.loadingIcon.decreaseLoadCount();
+            this.binding.loadingIcon.decreaseLoadCount();
         }), ((code, t) -> {
             if (code == 503) {
-                Util.showGenericServerErrorSnackbar(this.parentLayout);
+                Util.showGenericServerErrorSnackbar(this.binding.parentLayout);
             }
-            this.loadingIcon.decreaseLoadCount();
+            this.binding.loadingIcon.decreaseLoadCount();
             t.printStackTrace();
         }));
     }
 
     /**
-     * Initializes all the views of the activity
-     */
-    private void initViews() {
-        this.parentLayout = findViewById(R.id.postParentLayout);
-        this.loadingIcon = findViewById(R.id.loadingIcon);
-        this.postInfo = findViewById(R.id.post_info_comments);
-        this.postContent = findViewById(R.id.postContent);
-        this.fullPostBar = findViewById(R.id.post_full_bar_comments);
-        this.commentsList = findViewById(R.id.post_comments);
-    }
-
-    /**
-     * Sets up {@link PostActivity#commentsList}
+     * Sets up {@link ActivityPostBinding#comments}
      */
     private void setupCommentsList() {
         this.commentsAdapter = new CommentsAdapter(this.post);
         this.layoutManager = new LinearLayoutManager(this);
 
-        this.commentsList.setAdapter(this.commentsAdapter);
-        this.commentsList.setLayoutManager(this.layoutManager);
+        this.binding.comments.setAdapter(this.commentsAdapter);
+        this.binding.comments.setLayoutManager(this.layoutManager);
     }
 
     /**

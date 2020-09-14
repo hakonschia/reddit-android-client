@@ -9,12 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,6 +26,7 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
@@ -47,13 +46,12 @@ public class SubredditFragment extends Fragment {
 
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
-    private String subreddit;
+    private FragmentSubredditBinding binding;
 
-    private CoordinatorLayout parentLayout;
+    private String subreddit;
 
     private PostsAdapter adapter;
     private LinearLayoutManager layoutManager;
-    private RecyclerView postsList;
 
     private ItemLoadingListener loadingListener;
 
@@ -88,7 +86,7 @@ public class SubredditFragment extends Fragment {
         this.decreaseLoadingCount();
 
         if (code == 503) {
-            Util.showGenericServerErrorSnackbar(this.parentLayout);
+            Util.showGenericServerErrorSnackbar(this.binding.parentLayout);
         }
     };
 
@@ -181,7 +179,7 @@ public class SubredditFragment extends Fragment {
     private void onRefreshPostsClicked(View view) {
         // Kinda weird to clear the posts here but works I guess?
         this.adapter.getPosts().clear();
-        this.postsList.scrollToPosition(0);
+        this.binding.posts.scrollToPosition(0);
 
         this.loadPosts();
     }
@@ -192,10 +190,9 @@ public class SubredditFragment extends Fragment {
     private void setupPostsList(View view) {
         this.layoutManager = new LinearLayoutManager(getActivity());
 
-        this.postsList = view.findViewById(R.id.posts);
-        this.postsList.setAdapter(this.adapter);
-        this.postsList.setLayoutManager(this.layoutManager);
-        this.postsList.setOnScrollChangeListener(this.scrollListener);
+        this.binding.posts.setAdapter(this.adapter);
+        this.binding.posts.setLayoutManager(this.layoutManager);
+        this.binding.posts.setOnScrollChangeListener(this.scrollListener);
     }
 
     private void increaseLoadingCount() {
@@ -227,27 +224,31 @@ public class SubredditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_subreddit, container, false);
+        this.binding = FragmentSubredditBinding.inflate(inflater);
+        View view = this.binding.getRoot();
 
 
         Bundle args = getArguments();
         if (args != null) {
-            this.subreddit = args.getString("subreddit");
+            this.subreddit = args.getString("subreddit", "");
+
+            // Set title in toolbar
+            this.binding.subredditName.setText(this.subreddit.isEmpty() ? "Front page" : "r/" + this.subreddit);
         }
 
-        this.parentLayout = view.findViewById(R.id.subredditParentLayout);
-
-        // Set title in toolbar
-        TextView title = view.findViewById(R.id.subredditName);
-        title.setText(this.subreddit.isEmpty() ? "Front page" : "r/" + this.subreddit);
-
         // Bind the refresh button in the toolbar
-        view.findViewById(R.id.subredditRefresh).setOnClickListener(this::onRefreshPostsClicked);
+        this.binding.subredditRefresh.setOnClickListener(this::onRefreshPostsClicked);
 
         // Setup the RecyclerView posts list
         this.setupPostsList(view);
 
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.binding = null;
     }
 
     @Override

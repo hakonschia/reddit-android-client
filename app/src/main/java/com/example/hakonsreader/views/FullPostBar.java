@@ -2,6 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.databinding.LayoutFullPostBarBinding;
 
 /**
  * View for the full bar underneath a Reddit post
@@ -17,15 +19,11 @@ import com.example.hakonsreader.api.model.RedditPost;
 public class FullPostBar extends ConstraintLayout {
     private RedditPost post;
 
-    private VoteBar voteBar;
-    private TextView numComments;
+    private LayoutFullPostBarBinding binding;
 
     public FullPostBar(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        inflate(getContext(), R.layout.layout_full_post_bar, this);
-
-        this.voteBar = findViewById(R.id.voteBar);
-        this.numComments = findViewById(R.id.postNumComments);
+        this.binding = LayoutFullPostBarBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
     /**
@@ -35,7 +33,7 @@ public class FullPostBar extends ConstraintLayout {
      */
     public void setPost(RedditPost post) {
         this.post = post;
-        this.voteBar.setListing(post);
+        this.binding.voteBar.setListing(post);
 
         this.updateView();
     }
@@ -44,7 +42,7 @@ public class FullPostBar extends ConstraintLayout {
      * Updates the view based on the post set with {@link FullPostBar#post}
      */
     private void updateView() {
-        this.voteBar.updateVoteStatus();
+        this.binding.voteBar.updateVoteStatus();
 
         float comments = this.post.getAmountOfComments();
 
@@ -61,6 +59,6 @@ public class FullPostBar extends ConstraintLayout {
             );
         }
 
-        this.numComments.setText(commentsText);
+        this.binding.numComments.setText(commentsText);
     }
 }

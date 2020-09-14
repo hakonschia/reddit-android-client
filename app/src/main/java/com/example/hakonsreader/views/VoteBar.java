@@ -2,8 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,34 +15,30 @@ import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.databinding.LayoutVoteBarBinding;
 import com.example.hakonsreader.misc.Util;
 
 import java.util.Locale;
 
 /**
  * Vote bar including buttons to upvote and downvote, and a text holding the current score
- * Layout file: {@code layout/layout_vote_bar.xml}
+ * <p>Layout file: {@code layout/layout_vote_bar.xml}</p>
  */
 public class VoteBar extends ConstraintLayout {
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
-    private TextView score;
-    private ImageButton upvote;
-    private ImageButton downvote;
+    private LayoutVoteBarBinding binding;
 
     private RedditListing listing;
 
 
     public VoteBar(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        inflate(getContext(), R.layout.layout_vote_bar, this);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        this.binding = LayoutVoteBarBinding.inflate(inflater, this, true);
 
-        this.score = findViewById(R.id.voteBarScore);
-        this.upvote = findViewById(R.id.voteBarUpvote);
-        this.downvote = findViewById(R.id.voteBarDownvote);
-
-        this.upvote.setOnClickListener(v -> this.vote(VoteType.UPVOTE));
-        this.downvote.setOnClickListener(v -> this.vote(VoteType.DOWNVOTE));
+        this.binding.upvote.setOnClickListener(v -> this.vote(VoteType.UPVOTE));
+        this.binding.downvote.setOnClickListener(v -> this.vote(VoteType.DOWNVOTE));
     }
 
     /**
@@ -99,18 +94,18 @@ public class VoteBar extends ConstraintLayout {
 
         // Reset both buttons as at least one will change
         // (to avoid keeping the color if going from upvote to downvote and vice versa)
-        upvote.setColorFilter(context.getColor(R.color.noVote));
-        downvote.setColorFilter(context.getColor(R.color.noVote));
+        this.binding.upvote.setColorFilter(context.getColor(R.color.noVote));
+        this.binding.downvote.setColorFilter(context.getColor(R.color.noVote));
 
         switch (voteType) {
             case UPVOTE:
                 color = R.color.upvoted;
-                upvote.setColorFilter(context.getColor(color));
+                this.binding.upvote.setColorFilter(context.getColor(color));
                 break;
 
             case DOWNVOTE:
                 color = R.color.downvoted;
-                downvote.setColorFilter(context.getColor(color));
+                this.binding.downvote.setColorFilter(context.getColor(color));
                 break;
 
             case NO_VOTE:
@@ -121,19 +116,19 @@ public class VoteBar extends ConstraintLayout {
         int scoreCount = listing.getScore();
 
         if (listing.isScoreHidden()) {
-            score.setText(getResources().getString(R.string.scoreHidden));
+            this.binding.score.setText(getResources().getString(R.string.scoreHidden));
         } else {
             // For scores over 10000 show as "10.5k"
             if (scoreCount > 10000) {
-                score.setText(String.format(
+                this.binding.score.setText(String.format(
                         Locale.getDefault(),
                         getResources().getString(R.string.scoreThousands), scoreCount / 1000f)
                 );
             } else {
-                score.setText(String.format(Locale.getDefault(), "%d", listing.getScore()));
+                this.binding.score.setText(String.format(Locale.getDefault(), "%d", listing.getScore()));
             }
         }
 
-        score.setTextColor(context.getColor(color));
+        this.binding.score.setTextColor(context.getColor(color));
     }
 }

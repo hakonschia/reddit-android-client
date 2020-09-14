@@ -8,7 +8,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
-        android:id="@+id/profileTopLayout"
+        android:id="@+id/topLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/layout_rounded_corner_profile"
@@ -21,7 +21,7 @@
         android:id="@+id/profilePicture"
         android:layout_width="140dp"
         android:layout_height="140dp"
-        android:layout_alignTop="@id/profileTopLayout"
+        android:layout_alignTop="@id/topLayout"
 
         android:layout_centerHorizontal="true"
         android:layout_marginTop="-70dp"
@@ -39,7 +39,7 @@
         android:text="@string/btnLogOut" />
 
     <TextView
-        android:id="@+id/profileName"
+        android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
 
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/profileName"
+        android:layout_below="@id/username"
 
         android:textColor="@color/textColor"
         tools:text="User since 12. August 1997" />
@@ -72,7 +72,7 @@
         android:layout_margin="10dp" />
 
     <TextView
-        android:id="@+id/profileCommentKarma"
+        android:id="@+id/commentKarma"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -83,11 +83,11 @@
         tools:text="1234 comment karma" />
 
     <TextView
-        android:id="@+id/profilePostKarma"
+        android:id="@+id/postKarma"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_alignBaseline="@id/profileCommentKarma"
+        android:layout_alignBaseline="@id/commentKarma"
         android:layout_marginEnd="15dp"
         android:layout_alignParentEnd="true"
 

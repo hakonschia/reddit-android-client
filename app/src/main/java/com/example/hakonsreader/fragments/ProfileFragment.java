@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +16,7 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.databinding.FragmentProfileBinding;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -36,11 +35,8 @@ public class ProfileFragment extends Fragment {
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
     private User user;
 
-    private TextView username;
-    private TextView age;
-    private TextView commentKarma;
-    private TextView postKarma;
-    private ImageView picture;
+    private FragmentProfileBinding binding;
+
 
     // Response handler for retrieval of user information
     private OnResponse<User> onUserResponse = user -> {
@@ -56,14 +52,8 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
-        username = view.findViewById(R.id.profileName);
-        age = view.findViewById(R.id.profileAge);
-        commentKarma = view.findViewById(R.id.profileCommentKarma);
-        postKarma = view.findViewById(R.id.profilePostKarma);
-        picture = view.findViewById(R.id.profilePicture);
-
+        this.binding = FragmentProfileBinding.inflate(inflater);
+        View view = this.binding.getRoot();
         this.user = User.getStoredUser();
 
         // Retrieve user info if there is no user previously stored, or if it's the fragments first time
@@ -94,13 +84,13 @@ public class ProfileFragment extends Fragment {
         String commentKarmaText = String.format(resources.getString(R.string.commentKarma), this.user.getCommentKarma());
         String postKarmaText = String.format(resources.getString(R.string.postKarma), this.user.getPostKarma());
 
-        username.setText(this.user.getName());
-        age.setText(ageText);
-        commentKarma.setText(commentKarmaText);
-        postKarma.setText(postKarmaText);
+        this.binding.username.setText(this.user.getName());
+        this.binding.profileAge.setText(ageText);
+        this.binding.commentKarma.setText(commentKarmaText);
+        this.binding.postKarma.setText(postKarmaText);
 
         // Load the users profile picture
-        Picasso.get().load(this.user.getProfilePictureUrl()).into(picture);
+        Picasso.get().load(this.user.getProfilePictureUrl()).into(this.binding.profilePicture);
     }
 
     /**

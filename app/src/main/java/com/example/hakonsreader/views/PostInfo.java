@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
-import android.widget.TextView;
+import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -13,6 +13,7 @@ import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.databinding.LayoutPostInfoBinding;
 import com.example.hakonsreader.misc.Util;
 
 import java.time.Duration;
@@ -22,21 +23,15 @@ import java.time.Instant;
  * View for info about posts (title, author, subreddit etc)
  */
 public class PostInfo extends ConstraintLayout {
-    private TextView subreddit;
-    private TextView author;
-    private TextView age;
-    private TextView title;
+    private LayoutPostInfoBinding binding;
 
     private RedditPost post;
 
+
     public PostInfo(Context context, AttributeSet attrs) {
         super(context, attrs);
-        inflate(context, R.layout.layout_post_info, this);
-
-        this.subreddit = findViewById(R.id.postInfoSubreddit);
-        this.author = findViewById(R.id.postInfoAuthor);
-        this.age = findViewById(R.id.postInfoAge);
-        this.title = findViewById(R.id.postInfoTitle);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        this.binding = LayoutPostInfoBinding.inflate(inflater, this, true);
     }
 
     /**
@@ -65,13 +60,13 @@ public class PostInfo extends ConstraintLayout {
         String subredditText = String.format(context.getString(R.string.subredditPrefixed), post.getSubreddit());
         String authorText = String.format(context.getString(R.string.authorPrefixed), post.getAuthor());
 
-        subreddit.setText(subredditText);
-        author.setText(authorText);
-        age.setText(Util.createAgeText(getResources(), between));
-        title.setText(post.getTitle());
+        this.binding.subreddit.setText(subredditText);
+        this.binding.author.setText(authorText);
+        this.binding.age.setText(Util.createAgeText(getResources(), between));
+        this.binding.title.setText(post.getTitle());
 
         // When the subreddit is clicked, open the selected subreddit in a new activity
-        subreddit.setOnClickListener(view -> openSubredditInActivity(post.getSubreddit()));
+        this.binding.subreddit.setOnClickListener(view -> openSubredditInActivity(post.getSubreddit()));
     }
 
     /**

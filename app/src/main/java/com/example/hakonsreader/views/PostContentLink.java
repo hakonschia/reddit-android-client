@@ -3,37 +3,33 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.databinding.LayoutPostContentLinkBinding;
 import com.squareup.picasso.Picasso;
 
 public class PostContentLink extends ConstraintLayout {
     private static final int THUMBNAIL_SIZE_NOT_SET = -1;
     private static int thumbnailSize = THUMBNAIL_SIZE_NOT_SET;
 
-    private RedditPost post;
+    private LayoutPostContentLinkBinding binding;
 
-    private ImageView thumbnail;
-    private TextView link;
+    private RedditPost post;
 
 
     public PostContentLink(@NonNull Context context, RedditPost post) {
         super(context);
-        inflate(getContext(), R.layout.layout_post_content_link, this);
+        this.binding = LayoutPostContentLinkBinding.inflate(LayoutInflater.from(context), this, true);
 
         this.post = post;
 
-        this.thumbnail = findViewById(R.id.linkContentThumbnail);
-        this.link = findViewById(R.id.linkContentLink);
-
-        this.thumbnail.setOnClickListener(v -> this.openLink());
-        this.link.setOnClickListener(v -> this.openLink());
+        this.binding.thumbnail.setOnClickListener(v -> this.openLink());
+        this.binding.link.setOnClickListener(v -> this.openLink());
 
         if (thumbnailSize == THUMBNAIL_SIZE_NOT_SET) {
             thumbnailSize = (int)getResources().getDimension(R.dimen.post_link_thumnail_size);
@@ -51,9 +47,9 @@ public class PostContentLink extends ConstraintLayout {
         Picasso.get()
                 .load(this.post.getThumbnail())
                 .resize(thumbnailSize, thumbnailSize)
-                .into(this.thumbnail);
+                .into(this.binding.thumbnail);
 
-        this.link.setText(post.getUrl());
+        this.binding.link.setText(post.getUrl());
     }
 
     private void openLink() {

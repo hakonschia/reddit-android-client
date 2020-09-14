@@ -147,7 +147,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             this.postInfo = itemView.findViewById(R.id.postInfo);
             this.fullPostBar = itemView.findViewById(R.id.postFullBar);
 
-            this.content = itemView.findViewById(R.id.postContent);
+            this.content = itemView.findViewById(R.id.content);
 
             // Call the registered onClick listener when an item is clicked
             itemView.setOnClickListener(view -> {

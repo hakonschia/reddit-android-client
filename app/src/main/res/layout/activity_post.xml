@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
-    android:id="@+id/postParentLayout"
+    android:id="@+id/parentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/secondaryBackground"
@@ -25,7 +25,7 @@
             app:layout_scrollFlags="enterAlways|scroll">
 
             <RelativeLayout
-                android:id="@+id/post_info_comments_container"
+                android:id="@+id/commentsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -34,25 +34,25 @@
                 android:elevation="2dp">
 
                 <com.example.hakonsreader.views.PostInfo
-                    android:id="@+id/post_info_comments"
+                    android:id="@+id/postInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <FrameLayout
-                    android:id="@+id/postContent"
+                    android:id="@+id/content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
 
-                    android:layout_below="@id/post_info_comments"
+                    android:layout_below="@id/postInfo"
 
                     android:transitionName="post_content" />
 
                 <com.example.hakonsreader.views.FullPostBar
-                    android:id="@+id/post_full_bar_comments"
+                    android:id="@+id/postFullBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/postContent"/>
+                    android:layout_below="@id/content"/>
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -60,7 +60,7 @@
 
     <!-- Comments -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/post_comments"
+        android:id="@+id/comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -86,7 +86,7 @@
         android:background="@drawable/rounded_square">
 
         <ImageButton
-            android:id="@+id/go_to_previous_top_level_comment"
+            android:id="@+id/goToPreviousTopLevelComment"
             android:layout_width="wrap_content"
 
             android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
             android:layout_marginBottom="5dp" />
 
         <ImageButton
-            android:id="@+id/go_to_next_top_level_comment"
+            android:id="@+id/goToNextTopLevelComment"
             android:layout_width="wrap_content"
 
             android:layout_height="wrap_content"
