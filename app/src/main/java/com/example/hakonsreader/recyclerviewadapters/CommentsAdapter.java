@@ -126,10 +126,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * Sets a holder as a "4 more comments" comment
      * <p>The only thing shown is the text of "more comments", everything else is hidden away</p>
      *
-     * @param comment The comment data
      * @param holder The holder to set for
      */
-    private void asMoreComments(RedditComment comment, ViewHolder holder) {
+    private void asMoreComments(ViewHolder holder) {
+        RedditComment comment = holder.comment;
         int extraComments = comment.getExtraCommentsCount();
 
         String extraCommentsText = holder.itemView.getResources().getQuantityString(
@@ -151,15 +151,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     /**
      * Sets the contents of the the view holder as a standard comment with content, vote bars etc.
      *
-     * @param comment The comment data
      * @param holder The holder to set for
      */
-    private void asNormalComment(RedditComment comment, ViewHolder holder) {
+    private void asNormalComment(ViewHolder holder) {
+        RedditComment comment = holder.comment;
         Context context = holder.itemView.getContext();
 
         String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
 
         holder.content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
+        // TODO this creates issues with the itemView not being clickable (to hide comment chains with longclicks)
         holder.content.setMovementMethod(LinkMovementMethod.getInstance());
 
         // TODO create something around the text to highlight better the post is from OP
@@ -205,13 +206,14 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RedditComment comment = this.comments.get(position);
+        holder.comment = comment;
 
         // TODO remove magic string and create "listing" enum or something
         // The comment is a "12 more comments"
         if (comment.getKind().equals("more")) {
-            this.asMoreComments(comment, holder);
+            this.asMoreComments(holder);
         } else {
-            this.asNormalComment(comment, holder);
+            this.asNormalComment(holder);
         }
 
         if (comment.isMod()) {
@@ -233,6 +235,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        private RedditComment comment;
+
         private TextView author;
         private TextView age;
         private TextView content;
