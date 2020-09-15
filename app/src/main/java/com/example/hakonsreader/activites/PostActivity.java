@@ -1,7 +1,6 @@
 package com.example.hakonsreader.activites;
 
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
@@ -61,45 +60,37 @@ public class PostActivity extends AppCompatActivity {
 
         this.setupCommentsList();
 
-        this.binding.postInfo.setPost(post);
-        this.binding.postFullBar.setPost(post);
+        this.binding.postInfoContainer.postInfo.setPost(post);
+        this.binding.postInfoContainer.postFullBar.setPost(post);
 
         View postContent = Util.generatePostContent(this.post, this);
         if (postContent != null) {
-            this.binding.content.addView(postContent);
+            this.binding.postInfoContainer.content.addView(postContent);
             LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) postContent.getLayoutParams();
 
-            // Convert dp to pixels
-            int pixels = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    20,
-                    getResources().getDisplayMetrics()
-            );
-
-            // TODO this makes transitions look weird
-            //params.setMarginStart(pixels);
-            //params.setMarginEnd(pixels);
-            //content.requestLayout();
+            //params.setMarginStart(R.dimen.defaultIndent);
+            //params.setMarginEnd(R.dimen.defaultIndent);
+            //postContent.requestLayout();
 
             // Ensure the content doesn't go over the set height limit
-            this.binding.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            this.binding.postInfoContainer.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     int height = postContent.getMeasuredHeight();
 
                     // Content is too large, set new height
                     if (height >= MAX_CONTENT_HEIGHT) {
-                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.content.getLayoutParams();
+                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.postInfoContainer.content.getLayoutParams();
                         layoutParams.height = MAX_CONTENT_HEIGHT;
-                        binding.content.setLayoutParams(layoutParams);
+                        binding.postInfoContainer.content.setLayoutParams(layoutParams);
                     }
 
                     // Remove listener to avoid an infinite loop of layout changes
-                    binding.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    binding.postInfoContainer.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                     // The runnable in post is called after the UI is (apparently) drawn, so it
                     // is then safe to start the transition
-                    binding.content.post(() -> startPostponedEnterTransition());
+                    binding.postInfoContainer.content.post(() -> startPostponedEnterTransition());
                 }
             });
         } else {
