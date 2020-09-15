@@ -5,6 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginStart="@dimen/defaultIndent"
+    android:layout_marginEnd="@dimen/defaultIndent"
     android:transitionName="post_info">
 
     <!-- This file contains a layout for the post information, such as what sub it is in, title, author etc -->
@@ -14,7 +16,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginStart="@dimen/defaultIndent"
 
         android:textSize="14sp"
         android:textColor="@color/linkColor"
@@ -53,10 +54,9 @@
 
         tools:text="2h" />
 
-
     <TextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
         android:paddingBottom="8dp"
@@ -66,6 +66,6 @@
 
         app:layout_constraintStart_toStartOf="@+id/subreddit"
         app:layout_constraintTop_toBottomOf="@+id/subreddit"
-        tools:text="FaZe wins major /s" />
+        tools:text="FaZe wins major /s. To show how this layout looks for long titles I am adding a bunch of random text here" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
