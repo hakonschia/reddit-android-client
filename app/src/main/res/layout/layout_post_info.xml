@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginStart="@dimen/defaultIndent"
-    android:layout_marginEnd="@dimen/defaultIndent"
+    android:paddingStart="@dimen/defaultIndent"
+    android:paddingEnd="@dimen/defaultIndent"
     android:transitionName="post_info">
 
     <!-- This file contains a layout for the post information, such as what sub it is in, title, author etc -->
