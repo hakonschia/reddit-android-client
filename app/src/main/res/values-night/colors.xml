@@ -23,4 +23,6 @@
 
     <color name="divider">#434343</color>
     <color name="iconColor">#DADADA</color>
+
+    <color name="imageVideoActivityBackground">#88000000</color>
 </resources>

@@ -1,12 +1,14 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 
 import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.squareup.picasso.Picasso;
 
@@ -43,6 +45,13 @@ public class PostContentImage extends androidx.appcompat.widget.AppCompatImageVi
                 // Scale so the image fits the width of the screen
                 .resize(MainActivity.SCREEN_WIDTH, 0)
                 .into(this);
+
+        // Open image when clicked
+        this.setOnClickListener(view -> {
+            Intent intent = new Intent(getContext(), ImageActivity.class);
+            intent.putExtra("imageUrl", post.getUrl());
+            getContext().startActivity(intent);
+        });
     }
 }
 
