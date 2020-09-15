@@ -3,7 +3,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 import android.content.Context;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.VoteBar;
-import com.google.gson.GsonBuilder;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -143,10 +141,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                     extraComments
             );
 
-            // TODO add listener to actually fetch the comments
             // Clear everything except the author field which now holds the amount of extra comments
             holder.author.setText(extraCommentsText);
-            holder.author.setOnClickListener((view) -> this.getMoreComments(comment));
+            holder.itemView.setOnClickListener((view) -> this.getMoreComments(comment));
 
             holder.age.setText("");
             holder.content.setText("");
@@ -175,6 +172,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             holder.voteBar.setListing(comment);
             holder.voteBar.setVisibility(View.VISIBLE);
+
+            // Remove the listener if there is one (from "more comments")
+            holder.itemView.setOnClickListener(null);
         }
 
         if (comment.isMod()) {
@@ -187,11 +187,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         holder.itemView.setPadding(paddingStart, 0, 0, 0);
         // Update the layout with new padding
         holder.itemView.requestLayout();
-
-        // DEBUG
-        holder.itemView.setOnClickListener(view -> {
-            Log.d(TAG, "onBindViewHolder: " + new GsonBuilder().setPrettyPrinting().create().toJson(comment));
-        });
     }
 
     @Override
