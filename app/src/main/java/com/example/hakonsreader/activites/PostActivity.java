@@ -130,6 +130,9 @@ public class PostActivity extends AppCompatActivity {
         // Add 1 so that we can go directly from a top level to the next without scrolling
         int next = this.commentsAdapter.getNextTopLevelCommentPos(currentPos + 1);
 
+        // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
+        this.binding.comments.stopScroll();
+
         // Scroll to the position, with 0 pixels offset from the top
         // TODO smooth scroll
         this.layoutManager.scrollToPositionWithOffset(next, 0);
@@ -143,6 +146,9 @@ public class PostActivity extends AppCompatActivity {
         int currentPos = layoutManager.findFirstVisibleItemPosition();
         // Subtract 1 so that we can go directly from a top level to the previous without scrolling
         int previous = this.commentsAdapter.getPreviousTopLevelCommentPos(currentPos - 1);
+
+        // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
+        this.binding.comments.stopScroll();
 
         this.layoutManager.scrollToPositionWithOffset(previous, 0);
     }
