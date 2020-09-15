@@ -51,6 +51,10 @@ public class PostContentText extends ScrollView {
             this.textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
             this.textView.setText(Html.fromHtml(post.getSelftextHtml(), Html.FROM_HTML_MODE_LEGACY));
         }
+
+        int padding = (int) getResources().getDimension(R.dimen.defaultIndent);
+
+        setPadding(padding, 0, padding, 0);
     }
 
 }
