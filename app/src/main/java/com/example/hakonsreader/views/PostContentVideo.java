@@ -111,6 +111,10 @@ public class PostContentVideo extends LinearLayout {
         exoPlayer.seekTo(time);
     }
 
+    public void release() {
+        exoPlayer.release();
+    }
+
     /* Shamelessly stolen from https://stackoverflow.com/a/19075245 */
     /*
     public void setVideoSize(int width, int height) {

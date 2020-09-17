@@ -1,7 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,6 +117,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        // If the holder previously had a video, release the player to free up its resources
+        View v = holder.content.getChildAt(0);
+        if (v instanceof PostContentVideo) {
+            ((PostContentVideo)v).release();
+        }
+
         final RedditPost post = this.posts.get(position);
         holder.post = post;
 
