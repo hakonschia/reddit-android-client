@@ -31,6 +31,7 @@ import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.List;
 
@@ -142,7 +143,10 @@ public class SubredditFragment extends Fragment {
         ClipData clip = ClipData.newPlainText("reddit post", post.getPermalink());
         clipboard.setPrimaryClip(clip);
 
-        Toast.makeText(getActivity(), R.string.linkCopied, Toast.LENGTH_SHORT).show();;
+        Toast.makeText(getActivity(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
+
+        // DEBUG
+        Log.d(TAG, "copyLinkToClipboard: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
     }
 
     /**

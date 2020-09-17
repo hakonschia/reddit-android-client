@@ -180,7 +180,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          * @return An array of {@link Pair<View, String>} mapping the view to its transition name in the new activity
          */
         public Pair<View, String>[] getPostTransitionViews() {
-            // TODO possibly add content
            return new Pair[] {
                 Pair.create(this.postInfo, "post_info"),
                 Pair.create(this.fullPostBar, "post_full_bar"),
@@ -211,15 +210,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             // A view to add and not text post (don't add text posts to the list)
             if (view != null && post.getPostType() != PostType.TEXT) {
                 content.addView(view);
-
-                // Align link post to start of parent
-                // TODO this should be done somewhere else to not have the same code here and in PostActivity
-                if (view instanceof PostContentLink) {
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) content.getLayoutParams();
-                    params.addRule(RelativeLayout.ALIGN_PARENT_START);
-                    content.setLayoutParams(params);
-                }
             }
+
+            // TODO this should be done somewhere else to not have the same code here and in PostActivity
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) content.getLayoutParams();
+            // Align link post to start of parent
+            // TODO make this not so bad
+            if (view instanceof PostContentLink) {
+                params.removeRule(RelativeLayout.CENTER_IN_PARENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_START);
+            } else {
+                params.removeRule(RelativeLayout.ALIGN_PARENT_START);
+                params.addRule(RelativeLayout.CENTER_IN_PARENT);
+            }
+
+            content.setLayoutParams(params);
         }
     }
 }
