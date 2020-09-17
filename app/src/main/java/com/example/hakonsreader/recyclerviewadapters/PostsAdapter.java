@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
@@ -18,6 +19,7 @@ import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.FullPostBar;
+import com.example.hakonsreader.views.PostContentLink;
 import com.example.hakonsreader.views.PostInfo;
 
 import java.util.ArrayList;
@@ -209,6 +211,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             // A view to add and not text post (don't add text posts to the list)
             if (view != null && post.getPostType() != PostType.TEXT) {
                 content.addView(view);
+
+                // Align link post to start of parent
+                // TODO this should be done somewhere else to not have the same code here and in PostActivity
+                if (view instanceof PostContentLink) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) content.getLayoutParams();
+                    params.addRule(RelativeLayout.ALIGN_PARENT_START);
+                    content.setLayoutParams(params);
+                }
             }
         }
     }

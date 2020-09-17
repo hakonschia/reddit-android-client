@@ -27,15 +27,12 @@ public class PostContentVideo extends VideoView {
     public PostContentVideo(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-    public PostContentVideo(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
 
 
     private void updateView() {
-
         // TODO width should be maximum this to not go outside of the screen
         this.setLayoutParams(new ViewGroup.LayoutParams(post.getVideoWidth(), post.getVideoHeight()));
         this.setVideoURI(Uri.parse(post.getVideoUrl()));
+        this.start();
     }
 }

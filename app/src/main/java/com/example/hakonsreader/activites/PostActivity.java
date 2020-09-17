@@ -3,7 +3,6 @@ package com.example.hakonsreader.activites;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +15,7 @@ import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
+import com.example.hakonsreader.views.PostContentLink;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
 
@@ -27,7 +27,8 @@ public class PostActivity extends AppCompatActivity {
 
     /**
      * The max height the content of the post can have (the image, video etc.)
-     * Set during initialization
+     *
+     * <p>Set during initialization</p>
      */
     private static int MAX_CONTENT_HEIGHT = -1;
 
@@ -40,6 +41,7 @@ public class PostActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
 
     private RedditPost post;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,11 +68,13 @@ public class PostActivity extends AppCompatActivity {
         View postContent = Util.generatePostContent(this.post, this);
         if (postContent != null) {
             this.binding.postInfoContainer.content.addView(postContent);
-            LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) postContent.getLayoutParams();
 
-            //params.setMarginStart(R.dimen.defaultIndent);
-            //params.setMarginEnd(R.dimen.defaultIndent);
-            //postContent.requestLayout();
+            // Align link post to start of parent
+            if (postContent instanceof PostContentLink) {
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.binding.postInfoContainer.content.getLayoutParams();
+                params.addRule(RelativeLayout.ALIGN_PARENT_START);
+                this.binding.postInfoContainer.content.setLayoutParams(params);
+            }
 
             // Ensure the content doesn't go over the set height limit
             this.binding.postInfoContainer.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -85,10 +89,10 @@ public class PostActivity extends AppCompatActivity {
                         binding.postInfoContainer.content.setLayoutParams(layoutParams);
                     }
 
-                    // Remove listener to avoid an infinite loop of layout changes
+                    // Remove listener to avoid infinite calls of layout changes
                     binding.postInfoContainer.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                    // The runnable in post is called after the UI is (apparently) drawn, so it
+                    // The runnable in post is (apparently) called after the UI is drawn, so it
                     // is then safe to start the transition
                     binding.postInfoContainer.content.post(() -> startPostponedEnterTransition());
                 }
