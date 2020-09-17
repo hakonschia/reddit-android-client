@@ -13,10 +13,10 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.LayoutPostContentLinkBinding;
 import com.squareup.picasso.Picasso;
 
+/**
+ * Class for post contents that are a link
+ */
 public class PostContentLink extends ConstraintLayout {
-    private static final int THUMBNAIL_SIZE_NOT_SET = -1;
-    private static int thumbnailSize = THUMBNAIL_SIZE_NOT_SET;
-
     private LayoutPostContentLinkBinding binding;
 
     private RedditPost post;
@@ -31,10 +31,6 @@ public class PostContentLink extends ConstraintLayout {
         this.binding.thumbnail.setOnClickListener(v -> this.openLink());
         this.binding.link.setOnClickListener(v -> this.openLink());
 
-        if (thumbnailSize == THUMBNAIL_SIZE_NOT_SET) {
-            thumbnailSize = (int)getResources().getDimension(R.dimen.postLinkThumnailHeight);
-        }
-
         this.updateView();
     }
 
@@ -46,12 +42,15 @@ public class PostContentLink extends ConstraintLayout {
     private void updateView() {
         Picasso.get()
                 .load(this.post.getThumbnail())
-                .resize(thumbnailSize, thumbnailSize)
+                .resize((int)getResources().getDimension(R.dimen.postLinkThumnailWidth), (int)getResources().getDimension(R.dimen.postLinkThumnailHeight))
                 .into(this.binding.thumbnail);
 
         this.binding.link.setText(post.getUrl());
     }
 
+    /**
+     * Opens the link found in {@link PostContentLink#post} in the browser
+     */
     private void openLink() {
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getUrl()));
         getContext().startActivity(i);
