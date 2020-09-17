@@ -11,6 +11,7 @@ import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.LayoutPostContentVideoBinding;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
@@ -37,6 +38,7 @@ public class PostContentVideo extends LinearLayout {
 
 
     private LayoutPostContentVideoBinding binding;
+    private ExoPlayer exoPlayer;
 
     private RedditPost post;
     private int videoWidth;
@@ -86,14 +88,23 @@ public class PostContentVideo extends LinearLayout {
         MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
                 .createMediaSource(Uri.parse(post.getVideoUrl()));
 
-        SimpleExoPlayer exoPlayer = new SimpleExoPlayer.Builder(getContext())
+        exoPlayer = new SimpleExoPlayer.Builder(getContext())
                 .setBandwidthMeter(new DefaultBandwidthMeter.Builder(getContext()).build())
                 .setTrackSelector(new DefaultTrackSelector(getContext(), new AdaptiveTrackSelection.Factory()))
                 .build();
         exoPlayer.prepare(mediaSource);
         exoPlayer.setPlayWhenReady(true);
 
-        this.binding.player.setPlayer(exoPlayer);
+        binding.player.setPlayer(exoPlayer);
+    }
+
+    /**
+     * Retrieves the position in the video
+     *
+     * @return The amount of milliseconds into the video
+     */
+    public long getCurrentPosition() {
+        return exoPlayer.getCurrentPosition();
     }
 
 
