@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.model;
 
+import android.util.Log;
+
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
@@ -252,10 +254,12 @@ public class RedditPost implements RedditListing {
         }
 
         if (hint.equals("link")) {
+            Log.d(TAG, "getPostType: hint is link, url: " + getUrl());
             // Link posts might be images not uploaded to reddit
-            if (hint.matches("(.png|.jpeg|.jpg)$")) {
+            if (getUrl().matches("(.png|.jpeg|.jpg)$")) {
                 return PostType.IMAGE;
-            } else if (hint.matches(".gifv")) {
+            } else if (getUrl().endsWith(".gifv REMOVE THIS LATER")) {
+                // TODO load gifs somehow (change to PostType.GIF maybe)
                 return PostType.VIDEO;
             }
 
