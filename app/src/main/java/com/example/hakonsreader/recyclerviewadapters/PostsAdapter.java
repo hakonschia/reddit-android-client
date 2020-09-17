@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
-import android.content.res.Resources;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.FullPostBar;
 import com.example.hakonsreader.views.PostContentLink;
+import com.example.hakonsreader.views.PostContentVideo;
 import com.example.hakonsreader.views.PostInfo;
 
 import java.util.ArrayList;
@@ -139,12 +141,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private FrameLayout content;
 
         private View itemView;
-        private Resources resources;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             this.itemView = itemView;
-            this.resources = itemView.getResources();
 
             this.postInfo = itemView.findViewById(R.id.postInfo);
             this.fullPostBar = itemView.findViewById(R.id.postFullBar);
@@ -194,6 +194,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         public RedditPost getPost() {
             return post;
+        }
+
+        /**
+         * Retrieves any extra information about the content of the post
+         *
+         * <p>Currently only returns the timestamp of the video, if the post is a video post</p>
+         * @return A bundle that might include extra information about the state of the post
+         */
+        public Bundle getExtraPostInfo() {
+            Bundle bundle = new Bundle();
+
+            View c = content.getChildAt(0);
+            if (c instanceof PostContentVideo) {
+                bundle.putLong("videoTimestamp", ((PostContentVideo)c).getCurrentPosition());
+            }
+
+            return bundle;
         }
 
         /**

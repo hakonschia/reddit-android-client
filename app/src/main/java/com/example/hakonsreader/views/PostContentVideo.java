@@ -107,6 +107,9 @@ public class PostContentVideo extends LinearLayout {
         return exoPlayer.getCurrentPosition();
     }
 
+    public void setPosition(long time) {
+        exoPlayer.seekTo(time);
+    }
 
     /* Shamelessly stolen from https://stackoverflow.com/a/19075245 */
     /*

@@ -1,6 +1,7 @@
 package com.example.hakonsreader.activites;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
@@ -16,6 +17,7 @@ import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.views.PostContentLink;
+import com.example.hakonsreader.views.PostContentVideo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
 
@@ -48,8 +50,10 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.binding = ActivityPostBinding.inflate(getLayoutInflater());
         setContentView(this.binding.getRoot());
-
         Slidr.attach(this);
+
+        // Extra information that might hold information about the state of the post
+        Bundle extras = getIntent().getExtras().getBundle("extras");
 
         // Postpone transition until the height of the content is known
         postponeEnterTransition();
@@ -74,7 +78,15 @@ public class PostActivity extends AppCompatActivity {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.binding.postInfoContainer.content.getLayoutParams();
                 params.addRule(RelativeLayout.ALIGN_PARENT_START);
                 this.binding.postInfoContainer.content.setLayoutParams(params);
+            } else if (postContent instanceof PostContentVideo) {
+                // Get the timestamp of the video and seek to it
+                long timestamp = extras.getLong("videoTimestamp");
+
+                Log.d(TAG, "onCreate: " + timestamp);
+
+                ((PostContentVideo)postContent).setPosition(timestamp);
             }
+
 
             // Ensure the content doesn't go over the set height limit
             this.binding.postInfoContainer.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

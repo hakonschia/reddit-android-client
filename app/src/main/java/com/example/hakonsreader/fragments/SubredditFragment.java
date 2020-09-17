@@ -128,6 +128,9 @@ public class SubredditFragment extends Fragment {
         Intent intent = new Intent(requireActivity(), PostActivity.class);
         intent.putExtra("post", new Gson().toJson(view.getPost()));
 
+        Bundle extras = view.getExtraPostInfo();
+        intent.putExtra("extras", extras);
+
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), view.getPostTransitionViews());
 
         startActivity(intent, options.toBundle());
