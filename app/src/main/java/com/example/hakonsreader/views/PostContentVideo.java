@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.LayoutPostContentVideoBinding;
@@ -22,6 +23,18 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 
 public class PostContentVideo extends LinearLayout {
     private static final String TAG = "PostContentVideo";
+
+    /**
+     * The lowest width ratio (compared to the screen width) that a video can be, ie. the
+     * minimum percentage of the screen the video will take
+     */
+    private static final float MIN_WIDTH_RATIO = 0.75f;
+    /**
+     * The max width ratio (compared to the screen width) that a video will be, ie. the
+     * maximum percentage of the screen the video will take
+     */
+    private static final float MAX_WIDTH_RATIO = 1.0f;
+
 
     private LayoutPostContentVideoBinding binding;
 
@@ -49,13 +62,23 @@ public class PostContentVideo extends LinearLayout {
 
 
     private void updateView() {
-        // TODO width should be maximum this to not go outside of the screen
-        //this.setVideoSize(post.getVideoWidth(), post.getVideoHeight());
-        // this.setVideoURI(Uri.parse(post.getVideoUrl()));
-        // this.start();
+        // Ensure the video size to screen ratio isn't too large or too small
+        float videoRatio = (float) post.getVideoWidth() / MainActivity.SCREEN_WIDTH;
+        if (videoRatio > MAX_WIDTH_RATIO) {
+            videoRatio = MAX_WIDTH_RATIO;
+        } else if (videoRatio < MIN_WIDTH_RATIO) {
+            videoRatio = MIN_WIDTH_RATIO;
+        }
 
-        setLayoutParams(new ViewGroup.LayoutParams(post.getVideoWidth(), post.getVideoHeight()));
+        // The original aspect ratio of the video
+        float aspectRatio = (float)post.getVideoWidth() / post.getVideoHeight();
 
+        // Calculate and set the new width and height
+        int width = (int)(MainActivity.SCREEN_WIDTH * videoRatio);
+        int height = (int)(width * aspectRatio);
+        setLayoutParams(new ViewGroup.LayoutParams(width, height));
+
+        // Create the player
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
         DefaultHttpDataSourceFactory dataSourceFactory = new DefaultHttpDataSourceFactory(NetworkConstants.USER_AGENT);
 
