@@ -28,7 +28,7 @@ public class PostContentVideo extends LinearLayout {
      * The lowest width ratio (compared to the screen width) that a video can be, ie. the
      * minimum percentage of the screen the video will take
      */
-    private static final float MIN_WIDTH_RATIO = 0.75f;
+    private static final float MIN_WIDTH_RATIO = 0.7f;
     /**
      * The max width ratio (compared to the screen width) that a video will be, ie. the
      * maximum percentage of the screen the video will take
@@ -70,12 +70,13 @@ public class PostContentVideo extends LinearLayout {
             videoRatio = MIN_WIDTH_RATIO;
         }
 
-        // The original aspect ratio of the video
-        float aspectRatio = (float)post.getVideoWidth() / post.getVideoHeight();
-
         // Calculate and set the new width and height
         int width = (int)(MainActivity.SCREEN_WIDTH * videoRatio);
-        int height = (int)(width * aspectRatio);
+
+        // Find how much the width was scaled by and use that to find the new height
+        float widthScaledBy = post.getVideoWidth() / (float)width;
+        int height = (int)(post.getVideoHeight() / widthScaledBy);
+
         setLayoutParams(new ViewGroup.LayoutParams(width, height));
 
         // Create the player
