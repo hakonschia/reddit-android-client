@@ -9,11 +9,12 @@
 
     <ImageButton
         android:id="@+id/thumbnail"
-        android:layout_width="@dimen/post_link_thumnail_size"
-        android:layout_height="@dimen/post_link_thumnail_size"
+        android:layout_width="@dimen/postLinkThumnailWidth"
+        android:layout_height="@dimen/postLinkThumnailHeight"
 
         android:layout_gravity="center"
         android:src="@drawable/ic_baseline_sort_24"
+        android:background="@drawable/rounded_square"
 
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

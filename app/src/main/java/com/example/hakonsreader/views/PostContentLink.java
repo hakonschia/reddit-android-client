@@ -32,7 +32,7 @@ public class PostContentLink extends ConstraintLayout {
         this.binding.link.setOnClickListener(v -> this.openLink());
 
         if (thumbnailSize == THUMBNAIL_SIZE_NOT_SET) {
-            thumbnailSize = (int)getResources().getDimension(R.dimen.post_link_thumnail_size);
+            thumbnailSize = (int)getResources().getDimension(R.dimen.postLinkThumnailHeight);
         }
 
         this.updateView();
