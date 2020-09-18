@@ -25,6 +25,7 @@ import com.example.hakonsreader.fragments.ProfileFragment;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
+import com.example.hakonsreader.misc.OAuthStateGenerator;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     private RedditApi redditApi;
 
     // The random string generated for OAuth authentication
-    private String oauthState;
+    private static String OAuthState;
 
 
     // Handler for token responses. If an access token is given user information is automatically retrieved
@@ -115,7 +116,19 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
         // Resumed from OAuth authorization
         if (uri.toString().startsWith(NetworkConstants.CALLBACK_URL)) {
+            String state = uri.getQueryParameter("state");
+
+            // Not a match from the state we generated, something weird is happening
+            if (state == null || !state.equals(OAuthState)) {
+                Util.showErrorLoggingInSnackbar(this.binding.parentLayout);
+                return;
+            }
+
             String code = uri.getQueryParameter("code");
+            if (code == null) {
+                Util.showErrorLoggingInSnackbar(this.binding.parentLayout);
+                return;
+            }
 
             this.binding.loadingIcon.increaseLoadCount();
             this.redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
@@ -266,5 +279,14 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         TokenManager.removeToken();
 
         SharedPreferencesManager.remove(SharedPreferencesConstants.USER_INFO);
+    }
+
+    /**
+     * Generates a new OAuth state that is used for validation
+     *
+     * @return A random string to use in the request for access
+     */
+    public static String generateAndGetOAuthState() {
+        return (OAuthState = OAuthStateGenerator.generate());
     }
 }

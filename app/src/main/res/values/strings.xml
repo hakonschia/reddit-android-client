@@ -59,8 +59,10 @@
         <item quantity="other">%d hours</item>
     </plurals>
 
+    <!-- Error messages -->
     <string name="genericServerError">Can\'t connect to Reddit servers</string>
     <string name="tooManyRequestsError">Too many request sent. Try again in a few seconds</string>
+    <string name="errorLoggingIn">Error logging in</string>
 
     <string name="commentByPoster">%s (OP)</string>
 </resources>

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.hakonsreader.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.constants.NetworkConstants;
 
@@ -18,7 +19,8 @@ import com.example.hakonsreader.constants.NetworkConstants;
  * Fragment for the login page
  */
 public class LogInFragment extends Fragment {
-
+    private static final String TAG = "LogInFragment";
+    
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -34,13 +36,15 @@ public class LogInFragment extends Fragment {
      * Opens a web page to log a user in with OAuth
      */
     private void requestOAuth(View view) {
-        // TODO generate random state, make sure it is the same when we get a result in onResume
+        // Generate a new state to validate when we get a response back
+        String state = MainActivity.generateAndGetOAuthState();
+
         String url = String.format(
                 "%s?client_id=%s&response_type=%s&state=%s&redirect_uri=%s&scope=%s&duration=%s",
                 "https://www.reddit.com/api/v1/authorize/",
                 NetworkConstants.CLIENT_ID,
                 NetworkConstants.RESPONSE_TYPE,
-                "randomString", // state
+                state,
                 NetworkConstants.CALLBACK_URL,
                 NetworkConstants.SCOPE,
                 NetworkConstants.DURATION

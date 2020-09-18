@@ -66,6 +66,15 @@ public class Util {
         Snackbar.make(parent, parent.getResources().getString(R.string.tooManyRequestsError), Snackbar.LENGTH_SHORT).show();
     }
 
+    /**
+     * Creates and shows a snackbar for errors caused by too many requests sent
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showErrorLoggingInSnackbar(View parent) {
+        Snackbar.make(parent, parent.getResources().getString(R.string.errorLoggingIn), Snackbar.LENGTH_SHORT).show();
+    }
+
 
     /**
      * Creates the text for text age text fields
