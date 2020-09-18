@@ -1,7 +1,6 @@
 package com.example.hakonsreader.activites;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
@@ -78,12 +77,11 @@ public class PostActivity extends AppCompatActivity {
             if (postContent instanceof PostContentLink) {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.binding.postInfoContainer.content.getLayoutParams();
                 params.addRule(RelativeLayout.ALIGN_PARENT_START);
+
                 this.binding.postInfoContainer.content.setLayoutParams(params);
             } else if (postContent instanceof PostContentVideo) {
                 // Get the timestamp of the video and seek to it
                 long timestamp = extras.getLong("videoTimestamp");
-
-                Log.d(TAG, "onCreate: " + timestamp);
 
                 ((PostContentVideo)postContent).setPosition(timestamp);
             }
@@ -131,6 +129,7 @@ public class PostActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        // Ensure resources are freed when the activity exits
         Util.cleanupPostContent(postContent);
     }
 

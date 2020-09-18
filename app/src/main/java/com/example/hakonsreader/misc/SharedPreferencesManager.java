@@ -1,11 +1,8 @@
 package com.example.hakonsreader.misc;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.gson.Gson;
-
-import java.util.Map;
 
 
 public class SharedPreferencesManager {
@@ -27,20 +24,9 @@ public class SharedPreferencesManager {
 
         String asJson = gson.toJson(value);
 
-        Log.d(TAG, "puting " + asJson);
-
-        Map<String, ?> p = prefs.getAll();
-
-        p.forEach((k, v) -> {
-            Log.d(TAG, "put: " + k + ": " + v);
-        });
         prefs.edit()
                 .putString(key, asJson)
                 .apply();
-
-        p.forEach((k, v) -> {
-            Log.d(TAG, "put: " + k + ": " + v);
-        });
     }
 
     /**

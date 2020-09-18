@@ -11,8 +11,6 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
  * Class for managing the access token for the logged in user
  */
 public class TokenManager {
-    private static final String TAG = "TokenManager";
-    
     private static AccessToken token;
 
     /**
@@ -35,8 +33,6 @@ public class TokenManager {
      * @param newToken The new token to save
      */
     public static void saveToken(AccessToken newToken) {
-        Log.d(TAG, "Saving new token: " + newToken);
-        
         token = newToken;
 
         // Notify the API

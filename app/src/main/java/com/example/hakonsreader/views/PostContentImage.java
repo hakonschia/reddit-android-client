@@ -38,7 +38,6 @@ public class PostContentImage extends androidx.appcompat.widget.AppCompatImageVi
      * Updates the view with the url from {@link PostContentImage#post}
      */
     private void updateView() {
-        // TODO when clicked open the image so you can ZOOOOOM
         Picasso.get()
                 .load(post.getUrl())
                 .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
