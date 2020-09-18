@@ -22,6 +22,7 @@
 
     <string name="subredditPrefixed">r/%s</string>
     <string name="authorPrefixed">u/%s</string>
+    <string name="commentByPoster">u/%s (OP)</string>
 
     <string name="profileAge">User since %s</string>
     <string name="commentKarma">%d comment karma</string>
@@ -65,5 +66,4 @@
     <string name="errorLoggingIn">Error logging in</string>
     <string name="noInternetConnection">No internet connection</string>
 
-    <string name="commentByPoster">%s (OP)</string>
 </resources>
