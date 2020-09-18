@@ -1,13 +1,11 @@
 package com.example.hakonsreader;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
-import com.danikula.videocache.HttpProxyCacheServer;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
@@ -30,8 +28,6 @@ public class App extends Application {
 
     // The random string generated for OAuth authentication
     private static String OAuthState;
-
-    private HttpProxyCacheServer proxy;
 
 
     @Override
@@ -97,16 +93,5 @@ public class App extends Application {
      */
     public static String generateAndGetOAuthState() {
         return (OAuthState = OAuthStateGenerator.generate());
-    }
-
-
-    public static HttpProxyCacheServer getProxy(Context context) {
-        App app = (App) context.getApplicationContext();
-        return app.proxy == null ? (app.proxy = app.newProxy()) : app.proxy;
-    }
-
-    private HttpProxyCacheServer newProxy() {
-        return new HttpProxyCacheServer.Builder(this)
-                .build();
     }
 }

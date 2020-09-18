@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.danikula.videocache.HttpProxyCacheServer;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
@@ -36,8 +35,6 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
 
     private static final String TAG = "MainActivity";
-
-    private static HttpProxyCacheServer cacheServer;
 
     private ActivityMainBinding binding;
 

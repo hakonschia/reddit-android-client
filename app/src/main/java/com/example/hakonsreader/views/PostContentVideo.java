@@ -7,11 +7,11 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.danikula.videocache.HttpProxyCacheServer;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.LayoutPostContentVideoBinding;
+import com.example.hakonsreader.misc.VideoCache;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -23,6 +23,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 
 public class PostContentVideo extends LinearLayout {
     private static final String TAG = "PostContentVideo";
@@ -66,6 +67,8 @@ public class PostContentVideo extends LinearLayout {
 
 
     private void updateView() {
+        Context context = getContext();
+
         // Ensure the video size to screen ratio isn't too large or too small
         float videoRatio = (float) post.getVideoWidth() / App.getScreenWidth();
         if (videoRatio > MAX_WIDTH_RATIO) {
@@ -85,17 +88,15 @@ public class PostContentVideo extends LinearLayout {
 
         // Create the player
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getContext(), NetworkConstants.USER_AGENT);
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
+        CacheDataSourceFactory cacheFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
 
-        HttpProxyCacheServer proxy = App.getProxy(getContext());
-        String proxyUrl = proxy.getProxyUrl(post.getVideoUrl());
+        MediaSource mediaSource = new ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
+                .createMediaSource(Uri.parse(post.getVideoUrl()));
 
-        MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
-                .createMediaSource(Uri.parse(proxyUrl));
-
-        exoPlayer = new SimpleExoPlayer.Builder(getContext())
-                .setBandwidthMeter(new DefaultBandwidthMeter.Builder(getContext()).build())
-                .setTrackSelector(new DefaultTrackSelector(getContext(), new AdaptiveTrackSelection.Factory()))
+        exoPlayer = new SimpleExoPlayer.Builder(context)
+                .setBandwidthMeter(new DefaultBandwidthMeter.Builder(context).build())
+                .setTrackSelector(new DefaultTrackSelector(context, new AdaptiveTrackSelection.Factory()))
                 .build();
         exoPlayer.prepare(mediaSource);
         exoPlayer.setPlayWhenReady(false);
