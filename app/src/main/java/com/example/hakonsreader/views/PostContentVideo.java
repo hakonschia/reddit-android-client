@@ -3,6 +3,7 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -27,6 +28,22 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 
 public class PostContentVideo extends LinearLayout {
     private static final String TAG = "PostContentVideo";
+
+    /**
+     * The key used for extra information about the timestamp of the video
+     */
+    public static final String EXTRA_TIMESTAMP = "videoTimestamp";
+
+    /**
+     * The key used for extra information about the playback state of a video
+     */
+    public static final String EXTRA_IS_PLAYING = "isPlaying";
+
+    /**
+     * The key used for extra information about the playback state of a video
+     */
+    public static final String EXTRA_SHOW_CONTROLS = "showControls";
+
 
     /**
      * The lowest width ratio (compared to the screen width) that a video can be, ie. the
@@ -114,12 +131,21 @@ public class PostContentVideo extends LinearLayout {
     }
 
     /**
-     * Sets the position of the video
+     * Retrieve the current playback state
      *
-     * @param time The amount of milliseconds to go into the video
+     * @return True if there is a video playing
      */
-    public void setPosition(long time) {
-        exoPlayer.seekTo(time);
+    public boolean isPlaying() {
+        return exoPlayer.getPlayWhenReady();
+    }
+
+    /**
+     * Retrieve the state of the controllers of the video
+     *
+     * @return True if the controller is visible
+     */
+    public boolean isControllerShown() {
+        return binding.player.isControllerVisible();
     }
 
     /**
@@ -129,18 +155,38 @@ public class PostContentVideo extends LinearLayout {
         exoPlayer.release();
     }
 
+
     /**
-     * Plays the video
+     * Sets the position of the video
+     *
+     * @param time The amount of milliseconds to go into the video
      */
-    public void play() {
-        exoPlayer.setPlayWhenReady(true);
+    public void setPosition(long time) {
+        exoPlayer.seekTo(time);
     }
 
     /**
-     * Pauses the video
+     * Set if the video should play or not
+     *
+     * @param play If true the video will start playing
      */
-    public void pause() {
-        exoPlayer.setPlayWhenReady(false);
+    public void setPlayback(boolean play) {
+        exoPlayer.setPlayWhenReady(play);
+    }
+
+    /**
+     * Set the visibility of the controller of the video
+     *
+     * @param visible If true the controller will be shown
+     */
+    public void setControllerVisible(boolean visible) {
+        if (visible) {
+            binding.player.showController();
+            Log.d(TAG, "setControllerVisible: showing controller");
+        } else {
+            Log.d(TAG, "setControllerVisible: hiding controller");
+            binding.player.hideController();
+        }
     }
 
     /* Shamelessly stolen from https://stackoverflow.com/a/19075245 */

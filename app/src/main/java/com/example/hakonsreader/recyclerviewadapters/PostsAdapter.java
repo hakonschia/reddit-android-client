@@ -210,7 +210,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             View c = content.getChildAt(0);
             if (c instanceof PostContentVideo) {
-                bundle.putLong("videoTimestamp", ((PostContentVideo)c).getCurrentPosition());
+                PostContentVideo video = (PostContentVideo)c;
+                bundle.putLong(PostContentVideo.EXTRA_TIMESTAMP, video.getCurrentPosition());
+                bundle.putBoolean(PostContentVideo.EXTRA_IS_PLAYING, video.isPlaying());
+                bundle.putBoolean(PostContentVideo.EXTRA_SHOW_CONTROLS, video.isControllerShown());
             }
 
             return bundle;

@@ -1,6 +1,7 @@
 package com.example.hakonsreader.activites;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
@@ -80,10 +81,7 @@ public class PostActivity extends AppCompatActivity {
 
                 this.binding.postInfoContainer.content.setLayoutParams(params);
             } else if (postContent instanceof PostContentVideo) {
-                // Get the timestamp of the video and seek to it
-                long timestamp = extras.getLong("videoTimestamp");
-
-                ((PostContentVideo)postContent).setPosition(timestamp);
+                this.resumeVideoPost(extras);
             }
 
 
@@ -94,7 +92,7 @@ public class PostActivity extends AppCompatActivity {
                     int height = postContent.getMeasuredHeight();
 
                     // Content is too large, set new height
-                    if (height >= 346803) {
+                    if (height >= MAX_CONTENT_HEIGHT) {
                         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.postInfoContainer.content.getLayoutParams();
                         layoutParams.height = MAX_CONTENT_HEIGHT;
                         binding.postInfoContainer.content.setLayoutParams(layoutParams);
@@ -131,6 +129,24 @@ public class PostActivity extends AppCompatActivity {
 
         // Ensure resources are freed when the activity exits
         Util.cleanupPostContent(postContent);
+    }
+
+    /**
+     * Resumes state of a video according to how it was when it was clicked
+     *
+     * @param data The data to use for restoring the state
+     */
+    private void resumeVideoPost(Bundle data) {
+        PostContentVideo video = (PostContentVideo)postContent;
+
+        long timestamp = data.getLong(PostContentVideo.EXTRA_TIMESTAMP);
+        boolean isPlaying = data.getBoolean(PostContentVideo.EXTRA_IS_PLAYING);
+        boolean showController = data.getBoolean(PostContentVideo.EXTRA_SHOW_CONTROLS);
+
+        Log.d(TAG, "resumeVideoPost: " + showController);
+        video.setPosition(timestamp);
+        video.setPlayback(isPlaying);
+        video.setControllerVisible(showController);
     }
 
     /**
