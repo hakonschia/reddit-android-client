@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         TokenManager.saveToken(token);
 
         // Re-create the start fragment as it now should load posts for the logged in user
-        //this.setupStartFragment();
+        // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
+        this.setupStartFragment();
 
         Snackbar.make(this.binding.parentLayout, R.string.loggedIn, Snackbar.LENGTH_SHORT).show();
     };
