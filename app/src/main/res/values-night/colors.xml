@@ -24,5 +24,5 @@
     <color name="divider">#434343</color>
     <color name="iconColor">#DADADA</color>
 
-    <color name="imageVideoActivityBackground">#88000000</color>
+    <color name="imageVideoActivityBackground">#CC000000</color>
 </resources>

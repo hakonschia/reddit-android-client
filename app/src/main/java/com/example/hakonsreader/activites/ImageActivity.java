@@ -27,4 +27,11 @@ public class ImageActivity extends AppCompatActivity {
             Picasso.get().load(imageUrl).into(image);
         }
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+    }
 }

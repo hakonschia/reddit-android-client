@@ -1,5 +1,6 @@
 package com.example.hakonsreader.views;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
@@ -50,6 +51,7 @@ public class PostContentImage extends androidx.appcompat.widget.AppCompatImageVi
             Intent intent = new Intent(getContext(), ImageActivity.class);
             intent.putExtra("imageUrl", post.getUrl());
             getContext().startActivity(intent);
+            ((Activity)getContext()).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
     }
 }
