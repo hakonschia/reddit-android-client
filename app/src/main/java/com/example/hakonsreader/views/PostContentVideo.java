@@ -182,9 +182,7 @@ public class PostContentVideo extends LinearLayout {
     public void setControllerVisible(boolean visible) {
         if (visible) {
             binding.player.showController();
-            Log.d(TAG, "setControllerVisible: showing controller");
         } else {
-            Log.d(TAG, "setControllerVisible: hiding controller");
             binding.player.hideController();
         }
     }

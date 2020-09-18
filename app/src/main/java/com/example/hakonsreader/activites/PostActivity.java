@@ -143,7 +143,6 @@ public class PostActivity extends AppCompatActivity {
         boolean isPlaying = data.getBoolean(PostContentVideo.EXTRA_IS_PLAYING);
         boolean showController = data.getBoolean(PostContentVideo.EXTRA_SHOW_CONTROLS);
 
-        Log.d(TAG, "resumeVideoPost: " + showController);
         video.setPosition(timestamp);
         video.setPlayback(isPlaying);
         video.setControllerVisible(showController);
