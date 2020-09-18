@@ -17,6 +17,7 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.FragmentProfileBinding;
+import com.example.hakonsreader.misc.Util;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -46,7 +47,11 @@ public class ProfileFragment extends Fragment {
 
         this.updateViews();
     };
-    private OnFailure onUserFailure = (call, t) -> { };
+    private OnFailure onUserFailure = (code, t) -> {
+        if (code == 503) {
+            Util.showGenericServerErrorSnackbar(this.binding.parentLayout);
+        }
+    };
 
 
     @Nullable

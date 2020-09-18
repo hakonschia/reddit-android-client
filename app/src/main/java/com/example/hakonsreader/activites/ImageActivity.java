@@ -10,6 +10,9 @@ import com.example.hakonsreader.R;
 import com.jsibbold.zoomage.ZoomageView;
 import com.squareup.picasso.Picasso;
 
+/**
+ * Activity to display a zoomable image taking the entire screen
+ */
 public class ImageActivity extends AppCompatActivity {
     private static final String TAG = "ImageActivity";
     

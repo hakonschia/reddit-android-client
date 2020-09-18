@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * Response for retrieving more comments in a comment chain
+ */
 public class MoreCommentsResponse {
 
     private Json json;

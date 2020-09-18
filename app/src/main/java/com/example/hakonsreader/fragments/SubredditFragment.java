@@ -137,7 +137,7 @@ public class SubredditFragment extends Fragment {
     }
 
     /**
-     * For long clicks on a Reddit post, copy the post URL
+     * For long clicks on a post, copy the post URL
      *
      * @param post The post clicked on
      */
@@ -192,7 +192,7 @@ public class SubredditFragment extends Fragment {
     }
 
     /**
-     * Sets up {@link SubredditFragment#postsList}
+     * Sets up {@link FragmentSubredditBinding#posts}
      */
     private void setupPostsList(View view) {
         this.layoutManager = new LinearLayoutManager(getActivity());

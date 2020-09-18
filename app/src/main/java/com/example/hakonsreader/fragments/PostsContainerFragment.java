@@ -35,8 +35,9 @@ public class PostsContainerFragment extends Fragment implements ItemLoadingListe
     }
 
     /**
-     * Creates and initializes the fragments needed. Sets the fragments array
-     * Note: Setup is only done if {@link PostsContainerFragment#fragments} is null
+     * Creates and initializes the fragments needed. Sets {@link PostsContainerFragment#fragments}
+     *
+     * <p>Note: Setup is only done if {@link PostsContainerFragment#fragments} is null</p>
      */
     private void setupFragments() {
         if (this.fragments == null) {
@@ -81,6 +82,11 @@ public class PostsContainerFragment extends Fragment implements ItemLoadingListe
         return view;
     }
 
+    /**
+     * Listener for when something has changed its loading status (something has started/finished loading)
+     *
+     * @param up True if the count has gone up
+     */
     @Override
     public void onCountChange(boolean up) {
         if (this.loadingListener != null) {

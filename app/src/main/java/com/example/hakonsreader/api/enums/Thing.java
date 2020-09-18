@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.enums;
 
 /**
- * A Reddit "Thing"
+ * A Reddit "Thing" (comment, post etc.)
  */
 public enum Thing {
     COMMENT("t1"),
@@ -16,7 +16,9 @@ public enum Thing {
 
     /**
      * Retrieve the underlying string value of the thing
+     *
      * <p>This value can be used in addition to the things ID to create the fullname of the thing</p>
+     *
      * <p>When creating the fullname use a "_" between the thing value and the ID</p>
      *
      * @return The string identifier for the thing (eg. "t1")

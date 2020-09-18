@@ -167,9 +167,14 @@ public class RedditApi {
 
 
     /**
+     * Retrieves the singleton instance of the API. Use relevant setters when getting the instance
+     * for the first time
+     *
      * @param userAgent The user agent for the application.
-     * <p>See <a href="https://github.com/reddit-archive/reddit/wiki/API">Reddit documentation</a>
-     * on creating your user agent</p>* @return The RedditApi instance
+     *                  <p>See <a href="https://github.com/reddit-archive/reddit/wiki/API">Reddit documentation</a>
+     *                  on creating your user agent</p>
+     *
+     * @return The RedditApi instance
      */
     public static RedditApi getInstance(String userAgent) {
         if (instance == null) {
@@ -180,15 +185,20 @@ public class RedditApi {
     }
 
     /**
-     * Sets the listener for what to do when a new token is received by the API
+     * If an access token is set a new one is automatically retrieved when a request is attempted with
+     * an invalid token. This sets the listener for what to do when a new token is received by the API
      *
-     * @param onNewToken The token listener
+     * <p>Note: {@link RedditApi#setToken(AccessToken)} is not called and must be set manually</p>
+     *
+     * @param onNewToken The token listener. Holds an {@link AccessToken} object
      */
     public void setOnNewToken(OnNewToken onNewToken) {
         this.onNewToken = onNewToken;
     }
 
     /**
+     * Sets the {@link HttpLoggingInterceptor.Level} to use
+     *
      * @param loggingLevel The level at what to log
      */
     public void setLoggingLevel(HttpLoggingInterceptor.Level loggingLevel) {
@@ -229,6 +239,7 @@ public class RedditApi {
         this.basicAuthHeader = "Basic " + Base64.encodeToString((clientID + ":").getBytes(), Base64.NO_WRAP);
     }
 
+
     /* --------------- Access token calls --------------- */
     /**
      * Asynchronously retrieves an access token from Reddit
@@ -266,38 +277,6 @@ public class RedditApi {
                     } else {
                         onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
                     }
-                } else {
-                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                }
-            }
-            @Override
-            public void onFailure(Call<AccessToken> call, Throwable t) {
-                onFailure.onFailure(-1, t);
-            }
-        });
-    }
-
-    /**
-     * Asynchronously refreshes the access token from Reddit
-     *
-     * @param onResponse The callback for successful requests. Holds the new access token
-     * @param onFailure The callback for failed requests
-     */
-    @EverythingIsNonNull
-    private void refreshToken(OnResponse<AccessToken> onResponse, OnFailure onFailure) {
-        this.OAuthService.refreshToken(
-                this.basicAuthHeader,
-                this.accessToken.getRefreshToken(),
-                OAuthConstants.GRANT_TYPE_REFRESH
-        ).enqueue(new Callback<AccessToken>() {
-            @Override
-            public void onResponse(Call<AccessToken> call, retrofit2.Response<AccessToken> response) {
-                if (response.isSuccessful()) {
-                    AccessToken body = response.body();
-                    if (body != null) {
-                        onResponse.onResponse(body);
-                    }
-
                 } else {
                     onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
                 }
@@ -424,7 +403,7 @@ public class RedditApi {
      * @param after The ID of the last post seen (or an empty string if first time loading)
      * @param count The amount of posts already retrieved
      *
-     * @param onResponse The callback for successful requests. Holds the list of posts
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
      * @param onFailure The callback for failed requests
      */
     @EverythingIsNonNull
@@ -472,8 +451,7 @@ public class RedditApi {
      * <p>If an access token is set posts are customized for the user</p>
      *
      * @param postID The post ID to retrieve comments from
-     *
-     * @param onResponse The callback for successful requests. Holds the list of posts
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onFailure The callback for failed requests
      */
     @EverythingIsNonNull
@@ -523,8 +501,8 @@ public class RedditApi {
      *
      * @param postId The ID of the post the comments are in
      * @param children The list of IDs of comments to get
-     * @param onResponse
-     * @param onFailure
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
+     * @param onFailure The callback for failed requests
      */
     public void getMoreComments(String postId, List<String> children, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
         Pair<String, String> urlAndToken = this.getCorrectApiUrl(true);
@@ -568,7 +546,8 @@ public class RedditApi {
 
     /**
      * Send an asynchronous request to cast a vote on a thing (post or comment)
-     * <p>Requires a valid access token</p>
+     *
+     * <p>Requires an access token to be set</p>
      *
      * @param thingId The ID of the thing
      * @param type The type of vote to cast

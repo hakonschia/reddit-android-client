@@ -42,6 +42,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         this.post = post;
     }
 
+    /**
+     * Appends comments to the current list of comments
+     *
+     * @param comments The comments to add
+     */
     public void addComments(List<RedditComment> comments) {
         this.comments.addAll(comments);
         notifyDataSetChanged();
@@ -58,6 +63,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         notifyItemRangeInserted(at, newComments.size());
     }
 
+    /**
+     * Removes a comment from the comment list
+     *
+     * @param comment The comment to remove
+     */
     public void removeComment(RedditComment comment) {
         int pos = this.comments.indexOf(comment);
         this.comments.remove(pos);
@@ -82,6 +92,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         return currentPos;
     }
 
+    /**
+     * Finds the position of the previous top level comment
+     *
+     * @param currentPos The position to start from
+     * @return The position of the previous top level comment
+     */
     public int getPreviousTopLevelCommentPos(int currentPos) {
         for(int i = currentPos; i >= 0; i--) {
             RedditComment comment = comments.get(i);

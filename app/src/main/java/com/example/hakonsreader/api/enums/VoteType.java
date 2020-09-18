@@ -10,7 +10,7 @@ public enum VoteType {
 
     private int value;
 
-    private VoteType(int value) {
+    VoteType(int value) {
         this.value = value;
     }
 

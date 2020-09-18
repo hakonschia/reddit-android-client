@@ -107,10 +107,18 @@ public class PostContentVideo extends LinearLayout {
         return exoPlayer.getCurrentPosition();
     }
 
+    /**
+     * Sets the position of the video
+     *
+     * @param time The amount of milliseconds to go into the video
+     */
     public void setPosition(long time) {
         exoPlayer.seekTo(time);
     }
 
+    /**
+     * Releases the video to free up its resources
+     */
     public void release() {
         exoPlayer.release();
     }

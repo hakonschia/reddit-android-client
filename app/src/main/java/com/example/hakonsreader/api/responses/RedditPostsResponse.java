@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * Response for retrieving posts from a subreddit
+ */
 public class RedditPostsResponse {
 
     private Data data;

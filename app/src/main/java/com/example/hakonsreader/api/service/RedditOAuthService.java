@@ -30,6 +30,7 @@ public interface RedditOAuthService {
      * @param code The authorization token retrieved from the initial login process
      * @param grantType The string "authorization_code"
      * @param redirectUri The callback URL for the OAuth application
+     *
      * @return A Call object to be used to retrieve an access token
      */
     @POST(ACCESS_TOKEN_PATH)
@@ -48,6 +49,7 @@ public interface RedditOAuthService {
      * @param basicAuth The basic authorization header with the client ID and secret
      * @param refreshToken The refresh token received in the initial access token retrieval
      * @param grantType The grant type (refresh_token)
+     *
      * @return A Call object to be used to refresh the access token
      */
     @POST(ACCESS_TOKEN_PATH)
@@ -66,6 +68,7 @@ public interface RedditOAuthService {
      * @param basicAuth The basic authorization header with the client ID and secret
      * @param token The token to revoke
      * @param tokenType The token type, either "refresh_token" or "access_token"
+     *
      * @return A void Call. This API call only returns a status code to indicate if the request
      * was successful or not
      */

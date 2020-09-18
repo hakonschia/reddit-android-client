@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * Response for retrieving comments for a post
+ */
 public class RedditCommentsResponse {
 
     private Data data;

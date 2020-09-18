@@ -10,6 +10,9 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class representing a Reddit comment
+ */
 public class RedditComment implements RedditListing {
     private static final String TAG = "RedditComment";
 

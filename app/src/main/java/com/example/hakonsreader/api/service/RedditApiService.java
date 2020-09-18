@@ -38,8 +38,14 @@ public interface RedditApiService {
     String MORE_COMMENTS_PATH = "morechildren";
 
 
+    /**
+     * Retrieves information about the logged in user
+     *
+     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @return A Call with {@link User}
+     */
     @GET(USER_INFO_PATH)
-    Call<User> getUserInfo(@Header("Authorization") String token);
+    Call<User> getUserInfo(@Header("Authorization") String accessToken);
 
     /**
      * Retrieves posts from Reddit
@@ -56,6 +62,7 @@ public interface RedditApiService {
                                        @Query("after") String after,
                                        @Query("count") int count,
                                        @Query("raw_json") int rawJson,
+
                                        @Header("Authorization") String accessToken
     );
 
@@ -75,6 +82,7 @@ public interface RedditApiService {
     Call<List<RedditCommentsResponse>> getComments(@Url String url,
                                                    @Query("show") String show,
                                                    @Query("raw_json") int rawJson,
+
                                                    @Header("Authorization") String accessToken
     );
 
@@ -86,7 +94,7 @@ public interface RedditApiService {
      * @param linkId The fullname of the post the comments are in
      * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
      *                    to retrieve comments without a logged in user
-     * @return
+     * @return A call with {@link MoreCommentsResponse}
      */
     @POST(MORE_COMMENTS_PATH)
     @FormUrlEncoded
@@ -111,7 +119,8 @@ public interface RedditApiService {
     @POST(VOTE_PATH)
     @FormUrlEncoded
     Call<Void> vote(@Field("id") String id,
-                            @Field("dir") int dir,
-                            @Header("Authorization") String accessToken
+                    @Field("dir") int dir,
+
+                    @Header("Authorization") String accessToken
     );
 }
