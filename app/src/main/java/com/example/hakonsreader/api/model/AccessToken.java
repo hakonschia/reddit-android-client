@@ -13,9 +13,6 @@ public class AccessToken {
     @SerializedName("token_type")
     private String tokenType;
 
-    @SerializedName("expires_in")
-    private int expiresIn;
-
     private String scope;
 
     @SerializedName("refresh_token")
@@ -69,7 +66,6 @@ public class AccessToken {
         return "AccessToken{" +
                 "accessToken='" + accessToken + '\'' +
                 ", tokenType='" + tokenType + '\'' +
-                ", expiresIn=" + expiresIn +
                 ", scope='" + scope + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
                 '}';

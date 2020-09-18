@@ -1,7 +1,5 @@
 package com.example.hakonsreader.misc;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.constants.NetworkConstants;

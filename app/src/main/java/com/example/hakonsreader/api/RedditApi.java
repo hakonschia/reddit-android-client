@@ -188,8 +188,6 @@ public class RedditApi {
      * If an access token is set a new one is automatically retrieved when a request is attempted with
      * an invalid token. This sets the listener for what to do when a new token is received by the API
      *
-     * <p>Note: {@link RedditApi#setToken(AccessToken)} is not called and must be set manually</p>
-     *
      * @param onNewToken The token listener. Holds an {@link AccessToken} object
      */
     public void setOnNewToken(OnNewToken onNewToken) {
@@ -228,7 +226,7 @@ public class RedditApi {
     /**
      * Sets the client ID of the application
      * <p>To find your client ID see <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
-
+     *
      * @param clientID The client ID
      */
     public void setClientID(String clientID) {
@@ -349,7 +347,7 @@ public class RedditApi {
      * @throws AccessTokenNotSetException If there isn't any access token set
      */
     private void ensureTokenIsSet() throws AccessTokenNotSetException {
-        if (this.accessToken == null) {
+        if (this.accessToken == null || this.accessToken.getAccessToken() == null) {
             throw new AccessTokenNotSetException("Access token was not found");
         }
     }
@@ -626,6 +624,7 @@ public class RedditApi {
 
                 if (onNewToken != null) {
                     onNewToken.newToken(newToken);
+                    setToken(newToken);
                 }
 
                 return response.request().newBuilder()

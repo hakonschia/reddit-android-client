@@ -3,7 +3,6 @@ package com.example.hakonsreader;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -81,6 +80,14 @@ public class App extends Application {
      */
     public static String getOAuthState() {
         return OAuthState;
+    }
+
+    /**
+     * Clears the OAuth state.
+     * <p>Use this when the state has been verified</p>
+     */
+    public static void clearOAuthState() {
+        OAuthState = null;
     }
 
     /**

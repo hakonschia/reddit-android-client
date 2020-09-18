@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         if (uri == null) {
             return;
         }
+        // TODO when logging in and going into a post, going back triggers onResume and the intent data
+        //  is still the same which causes the error logging in snackbar to appear
 
         // Resumed from OAuth authorization
         if (uri.toString().startsWith(NetworkConstants.CALLBACK_URL)) {
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
                 return;
             }
 
+            App.clearOAuthState();
             this.binding.loadingIcon.increaseLoadCount();
             this.redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
         }
