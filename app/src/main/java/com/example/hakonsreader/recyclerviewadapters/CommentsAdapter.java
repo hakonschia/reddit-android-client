@@ -119,7 +119,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * @param start The comment to start at. This comment and any replies will be hidden
      */
     private void hideComments(RedditComment start) {
-
+        Log.d(TAG, "hideComments: Hiding comments from author " + start.getAuthor());
+        // TODO the start comment should still show something as to signify there is a collapsed comment
     }
 
     /**
@@ -183,10 +184,20 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         // Remove the listener if there is one (from "more comments")
         holder.itemView.setOnClickListener(null);
 
+
         // Hide comments on long clicks
+        // This has to be set on both the TextView as well as the entire holder since the TextView
+        // has movementMethod set to allow for clickable hyperlinks which makes setting it on only
+        // the holder not work for the TextView
+        holder.content.setOnLongClickListener(view -> {
+            // Not a hyperlink (even long clicking on the hyperlink would open it, so don't collapse as well)
+            if (holder.content.getSelectionStart() == -1 && holder.content.getSelectionEnd() == -1) {
+                this.hideComments(comment);
+            }
+            return true;
+        });
         holder.itemView.setOnLongClickListener(view -> {
             this.hideComments(comment);
-            Log.d(TAG, "onBindViewHolder: Hiding comments from " + comment.getBody());
             return true;
         });
     }
