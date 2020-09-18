@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
@@ -24,7 +25,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
@@ -187,17 +187,17 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
 
         holder.content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
-        // TODO this creates issues with the itemView not being clickable (to hide comment chains with longclicks)
         holder.content.setMovementMethod(LinkMovementMethod.getInstance());
 
-        // TODO create something around the text to highlight better the post is from OP
+        // Add a box aronud the text to show it's by the poster
         if (comment.getAuthor().equals(post.getAuthor())) {
-            holder.author.setText(
-                    String.format(Locale.getDefault(), context.getString(R.string.commentByPoster), comment.getAuthor())
-            );
+            holder.author.setBackground(ContextCompat.getDrawable(context, R.drawable.comment_by_poster));
+            holder.author.setTextColor(ContextCompat.getColor(context, R.color.textColor));
         } else {
-            holder.author.setText(authorText);
+            holder.author.setBackground(null);
         }
+
+        holder.author.setText(authorText);
 
         // Calculate the time since the comment was posted
         Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
@@ -245,18 +245,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         RedditComment comment = this.comments.get(position);
         holder.comment = comment;
 
+        if (comment.isMod()) {
+            holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.modTextColor));
+        } else {
+            holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.linkColor));
+        }
+
         // TODO remove magic string and create "listing" enum or something
         // The comment is a "12 more comments"
         if (comment.getKind().equals("more")) {
             this.asMoreComments(holder);
         } else {
             this.asNormalComment(holder);
-        }
-
-        if (comment.isMod()) {
-            holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.modTextColor));
-        } else {
-            holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.linkColor));
         }
 
         int paddingStart = comment.getDepth() * (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
