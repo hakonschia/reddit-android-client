@@ -93,7 +93,7 @@ public class PostContentVideo extends LinearLayout {
                 .setTrackSelector(new DefaultTrackSelector(getContext(), new AdaptiveTrackSelection.Factory()))
                 .build();
         exoPlayer.prepare(mediaSource);
-        exoPlayer.setPlayWhenReady(true);
+        exoPlayer.setPlayWhenReady(false);
 
         binding.player.setPlayer(exoPlayer);
     }
@@ -113,6 +113,20 @@ public class PostContentVideo extends LinearLayout {
 
     public void release() {
         exoPlayer.release();
+    }
+
+    /**
+     * Plays the video
+     */
+    public void play() {
+        exoPlayer.setPlayWhenReady(true);
+    }
+
+    /**
+     * Pauses the video
+     */
+    public void pause() {
+        exoPlayer.setPlayWhenReady(false);
     }
 
     /* Shamelessly stolen from https://stackoverflow.com/a/19075245 */
