@@ -90,4 +90,16 @@ public class Util {
 
         return String.format(Locale.getDefault(), format, t);
     }
+
+    /**
+     * Cleans up post content by releasing any resources that might be used by the view
+     *
+     * @param postContent The view of the content
+     */
+    public static void cleanupPostContent(View postContent) {
+        // Release the exo player from video posts
+        if (postContent instanceof PostContentVideo) {
+            ((PostContentVideo)postContent).release();
+        }
+    }
 }

@@ -117,11 +117,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // If the holder previously had a video, release the player to free up its resources
+        // Free up any resources that might not be garbage collected automatically
         View v = holder.content.getChildAt(0);
-        if (v instanceof PostContentVideo) {
-            ((PostContentVideo)v).release();
-        }
+        Util.cleanupPostContent(v);
 
         final RedditPost post = this.posts.get(position);
         holder.post = post;

@@ -43,6 +43,7 @@ public class PostActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
 
     private RedditPost post;
+    private View postContent;
 
 
     @Override
@@ -69,7 +70,7 @@ public class PostActivity extends AppCompatActivity {
         this.binding.postInfoContainer.postInfo.setPost(post);
         this.binding.postInfoContainer.postFullBar.setPost(post);
 
-        View postContent = Util.generatePostContent(this.post, this);
+        postContent = Util.generatePostContent(this.post, this);
         if (postContent != null) {
             this.binding.postInfoContainer.content.addView(postContent);
 
@@ -124,6 +125,13 @@ public class PostActivity extends AppCompatActivity {
             this.binding.loadingIcon.decreaseLoadCount();
             t.printStackTrace();
         }));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Util.cleanupPostContent(postContent);
     }
 
     /**
