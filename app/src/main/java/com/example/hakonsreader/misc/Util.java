@@ -12,6 +12,7 @@ import com.example.hakonsreader.views.PostContentText;
 import com.example.hakonsreader.views.PostContentVideo;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Locale;
 
@@ -49,6 +50,34 @@ public class Util {
 
 
     /**
+     * Handles generic errors that are common for all API responses.
+     * <p>Handles too many requests, server, and no internet errors
+     *
+     * <p>Shows a snackbar with error information</p>
+     *
+     * @param parent The view to attach the snackbar to
+     * @param code The code for the request
+     * @param t Throwable from the request
+     * @return True if the error is handled
+     */
+    public static boolean handleGenericResponseErrors(View parent, int code, Throwable t) {
+        boolean handled = false;
+
+        if (t instanceof IOException) {
+            Util.showNoInternetSnackbar(parent);
+            handled = true;
+        } else if (code == 429) {
+            Util.showTooManyRequestsSnackbar(parent);
+            handled = true;
+        } else if (code == 503) {
+            Util.showGenericServerErrorSnackbar(parent);
+            handled = true;
+        }
+
+        return handled;
+    }
+
+    /**
      * Creates and shows a snackbar for generic server errors
      *
      * @param parent The view to attach the snackbar to
@@ -75,6 +104,14 @@ public class Util {
         Snackbar.make(parent, parent.getResources().getString(R.string.errorLoggingIn), Snackbar.LENGTH_SHORT).show();
     }
 
+    /**
+     * Creates and shows a snackbar for errors caused by no internet connection
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showNoInternetSnackbar(View parent) {
+        Snackbar.make(parent, parent.getResources().getString(R.string.noInternetConnection), Snackbar.LENGTH_SHORT).show();
+    }
 
     /**
      * Creates the text for text age text fields

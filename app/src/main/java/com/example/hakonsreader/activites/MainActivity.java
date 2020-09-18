@@ -64,9 +64,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     private OnFailure onTokenFailure = (code, t) -> {
         this.binding.loadingIcon.decreaseLoadCount();
 
-        if (code == 503) {
-            Util.showGenericServerErrorSnackbar(this.binding.parentLayout);
-        }
+        Util.handleGenericResponseErrors(this.binding.parentLayout, code, t);
     };
 
 

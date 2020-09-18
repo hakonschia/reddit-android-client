@@ -138,6 +138,7 @@ public class PostActivity extends AppCompatActivity {
      */
     private void setupCommentsList() {
         this.commentsAdapter = new CommentsAdapter(this.post);
+        this.commentsAdapter.setParentLayout(this.binding.parentLayout);
         this.layoutManager = new LinearLayoutManager(this);
 
         this.binding.comments.setAdapter(this.commentsAdapter);

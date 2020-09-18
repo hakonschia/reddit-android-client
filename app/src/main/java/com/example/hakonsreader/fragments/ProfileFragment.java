@@ -48,9 +48,7 @@ public class ProfileFragment extends Fragment {
         this.updateViews();
     };
     private OnFailure onUserFailure = (code, t) -> {
-        if (code == 503) {
-            Util.showGenericServerErrorSnackbar(this.binding.parentLayout);
-        }
+        Util.handleGenericResponseErrors(this.binding.parentLayout, code, t);
     };
 
 

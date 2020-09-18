@@ -86,9 +86,7 @@ public class SubredditFragment extends Fragment {
     private OnFailure onPostFailure = (code, t) -> {
         this.decreaseLoadingCount();
 
-        if (code == 503) {
-            Util.showGenericServerErrorSnackbar(this.binding.parentLayout);
-        }
+        Util.handleGenericResponseErrors(this.binding.parentLayout, code, t);
     };
 
 
@@ -102,7 +100,6 @@ public class SubredditFragment extends Fragment {
         Bundle args = new Bundle();
 
         args.putString("subreddit", subreddit);
-        Log.d(TAG, "newInstance called");
 
         SubredditFragment fragment = new SubredditFragment();
         fragment.setArguments(args);

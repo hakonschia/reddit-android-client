@@ -33,6 +33,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
     private List<RedditComment> comments = new ArrayList<>();
     private RedditPost post;
+    private View parentLayout;
 
 
     /**
@@ -40,6 +41,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      */
     public CommentsAdapter(RedditPost post) {
         this.post = post;
+    }
+
+    /**
+     * Sets the parent layout this adapter is in
+     *
+     * @param parentLayout The parent layout of the adapter
+     */
+    public void setParentLayout(View parentLayout) {
+        this.parentLayout = parentLayout;
     }
 
     /**
@@ -125,7 +135,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             // Remove the parent comment (this is the "2 more comments" comment)
             this.removeComment(parent);
         }, (code, t) -> {
-
+            Util.handleGenericResponseErrors(this.parentLayout, code, t);
         });
     }
 

@@ -72,12 +72,7 @@ public class VoteBar extends ConstraintLayout {
 
             updateVoteStatus();
         }, (code, t) -> {
-            if (code == 503) {
-                Util.showGenericServerErrorSnackbar(this);
-            } else if (code == 429) {
-                Util.showTooManyRequestsSnackbar(this);
-            }
-            t.printStackTrace();
+            Util.handleGenericResponseErrors(this, code, t);
         });
     }
 
