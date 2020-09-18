@@ -7,7 +7,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.example.hakonsreader.MainActivity;
+import com.danikula.videocache.HttpProxyCacheServer;
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.LayoutPostContentVideoBinding;
@@ -19,8 +20,9 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 
 public class PostContentVideo extends LinearLayout {
     private static final String TAG = "PostContentVideo";
@@ -65,7 +67,7 @@ public class PostContentVideo extends LinearLayout {
 
     private void updateView() {
         // Ensure the video size to screen ratio isn't too large or too small
-        float videoRatio = (float) post.getVideoWidth() / MainActivity.SCREEN_WIDTH;
+        float videoRatio = (float) post.getVideoWidth() / App.getScreenWidth();
         if (videoRatio > MAX_WIDTH_RATIO) {
             videoRatio = MAX_WIDTH_RATIO;
         } else if (videoRatio < MIN_WIDTH_RATIO) {
@@ -73,7 +75,7 @@ public class PostContentVideo extends LinearLayout {
         }
 
         // Calculate and set the new width and height
-        int width = (int)(MainActivity.SCREEN_WIDTH * videoRatio);
+        int width = (int)(App.getScreenWidth() * videoRatio);
 
         // Find how much the width was scaled by and use that to find the new height
         float widthScaledBy = post.getVideoWidth() / (float)width;
@@ -83,10 +85,13 @@ public class PostContentVideo extends LinearLayout {
 
         // Create the player
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        DefaultHttpDataSourceFactory dataSourceFactory = new DefaultHttpDataSourceFactory(NetworkConstants.USER_AGENT);
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getContext(), NetworkConstants.USER_AGENT);
+
+        HttpProxyCacheServer proxy = App.getProxy(getContext());
+        String proxyUrl = proxy.getProxyUrl(post.getVideoUrl());
 
         MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
-                .createMediaSource(Uri.parse(post.getVideoUrl()));
+                .createMediaSource(Uri.parse(proxyUrl));
 
         exoPlayer = new SimpleExoPlayer.Builder(getContext())
                 .setBandwidthMeter(new DefaultBandwidthMeter.Builder(getContext()).build())

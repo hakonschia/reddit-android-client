@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 
 import androidx.annotation.Nullable;
 
-import com.example.hakonsreader.MainActivity;
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -43,7 +43,7 @@ public class PostContentImage extends androidx.appcompat.widget.AppCompatImageVi
                 .load(post.getUrl())
                 .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
                 // Scale so the image fits the width of the screen
-                .resize(MainActivity.SCREEN_WIDTH, 0)
+                .resize(App.getScreenWidth(), 0)
                 .into(this);
 
         // Open image when clicked

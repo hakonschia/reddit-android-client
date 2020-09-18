@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.example.hakonsreader.MainActivity;
+import com.example.hakonsreader.activites.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.model.RedditPost;

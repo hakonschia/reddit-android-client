@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.hakonsreader.MainActivity;
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.constants.NetworkConstants;
 
@@ -37,7 +37,7 @@ public class LogInFragment extends Fragment {
      */
     private void requestOAuth(View view) {
         // Generate a new state to validate when we get a response back
-        String state = MainActivity.generateAndGetOAuthState();
+        String state = App.generateAndGetOAuthState();
 
         String url = String.format(
                 "%s?client_id=%s&response_type=%s&state=%s&redirect_uri=%s&scope=%s&duration=%s",

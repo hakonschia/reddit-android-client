@@ -1,17 +1,17 @@
-package com.example.hakonsreader;
+package com.example.hakonsreader.activites;
 
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.PreferenceManager;
 
+import com.danikula.videocache.HttpProxyCacheServer;
+import com.example.hakonsreader.App;
+import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
@@ -25,14 +25,11 @@ import com.example.hakonsreader.fragments.ProfileFragment;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
-import com.example.hakonsreader.misc.OAuthStateGenerator;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
-
-import okhttp3.logging.HttpLoggingInterceptor;
 
 public class MainActivity extends AppCompatActivity implements ItemLoadingListener {
     private SubredditFragment globalOffensive;
@@ -40,10 +37,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
     private static final String TAG = "MainActivity";
 
-    /**
-     * The width of the screen of the current device
-     */
-    public static int SCREEN_WIDTH;
+    private static HttpProxyCacheServer cacheServer;
 
     private ActivityMainBinding binding;
 
@@ -54,10 +48,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     private SettingsFragment settingsFragment;
 
     // Interface towards the Reddit API
-    private RedditApi redditApi;
-
-    // The random string generated for OAuth authentication
-    private static String OAuthState;
+    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
 
 
     // Handler for token responses. If an access token is given user information is automatically retrieved
@@ -87,22 +78,8 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         this.binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        SCREEN_WIDTH = getScreenWidth();
-
-        SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
-        SharedPreferencesManager.create(prefs);
-
-        this.setupRedditApi();
-
         this.setupNavBar();
         this.setupStartFragment();
-
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        if (settings.getBoolean(SharedPreferencesConstants.NIGHT_MODE, false)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
     }
 
     @Override
@@ -119,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
             String state = uri.getQueryParameter("state");
 
             // Not a match from the state we generated, something weird is happening
-            if (state == null || !state.equals(OAuthState)) {
+            if (state == null || !state.equals(App.getOAuthState())) {
                 Util.showErrorLoggingInSnackbar(this.binding.parentLayout);
                 return;
             }
@@ -154,27 +131,6 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         } else {
             this.binding.loadingIcon.decreaseLoadCount();
         }
-    }
-
-
-    /**
-     * @return The width of the screen in pixels
-     */
-    private int getScreenWidth() {
-        return getResources().getDisplayMetrics().widthPixels;
-    }
-
-    /**
-     * Sets up the reddit API object
-     */
-    private void setupRedditApi() {
-        // Set the previously stored token, and the listener for new tokens
-        this.redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
-        this.redditApi.setToken(TokenManager.getToken());
-        this.redditApi.setOnNewToken(TokenManager::saveToken);
-        this.redditApi.setLoggingLevel(HttpLoggingInterceptor.Level.BODY);
-        this.redditApi.setCallbackURL(NetworkConstants.CALLBACK_URL);
-        this.redditApi.setClientID(NetworkConstants.CLIENT_ID);
     }
 
     /**
@@ -281,12 +237,4 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         SharedPreferencesManager.remove(SharedPreferencesConstants.USER_INFO);
     }
 
-    /**
-     * Generates a new OAuth state that is used for validation
-     *
-     * @return A random string to use in the request for access
-     */
-    public static String generateAndGetOAuthState() {
-        return (OAuthState = OAuthStateGenerator.generate());
-    }
 }

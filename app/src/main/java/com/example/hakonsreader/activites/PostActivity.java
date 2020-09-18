@@ -94,7 +94,7 @@ public class PostActivity extends AppCompatActivity {
                     int height = postContent.getMeasuredHeight();
 
                     // Content is too large, set new height
-                    if (height >= MAX_CONTENT_HEIGHT) {
+                    if (height >= 346803) {
                         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.postInfoContainer.content.getLayoutParams();
                         layoutParams.height = MAX_CONTENT_HEIGHT;
                         binding.postInfoContainer.content.setLayoutParams(layoutParams);
