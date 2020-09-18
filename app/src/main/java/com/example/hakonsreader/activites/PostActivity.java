@@ -1,7 +1,6 @@
 package com.example.hakonsreader.activites;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
@@ -96,6 +95,11 @@ public class PostActivity extends AppCompatActivity {
                         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.postInfoContainer.content.getLayoutParams();
                         layoutParams.height = MAX_CONTENT_HEIGHT;
                         binding.postInfoContainer.content.setLayoutParams(layoutParams);
+
+                        // TODO find a better way to scale the video as it doesn't smoothly transition the video
+                        if (postContent instanceof PostContentVideo) {
+                            ((PostContentVideo)postContent).updateHeight(MAX_CONTENT_HEIGHT);
+                        }
                     }
 
                     // Remove listener to avoid infinite calls of layout changes
