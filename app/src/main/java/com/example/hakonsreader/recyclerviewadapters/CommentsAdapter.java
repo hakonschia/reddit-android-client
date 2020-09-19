@@ -187,6 +187,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
         holder.age.setText("");
         holder.content.setText("");
+        holder.reply.setVisibility(View.GONE);
         holder.voteBar.setVisibility(View.GONE);
     }
 
@@ -218,6 +219,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
         holder.voteBar.setListing(comment);
         holder.voteBar.setVisibility(View.VISIBLE);
+        holder.reply.setVisibility(View.VISIBLE);
 
         // Remove the listener if there is one (from "more comments")
         holder.itemView.setOnClickListener(null);
