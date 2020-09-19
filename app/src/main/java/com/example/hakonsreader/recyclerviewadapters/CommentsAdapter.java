@@ -164,81 +164,36 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         Log.d(TAG, "hideComments: " + Html.fromHtml(start.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
     }
 
-    /**
-     * Sets a holder as a "4 more comments" comment
-     * <p>The only thing shown is the text of "more comments", everything else is hidden away</p>
-     *
-     * @param holder The holder to set for
-     */
-    private void asMoreComments(ViewHolder holder) {
-        RedditComment comment = holder.comment;
-        int extraComments = comment.getExtraCommentsCount();
 
-        String extraCommentsText = holder.itemView.getResources().getQuantityString(
-                R.plurals.extraComments,
-                extraComments,
-                extraComments
-        );
-
-        // Clear everything except the author field which now holds the amount of extra comments
-        holder.author.setText(extraCommentsText);
-        holder.itemView.setOnClickListener(view -> this.getMoreComments(comment));
-        holder.itemView.setOnLongClickListener(null);
-
-        holder.age.setText("");
-        holder.content.setText("");
-        holder.reply.setVisibility(View.GONE);
-        holder.voteBar.setVisibility(View.GONE);
+    @Override
+    public int getItemCount() {
+        return this.comments.size();
     }
 
-    /**
-     * Sets the contents of the the view holder as a standard comment with content, vote bars etc.
-     *
-     * @param holder The holder to set for
-     */
-    private void asNormalComment(ViewHolder holder) {
-        RedditComment comment = holder.comment;
-        Context context = holder.itemView.getContext();
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        RedditComment comment = this.comments.get(position);
 
-        String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
+        // Format holder based on who the user is
+        if (comment.isMod()) {
+            holder.asMod();
+        } else if (post.getAuthor().equals(comment.getAuthor())) {
+            holder.asPoster();
+        } else {
+            holder.asNormal();
+        }
 
-        // Html.fromHtml adds a newline at the end which makes the TextView larger than it should be
-        // TODO it ruins the HTML formatting tho
-        // String contentText = Util.trimTrailingWhitespace(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
-        holder.content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
-        holder.content.setMovementMethod(LinkMovementMethod.getInstance());
+        // TODO remove magic string and create "listing" enum or something
+        if (comment.getKind().equals("more")) {
+            holder.asMoreComments(comment);
+        } else {
+            holder.asNormalComment(comment);
+        }
 
-        holder.author.setText(authorText);
-
-        // Calculate the time since the comment was posted
-        Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
-        Duration between = Duration.between(created, Instant.now());
-        holder.age.setText(Util.createAgeText(context.getResources(), between));
-
-        holder.reply.setOnClickListener(view -> this.replyListener.replyTo(comment));
-
-        holder.voteBar.setListing(comment);
-        holder.voteBar.setVisibility(View.VISIBLE);
-        holder.reply.setVisibility(View.VISIBLE);
-
-        // Remove the listener if there is one (from "more comments")
-        holder.itemView.setOnClickListener(null);
-
-        // Hide comments on long clicks
-        // This has to be set on both the TextView as well as the entire holder since the TextView
-        // has movementMethod set to allow for clickable hyperlinks which makes setting it on only
-        // the holder not work for the TextView
-        holder.content.setOnLongClickListener(view -> {
-            // Not a hyperlink (even long clicking on the hyperlink would open it, so don't collapse as well)
-            if (holder.content.getSelectionStart() == -1 && holder.content.getSelectionEnd() == -1) {
-                this.hideComments(comment);
-            }
-            return true;
-        });
-        holder.itemView.setOnLongClickListener(view -> {
-            this.hideComments(comment);
-            return true;
-        });
+        int paddingStart = comment.getDepth() * (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
+        holder.itemView.setPadding(paddingStart, 0, 0, 0);
+        // Update the layout with new padding
+        holder.itemView.requestLayout();
     }
 
     @NonNull
@@ -253,48 +208,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         return new ViewHolder(view);
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        RedditComment comment = this.comments.get(position);
-        holder.comment = comment;
-
-        Context context = holder.itemView.getContext();
-
-        // Add a box around the text to show it's by a mod or the OP of the post
-        if (comment.isMod()) {
-            holder.author.setBackground(ContextCompat.getDrawable(context, R.drawable.comment_by_mod));
-            holder.author.setTextColor(ContextCompat.getColor(context, R.color.textColor));
-        } else if (post.getAuthor().equals(comment.getAuthor())) {
-            holder.author.setBackground(ContextCompat.getDrawable(context, R.drawable.comment_by_poster));
-            holder.author.setTextColor(ContextCompat.getColor(context, R.color.textColor));
-        } else {
-            holder.author.setBackground(null);
-            holder.author.setTextColor(ContextCompat.getColor(context, R.color.linkColor));
-        }
-
-        // TODO remove magic string and create "listing" enum or something
-        // The comment is a "12 more comments"
-        if (comment.getKind().equals("more")) {
-            this.asMoreComments(holder);
-        } else {
-            this.asNormalComment(holder);
-        }
-
-        int paddingStart = comment.getDepth() * (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
-        holder.itemView.setPadding(paddingStart, 0, 0, 0);
-        // Update the layout with new padding
-        holder.itemView.requestLayout();
-    }
-
-    @Override
-    public int getItemCount() {
-        return this.comments.size();
-    }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private RedditComment comment;
-
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView author;
         private TextView age;
         private TextView content;
@@ -309,6 +225,107 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             this.content = itemView.findViewById(R.id.commentContent);
             this.reply = itemView.findViewById(R.id.reply);
             this.voteBar = itemView.findViewById(R.id.commentVoteBar);
+        }
+
+
+        /**
+         * Formats the comment as a mod comment
+         */
+        private void asMod() {
+            author.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.comment_by_mod));
+            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.textColor));
+        }
+
+        /**
+         * Formats the comment as a comment posted by the OP of the post
+         */
+        private void asPoster() {
+            author.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.comment_by_poster));
+            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.textColor));
+        }
+
+        /**
+         * Formats the comment as a normal comment by a standard user
+         */
+        private void asNormal() {
+            author.setBackground(null);
+            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.linkColor));
+        }
+
+
+        /**
+         * Sets the contents of the the view holder as a standard comment with content, vote bars etc.
+         *
+         * @param comment The comment to use for the holder
+         */
+        private void asNormalComment(RedditComment comment) {
+            Context context = itemView.getContext();
+
+            String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
+
+            // Html.fromHtml adds a newline at the end which makes the TextView larger than it should be
+            // TODO it ruins the HTML formatting tho
+            // String contentText = Util.trimTrailingWhitespace(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
+            content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
+            content.setMovementMethod(LinkMovementMethod.getInstance());
+
+            author.setText(authorText);
+
+            // Calculate the time since the comment was posted
+            Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
+            Duration between = Duration.between(created, Instant.now());
+            age.setText(Util.createAgeText(context.getResources(), between));
+
+            reply.setOnClickListener(view -> replyListener.replyTo(comment));
+            reply.setVisibility(View.VISIBLE);
+
+            voteBar.setListing(comment);
+            voteBar.setVisibility(View.VISIBLE);
+
+            // Remove the listener if there is one (from "more comments")
+            itemView.setOnClickListener(null);
+
+            // Hide comments on long clicks
+            // This has to be set on both the TextView as well as the entire holder since the TextView
+            // has movementMethod set to allow for clickable hyperlinks which makes setting it on only
+            // the holder not work for the TextView
+            content.setOnLongClickListener(view -> {
+                // Not a hyperlink (even long clicking on the hyperlink would open it, so don't collapse as well)
+                if (content.getSelectionStart() == -1 && content.getSelectionEnd() == -1) {
+                    hideComments(comment);
+                }
+                return true;
+            });
+            itemView.setOnLongClickListener(view -> {
+                hideComments(comment);
+                return true;
+            });
+        }
+
+        /**
+         * Sets a holder as a "4 more comments" comment
+         * <p>The only thing shown is the text of "more comments", everything else is hidden away</p>
+         *
+         * @param comment The comment to use for the holder
+         */
+        private void asMoreComments(RedditComment comment) {
+            int extraComments = comment.getExtraCommentsCount();
+
+            String extraCommentsText = itemView.getResources().getQuantityString(
+                    R.plurals.extraComments,
+                    extraComments,
+                    extraComments
+            );
+
+            // Clear everything except the author field which now holds the amount of extra comments
+            author.setText(extraCommentsText);
+            itemView.setOnClickListener(view -> getMoreComments(comment));
+            itemView.setOnLongClickListener(null);
+
+            age.setText("");
+            content.setText("");
+            reply.setVisibility(View.GONE);
+            voteBar.setVisibility(View.GONE);
         }
     }
 }
