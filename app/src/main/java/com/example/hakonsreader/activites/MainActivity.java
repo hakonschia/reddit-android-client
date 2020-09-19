@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
                 case R.id.navSubreddit:
                     // TODO this
                     if (this.globalOffensive == null) {
-                        this.globalOffensive = SubredditFragment.newInstance("GlobalOffensive");
+                        this.globalOffensive = SubredditFragment.newInstance("norge");
                     }
                     selected = this.globalOffensive;
                     break;

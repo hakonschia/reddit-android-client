@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.VoteBar;
 
@@ -35,6 +37,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     private RedditPost post;
     private View parentLayout;
 
+    private OnReplyListener replyListener;
+
 
     /**
      * @param post The post the comment is for
@@ -50,6 +54,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      */
     public void setParentLayout(View parentLayout) {
         this.parentLayout = parentLayout;
+    }
+
+    /**
+     * Sets the listener for what to do when the reply button has been clicked
+     *
+     * @param replyListener The listener to call
+     */
+    public void setOnReplyListener(OnReplyListener replyListener) {
+        this.replyListener = replyListener;
     }
 
     /**
@@ -189,8 +202,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
 
         // Html.fromHtml adds a newline at the end which makes the TextView larger than it should be
-        String contentText = Util.trimTrailingWhitespace(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
-        holder.content.setText(contentText);
+        // TODO it ruins the HTML formatting tho
+        // String contentText = Util.trimTrailingWhitespace(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
+        holder.content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
         holder.content.setMovementMethod(LinkMovementMethod.getInstance());
 
         holder.author.setText(authorText);
@@ -200,12 +214,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         Duration between = Duration.between(created, Instant.now());
         holder.age.setText(Util.createAgeText(context.getResources(), between));
 
+        holder.reply.setOnClickListener(view -> this.replyListener.replyTo(comment));
+
         holder.voteBar.setListing(comment);
         holder.voteBar.setVisibility(View.VISIBLE);
 
         // Remove the listener if there is one (from "more comments")
         holder.itemView.setOnClickListener(null);
-
 
         // Hide comments on long clicks
         // This has to be set on both the TextView as well as the entire holder since the TextView
@@ -281,6 +296,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         private TextView author;
         private TextView age;
         private TextView content;
+        private ImageButton reply;
         private VoteBar voteBar;
 
         public ViewHolder(@NonNull View itemView) {
@@ -289,6 +305,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             this.author = itemView.findViewById(R.id.commentAuthor);
             this.age = itemView.findViewById(R.id.commentAge);
             this.content = itemView.findViewById(R.id.commentContent);
+            this.reply = itemView.findViewById(R.id.reply);
             this.voteBar = itemView.findViewById(R.id.commentVoteBar);
         }
     }

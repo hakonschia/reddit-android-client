@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
@@ -44,47 +45,71 @@
 
         tools:listitem="@layout/list_layout_comment" />
 
-    <!-- Navigation buttons -->
+
+    <!-- Reply, navigation buttons -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
 
-        android:layout_gravity="bottom|end"
+        android:layout_gravity="bottom|end" >
 
-        android:background="@drawable/rounded_square">
-
-        <ImageButton
-            android:id="@+id/goToPreviousTopLevelComment"
+        <!-- Reply button -->
+        <LinearLayout
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/secondaryBackground"
+            android:background="@drawable/rounded_square"
+            android:layout_marginEnd="5dp" >
 
-            android:onClick="goToPreviousTopLevelComment"
-            android:src="@drawable/ic_baseline_arrow_upward_24" />
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_reply_24"
+                android:backgroundTint="@color/secondaryBackground"
+                android:onClick="replyToPost"/>
+        </LinearLayout>
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@color/divider"
 
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp" />
-
-        <ImageButton
-            android:id="@+id/goToNextTopLevelComment"
+        <!-- Navigation buttons -->
+        <LinearLayout
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
 
-            android:backgroundTint="@color/secondaryBackground"
+            android:background="@drawable/rounded_square">
 
-            android:onClick="goToNextTopLevelComment"
-            android:src="@drawable/ic_baseline_arrow_downward_24" />
+            <ImageButton
+                android:id="@+id/goToPreviousTopLevelComment"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/secondaryBackground"
+
+                android:onClick="goToPreviousTopLevelComment"
+                android:src="@drawable/ic_baseline_arrow_upward_24" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/divider"
+
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp" />
+
+            <ImageButton
+                android:id="@+id/goToNextTopLevelComment"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:backgroundTint="@color/secondaryBackground"
+
+                android:onClick="goToNextTopLevelComment"
+                android:src="@drawable/ic_baseline_arrow_downward_24" />
+        </LinearLayout>
+
     </LinearLayout>
+
 
     <com.example.hakonsreader.views.LoadingIcon
         android:id="@+id/loadingIcon"
@@ -96,5 +121,4 @@
         android:indeterminateTint="@color/iconColor"
 
         tools:visibility="visible" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

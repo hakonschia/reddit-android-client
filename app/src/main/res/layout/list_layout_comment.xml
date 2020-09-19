@@ -43,6 +43,19 @@
 
         tools:text="@tools:sample/lorem"/>
 
+    <ImageButton
+        android:id="@+id/reply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginEnd="10dp"
+
+        android:background="?android:selectableItemBackground"
+        android:src="@drawable/ic_baseline_reply_24"
+
+        app:layout_constraintEnd_toStartOf="@+id/commentVoteBar"
+        app:layout_constraintTop_toBottomOf="@+id/commentContent" />
+
     <com.example.hakonsreader.views.VoteBar
         android:id="@+id/commentVoteBar"
         android:layout_width="wrap_content"
@@ -51,7 +64,7 @@
         android:layout_marginEnd="10dp"
 
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/commentContent" />
+        app:layout_constraintTop_toTopOf="@+id/reply" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.example.hakonsreader.activites;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
@@ -114,6 +115,15 @@ public class PostActivity extends AppCompatActivity {
             startPostponedEnterTransition();
         }
 
+        // TODO move stuff here to functions
+
+        this.commentsAdapter.setOnReplyListener(listing -> {
+            Log.d(TAG, "onCreate: replying to " + listing.getAuthor());
+
+            // Open activity or fragment or something to allow reply
+        });
+
+
         this.binding.loadingIcon.increaseLoadCount();
         this.redditApi.getComments(post.getId(), (comments -> {
             this.commentsAdapter.addComments(comments);
@@ -123,7 +133,6 @@ public class PostActivity extends AppCompatActivity {
                 Util.showGenericServerErrorSnackbar(this.binding.parentLayout);
             }
             this.binding.loadingIcon.decreaseLoadCount();
-            t.printStackTrace();
         }));
     }
 
@@ -194,5 +203,13 @@ public class PostActivity extends AppCompatActivity {
         this.binding.comments.stopScroll();
 
         this.layoutManager.scrollToPositionWithOffset(previous, 0);
+    }
+
+    /**
+     * Click listener for the post reply button
+     * @param view Ignored
+     */
+    public void replyToPost(View view) {
+        Log.d(TAG, "replyToPost: Replying to " + post.getTitle());
     }
 }
