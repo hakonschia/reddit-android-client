@@ -56,8 +56,8 @@
         <item quantity="other">%d hours</item>
     </plurals>
     <plurals name="postAgeDays">
-        <item quantity="one">%d hour</item>
-        <item quantity="other">%d hours</item>
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
     </plurals>
 
     <!-- Error messages -->
