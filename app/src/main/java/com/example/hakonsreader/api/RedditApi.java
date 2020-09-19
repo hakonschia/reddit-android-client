@@ -444,6 +444,7 @@ public class RedditApi {
     }
 
 
+    /* ---------------- Comments ---------------- */
     /**
      * Asynchronously retrieves posts from a given subreddit
      * <p>If an access token is set posts are customized for the user</p>
@@ -540,6 +541,53 @@ public class RedditApi {
                     }
                 });
     }
+
+    /**
+     * Submit a new comment. This can either be a comment on a post (top-level comment), a reply,
+     * or a private message.
+     *
+     * <p>Comments to posts and replies requires OAuth scope "submit", and private message requires "privatemessage"</p>
+     *
+     * @param comment The comment to submit
+     * @param thingId The ID of the thing being replied to
+     * @param thing The thing being replied to
+     * @param onResponse Callback for successful responses. Holds the newly created comment
+     * @param onFailure Callback for failed requests
+     */
+    public void postComment(String comment, String thingId, Thing thing, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+        try {
+            this.ensureTokenIsSet();
+        } catch (AccessTokenNotSetException e) {
+            onFailure.onFailure(-1, e);
+            return;
+        }
+
+        String fullname = thing.getValue() + "_" +  thingId;
+
+        this.apiService.postComment(comment, fullname, "json", true, this.accessToken.generateHeaderString())
+                .enqueue(new Callback<RedditComment>() {
+                    @Override
+                    public void onResponse(Call<RedditComment> call, retrofit2.Response<RedditComment> response) {
+                        if (response.isSuccessful()) {
+                            RedditComment body = response.body();
+                            if (body != null) {
+                                onResponse.onResponse(body);
+                            } else {
+                                onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                            }
+                        } else {
+                            onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<RedditComment> call, Throwable t) {
+                        onFailure.onFailure(-1, t);
+                    }
+                });
+    }
+
+
+    /* ---------------- End comments ---------------- */
 
 
     /**
