@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
@@ -118,14 +119,7 @@ public class PostActivity extends AppCompatActivity {
 
         // TODO move stuff here to functions
 
-        this.commentsAdapter.setOnReplyListener(listing -> {
-            Log.d(TAG, "onCreate: replying to " + listing.getAuthor());
-
-            // Open activity or fragment or something to allow reply
-            Intent intent = new Intent(this, ReplyActivity.class);
-            startActivity(intent);
-            overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
-        });
+        this.commentsAdapter.setOnReplyListener(this::replyTo);
 
 
         this.binding.loadingIcon.increaseLoadCount();
@@ -210,10 +204,25 @@ public class PostActivity extends AppCompatActivity {
     }
 
     /**
+     * Replies to a comment or post
+     *
+     * @param listing The listing to reply to
+     */
+    private void replyTo(RedditListing listing) {
+        // Open activity or fragment or something to allow reply
+        Intent intent = new Intent(this, ReplyActivity.class);
+        // TODO add listing data
+
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
+    }
+
+    /**
      * Click listener for the post reply button
      * @param view Ignored
      */
     public void replyToPost(View view) {
         Log.d(TAG, "replyToPost: Replying to " + post.getTitle());
+        this.replyTo(this.post);
     }
 }
