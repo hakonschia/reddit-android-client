@@ -66,4 +66,6 @@
     <string name="errorLoggingIn">Error logging in</string>
     <string name="noInternetConnection">No internet connection</string>
 
+
+    <string name="btnAddComment">Add comment</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.hakonsreader.activites;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -121,6 +122,9 @@ public class PostActivity extends AppCompatActivity {
             Log.d(TAG, "onCreate: replying to " + listing.getAuthor());
 
             // Open activity or fragment or something to allow reply
+            Intent intent = new Intent(this, ReplyActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
         });
 
 

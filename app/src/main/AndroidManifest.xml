@@ -40,6 +40,8 @@
         <activity android:name=".activites.ImageActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
 
+        <activity android:name=".activites.ReplyActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
     </application>
 
 </manifest>
