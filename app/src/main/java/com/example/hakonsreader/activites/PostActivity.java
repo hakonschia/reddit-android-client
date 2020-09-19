@@ -55,9 +55,6 @@ public class PostActivity extends AppCompatActivity {
         setContentView(this.binding.getRoot());
         Slidr.attach(this);
 
-        // Extra information that might hold information about the state of the post
-        Bundle extras = getIntent().getExtras().getBundle("extras");
-
         // Postpone transition until the height of the content is known
         postponeEnterTransition();
 
@@ -68,9 +65,33 @@ public class PostActivity extends AppCompatActivity {
         this.post = new Gson().fromJson(getIntent().getExtras().getString("post"), RedditPost.class);
 
         this.setupCommentsList();
+        this.getComments();
 
         this.binding.postInfoContainer.postInfo.setPost(post);
         this.binding.postInfoContainer.postFullBar.setPost(post);
+
+        this.addPostContent();
+
+        this.commentsAdapter.setOnReplyListener(this::replyTo);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Ensure resources are freed when the activity exits
+        Util.cleanupPostContent(postContent);
+    }
+
+
+    /**
+     * Adds the content to the post
+     *
+     * <p>When the content is added the enter transition is called</p>
+     */
+    private void addPostContent() {
+        // Extra information that might hold information about the state of the post
+        Bundle extras = getIntent().getExtras().getBundle("extras");
 
         postContent = Util.generatePostContent(this.post, this);
         if (postContent != null) {
@@ -116,12 +137,12 @@ public class PostActivity extends AppCompatActivity {
         } else {
             startPostponedEnterTransition();
         }
+    }
 
-        // TODO move stuff here to functions
-
-        this.commentsAdapter.setOnReplyListener(this::replyTo);
-
-
+    /**
+     * Retrieves the comments for the post and adds them to the adapter
+     */
+    private void getComments() {
         this.binding.loadingIcon.increaseLoadCount();
         this.redditApi.getComments(post.getId(), (comments -> {
             this.commentsAdapter.addComments(comments);
@@ -132,14 +153,6 @@ public class PostActivity extends AppCompatActivity {
             }
             this.binding.loadingIcon.decreaseLoadCount();
         }));
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // Ensure resources are freed when the activity exits
-        Util.cleanupPostContent(postContent);
     }
 
     /**
