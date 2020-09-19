@@ -193,14 +193,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         holder.content.setText(contentText);
         holder.content.setMovementMethod(LinkMovementMethod.getInstance());
 
-        // Add a box aronud the text to show it's by the poster
-        if (comment.getAuthor().equals(post.getAuthor())) {
-            holder.author.setBackground(ContextCompat.getDrawable(context, R.drawable.comment_by_poster));
-            holder.author.setTextColor(ContextCompat.getColor(context, R.color.textColor));
-        } else {
-            holder.author.setBackground(null);
-        }
-
         holder.author.setText(authorText);
 
         // Calculate the time since the comment was posted
@@ -249,10 +241,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         RedditComment comment = this.comments.get(position);
         holder.comment = comment;
 
+        Context context = holder.itemView.getContext();
+
+        // Add a box around the text to show it's by a mod or the OP of the post
         if (comment.isMod()) {
-            holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.modTextColor));
+            holder.author.setBackground(ContextCompat.getDrawable(context, R.drawable.comment_by_mod));
+            holder.author.setTextColor(ContextCompat.getColor(context, R.color.textColor));
+        } else if (comment.getAuthor().equals(post.getAuthor())) {
+            holder.author.setBackground(ContextCompat.getDrawable(context, R.drawable.comment_by_poster));
+            holder.author.setTextColor(ContextCompat.getColor(context, R.color.textColor));
         } else {
-            holder.author.setTextColor(holder.itemView.getContext().getColor(R.color.linkColor));
+            holder.author.setBackground(null);
+            holder.author.setTextColor(ContextCompat.getColor(context, R.color.linkColor));
         }
 
         // TODO remove magic string and create "listing" enum or something

@@ -25,6 +25,7 @@
     <color name="iconColor">#3A3A3A</color>
 
     <color name="commentByPosterBackground">#2196F3</color>
+    <color name="commentByModBackground">#00C130</color>
 
     <color name="imageVideoActivityBackground">#CCFFFFFF</color>
 </resources>
