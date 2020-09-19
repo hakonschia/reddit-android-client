@@ -147,6 +147,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     private void hideComments(RedditComment start) {
         Log.d(TAG, "hideComments: Hiding comments from author " + start.getAuthor());
         // TODO the start comment should still show something as to signify there is a collapsed comment
+
+        Log.d(TAG, "hideComments: " + Html.fromHtml(start.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
     }
 
     /**
@@ -186,7 +188,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
         String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
 
-        holder.content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
+        // Html.fromHtml adds a newline at the end which makes the TextView larger than it should be
+        String contentText = Util.trimTrailingWhitespace(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
+        holder.content.setText(contentText);
         holder.content.setMovementMethod(LinkMovementMethod.getInstance());
 
         // Add a box aronud the text to show it's by the poster
