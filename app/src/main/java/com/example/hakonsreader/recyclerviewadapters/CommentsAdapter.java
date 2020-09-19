@@ -247,7 +247,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         if (comment.isMod()) {
             holder.author.setBackground(ContextCompat.getDrawable(context, R.drawable.comment_by_mod));
             holder.author.setTextColor(ContextCompat.getColor(context, R.color.textColor));
-        } else if (comment.getAuthor().equals(post.getAuthor())) {
+        } else if (post.getAuthor().equals(comment.getAuthor())) {
             holder.author.setBackground(ContextCompat.getDrawable(context, R.drawable.comment_by_poster));
             holder.author.setTextColor(ContextCompat.getColor(context, R.color.textColor));
         } else {
