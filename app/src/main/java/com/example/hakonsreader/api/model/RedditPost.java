@@ -194,6 +194,10 @@ public class RedditPost implements RedditListing {
         return this.data.spoiler;
     }
 
+    public boolean isNsfw() {
+        return this.data.nsfw;
+    }
+
     public boolean isVideo() {
         return this.data.isVideo;
     }

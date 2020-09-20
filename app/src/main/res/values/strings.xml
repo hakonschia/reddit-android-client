@@ -68,4 +68,7 @@
 
 
     <string name="btnAddComment">Add comment</string>
+
+    <string name="tagNSFW">NSFW</string>
+    <string name="tagSpoiler">Spoiler</string>
 </resources>

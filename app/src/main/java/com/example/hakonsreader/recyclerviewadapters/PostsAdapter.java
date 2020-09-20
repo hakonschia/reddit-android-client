@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,8 @@ import com.example.hakonsreader.views.PostInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 
 /**
@@ -120,12 +123,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // Free up any resources that might not be garbage collected automatically
         View v = holder.content.getChildAt(0);
         Util.cleanupPostContent(v);
+        holder.tags.removeAllViews();
 
         final RedditPost post = this.posts.get(position);
         holder.post = post;
 
         holder.postInfo.setPost(post);
         holder.fullPostBar.setPost(post);
+
+        LayoutInflater inflater = (LayoutInflater) holder.itemView.getContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+        if (post.isSpoiler()) {
+            View view = inflater.inflate(R.layout.tag_spoiler, holder.tags, false);
+            holder.tags.addView(view);
+        }
+        if (post.isNsfw()) {
+            View view = inflater.inflate(R.layout.tag_nsfw, holder.tags, false);
+            holder.tags.addView(view);
+        }
 
         // Update to set the initial vote status
         holder.setPostContent();
@@ -139,6 +153,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private RedditPost post;
 
         private PostInfo postInfo;
+        private LinearLayout tags;
         private FullPostBar fullPostBar;
 
         private FrameLayout content;
@@ -150,6 +165,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             this.itemView = itemView;
 
             this.postInfo = itemView.findViewById(R.id.postInfo);
+            this.tags = itemView.findViewById(R.id.tags);
             this.fullPostBar = itemView.findViewById(R.id.postFullBar);
 
             this.content = itemView.findViewById(R.id.content);

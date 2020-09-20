@@ -54,6 +54,14 @@
 
         tools:text="2h" />
 
+    <LinearLayout
+        android:id="@+id/tags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/subreddit"
+        app:layout_constraintTop_toBottomOf="@+id/subreddit"
+        android:orientation="horizontal" />
+
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
@@ -64,8 +72,8 @@
         android:textColor="@color/textColor"
         android:textSize="17sp"
 
-        app:layout_constraintStart_toStartOf="@+id/subreddit"
-        app:layout_constraintTop_toBottomOf="@+id/subreddit"
+        app:layout_constraintStart_toStartOf="@+id/tags"
+        app:layout_constraintTop_toBottomOf="@+id/tags"
         tools:text="FaZe wins major /s. To show how this layout looks for long titles I am adding a bunch of random text here" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

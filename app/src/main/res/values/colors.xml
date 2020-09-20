@@ -28,4 +28,9 @@
     <color name="commentByModBackground">#00C130</color>
 
     <color name="imageVideoActivityBackground">#CCFFFFFF</color>
+
+    <color name="tagNSFW">#FF2B2B</color>
+    <color name="tagSpoiler">#595959</color>
+    <color name="tagNSFWText">#FFFFFF</color>
+    <color name="tagSpoilerText">#FFFFFF</color>
 </resources>
