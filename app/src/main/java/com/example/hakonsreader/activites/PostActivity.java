@@ -21,6 +21,7 @@ import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.views.PostContentLink;
+import com.example.hakonsreader.views.PostContentText;
 import com.example.hakonsreader.views.PostContentVideo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
@@ -143,7 +144,7 @@ public class PostActivity extends AppCompatActivity {
             this.binding.postInfoContainer.content.addView(postContent);
 
             // Align link post to start of parent
-            if (postContent instanceof PostContentLink) {
+            if (postContent instanceof PostContentLink || postContent instanceof PostContentText) {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.binding.postInfoContainer.content.getLayoutParams();
                 params.addRule(RelativeLayout.ALIGN_PARENT_START);
 
