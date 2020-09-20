@@ -7,12 +7,14 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.RedditListing;
+import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
@@ -30,11 +32,32 @@ public class PostActivity extends AppCompatActivity {
     private static final String TAG = "PostActivity";
 
     /**
+     * The key used for sending the post data to this activity
+     */
+    public static final String POST = "post";
+
+    /**
+     * They key used to tell what kind of listing something is
+     */
+    public static final String KIND = "kind";
+
+    /**
+     * The key used in intent extras for listings
+     */
+    public static final String LISTING = "listing";
+
+    /**
+     * Request code for opening a reply activity
+     */
+    public static final int REQUEST_REPLY = 1;
+
+
+    /**
      * The max height the content of the post can have (the image, video etc.)
      *
      * <p>Set during initialization</p>
      */
-    private static int MAX_CONTENT_HEIGHT = -1;
+    private static int maxContentHeight = -1;
 
 
     private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
@@ -45,6 +68,7 @@ public class PostActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
 
     private RedditPost post;
+    private RedditListing replyingTo;
     private View postContent;
 
 
@@ -58,11 +82,11 @@ public class PostActivity extends AppCompatActivity {
         // Postpone transition until the height of the content is known
         postponeEnterTransition();
 
-        if (MAX_CONTENT_HEIGHT == -1) {
-            MAX_CONTENT_HEIGHT = (int) getResources().getDimension(R.dimen.postContentMaxHeight);
+        if (maxContentHeight == -1) {
+            maxContentHeight = (int) getResources().getDimension(R.dimen.postContentMaxHeight);
         }
 
-        this.post = new Gson().fromJson(getIntent().getExtras().getString("post"), RedditPost.class);
+        this.post = new Gson().fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
 
         this.setupCommentsList();
         this.getComments();
@@ -73,6 +97,27 @@ public class PostActivity extends AppCompatActivity {
         this.addPostContent();
 
         this.commentsAdapter.setOnReplyListener(this::replyTo);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_REPLY) {
+                if (data != null) {
+                    RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING), RedditComment.class);
+
+                    // Adding a top-level comment
+                    if (this.replyingTo instanceof RedditPost) {
+                        this.commentsAdapter.addComment(newComment);
+                    } else {
+                        // Replying to a comment
+                        this.commentsAdapter.addComment(newComment, (RedditComment)this.replyingTo);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -115,14 +160,14 @@ public class PostActivity extends AppCompatActivity {
                     int height = postContent.getMeasuredHeight();
 
                     // Content is too large, set new height
-                    if (height >= MAX_CONTENT_HEIGHT) {
+                    if (height >= maxContentHeight) {
                         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.postInfoContainer.content.getLayoutParams();
-                        layoutParams.height = MAX_CONTENT_HEIGHT;
+                        layoutParams.height = maxContentHeight;
                         binding.postInfoContainer.content.setLayoutParams(layoutParams);
 
                         // TODO find a better way to scale the video as it doesn't smoothly transition the video
                         if (postContent instanceof PostContentVideo) {
-                            ((PostContentVideo)postContent).updateHeight(MAX_CONTENT_HEIGHT);
+                            ((PostContentVideo)postContent).updateHeight(maxContentHeight);
                         }
                     }
 
@@ -222,11 +267,14 @@ public class PostActivity extends AppCompatActivity {
      * @param listing The listing to reply to
      */
     private void replyTo(RedditListing listing) {
+        this.replyingTo = listing;
+
         // Open activity or fragment or something to allow reply
         Intent intent = new Intent(this, ReplyActivity.class);
-        // TODO add listing data
+        intent.putExtra(KIND, listing.getKind());
+        intent.putExtra(LISTING, new Gson().toJson(listing));
 
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_REPLY);
         overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
     }
 

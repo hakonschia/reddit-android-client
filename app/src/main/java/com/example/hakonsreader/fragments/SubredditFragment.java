@@ -123,7 +123,7 @@ public class SubredditFragment extends Fragment {
      */
     private void openPost(PostsAdapter.ViewHolder view) {
         Intent intent = new Intent(requireActivity(), PostActivity.class);
-        intent.putExtra("post", new Gson().toJson(view.getPost()));
+        intent.putExtra(PostActivity.POST, new Gson().toJson(view.getPost()));
 
         Bundle extras = view.getExtraPostInfo();
         intent.putExtra("extras", extras);

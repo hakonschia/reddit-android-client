@@ -66,6 +66,29 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     }
 
     /**
+     * Adds a new top level comment
+     *
+     * @param newComment The comment to add
+     */
+    public void addComment(RedditComment newComment) {
+        this.comments.add(newComment);
+        notifyItemInserted(this.comments.size() - 1);
+    }
+
+    /**
+     * Adds a new comment as a reply to {@code parent}
+     *
+     * @param newComment The comment to add
+     * @param parent The parent comment being replied to
+     */
+    public void addComment(RedditComment newComment, RedditComment parent) {
+        int pos = this.comments.indexOf(parent);
+
+        this.comments.add(pos + 1, newComment);
+        notifyItemInserted(pos + 1);
+    }
+
+    /**
      * Appends comments to the current list of comments
      *
      * @param comments The comments to add
@@ -276,6 +299,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             Duration between = Duration.between(created, Instant.now());
             age.setText(Util.createAgeText(context.getResources(), between));
 
+            // TODO if comment is locked replies shouldn't be accessible
             reply.setOnClickListener(view -> replyListener.replyTo(comment));
             reply.setVisibility(View.VISIBLE);
 

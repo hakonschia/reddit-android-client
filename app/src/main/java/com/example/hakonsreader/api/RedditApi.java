@@ -12,6 +12,7 @@ import com.example.hakonsreader.api.exceptions.AccessTokenNotSetException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
+import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -549,12 +550,11 @@ public class RedditApi {
      * <p>Comments to posts and replies requires OAuth scope "submit", and private message requires "privatemessage"</p>
      *
      * @param comment The comment to submit
-     * @param thingId The ID of the thing being replied to
      * @param thing The thing being replied to
      * @param onResponse Callback for successful responses. Holds the newly created comment
      * @param onFailure Callback for failed requests
      */
-    public void postComment(String comment, String thingId, Thing thing, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+    public void postComment(String comment, RedditListing thing, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
         try {
             this.ensureTokenIsSet();
         } catch (AccessTokenNotSetException e) {
@@ -562,16 +562,26 @@ public class RedditApi {
             return;
         }
 
-        String fullname = thing.getValue() + "_" +  thingId;
+        String fullname = thing.getKind() + "_" + thing.getId();
 
-        this.apiService.postComment(comment, fullname, "json", true, this.accessToken.generateHeaderString())
-                .enqueue(new Callback<RedditComment>() {
+        // The depth of the new comment
+        int depth = 0;
+        if (thing instanceof RedditComment) {
+            // Set depth to the comment being replied to
+            depth = ((RedditComment)thing).getDepth() + 1;
+        }
+
+        int finalDepth = depth;
+        this.apiService.postComment(comment, fullname, "json", false, this.accessToken.generateHeaderString())
+                .enqueue(new Callback<MoreCommentsResponse>() {
                     @Override
-                    public void onResponse(Call<RedditComment> call, retrofit2.Response<RedditComment> response) {
+                    public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {
                         if (response.isSuccessful()) {
-                            RedditComment body = response.body();
+                            MoreCommentsResponse body = response.body();
                             if (body != null) {
-                                onResponse.onResponse(body);
+                                RedditComment newComment = body.getComments().get(0);
+                                newComment.setDepth(finalDepth);
+                                onResponse.onResponse(newComment);
                             } else {
                                 onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
                             }
@@ -580,7 +590,7 @@ public class RedditApi {
                         }
                     }
                     @Override
-                    public void onFailure(Call<RedditComment> call, Throwable t) {
+                    public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
                         onFailure.onFailure(-1, t);
                     }
                 });
@@ -649,6 +659,8 @@ public class RedditApi {
             return new Pair<> ((api ? REDDIT_API_URL : REDDIT_URL), "");
         }
     }
+
+
 
     /**
      * Authenticator that automatically retrieves a new access token on 401 responses

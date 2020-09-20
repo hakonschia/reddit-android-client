@@ -14,10 +14,7 @@ public abstract class ListingData {
     private String subreddit;
 
     // The ID of the post
-    private String id;
-
-    // The title of the post
-    private String title;
+    String id;
 
     // The author of the psot
     private String author;
@@ -50,10 +47,6 @@ public abstract class ListingData {
 
     public String getId() {
         return id;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     public String getAuthor() {

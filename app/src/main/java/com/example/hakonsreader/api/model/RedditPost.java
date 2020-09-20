@@ -16,10 +16,20 @@ public class RedditPost implements RedditListing {
     private String kind;
     public Data data;
 
+    public void setId(String id) {
+        this.data.id = id;
+    }
+    public RedditPost() {
+        this.data = new Data();
+    }
+
     public static class Data extends ListingData {
+
+        protected String title;
 
         // The URL of the post. For images it links to the picture, for link posts it's the link
         protected String url;
+
 
         // The amount of comments the post has
         @SerializedName("num_comments")
@@ -89,11 +99,6 @@ public class RedditPost implements RedditListing {
     @Override
     public String getId() {
         return this.data.getId();
-    }
-
-    @Override
-    public String getTitle() {
-        return this.data.getTitle();
     }
 
     @Override
@@ -173,6 +178,9 @@ public class RedditPost implements RedditListing {
     /* --------------------- End inherited from ListingData --------------------- */
 
 
+    public String getTitle() {
+        return this.data.title;
+    }
 
     public String getThumbnail() {
         return this.data.thumbnail;

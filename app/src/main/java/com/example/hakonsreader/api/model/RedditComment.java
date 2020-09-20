@@ -69,11 +69,6 @@ public class RedditComment implements RedditListing {
     }
 
     @Override
-    public String getTitle() {
-        return this.data.getTitle();
-    }
-
-    @Override
     public String getAuthor() {
         return this.data.getAuthor();
     }
@@ -178,6 +173,18 @@ public class RedditComment implements RedditListing {
      */
     public int getDepth() {
         return this.data.depth;
+    }
+
+    /**
+     * Sets the depth of the comment
+     *
+     * <p>This should only be used when a new comment is created as the depth isn't given
+     * by Reddit automatically</p>
+     *
+     * @param depth The depth of the comment
+     */
+    public void setDepth(int depth) {
+        this.data.depth = depth;
     }
 
 

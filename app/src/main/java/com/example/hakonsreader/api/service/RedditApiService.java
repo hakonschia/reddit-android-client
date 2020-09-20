@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
@@ -120,14 +119,13 @@ public interface RedditApiService {
      * @param comment The raw markdown of the comment
      * @param parentId The fullname of the thing being replied to
      * @param apiType The string "json"
-     * @param returnJson The boolean value "true". Must be set to true, otherwise the response will be
-     *                   {@link RedditCommentsResponse} instead of {@link RedditComment}
+     * @param returnJson The boolean value "false". MUST be set to false
      * @param accessToken The type of token + the actual token. Form: "type token".
      * @return A call that holds the newly created comment
      */
     @POST(COMMENT)
     @FormUrlEncoded
-    Call<RedditComment> postComment(
+    Call<MoreCommentsResponse> postComment(
             @Field("text") String comment,
             @Field("thing_id") String parentId,
             @Field("api_type") String apiType,

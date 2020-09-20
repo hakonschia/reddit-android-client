@@ -13,8 +13,6 @@ public interface RedditListing {
 
     String getId();
 
-    String getTitle();
-
     String getAuthor();
 
     int getScore();
