@@ -2,7 +2,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
 import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,7 @@ import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.interfaces.OnReplyListener;
+import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.VoteBar;
 
@@ -290,7 +290,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             // TODO it ruins the HTML formatting tho
             // String contentText = Util.trimTrailingWhitespace(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
             content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
-            content.setMovementMethod(LinkMovementMethod.getInstance());
+            content.setMovementMethod(InternalLinkMovementMethod.getSubredditAndUserInstance(itemView.getContext()));
 
             author.setText(authorText);
 

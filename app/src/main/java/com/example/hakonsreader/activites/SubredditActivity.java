@@ -1,5 +1,6 @@
 package com.example.hakonsreader.activites;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -15,7 +16,8 @@ import com.r0adkll.slidr.Slidr;
  * Activity for a subreddit (used when a subreddit is clicked from a post)
  */
 public class SubredditActivity extends AppCompatActivity implements ItemLoadingListener {
-
+    private static final String TAG = "SubredditActivity";
+    
     private LoadingIcon loadingIcon;
 
     @Override
@@ -25,8 +27,19 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
 
         this.loadingIcon = findViewById(R.id.loadingIcon);
 
+        String subreddit;
+        
         Bundle data = getIntent().getExtras();
-        String subreddit = data.getString("subreddit");
+        // Activity started from URL intent
+        if (data == null) {
+            Uri uri = getIntent().getData();
+
+            // First path segment is "/r/", second is the subreddit
+            subreddit = uri.getPathSegments().get(1);
+        } else {
+            // Activity started from manual intent in app
+            subreddit = data.getString("subreddit");
+        }
 
         SubredditFragment fragment = SubredditFragment.newInstance(subreddit);
         fragment.setLoadingListener(this);

@@ -32,7 +32,21 @@
         </activity>
 
         <activity android:name=".activites.SubredditActivity"
-            android:theme="@style/AppTheme.SlidrActivityTheme" />
+            android:theme="@style/AppTheme.SlidrActivityTheme">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.reddit.com"
+                    android:pathPrefix="/r/"/>
+            </intent-filter>
+
+        </activity>
 
         <activity android:name=".activites.PostActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
