@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Base data that is common for all listings
  */
-public abstract class ListingData {
+abstract class ListingData {
 
     // Which subreddit the post is in
     private String subreddit;

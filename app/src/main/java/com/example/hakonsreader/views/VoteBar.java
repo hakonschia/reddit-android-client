@@ -10,10 +10,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
-import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.LayoutVoteBarBinding;
 import com.example.hakonsreader.misc.Util;
@@ -65,15 +63,10 @@ public class VoteBar extends ConstraintLayout {
 
         VoteType finalVoteType = voteType;
 
-        Thing thing = (listing instanceof RedditPost ? Thing.POST : Thing.COMMENT);
-
-        this.redditApi.vote(listing.getId(), voteType, thing, (resp) -> {
+        this.redditApi.vote(listing, voteType, (resp) -> {
             listing.setVoteType(finalVoteType);
-
             updateVoteStatus();
-        }, (code, t) -> {
-            Util.handleGenericResponseErrors(this, code, t);
-        });
+        }, (code, t) -> Util.handleGenericResponseErrors(this, code, t));
     }
 
 

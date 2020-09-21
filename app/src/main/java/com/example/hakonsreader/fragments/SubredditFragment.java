@@ -171,7 +171,7 @@ public class SubredditFragment extends Fragment {
         this.lastLoadAttemptCount = postsSize;
 
         this.increaseLoadingCount();
-        this.redditApi.getSubredditPosts(this.subreddit, after, postsSize, this.onPostResponse, this.onPostFailure);
+        this.redditApi.getPosts(this.subreddit, after, postsSize, this.onPostResponse, this.onPostFailure);
     }
 
     /**

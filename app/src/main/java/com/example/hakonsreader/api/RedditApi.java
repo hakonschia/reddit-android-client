@@ -1,8 +1,5 @@
 package com.example.hakonsreader.api;
 
-import android.util.Base64;
-
-import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
 import com.example.hakonsreader.api.constants.OAuthConstants;
@@ -25,6 +22,7 @@ import com.example.hakonsreader.api.service.RedditOAuthService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -49,24 +47,34 @@ public class RedditApi {
      */
     private static final int RAW_JSON = 1;
 
+    /**
+     * The API type needed in certain requests (always hardcoded to "json")
+     */
+    private static final String API_TYPE = "json";
 
+
+    /**
+     * Default Reddit URL
+     */
     public static final String REDDIT_URL = "https://reddit.com/";
 
     /**
-     *
      * The standard Reddit API URL.
+     *
      * <p>Do not use this for calls that should be authenticated with OAuth, see {@link RedditApi#REDDIT_OUATH_API_URL}</p>
      */
     public static final String REDDIT_API_URL = "https://www.reddit.com/api/";
 
     /**
      * The OAuth subdomain URL for Reddit.
+     *
      * <p>This is used to retrieve posts from reddit</p>
      */
     public static final String REDDIT_OUATH_URL = "https://oauth.reddit.com/";
 
     /**
      * The Reddit API URL used when authenticated with OAuth.
+     *
      * <p>This is used when making calls on behalf of a user with their access token</p>
      */
     public static final String REDDIT_OUATH_API_URL = REDDIT_OUATH_URL + "api/";
@@ -158,20 +166,22 @@ public class RedditApi {
         this.apiService = retrofit.create(RedditApiService.class);
 
         // Create the service object for OAuth related calls
-        Retrofit oauthRetrofit = new Retrofit.Builder()
+        Retrofit OAuthRetrofit = new Retrofit.Builder()
                 .baseUrl(REDDIT_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
-        this.OAuthService = oauthRetrofit.create(RedditOAuthService.class);
+        this.OAuthService = OAuthRetrofit.create(RedditOAuthService.class);
     }
 
 
     /**
-     * Retrieves the singleton instance of the API. Use relevant setters when getting the instance
-     * for the first time
+     * Retrieves the singleton instance of the API.
      *
-     * @param userAgent The user agent for the application.
+     * <p>Use relevant setters when getting the instance for the first time</p>
+     * <p>Setters</p>
+     *
+     * @param userAgent The user agent for the application. This cannot be changed after the instance is created
      *                  <p>See <a href="https://github.com/reddit-archive/reddit/wiki/API">Reddit documentation</a>
      *                  on creating your user agent</p>
      *
@@ -235,7 +245,7 @@ public class RedditApi {
 
         // Create the header value now as it is unnecessary to re-create it for every call
         // The username:password is the client ID + client secret (for installed apps there is no secret)
-        this.basicAuthHeader = "Basic " + Base64.encodeToString((clientID + ":").getBytes(), Base64.NO_WRAP);
+        this.basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((clientID + ":").getBytes());
     }
 
 
@@ -252,7 +262,7 @@ public class RedditApi {
     @EverythingIsNonNull
     public void getAccessToken(String code, OnResponse<AccessToken> onResponse, OnFailure onFailure) {
         if (this.callbackURL == null) {
-            onFailure.onFailure(-1, new Throwable("Callback URL is not set. Use RedditApi.setCallbackUrl()"));
+            onFailure.onFailure(-1, new Throwable("Callback URL is not set. Use RedditApi.setCallbackURL()"));
             return;
         }
         
@@ -367,30 +377,31 @@ public class RedditApi {
     public void getUserInfo(OnResponse<User> onResponse, OnFailure onFailure) {
         try {
             this.ensureTokenIsSet();
-
-            this.apiService.getUserInfo(this.accessToken.generateHeaderString())
-                    .enqueue(new Callback<User>() {
-                        @Override
-                        public void onResponse(Call<User> call, retrofit2.Response<User> response) {
-                            if (response.isSuccessful()) {
-                                User body = response.body();
-                                if (body != null) {
-                                    onResponse.onResponse(body);
-                                } else {
-                                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                                }
-                            } else {
-                                onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                            }
-                        }
-                        @Override
-                        public void onFailure(Call<User> call, Throwable t) {
-                            onFailure.onFailure(-1, t);
-                        }
-                    });
         } catch (AccessTokenNotSetException e) {
             onFailure.onFailure(-1, new AccessTokenNotSetException("Can't get user information without access token", e));
+            return;
         }
+
+
+        this.apiService.getUserInfo(this.accessToken.generateHeaderString()).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+                User body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    onResponse.onResponse(body);
+                } else {
+                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                }
+            }
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
     }
 
 
@@ -400,13 +411,12 @@ public class RedditApi {
      *
      * @param subreddit The subreddit to retrieve posts from. For front page use an empty string
      * @param after The ID of the last post seen (or an empty string if first time loading)
-     * @param count The amount of posts already retrieved
-     *
+     * @param count The amount of posts already retrieved (0 if first time loading)
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
      * @param onFailure The callback for failed requests
      */
     @EverythingIsNonNull
-    public void getSubredditPosts(String subreddit, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
+    public void getPosts(String subreddit, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
         Pair<String, String> urlAndToken = this.getCorrectApiUrl(false);
         String url = urlAndToken.first;
         String tokenString = urlAndToken.second;
@@ -420,19 +430,23 @@ public class RedditApi {
         // so add it anyways
         url += ".json";
 
-        this.apiService.getPosts(url, after, count, RAW_JSON, tokenString).enqueue(new Callback<RedditPostsResponse>() {
+        this.apiService.getPosts(
+                url,
+                after,
+                count,
+                RAW_JSON,
+                tokenString
+        ).enqueue(new Callback<RedditPostsResponse>() {
             @Override
             public void onResponse(Call<RedditPostsResponse> call, retrofit2.Response<RedditPostsResponse> response) {
+                RedditPostsResponse body = null;
                 if (response.isSuccessful()) {
-                    RedditPostsResponse body = response.body();
+                    body = response.body();
+                }
 
-                    if (body != null) {
-                        List<RedditPost> posts = body.getPosts();
-
-                        onResponse.onResponse(posts);
-                    } else {
-                        onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                    }
+                if (body != null) {
+                    List<RedditPost> posts = body.getPosts();
+                    onResponse.onResponse(posts);
                 } else {
                     onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
                 }
@@ -450,7 +464,7 @@ public class RedditApi {
      * Asynchronously retrieves posts from a given subreddit
      * <p>If an access token is set posts are customized for the user</p>
      *
-     * @param postID The post ID to retrieve comments from
+     * @param postID The ID of the post to retrieve comments for
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onFailure The callback for failed requests
      */
@@ -464,27 +478,31 @@ public class RedditApi {
         // so add it anyways
         url += "comments/" + postID + ".json";
 
-        this.apiService.getComments(url, "all", RAW_JSON, tokenString).enqueue(new Callback<List<RedditCommentsResponse>>() {
+        this.apiService.getComments(
+                url,
+                "all",
+                RAW_JSON,
+                tokenString
+        ).enqueue(new Callback<List<RedditCommentsResponse>>() {
             @Override
             public void onResponse(Call<List<RedditCommentsResponse>> call, retrofit2.Response<List<RedditCommentsResponse>> response) {
+                List<RedditCommentsResponse> body = null;
                 if (response.isSuccessful()) {
-                    List<RedditCommentsResponse> body = response.body();
+                    body = response.body();
+                }
 
-                    if (body != null) {
-                        // For comments the first listing object is the post itself and the second its comments
-                        List<RedditComment> topLevelComments = body.get(1).getComments();
+                if (body != null) {
+                    // For comments the first listing object is the post itself and the second its comments
+                    List<RedditComment> topLevelComments = body.get(1).getComments();
 
-                        List<RedditComment> allComments = new ArrayList<>();
-                        topLevelComments.forEach(comment -> {
-                            // Add the comment itself and all its replies
-                            allComments.add(comment);
-                            allComments.addAll(comment.getReplies());
-                        });
+                    List<RedditComment> allComments = new ArrayList<>();
+                    topLevelComments.forEach(comment -> {
+                        // Add the comment itself and all its replies
+                        allComments.add(comment);
+                        allComments.addAll(comment.getReplies());
+                    });
 
-                        onResponse.onResponse(allComments);
-                    } else {
-                        onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                    }
+                    onResponse.onResponse(allComments);
                 } else {
                     onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
                 }
@@ -498,19 +516,20 @@ public class RedditApi {
 
     /**
      * Retrieves comments initially hidden (from "2 more comments" comments)
+     * <p>If an access token is set posts are customized for the user</p>
      *
-     * @param postId The ID of the post the comments are in
-     * @param children The list of IDs of comments to get
+     * @param postID The ID of the post to retrieve comments for
+     * @param children The list of IDs of comments to get (retrieved via {@link RedditComment#getChildren()})
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onFailure The callback for failed requests
      */
-    public void getMoreComments(String postId, List<String> children, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
+    public void getMoreComments(String postID, List<String> children, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
         Pair<String, String> urlAndToken = this.getCorrectApiUrl(true);
-        String url = urlAndToken.first;
         String tokenString = urlAndToken.second;
 
-        String postFullname = Thing.POST.getValue() + "_" + postId;
+        String postFullname = Thing.POST.getValue() + "_" + postID;
 
+        // The query parameter for the children is a list of comma separated IDs
         StringBuilder childrenBuilder = new StringBuilder();
         for (int i = 0; i < children.size(); i++) {
             childrenBuilder.append(children.get(i));
@@ -520,27 +539,32 @@ public class RedditApi {
             }
         }
 
-        this.apiService.getMoreComments("json", childrenBuilder.toString(), postFullname, RAW_JSON, tokenString)
-                .enqueue(new Callback<MoreCommentsResponse>() {
-                    @Override
-                    public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {
-                        if (response.isSuccessful()) {
-                            MoreCommentsResponse body = response.body();
-                            if (body != null) {
-                                onResponse.onResponse(body.getComments());
-                            } else {
-                                onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                            }
-                        } else {
-                            onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                        }
-                    }
+        this.apiService.getMoreComments(
+                childrenBuilder.toString(),
+                postFullname,
+                API_TYPE,
+                RAW_JSON,
+                tokenString
+        ).enqueue(new Callback<MoreCommentsResponse>() {
+            @Override
+            public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {
+                MoreCommentsResponse body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
 
-                    @Override
-                    public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
-                        onFailure.onFailure(-1, t);
-                    }
-                });
+                if (body != null) {
+                    onResponse.onResponse(body.getComments());
+                } else {
+                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
     }
 
     /**
@@ -572,72 +596,79 @@ public class RedditApi {
         }
 
         int finalDepth = depth;
-        this.apiService.postComment(comment, fullname, "json", false, this.accessToken.generateHeaderString())
-                .enqueue(new Callback<MoreCommentsResponse>() {
-                    @Override
-                    public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {
-                        if (response.isSuccessful()) {
-                            MoreCommentsResponse body = response.body();
-                            if (body != null) {
-                                RedditComment newComment = body.getComments().get(0);
-                                newComment.setDepth(finalDepth);
-                                onResponse.onResponse(newComment);
-                            } else {
-                                onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                            }
-                        } else {
-                            onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                        }
-                    }
-                    @Override
-                    public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
-                        onFailure.onFailure(-1, t);
-                    }
-                });
+        this.apiService.postComment(
+                comment,
+                fullname, API_TYPE,
+                false,
+                this.accessToken.generateHeaderString()
+        ).enqueue(new Callback<MoreCommentsResponse>() {
+            @Override
+            public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {
+                MoreCommentsResponse body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    RedditComment newComment = body.getComments().get(0);
+                    newComment.setDepth(finalDepth);
+                    onResponse.onResponse(newComment);
+                } else {
+                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                }
+            }
+            @Override
+            public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
     }
-
-
     /* ---------------- End comments ---------------- */
 
 
     /**
-     * Send an asynchronous request to cast a vote on a thing (post or comment)
+     * Cast a vote on a listing
      *
      * <p>Requires an access token to be set</p>
      *
-     * @param thingId The ID of the thing
+     * @param thing The thing to cast a vote on
      * @param type The type of vote to cast
-     * @param thing What kind of thing the vote is for (post or comment)
-     * @param onResponse The callback for successful requests. Doesn't return anything but is called if successful
+     * @param onResponse The callback for successful requests. The value returned will always be null
+     *                   as this request does not return any data
      * @param onFailure The callback for failed requests
      */
     @EverythingIsNonNull
-    public void vote(String thingId, VoteType type, Thing thing, OnResponse<Void> onResponse, OnFailure onFailure) {
+    public void vote(RedditListing thing, VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
         try {
             this.ensureTokenIsSet();
-
-            this.apiService.vote(
-                    // "t1_gre3" etc. to identify what is being voted on (post or comment)
-                    thing.getValue() + "_" + thingId,
-                    type.getValue(),
-                    this.accessToken.generateHeaderString()
-            ).enqueue(new Callback<Void>() {
-                @Override
-                public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
-                    if (response.isSuccessful()) {
-                        onResponse.onResponse(null);
-                    } else {
-                        onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                    }
-                }
-                @Override
-                public void onFailure(Call<Void> call, Throwable t) {
-                    onFailure.onFailure(-1, t);
-                }
-            });
         } catch (AccessTokenNotSetException e) {
             onFailure.onFailure(-1, new AccessTokenNotSetException("Can't cast vote without access token", e));
+            return;
         }
+
+
+        // "t1_gre3" etc. to identify what is being voted on (post or comment)
+        String fullname = thing.getKind() + "_" + thing.getId();
+
+        this.apiService.vote(
+                fullname,
+                type.getValue(),
+                this.accessToken.generateHeaderString()
+        ).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
+                if (response.isSuccessful()) {
+                    onResponse.onResponse(null);
+                } else {
+                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
     }
 
 
@@ -667,9 +698,8 @@ public class RedditApi {
      */
     public class Authenticator implements okhttp3.Authenticator {
 
-        @Nullable
         @Override
-        public Request authenticate(@Nullable Route route, Response response) throws IOException {
+        public Request authenticate(Route route, Response response) throws IOException {
             // If we have a previous access token with a refresh token
             if (accessToken != null && accessToken.getRefreshToken() != null) {
                 AccessToken newToken = refreshToken();
@@ -682,10 +712,12 @@ public class RedditApi {
                 // The response does not send a new refresh token, so make sure the old one is saved
                 newToken.setRefreshToken(accessToken.getRefreshToken());
 
+                // Call token listener if registered
                 if (onNewToken != null) {
                     onNewToken.newToken(newToken);
-                    setToken(newToken);
                 }
+
+                setToken(newToken);
 
                 return response.request().newBuilder()
                         .header("Authorization", newToken.generateHeaderString())

@@ -60,6 +60,8 @@ public class User {
         return (long) createdAt;
     }
 
+
+    // TODO move this out of the API as this is android/application specific
     /**
      * @return Retrieves the user information stored in SharedPreferences
      */

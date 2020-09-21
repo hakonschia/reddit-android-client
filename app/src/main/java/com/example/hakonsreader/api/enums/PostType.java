@@ -4,5 +4,5 @@ package com.example.hakonsreader.api.enums;
  * Enum representing what a post is
  */
 public enum PostType {
-    IMAGE, VIDEO, RICH_VIDEO, LINK, TEXT
+    TEXT, LINK, IMAGE, GALLERY, VIDEO, RICH_VIDEO, GIF
 }
