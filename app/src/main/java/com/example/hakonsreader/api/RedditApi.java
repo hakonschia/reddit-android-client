@@ -450,7 +450,7 @@ public class RedditApi {
     /* ---------------- Comments ---------------- */
     /**
      * Asynchronously retrieves posts from a given subreddit
-     * <p>If an access token is set posts are customized for the user</p>
+     * <p>If an access token is set comments are customized for the user (ie. vote status is set)</p>
      *
      * @param postID The ID of the post to retrieve comments for
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
@@ -497,7 +497,7 @@ public class RedditApi {
 
     /**
      * Retrieves comments initially hidden (from "2 more comments" comments)
-     * <p>If an access token is set posts are customized for the user</p>
+     * <p>If an access token is set comments are customized for the user (ie. vote status is set)</p>
      *
      * @param postID The ID of the post to retrieve comments for
      * @param children The list of IDs of comments to get (retrieved via {@link RedditComment#getChildren()})
@@ -630,7 +630,7 @@ public class RedditApi {
         // "t1_gre3" etc. to identify what is being voted on (post or comment)
         String fullname = thing.getKind() + "_" + thing.getId();
 
-        this.api.vote(
+        this.apiOAuth.vote(
                 fullname,
                 type.getValue(),
                 this.accessToken.generateHeaderString()
