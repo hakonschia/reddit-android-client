@@ -55,15 +55,10 @@ public class RedditApi {
 
     /**
      * Default Reddit URL
+     *
+     * <p>Do not use this for calls that should be authenticated with OAuth, see {@link RedditApi#REDDIT_OUATH_URL}</p>
      */
     public static final String REDDIT_URL = "https://reddit.com/";
-
-    /**
-     * The standard Reddit API URL.
-     *
-     * <p>Do not use this for calls that should be authenticated with OAuth, see {@link RedditApi#REDDIT_OUATH_API_URL}</p>
-     */
-    public static final String REDDIT_API_URL = "https://www.reddit.com/api/";
 
     /**
      * The OAuth subdomain URL for Reddit.
@@ -71,13 +66,6 @@ public class RedditApi {
      * <p>This is used to retrieve posts from reddit</p>
      */
     public static final String REDDIT_OUATH_URL = "https://oauth.reddit.com/";
-
-    /**
-     * The Reddit API URL used when authenticated with OAuth.
-     *
-     * <p>This is used when making calls on behalf of a user with their access token</p>
-     */
-    public static final String REDDIT_OUATH_API_URL = REDDIT_OUATH_URL + "api/";
 
 
 
@@ -87,9 +75,15 @@ public class RedditApi {
     private static RedditApi instance;
 
     /**
-     * The service object used to communicate with the Reddit API
+     * The service object used to communicate with the Reddit API for non-logged in users
      */
-    private RedditApiService apiService;
+    private RedditApiService api;
+
+    /**
+     * The service object used to communicate with the Reddit API that are authorized with
+     * OAuth (for logged in users)
+     */
+    private RedditApiService apiOAuth;
 
     /**
      * The service object used to communicate only with the part of the Reddit API
@@ -157,21 +151,20 @@ public class RedditApi {
                 .addInterceptor(this.logger)
                 .build();
 
-        // Create the API service object used to make API calls
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(REDDIT_OUATH_API_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-        this.apiService = retrofit.create(RedditApiService.class);
 
-        // Create the service object for OAuth related calls
-        Retrofit OAuthRetrofit = new Retrofit.Builder()
-                .baseUrl(REDDIT_API_URL)
+        // Common builder for all service objects without a base URL set
+        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-        this.OAuthService = OAuthRetrofit.create(RedditOAuthService.class);
+                .client(client);
+
+        // Create the API service for logged in users
+        Retrofit loggedIn = retrofitBuilder.baseUrl(REDDIT_OUATH_URL).build();
+        this.apiOAuth = loggedIn.create(RedditApiService.class);
+
+        // Create the API service objects used to make API calls for non-logged in users
+        Retrofit nonLoggedIn = retrofitBuilder.baseUrl(REDDIT_URL).build();
+        this.api = nonLoggedIn.create(RedditApiService.class);
+        this.OAuthService = nonLoggedIn.create(RedditOAuthService.class);
     }
 
 
@@ -383,7 +376,7 @@ public class RedditApi {
         }
 
 
-        this.apiService.getUserInfo(this.accessToken.generateHeaderString()).enqueue(new Callback<User>() {
+        this.apiOAuth.getUserInfo(this.accessToken.generateHeaderString()).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, retrofit2.Response<User> response) {
                 User body = null;
@@ -417,25 +410,20 @@ public class RedditApi {
      */
     @EverythingIsNonNull
     public void getPosts(String subreddit, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        Pair<String, String> urlAndToken = this.getCorrectApiUrl(false);
-        String url = urlAndToken.first;
-        String tokenString = urlAndToken.second;
+        Pair<RedditApiService, String> serviceAndToken = this.getCorrectService();
 
-        // Load posts for a subreddit
+        // Not front page, add r/ prefix
         if (!subreddit.isEmpty()) {
-            url += "r/" + subreddit;
+            subreddit = "r/" + subreddit;
         }
 
-        // .json isn't strictly needed for requests to oauth.reddit.com, but it is for reddit.com
-        // so add it anyways
-        url += ".json";
-
-        this.apiService.getPosts(
-                url,
+        serviceAndToken.first.getPosts(
+                subreddit,
+                "hot",
                 after,
                 count,
                 RAW_JSON,
-                tokenString
+                serviceAndToken.second
         ).enqueue(new Callback<RedditPostsResponse>() {
             @Override
             public void onResponse(Call<RedditPostsResponse> call, retrofit2.Response<RedditPostsResponse> response) {
@@ -470,19 +458,12 @@ public class RedditApi {
      */
     @EverythingIsNonNull
     public void getComments(String postID, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
-        Pair<String, String> urlAndToken = this.getCorrectApiUrl(false);
-        String url = urlAndToken.first;
-        String tokenString = urlAndToken.second;
+        Pair<RedditApiService, String> serviceAndToken = this.getCorrectService();
 
-        // .json isn't strictly needed for requests to oauth.reddit.com, but it is for reddit.com
-        // so add it anyways
-        url += "comments/" + postID + ".json";
-
-        this.apiService.getComments(
-                url,
-                "all",
+        serviceAndToken.first.getComments(
+                postID,
                 RAW_JSON,
-                tokenString
+                serviceAndToken.second
         ).enqueue(new Callback<List<RedditCommentsResponse>>() {
             @Override
             public void onResponse(Call<List<RedditCommentsResponse>> call, retrofit2.Response<List<RedditCommentsResponse>> response) {
@@ -524,8 +505,7 @@ public class RedditApi {
      * @param onFailure The callback for failed requests
      */
     public void getMoreComments(String postID, List<String> children, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
-        Pair<String, String> urlAndToken = this.getCorrectApiUrl(true);
-        String tokenString = urlAndToken.second;
+        Pair<RedditApiService, String> serviceAndToken = this.getCorrectService();
 
         String postFullname = Thing.POST.getValue() + "_" + postID;
 
@@ -539,12 +519,12 @@ public class RedditApi {
             }
         }
 
-        this.apiService.getMoreComments(
+        serviceAndToken.first.getMoreComments(
                 childrenBuilder.toString(),
                 postFullname,
                 API_TYPE,
                 RAW_JSON,
-                tokenString
+                serviceAndToken.second
         ).enqueue(new Callback<MoreCommentsResponse>() {
             @Override
             public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {
@@ -596,7 +576,7 @@ public class RedditApi {
         }
 
         int finalDepth = depth;
-        this.apiService.postComment(
+        this.apiOAuth.postComment(
                 comment,
                 fullname, API_TYPE,
                 false,
@@ -650,7 +630,7 @@ public class RedditApi {
         // "t1_gre3" etc. to identify what is being voted on (post or comment)
         String fullname = thing.getKind() + "_" + thing.getId();
 
-        this.apiService.vote(
+        this.api.vote(
                 fullname,
                 type.getValue(),
                 this.accessToken.generateHeaderString()
@@ -673,21 +653,20 @@ public class RedditApi {
 
 
     /**
-     * Retrieves the correct API url to retrieve, based on if there is a logged in user
+     * Retrieves the correct API service object to use, based on if there is a logged in user
      *
-     * @param api If true returns the API url instead of the standard reddit.com URL
-     * @return A pair of strings where the first string is either www.reddit... or oauth.reddit...
-     * and the second string is the access token header (if a user is logged in)
+     * @return A pair where the first object is a {@link RedditApiService} and the second
+     * is the access token header string (an empty string if no user is logged in)
      */
-    private Pair<String, String> getCorrectApiUrl(boolean api) {
+    private Pair<RedditApiService, String> getCorrectService() {
         // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
         // customized post information (such as vote status)
         try {
             this.ensureTokenIsSet();
 
-            return new Pair<> ((api ? REDDIT_OUATH_API_URL : REDDIT_OUATH_URL), this.accessToken.generateHeaderString());
+            return new Pair<> (this.apiOAuth, this.accessToken.generateHeaderString());
         } catch (AccessTokenNotSetException ignored) {
-            return new Pair<> ((api ? REDDIT_API_URL : REDDIT_URL), "");
+            return new Pair<> (this.api, "");
         }
     }
 
