@@ -58,7 +58,7 @@ public class RedditApi {
      *
      * <p>Do not use this for calls that should be authenticated with OAuth, see {@link RedditApi#REDDIT_OUATH_URL}</p>
      */
-    public static final String REDDIT_URL = "https://reddit.com/";
+    public static final String REDDIT_URL = "https://www.reddit.com/";
 
     /**
      * The OAuth subdomain URL for Reddit.

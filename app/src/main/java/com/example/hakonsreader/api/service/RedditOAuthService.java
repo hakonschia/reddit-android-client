@@ -15,12 +15,12 @@ public interface RedditOAuthService {
     /**
      * The API path used to retrieve an access token
      */
-    String ACCESS_TOKEN_PATH = "v1/access_token";
+    String ACCESS_TOKEN_PATH = "api/v1/access_token";
 
     /**
      * The API path used to revoke access/refresh tokens
      */
-    String REVOKE_TOKEN_PATH = "v1/revoke_token";
+    String REVOKE_TOKEN_PATH = "api/v1/revoke_token";
 
 
     /**
