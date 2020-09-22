@@ -145,7 +145,7 @@ public class RedditApi {
         this.accessToken = new AccessToken();
         this.logger = new HttpLoggingInterceptor();
 
-        OkHttpClient client = new OkHttpClient.Builder()
+        OkHttpClient apiClient = new OkHttpClient.Builder()
                 // Automatically refresh access token on authentication errors (401)
                 .authenticator(new Authenticator())
                 // Add User-Agent header to every request
@@ -160,11 +160,15 @@ public class RedditApi {
         Retrofit oauth = new Retrofit.Builder()
                 .baseUrl(REDDIT_OUATH_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
+                .client(apiClient)
                 .build();
         this.api = oauth.create(RedditApiService.class);
 
-        OkHttpClient client1 = new OkHttpClient.Builder()
+        // The OAuth client does not need interceptors/authenticators for tokens as it doesn't
+        // use the access tokens for authorization
+        OkHttpClient oauthClient = new OkHttpClient.Builder()
+                // Add User-Agent header to every request
+                .addInterceptor(new UserAgentInterceptor())
                 .addInterceptor(this.logger)
                 .build();
 
@@ -172,7 +176,7 @@ public class RedditApi {
         Retrofit normal = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(REDDIT_URL)
-                .client(client1)
+                .client(oauthClient)
                 .build();
         this.oauthService = normal.create(RedditOAuthService.class);
     }
@@ -731,8 +735,6 @@ public class RedditApi {
                 }
             } else {
                 // No refresh token means we have a token for non-logged in users
-                // TODO remove this later
-                Log.d(TAG, "authenticate:\n\n\n ------------------------------ Getting new non-logged in token ------------------------------\n\n\n");
                 newToken = newNonLoggedInToken();
             }
 
