@@ -13,6 +13,8 @@ import com.example.hakonsreader.misc.OAuthStateGenerator;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 
+import java.util.UUID;
+
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
@@ -27,7 +29,9 @@ public class App extends Application {
     private static int screenWidth;
 
     // The random string generated for OAuth authentication
-    private static String OAuthState;
+    private static String oauthState;
+
+    private static RedditApi redditApi;
 
 
     @Override
@@ -49,6 +53,7 @@ public class App extends Application {
         setupRedditApi();
     }
 
+
     /**
      * @return The width of the screen in pixels
      */
@@ -61,12 +66,16 @@ public class App extends Application {
      */
     private void setupRedditApi() {
         // Set the previously stored token, and the listener for new tokens
-        RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
+        redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID);
         redditApi.setToken(TokenManager.getToken());
         redditApi.setOnNewToken(TokenManager::saveToken);
         redditApi.setLoggingLevel(HttpLoggingInterceptor.Level.BODY);
         redditApi.setCallbackURL(NetworkConstants.CALLBACK_URL);
-        redditApi.setClientID(NetworkConstants.CLIENT_ID);
+        redditApi.setDeviceID(UUID.randomUUID().toString());
+    }
+
+    public static RedditApi getApi() {
+        return redditApi;
     }
 
     /**
@@ -75,15 +84,16 @@ public class App extends Application {
      * @return The current OAuth state
      */
     public static String getOAuthState() {
-        return OAuthState;
+        return oauthState;
     }
 
     /**
      * Clears the OAuth state.
+     *
      * <p>Use this when the state has been verified</p>
      */
     public static void clearOAuthState() {
-        OAuthState = null;
+        oauthState = null;
     }
 
     /**
@@ -92,6 +102,7 @@ public class App extends Application {
      * @return A random string to use in the request for access
      */
     public static String generateAndGetOAuthState() {
-        return (OAuthState = OAuthStateGenerator.generate());
+        oauthState = OAuthStateGenerator.generate();
+        return oauthState;
     }
 }

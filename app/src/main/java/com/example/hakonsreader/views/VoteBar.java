@@ -8,11 +8,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
-import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.LayoutVoteBarBinding;
 import com.example.hakonsreader.misc.Util;
 
@@ -23,7 +23,7 @@ import java.util.Locale;
  * <p>Layout file: {@code layout/layout_vote_bar.xml}</p>
  */
 public class VoteBar extends ConstraintLayout {
-    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
+    private RedditApi redditApi = App.getApi();
 
     private LayoutVoteBarBinding binding;
 

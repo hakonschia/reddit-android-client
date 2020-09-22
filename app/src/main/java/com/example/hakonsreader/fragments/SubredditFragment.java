@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.RedditApi;
@@ -25,7 +26,6 @@ import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.Util;
@@ -45,7 +45,7 @@ public class SubredditFragment extends Fragment {
     private static final int NUM_REMAINING_POSTS_BEFORE_LOAD = 6;
 
 
-    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
+    private RedditApi redditApi = App.getApi();
 
     private FragmentSubredditBinding binding;
 

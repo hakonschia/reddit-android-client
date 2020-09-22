@@ -14,7 +14,6 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
-import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.databinding.ActivityMainBinding;
@@ -45,15 +44,12 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     private SettingsFragment settingsFragment;
 
     // Interface towards the Reddit API
-    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
+    private RedditApi redditApi = App.getApi();
 
 
     // Handler for token responses. If an access token is given user information is automatically retrieved
-    private OnResponse<AccessToken> onTokenResponse = token -> {
+    private OnResponse<Void> onTokenResponse = ignored -> {
         this.binding.loadingIcon.decreaseLoadCount();
-
-        // Store the new token
-        TokenManager.saveToken(token);
 
         // Re-create the start fragment as it now should load posts for the logged in user
         // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
@@ -177,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
                 case R.id.navProfile:
                     // If not logged in, show log in page
-                    if (TokenManager.getToken() == null) {
+                    if (TokenManager.getToken().getRefreshToken() == null) {
                         if (this.logInFragment == null) {
                             this.logInFragment = new LogInFragment();
                         }

@@ -1,11 +1,11 @@
 package com.example.hakonsreader.api;
 
-import androidx.core.util.Pair;
+import android.util.Log;
 
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
-import com.example.hakonsreader.api.exceptions.AccessTokenNotSetException;
+import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
@@ -25,19 +25,21 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.internal.EverythingIsNonNull;
 
+
 /**
- * Wrapper for the Reddit API
+ * Wrapper for the Reddit API for installed applications
  */
 public class RedditApi {
     private static final String TAG = "RedditApi";
@@ -75,25 +77,22 @@ public class RedditApi {
     private static RedditApi instance;
 
     /**
-     * The service object used to communicate with the Reddit API for non-logged in users
+     * The service object used to communicate with the Reddit API
      */
     private RedditApiService api;
-
-    /**
-     * The service object used to communicate with the Reddit API that are authorized with
-     * OAuth (for logged in users)
-     */
-    private RedditApiService apiOAuth;
 
     /**
      * The service object used to communicate only with the part of the Reddit API
      * that deals with OAuth access tokens
      */
-    private RedditOAuthService OAuthService;
+    private RedditOAuthService oauthService;
 
 
     /**
      * The access token to use for authorized API calls
+     *
+     * <p>Note: never set this to {@code null}, use {@code new AccessToken()} instead. To update the
+     * value use {@link RedditApi#setTokenInternal(AccessToken)} instead of updating it directly</p>
      */
     private AccessToken accessToken;
 
@@ -118,6 +117,7 @@ public class RedditApi {
      * The client ID for the application
      */
     private String clientID;
+
     /**
      * The basic authentication header with client ID. Includes "Basic " prefix
      */
@@ -128,43 +128,53 @@ public class RedditApi {
      */
     private String userAgent;
 
+    /**
+     * The device ID to send to Reddit for non-logged in user access tokens
+     */
+    private String deviceID;
 
 
-    private RedditApi(String userAgent) {
+    private RedditApi(String userAgent, String clientID) {
         this.userAgent = userAgent;
 
+        this.clientID = clientID;
+        // Create the header value now as it is unnecessary to re-create it for every call
+        // The username:password is the client ID + client secret (for installed apps there is no secret)
+        this.basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((clientID + ":").getBytes());
+
+        this.accessToken = new AccessToken();
         this.logger = new HttpLoggingInterceptor();
 
         OkHttpClient client = new OkHttpClient.Builder()
                 // Automatically refresh access token on authentication errors (401)
                 .authenticator(new Authenticator())
                 // Add User-Agent header to every request
-                .addInterceptor(chain -> {
-                    Request original = chain.request();
-                    Request request = original.newBuilder()
-                            .header("User-Agent", this.userAgent)
-                            .build();
-
-                    return chain.proceed(request);
-                })
+                .addInterceptor(new UserAgentInterceptor())
+                // Ensure that an access token is always set before sending a request
+                .addInterceptor(new NoTokenInterceptor())
                 // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(this.logger)
                 .build();
 
-
-        // Common builder for all service objects without a base URL set
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
+        // Create the API service used to make calls towards oauth.reddit.com
+        Retrofit oauth = new Retrofit.Builder()
+                .baseUrl(REDDIT_OUATH_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client);
+                .client(client)
+                .build();
+        this.api = oauth.create(RedditApiService.class);
 
-        // Create the API service for logged in users
-        Retrofit loggedIn = retrofitBuilder.baseUrl(REDDIT_OUATH_URL).build();
-        this.apiOAuth = loggedIn.create(RedditApiService.class);
+        OkHttpClient client1 = new OkHttpClient.Builder()
+                .addInterceptor(this.logger)
+                .build();
 
-        // Create the API service objects used to make API calls for non-logged in users
-        Retrofit nonLoggedIn = retrofitBuilder.baseUrl(REDDIT_URL).build();
-        this.api = nonLoggedIn.create(RedditApiService.class);
-        this.OAuthService = nonLoggedIn.create(RedditOAuthService.class);
+        // Create the API service used to make API calls towards www.reddit.com
+        Retrofit normal = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(REDDIT_URL)
+                .client(client1)
+                .build();
+        this.oauthService = normal.create(RedditOAuthService.class);
     }
 
 
@@ -177,12 +187,14 @@ public class RedditApi {
      * @param userAgent The user agent for the application. This cannot be changed after the instance is created
      *                  <p>See <a href="https://github.com/reddit-archive/reddit/wiki/API">Reddit documentation</a>
      *                  on creating your user agent</p>
+     * @param clientID The client ID of the application
+     *                 <p>To find your client ID see <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
      *
      * @return The RedditApi instance
      */
-    public static RedditApi getInstance(String userAgent) {
+    public static RedditApi getInstance(String userAgent, String clientID) {
         if (instance == null) {
-            instance = new RedditApi(userAgent);
+            instance = new RedditApi(userAgent, clientID);
         }
 
         return instance;
@@ -210,11 +222,18 @@ public class RedditApi {
 
     /**
      * Sets the access token to use for authorized API calls
+     * 
+     * <p>This only has to be set during the initial initialization. When new tokens are retrieved
+     * the internal value is set automatically. To retrieve the new token use {@link RedditApi#setOnNewToken(OnNewToken)}</p>
      *
      * @param token The token to use
      */
     public void setToken(AccessToken token) {
-        this.accessToken = token;
+        if (token != null) {
+            this.accessToken = token;
+        } else {
+            this.accessToken = new AccessToken();
+        }
     }
 
     /**
@@ -228,61 +247,76 @@ public class RedditApi {
     }
 
     /**
-     * Sets the client ID of the application
-     * <p>To find your client ID see <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
+     * Set the device ID to use to receive access tokens for non-logged in users
      *
-     * @param clientID The client ID
+     * <p>If this is null or empty "DO_NOT_TRACK_THIS_DEVICE" will be used. See
+     * <a href="https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth">
+     *     Reddit OAuth documentation</a> for more information</p>
+     *
+     * @param deviceID The device ID to use
      */
-    public void setClientID(String clientID) {
-        this.clientID = clientID;
-
-        // Create the header value now as it is unnecessary to re-create it for every call
-        // The username:password is the client ID + client secret (for installed apps there is no secret)
-        this.basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((clientID + ":").getBytes());
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
     }
 
 
+    /**
+     * Convenience method to set the internal token. This calls the registered token listener
+     *
+     * @param token The token to set, does nothing if null
+     */
+    private void setTokenInternal(AccessToken token) {
+        if (token != null) {
+            accessToken = token;
+
+            // Call token listener if registered
+            if (onNewToken != null) {
+                onNewToken.newToken(token);
+            }
+        }
+    }
+
     /* --------------- Access token calls --------------- */
     /**
-     * Asynchronously retrieves an access token from Reddit
+     * Asynchronously retrieves an access token from Reddit.
+     *
+     * <p>Note: The new access token is given with the registered token listener. Use
+     * {@link RedditApi#setOnNewToken(OnNewToken)} to retrieve the new token</p>
      * <p>Note: The callback URL must be set with {@link RedditApi#setCallbackURL(String)}</p>
-     * <p>Note: Client ID must be set with {@link RedditApi#setClientID(String)}</p>
      *
      * @param code The authorization code retrieved from the initial login process
-     * @param onResponse The callback for successful requests. Holds the new access token
+     * @param onResponse The callback for successful requests. Does not hold anything, but is called with
+     *                   {@code null} when successful.
      * @param onFailure The callback for failed requests
      */
     @EverythingIsNonNull
-    public void getAccessToken(String code, OnResponse<AccessToken> onResponse, OnFailure onFailure) {
+    public void getAccessToken(String code, OnResponse<Void> onResponse, OnFailure onFailure) {
         if (this.callbackURL == null) {
             onFailure.onFailure(-1, new Throwable("Callback URL is not set. Use RedditApi.setCallbackURL()"));
             return;
         }
-        
-        if (this.clientID == null) {
-            onFailure.onFailure(-1, new Throwable("Client ID is not set. Use RedditApi.setClientID()"));
-            return;
-        }
 
-        this.OAuthService.getAccessToken(
+        this.oauthService.getAccessToken(
                 this.basicAuthHeader,
                 code,
                 OAuthConstants.GRANT_TYPE_AUTHORIZATION,
                 this.callbackURL
         ).enqueue(new Callback<AccessToken>() {
             @Override
-            public void onResponse(Call<AccessToken> call, retrofit2.Response<AccessToken> response) {
+            public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
+                AccessToken token = null;
                 if (response.isSuccessful()) {
-                    AccessToken token = response.body();
-                    if (token != null) {
-                        onResponse.onResponse(token);
-                    } else {
-                        onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
-                    }
-                } else {
-                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                    token = response.body();
+                }
+
+                if (token != null) {
+                    setTokenInternal(token);
+                    onResponse.onResponse(null);
+                }  else {
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
+
             @Override
             public void onFailure(Call<AccessToken> call, Throwable t) {
                 onFailure.onFailure(-1, t);
@@ -291,68 +325,53 @@ public class RedditApi {
     }
 
     /**
-     * Synchronously refreshes the access token
-     *
-     * @return The new access token, or null if it couldn't be refreshed
-     */
-    private AccessToken refreshToken() {
-        AccessToken newToken = null;
-        try {
-            newToken = this.OAuthService.refreshToken(
-                    this.basicAuthHeader,
-                    this.accessToken.getRefreshToken(),
-                    OAuthConstants.GRANT_TYPE_REFRESH
-            ).execute().body();
-
-            if (newToken != null) {
-                newToken.setRefreshToken(this.accessToken.getRefreshToken());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return newToken;
-    }
-
-    /**
      * Revokes the refresh token. This will also invalidate the corresponding access token,
      * effectively logging the user out as the client can no longer make calls on behalf of the user
+     *
+     * <p>This does nothing with access tokens for non-logged in users</p>
      *
      * @param onResponse The callback for successful requests. Doesn't return anything, but is called when successful
      * @param onFailure The callback for failed requests
      */
     @EverythingIsNonNull
     public void revokeRefreshToken(OnResponse<Void> onResponse, OnFailure onFailure) {
-        this.OAuthService.revokeToken(
+        if (this.accessToken.getRefreshToken() == null) {
+            onFailure.onFailure(-1, new Throwable("No token to revoke"));
+            return;
+        }
+
+        this.oauthService.revokeToken(
                 this.basicAuthHeader,
                 this.accessToken.getRefreshToken(),
                 OAuthConstants.TOKEN_TYPE_REFRESH
         ).enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
+
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 onFailure.onFailure(-1, t);
             }
         });
 
-        this.accessToken = null;
+        this.accessToken = new AccessToken();
     }
 
     /**
-     * Ensures that {@link RedditApi#accessToken} is set if one is stored in the application
+     * Ensures that {@link RedditApi#accessToken} is set and is valid for a user that is logged in.
+     * Access tokens for non-logged in users do not count.
      *
-     * @throws AccessTokenNotSetException If there isn't any access token set
+     * @throws InvalidAccessTokenException If the access token has no refresh token (ie. not an actually logged in user)
      */
-    private void ensureTokenIsSet() throws AccessTokenNotSetException {
-        if (this.accessToken == null || this.accessToken.getAccessToken() == null) {
-            throw new AccessTokenNotSetException("Access token was not found");
+    private void verifyLoggedInToken() throws InvalidAccessTokenException {
+        if (this.accessToken.getRefreshToken() == null) {
+            throw new InvalidAccessTokenException("Valid access token was not found");
         }
     }
     /* --------------- End access token calls --------------- */
@@ -361,6 +380,8 @@ public class RedditApi {
 
     /**
      * Asynchronously retrieves information about the user logged in
+     *
+     * <p>Requires OAuth scope "identity"</p>
      * <p>Requires a valid access token for the request to be made</p>
      *
      * @param onResponse The callback for successful requests. Holds the {@link User} object representing the logged in user
@@ -369,16 +390,15 @@ public class RedditApi {
     @EverythingIsNonNull
     public void getUserInfo(OnResponse<User> onResponse, OnFailure onFailure) {
         try {
-            this.ensureTokenIsSet();
-        } catch (AccessTokenNotSetException e) {
-            onFailure.onFailure(-1, new AccessTokenNotSetException("Can't get user information without access token", e));
+            this.verifyLoggedInToken();
+        } catch (InvalidAccessTokenException e) {
+            onFailure.onFailure(-1, new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
             return;
         }
 
-
-        this.apiOAuth.getUserInfo(this.accessToken.generateHeaderString()).enqueue(new Callback<User>() {
+        this.api.getUserInfo(this.accessToken.generateHeaderString()).enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+            public void onResponse(Call<User> call, Response<User> response) {
                 User body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -387,9 +407,10 @@ public class RedditApi {
                 if (body != null) {
                     onResponse.onResponse(body);
                 } else {
-                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
+
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 onFailure.onFailure(-1, t);
@@ -410,23 +431,21 @@ public class RedditApi {
      */
     @EverythingIsNonNull
     public void getPosts(String subreddit, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        Pair<RedditApiService, String> serviceAndToken = this.getCorrectService();
-
         // Not front page, add r/ prefix
         if (!subreddit.isEmpty()) {
             subreddit = "r/" + subreddit;
         }
 
-        serviceAndToken.first.getPosts(
+        this.api.getPosts(
                 subreddit,
                 "hot",
                 after,
                 count,
                 RAW_JSON,
-                serviceAndToken.second
+                this.accessToken.generateHeaderString()
         ).enqueue(new Callback<RedditPostsResponse>() {
             @Override
-            public void onResponse(Call<RedditPostsResponse> call, retrofit2.Response<RedditPostsResponse> response) {
+            public void onResponse(Call<RedditPostsResponse> call, Response<RedditPostsResponse> response) {
                 RedditPostsResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -436,9 +455,10 @@ public class RedditApi {
                     List<RedditPost> posts = body.getPosts();
                     onResponse.onResponse(posts);
                 } else {
-                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
+
             @Override
             public void onFailure(Call<RedditPostsResponse> call, Throwable t) {
                 onFailure.onFailure(-1, t);
@@ -450,7 +470,9 @@ public class RedditApi {
     /* ---------------- Comments ---------------- */
     /**
      * Asynchronously retrieves posts from a given subreddit
-     * <p>If an access token is set comments are customized for the user (ie. vote status is set)</p>
+     *
+     * <p>If a user access token is set comments are customized for the user (ie. vote status is set).
+     * Requires OAuth scope "read"</p>
      *
      * @param postID The ID of the post to retrieve comments for
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
@@ -458,15 +480,13 @@ public class RedditApi {
      */
     @EverythingIsNonNull
     public void getComments(String postID, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
-        Pair<RedditApiService, String> serviceAndToken = this.getCorrectService();
-
-        serviceAndToken.first.getComments(
+        this.api.getComments(
                 postID,
                 RAW_JSON,
-                serviceAndToken.second
+                this.accessToken.generateHeaderString()
         ).enqueue(new Callback<List<RedditCommentsResponse>>() {
             @Override
-            public void onResponse(Call<List<RedditCommentsResponse>> call, retrofit2.Response<List<RedditCommentsResponse>> response) {
+            public void onResponse(Call<List<RedditCommentsResponse>> call, Response<List<RedditCommentsResponse>> response) {
                 List<RedditCommentsResponse> body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -485,9 +505,10 @@ public class RedditApi {
 
                     onResponse.onResponse(allComments);
                 } else {
-                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
+
             @Override
             public void onFailure(Call<List<RedditCommentsResponse>> call, Throwable t) {
                 onFailure.onFailure(-1, t);
@@ -505,8 +526,6 @@ public class RedditApi {
      * @param onFailure The callback for failed requests
      */
     public void getMoreComments(String postID, List<String> children, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
-        Pair<RedditApiService, String> serviceAndToken = this.getCorrectService();
-
         String postFullname = Thing.POST.getValue() + "_" + postID;
 
         // The query parameter for the children is a list of comma separated IDs
@@ -519,15 +538,15 @@ public class RedditApi {
             }
         }
 
-        serviceAndToken.first.getMoreComments(
+        this.api.getMoreComments(
                 childrenBuilder.toString(),
                 postFullname,
                 API_TYPE,
                 RAW_JSON,
-                serviceAndToken.second
+                this.accessToken.generateHeaderString()
         ).enqueue(new Callback<MoreCommentsResponse>() {
             @Override
-            public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {
+            public void onResponse(Call<MoreCommentsResponse> call, Response<MoreCommentsResponse> response) {
                 MoreCommentsResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -536,7 +555,7 @@ public class RedditApi {
                 if (body != null) {
                     onResponse.onResponse(body.getComments());
                 } else {
-                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
 
@@ -552,6 +571,7 @@ public class RedditApi {
      * or a private message.
      *
      * <p>Comments to posts and replies requires OAuth scope "submit", and private message requires "privatemessage"</p>
+     * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
      *
      * @param comment The comment to submit
      * @param thing The thing being replied to
@@ -560,9 +580,9 @@ public class RedditApi {
      */
     public void postComment(String comment, RedditListing thing, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
         try {
-            this.ensureTokenIsSet();
-        } catch (AccessTokenNotSetException e) {
-            onFailure.onFailure(-1, e);
+            this.verifyLoggedInToken();
+        } catch (InvalidAccessTokenException e) {
+            onFailure.onFailure(-1, new InvalidAccessTokenException("Posting comments requires a valid access token for a logged in user"));
             return;
         }
 
@@ -576,14 +596,14 @@ public class RedditApi {
         }
 
         int finalDepth = depth;
-        this.apiOAuth.postComment(
+        this.api.postComment(
                 comment,
                 fullname, API_TYPE,
                 false,
                 this.accessToken.generateHeaderString()
         ).enqueue(new Callback<MoreCommentsResponse>() {
             @Override
-            public void onResponse(Call<MoreCommentsResponse> call, retrofit2.Response<MoreCommentsResponse> response) {
+            public void onResponse(Call<MoreCommentsResponse> call, Response<MoreCommentsResponse> response) {
                 MoreCommentsResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -594,9 +614,10 @@ public class RedditApi {
                     newComment.setDepth(finalDepth);
                     onResponse.onResponse(newComment);
                 } else {
-                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
+
             @Override
             public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
                 onFailure.onFailure(-1, t);
@@ -609,7 +630,8 @@ public class RedditApi {
     /**
      * Cast a vote on a listing
      *
-     * <p>Requires an access token to be set</p>
+     * <p>Requires OAuth scope "vote"</p>
+     * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
      *
      * @param thing The thing to cast a vote on
      * @param type The type of vote to cast
@@ -620,9 +642,9 @@ public class RedditApi {
     @EverythingIsNonNull
     public void vote(RedditListing thing, VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
         try {
-            this.ensureTokenIsSet();
-        } catch (AccessTokenNotSetException e) {
-            onFailure.onFailure(-1, new AccessTokenNotSetException("Can't cast vote without access token", e));
+            this.verifyLoggedInToken();
+        } catch (InvalidAccessTokenException e) {
+            onFailure.onFailure(-1, new InvalidAccessTokenException("Voting requires a valid access token for a logged in user", e));
             return;
         }
 
@@ -630,17 +652,17 @@ public class RedditApi {
         // "t1_gre3" etc. to identify what is being voted on (post or comment)
         String fullname = thing.getKind() + "_" + thing.getId();
 
-        this.apiOAuth.vote(
+        this.api.vote(
                 fullname,
                 type.getValue(),
                 this.accessToken.generateHeaderString()
         ).enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Void> call, retrofit2.Response<Void> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), new Throwable("Error executing request: " + response.code()));
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
 
@@ -652,58 +674,141 @@ public class RedditApi {
     }
 
 
-    /**
-     * Retrieves the correct API service object to use, based on if there is a logged in user
-     *
-     * @return A pair where the first object is a {@link RedditApiService} and the second
-     * is the access token header string (an empty string if no user is logged in)
-     */
-    private Pair<RedditApiService, String> getCorrectService() {
-        // User is logged in, generate token string and set url to oauth.reddit.com to retrieve
-        // customized post information (such as vote status)
-        try {
-            this.ensureTokenIsSet();
 
-            return new Pair<> (this.apiOAuth, this.accessToken.generateHeaderString());
-        } catch (AccessTokenNotSetException ignored) {
-            return new Pair<> (this.api, "");
+    /* ----------------- Misc ----------------- */
+    /**
+     * Retrieve a new access token valid for non-logged in users
+     *
+     * @return A new access token only valid for non-logged in users
+     */
+    private AccessToken newNonLoggedInToken() {
+        AccessToken newToken = null;
+        try {
+            String device = (this.deviceID == null || this.deviceID.isEmpty() ? "DO_NOT_TRACK_THIS_DEVICE" : this.deviceID);
+
+            newToken = this.oauthService.getAccessTokenNoUser(
+                    this.basicAuthHeader,
+                    OAuthConstants.GRANT_TYPE_INSTALLED_CLIENT,
+                    device
+            ).execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return newToken;
+    }
+
+    /**
+     * Create a new throwable with a generic request error message
+     *
+     * @param code The code of the request
+     * @return A throwable with a generic error message and the code
+     */
+    private Throwable newThrowable(int code) {
+        return new Throwable("Error executing request: " + code);
+    }
+    /* ----------------- End misc ----------------- */
+
+
+
+    /* ----------------- Classes ----------------- */
+    /**
+     * Authenticator that automatically retrieves a new access token
+     */
+    private class Authenticator implements okhttp3.Authenticator {
+
+        @Override
+        public Request authenticate(Route route, okhttp3.Response response) {
+            AccessToken newToken;
+
+            // If we have a previous access token with a refresh token
+            if (accessToken.getRefreshToken() != null) {
+                newToken = refreshToken();
+
+                if (newToken != null) {
+                    // The response does not send a new refresh token, so make sure the old one is saved
+                    newToken.setRefreshToken(accessToken.getRefreshToken());
+                }
+            } else {
+                // No refresh token means we have a token for non-logged in users
+                // TODO remove this later
+                Log.d(TAG, "authenticate:\n\n\n ------------------------------ Getting new non-logged in token ------------------------------\n\n\n");
+                newToken = newNonLoggedInToken();
+            }
+
+            // No new token received
+            if (newToken != null) {
+                setTokenInternal(newToken);
+
+                return response.request().newBuilder()
+                        .header("Authorization", accessToken.generateHeaderString())
+                        .build();
+            } else {
+                return response.request();
+            }
+        }
+
+        /**
+         * Synchronously refreshes the access token
+         *
+         * @return The new access token, or null if it couldn't be refreshed
+         */
+        private AccessToken refreshToken() {
+            AccessToken newToken = null;
+            try {
+                newToken = oauthService.refreshToken(
+                        basicAuthHeader,
+                        accessToken.getRefreshToken(),
+                        OAuthConstants.GRANT_TYPE_REFRESH
+                ).execute().body();
+
+                if (newToken != null) {
+                    newToken.setRefreshToken(accessToken.getRefreshToken());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return newToken;
         }
     }
 
 
+    /**
+     * Interceptor that adds the User-Agent header to the request
+     */
+    private class UserAgentInterceptor implements Interceptor {
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            Request original = chain.request();
+            Request request = original.newBuilder()
+                    .header("User-Agent", userAgent)
+                    .build();
+
+            return chain.proceed(request);
+        }
+    }
 
     /**
-     * Authenticator that automatically retrieves a new access token on 401 responses
+     * Interceptor that ensures that an access token is set. If no token is found
+     * a new token for non-logged in users is retrieved
      */
-    public class Authenticator implements okhttp3.Authenticator {
-
+    private class NoTokenInterceptor implements Interceptor {
         @Override
-        public Request authenticate(Route route, Response response) throws IOException {
-            // If we have a previous access token with a refresh token
-            if (accessToken != null && accessToken.getRefreshToken() != null) {
-                AccessToken newToken = refreshToken();
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            Request original = chain.request();
+            Request.Builder request = original.newBuilder();
 
-                // No new token received
-                if (newToken == null) {
-                    return response.request();
+            if (accessToken.getAccessToken() == null) {
+                AccessToken token = newNonLoggedInToken();
+
+                if (token != null && onNewToken != null) {
+                    setTokenInternal(token);
+                    request.header("Authorization", accessToken.generateHeaderString());
                 }
-
-                // The response does not send a new refresh token, so make sure the old one is saved
-                newToken.setRefreshToken(accessToken.getRefreshToken());
-
-                // Call token listener if registered
-                if (onNewToken != null) {
-                    onNewToken.newToken(newToken);
-                }
-
-                setToken(newToken);
-
-                return response.request().newBuilder()
-                        .header("Authorization", newToken.generateHeaderString())
-                        .build();
             }
 
-            return null;
+            return chain.proceed(request.build());
         }
     }
 }

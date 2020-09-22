@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.service;
 
+import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
@@ -21,7 +22,6 @@ import retrofit2.http.Query;
  */
 public interface RedditApiService {
     /* --------------------- API paths --------------------- */
-
     /**
      * The API path used to retrieve user information
      */
@@ -41,6 +41,7 @@ public interface RedditApiService {
      * API path used to submit a comment, either to a post, a reply to another comment, or a private message
      */
     String COMMENT = "api/comment";
+    /* --------------------- End API paths --------------------- */
 
 
     /**

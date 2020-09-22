@@ -18,21 +18,60 @@ public class AccessToken {
     @SerializedName("refresh_token")
     private String refreshToken;
 
+    @SerializedName("expires_in")
+    private int expiresIn;
 
+    @SerializedName("device_id")
+    private String deviceID;
+
+
+    /**
+     * Sets the refresh token for this token
+     *
+     * @param refreshToken The token to use to refresh the access token when expired
+     */
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
+
+    /**
+     * @return The actual token this {@link AccessToken} represents
+     */
     public String getAccessToken() {
         return this.accessToken;
     }
 
+    /**
+     * @return The type of token this is
+     */
     public String getTokenType() {
         return this.tokenType;
     }
 
+    /**
+     * @return The token used to refresh the token value when expired
+     */
     public String getRefreshToken() {
         return this.refreshToken;
+    }
+
+    /**
+     * @return The amount of seconds the token is valid for. The value returned does not say the timestamp
+     * the token expires, but how many seconds it is valid for from when the token was retrieved
+     */
+    public int getExpiresIn() {
+        return this.expiresIn;
+    }
+
+    /**
+     * Retrieve the device ID the token is for. This is only applicable for access tokens for non-logged in
+     * users. See <a href="https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth">Reddit OAuth documentation</a> for more information
+     *
+     * @return
+     */
+    public String getDeviceID() {
+        return deviceID;
     }
 
     /**
@@ -44,20 +83,18 @@ public class AccessToken {
         return this.scope.split(" ");
     }
 
+
     /**
      * Generates a string that can be used directly in an authorization header
      *
      * @return "tokenType tokenValue". If either the type or value is null an empty string is returned
      */
     public String generateHeaderString() {
-        String ret;
         if (this.tokenType == null || this.accessToken == null) {
-            ret = "";
+            return  "";
         } else {
-            ret = this.tokenType + " " + this.accessToken;
+            return this.tokenType + " " + this.accessToken;
         }
-
-        return ret;
     }
 
 
@@ -68,6 +105,8 @@ public class AccessToken {
                 ", tokenType='" + tokenType + '\'' +
                 ", scope='" + scope + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
+                ", expiresIn=" + expiresIn +
+                ", deviceID='" + deviceID + '\'' +
                 '}';
     }
 }

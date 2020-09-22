@@ -13,11 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
@@ -31,7 +31,7 @@ import java.util.List;
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
 
-    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
+    private RedditApi redditApi = App.getApi();
 
     private List<RedditComment> comments = new ArrayList<>();
     private RedditPost post;

@@ -10,12 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.User;
-import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.FragmentProfileBinding;
 import com.example.hakonsreader.misc.Util;
 import com.squareup.picasso.Picasso;
@@ -33,7 +33,7 @@ public class ProfileFragment extends Fragment {
 
     private boolean firstLoad = true;
 
-    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
+    private RedditApi redditApi = App.getApi();
     private User user;
 
     private FragmentProfileBinding binding;

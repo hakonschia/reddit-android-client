@@ -8,12 +8,12 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.ActivityReplyBinding;
 import com.example.hakonsreader.misc.Util;
 import com.google.gson.Gson;
@@ -23,7 +23,7 @@ public class ReplyActivity extends AppCompatActivity {
 
     private ActivityReplyBinding binding;
 
-    private RedditApi redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT);
+    private RedditApi redditApi = App.getApi();
     private RedditListing replyingTo;
 
 

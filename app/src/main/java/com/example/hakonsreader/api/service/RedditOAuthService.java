@@ -24,7 +24,7 @@ public interface RedditOAuthService {
 
 
     /**
-     * Retrieves the OAuth access token
+     * Retrieves an OAuth access token for an authorized user
      *
      * @param basicAuth The basic authorization header with the client ID and secret
      * @param code The authorization token retrieved from the initial login process
@@ -41,6 +41,22 @@ public interface RedditOAuthService {
             @Field("code") String code,
             @Field("grant_type") String grantType,
             @Field("redirect_uri") String redirectUri
+    );
+
+    /**
+     * Retrieves an OAuth access token for non-logged in users
+     *
+     * @param basicAuth The basic authorization header with the client ID and secret
+     * @param grantType The string "https://oauth.reddit.com/grants/installed_client&\"
+     *
+     * @return A Call object to be used to retrieve an access token
+     */
+    @POST(ACCESS_TOKEN_PATH)
+    @FormUrlEncoded
+    Call<AccessToken> getAccessTokenNoUser(
+            @Header("Authorization") String basicAuth,
+            @Field("grant_type") String grantType,
+            @Field("device_id") String deviceID
     );
 
     /**

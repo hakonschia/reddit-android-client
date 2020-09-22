@@ -1,8 +1,8 @@
 package com.example.hakonsreader.misc;
 
-import com.example.hakonsreader.api.RedditApi;
+import android.util.Log;
+
 import com.example.hakonsreader.api.model.AccessToken;
-import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 
 /**
@@ -31,10 +31,8 @@ public class TokenManager {
      * @param newToken The new token to save
      */
     public static void saveToken(AccessToken newToken) {
+        Log.d("TAG", "saveToken: saving new token="+newToken);
         token = newToken;
-
-        // Notify the API
-        RedditApi.getInstance(NetworkConstants.USER_AGENT).setToken(newToken);
 
         // Save in shared prefs
         SharedPreferencesManager.put(SharedPreferencesConstants.ACCESS_TOKEN, newToken);
