@@ -256,7 +256,6 @@ public class RedditComment implements RedditListing {
         // the comment chain as a reply to it
         for (int i = 0; i < replies.size(); i++) {
             RedditComment reply = replies.get(i);
-            Log.d(TAG, "addReplies: " + reply.getAuthor());
 
             // Create the chain of this replies comments and add them
             List<RedditComment> replyChain = createCommentChain(replies, i);

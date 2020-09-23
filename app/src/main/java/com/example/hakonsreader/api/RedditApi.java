@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
@@ -526,10 +524,14 @@ public class RedditApi {
      *
      * @param postID The ID of the post to retrieve comments for
      * @param children The list of IDs of comments to get (retrieved via {@link RedditComment#getChildren()})
+     * @param parent Optional: The parent comment the new comments belong to. If this sets the new comments
+     *               as replies directly. This is the same as calling {@link RedditComment#addReplies(List)} afterwards.
+     *               Note that this is the parent of the new comments, not the comment holding the list children
+     *               retrieved with {@link RedditComment#getChildren()}.
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onFailure The callback for failed requests
      */
-    public void getMoreComments(String postID, List<String> children, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
+    public void getMoreComments(String postID, List<String> children, RedditComment parent, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
         String postFullname = Thing.POST.getValue() + "_" + postID;
 
         // The query parameter for the children is a list of comma separated IDs
@@ -557,7 +559,11 @@ public class RedditApi {
                 }
 
                 if (body != null) {
-                    onResponse.onResponse(body.getComments());
+                    List<RedditComment> comments = body.getComments();
+                    if (parent != null) {
+                        parent.addReplies(comments);
+                    }
+                    onResponse.onResponse(comments);
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }

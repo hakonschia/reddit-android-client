@@ -175,16 +175,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      *
      * @param comment The comment to load from. This comment has to be a "2 more comments" comment.
      *               When the comments have been loaded this will be removed from {@link CommentsAdapter#comments}
-     * @param parent The parent comment of the {@code comment}
+     * @param parent The parent comment of {@code comment}
      */
     public void getMoreComments(RedditComment comment, RedditComment parent) {
-        this.redditApi.getMoreComments(post.getId(), comment.getChildren(), newComments -> {
+        this.redditApi.getMoreComments(post.getId(), comment.getChildren(), parent, newComments -> {
             // Find the parent index to know where to insert the new comments
             int commentPos = this.comments.indexOf(comment);
             this.insertComments(newComments, commentPos);
-
-            // Update the parent with the new replies
-            parent.addReplies(newComments);
 
             // Remove the previous comment (this is the "2 more comments" comment)
             this.removeComment(comment);
