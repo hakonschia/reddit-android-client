@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.model;
 
+import android.util.Log;
+
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter;
@@ -18,6 +20,7 @@ public class RedditComment implements RedditListing {
 
     private String kind;
     private Data data;
+    private List<RedditComment> replies;
 
     private static class Data extends ListingData {
         private String body;
@@ -194,16 +197,25 @@ public class RedditComment implements RedditListing {
      * @return The list of replies
      */
     public List<RedditComment> getReplies() {
-        // No replies
-        if (this.data.replies == null) {
-            return new ArrayList<>();
+        // First time retrieving replies, create the list from data.replies
+        if (this.replies == null) {
+            if (this.data.replies != null) {
+                replies = getRepliesInternal();
+            } else {
+                // No more for the comment
+                replies = new ArrayList<>();
+            }
         }
 
+        return replies;
+    }
+
+    private List<RedditComment> getRepliesInternal() {
         // All the comments from the current and its replies
         List<RedditComment> all = new ArrayList<>();
 
         // Loop through the list of replies and add the reply and the replies to the reply
-        List<RedditComment> replies = this.data.replies.getComments();
+        replies = this.data.replies.getComments();
         for (RedditComment reply : replies) {
             all.add(reply);
             all.addAll(reply.getReplies());
@@ -221,6 +233,62 @@ public class RedditComment implements RedditListing {
      */
     public List<String> getChildren() {
         return this.data.children;
+    }
+
+    /**
+     * Adds a list of comments as replies. This sets the replies for every comment downwards in the chain
+     * so every child has a list to its replies
+     *
+     * <p>Use this after retrieving new comments via {@link RedditComment#getChildren()}
+     * to add the replies. Note that this function should be called on the parent of the comment
+     * {@link RedditComment#getChildren()} was called on, as the comments received are replies to the
+     * parent, not that object itself</p>
+     */
+    public void addReplies(List<RedditComment> replies) {
+        if (this.replies == null) {
+            this.replies = new ArrayList<>();
+        }
+
+        // Add all as replies to this comment
+        this.replies.addAll(replies);
+
+        // Each comment holds a list of the replies to itself, so for every reply add the rest of
+        // the comment chain as a reply to it
+        for (int i = 0; i < replies.size(); i++) {
+            RedditComment reply = replies.get(i);
+            Log.d(TAG, "addReplies: " + reply.getAuthor());
+
+            // Create the chain of this replies comments and add them
+            List<RedditComment> replyChain = createCommentChain(replies, i);
+            if (reply.replies == null) {
+                reply.replies = new ArrayList<>();
+            }
+            reply.replies.addAll(replyChain);
+        }
+    }
+
+    /**
+     * Creates a subchain of comments
+     *
+     * @param parentChain The parent chain to create a subchain from
+     * @param pos The position of {@code parentChain} to start at
+     * @return The comment chain after {@code pos}
+     */
+    private List<RedditComment> createCommentChain(List<RedditComment> parentChain, int pos) {
+        List<RedditComment> chain = new ArrayList<>();
+
+        RedditComment start = parentChain.get(pos);
+        for(int i = pos + 1; i < parentChain.size(); i++) {
+            RedditComment current = parentChain.get(i);
+
+            if (current.getDepth() > start.getDepth()) {
+                chain.add(current);
+            } else {
+                break;
+            }
+        }
+
+        return chain;
     }
 
     /**
