@@ -143,6 +143,7 @@ public class RedditApi {
         this.accessToken = new AccessToken();
         this.logger = new HttpLoggingInterceptor();
 
+
         OkHttpClient apiClient = new OkHttpClient.Builder()
                 // Automatically refresh access token on authentication errors (401)
                 .authenticator(new Authenticator())
@@ -155,12 +156,12 @@ public class RedditApi {
                 .build();
 
         // Create the API service used to make calls towards oauth.reddit.com
-        Retrofit oauth = new Retrofit.Builder()
+        Retrofit apiRetrofit = new Retrofit.Builder()
                 .baseUrl(REDDIT_OUATH_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(apiClient)
                 .build();
-        this.api = oauth.create(RedditApiService.class);
+        this.api = apiRetrofit.create(RedditApiService.class);
 
         // The OAuth client does not need interceptors/authenticators for tokens as it doesn't
         // use the access tokens for authorization
@@ -171,12 +172,12 @@ public class RedditApi {
                 .build();
 
         // Create the API service used to make API calls towards www.reddit.com
-        Retrofit normal = new Retrofit.Builder()
+        Retrofit oauthRetrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(REDDIT_URL)
                 .client(oauthClient)
                 .build();
-        this.oauthService = normal.create(RedditOAuthService.class);
+        this.oauthService = oauthRetrofit.create(RedditOAuthService.class);
     }
 
 
