@@ -3,6 +3,7 @@ package com.example.hakonsreader.recyclerviewadapters;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -173,18 +174,21 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     /**
      * Loads more comments and adds them to {@link CommentsAdapter#comments}
      *
-     * @param parent The parent comment to load from. This comment has to be a "2 more comments" comment.
+     * @param comment The comment to load from. This comment has to be a "2 more comments" comment.
      *               When the comments have been loaded this will be removed from {@link CommentsAdapter#comments}
+     * @param parent The parent comment of the {@code comment}
      */
-    public void getMoreComments(RedditComment parent) {
-        // TODO change replies in the parent comment to include the new comments
-        this.redditApi.getMoreComments(post.getId(), parent.getChildren(), comments -> {
+    public void getMoreComments(RedditComment comment, RedditComment parent) {
+        this.redditApi.getMoreComments(post.getId(), comment.getChildren(), newComments -> {
             // Find the parent index to know where to insert the new comments
-            int commentPos = this.comments.indexOf(parent);
-            this.insertComments(comments, commentPos);
+            int commentPos = this.comments.indexOf(comment);
+            this.insertComments(newComments, commentPos);
 
-            // Remove the parent comment (this is the "2 more comments" comment)
-            this.removeComment(parent);
+            // Update the parent with the new replies
+            parent.addReplies(newComments);
+
+            // Remove the previous comment (this is the "2 more comments" comment)
+            this.removeComment(comment);
         }, (code, t) -> {
             Util.handleGenericResponseErrors(this.parentLayout, code, t);
         });
@@ -277,7 +281,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
         // TODO remove magic string and create "listing" enum or something
         if (comment.getKind().equals("more")) {
-            holder.asMoreComments(comment);
+            // TODO the parent comment isn't necessarily the previous, get the comment before in the list whos depth is one lower
+            holder.asMoreComments(comment, this.comments.get(position - 1));
         } else {
             holder.asNormalComment(comment);
         }
@@ -408,7 +413,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
          *
          * @param comment The comment to use for the holder
          */
-        private void asMoreComments(RedditComment comment) {
+        private void asMoreComments(RedditComment comment, RedditComment parent) {
             int extraComments = comment.getExtraCommentsCount();
 
             String extraCommentsText = itemView.getResources().getQuantityString(
@@ -419,7 +424,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             // Clear everything except the author field which now holds the amount of extra comments
             author.setText(extraCommentsText);
-            itemView.setOnClickListener(view -> getMoreComments(comment));
+            itemView.setOnClickListener(view -> getMoreComments(comment, parent));
             itemView.setOnLongClickListener(null);
 
             age.setText("");
