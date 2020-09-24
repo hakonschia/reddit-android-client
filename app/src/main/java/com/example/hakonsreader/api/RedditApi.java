@@ -728,6 +728,43 @@ public class RedditApi {
         });
     }
 
+    /**
+     * Retrieve the list of default subreddits (as selected by reddit)
+     *
+     * @param after The ID of the last subreddit seen (empty string if loading for the first time)
+     * @param count The amount of items fetched previously (0 if loading for the first time)
+     * @param onResponse The response handler for successful request. Holds the list of subreddits fetched.
+     *                   This list is not sorted
+     * @param onFailure The response handler for failed requests
+     */
+    public void getDefaultSubreddits(String after, int count, OnResponse<List<Subreddit>> onResponse, OnFailure onFailure) {
+        this.api.getDefaultSubreddits(
+                after,
+                count,
+                100,
+                this.accessToken.generateHeaderString()
+        ).enqueue(new Callback<SubredditResponse>() {
+            @Override
+            public void onResponse(Call<SubredditResponse> call, Response<SubredditResponse> response) {
+                SubredditResponse body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    onResponse.onResponse(body.getSubreddits());
+                } else {
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SubredditResponse> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
+    }
+
 
     /* ----------------- Misc ----------------- */
     /**

@@ -175,4 +175,22 @@ public interface RedditApiService {
 
             @Header("Authorization") String accessToken
     );
+
+    /**
+     * Retrieve a list of the the default subreddits (as set by reddit)
+     *
+     * @param after
+     * @param count
+     * @param limit
+     * @param accessToken
+     * @return
+     */
+    @GET("subreddits/default")
+    Call<SubredditResponse> getDefaultSubreddits(
+            @Query("after") String after,
+            @Query("count") int count,
+            @Query("limit") int limit,
+
+            @Header("Authorization") String accessToken
+    );
 }
