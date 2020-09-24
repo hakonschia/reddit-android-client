@@ -10,6 +10,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.misc.VideoCache;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
@@ -84,15 +85,26 @@ public class PostContentVideo extends PlayerView {
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
         CacheDataSourceFactory cacheFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
 
-        MediaSource mediaSource = new ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
+        final MediaSource mediaSource = new ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
                 .createMediaSource(Uri.parse(post.getVideoUrl()));
 
         exoPlayer = new SimpleExoPlayer.Builder(context)
                 .setBandwidthMeter(new DefaultBandwidthMeter.Builder(context).build())
                 .setTrackSelector(new DefaultTrackSelector(context, new AdaptiveTrackSelection.Factory()))
                 .build();
-        exoPlayer.prepare(mediaSource);
-        exoPlayer.setPlayWhenReady(false);
+
+        exoPlayer.addListener(new Player.EventListener() {
+            boolean isPrepared = false;
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                // If the player is trying to play and hasn't yet prepared the video, prepare it
+                if (playWhenReady && !isPrepared) {
+                    exoPlayer.prepare(mediaSource);
+                    isPrepared = true;
+                }
+            }
+        });
 
         setPlayer(exoPlayer);
     }
