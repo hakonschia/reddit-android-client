@@ -114,8 +114,11 @@ public class RedditPost implements VotableListing, PostableListing {
         @SerializedName("link_flair_background_color")
         private String linkFlairBackgroundColor;
 
+        @SerializedName("link_flair_text_color")
+        private String linkFlairTextColor;
+
         @SerializedName("link_flair_richtext")
-        private List<RichtextFlair> richtextFlairs;
+        private List<RichtextFlair> linkRichtextFlairs;
 
 
         @SerializedName("media")
@@ -348,11 +351,19 @@ public class RedditPost implements VotableListing, PostableListing {
     }
 
 
+    public String getLinkFlairBackgroundColor() {
+        return data.linkFlairBackgroundColor;
+    }
+
+    public String getLinkFlairTextColor() {
+        return data.linkFlairTextColor;
+    }
+
     /**
      * @return The list of richtext flairs for the post
      */
-    public List<RichtextFlair> getRichtextFlairs() {
-        return data.richtextFlairs;
+    public List<RichtextFlair> getLinkRichtextFlairs() {
+        return data.linkRichtextFlairs;
     }
 
     /**

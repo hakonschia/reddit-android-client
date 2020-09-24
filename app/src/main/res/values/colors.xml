@@ -35,4 +35,8 @@
     <color name="tagSpoiler">#595959</color>
     <color name="tagNSFWText">#FFFFFF</color>
     <color name="tagSpoilerText">#FFFFFF</color>
+
+    <color name="flairTextDark">#292929</color>
+    <color name="flairBackgroundDark">#DFDFDF</color>
+
 </resources>

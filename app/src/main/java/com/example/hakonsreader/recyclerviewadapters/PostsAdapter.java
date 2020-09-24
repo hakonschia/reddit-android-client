@@ -1,6 +1,8 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +20,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.misc.ViewUtil;
@@ -24,12 +28,11 @@ import com.example.hakonsreader.views.FullPostBar;
 import com.example.hakonsreader.views.PostContentLink;
 import com.example.hakonsreader.views.PostContentVideo;
 import com.example.hakonsreader.views.PostInfo;
+import com.example.hakonsreader.views.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 
 /**
@@ -126,6 +129,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         Util.cleanupPostContent(v);
         holder.tags.removeAllViews();
 
+        Context context = holder.itemView.getContext();
         final RedditPost post = this.posts.get(position);
         holder.post = post;
 
@@ -133,11 +137,26 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.fullPostBar.setPost(post);
 
         if (post.isSpoiler()) {
-            holder.tags.addView(ViewUtil.createSpoilerTag(holder.itemView.getContext()));
+            holder.tags.addView(ViewUtil.createSpoilerTag(context));
         }
         if (post.isNSFW()) {
-            holder.tags.addView(ViewUtil.createNSFWTag(holder.itemView.getContext()));
+            holder.tags.addView(ViewUtil.createNSFWTag(context));
         }
+
+        List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
+        flairs.forEach(flair -> {
+            Log.d(TAG, "onBindViewHolder: sub="+post.getSubreddit() + ", post="+post.getTitle() + " with flair=" + flair.getText());
+            Tag tag = new Tag(context);
+            tag.setText(flair.getText());
+            // TODO this shouldn't be hardcoded like this
+
+            if (post.getLinkFlairTextColor().equals("dark")) {
+                tag.setTextColor(ContextCompat.getColor(context, R.color.flairTextDark));
+                tag.setFillColor(ContextCompat.getColor(context, R.color.flairBackgroundDark));
+            }
+           // tag.setFillColor(post.getLinkFlairBackgroundColor());
+            holder.tags.addView(tag);
+        });
 
         // Update to set the initial vote status
         holder.setPostContent();

@@ -25,4 +25,7 @@
     <color name="iconColor">#DADADA</color>
 
     <color name="imageVideoActivityBackground">#CC000000</color>
+
+    <color name="flairTextDark">#DCDCDC</color>
+    <color name="flairBackgroundDark">#040404</color>
 </resources>

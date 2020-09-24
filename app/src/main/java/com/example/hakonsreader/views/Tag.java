@@ -2,6 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -45,17 +46,23 @@ public class Tag extends LinearLayout {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+
     public void setText(String text) {
         binding.text.setText(text);
     }
 
     public void setTextColor(int color) {
-        textColor = color;
         binding.text.setTextColor(textColor);
     }
+    public void setTextColor(String hexColor) {
+        binding.text.setTextColor(Color.parseColor(hexColor));
+    }
+
 
     public void setFillColor(int color) {
-        fillColor = color;
         binding.cardView.setCardBackgroundColor(fillColor);
+    }
+    public void setFillColor(String hexColor) {
+        binding.cardView.setCardBackgroundColor(Color.parseColor(hexColor));
     }
 }
