@@ -377,7 +377,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             // Html.fromHtml adds a newline at the end which makes the TextView larger than it should be
             // TODO it ruins the HTML formatting tho
             // String contentText = Util.trimTrailingWhitespace(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
-            content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
+            content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_SEPARATOR_LINE_BREAK_DIV | Html.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE));
             content.setMovementMethod(InternalLinkMovementMethod.getSubredditAndUserInstance(context));
 
             author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));
