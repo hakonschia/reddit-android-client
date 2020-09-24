@@ -8,6 +8,8 @@ import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * Class representing a Reddit post
  */
@@ -101,6 +103,9 @@ public class RedditPost implements VotableListing, PostableListing {
         @SerializedName("is_video")
         private boolean isVideo;
 
+        @SerializedName("is_gallery")
+        private boolean isGallery;
+
         @SerializedName("post_hint")
         private String postHint;
 
@@ -128,6 +133,18 @@ public class RedditPost implements VotableListing, PostableListing {
                 @SerializedName("width")
                 private int width;
             }
+        }
+
+
+        @SerializedName("gallery_data")
+        private GalleryData galleryData;
+
+        /**
+         * Data for gallery posts (multiple images
+         */
+        private static class GalleryData {
+            @SerializedName("items")
+            private List<GalleryItem> items;
         }
     }
 
@@ -359,6 +376,15 @@ public class RedditPost implements VotableListing, PostableListing {
         return data.media.redditVideo.width;
     }
 
+    /**
+     * Retrieves the list of gallery items. If {@link RedditPost#getPostType()} isn't {@link PostType#GALLERY}
+     * this will be null
+     *
+     * @return The list of gallery items this post has
+     */
+    public List<GalleryItem> getGalleryItems() {
+         return data.galleryData.items;
+    }
 
 
     /**
@@ -366,11 +392,12 @@ public class RedditPost implements VotableListing, PostableListing {
      */
     public PostType getPostType() {
         // TODO make this less bad
-        // TODO reddit galleries (multiple images)
         if (data.isVideo) {
             return PostType.VIDEO;
         } else if (data.isText) {
             return PostType.TEXT;
+        } else if (data.isGallery) {
+            return PostType.GALLERY;
         }
 
         String hint = data.postHint;
