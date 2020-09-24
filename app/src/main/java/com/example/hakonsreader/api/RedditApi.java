@@ -12,10 +12,12 @@ import com.example.hakonsreader.api.interfaces.VotableListing;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditPostsResponse;
+import com.example.hakonsreader.api.responses.SubredditResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
 
@@ -681,6 +683,48 @@ public class RedditApi {
         });
     }
 
+
+    /**
+     * Retrieve the list of subreddits the logged in user is subscribed to
+     *
+     * @param after The ID of the last subreddit seen (empty string if loading for the first time)
+     * @param count The amount of items fetched previously (0 if loading for the first time)
+     * @param onResponse The response handler for successful request. Holds the list of subreddits fetched
+     * @param onFailure The response handler for failed requests
+     */
+    public void getSubscribedSubreddits(String after, int count, OnResponse<List<Subreddit>> onResponse, OnFailure onFailure) {
+        try {
+            this.verifyLoggedInToken();
+        } catch (InvalidAccessTokenException e) {
+            onFailure.onFailure(-1, new InvalidAccessTokenException("Getting subscribed subreddits requires a valid access token for a logged in user", e));
+            return;
+        }
+
+        this.api.getSubscribedSubreddits(
+                after,
+                count,
+                this.accessToken.generateHeaderString()
+        ).enqueue(new Callback<SubredditResponse>() {
+            @Override
+            public void onResponse(Call<SubredditResponse> call, Response<SubredditResponse> response) {
+                SubredditResponse body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    onResponse.onResponse(body.getSubreddits());
+                } else {
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SubredditResponse> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
+    }
 
 
     /* ----------------- Misc ----------------- */

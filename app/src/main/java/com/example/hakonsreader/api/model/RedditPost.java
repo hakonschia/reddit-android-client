@@ -152,6 +152,14 @@ public class RedditPost implements VotableListing, PostableListing {
 
     /**
      * {@inheritDoc}
+     */
+    @Override
+    public String getURL() {
+        return data.url;
+    }
+
+    /**
+     * {@inheritDoc}
      */@Override
     public String getFullname() {
         return data.fullname;
@@ -298,14 +306,6 @@ public class RedditPost implements VotableListing, PostableListing {
      */
     public String getThumbnail() {
         return data.thumbnail;
-    }
-
-    /**
-     * @return The URL of the post. For link posts this is the link, otherwise
-     * it points the URL for the post
-     */
-    public String getURL() {
-        return data.url;
     }
 
     /**

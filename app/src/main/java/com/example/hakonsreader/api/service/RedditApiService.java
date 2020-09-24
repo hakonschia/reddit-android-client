@@ -4,6 +4,7 @@ import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditPostsResponse;
+import com.example.hakonsreader.api.responses.SubredditResponse;
 
 import java.util.List;
 
@@ -152,6 +153,15 @@ public interface RedditApiService {
     Call<Void> vote(
             @Field("id") String id,
             @Field("dir") int dir,
+
+            @Header("Authorization") String accessToken
+    );
+
+
+    @GET("subreddits/mine/subscriber")
+    Call<SubredditResponse> getSubscribedSubreddits(
+            @Query("after") String after,
+            @Query("count") int count,
 
             @Header("Authorization") String accessToken
     );
