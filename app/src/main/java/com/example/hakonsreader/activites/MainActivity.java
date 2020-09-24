@@ -27,7 +27,6 @@ import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity implements ItemLoadingListener {
@@ -117,6 +116,15 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     }
 
     @Override
+    public void onBackPressed() {
+        // Always go back to the home page on back presses
+        if (binding.bottomNav.getSelectedItemId() != R.id.navHome) {
+            binding.bottomNav.setSelectedItemId(R.id.navHome);
+            // Else do something else probably
+        }
+    }
+
+    @Override
     public void onAttachFragment(@NonNull Fragment fragment) {
         super.onAttachFragment(fragment);
 
@@ -152,17 +160,8 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
      * Sets up the navbar to be able to switch between the fragments
      */
     private void setupNavBar() {
-        BottomNavigationView navBar = findViewById(R.id.bottomNav);
-        navBar.setOnNavigationItemSelectedListener(item -> {
+        binding.bottomNav.setOnNavigationItemSelectedListener(item -> {
             Fragment selected = null;
-
-            // TODO create another fix to this as clicknig twice on subreddits should provide functionality
-            // Item pressed is same as item selected, do nothing as this adds to the backstack
-            /*
-            if (navBar.getSelectedItemId() == item.getItemId()) {
-                return false;
-            }
-             */
 
             // TODO clean up this mess
             switch (item.getItemId()) {
@@ -211,7 +210,8 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragmentContainer, selected)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    // When back is pressed go to the last fragment
+                    // Although we don't use the backstack to pop elements, it is needed to keep the state
+                    // of the fragments (otherwise posts are reloaded when coming back)
                     .addToBackStack(null)
                     .commit();
 
