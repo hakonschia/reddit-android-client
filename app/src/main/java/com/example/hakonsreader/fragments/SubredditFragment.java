@@ -257,12 +257,10 @@ public class SubredditFragment extends Fragment {
         this.binding = null;
     }
 
-        /*
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        // TODO store state of list
+        // TODO store state of list, videos should release their players to free the resources
     }
 
     @Override
@@ -271,7 +269,6 @@ public class SubredditFragment extends Fragment {
         // TODO restore state of stuff here
         Log.d(TAG, "onViewStateRestored");
     }
-     */
 
     @Override
     public void onResume() {

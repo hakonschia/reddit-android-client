@@ -52,7 +52,7 @@ public class Tag extends LinearLayout {
     }
 
     public void setTextColor(int color) {
-        binding.text.setTextColor(textColor);
+        binding.text.setTextColor(color);
     }
     public void setTextColor(String hexColor) {
         binding.text.setTextColor(Color.parseColor(hexColor));
@@ -60,7 +60,7 @@ public class Tag extends LinearLayout {
 
 
     public void setFillColor(int color) {
-        binding.cardView.setCardBackgroundColor(fillColor);
+        binding.cardView.setCardBackgroundColor(color);
     }
     public void setFillColor(String hexColor) {
         binding.cardView.setCardBackgroundColor(Color.parseColor(hexColor));
