@@ -178,7 +178,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * @param parent The parent comment of {@code comment}
      */
     public void getMoreComments(RedditComment comment, RedditComment parent) {
-        this.redditApi.getMoreComments(post.getId(), comment.getChildren(), parent, newComments -> {
+        this.redditApi.getMoreComments(post.getID(), comment.getChildren(), parent, newComments -> {
             // Find the parent index to know where to insert the new comments
             int commentPos = this.comments.indexOf(comment);
             this.insertComments(newComments, commentPos);

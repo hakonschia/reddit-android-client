@@ -7,7 +7,8 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
-import com.example.hakonsreader.api.interfaces.RedditListing;
+import com.example.hakonsreader.api.interfaces.PostableListing;
+import com.example.hakonsreader.api.interfaces.VotableListing;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -589,7 +590,7 @@ public class RedditApi {
      * @param onResponse Callback for successful responses. Holds the newly created comment
      * @param onFailure Callback for failed requests
      */
-    public void postComment(String comment, RedditListing thing, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+    public void postComment(String comment, PostableListing thing, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
         try {
             this.verifyLoggedInToken();
         } catch (InvalidAccessTokenException e) {
@@ -597,7 +598,7 @@ public class RedditApi {
             return;
         }
 
-        String fullname = thing.getKind() + "_" + thing.getId();
+        String fullname = thing.getKind() + "_" + thing.getID();
 
         // The depth of the new comment
         int depth = 0;
@@ -651,7 +652,7 @@ public class RedditApi {
      * @param onFailure The callback for failed requests
      */
     @EverythingIsNonNull
-    public void vote(RedditListing thing, VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
+    public void vote(VotableListing thing, VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
         try {
             this.verifyLoggedInToken();
         } catch (InvalidAccessTokenException e) {
@@ -659,12 +660,8 @@ public class RedditApi {
             return;
         }
 
-
-        // "t1_gre3" etc. to identify what is being voted on (post or comment)
-        String fullname = thing.getKind() + "_" + thing.getId();
-
         this.api.vote(
-                fullname,
+                thing.getFullname(),
                 type.getValue(),
                 this.accessToken.generateHeaderString()
         ).enqueue(new Callback<Void>() {

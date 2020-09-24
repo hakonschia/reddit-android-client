@@ -45,14 +45,14 @@ public class PostContentLink extends ConstraintLayout {
                 .resize((int)getResources().getDimension(R.dimen.postLinkThumnailWidth), (int)getResources().getDimension(R.dimen.postLinkThumnailHeight))
                 .into(this.binding.thumbnail);
 
-        this.binding.link.setText(post.getUrl());
+        this.binding.link.setText(post.getURL());
     }
 
     /**
      * Opens the link found in {@link PostContentLink#post} in the browser
      */
     private void openLink() {
-        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getUrl()));
+        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getURL()));
         getContext().startActivity(i);
     }
 }

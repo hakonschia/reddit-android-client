@@ -43,13 +43,13 @@ public class PostContentText extends ScrollView {
     private void updateView() {
         this.textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));
 
-        String html = post.getSelftextHtml();
+        String html = post.getSelftextHTML();
 
         // Self text posts with only a title won't have a body
         if (html != null) {
             this.textView.setMovementMethod(LinkMovementMethod.getInstance());
             this.textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
-            this.textView.setText(Html.fromHtml(post.getSelftextHtml(), Html.FROM_HTML_MODE_LEGACY));
+            this.textView.setText(Html.fromHtml(post.getSelftextHTML(), Html.FROM_HTML_MODE_LEGACY));
         }
 
         int padding = (int) getResources().getDimension(R.dimen.defaultIndent);

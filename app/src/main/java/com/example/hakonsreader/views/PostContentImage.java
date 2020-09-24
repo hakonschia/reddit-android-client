@@ -40,7 +40,7 @@ public class PostContentImage extends androidx.appcompat.widget.AppCompatImageVi
      */
     private void updateView() {
         Picasso.get()
-                .load(post.getUrl())
+                .load(post.getURL())
                 .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
                 // Scale so the image fits the width of the screen
                 .resize(App.getScreenWidth(), 0)
@@ -49,7 +49,7 @@ public class PostContentImage extends androidx.appcompat.widget.AppCompatImageVi
         // Open image when clicked
         this.setOnClickListener(view -> {
             Intent intent = new Intent(getContext(), ImageActivity.class);
-            intent.putExtra("imageUrl", post.getUrl());
+            intent.putExtra("imageUrl", post.getURL());
             getContext().startActivity(intent);
             ((Activity)getContext()).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });

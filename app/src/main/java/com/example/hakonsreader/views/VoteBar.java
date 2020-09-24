@@ -12,7 +12,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.VoteType;
-import com.example.hakonsreader.api.interfaces.RedditListing;
+import com.example.hakonsreader.api.interfaces.VotableListing;
 import com.example.hakonsreader.databinding.LayoutVoteBarBinding;
 import com.example.hakonsreader.misc.Util;
 
@@ -27,7 +27,7 @@ public class VoteBar extends ConstraintLayout {
 
     private LayoutVoteBarBinding binding;
 
-    private RedditListing listing;
+    private VotableListing listing;
 
 
     public VoteBar(Context context, @Nullable AttributeSet attrs) {
@@ -44,7 +44,7 @@ public class VoteBar extends ConstraintLayout {
      *
      * @param listing The listing to set
      */
-    public void setListing(@NonNull RedditListing listing) {
+    public void setListing(@NonNull VotableListing listing) {
         this.listing = listing;
         // Make sure the initial status is up to date
         this.updateVoteStatus();

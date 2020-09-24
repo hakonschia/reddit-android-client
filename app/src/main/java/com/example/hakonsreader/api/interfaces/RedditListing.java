@@ -1,37 +1,41 @@
 package com.example.hakonsreader.api.interfaces;
 
-import com.example.hakonsreader.api.enums.VoteType;
-
 /**
  * Interface for all common attributes for a Reddit listing
+ *
+ * <p>There are also other types of mores specific listings, such as {@link VotableListing}</p>
  */
 public interface RedditListing {
 
+    /**
+     * @return What kind of listing this is
+     */
     String getKind();
 
-    String getSubreddit();
+    /**
+     * @return The ID of the listing
+     */
+    String getID();
 
-    String getId();
 
-    String getAuthor();
+    /**
+     * @return The URL of the listing
+     */
+    String getURL();
 
-    int getScore();
+    /**
+     * @return The fullname of the listing (equivalent to "{@link RedditListing#getKind()} + "_" + {@link RedditListing#getID()})
+     */
+    String getFullname();
 
-    String getPermalink();
-
+    /**
+     * @return The unix timestamp in milliseconds when the listing was created
+     */
     long getCreatedAt();
 
-    Boolean getLiked();
+    /**
+     * @return True if the listing is NSFW (over 18)
+     */
+    boolean isNSFW();
 
-    boolean isLocked();
-
-    boolean isScoreHidden();
-
-    boolean isStickied();
-
-    boolean isMod();
-
-    VoteType getVoteType();
-
-    void setVoteType(VoteType voteType);
 }

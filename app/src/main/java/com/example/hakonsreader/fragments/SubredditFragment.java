@@ -80,11 +80,13 @@ public class SubredditFragment extends Fragment {
     // Response handler for loading posts
     private OnResponse<List<RedditPost>> onPostResponse = posts -> {
         this.decreaseLoadingCount();
+        Log.d(TAG, "post size="+posts.size());
         adapter.addPosts(posts);
     };
     // Failure handler for loading posts
     private OnFailure onPostFailure = (code, t) -> {
         this.decreaseLoadingCount();
+        t.printStackTrace();
 
         Util.handleGenericResponseErrors(this.binding.parentLayout, code, t);
     };
@@ -164,7 +166,7 @@ public class SubredditFragment extends Fragment {
         int postsSize = previousPosts.size();
 
         if (postsSize > 0) {
-            after = Thing.POST.getValue() + "_" + previousPosts.get(postsSize - 1).getId();
+            after = Thing.POST.getValue() + "_" + previousPosts.get(postsSize - 1).getID();
         }
 
         // Store the current attempt to load more posts to avoid attempting many times if it fails

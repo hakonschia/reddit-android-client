@@ -2,159 +2,247 @@ package com.example.hakonsreader.api.model;
 
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.enums.VoteType;
-import com.example.hakonsreader.api.interfaces.RedditListing;
+import com.example.hakonsreader.api.interfaces.PostableListing;
+import com.example.hakonsreader.api.interfaces.VotableListing;
+import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Class representing a Reddit post
  */
-public class RedditPost implements RedditListing {
+public class RedditPost implements VotableListing, PostableListing {
     private static final String TAG = "RedditPost";
 
+    @SerializedName("kind")
     private String kind;
+
+    @SerializedName("data")
     public Data data;
 
-    public void setId(String id) {
-        this.data.id = id;
-    }
-    public RedditPost() {
-        this.data = new Data();
-    }
 
-    public static class Data extends ListingData {
+    /**
+     * Post specific data
+     */
+    private static class Data {
+        /* ------------- RedditListing ------------- */
+        @SerializedName("id")
+        private String id;
 
-        protected String title;
+        @SerializedName("url")
+        private String url;
 
-        // The URL of the post. For images it links to the picture, for link posts it's the link
-        protected String url;
+        @SerializedName("name")
+        private String fullname;
 
+        @SerializedName("created_utc")
+        private float createdAt;
 
-        // The amount of comments the post has
-        @SerializedName("num_comments")
-        protected int amountOfComments;
+        @SerializedName("over_18")
+        private boolean nsfw;
+        /* ------------- End RedditListing ------------- */
 
-        // Is the post a self post (ie. text post)
-        @SerializedName("is_self")
-        protected boolean isText;
+        /* ------------- PostableListing ------------- */
+        @SerializedName("subreddit")
+        private String subreddit;
 
-        // Is the post a video?
-        @SerializedName("is_video")
-        protected boolean isVideo;
+        @SerializedName("author")
+        private String author;
 
-        protected boolean spoiler;
+        @SerializedName("permalink")
+        private String permalink;
 
-        @SerializedName("hide_score")
+        @SerializedName("is_locked")
+        private boolean isLocked;
+
+        @SerializedName("is_stickied")
+        private boolean isStickied;
+
+        /**
+         * What the listing is distinguished as (such as "moderator")
+         */
+        @SerializedName("distinguished")
+        private String distinguished;
+        /* ------------- End PostableListing ------------- */
+
+        /* ------------- End VoteableListing ------------- */
+        @SerializedName("score")
+        private int score;
+
+        @SerializedName("score_hidden")
         private boolean scoreHidden;
 
+        @SerializedName("likes")
+        @JsonAdapter(BooleanPrimitiveAdapter.class)
+        private Boolean liked;
+        /* ------------- End VoteableListing ------------- */
 
-        protected String thumbnail;
 
-        // Is the post NSFW?
-        @SerializedName("over_18")
-        protected boolean nsfw;
 
-        @SerializedName("post_hint")
-        protected String postHint;
+        @SerializedName("title")
+        private String title;
+
+        @SerializedName("num_comments")
+        private int amountOfComments;
+
+        @SerializedName("thumbnail")
+        private String thumbnail;
+
+        @SerializedName("spoiler")
+        private boolean spoiler;
 
         @SerializedName("selftext_html")
-        protected String selftextHtml;
+        private String selftextHtml;
 
 
-        // For video posts
-        protected Media media;
+        @SerializedName("is_self")
+        private boolean isText;
+
+        @SerializedName("is_video")
+        private boolean isVideo;
+
+        @SerializedName("post_hint")
+        private String postHint;
+
+
+        @SerializedName("media")
+        private Media media;
+
+        /**
+         * Data for video posts
+         */
         private static class Media {
 
             @SerializedName("reddit_video")
-            protected RedditVideo redditVideo;
+            private RedditVideo redditVideo;
 
-            protected static class RedditVideo {
-                protected int duration;
+            private static class RedditVideo {
+                private int duration;
 
                 @SerializedName("fallback_url")
-                protected String url;
+                private String url;
 
-                protected int height;
-                protected int width;
+                @SerializedName("height")
+                private int height;
+
+                @SerializedName("width")
+                private int width;
             }
         }
     }
 
 
-    /* --------------------- Inherited from ListingData --------------------- */
+    /* --------------------- Inherited --------------------- */
+    /* ------------- RedditListing ------------- */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getKind() {
-        return this.kind;
+        return kind;
     }
 
     /**
-     * @return The clean name of the subreddit (no r/ prefix)
+     * {@inheritDoc}
      */
     @Override
-    public String getSubreddit() {
-        return this.data.getSubreddit();
-    }
-
-    @Override
-    public String getId() {
-        return this.data.getId();
-    }
-
-    @Override
-    public String getAuthor() {
-        return this.data.getAuthor();
-    }
-
-    @Override
-    public int getScore() {
-        return this.data.getScore();
-    }
-
-    @Override
-    public Boolean getLiked() {
-        return this.data.getLiked();
-    }
-
-    @Override
-    public boolean isLocked() {
-        return this.data.isLocked();
+    public String getID() {
+        return data.id;
     }
 
     /**
-     * Should the score be hidden?
-     *
-     * @return True if the score should be hidden
-     */
-    @Override
-    public boolean isScoreHidden() {
-        return this.data.scoreHidden;
+     * {@inheritDoc}
+     */@Override
+    public String getFullname() {
+        return data.fullname;
     }
 
     /**
-     * Retrieve the link to the comments of a post (full link)
-     *
-     * @return The permalink to the post
-     */
-    @Override
-    public String getPermalink() {
-        return this.data.getPermalink();
-    }
-
-    /**
-     * @return The unix timestamp in UTC when the post was created
+     * {@inheritDoc}
      */
     @Override
     public long getCreatedAt() {
-        return (long)data.getCreatedAt();
+        return (long)data.createdAt;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isNSFW() {
+        return data.nsfw;
+    }
+    /* ------------- End RedditListing ------------- */
+
+    /* ------------- PostableListing ------------- */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSubreddit() {
+        return data.subreddit;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getAuthor() {
+        return data.author;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPermalink() {
+        return data.permalink;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isLocked() {
+        return data.isLocked;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isStickied() {
-        return data.getStickied();
+        return data.isStickied;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isMod() {
-        return data.isMod();
+        if (data.distinguished == null) {
+            return false;
+        }
+
+        return data.distinguished.equals("moderator");
+    }
+    /* ------------- End PostableListing ------------- */
+
+    /* ------------- VoteableListing ------------- */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getScore() {
+        return data.score;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isScoreHidden() {
+        return data.scoreHidden;
     }
 
     /**
@@ -162,60 +250,89 @@ public class RedditPost implements RedditListing {
      *
      * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
      */
-    @Override
     public VoteType getVoteType() {
-        return this.data.getVoteType();
+        if (data.liked == null) {
+            return VoteType.NO_VOTE;
+        }
+
+        return (data.liked ? VoteType.UPVOTE : VoteType.DOWNVOTE);
     }
+
     /**
      * @param voteType The vote type for this post for the current user
      */
-    @Override
     public void setVoteType(VoteType voteType) {
-        this.data.setVoteType(voteType);
+        // Update the internal data as that is used in getVoteType
+        switch (voteType) {
+            case UPVOTE:
+                data.liked = true;
+                break;
+            case DOWNVOTE:
+                data.liked = false;
+                break;
+            case NO_VOTE:
+                data.liked = null;
+                break;
+        }
     }
-    /* --------------------- End inherited from ListingData --------------------- */
+    /* ------------- End VoteableListing ------------- */
+    /* --------------------- End inherited --------------------- */
 
 
+    /**
+     * @return The title of the post
+     */
     public String getTitle() {
-        return this.data.title;
+        return data.title;
     }
 
-    public String getThumbnail() {
-        return this.data.thumbnail;
-    }
-
-    public String getUrl() {
-        return this.data.url;
-    }
-
-    public boolean isSpoiler() {
-        return this.data.spoiler;
-    }
-
-    public boolean isNsfw() {
-        return this.data.nsfw;
-    }
-
-    public boolean isVideo() {
-        return this.data.isVideo;
-    }
-
+    /**
+     * @return The amount of comments the post has
+     */
     public int getAmountOfComments() {
-        return this.data.amountOfComments;
+        return data.amountOfComments;
     }
 
+    /**
+     * @return The URL to the thumbnail of the post
+     */
+    public String getThumbnail() {
+        return data.thumbnail;
+    }
+
+    /**
+     * @return The URL of the post. For link posts this is the link, otherwise
+     * it points the URL for the post
+     */
+    public String getURL() {
+        return data.url;
+    }
+
+    /**
+     * @return True if the post is marked as a spoiler
+     */
+    public boolean isSpoiler() {
+        return data.spoiler;
+    }
+
+    /**
+     * @return The HTML of the text of the post if the post is {@link PostType#TEXT}
+     */
+    public String getSelftextHTML() {
+        return data.selftextHtml;
+    }
+
+    /**
+     * @return The URL to the video of the post if the post is {@link PostType#VIDEO}
+     * or {@link PostType#RICH_VIDEO}
+     */
     public String getVideoUrl() {
         // If video not hosted by reddit
-        if (this.data.media == null) {
-            return this.getUrl();
+        if (data.media == null) {
+            return getURL();
         }
-        return this.data.media.redditVideo.url;
+        return data.media.redditVideo.url;
     }
-
-    public String getSelftextHtml() {
-        return this.data.selftextHtml;
-    }
-
 
     /**
      * Retrieves the height of the video
@@ -223,11 +340,11 @@ public class RedditPost implements RedditListing {
      * @return The height of the video, or -1 if there is no video
      */
     public int getVideoHeight() {
-        if (this.data.media == null) {
+        if (data.media == null) {
             return -1;
         }
 
-        return this.data.media.redditVideo.height;
+        return data.media.redditVideo.height;
     }
 
     /**
@@ -235,11 +352,11 @@ public class RedditPost implements RedditListing {
      *
      * @return The width of the video, or -1 if there is no video
      */public int getVideoWidth() {
-        if (this.data.media == null) {
+        if (data.media == null) {
             return -1;
         }
 
-        return this.data.media.redditVideo.width;
+        return data.media.redditVideo.width;
     }
 
 
@@ -265,9 +382,9 @@ public class RedditPost implements RedditListing {
 
         if (hint.equals("link")) {
             // Link posts might be images not uploaded to reddit
-            if (getUrl().matches("(.png|.jpeg|.jpg)$")) {
+            if (getURL().matches("(.png|.jpeg|.jpg)$")) {
                 return PostType.IMAGE;
-            } else if (getUrl().endsWith(".gifv REMOVE THIS LATER")) {
+            } else if (getURL().endsWith(".gifv REMOVE THIS LATER")) {
                 // TODO load gifs somehow (change to PostType.GIF maybe)
                 return PostType.VIDEO;
             }

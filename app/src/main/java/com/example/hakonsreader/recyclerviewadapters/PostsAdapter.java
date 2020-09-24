@@ -80,7 +80,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 .filter(post -> {
                     for (RedditPost p : this.posts) {
                         // Filter out the post on matching ID
-                        if (p.getId().equals(post.getId())) {
+                        if (p.getID().equals(post.getID())) {
                             return false;
                         }
                     }
@@ -136,7 +136,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             View view = inflater.inflate(R.layout.tag_spoiler, holder.tags, false);
             holder.tags.addView(view);
         }
-        if (post.isNsfw()) {
+        if (post.isNSFW()) {
             View view = inflater.inflate(R.layout.tag_nsfw, holder.tags, false);
             holder.tags.addView(view);
         }

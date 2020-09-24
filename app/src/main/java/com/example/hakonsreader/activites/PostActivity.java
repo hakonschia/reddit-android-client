@@ -190,7 +190,7 @@ public class PostActivity extends AppCompatActivity {
      */
     private void getComments() {
         this.binding.loadingIcon.increaseLoadCount();
-        this.redditApi.getComments(post.getId(), (comments -> {
+        this.redditApi.getComments(post.getID(), (comments -> {
             this.commentsAdapter.addComments(comments);
             this.binding.loadingIcon.decreaseLoadCount();
         }), ((code, t) -> {

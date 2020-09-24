@@ -31,7 +31,6 @@ public class TokenManager {
      * @param newToken The new token to save
      */
     public static void saveToken(AccessToken newToken) {
-        Log.d("TAG", "saveToken: saving new token="+newToken);
         token = newToken;
 
         // Save in shared prefs
@@ -42,7 +41,7 @@ public class TokenManager {
      * Clears the stored token
      */
     public static void removeToken() {
-        token = null;
+        token = new AccessToken();
         SharedPreferencesManager.remove(SharedPreferencesConstants.ACCESS_TOKEN);
     }
 }

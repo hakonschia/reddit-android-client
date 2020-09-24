@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
-import com.example.hakonsreader.api.interfaces.RedditListing;
+import com.example.hakonsreader.api.interfaces.PostableListing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityReplyBinding;
@@ -24,7 +24,7 @@ public class ReplyActivity extends AppCompatActivity {
     private ActivityReplyBinding binding;
 
     private RedditApi redditApi = App.getApi();
-    private RedditListing replyingTo;
+    private PostableListing replyingTo;
 
 
     @Override
