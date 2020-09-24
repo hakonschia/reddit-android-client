@@ -55,6 +55,7 @@ public class PostContentVideo extends PlayerView {
     private static final float MAX_WIDTH_RATIO = 1.0f;
 
     private ExoPlayer exoPlayer;
+    private MediaSource mediaSource;
     private RedditPost post;
 
     public PostContentVideo(Context context, RedditPost post) {
@@ -85,7 +86,7 @@ public class PostContentVideo extends PlayerView {
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
         CacheDataSourceFactory cacheFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
 
-        final MediaSource mediaSource = new ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
+        mediaSource = new ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
                 .createMediaSource(Uri.parse(post.getVideoUrl()));
 
         exoPlayer = new SimpleExoPlayer.Builder(context)
@@ -141,6 +142,15 @@ public class PostContentVideo extends PlayerView {
      */
     public void release() {
         exoPlayer.release();
+    }
+
+    /**
+     * Prepares the exo player
+     */
+    public void prepare() {
+        if (mediaSource != null) {
+            exoPlayer.prepare(mediaSource);
+        }
     }
 
 

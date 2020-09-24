@@ -213,6 +213,10 @@ public class PostActivity extends AppCompatActivity {
         boolean isPlaying = data.getBoolean(PostContentVideo.EXTRA_IS_PLAYING);
         boolean showController = data.getBoolean(PostContentVideo.EXTRA_SHOW_CONTROLS);
 
+        // Video has been played previously so make sure the player is prepared
+        if (timestamp != 0) {
+            video.prepare();
+        }
         video.setPosition(timestamp);
         video.setPlayback(isPlaying);
         video.setControllerVisible(showController);
