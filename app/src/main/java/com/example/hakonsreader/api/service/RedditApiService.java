@@ -158,10 +158,20 @@ public interface RedditApiService {
     );
 
 
+    /**
+     * Retrieve a list of the users subscribed subreddits
+     *
+     * @param after
+     * @param count
+     * @param limit
+     * @param accessToken
+     * @return
+     */
     @GET("subreddits/mine/subscriber")
     Call<SubredditResponse> getSubscribedSubreddits(
             @Query("after") String after,
             @Query("count") int count,
+            @Query("limit") int limit,
 
             @Header("Authorization") String accessToken
     );

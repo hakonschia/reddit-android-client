@@ -56,6 +56,11 @@ public class Subreddit implements RedditListing {
         @SerializedName("quarantine")
         private boolean quarantine;
 
+        @SerializedName("user_has_favorited")
+        private boolean userHasFavorited;
+
+        @SerializedName("submit_text")
+        private String submitText;
     }
 
     /* --------------------- Inherited --------------------- */
@@ -169,4 +174,17 @@ public class Subreddit implements RedditListing {
         return data.quarantine;
     }
 
+    /**
+     * @return True if the currently logged in user has favorited the subreddit
+     */
+    public boolean userHasFavorited() {
+        return data.userHasFavorited;
+    }
+
+    /**
+     * @return The text to display when submitting a post to the subreddit
+     */
+    public String getSubmitText() {
+        return data.submitText;
+    }
 }

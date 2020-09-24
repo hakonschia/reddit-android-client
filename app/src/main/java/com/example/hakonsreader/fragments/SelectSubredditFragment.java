@@ -12,9 +12,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.databinding.FragmentSubredditBinding;
+import com.example.hakonsreader.api.model.Subreddit;
+import com.example.hakonsreader.databinding.FragmentSelectSubredditBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SelectSubredditFragment extends Fragment {
     private static final String TAG = "SelectSubredditFragment";
@@ -24,7 +29,7 @@ public class SelectSubredditFragment extends Fragment {
     private SubredditsAdapter subredditsAdapter;
     private LinearLayoutManager layoutManager;
 
-    private FragmentSubredditBinding binding;
+    private FragmentSelectSubredditBinding binding;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,18 +39,33 @@ public class SelectSubredditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        this.binding = FragmentSubredditBinding.inflate(inflater);
+        this.binding = FragmentSelectSubredditBinding.inflate(inflater);
         View view = this.binding.getRoot();
 
 
         subredditsAdapter = new SubredditsAdapter();
         layoutManager = new LinearLayoutManager(getContext());
 
-        binding.posts.setAdapter(subredditsAdapter);
-        binding.posts.setLayoutManager(layoutManager);
+        binding.subreddits.setAdapter(subredditsAdapter);
+        binding.subreddits.setLayoutManager(layoutManager);
 
         redditApi.getSubscribedSubreddits("", 0, subreddits -> {
-            subredditsAdapter.setSubreddits(subreddits);
+            List<Subreddit> favorites = subreddits.stream()
+                    .filter(Subreddit::userHasFavorited)
+                    .collect(Collectors.toList());
+
+            List<Subreddit> sorted = subreddits.stream()
+                    // Sort based on subreddit name
+                    .sorted((first, second) -> first.getName().compareTo(second.getName()))
+                    .collect(Collectors.toList());
+            // Remove the favorites to not include twice
+            sorted.removeAll(favorites);
+
+            List<Subreddit> combined = new ArrayList<>();
+            combined.addAll(favorites);
+            combined.addAll(sorted);
+
+            subredditsAdapter.setSubreddits(combined);
         }, (code, t) -> {
             t.printStackTrace();
             Util.handleGenericResponseErrors(binding.parentLayout, code, t);

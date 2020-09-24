@@ -121,7 +121,7 @@
         android:visibility="gone"
 
         android:layout_gravity="center"
-        android:indeterminateTint="@color/iconColor"
+        android:indeterminateTint="@color/accent"
 
         tools:visibility="visible" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

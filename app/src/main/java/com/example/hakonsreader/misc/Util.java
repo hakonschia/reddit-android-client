@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.util.Locale;
 
 public class Util {
+    private Util() { }
 
 
     /**

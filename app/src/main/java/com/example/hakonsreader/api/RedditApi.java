@@ -689,7 +689,8 @@ public class RedditApi {
      *
      * @param after The ID of the last subreddit seen (empty string if loading for the first time)
      * @param count The amount of items fetched previously (0 if loading for the first time)
-     * @param onResponse The response handler for successful request. Holds the list of subreddits fetched
+     * @param onResponse The response handler for successful request. Holds the list of subreddits fetched.
+     *                   This list is not sorted
      * @param onFailure The response handler for failed requests
      */
     public void getSubscribedSubreddits(String after, int count, OnResponse<List<Subreddit>> onResponse, OnFailure onFailure) {
@@ -703,6 +704,7 @@ public class RedditApi {
         this.api.getSubscribedSubreddits(
                 after,
                 count,
+                100,
                 this.accessToken.generateHeaderString()
         ).enqueue(new Callback<SubredditResponse>() {
             @Override

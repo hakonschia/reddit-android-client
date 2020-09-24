@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.ViewHolder> {
-
+    private static final String TAG = "SubredditsAdapter";
+    
+    
     private List<Subreddit> subreddits = new ArrayList<>();
 
     public void setSubreddits(List<Subreddit> subreddits) {
@@ -30,8 +33,20 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Subreddit subreddit = subreddits.get(position);
 
-        holder.name.setText(subreddit.getName());
+        holder.name.setText(subreddit.getName() + (subreddit.userHasFavorited() ? " (favorite)" : ""));
+        String iconURL = subreddit.getIconImage();
+        if (iconURL != null && !iconURL.isEmpty()) {
+            Picasso.get()
+                    .load(iconURL)
+                    .into(holder.icon);
+        }
 
+        holder.itemView.setOnLongClickListener(view -> {
+            String k = String.format("{\n\tname:%s\n\ticonURL:%s\n\turl:%s\n}", subreddit.getName(), subreddit.getIconImage(), subreddit.getURL());
+
+            Log.d(TAG, "onBindViewHolder: \n" +k);
+            return true;
+        });
     }
 
     @NonNull
@@ -61,6 +76,10 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
             icon = itemView.findViewById(R.id.icon);
             name = itemView.findViewById(R.id.name);
+
+            itemView.setOnClickListener(view -> {
+
+            });
         }
     }
 }

@@ -71,4 +71,6 @@
 
     <string name="tagNSFW">NSFW</string>
     <string name="tagSpoiler">Spoiler</string>
+
+    <string name="searchForSubreddit">Search for subreddit</string>
 </resources>

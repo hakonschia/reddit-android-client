@@ -19,6 +19,7 @@ import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.misc.Util;
+import com.example.hakonsreader.misc.ViewUtil;
 import com.example.hakonsreader.views.FullPostBar;
 import com.example.hakonsreader.views.PostContentLink;
 import com.example.hakonsreader.views.PostContentVideo;
@@ -131,14 +132,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.postInfo.setPost(post);
         holder.fullPostBar.setPost(post);
 
-        LayoutInflater inflater = (LayoutInflater) holder.itemView.getContext().getSystemService(LAYOUT_INFLATER_SERVICE);
         if (post.isSpoiler()) {
-            View view = inflater.inflate(R.layout.tag_spoiler, holder.tags, false);
-            holder.tags.addView(view);
+            holder.tags.addView(ViewUtil.createSpoilerTag(holder.itemView.getContext()));
         }
         if (post.isNSFW()) {
-            View view = inflater.inflate(R.layout.tag_nsfw, holder.tags, false);
-            holder.tags.addView(view);
+            holder.tags.addView(ViewUtil.createNSFWTag(holder.itemView.getContext()));
         }
 
         // Update to set the initial vote status

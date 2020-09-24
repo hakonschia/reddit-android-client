@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Tag">
+        <attr name="textColor" format="color" />
+        <attr name="fillColor" format="color" />
+
+        <attr name="text" format="string" />
+    </declare-styleable>
+</resources>

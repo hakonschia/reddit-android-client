@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         Snackbar.make(this.binding.parentLayout, R.string.loggedIn, Snackbar.LENGTH_SHORT).show();
     };
     private OnFailure onTokenFailure = (code, t) -> {
-        this.binding.loadingIcon.decreaseLoadCount();
+        binding.loadingIcon.decreaseLoadCount();
 
         Util.handleGenericResponseErrors(this.binding.parentLayout, code, t);
     };
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         this.setupNavBar();
@@ -111,8 +111,8 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
             getIntent().setData(null);
             getIntent().setFlags(0);
 
-            this.binding.loadingIcon.increaseLoadCount();
-            this.redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
+            binding.loadingIcon.increaseLoadCount();
+            redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
         }
     }
 
@@ -131,9 +131,9 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     @Override
     public void onCountChange(boolean up) {
         if (up) {
-            this.binding.loadingIcon.increaseLoadCount();
+            binding.loadingIcon.increaseLoadCount();
         } else {
-            this.binding.loadingIcon.decreaseLoadCount();
+            binding.loadingIcon.decreaseLoadCount();
         }
     }
 
@@ -141,10 +141,10 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
      * Creates new fragments and passes along needed information such as the access token
      */
     private void setupStartFragment() {
-        this.postsFragment = new PostsContainerFragment();
+        postsFragment = new PostsContainerFragment();
 
         getSupportFragmentManager().beginTransaction()
-            .replace(R.id.fragmentContainer, this.postsFragment)
+            .replace(R.id.fragmentContainer, postsFragment)
             .commit();
     }
 
@@ -167,11 +167,11 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
             // TODO clean up this mess
             switch (item.getItemId()) {
                 case R.id.navHome:
-                    selected = this.postsFragment;
+                    selected = postsFragment;
                     break;
 
                 case R.id.navSubreddit:
-                    if (this.activeSubreddit == null) {
+                    if (activeSubreddit == null) {
                         if (selectSubredditFragment == null) {
                             selectSubredditFragment = new SelectSubredditFragment();
                         }
@@ -182,26 +182,26 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
                 case R.id.navProfile:
                     // If not logged in, show log in page
                     if (TokenManager.getToken().getRefreshToken() == null) {
-                        if (this.logInFragment == null) {
-                            this.logInFragment = new LogInFragment();
+                        if (logInFragment == null) {
+                            logInFragment = new LogInFragment();
                         }
 
-                        selected = this.logInFragment;
+                        selected = logInFragment;
                     } else {
-                        if (this.profileFragment == null) {
-                            this.profileFragment = new ProfileFragment();
+                        if (profileFragment == null) {
+                            profileFragment = new ProfileFragment();
                         }
 
-                        selected = this.profileFragment;
+                        selected = profileFragment;
                     }
                     break;
 
                 case R.id.navSettings:
-                    if (this.settingsFragment == null) {
-                        this.settingsFragment = new SettingsFragment();
+                    if (settingsFragment == null) {
+                        settingsFragment = new SettingsFragment();
                     }
 
-                    selected = this.settingsFragment;
+                    selected = settingsFragment;
                     break;
 
                 default:
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
      */
     public void btnLogOutOnClick(View view) {
         // Revoke token
-        this.redditApi.revokeRefreshToken(response -> {
+        redditApi.revokeRefreshToken(response -> {
         }, (call, t) -> {
             // If failed because of internet connection try to revoke later
         });
