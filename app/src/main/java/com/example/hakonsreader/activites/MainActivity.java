@@ -20,6 +20,7 @@ import com.example.hakonsreader.databinding.ActivityMainBinding;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
+import com.example.hakonsreader.fragments.SelectSubredditFragment;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
     // The fragments to show in the nav bar
     private PostsContainerFragment postsFragment;
+    private SubredditFragment activeSubreddit;
+    private SelectSubredditFragment selectSubredditFragment;
     private ProfileFragment profileFragment;
     private LogInFragment logInFragment;
     private SettingsFragment settingsFragment;
@@ -153,22 +156,27 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         navBar.setOnNavigationItemSelectedListener(item -> {
             Fragment selected = null;
 
+            // TODO create another fix to this as clicknig twice on subreddits should provide functionality
             // Item pressed is same as item selected, do nothing as this adds to the backstack
+            /*
             if (navBar.getSelectedItemId() == item.getItemId()) {
                 return false;
             }
+             */
 
+            // TODO clean up this mess
             switch (item.getItemId()) {
                 case R.id.navHome:
                     selected = this.postsFragment;
                     break;
 
                 case R.id.navSubreddit:
-                    // TODO this
-                    if (this.globalOffensive == null) {
-                        this.globalOffensive = SubredditFragment.newInstance("test");
+                    if (this.activeSubreddit == null) {
+                        if (selectSubredditFragment == null) {
+                            selectSubredditFragment = new SelectSubredditFragment();
+                        }
+                        selected = selectSubredditFragment;
                     }
-                    selected = this.globalOffensive;
                     break;
 
                 case R.id.navProfile:
