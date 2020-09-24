@@ -3,6 +3,7 @@ package com.example.hakonsreader.recyclerviewadapters;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -271,8 +272,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             holder.asMod();
         } else if (post.getAuthor().equals(comment.getAuthor())) {
             holder.asPoster();
-        } else {
-            holder.asNormal();
         }
 
         // TODO remove magic string and create "listing" enum or something
@@ -291,6 +290,14 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         holder.itemView.setPadding(paddingStart, 0, 0, 0);
         // Update the layout with new padding
         holder.itemView.requestLayout();
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        super.onViewRecycled(holder);
+
+        Log.d(TAG, "onViewRecycled: Recycling comment from " + holder.author.getText().toString());
+        holder.reset();
     }
 
     @NonNull
@@ -326,6 +333,24 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
 
         /**
+         * Resets the view to default values so all views start out the same
+         */
+        private void reset() {
+            // Reset author text (from when comment is by poster/mod)
+            author.setBackground(null);
+            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.linkColor));
+
+            // Reset if holder previously was a hidden comment
+            author.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+            age.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+
+            // Reset it holder previously was "5 more comments"
+            voteBar.setVisibility(View.VISIBLE);
+            reply.setVisibility(View.VISIBLE);
+            itemView.setOnClickListener(null);
+        }
+
+        /**
          * Formats the comment as a mod comment
          */
         private void asMod() {
@@ -342,15 +367,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         }
 
         /**
-         * Formats the comment as a normal comment by a standard user
-         */
-        private void asNormal() {
-            author.setBackground(null);
-            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.linkColor));
-        }
-
-
-        /**
          * Sets the contents of the the view holder as a standard comment with content, vote bars etc.
          *
          * @param comment The comment to use for the holder
@@ -358,33 +374,23 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         private void asNormalComment(RedditComment comment) {
             Context context = itemView.getContext();
 
-            String authorText = String.format(context.getString(R.string.authorPrefixed), comment.getAuthor());
-
             // Html.fromHtml adds a newline at the end which makes the TextView larger than it should be
             // TODO it ruins the HTML formatting tho
             // String contentText = Util.trimTrailingWhitespace(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
             content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
-            content.setMovementMethod(InternalLinkMovementMethod.getSubredditAndUserInstance(itemView.getContext()));
+            content.setMovementMethod(InternalLinkMovementMethod.getSubredditAndUserInstance(context));
 
-
-            author.setText(authorText);
-            author.setTypeface(author.getTypeface(), Typeface.NORMAL);
+            author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));
 
             // Calculate the time since the comment was posted
             Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
             Duration between = Duration.between(created, Instant.now());
             age.setText(Util.createAgeText(context.getResources(), between));
-            age.setTypeface(age.getTypeface(), Typeface.NORMAL);
 
             // TODO if comment is locked replies shouldn't be accessible
             reply.setOnClickListener(view -> replyListener.replyTo(comment));
-            reply.setVisibility(View.VISIBLE);
 
             voteBar.setListing(comment);
-            voteBar.setVisibility(View.VISIBLE);
-
-            // Remove the listener if there is one (from "more comments")
-            itemView.setOnClickListener(null);
 
             // Hide comments on long clicks
             // This has to be set on both the TextView as well as the entire holder since the TextView
@@ -437,8 +443,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
          * @param runnable What to do when the comment is clicked again
          */
         private void commentHidden(Runnable runnable) {
-            author.setTypeface(author.getTypeface(), Typeface.ITALIC);
-            age.setTypeface(age.getTypeface(), Typeface.ITALIC);
+            author.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
+            age.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
 
             content.setText("");
             reply.setVisibility(View.GONE);

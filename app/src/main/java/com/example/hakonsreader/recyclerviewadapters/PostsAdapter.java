@@ -124,11 +124,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // Free up any resources that might not be garbage collected automatically
-        View v = holder.content.getChildAt(0);
-        Util.cleanupPostContent(v);
-        holder.tags.removeAllViews();
-
         Context context = holder.itemView.getContext();
         final RedditPost post = this.posts.get(position);
         holder.post = post;
@@ -160,6 +155,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         // Update to set the initial vote status
         holder.setPostContent();
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        super.onViewRecycled(holder);
+
+        // Free up any resources that might not be garbage collected automatically
+        View v = holder.content.getChildAt(0);
+        Util.cleanupPostContent(v);
+        holder.tags.removeAllViews();
     }
 
 

@@ -257,6 +257,22 @@ public class SubredditFragment extends Fragment {
         this.binding = null;
     }
 
+        /*
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // TODO store state of list
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        // TODO restore state of stuff here
+        Log.d(TAG, "onViewStateRestored");
+    }
+     */
+
     @Override
     public void onResume() {
         super.onResume();
