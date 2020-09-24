@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.responses.RedditCommentsResponse;
