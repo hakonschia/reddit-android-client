@@ -5,6 +5,7 @@ import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.PostableListing;
 import com.example.hakonsreader.api.interfaces.VotableListing;
 import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
+import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -108,6 +109,13 @@ public class RedditPost implements VotableListing, PostableListing {
 
         @SerializedName("post_hint")
         private String postHint;
+
+
+        @SerializedName("link_flair_background_color")
+        private String linkFlairBackgroundColor;
+
+        @SerializedName("link_flair_richtext")
+        private List<RichtextFlair> richtextFlairs;
 
 
         @SerializedName("media")
@@ -337,6 +345,14 @@ public class RedditPost implements VotableListing, PostableListing {
      */
     public String getSelftextHTML() {
         return data.selftextHtml;
+    }
+
+
+    /**
+     * @return The list of richtext flairs for the post
+     */
+    public List<RichtextFlair> getRichtextFlairs() {
+        return data.richtextFlairs;
     }
 
     /**
