@@ -61,6 +61,9 @@ public class Subreddit implements RedditListing {
 
         @SerializedName("submit_text")
         private String submitText;
+
+        @SerializedName("subreddit_type")
+        private String subredditType;
     }
 
     /* --------------------- Inherited --------------------- */
@@ -186,5 +189,12 @@ public class Subreddit implements RedditListing {
      */
     public String getSubmitText() {
         return data.submitText;
+    }
+
+    /**
+     * @return The type of subreddit this is. For user subreddit this is "user"
+     */
+    public String getSubredditType() {
+        return data.subredditType;
     }
 }

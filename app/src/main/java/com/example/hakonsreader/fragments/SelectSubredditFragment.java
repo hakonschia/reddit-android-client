@@ -64,20 +64,27 @@ public class SelectSubredditFragment extends Fragment {
         binding.subreddits.setLayoutManager(layoutManager);
 
         redditApi.getSubscribedSubreddits("", 0, subreddits -> {
-            List<Subreddit> favorites = subreddits.stream()
-                    .filter(Subreddit::userHasFavorited)
-                    .collect(Collectors.toList());
-
             List<Subreddit> sorted = subreddits.stream()
                     // Sort based on subreddit name
                     .sorted((first, second) -> first.getName().compareTo(second.getName()))
                     .collect(Collectors.toList());
+
+            List<Subreddit> favorites = sorted.stream()
+                    .filter(Subreddit::userHasFavorited)
+                    .collect(Collectors.toList());
+
+            List<Subreddit> users = sorted.stream()
+                    .filter(subreddit -> subreddit.getSubredditType().equals("user"))
+                    .collect(Collectors.toList());
+
             // Remove the favorites to not include twice
             sorted.removeAll(favorites);
+            sorted.removeAll(users);
 
             List<Subreddit> combined = new ArrayList<>();
             combined.addAll(favorites);
             combined.addAll(sorted);
+            combined.addAll(users);
 
             subredditsAdapter.setSubreddits(combined);
         }, (code, t) -> {

@@ -2,7 +2,6 @@ package com.example.hakonsreader.activites;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -151,24 +150,17 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     @Override
     public void subredditSelected(Subreddit subreddit) {
         // Create new subreddit fragment and replace
-        Log.d(TAG, "subredditSelected: " + subreddit.getName());
-        this.activeSubreddit = SubredditFragment.newInstance(subreddit.getName());
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, activeSubreddit)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
+        activeSubreddit = SubredditFragment.newInstance(subreddit.getName());
+        replaceFragment(activeSubreddit);
     }
 
 
     /**
-     * Creates new fragments and passes along needed information such as the access token
+     * Creates the posts fragment and replaces it in the container view
      */
     private void setupStartFragment() {
         postsFragment = new PostsContainerFragment();
-
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.fragmentContainer, postsFragment)
-            .commit();
+        replaceFragment(postsFragment);
     }
 
     /**
@@ -202,16 +194,45 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
                     return false;
             }
 
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, selected)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    // Although we don't use the backstack to pop elements, it is needed to keep the state
-                    // of the fragments (otherwise posts are reloaded when coming back)
-                    .addToBackStack(null)
-                    .commit();
+            replaceFragment(selected);
 
             return true;
         });
+
+        // Set listener for when an item has been clicked when already selected
+        binding.bottomNav.setOnNavigationItemReselectedListener(item -> {
+            Fragment selected = null;
+
+            // When the subreddit is clicked when already in subreddit go back to the subreddit list
+            if (item.getItemId() == R.id.navSubreddit) {
+                activeSubreddit = null;
+
+                if (selectSubredditFragment == null) {
+                    selectSubredditFragment = new SelectSubredditFragment();
+                    selectSubredditFragment.setSubredditSelected(this);
+                }
+                selected = selectSubredditFragment;
+            }
+
+            if (selected != null) {
+                replaceFragment(selected);
+            }
+        });
+    }
+
+    /**
+     * Replaces the fragment in {@link ActivityMainBinding#fragmentContainer}
+     *
+     * @param fragment The new fragment to show
+     */
+    private void replaceFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                // Although we don't use the backstack to pop elements, it is needed to keep the state
+                // of the fragments (otherwise posts are reloaded when coming back)
+                .addToBackStack(null)
+                .commit();
     }
 
     /**
@@ -225,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
      */
     private Fragment onNavBarSubreddit() {
         // No subreddit created (first time here), or we in a subreddit looking to get back
-        if (activeSubreddit == null || binding.bottomNav.getSelectedItemId() == R.id.navSubreddit) {
+        if (activeSubreddit == null) {
             if (selectSubredditFragment == null) {
                 selectSubredditFragment = new SelectSubredditFragment();
                 selectSubredditFragment.setSubredditSelected(this);
