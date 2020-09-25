@@ -14,6 +14,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.databinding.FragmentSelectSubredditBinding;
+import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter;
 
@@ -30,6 +31,18 @@ public class SelectSubredditFragment extends Fragment {
     private LinearLayoutManager layoutManager;
 
     private FragmentSelectSubredditBinding binding;
+    private OnSubredditSelected subredditSelected;
+
+
+    /**
+     * Sets the listener for when a subreddit has been selected
+     *
+     * @param subredditSelected The listener to call
+     */
+    public void setSubredditSelected(OnSubredditSelected subredditSelected) {
+        this.subredditSelected = subredditSelected;
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,6 +57,7 @@ public class SelectSubredditFragment extends Fragment {
 
 
         subredditsAdapter = new SubredditsAdapter();
+        subredditsAdapter.setSubredditSelected(subredditSelected);
         layoutManager = new LinearLayoutManager(getContext());
 
         binding.subreddits.setAdapter(subredditsAdapter);

@@ -2,6 +2,7 @@ package com.example.hakonsreader.activites;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
+import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.databinding.ActivityMainBinding;
@@ -24,12 +26,13 @@ import com.example.hakonsreader.fragments.SelectSubredditFragment;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
+import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.snackbar.Snackbar;
 
-public class MainActivity extends AppCompatActivity implements ItemLoadingListener {
+public class MainActivity extends AppCompatActivity implements ItemLoadingListener, OnSubredditSelected {
     private SubredditFragment globalOffensive;
 
 
@@ -170,11 +173,15 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
                     break;
 
                 case R.id.navSubreddit:
-                    if (activeSubreddit == null) {
+                    // No subreddit created (first time here), or we in a subreddit looking to get back
+                    if (activeSubreddit == null || binding.bottomNav.getSelectedItemId() == R.id.navSubreddit) {
                         if (selectSubredditFragment == null) {
                             selectSubredditFragment = new SelectSubredditFragment();
+                            selectSubredditFragment.setSubredditSelected(this);
                         }
                         selected = selectSubredditFragment;
+                    } else {
+                        selected = activeSubreddit;
                     }
                     break;
 
@@ -246,4 +253,14 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         SharedPreferencesManager.remove(SharedPreferencesConstants.USER_INFO);
     }
 
+    @Override
+    public void subredditSelected(Subreddit subreddit) {
+        // Create new subreddit fragment and replace
+        Log.d(TAG, "subredditSelected: " + subreddit.getName());
+        this.activeSubreddit = SubredditFragment.newInstance(subreddit.getName());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, activeSubreddit)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
+    }
 }
