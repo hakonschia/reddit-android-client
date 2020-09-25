@@ -148,6 +148,18 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         }
     }
 
+    @Override
+    public void subredditSelected(Subreddit subreddit) {
+        // Create new subreddit fragment and replace
+        Log.d(TAG, "subredditSelected: " + subreddit.getName());
+        this.activeSubreddit = SubredditFragment.newInstance(subreddit.getName());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, activeSubreddit)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
+    }
+
+
     /**
      * Creates new fragments and passes along needed information such as the access token
      */
@@ -164,49 +176,25 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
      */
     private void setupNavBar() {
         binding.bottomNav.setOnNavigationItemSelectedListener(item -> {
-            Fragment selected = null;
+            Fragment selected;
 
-            // TODO clean up this mess
             switch (item.getItemId()) {
                 case R.id.navHome:
                     selected = postsFragment;
                     break;
 
                 case R.id.navSubreddit:
-                    // No subreddit created (first time here), or we in a subreddit looking to get back
-                    if (activeSubreddit == null || binding.bottomNav.getSelectedItemId() == R.id.navSubreddit) {
-                        if (selectSubredditFragment == null) {
-                            selectSubredditFragment = new SelectSubredditFragment();
-                            selectSubredditFragment.setSubredditSelected(this);
-                        }
-                        selected = selectSubredditFragment;
-                    } else {
-                        selected = activeSubreddit;
-                    }
+                    selected = this.onNavBarSubreddit();
                     break;
 
                 case R.id.navProfile:
-                    // If not logged in, show log in page
-                    if (TokenManager.getToken().getRefreshToken() == null) {
-                        if (logInFragment == null) {
-                            logInFragment = new LogInFragment();
-                        }
-
-                        selected = logInFragment;
-                    } else {
-                        if (profileFragment == null) {
-                            profileFragment = new ProfileFragment();
-                        }
-
-                        selected = profileFragment;
-                    }
+                    selected = this.onNavBarProfile();
                     break;
 
                 case R.id.navSettings:
                     if (settingsFragment == null) {
                         settingsFragment = new SettingsFragment();
                     }
-
                     selected = settingsFragment;
                     break;
 
@@ -225,6 +213,52 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
             return true;
         });
     }
+
+    /**
+     * Retrieves the correct fragment for when subreddit is clicked in the nav bar
+     *
+     * <p>If this is the first time clicking the icon the subreddit list is shown.
+     * If clicked when already in the subreddit nav bar the subreddit list is shown.
+     * If clicked when not already in the subreddit, the previous subreddit fragment selected is shown</p>
+     *
+     * @return The correct fragment to show
+     */
+    private Fragment onNavBarSubreddit() {
+        // No subreddit created (first time here), or we in a subreddit looking to get back
+        if (activeSubreddit == null || binding.bottomNav.getSelectedItemId() == R.id.navSubreddit) {
+            if (selectSubredditFragment == null) {
+                selectSubredditFragment = new SelectSubredditFragment();
+                selectSubredditFragment.setSubredditSelected(this);
+            }
+            return selectSubredditFragment;
+        } else {
+            return activeSubreddit;
+        }
+    }
+
+    /**
+     * Retrieves the correct fragment for profiles
+     *
+     * @return If a user is logged in a {@link ProfileFragment} is shown, otherwise a {@link LogInFragment}
+     * is shown so the user can log in
+     */
+    private Fragment onNavBarProfile() {
+        // If not logged in, show log in page
+        if (TokenManager.getToken().getRefreshToken() == null) {
+            if (logInFragment == null) {
+                logInFragment = new LogInFragment();
+            }
+
+            return logInFragment;
+        } else {
+            if (profileFragment == null) {
+                profileFragment = new ProfileFragment();
+            }
+
+            return profileFragment;
+        }
+    }
+
 
     /**
      * Click listener for the "Log out" button
@@ -251,16 +285,5 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         TokenManager.removeToken();
 
         SharedPreferencesManager.remove(SharedPreferencesConstants.USER_INFO);
-    }
-
-    @Override
-    public void subredditSelected(Subreddit subreddit) {
-        // Create new subreddit fragment and replace
-        Log.d(TAG, "subredditSelected: " + subreddit.getName());
-        this.activeSubreddit = SubredditFragment.newInstance(subreddit.getName());
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, activeSubreddit)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
     }
 }
