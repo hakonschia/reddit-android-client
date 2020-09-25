@@ -45,20 +45,6 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
                     .load(iconURL)
                     .into(holder.icon);
         }
-
-
-        holder.itemView.setOnClickListener(view -> {
-            if (subredditSelected != null) {
-                subredditSelected.subredditSelected(subreddit);
-            }
-        });
-
-        holder.itemView.setOnLongClickListener(view -> {
-            String k = String.format("{\n\tname:%s\n\ticonURL:%s\n\turl:%s\n}", subreddit.getName(), subreddit.getIconImage(), subreddit.getURL());
-
-            Log.d(TAG, "onBindViewHolder: \n" +k);
-            return true;
-        });
     }
 
     @NonNull
@@ -88,6 +74,28 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
             icon = itemView.findViewById(R.id.icon);
             name = itemView.findViewById(R.id.name);
+
+            // Call the registered onClick listener when an item is clicked
+            itemView.setOnClickListener(view -> {
+                int pos = getAdapterPosition();
+
+                if (subredditSelected != null && pos != RecyclerView.NO_POSITION) {
+                    subredditSelected.subredditSelected(subreddits.get(pos));
+                }
+            });
+
+
+            itemView.setOnLongClickListener(view -> {
+                int pos = getAdapterPosition();
+
+                if (subredditSelected != null && pos != RecyclerView.NO_POSITION) {
+                    Subreddit subreddit = subreddits.get(pos);
+                    
+                    String k = String.format("{\n\tname:%s\n\ticonURL:%s\n\turl:%s\n}", subreddit.getName(), subreddit.getIconImage(), subreddit.getURL());
+                    Log.d(TAG, "onBindViewHolder: \n" +k);
+                }
+                return true;
+            });
         }
     }
 }
