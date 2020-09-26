@@ -200,8 +200,8 @@ public class SubredditFragment extends Fragment {
         // Set long clicks to copy the post link
         adapter.setOnLongClickListener(this::copyLinkToClipboard);
 
-        postsViewModel = new ViewModelProvider(requireActivity()).get(PostsViewModel.class);
-        postsViewModel.getPosts().observe(requireActivity(), posts -> {
+        postsViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
+        postsViewModel.getPosts().observe(this, posts -> {
             adapter.addPosts(posts);
         });
     }
