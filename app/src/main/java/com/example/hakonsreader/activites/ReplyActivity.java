@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,6 +22,9 @@ import com.google.gson.Gson;
 public class ReplyActivity extends AppCompatActivity {
     private static final String TAG = "ReplyActivity";
 
+    private static final String REPLY_TEXT = "replyText";
+
+
     private ActivityReplyBinding binding;
 
     private RedditApi redditApi = App.getApi();
@@ -32,6 +36,10 @@ public class ReplyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.binding = ActivityReplyBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        if (savedInstanceState != null) {
+            binding.replyText.setText(savedInstanceState.getString(REPLY_TEXT));
+        }
 
         // TODO get comment/post
         Bundle extras = getIntent().getExtras();
@@ -48,6 +56,20 @@ public class ReplyActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Store what is in the edit text
+        outState.putString(REPLY_TEXT, binding.replyText.getText().toString());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
+    }
+
 
     /**
      * Sends the reply

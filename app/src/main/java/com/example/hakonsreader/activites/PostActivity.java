@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,7 +25,12 @@ import com.example.hakonsreader.views.PostContentLink;
 import com.example.hakonsreader.views.PostContentText;
 import com.example.hakonsreader.views.PostContentVideo;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.r0adkll.slidr.Slidr;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activity to show a Reddit post with its comments
@@ -53,15 +59,9 @@ public class PostActivity extends AppCompatActivity {
     public static final int REQUEST_REPLY = 1;
 
 
-    /**
-     * The max height the content of the post can have (the image, video etc.)
-     *
-     * <p>Set during initialization</p>
-     */
-    private static int maxContentHeight = -1;
+    private static final String COMMENTS = "comments";
+    private static final String HIDDEN_COMMENTS = "hiddenComments";
 
-
-    private RedditApi redditApi = App.getApi();
 
     private ActivityPostBinding binding;
 
@@ -72,7 +72,6 @@ public class PostActivity extends AppCompatActivity {
     private RedditListing replyingTo;
     private View postContent;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,17 +79,28 @@ public class PostActivity extends AppCompatActivity {
         setContentView(this.binding.getRoot());
         Slidr.attach(this);
 
-        // Postpone transition until the height of the content is known
-        postponeEnterTransition();
-
-        if (maxContentHeight == -1) {
-            maxContentHeight = (int) getResources().getDimension(R.dimen.postContentMaxHeight);
-        }
-
-        this.post = new Gson().fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
+        Gson gson = new Gson();
+        this.post = gson.fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
 
         this.setupCommentsList();
-        this.getComments();
+
+        if (savedInstanceState != null) {
+            Type listType = new TypeToken<ArrayList<RedditComment>>(){}.getType();
+
+            String commentsJson = savedInstanceState.getString(COMMENTS);
+            String hiddenJson = savedInstanceState.getString(HIDDEN_COMMENTS);
+
+            List<RedditComment> comments = gson.fromJson(commentsJson, listType);
+            List<RedditComment> hiddenComments = gson.fromJson(hiddenJson, listType);
+
+            commentsAdapter.setComments(comments);
+            commentsAdapter.setCommentsHidden(hiddenComments);
+        } else {
+            this.getComments();
+        }
+
+        // Postpone transition until the height of the content is known
+        postponeEnterTransition();
 
         this.binding.postInfoContainer.postInfo.setPost(post);
         this.binding.postInfoContainer.postFullBar.setPost(post);
@@ -99,6 +109,32 @@ public class PostActivity extends AppCompatActivity {
 
         this.commentsAdapter.setOnReplyListener(this::replyTo);
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // TODO this doesn't work for posts with many comments as it will use too much memory and
+        //  it is so slow it freezes the phone
+        Gson gson = new Gson();
+        // Save comments
+        String commentsJson = gson.toJson(commentsAdapter.getComments());
+        String hiddenJson = gson.toJson(commentsAdapter.getCommentsHidden());
+
+        outState.putString(COMMENTS, commentsJson);
+        outState.putString(HIDDEN_COMMENTS, hiddenJson);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
+
+        // Ensure resources are freed when the activity exits
+        Util.cleanupPostContent(postContent);
+    }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -119,14 +155,6 @@ public class PostActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // Ensure resources are freed when the activity exits
-        Util.cleanupPostContent(postContent);
     }
 
 
@@ -158,17 +186,18 @@ public class PostActivity extends AppCompatActivity {
             this.binding.postInfoContainer.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
+                    int maxHeight = (int)getResources().getDimension(R.dimen.postContentMaxHeight);
                     int height = postContent.getMeasuredHeight();
 
                     // Content is too large, set new height
-                    if (height >= maxContentHeight) {
+                    if (height >= maxHeight) {
                         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.postInfoContainer.content.getLayoutParams();
-                        layoutParams.height = maxContentHeight;
+                        layoutParams.height = maxHeight;
                         binding.postInfoContainer.content.setLayoutParams(layoutParams);
 
                         // TODO find a better way to scale the video as it doesn't smoothly transition the video
                         if (postContent instanceof PostContentVideo) {
-                            ((PostContentVideo)postContent).updateHeight(maxContentHeight);
+                            ((PostContentVideo)postContent).updateHeight(maxHeight);
                         }
                     }
 
@@ -190,7 +219,7 @@ public class PostActivity extends AppCompatActivity {
      */
     private void getComments() {
         this.binding.loadingIcon.increaseLoadCount();
-        this.redditApi.getComments(post.getID(), (comments -> {
+        App.getApi().getComments(post.getID(), (comments -> {
             this.commentsAdapter.addComments(comments);
             this.binding.loadingIcon.decreaseLoadCount();
         }), ((code, t) -> {

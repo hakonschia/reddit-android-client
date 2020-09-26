@@ -135,6 +135,24 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         notifyItemRemoved(pos);
     }
 
+    public void setComments(List<RedditComment> comments) {
+        this.comments = comments;
+        notifyDataSetChanged();
+    }
+
+    public void setCommentsHidden(List<RedditComment> commentsHidden) {
+        this.commentsHidden = commentsHidden;
+        notifyDataSetChanged();
+    }
+
+    public List<RedditComment> getComments() {
+        return comments;
+    }
+
+    public List<RedditComment> getCommentsHidden() {
+        return commentsHidden;
+    }
+
     /**
      * Find the next top level comment of the comment chain
      *
@@ -186,6 +204,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             // Remove the previous comment (this is the "2 more comments" comment)
             this.removeComment(comment);
+
+            // TODO remove comment as reply from the parent
         }, (code, t) -> {
             Util.handleGenericResponseErrors(this.parentLayout, code, t);
         });

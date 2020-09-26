@@ -1,8 +1,9 @@
 package com.example.hakonsreader.activites;
 
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +20,7 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
     private static final String TAG = "SubredditActivity";
     
     private LoadingIcon loadingIcon;
+    private SubredditFragment fragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,8 +29,20 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
 
         this.loadingIcon = findViewById(R.id.loadingIcon);
 
-        String subreddit;
+        if (savedInstanceState != null) {
+            Log.d(TAG, "onCreate: an instance was saved");
+           // fragment = (SubredditFragment) getSupportFragmentManager().getFragment(savedInstanceState, "subredditFragment");
+            fragment = (SubredditFragment) getSupportFragmentManager().findFragmentByTag("subredditFragment");
+        } else {
+            fragment = SubredditFragment.newInstance("GlobalOffensive");
+            getSupportFragmentManager().beginTransaction().add(R.id.subredditActivityFragment, fragment, "subredditFragment").commit();
+        }
         
+        fragment.setLoadingListener(this);
+
+        String subreddit;
+        /*
+
         Bundle data = getIntent().getExtras();
         // Activity started from URL intent
         if (data == null) {
@@ -40,13 +54,18 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
             // Activity started from manual intent in app
             subreddit = data.getString("subreddit");
         }
+         */
 
-        SubredditFragment fragment = SubredditFragment.newInstance(subreddit);
-        fragment.setLoadingListener(this);
-
-        getSupportFragmentManager().beginTransaction().replace(R.id.subredditActivityFragment, fragment).commit();
 
         Slidr.attach(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState: ");
+
+        getSupportFragmentManager().putFragment(outState, "subredditFragment", fragment);
     }
 
     @Override

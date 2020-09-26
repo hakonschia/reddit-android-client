@@ -2,6 +2,7 @@ package com.example.hakonsreader.activites;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,14 @@ import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity implements ItemLoadingListener, OnSubredditSelected {
     private SubredditFragment globalOffensive;
+
+
+    private static final String POSTS_FRAGMENT = "postsFragment";
+    private static final String ACTIVE_SUBREDDIT_FRAGMENT = "activeSubredditFragment";
+    private static final String SELECT_SUBREDDIT_FRAGMENT = "selectSubredditFragment";
+    private static final String PROFILE_FRAGMENT = "profileFragment";
+    private static final String ACTIVE_NAV_ITEM = "activeNavItem";
+
 
 
     private static final String TAG = "MainActivity";
@@ -74,8 +83,41 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        this.setupNavBar();
-        this.setupStartFragment();
+        if (savedInstanceState != null) {
+            this.restoreFragmentStates(savedInstanceState);
+        } else {
+            // Only setup the start fragment if we have no state to restore (as this is then a new activity)
+            this.setupStartFragment();
+        }
+
+        this.setupNavBar(savedInstanceState);
+    }
+
+    /**
+     * Saves the state of the fragments and active nav item
+     */
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // If fragments aren't null, save them
+        // Save which fragment is the active one as well
+        if (postsFragment != null) {
+            getSupportFragmentManager().putFragment(outState, POSTS_FRAGMENT, postsFragment);
+        }
+        if (activeSubreddit != null) {
+            getSupportFragmentManager().putFragment(outState, ACTIVE_SUBREDDIT_FRAGMENT, activeSubreddit);
+        }
+        if (selectSubredditFragment != null) {
+            getSupportFragmentManager().putFragment(outState, SELECT_SUBREDDIT_FRAGMENT, selectSubredditFragment);
+        }
+        if (profileFragment != null) {
+            getSupportFragmentManager().putFragment(outState, PROFILE_FRAGMENT, profileFragment);
+        }
+        // Login/settings fragments can just be recreated when needed as they don't store any specific state
+
+        // Store state of navbar
+        outState.putInt(ACTIVE_NAV_ITEM, binding.bottomNav.getSelectedItemId());
     }
 
     @Override
@@ -117,6 +159,9 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         }
     }
 
+    /**
+     * If back is pressed when not in the home page the home page is selected, otherwise nothing happens
+     */
     @Override
     public void onBackPressed() {
         // Always go back to the home page on back presses
@@ -138,6 +183,12 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         }
     }
 
+    /**
+     * Called when an item has started/finished loading. Depending on the action {@link ActivityMainBinding#loadingIcon}
+     * is either increased or decreased
+     *
+     * @param up If true, an item has started loading. If false an item has finished loading
+     */
     @Override
     public void onCountChange(boolean up) {
         if (up) {
@@ -147,6 +198,12 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         }
     }
 
+    /**
+     * Called when a subreddit has been selected from a {@link SelectSubredditFragment} fragment
+     * <p>A new instance of {@link SubredditFragment} is created and shown</p>
+     *
+     * @param subreddit The subreddit selected
+     */
     @Override
     public void subredditSelected(Subreddit subreddit) {
         // Create new subreddit fragment and replace
@@ -154,19 +211,36 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         replaceFragment(activeSubreddit);
     }
 
+    /**
+     * Restores the state of the fragments as saved in {@link MainActivity#onSaveInstanceState(Bundle)}
+     *
+     * @param restoredState The bundle with the state of the fragments
+     */
+    private void restoreFragmentStates(@NonNull Bundle restoredState) {
+        postsFragment = (PostsContainerFragment) getSupportFragmentManager().getFragment(restoredState, POSTS_FRAGMENT);
+        activeSubreddit = (SubredditFragment) getSupportFragmentManager().getFragment(restoredState, ACTIVE_SUBREDDIT_FRAGMENT);
+        selectSubredditFragment = (SelectSubredditFragment) getSupportFragmentManager().getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT);
+        profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(restoredState, PROFILE_FRAGMENT);
+    }
 
     /**
      * Creates the posts fragment and replaces it in the container view
      */
     private void setupStartFragment() {
-        postsFragment = new PostsContainerFragment();
+        if (postsFragment == null) {
+            postsFragment = new PostsContainerFragment();
+        }
         replaceFragment(postsFragment);
     }
 
     /**
      * Sets up the navbar to be able to switch between the fragments
+     *
+     * @param restoredState The restored state of the activity. If this isn't null (the activity is
+     *                      restored from a previous point) the active nav bar item is set to what is
+     *                      stored in the state
      */
-    private void setupNavBar() {
+    private void setupNavBar(Bundle restoredState) {
         binding.bottomNav.setOnNavigationItemSelectedListener(item -> {
             Fragment selected;
 
@@ -218,6 +292,11 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
                 replaceFragment(selected);
             }
         });
+
+        if (restoredState != null) {
+            int active = restoredState.getInt(ACTIVE_NAV_ITEM);
+            binding.bottomNav.setSelectedItemId(active);
+        }
     }
 
     /**

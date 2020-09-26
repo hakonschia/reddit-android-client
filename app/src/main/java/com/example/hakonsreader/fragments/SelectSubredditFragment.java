@@ -94,4 +94,10 @@ public class SelectSubredditFragment extends Fragment {
 
         return view;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        binding = null;
+    }
 }

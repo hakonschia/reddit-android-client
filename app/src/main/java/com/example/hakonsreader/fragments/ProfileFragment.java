@@ -72,6 +72,11 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        binding = null;
+    }
 
     /**
      * Updates the views with the information found in {@link ProfileFragment#user}

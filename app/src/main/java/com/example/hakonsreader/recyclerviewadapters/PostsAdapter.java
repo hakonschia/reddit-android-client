@@ -140,7 +140,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
         flairs.forEach(flair -> {
-            Log.d(TAG, "onBindViewHolder: sub="+post.getSubreddit() + ", post="+post.getTitle() + " with flair=" + flair.getText());
             Tag tag = new Tag(context);
             tag.setText(flair.getText());
             // TODO this shouldn't be hardcoded like this

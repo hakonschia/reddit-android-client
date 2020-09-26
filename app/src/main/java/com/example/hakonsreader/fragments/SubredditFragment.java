@@ -32,7 +32,10 @@ import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,8 +44,22 @@ import java.util.List;
 public class SubredditFragment extends Fragment {
     private static final String TAG = "SubredditFragment";
 
-    // The amount of posts left in the list before attempting to load more posts automatically
+
+    /**
+     * The amount of posts left in the list before attempting to load more posts automatically
+     */
     private static final int NUM_REMAINING_POSTS_BEFORE_LOAD = 6;
+
+    /**
+     * The key used for saving the state of the layout manager in the posts lists
+     */
+    private static final String LAYOUT_STATE = "layoutState";
+
+    /**
+     * The key used for saving the list of posts
+     */
+    private static final String POSTS_STATE = "postsState";
+
 
 
     private RedditApi redditApi = App.getApi();
@@ -80,7 +97,6 @@ public class SubredditFragment extends Fragment {
     // Response handler for loading posts
     private OnResponse<List<RedditPost>> onPostResponse = posts -> {
         this.decreaseLoadingCount();
-        Log.d(TAG, "post size="+posts.size());
         adapter.addPosts(posts);
     };
     // Failure handler for loading posts
@@ -100,6 +116,7 @@ public class SubredditFragment extends Fragment {
      */
     public static SubredditFragment newInstance(String subreddit) {
         Bundle args = new Bundle();
+        Log.d(TAG, "newInstance: " + subreddit);
 
         args.putString("subreddit", subreddit);
 
@@ -155,9 +172,7 @@ public class SubredditFragment extends Fragment {
      * Loads more posts. Retrieves posts continuing from the last item in the list
      */
     private void loadPosts() {
-        if (this.redditApi == null) {
-            return;
-        }
+        Log.d(TAG, "loadPosts: Loading posts for " + subreddit);
 
         // Get the ID of the last post in the list
         String after = "";
@@ -260,14 +275,30 @@ public class SubredditFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        // TODO store state of list, videos should release their players to free the resources
+
+        // Save the posts
+        String postsJson =  new Gson().toJson(adapter.getPosts());
+        outState.putString(POSTS_STATE, postsJson);
+
+        // TODO need to store state of video posts to play/seek to etc.
     }
 
     @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        // TODO restore state of stuff here
-        Log.d(TAG, "onViewStateRestored");
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState == null) {
+            return;
+        }
+
+        // Restore the posts
+        String postsJson = savedInstanceState.getString(POSTS_STATE);
+        Type listType = new TypeToken<ArrayList<RedditPost>>(){}.getType();
+        List<RedditPost> posts = new Gson().fromJson(postsJson, listType);
+
+        if (posts != null) {
+            adapter.addPosts(posts);
+        }
     }
 
     @Override
