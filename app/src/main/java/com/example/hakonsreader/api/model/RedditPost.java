@@ -97,6 +97,12 @@ public class RedditPost implements VotableListing, PostableListing {
         @SerializedName("selftext_html")
         private String selftextHtml;
 
+        @SerializedName("crosspost_parent")
+        private String crosspostParentID;
+
+        @SerializedName("crosspost_parent_list")
+        private List<RedditPost> crossposts;
+
 
         @SerializedName("is_self")
         private boolean isText;
@@ -350,6 +356,20 @@ public class RedditPost implements VotableListing, PostableListing {
         return data.selftextHtml;
     }
 
+    /**
+     * @return The ID of the post this post is a crosspost from
+     */
+    public String getCrosspostParentID() {
+        return data.crosspostParentID;
+    }
+
+    /**
+     * @return The list of parent crossposts of this post
+     */
+    public List<RedditPost> getCrossposts() {
+        return data.crossposts;
+    }
+
 
     public String getLinkFlairBackgroundColor() {
         return data.linkFlairBackgroundColor;
@@ -425,6 +445,8 @@ public class RedditPost implements VotableListing, PostableListing {
             return PostType.TEXT;
         } else if (data.isGallery) {
             return PostType.GALLERY;
+        } else if (data.crosspostParentID != null) {
+            return PostType.CROSSPOST;
         }
 
         String hint = data.postHint;
