@@ -81,26 +81,9 @@ public class SubredditFragment extends Fragment {
             // Only load posts if there hasn't been an attempt at loading more posts
             if (this.lastLoadAttemptCount < listSize) {
                 this.lastLoadAttemptCount = adapter.getPosts().size();
-                postsViewModel.loadPosts(subreddit);
+                postsViewModel.loadPosts(binding.parentLayout, subreddit);
             }
         }
-    };
-
-    /**
-     * Response handler for loading posts
-     */
-    private OnResponse<List<RedditPost>> onPostResponse = posts -> {
-        this.decreaseLoadingCount();
-        adapter.addPosts(posts);
-    };
-    /**
-     * Failure handler for loading posts
-     */
-    private OnFailure onPostFailure = (code, t) -> {
-        this.decreaseLoadingCount();
-        t.printStackTrace();
-
-        Util.handleGenericResponseErrors(this.binding.parentLayout, code, t);
     };
 
 
@@ -259,7 +242,7 @@ public class SubredditFragment extends Fragment {
 
         // If the fragment is selected without any posts load posts automatically
         if (adapter.getPosts().isEmpty()) {
-            postsViewModel.loadPosts(subreddit);
+            postsViewModel.loadPosts(binding.parentLayout, subreddit);
         }
     }
 }

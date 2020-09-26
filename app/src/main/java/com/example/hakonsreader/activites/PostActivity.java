@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
@@ -21,6 +22,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
+import com.example.hakonsreader.viewmodels.CommentsViewModel;
 import com.example.hakonsreader.views.PostContentLink;
 import com.example.hakonsreader.views.PostContentText;
 import com.example.hakonsreader.views.PostContentVideo;
@@ -59,12 +61,9 @@ public class PostActivity extends AppCompatActivity {
     public static final int REQUEST_REPLY = 1;
 
 
-    private static final String COMMENTS = "comments";
-    private static final String HIDDEN_COMMENTS = "hiddenComments";
-
-
     private ActivityPostBinding binding;
 
+    private CommentsViewModel commentsViewModel;
     private CommentsAdapter commentsAdapter;
     private LinearLayoutManager layoutManager;
 
@@ -75,54 +74,40 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.binding = ActivityPostBinding.inflate(getLayoutInflater());
-        setContentView(this.binding.getRoot());
         Slidr.attach(this);
 
+        binding = ActivityPostBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         Gson gson = new Gson();
-        this.post = gson.fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
+        post = gson.fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
 
         this.setupCommentsList();
-
-        if (savedInstanceState != null) {
-            Type listType = new TypeToken<ArrayList<RedditComment>>(){}.getType();
-
-            String commentsJson = savedInstanceState.getString(COMMENTS);
-            String hiddenJson = savedInstanceState.getString(HIDDEN_COMMENTS);
-
-            List<RedditComment> comments = gson.fromJson(commentsJson, listType);
-            List<RedditComment> hiddenComments = gson.fromJson(hiddenJson, listType);
-
-            commentsAdapter.setComments(comments);
-            commentsAdapter.setCommentsHidden(hiddenComments);
-        } else {
-            this.getComments();
-        }
 
         // Postpone transition until the height of the content is known
         postponeEnterTransition();
 
-        this.binding.postInfoContainer.postInfo.setPost(post);
-        this.binding.postInfoContainer.postFullBar.setPost(post);
+        binding.postInfoContainer.postInfo.setPost(post);
+        binding.postInfoContainer.postFullBar.setPost(post);
 
         this.addPostContent();
 
-        this.commentsAdapter.setOnReplyListener(this::replyTo);
-    }
+        commentsAdapter.setOnReplyListener(this::replyTo);
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
 
-        // TODO this doesn't work for posts with many comments as it will use too much memory and
-        //  it is so slow it freezes the phone
-        Gson gson = new Gson();
-        // Save comments
-        String commentsJson = gson.toJson(commentsAdapter.getComments());
-        String hiddenJson = gson.toJson(commentsAdapter.getCommentsHidden());
+        commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
 
-        outState.putString(COMMENTS, commentsJson);
-        outState.putString(HIDDEN_COMMENTS, hiddenJson);
+        commentsViewModel.getItemsLoading().observe(this, itemsLoading -> {
+            binding.loadingIcon.setItemsLoading(itemsLoading);
+        });
+
+        commentsViewModel.getComments().observe(this, comments -> {
+            commentsAdapter.addComments(comments);
+        });
+        commentsViewModel.loadComments(binding.parentLayout, post);
+
+
+        // TODO save height of content (for configuration changes), now it always sets the height to max height
     }
 
     @Override
@@ -133,8 +118,6 @@ public class PostActivity extends AppCompatActivity {
         // Ensure resources are freed when the activity exits
         Util.cleanupPostContent(postContent);
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -212,22 +195,6 @@ public class PostActivity extends AppCompatActivity {
         } else {
             startPostponedEnterTransition();
         }
-    }
-
-    /**
-     * Retrieves the comments for the post and adds them to the adapter
-     */
-    private void getComments() {
-        this.binding.loadingIcon.increaseLoadCount();
-        App.getApi().getComments(post.getID(), (comments -> {
-            this.commentsAdapter.addComments(comments);
-            this.binding.loadingIcon.decreaseLoadCount();
-        }), ((code, t) -> {
-            if (code == 503) {
-                Util.showGenericServerErrorSnackbar(this.binding.parentLayout);
-            }
-            this.binding.loadingIcon.decreaseLoadCount();
-        }));
     }
 
     /**

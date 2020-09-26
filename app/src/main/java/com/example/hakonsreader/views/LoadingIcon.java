@@ -33,4 +33,13 @@ public class LoadingIcon extends ProgressBar {
             setVisibility(View.GONE);
         }
     }
+
+    public synchronized void setItemsLoading(int itemsLoading) {
+        this.itemsLoading = itemsLoading;
+        if (this.itemsLoading == 0) {
+            setVisibility(View.GONE);
+        } else {
+            setVisibility(VISIBLE);
+        }
+    }
 }
