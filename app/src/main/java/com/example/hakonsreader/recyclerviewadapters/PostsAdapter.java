@@ -43,7 +43,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     
 
     private List<RedditPost> posts = new ArrayList<>();
-    private RedditApi redditApi = App.getApi();
 
     // Listener for when a list item has been clicked
     private OnClickListener<ViewHolder> onClickListener;
@@ -143,6 +142,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Tag tag = new Tag(context);
             tag.setText(flair.getText());
             // TODO this shouldn't be hardcoded like this
+            // TODO each flair item is different types of items in the flair (such as an icon and text)
+            
 
             if (post.getLinkFlairTextColor().equals("dark")) {
                 tag.setTextColor(ContextCompat.getColor(context, R.color.flairTextDark));
