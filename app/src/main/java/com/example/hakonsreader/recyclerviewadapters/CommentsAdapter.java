@@ -3,6 +3,7 @@ package com.example.hakonsreader.recyclerviewadapters;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -393,10 +394,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         private void asNormalComment(RedditComment comment) {
             Context context = itemView.getContext();
 
-            // Html.fromHtml adds a newline at the end which makes the TextView larger than it should be
-            // TODO it ruins the HTML formatting tho
-            // String contentText = Util.trimTrailingWhitespace(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_MODE_COMPACT));
-            content.setText(Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_SEPARATOR_LINE_BREAK_DIV | Html.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE));
+            Spanned s = Html.fromHtml(comment.getBodyHtml(), Html.FROM_HTML_SEPARATOR_LINE_BREAK_DIV | Html.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE);
+            content.setText(Util.trim(s, 0, s.length()));
             content.setMovementMethod(InternalLinkMovementMethod.getSubredditAndUserInstance(context));
 
             author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));

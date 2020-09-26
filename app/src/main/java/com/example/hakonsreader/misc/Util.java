@@ -150,34 +150,25 @@ public class Util {
         }
     }
 
-
     /**
-     * Taken from: https://stackoverflow.com/a/10187511/7750841
+     * Removes whitespace from a {@link CharSequence}
      *
-     * Trims trailing whitespace. Removes any of these characters:
-     * 0009, HORIZONTAL TABULATION
-     * 000A, LINE FEED
-     * 000B, VERTICAL TABULATION
-     * 000C, FORM FEED
-     * 000D, CARRIAGE RETURN
-     * 001C, FILE SEPARATOR
-     * 001D, GROUP SEPARATOR
-     * 001E, RECORD SEPARATOR
-     * 001F, UNIT SEPARATOR
+     * <p>Taken from: https://stackoverflow.com/a/16745540/7750841</p>
      *
-     * @return "" if source is null, otherwise string with all trailing whitespace removed
+     * @param s The sequence to trim
+     * @param start Where in the sequence to start
+     * @param end Where in the sequence to end
+     * @return A trimmed {@link CharSequence}
      */
-    public static String trimTrailingWhitespace(CharSequence source) {
-
-        if(source == null)
-            return "";
-
-        int i = source.length();
-
-        // loop back to the first non-whitespace character
-        while(--i >= 0 && Character.isWhitespace(source.charAt(i))) {
+    public static CharSequence trim(CharSequence s, int start, int end) {
+        while (start < end && Character.isWhitespace(s.charAt(start))) {
+            start++;
         }
 
-        return source.subSequence(0, i+1).toString();
+        while (end > start && Character.isWhitespace(s.charAt(end - 1))) {
+            end--;
+        }
+
+        return s.subSequence(start, end);
     }
 }
