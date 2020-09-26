@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +31,7 @@ import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
+import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -44,42 +46,31 @@ import java.util.List;
 public class SubredditFragment extends Fragment {
     private static final String TAG = "SubredditFragment";
 
-
     /**
      * The amount of posts left in the list before attempting to load more posts automatically
      */
     private static final int NUM_REMAINING_POSTS_BEFORE_LOAD = 6;
 
-    /**
-     * The key used for saving the state of the layout manager in the posts lists
-     */
-    private static final String LAYOUT_STATE = "layoutState";
-
-    /**
-     * The key used for saving the list of posts
-     */
-    private static final String POSTS_STATE = "postsState";
-
-
-
-    private RedditApi redditApi = App.getApi();
 
     private FragmentSubredditBinding binding;
+    private ItemLoadingListener loadingListener;
 
     private String subreddit;
 
+    /**
+     * The amount of items in the list at the last attempt at loading more posts
+     */
+    private int lastLoadAttemptCount;
+
+    private PostsViewModel postsViewModel;
     private PostsAdapter adapter;
     private LinearLayoutManager layoutManager;
 
-    private ItemLoadingListener loadingListener;
 
-
-    // The amount of items in the list at the last attempt at loading more posts
-    private int lastLoadAttemptCount;
-
-
-    // Listener for scrolling in the posts list that automatically tries to load more posts
-    private RecyclerView.OnScrollChangeListener scrollListener = (view, i, i1, i2, i3) -> {
+    /**
+     * Listener for scrolling in the posts list that automatically tries to load more posts
+     */
+    private View.OnScrollChangeListener scrollListener = (view, i, i1, i2, i3) -> {
         // Get the last item visible in the current list
         int posLastItem = this.layoutManager.findLastVisibleItemPosition();
         int listSize = this.adapter.getItemCount();
@@ -89,17 +80,22 @@ public class SubredditFragment extends Fragment {
 
             // Only load posts if there hasn't been an attempt at loading more posts
             if (this.lastLoadAttemptCount < listSize) {
-                this.loadPosts();
+                this.lastLoadAttemptCount = adapter.getPosts().size();
+                postsViewModel.loadPosts(subreddit);
             }
         }
     };
 
-    // Response handler for loading posts
+    /**
+     * Response handler for loading posts
+     */
     private OnResponse<List<RedditPost>> onPostResponse = posts -> {
         this.decreaseLoadingCount();
         adapter.addPosts(posts);
     };
-    // Failure handler for loading posts
+    /**
+     * Failure handler for loading posts
+     */
     private OnFailure onPostFailure = (code, t) -> {
         this.decreaseLoadingCount();
         t.printStackTrace();
@@ -168,28 +164,6 @@ public class SubredditFragment extends Fragment {
         Log.d(TAG, "copyLinkToClipboard: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
     }
 
-    /**
-     * Loads more posts. Retrieves posts continuing from the last item in the list
-     */
-    private void loadPosts() {
-        Log.d(TAG, "loadPosts: Loading posts for " + subreddit);
-
-        // Get the ID of the last post in the list
-        String after = "";
-
-        List<RedditPost> previousPosts = this.adapter.getPosts();
-        int postsSize = previousPosts.size();
-
-        if (postsSize > 0) {
-            after = Thing.POST.getValue() + "_" + previousPosts.get(postsSize - 1).getID();
-        }
-
-        // Store the current attempt to load more posts to avoid attempting many times if it fails
-        this.lastLoadAttemptCount = postsSize;
-
-        this.increaseLoadingCount();
-        this.redditApi.getPosts(this.subreddit, after, postsSize, this.onPostResponse, this.onPostFailure);
-    }
 
     /**
      * Called when the refresh button has been clicked
@@ -202,7 +176,8 @@ public class SubredditFragment extends Fragment {
         this.adapter.getPosts().clear();
         this.binding.posts.scrollToPosition(0);
 
-        this.loadPosts();
+        // TODO viewmodel load etc etc
+        //this.loadPosts();
     }
 
     /**
@@ -231,15 +206,21 @@ public class SubredditFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.lastLoadAttemptCount = 0;
 
-        this.adapter = new PostsAdapter();
+        lastLoadAttemptCount = 0;
+
+        adapter = new PostsAdapter();
 
         // Open post with comments when clicked
-        this.adapter.setOnClickListener(this::openPost);
+        adapter.setOnClickListener(this::openPost);
 
         // Set long clicks to copy the post link
-        this.adapter.setOnLongClickListener(this::copyLinkToClipboard);
+        adapter.setOnLongClickListener(this::copyLinkToClipboard);
+
+        postsViewModel = new ViewModelProvider(requireActivity()).get(PostsViewModel.class);
+        postsViewModel.getPosts().observe(requireActivity(), posts -> {
+            adapter.addPosts(posts);
+        });
     }
 
     @Nullable
@@ -251,14 +232,14 @@ public class SubredditFragment extends Fragment {
 
         Bundle args = getArguments();
         if (args != null) {
-            this.subreddit = args.getString("subreddit", "");
+            subreddit = args.getString("subreddit", "");
 
             // Set title in toolbar
-            this.binding.subredditName.setText(this.subreddit.isEmpty() ? "Front page" : "r/" + this.subreddit);
+            binding.subredditName.setText(subreddit.isEmpty() ? "Front page" : "r/" + subreddit);
         }
 
         // Bind the refresh button in the toolbar
-        this.binding.subredditRefresh.setOnClickListener(this::onRefreshPostsClicked);
+        binding.subredditRefresh.setOnClickListener(this::onRefreshPostsClicked);
 
         // Setup the RecyclerView posts list
         this.setupPostsList(view);
@@ -269,36 +250,7 @@ public class SubredditFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.binding = null;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        // Save the posts
-        String postsJson =  new Gson().toJson(adapter.getPosts());
-        outState.putString(POSTS_STATE, postsJson);
-
-        // TODO need to store state of video posts to play/seek to etc.
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (savedInstanceState == null) {
-            return;
-        }
-
-        // Restore the posts
-        String postsJson = savedInstanceState.getString(POSTS_STATE);
-        Type listType = new TypeToken<ArrayList<RedditPost>>(){}.getType();
-        List<RedditPost> posts = new Gson().fromJson(postsJson, listType);
-
-        if (posts != null) {
-            adapter.addPosts(posts);
-        }
+        binding = null;
     }
 
     @Override
@@ -306,8 +258,8 @@ public class SubredditFragment extends Fragment {
         super.onResume();
 
         // If the fragment is selected without any posts load posts automatically
-        if (this.adapter.getPosts().isEmpty()) {
-            this.loadPosts();
+        if (adapter.getPosts().isEmpty()) {
+            postsViewModel.loadPosts(subreddit);
         }
     }
 }
