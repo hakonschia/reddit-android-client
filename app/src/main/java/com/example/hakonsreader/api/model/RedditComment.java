@@ -347,6 +347,17 @@ public class RedditComment implements VotableListing, PostableListing {
         return all;
     }
 
+    /**
+     * Removes a reply from the comment
+     *
+     * <p>The reply must be a direct child</p>
+     *
+     * @param reply The reply to remove
+     */
+    public void removeReply(RedditComment reply) {
+        replies.remove(reply);
+    }
+
 
     /**
      * Retrieves the children of the comment (for loading more comments)

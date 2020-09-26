@@ -204,8 +204,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             // Remove the previous comment (this is the "2 more comments" comment)
             this.removeComment(comment);
-
-            // TODO remove comment as reply from the parent
+            parent.removeReply(comment);
         }, (code, t) -> {
             Util.handleGenericResponseErrors(this.parentLayout, code, t);
         });
