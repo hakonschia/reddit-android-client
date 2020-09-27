@@ -1,31 +1,19 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.interfaces.OnClickListener;
-import com.example.hakonsreader.misc.Util;
-import com.example.hakonsreader.misc.ViewUtil;
-import com.example.hakonsreader.views.FullPostBar;
-import com.example.hakonsreader.views.ContentLink;
-import com.example.hakonsreader.views.ContentVideo;
-import com.example.hakonsreader.views.PostInfo;
-import com.example.hakonsreader.views.Tag;
+import com.example.hakonsreader.views.Post;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,53 +108,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Context context = holder.itemView.getContext();
         final RedditPost post = this.posts.get(position);
-        holder.post = post;
+        holder.redditPost = post;
 
-        holder.postInfo.setPost(post);
-        holder.fullPostBar.setPost(post);
-
-        if (post.isSpoiler()) {
-            holder.tags.addView(ViewUtil.createSpoilerTag(context));
-        }
-        if (post.isNSFW()) {
-            holder.tags.addView(ViewUtil.createNSFWTag(context));
+        // Don't show text posts here
+        if (post.getPostType() == PostType.TEXT) {
+            holder.post.setShowContent(false);
         }
 
-        List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
-        flairs.forEach(flair -> {
-            Tag tag = new Tag(context);
-            tag.setText(flair.getText());
-            // TODO this shouldn't be hardcoded like this
-            // TODO each flair item is different types of items in the flair (such as an icon and text)
-            
-
-            if (post.getLinkFlairTextColor().equals("dark")) {
-                tag.setTextColor(ContextCompat.getColor(context, R.color.flairTextDark));
-                tag.setFillColor(ContextCompat.getColor(context, R.color.flairBackgroundDark));
-            }
-           // tag.setFillColor(post.getLinkFlairBackgroundColor());
-            holder.tags.addView(tag);
-        });
-
-        // Update to set the initial vote status
-        holder.setPostContent();
-    }
-
-    @Override
-    public void onViewRecycled(@NonNull ViewHolder holder) {
-        super.onViewRecycled(holder);
-
-        // Free up any resources that might not be garbage collected automatically
-        View v = holder.content.getChildAt(0);
-        Util.cleanupPostContent(v);
-        holder.tags.removeAllViews();
-
-        // Remove previous post content
-        holder.content.removeAllViewsInLayout();
-        // Make sure the view size resets (or it will still have size of the previous post in this view holder)
-        holder.content.forceLayout();
+        holder.post.setPostData(post);
     }
 
 
@@ -174,25 +124,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      * The view for the items in the list
      */
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private RedditPost post;
+        private RedditPost redditPost;
 
-        private PostInfo postInfo;
-        private LinearLayout tags;
-        private FullPostBar fullPostBar;
-
-        private FrameLayout content;
-
-        private View itemView;
+        private Post post;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.itemView = itemView;
 
-            this.postInfo = itemView.findViewById(R.id.postInfo);
-            this.tags = itemView.findViewById(R.id.tags);
-            this.fullPostBar = itemView.findViewById(R.id.postFullBar);
-
-            this.content = itemView.findViewById(R.id.content);
+            post = itemView.findViewById(R.id.post);
 
             // Call the registered onClick listener when an item is clicked
             itemView.setOnClickListener(view -> {
@@ -224,9 +163,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         public Pair<View, String>[] getPostTransitionViews() {
            return new Pair[] {
-                Pair.create(this.postInfo, "post_info"),
-                Pair.create(this.fullPostBar, "post_full_bar"),
-                Pair.create(this.content, "post_content")
+                Pair.create(post, "post"),
             };
         }
 
@@ -235,8 +172,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          *
          * @return The Reddit post shown in this view holder
          */
-        public RedditPost getPost() {
-            return post;
+        public RedditPost getRedditPost() {
+            return redditPost;
         }
 
         /**
@@ -248,6 +185,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public Bundle getExtraPostInfo() {
             Bundle bundle = new Bundle();
 
+            /*
             View c = content.getChildAt(0);
             if (c instanceof ContentVideo) {
                 ContentVideo video = (ContentVideo)c;
@@ -255,34 +193,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 bundle.putBoolean(ContentVideo.EXTRA_IS_PLAYING, video.isPlaying());
                 bundle.putBoolean(ContentVideo.EXTRA_SHOW_CONTROLS, video.isControllerShown());
             }
+             */
 
             return bundle;
-        }
-
-        /**
-         * Sets the content of the post
-         */
-        private void setPostContent() {
-            View view = Util.generatePostContent(post, itemView.getContext());
-
-            // A view to add and not text post (don't add text posts to the list)
-            if (view != null && post.getPostType() != PostType.TEXT) {
-                content.addView(view);
-            }
-
-            // TODO this should be done somewhere else to not have the same code here and in PostActivity
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) content.getLayoutParams();
-            // Align link post to start of parent
-            // TODO make this not so bad
-            if (view instanceof ContentLink) {
-                params.removeRule(RelativeLayout.CENTER_IN_PARENT);
-                params.addRule(RelativeLayout.ALIGN_PARENT_START);
-            } else {
-                params.removeRule(RelativeLayout.ALIGN_PARENT_START);
-                params.addRule(RelativeLayout.CENTER_IN_PARENT);
-            }
-
-            content.setLayoutParams(params);
         }
     }
 }

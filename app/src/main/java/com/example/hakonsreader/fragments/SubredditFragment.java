@@ -17,28 +17,16 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.PostActivity;
-import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.enums.Thing;
-import com.example.hakonsreader.api.interfaces.OnFailure;
-import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
-import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Fragment containing a subreddit
@@ -121,13 +109,12 @@ public class SubredditFragment extends Fragment {
      */
     private void openPost(PostsAdapter.ViewHolder view) {
         Intent intent = new Intent(requireActivity(), PostActivity.class);
-        intent.putExtra(PostActivity.POST, new Gson().toJson(view.getPost()));
+        intent.putExtra(PostActivity.POST, new Gson().toJson(view.getRedditPost()));
 
         Bundle extras = view.getExtraPostInfo();
         intent.putExtra("extras", extras);
 
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), view.getPostTransitionViews());
-
         startActivity(intent, options.toBundle());
     }
 

@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.misc.Util;
 
 public class ContentText extends ScrollView {
 
@@ -49,7 +50,7 @@ public class ContentText extends ScrollView {
         if (html != null) {
             this.textView.setMovementMethod(LinkMovementMethod.getInstance());
             this.textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
-            this.textView.setText(Html.fromHtml(post.getSelftextHTML(), Html.FROM_HTML_MODE_LEGACY));
+            this.textView.setText(Util.fromHtml(html));
         }
 
         int padding = (int) getResources().getDimension(R.dimen.defaultIndent);

@@ -4,34 +4,52 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.activites.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.databinding.PostInfoBinding;
 import com.example.hakonsreader.misc.Util;
+import com.example.hakonsreader.misc.ViewUtil;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 
 /**
  * View for info about posts (title, author, subreddit etc)
  */
 public class PostInfo extends ConstraintLayout {
+    private static final String TAG = "PostInfo";
+    
     private PostInfoBinding binding;
-
     private RedditPost post;
 
-
+    
+    public PostInfo(@NonNull Context context) {
+        super(context);
+        binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
+    }
     public PostInfo(Context context, AttributeSet attrs) {
         super(context, attrs);
-        LayoutInflater inflater = LayoutInflater.from(context);
-        this.binding = PostInfoBinding.inflate(inflater, this, true);
+        binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
+    }
+    public PostInfo(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
+    }
+    public PostInfo(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
     /**
@@ -60,13 +78,45 @@ public class PostInfo extends ConstraintLayout {
         String subredditText = String.format(context.getString(R.string.subredditPrefixed), post.getSubreddit());
         String authorText = String.format(context.getString(R.string.authorPrefixed), post.getAuthor());
 
-        this.binding.subreddit.setText(subredditText);
-        this.binding.author.setText(authorText);
-        this.binding.age.setText(Util.createAgeText(getResources(), between));
-        this.binding.title.setText(post.getTitle());
+        binding.subreddit.setText(subredditText);
+        binding.author.setText(authorText);
+        binding.age.setText(Util.createAgeText(getResources(), between));
+        binding.title.setText(post.getTitle());
+
+        this.createAndAddTags();
 
         // When the subreddit is clicked, open the selected subreddit in a new activity
-        this.binding.subreddit.setOnClickListener(view -> openSubredditInActivity(post.getSubreddit()));
+        binding.subreddit.setOnClickListener(view -> openSubredditInActivity(post.getSubreddit()));
+    }
+
+    /**
+     * Creates and adds the relevant tags
+     */
+    private void createAndAddTags() {
+        // If this view has been used in a RecyclerView make sure it is fresh
+        binding.tags.removeAllViews();
+
+        if (true) {
+            binding.tags.addView(ViewUtil.createSpoilerTag(getContext()));
+        }
+        if (post.isNSFW()) {
+            binding.tags.addView(ViewUtil.createNSFWTag(getContext()));
+        }
+
+        List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
+        flairs.forEach(flair -> {
+            Tag tag = new Tag(getContext());
+            tag.setText(flair.getText());
+            // TODO this shouldn't be hardcoded like this
+            // TODO each flair item is different types of items in the flair (such as an icon and text)
+
+            if (post.getLinkFlairTextColor().equals("dark")) {
+                tag.setTextColor(ContextCompat.getColor(getContext(), R.color.flairTextDark));
+                tag.setFillColor(ContextCompat.getColor(getContext(), R.color.flairBackgroundDark));
+            }
+            // tag.setFillColor(post.getLinkFlairBackgroundColor());
+            binding.tags.addView(tag);
+        });
     }
 
     /**

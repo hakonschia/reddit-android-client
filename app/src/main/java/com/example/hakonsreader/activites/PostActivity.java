@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,8 +18,6 @@ import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.viewmodels.CommentsViewModel;
-import com.example.hakonsreader.views.ContentLink;
-import com.example.hakonsreader.views.ContentText;
 import com.example.hakonsreader.views.ContentVideo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
@@ -77,10 +73,9 @@ public class PostActivity extends AppCompatActivity {
         this.setupCommentsList();
 
         // Postpone transition until the height of the content is known
-        postponeEnterTransition();
+        //postponeEnterTransition();
 
-        binding.postInfoContainer.postInfo.setPost(post);
-        binding.postInfoContainer.postFullBar.setPost(post);
+        binding.post.setPostData(post);
 
         this.addPostContent();
 
@@ -88,11 +83,9 @@ public class PostActivity extends AppCompatActivity {
 
 
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
-
         commentsViewModel.getItemsLoading().observe(this, itemsLoading -> {
             binding.loadingIcon.setItemsLoading(itemsLoading);
         });
-
         commentsViewModel.getComments().observe(this, comments -> {
             commentsAdapter.addComments(comments);
         });
@@ -105,10 +98,10 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        binding = null;
 
         // Ensure resources are freed when the activity exits
-        Util.cleanupPostContent(postContent);
+        binding.post.cleanUpContent();
+        binding = null;
     }
 
     @Override
@@ -142,6 +135,7 @@ public class PostActivity extends AppCompatActivity {
         // Extra information that might hold information about the state of the post
         Bundle extras = getIntent().getExtras().getBundle("extras");
 
+        /*
         postContent = Util.generatePostContent(this.post, this);
         if (postContent != null) {
             this.binding.postInfoContainer.content.addView(postContent);
@@ -187,6 +181,8 @@ public class PostActivity extends AppCompatActivity {
         } else {
             startPostponedEnterTransition();
         }
+
+         */
     }
 
     /**

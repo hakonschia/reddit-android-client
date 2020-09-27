@@ -23,8 +23,10 @@
             app:contentInsetStart="0dp"
             app:layout_scrollFlags="enterAlways|scroll">
 
-            <include layout="@layout/list_item_post"
-                android:id="@+id/postInfoContainer" />
+            <com.example.hakonsreader.views.Post
+                android:id="@+id/post"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

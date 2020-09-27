@@ -2,6 +2,8 @@ package com.example.hakonsreader.misc;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.View;
 
 import com.example.hakonsreader.R;
@@ -18,36 +20,6 @@ import java.util.Locale;
 
 public class Util {
     private Util() { }
-
-
-    /**
-     * Generates content view for a post
-     *
-     * @param post The post to generate for
-     * @return A view with the content of the post
-     */
-    public static View generatePostContent(RedditPost post, Context context) {
-        switch (post.getPostType()) {
-            case IMAGE:
-                return new ContentImage(context, post);
-
-            case VIDEO:
-                return new ContentVideo(context, post);
-
-            case RICH_VIDEO:
-                // Links such as youtube, gfycat etc are rich video posts
-                return null;
-
-            case LINK:
-                return new ContentLink(context, post);
-
-            case TEXT:
-                return new ContentText(context, post);
-
-            default:
-                return null;
-        }
-    }
 
 
     /**
@@ -139,18 +111,6 @@ public class Util {
     }
 
     /**
-     * Cleans up post content by releasing any resources that might be used by the view
-     *
-     * @param postContent The view of the content
-     */
-    public static void cleanupPostContent(View postContent) {
-        // Release the exo player from video posts
-        if (postContent instanceof ContentVideo) {
-            ((ContentVideo)postContent).release();
-        }
-    }
-
-    /**
      * Removes whitespace from a {@link CharSequence}
      *
      * <p>Taken from: https://stackoverflow.com/a/16745540/7750841</p>
@@ -170,5 +130,18 @@ public class Util {
         }
 
         return s.subSequence(start, end);
+    }
+
+    /**
+     * Converts an HTML string to a {@link CharSequence} that can be used in TextView's
+     *
+     * <p>The end of the CharSequence is trimmed so it doesn't include extra whitespace</p>
+     *
+     * @param html The HTML string to convert
+     * @return A trimmed {@link CharSequence} of the input string
+     */
+    public static CharSequence fromHtml(String html) {
+        Spanned s = Html.fromHtml(html, Html.FROM_HTML_SEPARATOR_LINE_BREAK_DIV | Html.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE);
+        return Util.trim(s, 0, s.length());
     }
 }
