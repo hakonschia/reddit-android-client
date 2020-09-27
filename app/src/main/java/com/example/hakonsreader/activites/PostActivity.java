@@ -2,24 +2,20 @@ package com.example.hakonsreader.activites;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
-import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.viewmodels.CommentsViewModel;
 import com.example.hakonsreader.views.ContentVideo;
@@ -83,10 +79,9 @@ public class PostActivity extends AppCompatActivity {
         binding.post.setOnContentFinished(() -> runOnUiThread(this::startPostponedEnterTransition));
         binding.post.setPostData(post);
 
-        this.addPostContent();
-
-        commentsAdapter.setOnReplyListener(this::replyTo);
-
+        if (post.getPostType() == PostType.VIDEO) {
+            binding.post.resumeVideoPost(getIntent().getExtras().getBundle("extras"));
+        }
 
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
         commentsViewModel.getItemsLoading().observe(this, itemsLoading -> {
@@ -120,109 +115,30 @@ public class PostActivity extends AppCompatActivity {
                     RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING), RedditComment.class);
 
                     // Adding a top-level comment
-                    if (this.replyingTo instanceof RedditPost) {
-                        this.commentsAdapter.addComment(newComment);
+                    if (replyingTo instanceof RedditPost) {
+                        commentsAdapter.addComment(newComment);
                     } else {
                         // Replying to a comment
-                        this.commentsAdapter.addComment(newComment, (RedditComment)this.replyingTo);
+                        commentsAdapter.addComment(newComment, (RedditComment)replyingTo);
                     }
                 }
             }
         }
     }
 
-
-    /**
-     * Adds the content to the post
-     *
-     * <p>When the content is added the enter transition is called</p>
-     */
-    private void addPostContent() {
-        // Extra information that might hold information about the state of the post
-        Bundle extras = getIntent().getExtras().getBundle("extras");
-        //int newHeight = (totalHeight - height) + maxHeight;
-
-        /*
-        postContent = Util.generatePostContent(this.post, this);
-        if (postContent != null) {
-            this.binding.postInfoContainer.content.addView(postContent);
-
-            // Align link post to start of parent
-            if (postContent instanceof ContentLink || postContent instanceof ContentText) {
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.binding.postInfoContainer.content.getLayoutParams();
-                params.addRule(RelativeLayout.ALIGN_PARENT_START);
-
-                this.binding.postInfoContainer.content.setLayoutParams(params);
-            } else if (postContent instanceof ContentVideo) {
-                this.resumeVideoPost(extras);
-            }
-
-
-            // Ensure the content doesn't go over the set height limit
-            this.binding.postInfoContainer.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    int maxHeight = (int)getResources().getDimension(R.dimen.postContentMaxHeight);
-                    int height = postContent.getMeasuredHeight();
-
-                    // Content is too large, set new height
-                    if (height >= maxHeight) {
-                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.postInfoContainer.content.getLayoutParams();
-                        layoutParams.height = maxHeight;
-                        binding.postInfoContainer.content.setLayoutParams(layoutParams);
-
-                        // TODO find a better way to scale the video as it doesn't smoothly transition the video
-                        if (postContent instanceof ContentVideo) {
-                            ((ContentVideo)postContent).updateHeight(maxHeight);
-                        }
-                    }
-
-                    // Remove listener to avoid infinite calls of layout changes
-                    binding.postInfoContainer.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                    // The runnable in post is (apparently) called after the UI is drawn, so it
-                    // is then safe to start the transition
-                    binding.postInfoContainer.content.post(() -> startPostponedEnterTransition());
-                }
-            });
-        } else {
-            startPostponedEnterTransition();
-        }
-
-         */
-    }
-
-    /**
-     * Resumes state of a video according to how it was when it was clicked
-     *
-     * @param data The data to use for restoring the state
-     */
-    private void resumeVideoPost(Bundle data) {
-        ContentVideo video = (ContentVideo)postContent;
-
-        long timestamp = data.getLong(ContentVideo.EXTRA_TIMESTAMP);
-        boolean isPlaying = data.getBoolean(ContentVideo.EXTRA_IS_PLAYING);
-        boolean showController = data.getBoolean(ContentVideo.EXTRA_SHOW_CONTROLS);
-
-        // Video has been played previously so make sure the player is prepared
-        if (timestamp != 0) {
-            video.prepare();
-        }
-        video.setPosition(timestamp);
-        video.setPlayback(isPlaying);
-        video.setControllerVisible(showController);
-    }
 
     /**
      * Sets up {@link ActivityPostBinding#comments}
      */
     private void setupCommentsList() {
-        this.commentsAdapter = new CommentsAdapter(this.post);
-        this.commentsAdapter.setParentLayout(this.binding.parentLayout);
-        this.layoutManager = new LinearLayoutManager(this);
+        commentsAdapter = new CommentsAdapter(post);
+        commentsAdapter.setParentLayout(binding.parentLayout);
+        commentsAdapter.setOnReplyListener(this::replyTo);
 
-        this.binding.comments.setAdapter(this.commentsAdapter);
-        this.binding.comments.setLayoutManager(this.layoutManager);
+        layoutManager = new LinearLayoutManager(this);
+
+        binding.comments.setAdapter(commentsAdapter);
+        binding.comments.setLayoutManager(layoutManager);
     }
 
     /**
@@ -232,10 +148,10 @@ public class PostActivity extends AppCompatActivity {
     public void goToNextTopLevelComment(View view) {
         int currentPos = layoutManager.findFirstVisibleItemPosition();
         // Add 1 so that we can go directly from a top level to the next without scrolling
-        int next = this.commentsAdapter.getNextTopLevelCommentPos(currentPos + 1);
+        int next = commentsAdapter.getNextTopLevelCommentPos(currentPos + 1);
 
         // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
-        this.binding.comments.stopScroll();
+        binding.comments.stopScroll();
 
         // Scroll to the position, with 0 pixels offset from the top
         // TODO smooth scroll
@@ -249,12 +165,12 @@ public class PostActivity extends AppCompatActivity {
     public void goToPreviousTopLevelComment(View view) {
         int currentPos = layoutManager.findFirstVisibleItemPosition();
         // Subtract 1 so that we can go directly from a top level to the previous without scrolling
-        int previous = this.commentsAdapter.getPreviousTopLevelCommentPos(currentPos - 1);
+        int previous = commentsAdapter.getPreviousTopLevelCommentPos(currentPos - 1);
 
         // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
-        this.binding.comments.stopScroll();
+        binding.comments.stopScroll();
 
-        this.layoutManager.scrollToPositionWithOffset(previous, 0);
+        layoutManager.scrollToPositionWithOffset(previous, 0);
     }
 
     /**
@@ -263,7 +179,7 @@ public class PostActivity extends AppCompatActivity {
      * @param listing The listing to reply to
      */
     private void replyTo(RedditListing listing) {
-        this.replyingTo = listing;
+        replyingTo = listing;
 
         // Open activity or fragment or something to allow reply
         Intent intent = new Intent(this, ReplyActivity.class);
@@ -279,7 +195,6 @@ public class PostActivity extends AppCompatActivity {
      * @param view Ignored
      */
     public void replyToPost(View view) {
-        Log.d(TAG, "replyToPost: Replying to " + post.getTitle());
-        this.replyTo(this.post);
+        this.replyTo(post);
     }
 }

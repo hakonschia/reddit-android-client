@@ -1,12 +1,12 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
@@ -226,5 +226,49 @@ public class Post extends RelativeLayout {
         binding.content.removeAllViewsInLayout();
         // Make sure the view size resets
         binding.content.forceLayout();
+    }
+
+    /**
+     * Retrieve a bundle of information that can be useful for saving the state of the post
+     *
+     * <p>Currently only saves state for video posts</p>
+     *
+     * @return A bundle that might include state variables
+     */
+    public Bundle getExtras() {
+        Bundle extras = new Bundle();
+
+        View c = binding.content.getChildAt(0);
+
+        if (c instanceof ContentVideo) {
+            ContentVideo video = (ContentVideo)c;
+            extras.putLong(ContentVideo.EXTRA_TIMESTAMP, video.getCurrentPosition());
+            extras.putBoolean(ContentVideo.EXTRA_IS_PLAYING, video.isPlaying());
+            extras.putBoolean(ContentVideo.EXTRA_SHOW_CONTROLS, video.isControllerShown());
+        }
+
+        return extras;
+    }
+
+    /**
+     * Resumes state of a video according to how it was when it was clicked
+     *
+     * @param data The data to use for restoring the state
+     */
+    public void resumeVideoPost(Bundle data) {
+        Log.d(TAG, "resumeVideoPost: " + data);
+        ContentVideo video = (ContentVideo)binding.content.getChildAt(0);
+
+        long timestamp = data.getLong(ContentVideo.EXTRA_TIMESTAMP);
+        boolean isPlaying = data.getBoolean(ContentVideo.EXTRA_IS_PLAYING);
+        boolean showController = data.getBoolean(ContentVideo.EXTRA_SHOW_CONTROLS);
+
+        // Video has been played previously so make sure the player is prepared
+        if (timestamp != 0) {
+            video.prepare();
+        }
+        video.setPosition(timestamp);
+        video.setPlayback(isPlaying);
+        video.setControllerVisible(showController);
     }
 }

@@ -14,6 +14,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.interfaces.OnClickListener;
+import com.example.hakonsreader.views.ContentVideo;
 import com.example.hakonsreader.views.Post;
 
 import java.util.ArrayList;
@@ -187,19 +188,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          * @return A bundle that might include extra information about the state of the post
          */
         public Bundle getExtraPostInfo() {
-            Bundle bundle = new Bundle();
-
-            /*
-            View c = content.getChildAt(0);
-            if (c instanceof ContentVideo) {
-                ContentVideo video = (ContentVideo)c;
-                bundle.putLong(ContentVideo.EXTRA_TIMESTAMP, video.getCurrentPosition());
-                bundle.putBoolean(ContentVideo.EXTRA_IS_PLAYING, video.isPlaying());
-                bundle.putBoolean(ContentVideo.EXTRA_SHOW_CONTROLS, video.isControllerShown());
-            }
-             */
-
-            return bundle;
+            return post.getExtras();
         }
     }
 }
