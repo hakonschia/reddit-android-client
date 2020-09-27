@@ -71,7 +71,7 @@
             android:layout_weight="1"
             app:buffered_color="@android:color/white"
             app:played_color="@color/accent"
-            app:unplayed_color="@android:color/white" />
+            app:unplayed_color="@android:color/darker_gray" />
 
         <TextView
             android:id="@id/exo_duration"
