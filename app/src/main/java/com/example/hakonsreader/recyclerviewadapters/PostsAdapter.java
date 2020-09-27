@@ -162,6 +162,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         View v = holder.content.getChildAt(0);
         Util.cleanupPostContent(v);
         holder.tags.removeAllViews();
+
+        // Remove previous post content
+        holder.content.removeAllViewsInLayout();
+        // Make sure the view size resets (or it will still have size of the previous post in this view holder)
+        holder.content.forceLayout();
     }
 
 
@@ -259,11 +264,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         private void setPostContent() {
             View view = Util.generatePostContent(post, itemView.getContext());
-
-            // Since the ViewHolder is recycled it can still have views from other posts
-            content.removeAllViewsInLayout();
-            // Make sure the view size resets (or it will still have size of the previous post in this view holder)
-            content.forceLayout();
 
             // A view to add and not text post (don't add text posts to the list)
             if (view != null && post.getPostType() != PostType.TEXT) {
