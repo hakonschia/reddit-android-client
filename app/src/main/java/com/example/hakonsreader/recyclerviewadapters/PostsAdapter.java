@@ -112,11 +112,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         final RedditPost post = this.posts.get(position);
         holder.redditPost = post;
 
-        // Don't show text posts here
-        if (post.getPostType() == PostType.TEXT) {
-            holder.post.setShowContent(false);
-        }
-
+        // Don't show text posts here (only show when a post is opened)
+        holder.post.setShowContent(post.getPostType() != PostType.TEXT);
         holder.post.setPostData(post);
     }
 

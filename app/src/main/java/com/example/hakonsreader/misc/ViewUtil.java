@@ -2,9 +2,14 @@ package com.example.hakonsreader.misc;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.views.Tag;
+import com.squareup.picasso.Picasso;
 
 public class ViewUtil {
     private ViewUtil() { }
@@ -19,10 +24,13 @@ public class ViewUtil {
     public static Tag createSpoilerTag(Context context) {
         Resources resources = context.getResources();
 
+        TextView tv = new TextView(context);
+        tv.setText(resources.getString(R.string.tagSpoiler));
+        tv.setTextColor(ContextCompat.getColor(context, R.color.tagSpoilerText));
+
         Tag tag = new Tag(context);
-        tag.setText(resources.getString(R.string.tagSpoiler));
-        tag.setTextColor(resources.getColor(R.color.tagSpoilerText));
-        tag.setFillColor(resources.getColor(R.color.tagSpoiler));
+        tag.add(tv);
+        tag.setFillColor(ContextCompat.getColor(context, R.color.tagSpoiler));
 
         return tag;
     }
@@ -36,10 +44,14 @@ public class ViewUtil {
     public static Tag createNSFWTag(Context context) {
         Resources resources = context.getResources();
 
+
+        TextView tv = new TextView(context);
+        tv.setText(resources.getString(R.string.tagNSFW));
+        tv.setTextColor(ContextCompat.getColor(context, R.color.tagNSFWText));
+
         Tag tag = new Tag(context);
-        tag.setText(resources.getString(R.string.tagNSFW));
-        tag.setTextColor(resources.getColor(R.color.tagNSFWText));
-        tag.setFillColor(resources.getColor(R.color.tagNSFW));
+        tag.add(tv);
+        tag.setFillColor(ContextCompat.getColor(context, R.color.tagNSFW));
 
         return tag;
     }

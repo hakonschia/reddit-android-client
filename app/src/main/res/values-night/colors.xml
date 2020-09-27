@@ -26,6 +26,8 @@
 
     <color name="imageVideoActivityBackground">#CC000000</color>
 
-    <color name="flairTextDark">#DCDCDC</color>
-    <color name="flairBackgroundDark">#040404</color>
+    <color name="flairTextDark">#FFFFFF</color>
+    <color name="flairBackgroundDark">#2C2C2C</color>
+    <color name="flairTextLight">#040404</color>
+    <color name="flairBackgroundLight">#DCDCDC</color>
 </resources>

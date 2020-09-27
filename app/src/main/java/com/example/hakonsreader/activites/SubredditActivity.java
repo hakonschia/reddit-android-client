@@ -34,7 +34,7 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
            // fragment = (SubredditFragment) getSupportFragmentManager().getFragment(savedInstanceState, "subredditFragment");
             fragment = (SubredditFragment) getSupportFragmentManager().findFragmentByTag("subredditFragment");
         } else {
-            fragment = SubredditFragment.newInstance("rocketleague");
+            fragment = SubredditFragment.newInstance("sports");
             getSupportFragmentManager().beginTransaction().add(R.id.subredditActivityFragment, fragment, "subredditFragment").commit();
         }
         

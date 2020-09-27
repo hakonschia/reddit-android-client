@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.Space;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +24,7 @@ import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.databinding.PostInfoBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.misc.ViewUtil;
+import com.squareup.picasso.Picasso;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -103,20 +108,49 @@ public class PostInfo extends ConstraintLayout {
             binding.tags.addView(ViewUtil.createNSFWTag(getContext()));
         }
 
+        Tag tag = new Tag(getContext());
+
+        int textColor;
+        if (post.getLinkFlairTextColor().equals("dark")) {
+            textColor = ContextCompat.getColor(getContext(), R.color.flairTextDark);
+            tag.setFillColor(ContextCompat.getColor(getContext(), R.color.flairBackgroundDark));
+        } else {
+            textColor = ContextCompat.getColor(getContext(), R.color.flairTextLight);
+            tag.setFillColor(ContextCompat.getColor(getContext(), R.color.flairBackgroundLight));
+        }
+
+        String fillColor = post.getLinkFlairBackgroundColor();
+        if (fillColor != null && !fillColor.isEmpty()) {
+            Log.d(TAG, "createAndAddTags: Adding flair color: " + fillColor);
+            tag.setFillColor(fillColor);
+        }
+
+        // Add all views the flair has
         List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
         flairs.forEach(flair -> {
-            Tag tag = new Tag(getContext());
-            tag.setText(flair.getText());
-            // TODO this shouldn't be hardcoded like this
-            // TODO each flair item is different types of items in the flair (such as an icon and text)
+            View view = null;
 
-            if (post.getLinkFlairTextColor().equals("dark")) {
-                tag.setTextColor(ContextCompat.getColor(getContext(), R.color.flairTextDark));
-                tag.setFillColor(ContextCompat.getColor(getContext(), R.color.flairBackgroundDark));
+            if (flair.getType().equals("text")) {
+                TextView tv = new TextView(getContext());
+                tv.setText(flair.getText());
+                tv.setTextColor(textColor);
+                view = tv;
+            } else if (flair.getType().equals("emoji")) {
+                ImageView iv = new ImageView(getContext());
+                Picasso.get()
+                        .load(flair.getUrl())
+                        .resize(50, 50)
+                        .into(iv);
+                view = iv;
             }
-            // tag.setFillColor(post.getLinkFlairBackgroundColor());
-            binding.tags.addView(tag);
+
+            // Don't know if there are more than "text" and "emoji" types, so this will do for now
+            if (view != null) {
+                tag.add(view);
+            }
         });
+
+        binding.tags.addView(tag);
     }
 
     /**

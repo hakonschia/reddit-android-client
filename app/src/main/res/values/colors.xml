@@ -38,5 +38,7 @@
 
     <color name="flairTextDark">#292929</color>
     <color name="flairBackgroundDark">#DFDFDF</color>
+    <color name="flairTextLight">#FFFFFF</color>
+    <color name="flairBackgroundLight">#292929</color>
 
 </resources>

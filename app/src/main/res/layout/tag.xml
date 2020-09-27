@@ -11,17 +11,13 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="5dp">
 
-        <TextView
-            android:id="@+id/text"
+        <LinearLayout
+            android:id="@+id/tags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="5dp"
-            android:paddingEnd="5dp"
-            android:paddingBottom="1dp"
-            android:textSize="12sp"
-
-            tools:textColor="@color/textColor"
-            tools:text="@string/tagNSFW" />
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp"
+            android:orientation="horizontal" />
 
     </androidx.cardview.widget.CardView>
 
