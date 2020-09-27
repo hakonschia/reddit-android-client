@@ -4,8 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
-    android:paddingBottom="10dp"
-    android:background="@color/secondaryBackground">
+    android:paddingBottom="10dp">
 
     <ImageView
         android:id="@+id/icon"
