@@ -133,12 +133,14 @@ public class PostInfo extends ConstraintLayout {
                 TextView tv = new TextView(getContext());
                 tv.setText(flair.getText());
                 tv.setTextColor(textColor);
+                tv.setTextSize(getContext().getResources().getDimension(R.dimen.tagTextSize));
                 view = tv;
             } else if (flair.getType().equals("emoji")) {
+                int size = (int)getContext().getResources().getDimension(R.dimen.tagIconSize);
                 ImageView iv = new ImageView(getContext());
                 Picasso.get()
                         .load(flair.getUrl())
-                        .resize(50, 50)
+                        .resize(size, size)
                         .into(iv);
                 view = iv;
             }

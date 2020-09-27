@@ -26,6 +26,7 @@ public class ViewUtil {
 
         TextView tv = new TextView(context);
         tv.setText(resources.getString(R.string.tagSpoiler));
+        tv.setTextSize(resources.getDimension(R.dimen.tagTextSize));
         tv.setTextColor(ContextCompat.getColor(context, R.color.tagSpoilerText));
 
         Tag tag = new Tag(context);
@@ -44,9 +45,9 @@ public class ViewUtil {
     public static Tag createNSFWTag(Context context) {
         Resources resources = context.getResources();
 
-
         TextView tv = new TextView(context);
         tv.setText(resources.getString(R.string.tagNSFW));
+        tv.setTextSize(resources.getDimension(R.dimen.tagTextSize));
         tv.setTextColor(ContextCompat.getColor(context, R.color.tagNSFWText));
 
         Tag tag = new Tag(context);
