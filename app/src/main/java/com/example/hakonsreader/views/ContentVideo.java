@@ -138,6 +138,9 @@ public class ContentVideo extends PlayerView {
                 .load(post.getThumbnail())
                 .resize(params.width, params.height)
                 .into(thumbnail);
+        // When the thumbnail is shown, clicking it (ie. clicking on the video but not on the controls)
+        // "removes" the view so the view turns black
+        thumbnail.setOnClickListener(null);
     }
 
     /**
