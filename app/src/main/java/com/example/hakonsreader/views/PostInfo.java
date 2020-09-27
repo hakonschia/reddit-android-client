@@ -96,7 +96,7 @@ public class PostInfo extends ConstraintLayout {
         // If this view has been used in a RecyclerView make sure it is fresh
         binding.tags.removeAllViews();
 
-        if (true) {
+        if (post.isSpoiler()) {
             binding.tags.addView(ViewUtil.createSpoilerTag(getContext()));
         }
         if (post.isNSFW()) {
