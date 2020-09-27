@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/secondaryBackground"
+        app:itemIconTint="@color/iconColor"
         app:menu="@menu/bottom_navigation"/>
 
     <com.example.hakonsreader.views.LoadingIcon
