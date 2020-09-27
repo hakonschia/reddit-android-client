@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.R;
@@ -154,22 +155,26 @@ public class SubredditFragment extends Fragment {
      * Sets up {@link FragmentSubredditBinding#posts}
      */
     private void setupPostsList(View view) {
-        this.layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity());
 
-        this.binding.posts.setAdapter(this.adapter);
-        this.binding.posts.setLayoutManager(this.layoutManager);
-        this.binding.posts.setOnScrollChangeListener(this.scrollListener);
+        binding.posts.setAdapter(this.adapter);
+        binding.posts.setLayoutManager(this.layoutManager);
+        binding.posts.setOnScrollChangeListener(this.scrollListener);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.posts.getContext(),
+                layoutManager.getOrientation());
+        binding.posts.addItemDecoration(dividerItemDecoration);
     }
 
     private void increaseLoadingCount() {
-        if (this.loadingListener != null) {
-            this.loadingListener.onCountChange(true);
+        if (loadingListener != null) {
+            loadingListener.onCountChange(true);
         }
     }
 
     private void decreaseLoadingCount() {
-        if (this.loadingListener != null) {
-            this.loadingListener.onCountChange(false);
+        if (loadingListener != null) {
+            loadingListener.onCountChange(false);
         }
     }
 

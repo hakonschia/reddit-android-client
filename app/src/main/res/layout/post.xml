@@ -2,19 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/postsParentLayout"
 
+    android:id="@+id/postsParentLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 
-    android:layout_marginBottom="10dp"
-    android:paddingBottom="5dp"
-
     android:background="@color/background"
     android:foreground="?attr/selectableItemBackground"
-    android:clipChildren="false"
-
-    android:elevation="2dp">
+    android:paddingBottom="4dp">
 
     <com.example.hakonsreader.views.PostInfo
         android:id="@+id/postInfo"
