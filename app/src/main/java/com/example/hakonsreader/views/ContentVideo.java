@@ -214,9 +214,6 @@ public class ContentVideo extends PlayerView {
      * @param play If true the video will start playing
      */
     public void setPlayback(boolean play) {
-        if (play) {
-            thumbnail.setVisibility(GONE);
-        }
         exoPlayer.setPlayWhenReady(play);
     }
 
