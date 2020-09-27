@@ -11,7 +11,9 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.misc.VideoCache;
+import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -89,11 +91,16 @@ public class ContentVideo extends PlayerView {
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
         CacheDataSourceFactory cacheFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
+        LoadControl loadControl = new DefaultLoadControl.Builder()
+                // Buffer size between 2.5 and 7.5 seconds, with minimum of 1 second for playback to start
+                .setBufferDurationsMs(2500, 7500, 1000, 500)
+                .createDefaultLoadControl();
 
         mediaSource = new ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
                 .createMediaSource(Uri.parse(post.getVideoUrl()));
 
         exoPlayer = new SimpleExoPlayer.Builder(context)
+                .setLoadControl(loadControl)
                 .setBandwidthMeter(new DefaultBandwidthMeter.Builder(context).build())
                 .setTrackSelector(new DefaultTrackSelector(context, new AdaptiveTrackSelection.Factory()))
                 .build();
