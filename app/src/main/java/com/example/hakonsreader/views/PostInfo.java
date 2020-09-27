@@ -121,7 +121,6 @@ public class PostInfo extends ConstraintLayout {
 
         String fillColor = post.getLinkFlairBackgroundColor();
         if (fillColor != null && !fillColor.isEmpty()) {
-            Log.d(TAG, "createAndAddTags: Adding flair color: " + fillColor);
             tag.setFillColor(fillColor);
         }
 
