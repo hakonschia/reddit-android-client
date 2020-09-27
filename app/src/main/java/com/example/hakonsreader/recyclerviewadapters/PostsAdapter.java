@@ -163,10 +163,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          * @return An array of {@link Pair} mapping the view to its transition name in the new activity
          */
         public Pair<View, String>[] getPostTransitionViews() {
-            return new Pair[] {
-                    Pair.create(post, "post"),
-                    Pair.create(post.getContent(), "post_content")
-            };
+            List<Pair<View, String>> pairs = new ArrayList<>();
+            pairs.add(Pair.create(post, "post"));
+
+            View content = post.getContent();
+            if (content != null) {
+                pairs.add(Pair.create(post.getContent(), "post_content"));
+            }
+            
+            return pairs.toArray(new Pair[0]);
         }
 
         /**
