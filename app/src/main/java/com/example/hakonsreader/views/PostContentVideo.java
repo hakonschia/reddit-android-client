@@ -2,14 +2,20 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.Layout;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.App;
+import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.LayoutPostContentLinkBinding;
@@ -31,7 +37,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.squareup.picasso.Picasso;
 
-public class PostContentVideo extends ConstraintLayout {
+public class PostContentVideo extends PlayerView {
     private static final String TAG = "PostContentVideo";
 
     /**
@@ -61,16 +67,13 @@ public class PostContentVideo extends ConstraintLayout {
      */
     private static final float MAX_WIDTH_RATIO = 1.0f;
 
+    private ImageView thumbnail;
     private ExoPlayer exoPlayer;
     private MediaSource mediaSource;
     private RedditPost post;
 
-    private LayoutPostContentVideoBinding binding;
-
-
     public PostContentVideo(Context context, RedditPost post) {
         super(context);
-        this.binding = LayoutPostContentVideoBinding.inflate(LayoutInflater.from(context), this, true);
 
         this.post = post;
         this.updateView();
@@ -89,13 +92,6 @@ public class PostContentVideo extends ConstraintLayout {
 
     private void updateView() {
         this.setSize();
-
-        ViewGroup.LayoutParams params = getLayoutParams();
-        // Show the thumbnail over the video before it is being played
-        Picasso.get()
-                .load(post.getThumbnail())
-                .resize(params.width, params.height)
-                .into(binding.thumbnail);
 
         Context context = getContext();
 
@@ -120,14 +116,31 @@ public class PostContentVideo extends ConstraintLayout {
                 // If the player is trying to play and hasn't yet prepared the video, prepare it
                 if (playWhenReady && !isPrepared) {
                     // Remove the thumbnail
-                    binding.thumbnail.setVisibility(GONE);
+                    thumbnail.setVisibility(GONE);
+
                     exoPlayer.prepare(mediaSource);
                     isPrepared = true;
                 }
             }
         });
 
-        binding.player.setPlayer(exoPlayer);
+        setPlayer(exoPlayer);
+
+        ViewGroup.LayoutParams params = getLayoutParams();
+
+        /*
+        // TODO this doesnt work
+        TextView duration = findViewById(R.id.exo_duration);
+        duration.setText(String.valueOf(post.getVideoDuration()));
+
+         */
+
+        thumbnail = findViewById(R.id.thumbnail);
+        // Show the thumbnail over the video before it is being played
+        Picasso.get()
+                .load(post.getThumbnail())
+                .resize(params.width, params.height)
+                .into(thumbnail);
     }
 
     /**
@@ -154,7 +167,7 @@ public class PostContentVideo extends ConstraintLayout {
      * @return True if the controller is visible
      */
     public boolean isControllerShown() {
-        return binding.player.isControllerVisible();
+        return isControllerVisible();
     }
 
     /**
@@ -190,7 +203,7 @@ public class PostContentVideo extends ConstraintLayout {
      */
     public void setPlayback(boolean play) {
         if (play) {
-            binding.thumbnail.setVisibility(GONE);
+            thumbnail.setVisibility(GONE);
         }
         exoPlayer.setPlayWhenReady(play);
     }
@@ -202,9 +215,9 @@ public class PostContentVideo extends ConstraintLayout {
      */
     public void setControllerVisible(boolean visible) {
         if (visible) {
-            binding.player.showController();
+            showController();
         } else {
-            binding.player.hideController();
+            hideController();
         }
     }
 

@@ -139,6 +139,7 @@ public class RedditPost implements VotableListing, PostableListing {
             private RedditVideo redditVideo;
 
             private static class RedditVideo {
+                @SerializedName("duration")
                 private int duration;
 
                 @SerializedName("fallback_url")
@@ -384,6 +385,13 @@ public class RedditPost implements VotableListing, PostableListing {
      */
     public List<RichtextFlair> getLinkRichtextFlairs() {
         return data.linkRichtextFlairs;
+    }
+
+    /**
+     * @return The duration of the video if this is a video post
+     */
+    public int getVideoDuration() {
+        return data.media.redditVideo.duration;
     }
 
     /**
