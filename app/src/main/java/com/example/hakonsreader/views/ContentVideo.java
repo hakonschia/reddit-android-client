@@ -3,6 +3,7 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -59,10 +60,17 @@ public class ContentVideo extends PlayerView {
      */
     private static final float MAX_WIDTH_RATIO = 1.0f;
 
+    private RedditPost post;
+
     private ImageView thumbnail;
     private ExoPlayer exoPlayer;
     private MediaSource mediaSource;
-    private RedditPost post;
+
+    /**
+     * True if {@link ContentVideo#exoPlayer} has been prepared
+     */
+    private boolean isPrepared = false;
+
 
     public ContentVideo(Context context, RedditPost post) {
         super(context);
@@ -106,8 +114,6 @@ public class ContentVideo extends PlayerView {
                 .build();
 
         exoPlayer.addListener(new Player.EventListener() {
-            boolean isPrepared = false;
-
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
                 // Ensure the thumbnail isn't visible when the video is playing
@@ -186,8 +192,9 @@ public class ContentVideo extends PlayerView {
      * Prepares the exo player
      */
     public void prepare() {
-        if (mediaSource != null) {
+        if (mediaSource != null && !isPrepared) {
             exoPlayer.prepare(mediaSource);
+            isPrepared = true;
         }
     }
 
