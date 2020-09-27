@@ -4,7 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -73,8 +77,10 @@ public class PostActivity extends AppCompatActivity {
         this.setupCommentsList();
 
         // Postpone transition until the height of the content is known
-        //postponeEnterTransition();
+        postponeEnterTransition();
 
+        binding.post.setMaxContentHeight((int)getResources().getDimension(R.dimen.postContentMaxHeight));
+        binding.post.setOnContentFinished(() -> runOnUiThread(this::startPostponedEnterTransition));
         binding.post.setPostData(post);
 
         this.addPostContent();
@@ -134,6 +140,7 @@ public class PostActivity extends AppCompatActivity {
     private void addPostContent() {
         // Extra information that might hold information about the state of the post
         Bundle extras = getIntent().getExtras().getBundle("extras");
+        //int newHeight = (totalHeight - height) + maxHeight;
 
         /*
         postContent = Util.generatePostContent(this.post, this);

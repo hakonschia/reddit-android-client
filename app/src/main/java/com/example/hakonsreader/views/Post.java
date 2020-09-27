@@ -2,20 +2,27 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
 
+import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 
 public class Post extends RelativeLayout {
+    private static final String TAG = "Post";
 
     private PostBinding binding;
     private RedditPost postData;
     private boolean showContent = true;
+    private Runnable onContentFinished;
+    private int maxContentHeight = -1;
 
 
     public Post(Context context) {
@@ -62,6 +69,32 @@ public class Post extends RelativeLayout {
     }
 
     /**
+     * @return The view object of the content
+     */
+    public View getContent() {
+        return binding.content.getChildAt(0);
+    }
+
+    /**
+     * Sets the max height the content of the post can have.
+     *
+     * <p>When using this you might want to use {@link Post#setOnContentFinished(Runnable)} to run code
+     * when the content has finished calculating its height</p>
+     *
+     * @param maxContentHeight The height limit
+     */
+    public void setMaxContentHeight(int maxContentHeight) {
+        this.maxContentHeight = maxContentHeight;
+    }
+
+    /**
+     * @param onContentFinished a runnable that runs when content height has been set
+     */
+    public void setOnContentFinished(Runnable onContentFinished) {
+        this.onContentFinished = onContentFinished;
+    }
+
+    /**
      * Updates the view
      */
     private void updateView() {
@@ -86,6 +119,41 @@ public class Post extends RelativeLayout {
         View content = generatePostContent(postData, getContext(), this);
         if (content != null) {
             binding.content.addView(content);
+
+            if (maxContentHeight != -1) {
+                binding.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        int maxHeight = (int)getResources().getDimension(R.dimen.postContentMaxHeight);
+
+                        int height = content.getMeasuredHeight();
+
+                        // Content is too large, set new height
+                        if (height >= maxHeight) {
+                            RelativeLayout.LayoutParams params = (LayoutParams) binding.content.getLayoutParams();
+                            params.height = maxHeight;
+
+                            binding.content.setLayoutParams(params);
+
+                            // For videos the PlayerView also has to update its height, or else it will just go below the view
+                            if (content instanceof ContentVideo) {
+                                ((ContentVideo)content).updateHeight(maxHeight);
+                            }
+                        }
+
+                        // Remove listener to avoid infinite calls of layout changes
+                        binding.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                        // The runnable in post is (apparently) called after the UI is drawn, so it
+                        // is then safe to start the transition
+                        binding.content.post(onContentFinished);
+                    }
+                });
+            }
+        } else {
+            if (onContentFinished != null) {
+                onContentFinished.run();
+            }
         }
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.content.getLayoutParams();

@@ -69,7 +69,7 @@ public class App extends Application {
         redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID);
         redditApi.setToken(TokenManager.getToken());
         redditApi.setOnNewToken(TokenManager::saveToken);
-        redditApi.setLoggingLevel(HttpLoggingInterceptor.Level.BODY);
+        //redditApi.setLoggingLevel(HttpLoggingInterceptor.Level.BODY);
         redditApi.setCallbackURL(NetworkConstants.CALLBACK_URL);
         redditApi.setDeviceID(UUID.randomUUID().toString());
     }

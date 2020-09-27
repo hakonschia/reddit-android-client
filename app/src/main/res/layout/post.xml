@@ -12,10 +12,9 @@
 
     android:background="@color/background"
     android:foreground="?attr/selectableItemBackground"
+    android:clipChildren="false"
 
-    android:elevation="2dp"
-
-    android:transitionName="post">
+    android:elevation="2dp">
 
     <com.example.hakonsreader.views.PostInfo
         android:id="@+id/postInfo"

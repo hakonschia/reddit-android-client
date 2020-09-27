@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -159,11 +160,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         /**
          * Gets a list of pairs of the views that should be transitioned to the post activity
          *
-         * @return An array of {@link Pair<View, String>} mapping the view to its transition name in the new activity
+         * @return An array of {@link Pair} mapping the view to its transition name in the new activity
          */
         public Pair<View, String>[] getPostTransitionViews() {
-           return new Pair[] {
-                Pair.create(post, "post"),
+            return new Pair[] {
+                    Pair.create(post, "post"),
+                    Pair.create(post.getContent(), "post_content")
             };
         }
 

@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="@dimen/defaultIndent"
-    android:paddingEnd="@dimen/defaultIndent"
-    android:transitionName="post_info">
+    android:paddingEnd="@dimen/defaultIndent">
 
     <!-- This file contains a layout for the post information, such as what sub it is in, title, author etc -->
 

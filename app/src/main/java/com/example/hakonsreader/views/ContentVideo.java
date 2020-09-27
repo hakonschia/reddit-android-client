@@ -264,7 +264,7 @@ public class ContentVideo extends PlayerView {
     public void updateHeight(int height) {
         ViewGroup.LayoutParams params = getLayoutParams();
 
-        int ratio = params.height / height;
+        float ratio = (float) params.height / height;
 
         params.height /= ratio;
         params.width /= ratio;
