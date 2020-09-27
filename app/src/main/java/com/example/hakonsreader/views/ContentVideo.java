@@ -109,12 +109,17 @@ public class ContentVideo extends PlayerView {
             boolean isPrepared = false;
 
             @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                // Ensure the thumbnail isn't visible when the video is playing
+                if (isPlaying && thumbnail.getVisibility() == VISIBLE) {
+                    thumbnail.setVisibility(GONE);
+                }
+            }
+
+            @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 // If the player is trying to play and hasn't yet prepared the video, prepare it
                 if (playWhenReady && !isPrepared) {
-                    // Remove the thumbnail
-                    thumbnail.setVisibility(GONE);
-
                     exoPlayer.prepare(mediaSource);
                     isPrepared = true;
                 }
