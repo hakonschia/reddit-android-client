@@ -13,7 +13,7 @@ import com.example.hakonsreader.activites.MainActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.databinding.LayoutPostInfoBinding;
+import com.example.hakonsreader.databinding.PostInfoBinding;
 import com.example.hakonsreader.misc.Util;
 
 import java.time.Duration;
@@ -23,7 +23,7 @@ import java.time.Instant;
  * View for info about posts (title, author, subreddit etc)
  */
 public class PostInfo extends ConstraintLayout {
-    private LayoutPostInfoBinding binding;
+    private PostInfoBinding binding;
 
     private RedditPost post;
 
@@ -31,7 +31,7 @@ public class PostInfo extends ConstraintLayout {
     public PostInfo(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater inflater = LayoutInflater.from(context);
-        this.binding = LayoutPostInfoBinding.inflate(inflater, this, true);
+        this.binding = PostInfoBinding.inflate(inflater, this, true);
     }
 
     /**

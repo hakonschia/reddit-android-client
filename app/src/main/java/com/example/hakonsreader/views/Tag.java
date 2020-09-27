@@ -10,10 +10,10 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.databinding.LayoutTagBinding;
+import com.example.hakonsreader.databinding.TagBinding;
 
 public class Tag extends LinearLayout {
-    private LayoutTagBinding binding;
+    private TagBinding binding;
     private String text;
     private int textColor;
     private int fillColor;
@@ -22,7 +22,7 @@ public class Tag extends LinearLayout {
         super(context);
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        binding = LayoutTagBinding.inflate(inflater, this, true);
+        binding = TagBinding.inflate(inflater, this, true);
     }
 
     public Tag(Context context, @Nullable AttributeSet attrs) {

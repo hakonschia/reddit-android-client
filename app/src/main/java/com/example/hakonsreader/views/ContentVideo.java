@@ -2,24 +2,14 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.net.Uri;
-import android.text.Layout;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
-import com.example.hakonsreader.databinding.LayoutPostContentLinkBinding;
-import com.example.hakonsreader.databinding.LayoutPostContentVideoBinding;
 import com.example.hakonsreader.misc.VideoCache;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
@@ -37,7 +27,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.squareup.picasso.Picasso;
 
-public class PostContentVideo extends PlayerView {
+public class ContentVideo extends PlayerView {
     private static final String TAG = "PostContentVideo";
 
     /**
@@ -72,20 +62,20 @@ public class PostContentVideo extends PlayerView {
     private MediaSource mediaSource;
     private RedditPost post;
 
-    public PostContentVideo(Context context, RedditPost post) {
+    public ContentVideo(Context context, RedditPost post) {
         super(context);
 
         this.post = post;
         this.updateView();
     }
 
-    public PostContentVideo(Context context) {
+    public ContentVideo(Context context) {
         super(context);
     }
-    public PostContentVideo(Context context, AttributeSet attrs) {
+    public ContentVideo(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-    public PostContentVideo(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ContentVideo(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

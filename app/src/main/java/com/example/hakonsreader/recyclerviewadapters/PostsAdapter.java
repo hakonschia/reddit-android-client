@@ -2,7 +2,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
@@ -25,8 +22,8 @@ import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.misc.ViewUtil;
 import com.example.hakonsreader.views.FullPostBar;
-import com.example.hakonsreader.views.PostContentLink;
-import com.example.hakonsreader.views.PostContentVideo;
+import com.example.hakonsreader.views.ContentLink;
+import com.example.hakonsreader.views.ContentVideo;
 import com.example.hakonsreader.views.PostInfo;
 import com.example.hakonsreader.views.Tag;
 
@@ -247,11 +244,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Bundle bundle = new Bundle();
 
             View c = content.getChildAt(0);
-            if (c instanceof PostContentVideo) {
-                PostContentVideo video = (PostContentVideo)c;
-                bundle.putLong(PostContentVideo.EXTRA_TIMESTAMP, video.getCurrentPosition());
-                bundle.putBoolean(PostContentVideo.EXTRA_IS_PLAYING, video.isPlaying());
-                bundle.putBoolean(PostContentVideo.EXTRA_SHOW_CONTROLS, video.isControllerShown());
+            if (c instanceof ContentVideo) {
+                ContentVideo video = (ContentVideo)c;
+                bundle.putLong(ContentVideo.EXTRA_TIMESTAMP, video.getCurrentPosition());
+                bundle.putBoolean(ContentVideo.EXTRA_IS_PLAYING, video.isPlaying());
+                bundle.putBoolean(ContentVideo.EXTRA_SHOW_CONTROLS, video.isControllerShown());
             }
 
             return bundle;
@@ -277,7 +274,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) content.getLayoutParams();
             // Align link post to start of parent
             // TODO make this not so bad
-            if (view instanceof PostContentLink) {
+            if (view instanceof ContentLink) {
                 params.removeRule(RelativeLayout.CENTER_IN_PARENT);
                 params.addRule(RelativeLayout.ALIGN_PARENT_START);
             } else {

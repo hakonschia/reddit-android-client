@@ -6,10 +6,10 @@ import android.view.View;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.views.PostContentImage;
-import com.example.hakonsreader.views.PostContentLink;
-import com.example.hakonsreader.views.PostContentText;
-import com.example.hakonsreader.views.PostContentVideo;
+import com.example.hakonsreader.views.ContentImage;
+import com.example.hakonsreader.views.ContentLink;
+import com.example.hakonsreader.views.ContentText;
+import com.example.hakonsreader.views.ContentVideo;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -29,20 +29,20 @@ public class Util {
     public static View generatePostContent(RedditPost post, Context context) {
         switch (post.getPostType()) {
             case IMAGE:
-                return new PostContentImage(context, post);
+                return new ContentImage(context, post);
 
             case VIDEO:
-                return new PostContentVideo(context, post);
+                return new ContentVideo(context, post);
 
             case RICH_VIDEO:
                 // Links such as youtube, gfycat etc are rich video posts
                 return null;
 
             case LINK:
-                return new PostContentLink(context, post);
+                return new ContentLink(context, post);
 
             case TEXT:
-                return new PostContentText(context, post);
+                return new ContentText(context, post);
 
             default:
                 return null;
@@ -145,8 +145,8 @@ public class Util {
      */
     public static void cleanupPostContent(View postContent) {
         // Release the exo player from video posts
-        if (postContent instanceof PostContentVideo) {
-            ((PostContentVideo)postContent).release();
+        if (postContent instanceof ContentVideo) {
+            ((ContentVideo)postContent).release();
         }
     }
 

@@ -10,21 +10,21 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.databinding.LayoutPostContentLinkBinding;
+import com.example.hakonsreader.databinding.ContentLinkBinding;
 import com.squareup.picasso.Picasso;
 
 /**
  * Class for post contents that are a link
  */
-public class PostContentLink extends ConstraintLayout {
-    private LayoutPostContentLinkBinding binding;
+public class ContentLink extends ConstraintLayout {
+    private ContentLinkBinding binding;
 
     private RedditPost post;
 
 
-    public PostContentLink(@NonNull Context context, RedditPost post) {
+    public ContentLink(@NonNull Context context, RedditPost post) {
         super(context);
-        this.binding = LayoutPostContentLinkBinding.inflate(LayoutInflater.from(context), this, true);
+        this.binding = ContentLinkBinding.inflate(LayoutInflater.from(context), this, true);
 
         this.post = post;
 
@@ -34,7 +34,7 @@ public class PostContentLink extends ConstraintLayout {
         this.updateView();
     }
 
-    public PostContentLink(@NonNull Context context) {
+    public ContentLink(@NonNull Context context) {
         super(context);
     }
 
@@ -49,7 +49,7 @@ public class PostContentLink extends ConstraintLayout {
     }
 
     /**
-     * Opens the link found in {@link PostContentLink#post} in the browser
+     * Opens the link found in {@link ContentLink#post} in the browser
      */
     private void openLink() {
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getURL()));

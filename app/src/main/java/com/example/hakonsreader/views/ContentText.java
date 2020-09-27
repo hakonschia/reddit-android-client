@@ -12,12 +12,12 @@ import androidx.annotation.Nullable;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 
-public class PostContentText extends ScrollView {
+public class ContentText extends ScrollView {
 
     private RedditPost post;
     private TextView textView;
 
-    public PostContentText(Context context, RedditPost post) {
+    public ContentText(Context context, RedditPost post) {
         super(context);
 
         this.setScrollbarFadingEnabled(false);
@@ -29,13 +29,13 @@ public class PostContentText extends ScrollView {
         this.updateView();
     }
 
-    public PostContentText(Context context) {
+    public ContentText(Context context) {
         super(context);
     }
-    public PostContentText(Context context, @Nullable AttributeSet attrs) {
+    public ContentText(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
-    public PostContentText(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ContentText(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

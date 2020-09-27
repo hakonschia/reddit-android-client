@@ -13,30 +13,30 @@ import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.squareup.picasso.Picasso;
 
-public class PostContentImage extends androidx.appcompat.widget.AppCompatImageView {
+public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
 
     private RedditPost post;
 
-    public PostContentImage(Context context, RedditPost post) {
+    public ContentImage(Context context, RedditPost post) {
         super(context);
 
         this.post = post;
         this.updateView();
     }
 
-    public PostContentImage(Context context) {
+    public ContentImage(Context context) {
         super(context);
     }
-    public PostContentImage(Context context, @Nullable AttributeSet attrs) {
+    public ContentImage(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
-    public PostContentImage(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ContentImage(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
 
     /**
-     * Updates the view with the url from {@link PostContentImage#post}
+     * Updates the view with the url from {@link ContentImage#post}
      */
     private void updateView() {
         Picasso.get()

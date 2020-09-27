@@ -7,15 +7,12 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -23,16 +20,11 @@ import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.viewmodels.CommentsViewModel;
-import com.example.hakonsreader.views.PostContentLink;
-import com.example.hakonsreader.views.PostContentText;
-import com.example.hakonsreader.views.PostContentVideo;
+import com.example.hakonsreader.views.ContentLink;
+import com.example.hakonsreader.views.ContentText;
+import com.example.hakonsreader.views.ContentVideo;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.r0adkll.slidr.Slidr;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Activity to show a Reddit post with its comments
@@ -155,12 +147,12 @@ public class PostActivity extends AppCompatActivity {
             this.binding.postInfoContainer.content.addView(postContent);
 
             // Align link post to start of parent
-            if (postContent instanceof PostContentLink || postContent instanceof PostContentText) {
+            if (postContent instanceof ContentLink || postContent instanceof ContentText) {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.binding.postInfoContainer.content.getLayoutParams();
                 params.addRule(RelativeLayout.ALIGN_PARENT_START);
 
                 this.binding.postInfoContainer.content.setLayoutParams(params);
-            } else if (postContent instanceof PostContentVideo) {
+            } else if (postContent instanceof ContentVideo) {
                 this.resumeVideoPost(extras);
             }
 
@@ -179,8 +171,8 @@ public class PostActivity extends AppCompatActivity {
                         binding.postInfoContainer.content.setLayoutParams(layoutParams);
 
                         // TODO find a better way to scale the video as it doesn't smoothly transition the video
-                        if (postContent instanceof PostContentVideo) {
-                            ((PostContentVideo)postContent).updateHeight(maxHeight);
+                        if (postContent instanceof ContentVideo) {
+                            ((ContentVideo)postContent).updateHeight(maxHeight);
                         }
                     }
 
@@ -203,11 +195,11 @@ public class PostActivity extends AppCompatActivity {
      * @param data The data to use for restoring the state
      */
     private void resumeVideoPost(Bundle data) {
-        PostContentVideo video = (PostContentVideo)postContent;
+        ContentVideo video = (ContentVideo)postContent;
 
-        long timestamp = data.getLong(PostContentVideo.EXTRA_TIMESTAMP);
-        boolean isPlaying = data.getBoolean(PostContentVideo.EXTRA_IS_PLAYING);
-        boolean showController = data.getBoolean(PostContentVideo.EXTRA_SHOW_CONTROLS);
+        long timestamp = data.getLong(ContentVideo.EXTRA_TIMESTAMP);
+        boolean isPlaying = data.getBoolean(ContentVideo.EXTRA_IS_PLAYING);
+        boolean showController = data.getBoolean(ContentVideo.EXTRA_SHOW_CONTROLS);
 
         // Video has been played previously so make sure the player is prepared
         if (timestamp != 0) {

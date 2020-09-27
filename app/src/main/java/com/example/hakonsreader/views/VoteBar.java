@@ -13,19 +13,19 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.VotableListing;
-import com.example.hakonsreader.databinding.LayoutVoteBarBinding;
+import com.example.hakonsreader.databinding.VoteBarBinding;
 import com.example.hakonsreader.misc.Util;
 
 import java.util.Locale;
 
 /**
  * Vote bar including buttons to upvote and downvote, and a text holding the current score
- * <p>Layout file: {@code layout/layout_vote_bar.xml}</p>
+ * <p>Layout file: {@code layout/vote_bar.xml}</p>
  */
 public class VoteBar extends ConstraintLayout {
     private RedditApi redditApi = App.getApi();
 
-    private LayoutVoteBarBinding binding;
+    private VoteBarBinding binding;
 
     private VotableListing listing;
 
@@ -33,7 +33,7 @@ public class VoteBar extends ConstraintLayout {
     public VoteBar(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater inflater = LayoutInflater.from(context);
-        this.binding = LayoutVoteBarBinding.inflate(inflater, this, true);
+        this.binding = VoteBarBinding.inflate(inflater, this, true);
 
         this.binding.upvote.setOnClickListener(v -> this.vote(VoteType.UPVOTE));
         this.binding.downvote.setOnClickListener(v -> this.vote(VoteType.DOWNVOTE));

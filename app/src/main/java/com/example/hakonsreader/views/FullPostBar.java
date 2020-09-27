@@ -11,7 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.databinding.LayoutFullPostBarBinding;
+import com.example.hakonsreader.databinding.FullPostBarBinding;
 
 /**
  * View for the full bar underneath a Reddit post
@@ -19,11 +19,11 @@ import com.example.hakonsreader.databinding.LayoutFullPostBarBinding;
 public class FullPostBar extends ConstraintLayout {
     private RedditPost post;
 
-    private LayoutFullPostBarBinding binding;
+    private FullPostBarBinding binding;
 
     public FullPostBar(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        this.binding = LayoutFullPostBarBinding.inflate(LayoutInflater.from(context), this, true);
+        binding = FullPostBarBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
     /**
@@ -33,7 +33,7 @@ public class FullPostBar extends ConstraintLayout {
      */
     public void setPost(RedditPost post) {
         this.post = post;
-        this.binding.voteBar.setListing(post);
+        binding.voteBar.setListing(post);
 
         this.updateView();
     }
@@ -42,9 +42,9 @@ public class FullPostBar extends ConstraintLayout {
      * Updates the view based on the post set with {@link FullPostBar#post}
      */
     private void updateView() {
-        this.binding.voteBar.updateVoteStatus();
+        binding.voteBar.updateVoteStatus();
 
-        float comments = this.post.getAmountOfComments();
+        float comments = post.getAmountOfComments();
 
         String commentsText;
 
@@ -59,6 +59,6 @@ public class FullPostBar extends ConstraintLayout {
             );
         }
 
-        this.binding.numComments.setText(commentsText);
+        binding.numComments.setText(commentsText);
     }
 }
