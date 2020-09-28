@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -26,6 +27,7 @@ import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
+import com.example.hakonsreader.views.ListDivider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -161,9 +163,8 @@ public class SubredditFragment extends Fragment {
         binding.posts.setLayoutManager(this.layoutManager);
         binding.posts.setOnScrollChangeListener(this.scrollListener);
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.posts.getContext(),
-                layoutManager.getOrientation());
-        binding.posts.addItemDecoration(dividerItemDecoration);
+        ListDivider divider = new ListDivider(ContextCompat.getDrawable(getContext(), R.drawable.list_divider));
+        binding.posts.addItemDecoration(divider);
     }
 
     private void increaseLoadingCount() {
