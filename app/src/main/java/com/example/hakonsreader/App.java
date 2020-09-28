@@ -105,4 +105,10 @@ public class App extends Application {
         oauthState = OAuthStateGenerator.generate();
         return oauthState;
     }
+
+
+    public static boolean dontCacheNSFW() {
+        // TODO create an actual preference for this. Just a placeholder value for now
+        return true;
+    }
 }

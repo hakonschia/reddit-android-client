@@ -11,7 +11,9 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
 
@@ -39,12 +41,20 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
      * Updates the view with the url from {@link ContentImage#post}
      */
     private void updateView() {
-        Picasso.get()
-                .load(post.getURL())
-                .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
-                // Scale so the image fits the width of the screen
-                .resize(App.getScreenWidth(), 0)
-                .into(this);
+         RequestCreator c = Picasso.get()
+                 .load(post.getURL())
+                 .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
+                 .error(R.drawable.ic_baseline_wifi_tethering_150)
+                 // Scale so the image fits the width of the screen
+                 .resize(App.getScreenWidth(), 0);
+
+        // Post is NSFW and user has chosen not to cache NSFW
+        if (post.isNSFW() && App.dontCacheNSFW()) {
+            // Don't store in cache and don't look in cache as this image will never be there
+            c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
+        }
+
+        c.into(this);
 
         // Open image when clicked
         this.setOnClickListener(view -> {
