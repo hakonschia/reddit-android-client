@@ -10,10 +10,14 @@ import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Post extends RelativeLayout {
     private static final String TAG = "Post";
@@ -256,7 +260,6 @@ public class Post extends RelativeLayout {
      * @param data The data to use for restoring the state
      */
     public void resumeVideoPost(Bundle data) {
-        Log.d(TAG, "resumeVideoPost: " + data);
         ContentVideo video = (ContentVideo)binding.content.getChildAt(0);
 
         long timestamp = data.getLong(ContentVideo.EXTRA_TIMESTAMP);
@@ -270,5 +273,19 @@ public class Post extends RelativeLayout {
         video.setPosition(timestamp);
         video.setPlayback(isPlaying);
         video.setControllerVisible(showController);
+    }
+
+
+    public Pair<View, String>[] getTransitionViews() {
+        List<Pair<View, String>> pairs = new ArrayList<>();
+        pairs.add(Pair.create(binding.postInfo, "post_info"));
+        pairs.add(Pair.create(binding.postFullBar, "post_full_bar"));
+
+        View content = binding.content.getChildAt(0);
+        if (content != null) {
+            pairs.add(Pair.create(content, "post_content"));
+        }
+
+        return pairs.toArray(new Pair[0]);
     }
 }

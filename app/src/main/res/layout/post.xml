@@ -14,7 +14,9 @@
     <com.example.hakonsreader.views.PostInfo
         android:id="@+id/postInfo"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+
+        android:transitionName="post_info"/>
 
     <!-- Content of the post (image, video etc.) -->
     <FrameLayout
@@ -33,6 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:layout_below="@id/content"/>
+        android:layout_below="@id/content"
+
+        android:transitionName="post_full_bar"/>
 
  </RelativeLayout>
