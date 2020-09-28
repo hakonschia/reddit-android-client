@@ -19,7 +19,7 @@ public class CommentsViewModel extends ViewModel {
     private List<RedditComment> commentsDataSet = new ArrayList<>();
 
     private MutableLiveData<List<RedditComment>> comments;
-    private MutableLiveData<Integer> itemsLoading;
+    private MutableLiveData<Boolean> loadingChange;
 
     /**
      * @return The comments
@@ -34,27 +34,28 @@ public class CommentsViewModel extends ViewModel {
     }
 
     /**
-     * @return The amount of items currently loading
+     * Retrieve the value used for listening to when something has started or finished loading
+     *
+     * @return If something has started loading the value in this LiveData will be set to true, and when
+     * it has finished loading it will be set to false
      */
-    public LiveData<Integer> getItemsLoading() {
-        if (itemsLoading == null) {
-            itemsLoading = new MutableLiveData<>();
-            itemsLoading.setValue(0);
+    public LiveData<Boolean> onLoadingChange() {
+        if (loadingChange == null) {
+            loadingChange = new MutableLiveData<>();
         }
 
-        return itemsLoading;
+        return loadingChange;
     }
 
     public void loadComments(View parentLayout, RedditPost post) {
-        itemsLoading.setValue(itemsLoading.getValue() + 1);
+        loadingChange.setValue(true);
 
         App.getApi().getComments(post.getID(), (newComments -> {
             comments.setValue(newComments);
-
-            itemsLoading.setValue(itemsLoading.getValue() - 1);
+            loadingChange.setValue(false);
         }), ((code, t) -> {
-            itemsLoading.setValue(itemsLoading.getValue() - 1);
             t.printStackTrace();
+            loadingChange.setValue(false);
 
             Util.handleGenericResponseErrors(parentLayout, code, t);
         }));

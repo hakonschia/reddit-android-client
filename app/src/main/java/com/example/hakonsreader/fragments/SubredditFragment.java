@@ -167,18 +167,6 @@ public class SubredditFragment extends Fragment {
         binding.posts.addItemDecoration(divider);
     }
 
-    private void increaseLoadingCount() {
-        if (loadingListener != null) {
-            loadingListener.onCountChange(true);
-        }
-    }
-
-    private void decreaseLoadingCount() {
-        if (loadingListener != null) {
-            loadingListener.onCountChange(false);
-        }
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,8 +182,12 @@ public class SubredditFragment extends Fragment {
         adapter.setOnLongClickListener(this::copyLinkToClipboard);
 
         postsViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
-        postsViewModel.getPosts().observe(this, posts -> {
-            adapter.addPosts(posts);
+        postsViewModel.getPosts().observe(this, adapter::addPosts);
+        postsViewModel.onLoadingChange().observe(this, up -> {
+            if (loadingListener == null) {
+                return;
+            }
+            loadingListener.onCountChange(up);
         });
     }
 

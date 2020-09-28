@@ -18,6 +18,7 @@ public class PostsViewModel extends ViewModel {
     private static final String TAG = "PostsViewModel";
 
     private MutableLiveData<List<RedditPost>> posts;
+    private MutableLiveData<Boolean> loadingChange;
 
     /**
      * @return The observable for the posts
@@ -29,6 +30,21 @@ public class PostsViewModel extends ViewModel {
 
         return posts;
     }
+
+    /**
+     * Retrieve the value used for listening to when something has started or finished loading
+     *
+     * @return If something has started loading the value in this LiveData will be set to true, and when
+     * it has finished loading it will be set to false
+     */
+    public LiveData<Boolean> onLoadingChange() {
+        if (loadingChange == null) {
+            loadingChange = new MutableLiveData<>();
+        }
+
+        return loadingChange;
+    }
+
 
     public void loadPosts(View parentLayout, String subreddit) {
         // Get the ID of the last post in the list
@@ -45,9 +61,12 @@ public class PostsViewModel extends ViewModel {
             }
         }
 
+        loadingChange.setValue(true);
         App.getApi().getPosts(subreddit, after, count, newPosts -> {
             posts.setValue(newPosts);
+            loadingChange.setValue(false);
         }, (code, t) -> {
+            loadingChange.setValue(false);
             t.printStackTrace();
 
             Util.handleGenericResponseErrors(parentLayout, code, t);

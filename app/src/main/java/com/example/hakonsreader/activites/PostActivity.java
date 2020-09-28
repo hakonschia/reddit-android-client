@@ -86,8 +86,14 @@ public class PostActivity extends AppCompatActivity {
         }
 
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
-        commentsViewModel.getItemsLoading().observe(this, binding.loadingIcon::setItemsLoading);
         commentsViewModel.getComments().observe(this, commentsAdapter::addComments);
+        commentsViewModel.onLoadingChange().observe(this, up -> {
+            if (up) {
+                binding.loadingIcon.increaseLoadCount();
+            } else {
+                binding.loadingIcon.decreaseLoadCount();
+            }
+        });
 
         // TODO when going into a post and going to landscape and then back the animation of going
         //  back to the subreddit goes under the screen
