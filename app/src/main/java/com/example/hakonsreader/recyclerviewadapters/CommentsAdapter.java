@@ -200,14 +200,14 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public void getMoreComments(RedditComment comment, RedditComment parent) {
         this.redditApi.getMoreComments(post.getID(), comment.getChildren(), parent, newComments -> {
             // Find the parent index to know where to insert the new comments
-            int commentPos = this.comments.indexOf(comment);
+            int commentPos = comments.indexOf(comment);
             this.insertComments(newComments, commentPos);
 
             // Remove the previous comment (this is the "2 more comments" comment)
             this.removeComment(comment);
             parent.removeReply(comment);
         }, (code, t) -> {
-            Util.handleGenericResponseErrors(this.parentLayout, code, t);
+            Util.handleGenericResponseErrors(parentLayout, code, t);
         });
     }
 
@@ -217,15 +217,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * @param start The comment to start at. This comment and any replies will be hidden
      */
     private void hideComments(RedditComment start) {
-        int startPos = this.comments.indexOf(start);
+        int startPos = comments.indexOf(start);
 
         // Update the comment selected to show that it is now a hidden comment chain
-        this.commentsHidden.add(start);
+        commentsHidden.add(start);
         notifyItemChanged(startPos);
 
         // Remove all its replies
         List<RedditComment> replies = start.getReplies();
-        this.comments.removeAll(replies);
+        comments.removeAll(replies);
 
         // The comment explicitly hidden isn't being removed, but its UI is updated
         notifyItemRangeRemoved(startPos + 1, replies.size());
@@ -237,17 +237,17 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * @param start The start of the chain
      */
     private void showComments(RedditComment start) {
-        int pos = this.comments.indexOf(start);
+        int pos = comments.indexOf(start);
 
         // This comment is no longer hidden
-        this.commentsHidden.remove(start);
+        commentsHidden.remove(start);
         notifyItemChanged(pos);
 
         // Find the replies to the starting comment that are shown (not previously hidden)
         List<RedditComment> replies = getShownReplies(start);
 
         // Add back all its children
-        this.comments.addAll(pos + 1, replies);
+        comments.addAll(pos + 1, replies);
         notifyItemRangeInserted(pos + 1, replies.size());
     }
 
@@ -267,7 +267,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                 replies.add(reply);
 
                 // Reply isn't hidden which means it potentially has children to show
-                if (!this.commentsHidden.contains(reply)) {
+                if (!commentsHidden.contains(reply)) {
                     replies.addAll(getShownReplies(reply));
                 }
             }
@@ -280,12 +280,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return this.comments.size();
+        return comments.size();
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        RedditComment comment = this.comments.get(position);
+        RedditComment comment = comments.get(position);
 
         // Format holder based on who the user is (mod, poster, or no one special)
         if (comment.isMod()) {

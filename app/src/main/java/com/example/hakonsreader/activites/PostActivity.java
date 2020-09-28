@@ -2,8 +2,10 @@ package com.example.hakonsreader.activites;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -84,16 +86,20 @@ public class PostActivity extends AppCompatActivity {
         }
 
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
-        commentsViewModel.getItemsLoading().observe(this, itemsLoading -> {
-            binding.loadingIcon.setItemsLoading(itemsLoading);
-        });
-        commentsViewModel.getComments().observe(this, comments -> {
-            commentsAdapter.addComments(comments);
-        });
-        commentsViewModel.loadComments(binding.parentLayout, post);
+        commentsViewModel.getItemsLoading().observe(this, binding.loadingIcon::setItemsLoading);
+        commentsViewModel.getComments().observe(this, commentsAdapter::addComments);
 
+        // TODO when going into a post and going to landscape and then back the animation of going
+        //  back to the subreddit goes under the screen
+    }
 
-        // TODO save height of content (for configuration changes), now it always sets the height to max height
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (commentsAdapter.getItemCount() == 0) {
+            commentsViewModel.loadComments(binding.parentLayout, post);
+        }
     }
 
     @Override

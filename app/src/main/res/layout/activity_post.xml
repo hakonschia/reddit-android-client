@@ -13,6 +13,7 @@
     <!-- Post info, content etc -->
     <!-- Treat this as a toolbar so it can be hidden away when scrolled -->
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/secondaryBackground">
