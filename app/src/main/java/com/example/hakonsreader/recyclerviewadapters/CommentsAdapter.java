@@ -469,6 +469,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             voteBar.setVisibility(View.GONE);
 
             itemView.setOnClickListener(view -> runnable.run());
+            itemView.setOnLongClickListener(null);
         }
     }
 }
