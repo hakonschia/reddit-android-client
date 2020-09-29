@@ -2,6 +2,8 @@ package com.example.hakonsreader.activites;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.transition.Transition;
+import android.transition.TransitionListenerAdapter;
 import android.util.Log;
 import android.view.View;
 
@@ -75,10 +77,6 @@ public class PostActivity extends AppCompatActivity {
         binding.post.setMaxContentHeight((int)getResources().getDimension(R.dimen.postContentMaxHeight));
         binding.post.setPostData(post);
 
-        if (post.getPostType() == PostType.VIDEO) {
-            binding.post.resumeVideoPost(getIntent().getExtras().getBundle("extras"));
-        }
-
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
         commentsViewModel.getComments().observe(this, commentsAdapter::addComments);
         commentsViewModel.onLoadingChange().observe(this, up -> {
@@ -96,6 +94,21 @@ public class PostActivity extends AppCompatActivity {
         // Previous is upwards, next is down
         binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment);
         binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment);
+        
+        getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                super.onTransitionEnd(transition);
+
+                // Start videos again when the transition is finished, as playing videos during the transition
+                // can make the view weird.
+                // TODO the thumbnail is shown the entire time, make it so the frame the video
+                //  ended at is shown instead
+                if (post.getPostType() == PostType.VIDEO) {
+                    binding.post.resumeVideoPost(getIntent().getExtras().getBundle("extras"));
+                }
+            }
+        });
     }
 
     @Override
