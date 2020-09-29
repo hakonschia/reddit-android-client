@@ -2,14 +2,12 @@ package com.example.hakonsreader.misc;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.views.Tag;
-import com.squareup.picasso.Picasso;
 
 public class ViewUtil {
     private ViewUtil() { }

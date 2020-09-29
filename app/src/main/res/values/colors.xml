@@ -41,4 +41,6 @@
     <color name="flairTextLight">#FFFFFF</color>
     <color name="flairBackgroundLight">#292929</color>
 
+    <color name="quoteLine">#FF3E3E</color>
+
 </resources>

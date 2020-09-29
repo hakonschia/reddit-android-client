@@ -3,7 +3,9 @@ package com.example.hakonsreader.misc;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.Html;
+import android.text.Spannable;
 import android.text.Spanned;
+import android.text.style.QuoteSpan;
 import android.view.View;
 
 import com.example.hakonsreader.R;
@@ -143,5 +145,33 @@ public class Util {
     public static CharSequence fromHtml(String html) {
         Spanned s = Html.fromHtml(html, Html.FROM_HTML_SEPARATOR_LINE_BREAK_DIV | Html.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE);
         return Util.trim(s, 0, s.length());
+    }
+
+
+    /**
+     * Replace quote spans from a spannable to format beyond the default formatting
+     *
+     * <p>Taken from: https://stackoverflow.com/a/29114976/7750841</p>
+     *
+     * @param spannable The spannable to format
+     * @param color The color of the stripe at the start
+     * @param stripeWidth The width of the stripe at the start
+     * @param gapWidth The gap between the stripe and the text
+     * @return The formatted spannable
+     */
+    public static Spannable replaceQuoteSpans(Spannable spannable, int color, int stripeWidth, int gapWidth) {
+        QuoteSpan[] quoteSpans = spannable.getSpans(0, spannable.length(), QuoteSpan.class);
+        for (QuoteSpan quoteSpan : quoteSpans) {
+            int start = spannable.getSpanStart(quoteSpan);
+            int end = spannable.getSpanEnd(quoteSpan);
+            int flags = spannable.getSpanFlags(quoteSpan);
+            spannable.removeSpan(quoteSpan);
+            spannable.setSpan(new QuoteSpan(color, stripeWidth, gapWidth),
+                    start,
+                    end,
+                    flags);
+        }
+
+        return spannable;
     }
 }

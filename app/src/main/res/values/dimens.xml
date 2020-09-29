@@ -14,4 +14,7 @@
 
     <dimen name="tagTextSize">4dp</dimen>
     <dimen name="tagIconSize">14dp</dimen>
+
+    <dimen name="quoteLineWidth">2dp</dimen>
+    <dimen name="quoteGap">5dp</dimen>
 </resources>
