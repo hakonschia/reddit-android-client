@@ -315,8 +315,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     @Override
     public void onViewRecycled(@NonNull ViewHolder holder) {
         super.onViewRecycled(holder);
-
-        Log.d(TAG, "onViewRecycled: Recycling comment from " + holder.author.getText().toString());
         holder.reset();
     }
 

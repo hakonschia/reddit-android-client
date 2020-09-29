@@ -97,6 +97,11 @@ public class PostActivity extends AppCompatActivity {
 
         // TODO when going into a post and going to landscape and then back the animation of going
         //  back to the subreddit goes under the screen
+
+        // Go to first/last comment on longclicks on navigation buttons
+        // Previous is upwards, next is down
+        binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment);
+        binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment);
     }
 
     @Override
@@ -181,9 +186,33 @@ public class PostActivity extends AppCompatActivity {
 
         // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
         binding.comments.stopScroll();
-
         layoutManager.scrollToPositionWithOffset(previous, 0);
     }
+
+    /**
+     * Scrolls to the first comment
+     *
+     * @param view Ignored
+     * @return Always true, as this function will be used to indicate a long click has been handled
+     */
+    public boolean goToFirstComment(View view) {
+        binding.comments.stopScroll();
+        binding.comments.scrollToPosition(0);
+        return true;
+    }
+
+    /**
+     * Scrolls to the last comment
+     *
+     * @param view Ignored
+     * @return Always true, as this function will be used to indicate a long click has been handled
+     */
+    public boolean goToLastComment(View view) {
+        binding.comments.stopScroll();
+        binding.comments.scrollToPosition(commentsAdapter.getItemCount() - 1);
+        return true;
+    }
+
 
     /**
      * Replies to a comment or post
