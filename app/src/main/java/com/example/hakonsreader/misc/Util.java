@@ -18,6 +18,7 @@ import com.example.hakonsreader.views.ContentImage;
 import com.example.hakonsreader.views.ContentLink;
 import com.example.hakonsreader.views.ContentText;
 import com.example.hakonsreader.views.ContentVideo;
+import com.example.hakonsreader.views.CustomQuoteSpan;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -153,6 +154,7 @@ public class Util {
         Spannable text = Util.replaceQuoteSpans(
                 new SpannableString(s),
                 ContextCompat.getColor(context, R.color.quoteLine),
+                ContextCompat.getColor(context, R.color.secondaryBackground),
                 (int)context.getResources().getDimension(R.dimen.quoteLineWidth),
                 (int)context.getResources().getDimension(R.dimen.quoteGap)
         );
@@ -172,17 +174,19 @@ public class Util {
      * @param gapWidth The gap between the stripe and the text
      * @return The formatted spannable
      */
-    public static Spannable replaceQuoteSpans(Spannable spannable, int color, int stripeWidth, int gapWidth) {
+    public static Spannable replaceQuoteSpans(Spannable spannable, int color, int background, int stripeWidth, int gapWidth) {
         QuoteSpan[] quoteSpans = spannable.getSpans(0, spannable.length(), QuoteSpan.class);
         for (QuoteSpan quoteSpan : quoteSpans) {
             int start = spannable.getSpanStart(quoteSpan);
             int end = spannable.getSpanEnd(quoteSpan);
             int flags = spannable.getSpanFlags(quoteSpan);
             spannable.removeSpan(quoteSpan);
-            spannable.setSpan(new QuoteSpan(color, stripeWidth, gapWidth),
+            spannable.setSpan(
+                    new CustomQuoteSpan(color, background, stripeWidth, gapWidth),
                     start,
                     end,
-                    flags);
+                    flags
+            );
         }
 
         return spannable;
