@@ -126,6 +126,12 @@ public class ContentVideo extends PlayerView {
                 }
             }
 
+            // TODO doesnt actually work (as with other exoplayer controller layouts not changing)
+            @Override
+            public void onLoadingChanged(boolean isLoading) {
+                findViewById(R.id.exo_buffering).setVisibility((isLoading ? VISIBLE : GONE));
+            }
+
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 // If the player is trying to play and hasn't yet prepared the video, prepare it
