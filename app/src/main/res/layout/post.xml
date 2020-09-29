@@ -26,9 +26,7 @@
 
         android:layout_marginBottom="10dp"
         android:layout_below="@id/postInfo"
-        android:layout_centerInParent="true"
-
-        android:transitionName="post_content" />
+        android:layout_centerInParent="true" />
 
     <com.example.hakonsreader.views.FullPostBar
         android:id="@+id/postFullBar"

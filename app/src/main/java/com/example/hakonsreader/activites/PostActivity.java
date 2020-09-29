@@ -20,7 +20,6 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.viewmodels.CommentsViewModel;
-import com.example.hakonsreader.views.ContentVideo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
 
@@ -59,7 +58,6 @@ public class PostActivity extends AppCompatActivity {
 
     private RedditPost post;
     private RedditListing replyingTo;
-    private View postContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,11 +72,7 @@ public class PostActivity extends AppCompatActivity {
 
         this.setupCommentsList();
 
-        // Postpone transition until the height of the content is known
-        postponeEnterTransition();
-
         binding.post.setMaxContentHeight((int)getResources().getDimension(R.dimen.postContentMaxHeight));
-        binding.post.setOnContentFinished(() -> runOnUiThread(this::startPostponedEnterTransition));
         binding.post.setPostData(post);
 
         if (post.getPostType() == PostType.VIDEO) {
@@ -88,7 +82,7 @@ public class PostActivity extends AppCompatActivity {
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
         commentsViewModel.getComments().observe(this, commentsAdapter::addComments);
         commentsViewModel.onLoadingChange().observe(this, up -> {
-            if (up) {
+            if (Boolean.TRUE.equals(up)) {
                 binding.loadingIcon.increaseLoadCount();
             } else {
                 binding.loadingIcon.decreaseLoadCount();
