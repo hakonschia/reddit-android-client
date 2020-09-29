@@ -468,9 +468,8 @@ public class RedditPost implements VotableListing, PostableListing {
             // Link posts might be images not uploaded to reddit
             if (getURL().matches("(.png|.jpeg|.jpg)$")) {
                 return PostType.IMAGE;
-            } else if (getURL().endsWith(".gifv REMOVE THIS LATER")) {
-                // TODO load gifs somehow (change to PostType.GIF maybe)
-                return PostType.VIDEO;
+            } else if (getURL().endsWith(".gifv")) {
+                return PostType.GIF;
             }
 
             return PostType.LINK;
@@ -480,7 +479,7 @@ public class RedditPost implements VotableListing, PostableListing {
             case "image":
                 // .gif is treated as image
                 if (data.url.endsWith(".gif")) {
-                    return PostType.VIDEO;
+                    return PostType.GIF;
                 }
 
                 return PostType.IMAGE;
