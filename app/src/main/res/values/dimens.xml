@@ -12,7 +12,7 @@
 
     <dimen name="postContentMaxHeight">150dp</dimen>
 
-    <dimen name="tagTextSize">4dp</dimen>
+    <dimen name="tagTextSize">5dp</dimen>
     <dimen name="tagIconSize">14dp</dimen>
 
     <dimen name="quoteLineWidth">2dp</dimen>
