@@ -395,15 +395,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         private void asNormalComment(RedditComment comment) {
             Context context = itemView.getContext();
 
-            CharSequence s = Util.fromHtml(comment.getBodyHtml());
-            Spannable text = Util.replaceQuoteSpans(
-                    new SpannableString(s),
-                    ContextCompat.getColor(context, R.color.quoteLine),
-                    (int)context.getResources().getDimension(R.dimen.quoteLineWidth),
-                    (int)context.getResources().getDimension(R.dimen.quoteGap)
-            );
-
-            content.setText(text);
+            content.setText(Util.fromHtml(comment.getBodyHtml(), context));
             content.setMovementMethod(InternalLinkMovementMethod.getSubredditAndUserInstance(context));
 
             author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));

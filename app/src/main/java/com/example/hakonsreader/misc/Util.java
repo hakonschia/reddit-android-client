@@ -4,9 +4,13 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.text.Html;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.QuoteSpan;
 import android.view.View;
+
+import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -137,14 +141,23 @@ public class Util {
     /**
      * Converts an HTML string to a {@link CharSequence} that can be used in TextView's
      *
+     * <p>QuoteBlock tags are formatted based on the values found in the {@code res} folder</p>
      * <p>The end of the CharSequence is trimmed so it doesn't include extra whitespace</p>
      *
      * @param html The HTML string to convert
      * @return A trimmed {@link CharSequence} of the input string
      */
-    public static CharSequence fromHtml(String html) {
+    public static CharSequence fromHtml(String html, Context context) {
         Spanned s = Html.fromHtml(html, Html.FROM_HTML_SEPARATOR_LINE_BREAK_DIV | Html.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE);
-        return Util.trim(s, 0, s.length());
+
+        Spannable text = Util.replaceQuoteSpans(
+                new SpannableString(s),
+                ContextCompat.getColor(context, R.color.quoteLine),
+                (int)context.getResources().getDimension(R.dimen.quoteLineWidth),
+                (int)context.getResources().getDimension(R.dimen.quoteGap)
+        );
+
+        return Util.trim(text, 0, s.length());
     }
 
 

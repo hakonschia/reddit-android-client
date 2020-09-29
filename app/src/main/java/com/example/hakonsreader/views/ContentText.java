@@ -50,7 +50,7 @@ public class ContentText extends ScrollView {
         if (html != null) {
             this.textView.setMovementMethod(LinkMovementMethod.getInstance());
             this.textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
-            this.textView.setText(Util.fromHtml(html));
+            this.textView.setText(Util.fromHtml(html, getContext()));
         }
 
         int padding = (int) getResources().getDimension(R.dimen.defaultIndent);
