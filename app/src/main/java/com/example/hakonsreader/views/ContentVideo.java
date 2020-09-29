@@ -97,14 +97,18 @@ public class ContentVideo extends PlayerView {
 
         // Create the player
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
-        CacheDataSourceFactory cacheFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
         LoadControl loadControl = new DefaultLoadControl.Builder()
                 // Buffer size between 2.5 and 7.5 seconds, with minimum of 1 second for playback to start
                 .setBufferDurationsMs(2500, 7500, 1000, 500)
                 .createDefaultLoadControl();
 
-        mediaSource = new ProgressiveMediaSource.Factory(cacheFactory, extractorsFactory)
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
+        // Convert the data source into a cache source if the user has selected to cache NSFW videos
+        if (!(post.isNSFW() && App.dontCacheNSFW())) {
+            dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
+        }
+
+        mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
                 .createMediaSource(Uri.parse(post.getVideoUrl()));
 
         exoPlayer = new SimpleExoPlayer.Builder(context)

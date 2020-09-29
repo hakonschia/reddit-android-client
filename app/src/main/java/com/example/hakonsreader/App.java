@@ -109,6 +109,6 @@ public class App extends Application {
 
     public static boolean dontCacheNSFW() {
         // TODO create an actual preference for this. Just a placeholder value for now
-        return true;
+        return false;
     }
 }
