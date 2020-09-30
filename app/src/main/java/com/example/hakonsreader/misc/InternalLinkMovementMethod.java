@@ -1,6 +1,7 @@
 package com.example.hakonsreader.misc;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
+import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
 
@@ -76,6 +78,7 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
                     Intent intent = new Intent(context, ImageActivity.class);
                     intent.putExtra(ImageActivity.IMAGE_URL, linkText);
                     context.startActivity(intent);
+                    ((Activity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 }
 
