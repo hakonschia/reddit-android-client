@@ -150,8 +150,8 @@ public class Post extends RelativeLayout {
         }
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.content.getLayoutParams();
-        // Align link post to start of parent, otherwise center
-        if (content instanceof ContentLink) {
+        // Align link and text posts to start of parent, otherwise center
+        if (content instanceof ContentLink || content instanceof ContentText) {
             params.removeRule(RelativeLayout.CENTER_IN_PARENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_START);
         } else {
