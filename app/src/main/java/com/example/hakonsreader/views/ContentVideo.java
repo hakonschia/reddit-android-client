@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -110,7 +111,6 @@ public class ContentVideo extends PlayerView {
         Context context = getContext();
 
         // Create the player
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
         LoadControl loadControl = new DefaultLoadControl.Builder()
                 // Buffer size between 2.5 and 7.5 seconds, with minimum of 1 second for playback to start
                 .setBufferDurationsMs(2500, 7500, 1000, 500)
@@ -122,11 +122,10 @@ public class ContentVideo extends PlayerView {
             dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
         }
 
-        // TODO this doesnt cache for some reason :/
-
+        // With dash video the video gets cached, but it wont play offline (when playing again it doesn't use any
+        // network which is the main point)
         mediaSource = new DashMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(Uri.parse(redditVideo.getDashURL()));
-
 
         exoPlayer = new SimpleExoPlayer.Builder(context)
                 .setLoadControl(loadControl)
@@ -185,15 +184,20 @@ public class ContentVideo extends PlayerView {
         // Open video if we are not in a video activity
         if (!((Activity)context instanceof VideoActivity)) {
             fullscreen.setOnClickListener(view -> {
+                // TODO resume at the same point where we ended (for fullscreen and in posts)
+
                 Intent intent = new Intent(context, VideoActivity.class);
                 intent.putExtra(VideoActivity.POST, new Gson().toJson(post));
                 intent.putExtra("extras", getExtras());
+
+                // Pause the video here so it doesn't play both places
+                exoPlayer.setPlayWhenReady(false);
 
                 context.startActivity(intent);
                 ((Activity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             });
         } else {
-            // If we are in a video activity and press fullscreen, exit instead (should proably have a different icon)
+            // If we are in a video activity and press fullscreen, exit instead (should probably have a different icon)
             fullscreen.setOnClickListener(view -> ((Activity)context).finish());
         }
     }
@@ -311,6 +315,7 @@ public class ContentVideo extends PlayerView {
 
         extras.putLong(ContentVideo.EXTRA_TIMESTAMP, getCurrentPosition());
         extras.putBoolean(ContentVideo.EXTRA_IS_PLAYING, isPlaying());
+        Log.d(TAG, "getExtras: " + isPlaying());
         extras.putBoolean(ContentVideo.EXTRA_SHOW_CONTROLS, isControllerShown());
 
         return extras;

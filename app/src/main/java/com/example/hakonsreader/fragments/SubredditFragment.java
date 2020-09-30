@@ -117,6 +117,8 @@ public class SubredditFragment extends Fragment {
         Bundle extras = view.getExtraPostInfo();
         intent.putExtra("extras", extras);
 
+        view.pauseVideo();
+
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), view.getPostTransitionViews());
         startActivity(intent, options.toBundle());
     }

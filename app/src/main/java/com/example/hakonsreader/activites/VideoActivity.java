@@ -12,8 +12,6 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.views.ContentVideo;
 import com.example.hakonsreader.views.Post;
 import com.google.gson.Gson;
-import com.jsibbold.zoomage.ZoomageView;
-import com.squareup.picasso.Picasso;
 
 /**
  * Activity to display a zoomable image taking the entire screen

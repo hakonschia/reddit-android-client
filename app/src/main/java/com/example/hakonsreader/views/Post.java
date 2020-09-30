@@ -10,10 +10,8 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
-import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 
@@ -291,5 +289,13 @@ public class Post extends RelativeLayout {
      */
     public void reset() {
         binding.postInfo.reset();
+    }
+
+    /**
+     * Pauses the video content
+     */
+    public void pauseVideo() {
+        ContentVideo video = (ContentVideo)binding.content.getChildAt(0);
+        video.setPlayback(false);
     }
 }

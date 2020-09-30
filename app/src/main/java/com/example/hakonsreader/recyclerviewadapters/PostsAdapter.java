@@ -194,6 +194,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         /**
+         * Pauses the video content
+         */
+        public void pauseVideo() {
+            post.pauseVideo();
+        }
+
+        /**
          * Formats the post as a mod post
          */
         private void asMod() {
