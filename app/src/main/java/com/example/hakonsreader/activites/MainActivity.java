@@ -1,5 +1,6 @@
 package com.example.hakonsreader.activites;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -82,6 +83,10 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        Intent intent = new Intent(this, SubredditActivity.class);
+        intent.putExtra("subreddit", "test");
+        startActivity(intent);
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);

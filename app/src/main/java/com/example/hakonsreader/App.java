@@ -1,12 +1,15 @@
 package com.example.hakonsreader;
 
 import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
+import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.misc.OAuthStateGenerator;

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
+import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
 
 import java.util.List;
@@ -65,9 +66,18 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
                     Log.d(TAG, "asNormalComment: Trying to open user profile");
 
                     return true;
+                } else if (linkText.matches("^https://imgur.com/[A-Za-z0-9]{5,7}$")) {
+                    // If the image links to a standard imgur URL add .png to redirect to the direct image
+                    linkText += ".png";
                 }
-                // TODO if it's an image url open ImageActivity
 
+                // Open images directly in the app
+                if (linkText.matches(".+(.png|.jpeg|.jpg)$")) {
+                    Intent intent = new Intent(context, ImageActivity.class);
+                    intent.putExtra(ImageActivity.IMAGE_URL, linkText);
+                    context.startActivity(intent);
+                    return true;
+                }
 
                 return false;
             });
