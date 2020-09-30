@@ -10,8 +10,10 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
+import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 
@@ -275,5 +277,19 @@ public class Post extends RelativeLayout {
         }
 
         return pairs.toArray(new Pair[0]);
+    }
+
+    /**
+     * Formats the post as a mod post
+     */
+    public void asMod() {
+        binding.postInfo.asMod();
+    }
+
+    /**
+     * Resets formatting
+     */
+    public void reset() {
+        binding.postInfo.reset();
     }
 }

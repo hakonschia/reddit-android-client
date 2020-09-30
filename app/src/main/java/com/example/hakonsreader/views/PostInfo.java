@@ -180,4 +180,21 @@ public class PostInfo extends ConstraintLayout {
         // Slide the activity in
         activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
+
+    /**
+     * Formats the post as a mod post
+     */
+    public void asMod() {
+        binding.author.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.comment_by_mod));
+        binding.author.setTextColor(ContextCompat.getColor(getContext(), R.color.textColor));
+    }
+
+    /**
+     * Resets formatting
+     */
+    public void reset() {
+        // Reset author text (from when comment is by a mod)
+        binding.author.setBackground(null);
+        binding.author.setTextColor(ContextCompat.getColor(getContext(), R.color.linkColor));
+    }
 }

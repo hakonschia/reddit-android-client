@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -116,8 +117,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // Don't show text posts here (only show when a post is opened)
         holder.post.setShowContent(post.getPostType() != PostType.TEXT);
         holder.post.setPostData(post);
+
+        if (post.isMod()) {
+            holder.asMod();
+        }
     }
 
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.reset();
+    }
 
     /**
      * The view for the items in the list
@@ -181,6 +191,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         public Bundle getExtraPostInfo() {
             return post.getExtras();
+        }
+
+        /**
+         * Formats the post as a mod post
+         */
+        private void asMod() {
+            post.asMod();
+        }
+
+        /**
+         * Resets formatting to default
+         */
+        public void reset() {
+            post.reset();
         }
     }
 }
