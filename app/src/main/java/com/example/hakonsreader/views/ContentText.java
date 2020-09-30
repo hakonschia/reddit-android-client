@@ -1,8 +1,6 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -11,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
 
 public class ContentText extends ScrollView {
@@ -48,7 +47,7 @@ public class ContentText extends ScrollView {
 
         // Self text posts with only a title won't have a body
         if (html != null) {
-            this.textView.setMovementMethod(LinkMovementMethod.getInstance());
+            this.textView.setMovementMethod(InternalLinkMovementMethod.getInstance());
             this.textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
             this.textView.setText(Util.fromHtml(html, getContext()));
         }
