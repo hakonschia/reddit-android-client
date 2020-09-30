@@ -47,7 +47,7 @@ public class ContentText extends ScrollView {
 
         // Self text posts with only a title won't have a body
         if (html != null) {
-            this.textView.setMovementMethod(InternalLinkMovementMethod.getInstance());
+            this.textView.setMovementMethod(InternalLinkMovementMethod.getInstance(getContext()));
             this.textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
             this.textView.setText(Util.fromHtml(html, getContext()));
         }
