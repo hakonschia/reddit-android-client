@@ -26,7 +26,6 @@ public class ImageActivity extends AppCompatActivity {
             String imageUrl = data.getString("imageUrl");
             ZoomageView image = findViewById(R.id.image);
 
-            Log.d(TAG, "onCreate: lmao " + imageUrl);
             Picasso.get().load(imageUrl).into(image);
         }
     }

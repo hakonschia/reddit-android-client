@@ -1,5 +1,6 @@
 package com.example.hakonsreader.activites;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -18,7 +19,18 @@ import com.r0adkll.slidr.Slidr;
  */
 public class SubredditActivity extends AppCompatActivity implements ItemLoadingListener {
     private static final String TAG = "SubredditActivity";
-    
+
+    /**
+     * The key used to save the subreddit fagment
+     */
+    private static final String SAVED_SUBREDDIT = "subredditFragment";
+
+    /**
+     * The key used to transfer data about which subreddit the activity is for
+     */
+    public static final String SUBREDDIT_KEY = "subreddit";
+
+
     private LoadingIcon loadingIcon;
     private SubredditFragment fragment;
 
@@ -26,46 +38,42 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subreddit);
+        Slidr.attach(this);
 
         this.loadingIcon = findViewById(R.id.loadingIcon);
 
+        // Restore the fragment if possible
         if (savedInstanceState != null) {
-            Log.d(TAG, "onCreate: an instance was saved");
-           // fragment = (SubredditFragment) getSupportFragmentManager().getFragment(savedInstanceState, "subredditFragment");
-            fragment = (SubredditFragment) getSupportFragmentManager().findFragmentByTag("subredditFragment");
+            fragment = (SubredditFragment) getSupportFragmentManager().findFragmentByTag(SAVED_SUBREDDIT);
         } else {
-            fragment = SubredditFragment.newInstance("sports");
-            getSupportFragmentManager().beginTransaction().add(R.id.subredditActivityFragment, fragment, "subredditFragment").commit();
+            String subreddit;
+
+            Bundle data = getIntent().getExtras();
+            // Activity started from URL intent
+            if (data == null) {
+                Uri uri = getIntent().getData();
+
+                // First path segment is "/r/", second is the subreddit
+                subreddit = uri.getPathSegments().get(1);
+            } else {
+                // Activity started from manual intent in app
+                subreddit = data.getString(SUBREDDIT_KEY);
+            }
+
+            // For testing purposes hardcode a subreddit
+            //subreddit = "sports";
+
+            fragment = SubredditFragment.newInstance(subreddit);
+            fragment.setLoadingListener(this);
+            getSupportFragmentManager().beginTransaction().add(R.id.subredditActivityFragment, fragment, SAVED_SUBREDDIT).commit();
         }
-        
-        fragment.setLoadingListener(this);
-
-        String subreddit;
-        /*
-
-        Bundle data = getIntent().getExtras();
-        // Activity started from URL intent
-        if (data == null) {
-            Uri uri = getIntent().getData();
-
-            // First path segment is "/r/", second is the subreddit
-            subreddit = uri.getPathSegments().get(1);
-        } else {
-            // Activity started from manual intent in app
-            subreddit = data.getString("subreddit");
-        }
-         */
-
-
-        Slidr.attach(this);
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState: ");
 
-        getSupportFragmentManager().putFragment(outState, "subredditFragment", fragment);
+        getSupportFragmentManager().putFragment(outState, SAVED_SUBREDDIT, fragment);
     }
 
     @Override

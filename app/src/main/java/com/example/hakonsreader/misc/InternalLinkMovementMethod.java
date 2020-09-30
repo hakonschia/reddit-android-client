@@ -11,6 +11,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
+import com.example.hakonsreader.activites.SubredditActivity;
+
+import java.util.List;
+
 /**
  * Set this on a textview and then you can potentially open links locally if applicable
  *
@@ -28,10 +32,10 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
      * <p>When a subreddit or user profile is detected the corresponding activity is started.
      * If no match is found the link is handled normally</p>
      *
-     * @param context The context
+     * @param context The context to use for opening new activities
      * @return The static instance
      */
-    public static InternalLinkMovementMethod getSubredditAndUserInstance(Context context) {
+    public static InternalLinkMovementMethod getInstance(Context context) {
         if (subredditAndUserInstance == null) {
             subredditAndUserInstance = new InternalLinkMovementMethod(linkText -> {
                 // Match either "r/something" or "/r/something"
@@ -42,11 +46,19 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
 
 
                 if (linkText.matches(subredditRegex)) {
-                    // Add a slash if not in the link already
-                    String url = "https://www.reddit.com" + (linkText.charAt(0) == '/' ? "" : "/") + linkText;
-                    Log.d(TAG, "Opening " + url);
+                    // Extract only the subreddit. Probably an easier way to do this, but this way I don't have to
+                    // worry about if it's "r/" or "/r/" as it
 
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    // TODO this can probably be extracted for users as well when a UserActivity is created
+                    // Ensure it's a always "/r/" not "r/" as this makes extracting the subreddit easier
+                    linkText = (linkText.charAt(0) == '/' ? "" : "/") + linkText;
+                    String[] segments = linkText.split("/");
+
+                    // The segments include an empty string before the first slash
+                    String subreddit = segments[2];
+
+                    Intent intent = new Intent(context, SubredditActivity.class);
+                    intent.putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit);
                     context.startActivity(intent);
                     return true;
                 } else if (linkText.matches(userRegex)) {
@@ -54,6 +66,9 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
 
                     return true;
                 }
+                // TODO if it's an image url open ImageActivity
+
+
                 return false;
             });
         }

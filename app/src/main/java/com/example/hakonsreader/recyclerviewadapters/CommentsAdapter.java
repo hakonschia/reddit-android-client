@@ -2,12 +2,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.QuoteSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -396,7 +390,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             Context context = itemView.getContext();
 
             content.setText(Util.fromHtml(comment.getBodyHtml(), context));
-            content.setMovementMethod(InternalLinkMovementMethod.getSubredditAndUserInstance(context));
+            content.setMovementMethod(InternalLinkMovementMethod.getInstance(context));
 
             author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));
 
