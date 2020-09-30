@@ -84,9 +84,11 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        /*
         Intent intent = new Intent(this, SubredditActivity.class);
         intent.putExtra("subreddit", "test");
         startActivity(intent);
+         */
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);

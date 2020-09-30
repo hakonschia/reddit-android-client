@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -15,6 +14,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.VideoActivity;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.RedditVideo;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.misc.VideoCache;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -26,6 +26,10 @@ import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.source.chunk.DataChunk;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -67,6 +71,7 @@ public class ContentVideo extends PlayerView {
     private static final float MAX_WIDTH_RATIO = 1.0f;
 
     private RedditPost post;
+    private RedditVideo redditVideo;
 
     private ImageView thumbnail;
     private ImageButton fullscreen;
@@ -84,6 +89,7 @@ public class ContentVideo extends PlayerView {
         super(context);
 
         this.post = post;
+        this.redditVideo = post.getRedditVideo();
         this.updateView();
     }
 
@@ -116,8 +122,11 @@ public class ContentVideo extends PlayerView {
             dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
         }
 
-        mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
-                .createMediaSource(Uri.parse(post.getVideoUrl()));
+        // TODO this doesnt cache for some reason :/
+
+        mediaSource = new DashMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(Uri.parse(redditVideo.getDashURL()));
+
 
         exoPlayer = new SimpleExoPlayer.Builder(context)
                 .setLoadControl(loadControl)
@@ -274,7 +283,7 @@ public class ContentVideo extends PlayerView {
      */
     private void setSize() {
         // Ensure the video size to screen ratio isn't too large or too small
-        float videoRatio = (float) post.getVideoWidth() / App.getScreenWidth();
+        float videoRatio = (float) redditVideo.getWidth() / App.getScreenWidth();
         if (videoRatio > MAX_WIDTH_RATIO) {
             videoRatio = MAX_WIDTH_RATIO;
         } else if (videoRatio < MIN_WIDTH_RATIO) {
@@ -285,8 +294,8 @@ public class ContentVideo extends PlayerView {
         int width = (int)(App.getScreenWidth() * videoRatio);
 
         // Find how much the width was scaled by and use that to find the new height
-        float widthScaledBy = post.getVideoWidth() / (float)width;
-        int height = (int)(post.getVideoHeight() / widthScaledBy);
+        float widthScaledBy = redditVideo.getWidth() / (float)width;
+        int height = (int)(redditVideo.getHeight() / widthScaledBy);
 
         setLayoutParams(new ViewGroup.LayoutParams(width, height));
     }

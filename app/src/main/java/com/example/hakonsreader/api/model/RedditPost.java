@@ -139,20 +139,6 @@ public class RedditPost implements VotableListing, PostableListing {
 
             @SerializedName("reddit_video")
             private RedditVideo redditVideo;
-
-            private static class RedditVideo {
-                @SerializedName("duration")
-                private int duration;
-
-                @SerializedName("fallback_url")
-                private String url;
-
-                @SerializedName("height")
-                private int height;
-
-                @SerializedName("width")
-                private int width;
-            }
         }
 
 
@@ -390,47 +376,13 @@ public class RedditPost implements VotableListing, PostableListing {
     }
 
     /**
-     * @return The duration of the video if this is a video post
-     */
-    public int getVideoDuration() {
-        return data.media.redditVideo.duration;
-    }
-
-    /**
-     * @return The URL to the video of the post if the post is {@link PostType#VIDEO}
-     * or {@link PostType#RICH_VIDEO}
-     */
-    public String getVideoUrl() {
-        // If video not hosted by reddit
-        if (data.media == null) {
-            return getURL();
-        }
-        return data.media.redditVideo.url;
-    }
-
-    /**
-     * Retrieves the height of the video
+     * Retrieve the {@link RedditVideo} object. If {@link RedditPost#getPostType()} isn't
+     * {@link PostType#VIDEO}, this will be null
      *
-     * @return The height of the video, or -1 if there is no video
+     * @return The video object containing information about the video post
      */
-    public int getVideoHeight() {
-        if (data.media == null) {
-            return -1;
-        }
-
-        return data.media.redditVideo.height;
-    }
-
-    /**
-     * Retrieves the width of the video
-     *
-     * @return The width of the video, or -1 if there is no video
-     */public int getVideoWidth() {
-        if (data.media == null) {
-            return -1;
-        }
-
-        return data.media.redditVideo.width;
+    public RedditVideo getRedditVideo() {
+        return data.media.redditVideo;
     }
 
     /**
