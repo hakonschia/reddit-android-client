@@ -1,14 +1,19 @@
 package com.example.hakonsreader.views;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.VideoActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.misc.VideoCache;
@@ -28,6 +33,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 public class ContentVideo extends PlayerView {
@@ -63,8 +69,10 @@ public class ContentVideo extends PlayerView {
     private RedditPost post;
 
     private ImageView thumbnail;
+    private ImageButton fullscreen;
     private ExoPlayer exoPlayer;
     private MediaSource mediaSource;
+    
 
     /**
      * True if {@link ContentVideo#exoPlayer} has been prepared
@@ -162,6 +170,23 @@ public class ContentVideo extends PlayerView {
         // When the thumbnail is shown, clicking it (ie. clicking on the video but not on the controls)
         // "removes" the view so the view turns black
         thumbnail.setOnClickListener(null);
+        
+        fullscreen = findViewById(R.id.fullscreen);
+
+        // Open video if we are not in a video activity
+        if (!((Activity)context instanceof VideoActivity)) {
+            fullscreen.setOnClickListener(view -> {
+                Intent intent = new Intent(context, VideoActivity.class);
+                intent.putExtra(VideoActivity.POST, new Gson().toJson(post));
+                intent.putExtra("extras", getExtras());
+
+                context.startActivity(intent);
+                ((Activity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            });
+        } else {
+            // If we are in a video activity and press fullscreen, exit instead (should proably have a different icon)
+            fullscreen.setOnClickListener(view -> ((Activity)context).finish());
+        }
     }
 
     /**
@@ -266,19 +291,19 @@ public class ContentVideo extends PlayerView {
         setLayoutParams(new ViewGroup.LayoutParams(width, height));
     }
 
+
     /**
-     * Updates the height of the video, keeps the aspect ratio
+     * Retrieve a bundle of information that can be useful for saving the state of the post
      *
-     * @param height The height to set
+     * @return A bundle that might include state variables
      */
-    public void updateHeight(int height) {
-        ViewGroup.LayoutParams params = getLayoutParams();
+    public Bundle getExtras() {
+        Bundle extras = new Bundle();
 
-        float ratio = (float) params.height / height;
+        extras.putLong(ContentVideo.EXTRA_TIMESTAMP, getCurrentPosition());
+        extras.putBoolean(ContentVideo.EXTRA_IS_PLAYING, isPlaying());
+        extras.putBoolean(ContentVideo.EXTRA_SHOW_CONTROLS, isControllerShown());
 
-        params.height /= ratio;
-        params.width /= ratio;
-
-        setLayoutParams(params);
+        return extras;
     }
 }

@@ -109,6 +109,14 @@
             android:layout_gravity="center"
             tools:textColor="@color/accent"
             tools:text="05:32"/>
+
+        <ImageButton
+            android:id="@+id/fullscreen"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:src="@drawable/ic_baseline_fullscreen_24"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

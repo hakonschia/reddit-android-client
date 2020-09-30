@@ -82,10 +82,12 @@ public class Post extends RelativeLayout {
     }
 
     /**
-     * @return The view object of the content
+     * Retrieves the layout holding the content
+     *
+     * @return The parent layout of the content. The content is found as the first element inside this layout
      */
-    public View getContent() {
-        return binding.content.getChildAt(0);
+    public FrameLayout getContentLayout() {
+        return binding.content;
     }
 
     /**
@@ -234,9 +236,7 @@ public class Post extends RelativeLayout {
 
         if (c instanceof ContentVideo) {
             ContentVideo video = (ContentVideo)c;
-            extras.putLong(ContentVideo.EXTRA_TIMESTAMP, video.getCurrentPosition());
-            extras.putBoolean(ContentVideo.EXTRA_IS_PLAYING, video.isPlaying());
-            extras.putBoolean(ContentVideo.EXTRA_SHOW_CONTROLS, video.isControllerShown());
+            extras = video.getExtras();
         }
 
         return extras;
