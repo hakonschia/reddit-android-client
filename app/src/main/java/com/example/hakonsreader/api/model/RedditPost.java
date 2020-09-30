@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.model;
 
+import android.util.Log;
+
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.PostableListing;
@@ -465,10 +467,23 @@ public class RedditPost implements VotableListing, PostableListing {
         }
 
         if (hint.equals("link")) {
+            // If link matches "imgur.com/...", add a .png to the end and it will redirect to the direct link
+
+            // If we have a link post that is a link to imgur, redirect it to get the image directly
+            // The IDs are (as far as I know) alphanumerical (upper and lowercase) and 0-9 with 5 or 7 digits
+            // (it's currently between 5 and 7 characters but it works good enough I guess)
+            if (data.url.matches("^https://imgur.com/[A-Za-z0-9]{5,7}$")) {
+                // Technically the URL needs to be "i.imgur.com/...", but imgur does the redirection for us
+                // Which suffix is added (.png or .jpg or .jpeg) seemingly doesn't matter
+                data.url += ".png";
+            }
+
             // Link posts might be images not uploaded to reddit
-            if (getURL().matches("(.png|.jpeg|.jpg)$")) {
+            // Technically this doesn't match just URLs as anything can preceed the .png/.jpg/.jpeg
+            // but that shouldn't really matter
+            if (data.url.matches(".+(.png|.jpeg|.jpg)$")) {
                 return PostType.IMAGE;
-            } else if (getURL().endsWith(".gifv")) {
+            } else if (data.url.endsWith(".gifv")) {
                 return PostType.GIF;
             }
 
