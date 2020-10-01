@@ -114,4 +114,13 @@ public class App extends Application {
         // TODO create an actual preference for this. Just a placeholder value for now
         return false;
     }
+
+    /**
+     * Returns if videos should be muted by default
+     *
+     * @return True if the video should be muted
+     */
+    public static boolean muteVideoByDefault() {
+        return true;
+    }
 }

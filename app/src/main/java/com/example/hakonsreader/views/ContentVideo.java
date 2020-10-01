@@ -137,6 +137,12 @@ public class ContentVideo extends PlayerView {
 
         this.loadThumbnail();
         this.setFullscreenListener();
+        this.setVolumeListener();
+
+        // The default volume is on, so if the video should be muted toggle it
+        if (App.muteVideoByDefault()) {
+            this.toggleVolume();
+        }
     }
 
     /**
@@ -247,6 +253,47 @@ public class ContentVideo extends PlayerView {
             fullscreen.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_fullscreen_exit_24));
             // If we are in a video activity and press fullscreen, exit instead (should probably have a different icon)
             fullscreen.setOnClickListener(view -> ((Activity)context).finish());
+        }
+    }
+
+    /**
+     * Sets the listener for the volume button
+     *
+     * <p>This also changes the drawable of the button</p>
+     */
+    private void setVolumeListener() {
+        ImageButton button = findViewById(R.id.volumeButton);
+
+        button.setOnClickListener(view -> {
+            Player.AudioComponent audioComponent = exoPlayer.getAudioComponent();
+            // No audio, remove the button
+            if (audioComponent == null) {
+                button.setVisibility(GONE);
+            } else {
+                toggleVolume();
+            }
+        });
+    }
+
+    /**
+     * Toggles the volume on/off
+     * <p>The drawable of</p>
+     */
+    private void toggleVolume() {
+        Context context = getContext();
+        Player.AudioComponent audioComponent = exoPlayer.getAudioComponent();
+
+        if (audioComponent != null) {
+            ImageButton button = findViewById(R.id.volumeButton);
+            float volume = audioComponent.getVolume();
+
+            if ((int)volume == 1) {
+                audioComponent.setVolume(0f);
+                button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_volume_off_24));
+            } else {
+                audioComponent.setVolume(1f);
+                button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_volume_up_24));
+            }
         }
     }
 
