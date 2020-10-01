@@ -13,6 +13,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import androidx.core.content.ContextCompat;
+
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.VideoActivity;
@@ -218,7 +220,8 @@ public class ContentVideo extends PlayerView {
     /**
      * Sets the listener for the fullscreen button.
      * <p>If we are not in a fullscreen video already the video is opened in a {@link VideoActivity}.
-     * If we are already in a {@link VideoActivity} the activity is finished to return to the previous screen</p>
+     * If we are already in a {@link VideoActivity} the activity is finished to return to the previous screen.
+     * The drawable is also changed to an "Exit fullscreen" icon</p>
      */
     private void setFullscreenListener() {
         Context context = getContext();
@@ -241,6 +244,7 @@ public class ContentVideo extends PlayerView {
                 ((Activity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             });
         } else {
+            fullscreen.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_fullscreen_exit_24));
             // If we are in a video activity and press fullscreen, exit instead (should probably have a different icon)
             fullscreen.setOnClickListener(view -> ((Activity)context).finish());
         }
