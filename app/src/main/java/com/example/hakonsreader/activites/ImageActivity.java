@@ -1,7 +1,11 @@
 package com.example.hakonsreader.activites;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
+import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +33,18 @@ public class ImageActivity extends AppCompatActivity {
 
         Bundle data = getIntent().getExtras();
         if (data != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                final WindowInsetsController controller = getWindow().getInsetsController();
+
+                if (controller != null)
+                    controller.hide(WindowInsets.Type.statusBars());
+            }
+            else {
+                //noinspection deprecation
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+
             String imageUrl = data.getString(IMAGE_URL);
             ZoomageView image = findViewById(R.id.image);
 
@@ -37,6 +53,8 @@ public class ImageActivity extends AppCompatActivity {
             }
 
             Picasso.get().load(imageUrl).into(image);
+        } else {
+            finish();
         }
     }
 

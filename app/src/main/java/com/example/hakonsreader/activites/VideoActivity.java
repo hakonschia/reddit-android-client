@@ -1,7 +1,11 @@
 package com.example.hakonsreader.activites;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
@@ -34,6 +38,18 @@ public class VideoActivity extends AppCompatActivity {
 
         Bundle data = getIntent().getExtras();
         if (data != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                final WindowInsetsController controller = getWindow().getInsetsController();
+
+                if (controller != null)
+                    controller.hide(WindowInsets.Type.statusBars());
+            }
+            else {
+                //noinspection deprecation
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+
             Gson gson = new Gson();
             RedditPost redditPost = gson.fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
 
@@ -51,6 +67,8 @@ public class VideoActivity extends AppCompatActivity {
             contentLayout.removeView(content);
 
             video.addView(content);
+        } else {
+            finish();
         }
     }
 
