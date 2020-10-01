@@ -1,2 +1,13 @@
 
-V	java:S110"<This class has 9 parents which is greater than 5 authorized.(©˜¢Êøÿÿÿÿ
+I
+java:S1068"'Remove this unused "TAG" private field.(˜Ó×Ïúÿÿÿÿ8¹ø—óÍ.
+Y
+java:S1874/"7Remove this use of "FLAG_FULLSCREEN"; it is deprecated.(ÛŒ şÿÿÿÿ8ğåÓ—Î.
+O
+java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8¹ø—óÍ.
+T
+java:S18740"7Remove this use of "FLAG_FULLSCREEN"; it is deprecated.(­‰ı›8ğåÓ—Î.
+b
+java:S1128"@Remove this unused import 'com.r0adkll.slidr.model.SlidrConfig'.(¾Ê«ûÿÿÿÿ8Ğ“ÿšÎ.
+d
+java:S1128"BRemove this unused import 'com.r0adkll.slidr.model.SlidrPosition'.(ãèÿûıÿÿÿÿ8Ğ“ÿšÎ.

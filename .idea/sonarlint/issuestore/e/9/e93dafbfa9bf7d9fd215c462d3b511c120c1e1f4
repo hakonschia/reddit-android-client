@@ -1,10 +1,10 @@
 
-Q	java:S110"<This class has 9 parents which is greater than 5 authorized.(×Öì¢
-H
-java:S1135$"2Complete the task associated to this TODO comment.(ööØ«
-M
-java:S1135<"2Complete the task associated to this TODO comment.(½ˆ«¨ùÿÿÿÿ
-H
-java:S1135A"2Complete the task associated to this TODO comment.(ˆ²Ğ‹
 B
-java:S1602K",Remove useless curly braces around statement(ãî¼á
+java:S1602a",Remove useless curly braces around statement(ãî¼á
+Q	java:S110"<This class has 9 parents which is greater than 5 authorized.(×Öì¢
+H
+java:S1135W"2Complete the task associated to this TODO comment.(ˆ²Ğ‹
+H
+java:S1135,"2Complete the task associated to this TODO comment.(ööØ«
+M
+java:S1135R"2Complete the task associated to this TODO comment.(½ˆ«¨ùÿÿÿÿ

@@ -1,11 +1,10 @@
 
-N
-java:S2387¡"2"itemView" is the name of a field in "ViewHolder".(Ÿ±ªĞşÿÿÿÿ
-I
-java:S1135ş"2Complete the task associated to this TODO comment.(ÌïŠ³
-I
-java:S1135"2Complete the task associated to this TODO comment.(ø‡
-=
-java:S1068&"'Remove this unused "TAG" private field.(¡…”‰
-H
-java:S1068*"-Remove this unused "redditApi" private field.(¡‹Ãáıÿÿÿÿ
+j
+java:S1128"HRemove this unused import 'com.example.hakonsreader.views.ContentVideo'.(ü‹æáüÿÿÿÿ8ÉÚ¶ÍÍ.
+b
+java:S1128
+"@Remove this unused import 'androidx.core.content.ContextCompat'.(üäÂùÿÿÿÿ8ìé†÷Í.
+O
+java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8®®âœÎ.
+D
+java:S1068"'Remove this unused "TAG" private field.(¡…”‰8®®âœÎ.

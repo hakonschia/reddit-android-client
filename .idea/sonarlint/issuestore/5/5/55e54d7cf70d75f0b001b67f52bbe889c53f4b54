@@ -1,16 +1,22 @@
 
-D
-java:S1066l"/Merge this if statement with the enclosing one.(ï†›=
-E
-java:S1066m"/Merge this if statement with the enclosing one.(ﬂ∏Èè
-P	java:S110 "<This class has 9 parents which is greater than 5 authorized.(ò∏∂
-H
-java:S1612¥",Replace this lambda with a method reference.(∑àœìˇˇˇˇˇ
-u
-java:S1845G"_Rename field "post" to prevent any misunderstanding/clash with field "POST" defined on line 38.(¬è∑Ñ
-Q
-java:S2696W"6Make the enclosing method "static" or remove this set.(•Îπ˘¯ˇˇˇˇ
-N
-java:S1135©"2Complete the task associated to this TODO comment.(∂ˆ‘ô˘ˇˇˇˇ
+U
+java:S1128
+"8Remove this unused import 'androidx.annotation.NonNull'.(à€˙‹8’»ùÕÕ.
 I
-java:S1135ˆ"2Complete the task associated to this TODO comment.(“¶ã√
+java:S1135µ"2Complete the task associated to this TODO comment.(“¶ã√
+T
+java:S1135i"2Complete the task associated to this TODO comment.(ø¸îî˘ˇˇˇˇ8ËçŒŒÕ.
+O
+java:S1135Z"2Complete the task associated to this TODO comment.(ÛÀΩâ8’»ùÕÕ.
+D
+java:S1068 "'Remove this unused "TAG" private field.(¨¢∂ó8ªªŸŒÕ.
+u
+java:S1845="_Rename field "post" to prevent any misunderstanding/clash with field "POST" defined on line 37.(¬è∑Ñ
+O
+java:S1128"-Remove this unused import 'android.util.Log'.(‘¶ÿ≤¯ˇˇˇˇ8ªªŸŒÕ.
+E
+java:S1066â"/Merge this if statement with the enclosing one.(ï†›=
+F
+java:S1066ä"/Merge this if statement with the enclosing one.(ﬂ∏Èè
+q
+java:S1128"ORemove this unused import 'androidx.recyclerview.widget.DividerItemDecoration'.(µÕ·Áˇˇˇˇˇ8’»ùÕÕ.

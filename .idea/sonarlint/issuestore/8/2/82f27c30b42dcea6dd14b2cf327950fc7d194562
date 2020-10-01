@@ -1,7 +1,12 @@
 
-I
-java:S1068"'Remove this unused "TAG" private field.(ÁÌ¡„ýÿÿÿÿ8¸—‚’Ë.
-L
-java:S2696E"6Make the enclosing method "static" or remove this set.(šæ»å
 L
 java:S2696)"6Make the enclosing method "static" or remove this set.(÷„ÇÝ
+I
+java:S1068"'Remove this unused "TAG" private field.(ÁÌ¡„ýÿÿÿÿ8¸—‚’Ë.
+S
+java:S2696/"6Make the enclosing method "static" or remove this set.(—ÈëÕ8÷å“œÎ.
+X	java:S125E"<This block of commented-out lines of code should be removed.(Åé8ÒÈÍÍ.
+R
+java:S2696."6Make the enclosing method "static" or remove this set.(âìý?8ç»È›Î.
+L
+java:S2696B"6Make the enclosing method "static" or remove this set.(šæ»å

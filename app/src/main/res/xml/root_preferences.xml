@@ -4,24 +4,24 @@
         <SwitchPreference
             app:key="@string/prefs_key_theme"
             app:title="@string/prefs_title_theme"
-            app:useSimpleSummaryProvider="true" />
+            app:defaultValue="false" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/prefs_group_videos_images">
         <SwitchPreference
             app:key="@string/prefs_key_cache_nsfw"
             app:title="@string/prefs_title_cache_nsfw"
-            app:useSimpleSummaryProvider="true" />
+            app:defaultValue="false" />
 
         <SwitchPreference
             app:key="@string/prefs_key_auto_play_videos"
             app:title="@string/prefs_title_auto_play_videos"
-            app:useSimpleSummaryProvider="true" />
+            app:defaultValue="true" />
 
         <SwitchPreference
             app:key="@string/prefs_key_play_muted_videos"
             app:title="@string/prefs_title_play_muted_videos"
-            app:useSimpleSummaryProvider="true" />
+            app:defaultValue="true" />
     </PreferenceCategory>
 
 </PreferenceScreen>
