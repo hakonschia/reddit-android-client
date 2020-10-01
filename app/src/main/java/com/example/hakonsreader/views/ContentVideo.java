@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -165,7 +164,7 @@ public class ContentVideo extends PlayerView {
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
         // Convert the data source into a cache source if the user has selected to cache NSFW videos
-        if (!(post.isNSFW() && !App.cacheNSFW())) {
+        if (!(post.isNSFW() && App.dontCacheNSFW())) {
             dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
         }
 

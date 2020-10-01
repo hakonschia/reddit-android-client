@@ -2,16 +2,12 @@ package com.example.hakonsreader;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
-import com.example.hakonsreader.activites.SubredditActivity;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.misc.OAuthStateGenerator;
@@ -19,8 +15,6 @@ import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 
 import java.util.UUID;
-
-import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * Entry point for the application. Sets up various static variables used throughout the app
@@ -126,8 +120,8 @@ public class App extends Application {
      *
      * @return True if videos/images should be cached
      */
-    public static boolean cacheNSFW() {
-        return settings.getBoolean(context.getString(R.string.prefs_key_cache_nsfw), false);
+    public static boolean dontCacheNSFW() {
+        return !settings.getBoolean(context.getString(R.string.prefs_key_cache_nsfw), false);
     }
 
     /**

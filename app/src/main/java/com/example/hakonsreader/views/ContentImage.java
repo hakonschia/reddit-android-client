@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -51,7 +50,7 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
                  .resize(App.getScreenWidth(), 0);
 
         // Post is NSFW and user has chosen not to cache NSFW
-        if (post.isNSFW() && !App.cacheNSFW()) {
+        if (post.isNSFW() && App.dontCacheNSFW()) {
             // Don't store in cache and don't look in cache as this image will never be there
             c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
         }
