@@ -1,5 +1,6 @@
 package com.example.hakonsreader.views;
 
+import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -70,6 +71,12 @@ public class ContentVideo extends PlayerView {
      * maximum percentage of the screen the video will take
      */
     private static final float MAX_WIDTH_RATIO = 1.0f;
+
+    /**
+     * The amount of milliseconds it takes before the controller is automatically hidden
+     */
+    private static final int CONTROLLER_TIMEOUT = 1500;
+
 
     private RedditPost post;
     private RedditVideo redditVideo;
@@ -158,6 +165,9 @@ public class ContentVideo extends PlayerView {
             }
         });
 
+        // Equivalent to "android:animateLayoutChanges="true"", makes the controller fade in/out
+        setLayoutTransition(new LayoutTransition());
+        setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
         setPlayer(exoPlayer);
 
         ViewGroup.LayoutParams params = getLayoutParams();
