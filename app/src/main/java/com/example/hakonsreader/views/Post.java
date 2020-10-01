@@ -249,18 +249,7 @@ public class Post extends RelativeLayout {
      */
     public void resumeVideoPost(Bundle data) {
         ContentVideo video = (ContentVideo)binding.content.getChildAt(0);
-
-        long timestamp = data.getLong(ContentVideo.EXTRA_TIMESTAMP);
-        boolean isPlaying = data.getBoolean(ContentVideo.EXTRA_IS_PLAYING);
-        boolean showController = data.getBoolean(ContentVideo.EXTRA_SHOW_CONTROLS);
-
-        // Video has been played previously so make sure the player is prepared
-        if (timestamp != 0) {
-            video.prepare();
-        }
-        video.setPosition(timestamp);
-        video.setPlayback(isPlaying);
-        video.setControllerVisible(showController);
+        video.setExtras(data);
     }
 
 

@@ -60,6 +60,11 @@ public class ContentVideo extends PlayerView {
      */
     public static final String EXTRA_SHOW_CONTROLS = "showControls";
 
+    /**
+     * The key used for extra information about the volume of the video
+     */
+    public static final String EXTRA_VOLUME = "volume";
+
 
     /**
      * The lowest width ratio (compared to the screen width) that a video can be, ie. the
@@ -280,23 +285,15 @@ public class ContentVideo extends PlayerView {
      * <p>The drawable of</p>
      */
     private void toggleVolume() {
-        Context context = getContext();
         Player.AudioComponent audioComponent = exoPlayer.getAudioComponent();
 
         if (audioComponent != null) {
-            ImageButton button = findViewById(R.id.volumeButton);
             float volume = audioComponent.getVolume();
 
-            if ((int)volume == 1) {
-                audioComponent.setVolume(0f);
-                button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_volume_off_24));
-            } else {
-                audioComponent.setVolume(1f);
-                button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_volume_up_24));
-            }
+            // If volume is off (not 1), set it to on
+            this.setVolume((int)volume != 1);
         }
     }
-
 
 
     /**
@@ -375,6 +372,28 @@ public class ContentVideo extends PlayerView {
         }
     }
 
+    /**
+     * Sets if the volume should be on or off
+     *
+     * @param on True if the volume should be on
+     */
+    public void setVolume(boolean on) {
+        Context context = getContext();
+        Player.AudioComponent audioComponent = exoPlayer.getAudioComponent();
+
+        if (audioComponent != null) {
+            ImageButton button = findViewById(R.id.volumeButton);
+
+            if (on) {
+                audioComponent.setVolume(1f);
+                button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_volume_up_24));}
+            else {
+                audioComponent.setVolume(0f);
+                button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_volume_off_24));
+            }
+        }
+    }
+
 
     /**
      * Sets the size of the video. Ensures that the video is scaled up if it is too small, and
@@ -410,11 +429,39 @@ public class ContentVideo extends PlayerView {
     public Bundle getExtras() {
         Bundle extras = new Bundle();
 
-        extras.putLong(ContentVideo.EXTRA_TIMESTAMP, getCurrentPosition());
-        extras.putBoolean(ContentVideo.EXTRA_IS_PLAYING, isPlaying());
-        Log.d(TAG, "getExtras: " + isPlaying());
-        extras.putBoolean(ContentVideo.EXTRA_SHOW_CONTROLS, isControllerShown());
+        extras.putLong(EXTRA_TIMESTAMP, getCurrentPosition());
+        extras.putBoolean(EXTRA_IS_PLAYING, isPlaying());
+        extras.putBoolean(EXTRA_SHOW_CONTROLS, isControllerShown());
+
+        Player.AudioComponent audioComponent = exoPlayer.getAudioComponent();
+        if (audioComponent != null) {
+            extras.putBoolean(EXTRA_VOLUME, (int)audioComponent.getVolume() == 1);
+        } else {
+            extras.putBoolean(EXTRA_VOLUME, false);
+        }
 
         return extras;
+    }
+
+    /**
+     * Sets the extras for the video.
+     *
+     * @param extras The bundle of data to use. This should be the same bundle as retrieved with
+     *               {@link ContentVideo#getExtras()}
+     */
+    public void setExtras(Bundle extras) {
+        long timestamp = extras.getLong(EXTRA_TIMESTAMP);
+        boolean isPlaying = extras.getBoolean(EXTRA_IS_PLAYING);
+        boolean showController = extras.getBoolean(EXTRA_SHOW_CONTROLS);
+        boolean volumeOn = extras.getBoolean(EXTRA_VOLUME);
+
+        // Video has been played previously so make sure the player is prepared
+        if (timestamp != 0) {
+            prepare();
+        }
+        setPosition(timestamp);
+        setPlayback(isPlaying);
+        setControllerVisible(showController);
+        setVolume(volumeOn);
     }
 }
