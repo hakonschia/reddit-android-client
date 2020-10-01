@@ -295,7 +295,9 @@ public class Post extends RelativeLayout {
      * Pauses the video content
      */
     public void pauseVideo() {
-        ContentVideo video = (ContentVideo)binding.content.getChildAt(0);
-        video.setPlayback(false);
+        View video = binding.content.getChildAt(0);
+        if (video instanceof ContentVideo) {
+            ((ContentVideo)video).setPlayback(false);
+        }
     }
 }
