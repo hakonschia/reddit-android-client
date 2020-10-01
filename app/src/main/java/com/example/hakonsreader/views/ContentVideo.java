@@ -165,7 +165,7 @@ public class ContentVideo extends PlayerView {
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
         // Convert the data source into a cache source if the user has selected to cache NSFW videos
-        if (!(post.isNSFW() && App.dontCacheNSFW())) {
+        if (!(post.isNSFW() && !App.cacheNSFW())) {
             dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
         }
 

@@ -10,8 +10,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
-    private static final String TAG = "SettingsFragment";
-    
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -19,12 +18,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        Log.d(TAG, "onPreferenceTreeClick: " + preference);
+        String key = preference.getKey();
 
-
-        if (preference.getKey().equals(getString(R.string.theme_key))) {
+        // Update the theme right away so the app doesn't have to be restarted
+        if (key.equals(getString(R.string.prefs_key_theme))) {
             App.updateTheme();
-            return true;
         }
 
         return super.onPreferenceTreeClick(preference);

@@ -1,8 +1,10 @@
 package com.example.hakonsreader;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -35,6 +37,7 @@ public class App extends Application {
     private static String oauthState;
     private static RedditApi redditApi;
     private static SharedPreferences settings;
+    private static Context context;
 
 
     @Override
@@ -47,6 +50,7 @@ public class App extends Application {
         SharedPreferencesManager.create(prefs);
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
+        context = this;
 
         setupRedditApi();
         updateTheme();
@@ -110,17 +114,29 @@ public class App extends Application {
      * Updates the theme (night mode) based on what is in the default SharedPreferences
      */
     public static void updateTheme() {
-        if (settings.getBoolean(SharedPreferencesConstants.NIGHT_MODE, false)) {
+        if (settings.getBoolean(context.getString(R.string.prefs_key_theme), false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
     }
 
+    /**
+     * Returns if NSFW videos/images should be cached
+     *
+     * @return True if videos/images should be cached
+     */
+    public static boolean cacheNSFW() {
+        return settings.getBoolean(context.getString(R.string.prefs_key_cache_nsfw), false);
+    }
 
-    public static boolean dontCacheNSFW() {
-        // TODO create an actual preference for this. Just a placeholder value for now
-        return false;
+    /**
+     * Returns if videos should be automatically played or not
+     *
+     * @return True if videos should be automatically played
+     */
+    public static boolean autoPlayVideos() {
+        return settings.getBoolean(context.getString(R.string.prefs_key_auto_play_videos), false);
     }
 
     /**
@@ -129,6 +145,6 @@ public class App extends Application {
      * @return True if the video should be muted
      */
     public static boolean muteVideoByDefault() {
-        return true;
+        return settings.getBoolean(context.getString(R.string.prefs_key_play_muted_videos), false);
     }
 }

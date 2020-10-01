@@ -37,14 +37,22 @@
         <item quantity="other">%d more comments</item>
     </plurals>
 
-    <!-- Preference Titles -->
-    <string name="theme_header">Theme</string>
 
-    <!-- Messages Preferences -->
-    <string name="dark_mode_title">Dark Mode</string>
+    <!-- Preference groups -->
+    <string name="prefs_group_theme">Theme</string>
+    <string name="prefs_group_videos_images">Videos and images</string>
+
+    <!-- Preference titles/names -->
+    <string name="prefs_title_theme">Dark Mode</string>
+    <string name="prefs_title_auto_play_videos">Automatically play videos</string>
+    <string name="prefs_title_play_muted_videos">Start videos muted</string>
+    <string name="prefs_title_cache_nsfw">Cache NSFW videos/posts</string>
 
     <!-- Preferences keys -->
-    <string name="theme_key">theme</string>
+    <string name="prefs_key_theme">theme</string>
+    <string name="prefs_key_auto_play_videos">auto_play_videos</string>
+    <string name="prefs_key_play_muted_videos">play_muted_videos</string>
+    <string name="prefs_key_cache_nsfw">cache_nsfw</string>
 
 
     <plurals name="postAgeMinutes">

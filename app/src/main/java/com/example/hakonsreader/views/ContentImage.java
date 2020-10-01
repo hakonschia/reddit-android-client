@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -16,6 +17,8 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
 public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
+    private static final String TAG = "ContentImage";
+
 
     private RedditPost post;
 
@@ -25,7 +28,6 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
         this.post = post;
         this.updateView();
     }
-
     public ContentImage(Context context) {
         super(context);
     }
@@ -49,7 +51,7 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
                  .resize(App.getScreenWidth(), 0);
 
         // Post is NSFW and user has chosen not to cache NSFW
-        if (post.isNSFW() && App.dontCacheNSFW()) {
+        if (post.isNSFW() && !App.cacheNSFW()) {
             // Don't store in cache and don't look in cache as this image will never be there
             c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
         }

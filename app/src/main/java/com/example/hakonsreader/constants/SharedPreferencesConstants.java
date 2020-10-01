@@ -20,9 +20,4 @@ public class SharedPreferencesConstants {
      * The key for user information from the default SharedPreferences
      */
     public static final String USER_INFO = "userInfo";
-
-    /**
-     * If the app should be in night mode or not
-     */
-    public static final String NIGHT_MODE = "theme";
 }

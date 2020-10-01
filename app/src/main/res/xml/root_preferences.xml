@@ -1,12 +1,27 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/theme_header">
-
+    <PreferenceCategory app:title="@string/prefs_group_theme">
         <SwitchPreference
-            app:key="@string/theme_key"
-            app:title="@string/dark_mode_title"
+            app:key="@string/prefs_key_theme"
+            app:title="@string/prefs_title_theme"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/prefs_group_videos_images">
+        <SwitchPreference
+            app:key="@string/prefs_key_cache_nsfw"
+            app:title="@string/prefs_title_cache_nsfw"
             app:useSimpleSummaryProvider="true" />
 
+        <SwitchPreference
+            app:key="@string/prefs_key_auto_play_videos"
+            app:title="@string/prefs_title_auto_play_videos"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreference
+            app:key="@string/prefs_key_play_muted_videos"
+            app:title="@string/prefs_title_play_muted_videos"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
 </PreferenceScreen>
