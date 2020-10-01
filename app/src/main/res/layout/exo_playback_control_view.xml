@@ -31,7 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <ProgressBar
-        android:id="@+id/exo_buffering"
+        android:id="@+id/buffering"
         android:layout_width="25dp"
         android:layout_height="25dp"
 

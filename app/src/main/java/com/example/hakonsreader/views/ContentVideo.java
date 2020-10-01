@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -24,14 +25,8 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.chunk.DataChunk;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -42,6 +37,9 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+/**
+ * The view for video posts
+ */
 public class ContentVideo extends PlayerView {
     private static final String TAG = "PostContentVideo";
 
@@ -76,17 +74,19 @@ public class ContentVideo extends PlayerView {
      * The amount of milliseconds it takes before the controller is automatically hidden
      */
     private static final int CONTROLLER_TIMEOUT = 1500;
+    /**
+     * The amount of milliseconds the controller animation takes
+     */
+    private static final int CONTROLLER_ANIMATION_DURATION = 200;
 
 
     private RedditPost post;
     private RedditVideo redditVideo;
 
     private ImageView thumbnail;
-    private ImageButton fullscreen;
     private ExoPlayer exoPlayer;
     private MediaSource mediaSource;
     
-
     /**
      * True if {@link ContentVideo#exoPlayer} has been prepared
      */
@@ -100,7 +100,6 @@ public class ContentVideo extends PlayerView {
         this.redditVideo = post.getRedditVideo();
         this.updateView();
     }
-
     public ContentVideo(Context context) {
         super(context);
     }
@@ -112,12 +111,40 @@ public class ContentVideo extends PlayerView {
     }
 
 
+    /**
+     * Creates the exo player and updates the view
+     */
     private void updateView() {
         this.setSize();
 
+        // Equivalent to "android:animateLayoutChanges="true"", makes the controller fade in/out
+        LayoutTransition transition = new LayoutTransition();
+        transition.setDuration(CONTROLLER_ANIMATION_DURATION);
+        setLayoutTransition(transition);
+        setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
+
+        this.setupExoPlayer();
+        setPlayer(exoPlayer);
+
+        /*
+        // TODO this doesnt work
+        TextView duration = findViewById(R.id.exo_duration);
+        duration.setText(String.valueOf(post.getVideoDuration()));
+
+         */
+
+        this.loadThumbnail();
+        this.setFullscreenListener();
+    }
+
+    /**
+     * Sets up {@link ContentVideo#exoPlayer} and {@link ContentVideo#mediaSource}.
+     * Use this before calling {@link ContentVideo#setPlayer(Player)}
+     */
+    private void setupExoPlayer() {
         Context context = getContext();
 
-        // Create the player
+        // The load control is responsible for how much to buffer at a time
         LoadControl loadControl = new DefaultLoadControl.Builder()
                 // Buffer size between 2.5 and 7.5 seconds, with minimum of 1 second for playback to start
                 .setBufferDurationsMs(2500, 7500, 1000, 500)
@@ -140,7 +167,10 @@ public class ContentVideo extends PlayerView {
                 .setTrackSelector(new DefaultTrackSelector(context, new AdaptiveTrackSelection.Factory()))
                 .build();
 
+        // Add listener for buffering changes, playback changes etc.
         exoPlayer.addListener(new Player.EventListener() {
+            private ProgressBar loader;
+
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
                 // Ensure the thumbnail isn't visible when the video is playing
@@ -149,35 +179,30 @@ public class ContentVideo extends PlayerView {
                 }
             }
 
-            // TODO doesnt actually work (as with other exoplayer controller layouts not changing)
             @Override
             public void onLoadingChanged(boolean isLoading) {
-                findViewById(R.id.exo_buffering).setVisibility((isLoading ? VISIBLE : GONE));
+                if (loader == null) {
+                    loader = findViewById(R.id.buffering);
+                }
+                loader.setVisibility((isLoading ? VISIBLE : GONE));
             }
 
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 // If the player is trying to play and hasn't yet prepared the video, prepare it
                 if (playWhenReady && !isPrepared) {
-                    exoPlayer.prepare(mediaSource);
-                    isPrepared = true;
+                    prepare();
                 }
             }
         });
+    }
 
-        // Equivalent to "android:animateLayoutChanges="true"", makes the controller fade in/out
-        setLayoutTransition(new LayoutTransition());
-        setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
-        setPlayer(exoPlayer);
 
+    /**
+     * Loads the thumbnail for the video into {@link ContentVideo#thumbnail}
+     */
+    private void loadThumbnail() {
         ViewGroup.LayoutParams params = getLayoutParams();
-
-        /*
-        // TODO this doesnt work
-        TextView duration = findViewById(R.id.exo_duration);
-        duration.setText(String.valueOf(post.getVideoDuration()));
-
-         */
 
         thumbnail = findViewById(R.id.thumbnail);
         // Show the thumbnail over the video before it is being played
@@ -188,8 +213,17 @@ public class ContentVideo extends PlayerView {
         // When the thumbnail is shown, clicking it (ie. clicking on the video but not on the controls)
         // "removes" the view so the view turns black
         thumbnail.setOnClickListener(null);
-        
-        fullscreen = findViewById(R.id.fullscreen);
+    }
+
+    /**
+     * Sets the listener for the fullscreen button.
+     * <p>If we are not in a fullscreen video already the video is opened in a {@link VideoActivity}.
+     * If we are already in a {@link VideoActivity} the activity is finished to return to the previous screen</p>
+     */
+    private void setFullscreenListener() {
+        Context context = getContext();
+
+        ImageButton fullscreen = findViewById(R.id.fullscreen);
 
         // Open video if we are not in a video activity
         if (!((Activity)context instanceof VideoActivity)) {
@@ -201,7 +235,7 @@ public class ContentVideo extends PlayerView {
                 intent.putExtra("extras", getExtras());
 
                 // Pause the video here so it doesn't play both places
-                exoPlayer.setPlayWhenReady(false);
+                setPlayback(false);
 
                 context.startActivity(intent);
                 ((Activity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -211,6 +245,8 @@ public class ContentVideo extends PlayerView {
             fullscreen.setOnClickListener(view -> ((Activity)context).finish());
         }
     }
+
+
 
     /**
      * Retrieves the position in the video
