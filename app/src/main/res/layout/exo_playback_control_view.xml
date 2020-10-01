@@ -49,7 +49,7 @@
         android:layout_height="50dp"
 
         android:background="#CC000000"
-        style="@style/ExoMediaButton.Play"
+        style="@style/ExoMediaButton.Pause"
 
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
