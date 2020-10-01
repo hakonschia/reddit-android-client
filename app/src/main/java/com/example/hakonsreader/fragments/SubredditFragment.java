@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.PostActivity;
@@ -28,6 +29,7 @@ import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.views.ListDivider;
+import com.example.hakonsreader.views.Post;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -63,17 +65,38 @@ public class SubredditFragment extends Fragment {
      */
     private View.OnScrollChangeListener scrollListener = (view, i, i1, i2, i3) -> {
         // Get the last item visible in the current list
-        int posLastItem = this.layoutManager.findLastVisibleItemPosition();
-        int listSize = this.adapter.getItemCount();
+        int posLastItem = layoutManager.findLastVisibleItemPosition();
+        int listSize = adapter.getItemCount();
 
         // Load more posts before we reach the end to create an "infinite" list
         if (posLastItem + NUM_REMAINING_POSTS_BEFORE_LOAD > listSize) {
 
             // Only load posts if there hasn't been an attempt at loading more posts
-            if (this.lastLoadAttemptCount < listSize) {
-                this.lastLoadAttemptCount = adapter.getPosts().size();
+            if (lastLoadAttemptCount < listSize) {
+                lastLoadAttemptCount = adapter.getPosts().size();
                 postsViewModel.loadPosts(binding.parentLayout, subreddit);
             }
+        }
+
+        int posFirstItem = layoutManager.findFirstVisibleItemPosition();
+        PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(posFirstItem);
+        if (viewHolder != null) {
+            viewHolder.onSelected();
+        }
+    };
+
+    private RecyclerView.OnChildAttachStateChangeListener attachStateChangeListener = new RecyclerView.OnChildAttachStateChangeListener() {
+        @Override
+        public void onChildViewAttachedToWindow(@NonNull View view) {
+            // The video is started in the scroll listener, as that can find when the view is the first visible
+            // instead of when it is attached. It is attached before it is completely visible, so it would start
+            // playing before the user would see most if it
+        }
+
+        @Override
+        public void onChildViewDetachedFromWindow(@NonNull View view) {
+            Post post = view.findViewById(R.id.post);
+            post.pauseVideo();
         }
     };
 
@@ -161,9 +184,10 @@ public class SubredditFragment extends Fragment {
     private void setupPostsList(View view) {
         layoutManager = new LinearLayoutManager(getActivity());
 
-        binding.posts.setAdapter(this.adapter);
-        binding.posts.setLayoutManager(this.layoutManager);
-        binding.posts.setOnScrollChangeListener(this.scrollListener);
+        binding.posts.setAdapter(adapter);
+        binding.posts.setLayoutManager(layoutManager);
+        binding.posts.setOnScrollChangeListener(scrollListener);
+        binding.posts.addOnChildAttachStateChangeListener(attachStateChangeListener);
 
         ListDivider divider = new ListDivider(ContextCompat.getDrawable(getContext(), R.drawable.list_divider));
         binding.posts.addItemDecoration(divider);

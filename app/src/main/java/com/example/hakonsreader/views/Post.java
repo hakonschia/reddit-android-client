@@ -289,4 +289,14 @@ public class Post extends RelativeLayout {
             ((ContentVideo)video).setPlayback(false);
         }
     }
+
+    /**
+     * Plays the video content
+     */
+    public void playVideo() {
+        View video = binding.content.getChildAt(0);
+        if (video instanceof ContentVideo) {
+            ((ContentVideo)video).setPlayback(true);
+        }
+    }
 }

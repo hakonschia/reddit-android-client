@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -212,6 +213,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         public void reset() {
             post.reset();
+        }
+
+        /**
+         * Call when the view holder has been selected (ie. just been shown on the screen)
+         *
+         * <p>Plays a video if auto play is selected</p>
+         */
+        public void onSelected() {
+            if (App.autoPlayVideos()) {
+                post.playVideo();
+            }
         }
     }
 }
