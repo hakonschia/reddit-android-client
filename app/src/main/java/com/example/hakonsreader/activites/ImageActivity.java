@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.R;
 import com.jsibbold.zoomage.ZoomageView;
+import com.r0adkll.slidr.Slidr;
+import com.r0adkll.slidr.model.SlidrConfig;
+import com.r0adkll.slidr.model.SlidrPosition;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -56,6 +59,8 @@ public class ImageActivity extends AppCompatActivity {
         } else {
             finish();
         }
+
+        Slidr.attach(this);
     }
 
     @Override

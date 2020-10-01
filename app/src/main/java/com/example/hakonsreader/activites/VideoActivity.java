@@ -16,6 +16,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.views.ContentVideo;
 import com.example.hakonsreader.views.Post;
 import com.google.gson.Gson;
+import com.r0adkll.slidr.Slidr;
 
 /**
  * Activity to display a zoomable image taking the entire screen
@@ -70,6 +71,8 @@ public class VideoActivity extends AppCompatActivity {
         } else {
             finish();
         }
+
+        Slidr.attach(this);
     }
 
     @Override
