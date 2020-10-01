@@ -536,6 +536,12 @@ public class RedditApi {
      * @param onFailure The callback for failed requests
      */
     public void getMoreComments(String postID, List<String> children, RedditComment parent, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
+        // If no children are given, just return an empty list as it's not strictly an error but it will cause an API error later on
+        if (children.isEmpty()) {
+            onResponse.onResponse(new ArrayList<>());
+            return;
+        }
+
         String postFullname = Thing.POST.getValue() + "_" + postID;
 
         // The query parameter for the children is a list of comma separated IDs
