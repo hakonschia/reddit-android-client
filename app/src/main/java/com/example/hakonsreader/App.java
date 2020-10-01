@@ -33,8 +33,8 @@ public class App extends Application {
 
     // The random string generated for OAuth authentication
     private static String oauthState;
-
     private static RedditApi redditApi;
+    private static SharedPreferences settings;
 
 
     @Override
@@ -46,14 +46,10 @@ public class App extends Application {
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
 
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        if (settings.getBoolean(SharedPreferencesConstants.NIGHT_MODE, false)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         setupRedditApi();
+        updateTheme();
     }
 
 
@@ -107,6 +103,18 @@ public class App extends Application {
     public static String generateAndGetOAuthState() {
         oauthState = OAuthStateGenerator.generate();
         return oauthState;
+    }
+
+
+    /**
+     * Updates the theme (night mode) based on what is in the default SharedPreferences
+     */
+    public static void updateTheme() {
+        if (settings.getBoolean(SharedPreferencesConstants.NIGHT_MODE, false)) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 
 
