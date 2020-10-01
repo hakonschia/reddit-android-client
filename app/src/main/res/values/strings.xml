@@ -81,4 +81,8 @@
     <string name="tagSpoiler">Spoiler</string>
 
     <string name="searchForSubreddit">Search for subreddit</string>
+
+    <string name="transition_post_info">post_info</string>
+    <string name="transition_post_content">post_content</string>
+    <string name="transition_post_full_bar">post_full_bar</string>
 </resources>

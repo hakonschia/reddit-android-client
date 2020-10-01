@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:transitionName="post_info"/>
+        android:transitionName="@string/transition_post_info"/>
 
     <!-- Content of the post (image, video etc.) -->
     <FrameLayout
@@ -35,6 +35,6 @@
 
         android:layout_below="@id/content"
 
-        android:transitionName="post_full_bar"/>
+        android:transitionName="@string/transition_post_full_bar"/>
 
  </RelativeLayout>

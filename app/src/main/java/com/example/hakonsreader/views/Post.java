@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
+import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 
@@ -20,11 +21,6 @@ import java.util.List;
 
 public class Post extends RelativeLayout {
     private static final String TAG = "Post";
-
-    /**
-     * The transition name for the content of the post
-     */
-    private static final String CONTENT_TRANSITION_NAME = "post_content";
 
     /**
      * Flag used for when the {@link Post#maxContentHeight} isn't set
@@ -197,7 +193,7 @@ public class Post extends RelativeLayout {
         }
 
         if (content != null) {
-            content.setTransitionName(CONTENT_TRANSITION_NAME);
+            content.setTransitionName(context.getString(R.string.transition_post_content));
         }
         return content;
     }
@@ -253,14 +249,21 @@ public class Post extends RelativeLayout {
     }
 
 
+    /**
+     * Retrieve the list of views mapped to the corresponding transition name
+     *
+     * @return A list of pairs with a View mapped to a transition name
+     */
     public Pair<View, String>[] getTransitionViews() {
+        Context context = getContext();
+
         List<Pair<View, String>> pairs = new ArrayList<>();
-        pairs.add(Pair.create(binding.postInfo, "post_info"));
-        pairs.add(Pair.create(binding.postFullBar, "post_full_bar"));
+        pairs.add(Pair.create(binding.postInfo, context.getString(R.string.transition_post_info)));
+        pairs.add(Pair.create(binding.postFullBar, context.getString(R.string.transition_post_full_bar)));
 
         View content = binding.content.getChildAt(0);
         if (content != null) {
-            pairs.add(Pair.create(content, CONTENT_TRANSITION_NAME));
+            pairs.add(Pair.create(content, context.getString(R.string.transition_post_content)));
         }
 
         return pairs.toArray(new Pair[0]);
