@@ -35,11 +35,11 @@ import java.util.List;
  */
 public class PostInfo extends ConstraintLayout {
     private static final String TAG = "PostInfo";
-    
+
     private PostInfoBinding binding;
     private RedditPost post;
 
-    
+
     public PostInfo(@NonNull Context context) {
         super(context);
         binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
@@ -131,40 +131,46 @@ public class PostInfo extends ConstraintLayout {
             tag.setFillColor(fillColor);
         }
 
-        // Add all views the flair has
         List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
-        flairs.forEach(flair -> {
-            View view = null;
 
-            if (flair.getType().equals("text")) {
+        // If no richtext flairs, try to see if there is a text flair
+        // Apparently some subs set both text and richtext flairs *cough* GlobalOffensive *cough*
+        // so make sure not both are added
+        if (flairs.isEmpty()) {
+            String flairText = post.getLinkFlairText();
+            if (flairText != null && !flairText.isEmpty()) {
                 TextView tv = new TextView(getContext());
-                tv.setText(flair.getText());
+                tv.setText(flairText);
                 tv.setTextColor(textColor);
                 tv.setTextSize(getContext().getResources().getDimension(R.dimen.tagTextSize));
-                view = tv;
-            } else if (flair.getType().equals("emoji")) {
-                int size = (int)getContext().getResources().getDimension(R.dimen.tagIconSize);
-                ImageView iv = new ImageView(getContext());
-                Picasso.get()
-                        .load(flair.getUrl())
-                        .resize(size, size)
-                        .into(iv);
-                view = iv;
+                tag.add(tv);
             }
+        } else {
+            // Add all views the flair has
+            flairs.forEach(flair -> {
+                View view = null;
 
-            // Don't know if there are more than "text" and "emoji" types, so this will do for now
-            if (view != null) {
-                tag.add(view);
-            }
-        });
+                if (flair.getType().equals("text")) {
+                    TextView tv = new TextView(getContext());
+                    tv.setText(flair.getText());
+                    tv.setTextColor(textColor);
+                    tv.setTextSize(getContext().getResources().getDimension(R.dimen.tagTextSize));
+                    view = tv;
+                } else if (flair.getType().equals("emoji")) {
+                    int size = (int)getContext().getResources().getDimension(R.dimen.tagIconSize);
+                    ImageView iv = new ImageView(getContext());
+                    Picasso.get()
+                            .load(flair.getUrl())
+                            .resize(size, size)
+                            .into(iv);
+                    view = iv;
+                }
 
-        String flairText = post.getLinkFlairText();
-        if (flairText != null && !flairText.isEmpty()) {
-            TextView tv = new TextView(getContext());
-            tv.setText(flairText);
-            tv.setTextColor(textColor);
-            tv.setTextSize(getContext().getResources().getDimension(R.dimen.tagTextSize));
-            tag.add(tv);
+                // Don't know if there are more than "text" and "emoji" types, so this will do for now
+                if (view != null) {
+                    tag.add(view);
+                }
+            });
         }
 
         binding.tags.addView(tag);
