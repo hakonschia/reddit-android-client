@@ -123,6 +123,9 @@ public class RedditPost implements VotableListing, PostableListing {
         @SerializedName("link_flair_text_color")
         private String linkFlairTextColor;
 
+        @SerializedName("link_flair_text")
+        private String linkFlairText;
+
         @SerializedName("link_flair_richtext")
         private List<RichtextFlair> linkRichtextFlairs;
 
@@ -367,15 +370,36 @@ public class RedditPost implements VotableListing, PostableListing {
     }
 
 
+    /**
+     * @return The background color of the flair
+     */
     public String getLinkFlairBackgroundColor() {
         return data.linkFlairBackgroundColor;
     }
 
+    /**
+     * @return The text color of the link flair
+     */
     public String getLinkFlairTextColor() {
         return data.linkFlairTextColor;
     }
 
     /**
+     * Retrieve the raw text of a link flair.
+     *
+     * <p>For rich text flairs see {@link RedditPost#getLinkRichtextFlairs()}</p>
+     *
+     * @return The text of the link flair
+     */
+    public String getLinkFlairText() {
+        return data.linkFlairText;
+    }
+
+    /**
+     * Retrieve the list of richtext flairs this link flair is comprised of.
+     *
+     * <p>For standard text flairs see {@link RedditPost#getLinkFlairText()}</p>
+     *
      * @return The list of richtext flairs for the post
      */
     public List<RichtextFlair> getLinkRichtextFlairs() {
