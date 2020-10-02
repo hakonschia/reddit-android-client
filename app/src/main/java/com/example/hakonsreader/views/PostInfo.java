@@ -158,6 +158,15 @@ public class PostInfo extends ConstraintLayout {
             }
         });
 
+        String flairText = post.getLinkFlairText();
+        if (flairText != null && !flairText.isEmpty()) {
+            TextView tv = new TextView(getContext());
+            tv.setText(flairText);
+            tv.setTextColor(textColor);
+            tv.setTextSize(getContext().getResources().getDimension(R.dimen.tagTextSize));
+            tag.add(tv);
+        }
+
         binding.tags.addView(tag);
     }
 
