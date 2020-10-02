@@ -56,8 +56,10 @@ public class VoteBar extends ConstraintLayout {
      * @param voteType The vote type to cast
      */
     private void vote(VoteType voteType) {
+        VoteType current = listing.getVoteType();
+
         // Ie. if upvote is clicked when the listing is already upvoted, unvote the listing
-        if (voteType == listing.getVoteType()) {
+        if (voteType == current) {
             voteType = VoteType.NO_VOTE;
         }
 
@@ -68,7 +70,12 @@ public class VoteBar extends ConstraintLayout {
         listing.setVoteType(finalVoteType);
         updateVoteStatus();
 
-        this.redditApi.vote(listing, voteType, resp -> { }, (code, t) -> Util.handleGenericResponseErrors(this, code, t));
+        this.redditApi.vote(listing, voteType, resp -> { }, (code, t) -> {
+            // On failure set back to previous so the user doesn't think it updated when it didn't
+            listing.setVoteType(current);
+            updateVoteStatus();
+            Util.handleGenericResponseErrors(this, code, t);
+        });
     }
 
 
