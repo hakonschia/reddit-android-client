@@ -6,13 +6,16 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.databinding.TagBinding;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,5 +77,41 @@ public class Tag extends LinearLayout {
      */
     public void setFillColor(String hexColor) {
         binding.cardView.setCardBackgroundColor(Color.parseColor(hexColor));
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
+    }
+
+    /**
+     * Adds text to the tag
+     *
+     * <p>Note the text color must be set with {@link Tag#setTextColor(int)} before this is called</p>
+     *
+     * @param text The text to add
+     */
+    public void addText(String text) {
+        TextView tv = new TextView(getContext());
+        tv.setText(text);
+        tv.setTextColor(textColor);
+        tv.setTextSize(getContext().getResources().getDimension(R.dimen.tagTextSize));
+
+        this.add(tv);
+    }
+
+    /**
+     * Adds an image to the tag
+     *
+     * @param imageURL The URL to the image
+     */
+    public void addImage(String imageURL) {
+        int size = (int)getContext().getResources().getDimension(R.dimen.tagIconSize);
+        ImageView iv = new ImageView(getContext());
+        Picasso.get()
+                .load(imageURL)
+                .resize(size, size)
+                .into(iv);
+
+        this.add(iv);
     }
 }

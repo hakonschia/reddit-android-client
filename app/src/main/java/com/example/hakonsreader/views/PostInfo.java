@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -113,6 +114,22 @@ public class PostInfo extends ConstraintLayout {
             binding.tags.addView(ViewUtil.createNSFWTag(getContext()));
         }
 
+        this.addFlairs();
+    }
+
+
+    /**
+     * Adds the link flair to the post
+     */
+    private void addFlairs() {
+        List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
+        String flairText = post.getLinkFlairText();
+
+        // No flair to add
+        if (flairs.isEmpty() && (flairText == null || flairText.isEmpty())) {
+            return;
+        }
+
         Tag tag = new Tag(getContext());
 
         int textColor;
@@ -129,44 +146,20 @@ public class PostInfo extends ConstraintLayout {
             tag.setFillColor(fillColor);
         }
 
-        List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
+        tag.setTextColor(textColor);
 
         // If no richtext flairs, try to see if there is a text flair
         // Apparently some subs set both text and richtext flairs *cough* GlobalOffensive *cough*
-        // so make sure not both are added
+        // so make sure only one is
         if (flairs.isEmpty()) {
-            String flairText = post.getLinkFlairText();
-            if (flairText != null && !flairText.isEmpty()) {
-                TextView tv = new TextView(getContext());
-                tv.setText(flairText);
-                tv.setTextColor(textColor);
-                tv.setTextSize(getContext().getResources().getDimension(R.dimen.tagTextSize));
-                tag.add(tv);
-            }
+            tag.addText(flairText);
         } else {
             // Add all views the flair has
             flairs.forEach(flair -> {
-                View view = null;
-
                 if (flair.getType().equals("text")) {
-                    TextView tv = new TextView(getContext());
-                    tv.setText(flair.getText());
-                    tv.setTextColor(textColor);
-                    tv.setTextSize(getContext().getResources().getDimension(R.dimen.tagTextSize));
-                    view = tv;
+                    tag.addText(flair.getText());
                 } else if (flair.getType().equals("emoji")) {
-                    int size = (int)getContext().getResources().getDimension(R.dimen.tagIconSize);
-                    ImageView iv = new ImageView(getContext());
-                    Picasso.get()
-                            .load(flair.getUrl())
-                            .resize(size, size)
-                            .into(iv);
-                    view = iv;
-                }
-
-                // Don't know if there are more than "text" and "emoji" types, so this will do for now
-                if (view != null) {
-                    tag.add(view);
+                    tag.addImage(flair.getUrl());
                 }
             });
         }
