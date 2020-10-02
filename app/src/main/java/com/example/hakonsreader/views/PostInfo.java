@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Space;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -218,5 +216,8 @@ public class PostInfo extends ConstraintLayout {
         // Reset author text (from when comment is by a mod)
         binding.author.setBackground(null);
         binding.author.setTextColor(ContextCompat.getColor(getContext(), R.color.secondaryTextColor));
+
+        binding.lock.setVisibility(GONE);
+        binding.stickied.setVisibility(GONE);
     }
 }
