@@ -33,7 +33,7 @@ public class ProfileFragment extends Fragment {
 
     private boolean firstLoad = true;
 
-    private RedditApi redditApi = App.getApi();
+    private RedditApi redditApi = App.get().getApi();
     private User user;
 
     private FragmentProfileBinding binding;

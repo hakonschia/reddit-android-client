@@ -50,7 +50,7 @@ public class CommentsViewModel extends ViewModel {
     public void loadComments(View parentLayout, RedditPost post) {
         loadingChange.setValue(true);
 
-        App.getApi().getComments(post.getID(), (newComments -> {
+        App.get().getApi().getComments(post.getID(), (newComments -> {
             comments.setValue(newComments);
             loadingChange.setValue(false);
         }), ((code, t) -> {

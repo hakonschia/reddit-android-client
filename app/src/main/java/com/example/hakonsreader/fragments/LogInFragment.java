@@ -37,7 +37,7 @@ public class LogInFragment extends Fragment {
      */
     private void requestOAuth(View view) {
         // Generate a new state to validate when we get a response back
-        String state = App.generateAndGetOAuthState();
+        String state = App.get().generateAndGetOAuthState();
 
         String url = String.format(
                 "%s?client_id=%s&response_type=%s&state=%s&redirect_uri=%s&scope=%s&duration=%s",

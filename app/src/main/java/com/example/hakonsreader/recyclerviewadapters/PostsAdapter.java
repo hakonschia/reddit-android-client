@@ -221,7 +221,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          * <p>Plays a video if auto play is selected</p>
          */
         public void onSelected() {
-            if (App.autoPlayVideos()) {
+            if (App.get().autoPlayVideos()) {
                 post.playVideo();
             }
         }

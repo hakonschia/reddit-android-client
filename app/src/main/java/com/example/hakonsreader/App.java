@@ -25,18 +25,19 @@ public class App extends Application {
     /**
      * The width of the screen of the current device
      */
-    private static int screenWidth;
+    private int screenWidth;
 
     // The random string generated for OAuth authentication
-    private static String oauthState;
-    private static RedditApi redditApi;
-    private static SharedPreferences settings;
-    private static Context context;
+    private String oauthState;
+    private RedditApi redditApi;
+    private SharedPreferences settings;
+    private static App app;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
+        set();
 
         screenWidth = getResources().getDisplayMetrics().widthPixels;
 
@@ -44,17 +45,31 @@ public class App extends Application {
         SharedPreferencesManager.create(prefs);
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
-        context = this;
 
         setupRedditApi();
         updateTheme();
     }
 
+    /**
+     * Sets the app instance
+     */
+    private synchronized void set() {
+        app = this;
+    }
+
+    /**
+     * Retrieve the instance of the application that can be used to access various methods
+     *
+     * @return The static App instance
+     */
+    public static App get() {
+        return app;
+    }
 
     /**
      * @return The width of the screen in pixels
      */
-    public static int getScreenWidth() {
+    public int getScreenWidth() {
         return screenWidth;
     }
 
@@ -71,7 +86,7 @@ public class App extends Application {
         redditApi.setDeviceID(UUID.randomUUID().toString());
     }
 
-    public static RedditApi getApi() {
+    public RedditApi getApi() {
         return redditApi;
     }
 
@@ -80,7 +95,7 @@ public class App extends Application {
      *
      * @return The current OAuth state
      */
-    public static String getOAuthState() {
+    public String getOAuthState() {
         return oauthState;
     }
 
@@ -89,7 +104,7 @@ public class App extends Application {
      *
      * <p>Use this when the state has been verified</p>
      */
-    public static void clearOAuthState() {
+    public void clearOAuthState() {
         oauthState = null;
     }
 
@@ -98,7 +113,7 @@ public class App extends Application {
      *
      * @return A random string to use in the request for access
      */
-    public static String generateAndGetOAuthState() {
+    public String generateAndGetOAuthState() {
         oauthState = OAuthStateGenerator.generate();
         return oauthState;
     }
@@ -107,8 +122,8 @@ public class App extends Application {
     /**
      * Updates the theme (night mode) based on what is in the default SharedPreferences
      */
-    public static void updateTheme() {
-        if (settings.getBoolean(context.getString(R.string.prefs_key_theme), false)) {
+    public void updateTheme() {
+        if (settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_theme), false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -120,8 +135,8 @@ public class App extends Application {
      *
      * @return True if videos/images should be cached
      */
-    public static boolean dontCacheNSFW() {
-        return !settings.getBoolean(context.getString(R.string.prefs_key_cache_nsfw), false);
+    public boolean dontCacheNSFW() {
+        return !settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_cache_nsfw), false);
     }
 
     /**
@@ -129,8 +144,8 @@ public class App extends Application {
      *
      * @return True if videos should be automatically played
      */
-    public static boolean autoPlayVideos() {
-        return settings.getBoolean(context.getString(R.string.prefs_key_auto_play_videos), false);
+    public boolean autoPlayVideos() {
+        return settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_auto_play_videos), false);
     }
 
     /**
@@ -138,7 +153,7 @@ public class App extends Application {
      *
      * @return True if the video should be muted
      */
-    public static boolean muteVideoByDefault() {
-        return settings.getBoolean(context.getString(R.string.prefs_key_play_muted_videos), false);
+    public boolean muteVideoByDefault() {
+        return settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_play_muted_videos), false);
     }
 }

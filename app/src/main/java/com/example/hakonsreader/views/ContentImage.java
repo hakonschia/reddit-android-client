@@ -47,10 +47,10 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
                  .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
                  .error(R.drawable.ic_baseline_wifi_tethering_150)
                  // Scale so the image fits the width of the screen
-                 .resize(App.getScreenWidth(), 0);
+                 .resize(App.get().getScreenWidth(), 0);
 
         // Post is NSFW and user has chosen not to cache NSFW
-        if (post.isNSFW() && App.dontCacheNSFW()) {
+        if (post.isNSFW() && App.get().dontCacheNSFW()) {
             // Don't store in cache and don't look in cache as this image will never be there
             c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
         }

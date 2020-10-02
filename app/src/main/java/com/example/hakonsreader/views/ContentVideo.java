@@ -144,7 +144,7 @@ public class ContentVideo extends PlayerView {
         this.setVolumeListener();
 
         // The default volume is on, so if the video should be muted toggle it
-        if (App.muteVideoByDefault()) {
+        if (App.get().muteVideoByDefault()) {
             this.toggleVolume();
         }
     }
@@ -164,7 +164,7 @@ public class ContentVideo extends PlayerView {
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
         // Convert the data source into a cache source if the user has selected to cache NSFW videos
-        if (!(post.isNSFW() && App.dontCacheNSFW())) {
+        if (!(post.isNSFW() && App.get().dontCacheNSFW())) {
             dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
         }
 
@@ -402,7 +402,7 @@ public class ContentVideo extends PlayerView {
      */
     private void setSize() {
         // Ensure the video size to screen ratio isn't too large or too small
-        float videoRatio = (float) redditVideo.getWidth() / App.getScreenWidth();
+        float videoRatio = (float) redditVideo.getWidth() / App.get().getScreenWidth();
         if (videoRatio > MAX_WIDTH_RATIO) {
             videoRatio = MAX_WIDTH_RATIO;
         } else if (videoRatio < MIN_WIDTH_RATIO) {
@@ -410,7 +410,7 @@ public class ContentVideo extends PlayerView {
         }
 
         // Calculate and set the new width and height
-        int width = (int)(App.getScreenWidth() * videoRatio);
+        int width = (int)(App.get().getScreenWidth() * videoRatio);
 
         // Find how much the width was scaled by and use that to find the new height
         float widthScaledBy = redditVideo.getWidth() / (float)width;

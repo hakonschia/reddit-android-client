@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class SelectSubredditFragment extends Fragment {
     private static final String TAG = "SelectSubredditFragment";
 
-    private RedditApi redditApi = App.getApi();
+    private RedditApi redditApi = App.get().getApi();
 
     private SubredditsAdapter subredditsAdapter;
     private LinearLayoutManager layoutManager;

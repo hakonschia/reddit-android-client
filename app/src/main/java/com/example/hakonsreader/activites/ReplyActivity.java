@@ -27,7 +27,7 @@ public class ReplyActivity extends AppCompatActivity {
 
     private ActivityReplyBinding binding;
 
-    private RedditApi redditApi = App.getApi();
+    private RedditApi redditApi = App.get().getApi();
     private PostableListing replyingTo;
 
 

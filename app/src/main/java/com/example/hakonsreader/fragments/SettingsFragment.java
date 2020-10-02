@@ -22,7 +22,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         // Update the theme right away so the app doesn't have to be restarted
         if (key.equals(getString(R.string.prefs_key_theme))) {
-            App.updateTheme();
+            App.get().updateTheme();
         }
 
         return super.onPreferenceTreeClick(preference);

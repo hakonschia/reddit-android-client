@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
     private SettingsFragment settingsFragment;
 
     // Interface towards the Reddit API
-    private RedditApi redditApi = App.getApi();
+    private RedditApi redditApi = App.get().getApi();
 
 
     // Handler for token responses. If an access token is given user information is automatically retrieved
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
             String state = uri.getQueryParameter("state");
 
             // Not a match from the state we generated, something weird is happening
-            if (state == null || !state.equals(App.getOAuthState())) {
+            if (state == null || !state.equals(App.get().getOAuthState())) {
                 Util.showErrorLoggingInSnackbar(this.binding.parentLayout);
                 return;
             }
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
                 return;
             }
 
-            App.clearOAuthState();
+            App.get().clearOAuthState();
 
             // This might be bad, but onResume is called when opening a post and going back and still
             // holds the same intent which causes this branch to execute again, causing issues

@@ -23,7 +23,7 @@ import java.util.Locale;
  * <p>Layout file: {@code layout/vote_bar.xml}</p>
  */
 public class VoteBar extends ConstraintLayout {
-    private RedditApi redditApi = App.getApi();
+    private RedditApi redditApi = App.get().getApi();
 
     private VoteBarBinding binding;
 

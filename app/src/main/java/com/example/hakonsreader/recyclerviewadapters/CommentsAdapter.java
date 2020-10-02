@@ -33,7 +33,7 @@ import static android.view.View.GONE;
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
 
-    private RedditApi redditApi = App.getApi();
+    private RedditApi redditApi = App.get().getApi();
 
 
     /**

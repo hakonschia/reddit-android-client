@@ -62,7 +62,7 @@ public class PostsViewModel extends ViewModel {
         }
 
         loadingChange.setValue(true);
-        App.getApi().getPosts(subreddit, after, count, newPosts -> {
+        App.get().getApi().getPosts(subreddit, after, count, newPosts -> {
             posts.setValue(newPosts);
             loadingChange.setValue(false);
         }, (code, t) -> {
