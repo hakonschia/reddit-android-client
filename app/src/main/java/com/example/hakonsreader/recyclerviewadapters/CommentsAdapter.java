@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.view.View.GONE;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
@@ -333,17 +336,21 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         private TextView author;
         private TextView age;
         private TextView content;
+        private ImageView locked;
+        private ImageView stickied;
         private ImageButton reply;
         private VoteBar voteBar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            this.author = itemView.findViewById(R.id.commentAuthor);
-            this.age = itemView.findViewById(R.id.commentAge);
-            this.content = itemView.findViewById(R.id.commentContent);
-            this.reply = itemView.findViewById(R.id.reply);
-            this.voteBar = itemView.findViewById(R.id.commentVoteBar);
+            author = itemView.findViewById(R.id.commentAuthor);
+            age = itemView.findViewById(R.id.commentAge);
+            content = itemView.findViewById(R.id.commentContent);
+            locked = itemView.findViewById(R.id.lock);
+            stickied = itemView.findViewById(R.id.stickied);
+            reply = itemView.findViewById(R.id.reply);
+            voteBar = itemView.findViewById(R.id.commentVoteBar);
         }
 
 
@@ -358,6 +365,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             // Reset if holder previously was a hidden comment
             author.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
             age.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+
+            locked.setVisibility(View.GONE);
+            stickied.setVisibility(View.GONE);
 
             // Reset it holder previously was "5 more comments"
             voteBar.setVisibility(View.VISIBLE);
@@ -399,7 +409,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             Duration between = Duration.between(created, Instant.now());
             age.setText(Util.createAgeText(context.getResources(), between));
 
-            // TODO if comment is locked replies shouldn't be accessible
+            if (post.isLocked()) {
+                reply.setVisibility(GONE);
+            }
+            if (comment.isLocked()) {
+                locked.setVisibility(View.VISIBLE);
+            }
+            if (comment.isStickied()) {
+                stickied.setVisibility(View.VISIBLE);
+            }
+
             reply.setOnClickListener(view -> replyListener.replyTo(comment));
 
             voteBar.setListing(comment);
@@ -443,8 +462,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             age.setText("");
             content.setText("");
-            reply.setVisibility(View.GONE);
-            voteBar.setVisibility(View.GONE);
+            reply.setVisibility(GONE);
+            voteBar.setVisibility(GONE);
         }
 
         /**
@@ -459,8 +478,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             age.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
 
             content.setText("");
-            reply.setVisibility(View.GONE);
-            voteBar.setVisibility(View.GONE);
+            reply.setVisibility(GONE);
+            voteBar.setVisibility(GONE);
 
             itemView.setOnClickListener(view -> runnable.run());
             itemView.setOnLongClickListener(null);

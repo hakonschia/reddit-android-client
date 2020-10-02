@@ -72,6 +72,11 @@ public class PostActivity extends AppCompatActivity {
         Gson gson = new Gson();
         post = gson.fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
 
+        if (post.isLocked()) {
+            Log.d(TAG, "onCreate: POST IS LOCKED");
+            binding.replyPost.setVisibility(View.GONE);
+        }
+
         this.setupCommentsList();
 
         binding.post.setMaxContentHeight((int)getResources().getDimension(R.dimen.postContentMaxHeight));

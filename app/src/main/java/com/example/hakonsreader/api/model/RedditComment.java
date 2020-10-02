@@ -61,10 +61,10 @@ public class RedditComment implements VotableListing, PostableListing {
         @SerializedName("permalink")
         private String permalink;
 
-        @SerializedName("is_locked")
+        @SerializedName("locked")
         private boolean isLocked;
 
-        @SerializedName("is_stickied")
+        @SerializedName("stickied")
         private boolean isStickied;
 
         /**

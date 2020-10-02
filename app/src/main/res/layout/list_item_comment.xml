@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background"
+    android:layout_marginEnd="10dp"
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
@@ -28,6 +29,35 @@
         android:textColor="@color/secondaryTextColor"
 
         tools:text="2h ago" />
+
+    <!-- Extra icons such as stickied, locked etc. -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/commentAuthor" >
+
+        <ImageView
+            android:id="@+id/stickied"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+
+            android:visibility="gone"
+            tools:visibility="visible"
+
+            android:src="@drawable/ic_stickied" />
+
+        <ImageView
+            android:id="@+id/lock"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+
+            android:visibility="gone"
+            tools:visibility="visible"
+
+            android:src="@drawable/ic_baseline_lock_24" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/commentContent"
@@ -60,8 +90,6 @@
         android:id="@+id/commentVoteBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:layout_marginEnd="10dp"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/reply" />

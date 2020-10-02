@@ -88,6 +88,13 @@ public class PostInfo extends ConstraintLayout {
         binding.age.setText(Util.createAgeText(getResources(), between));
         binding.title.setText(post.getTitle());
 
+        if (post.isLocked()) {
+            binding.lock.setVisibility(VISIBLE);
+        }
+        if (post.isStickied()) {
+            binding.stickied.setVisibility(VISIBLE);
+        }
+
         this.createAndAddTags();
 
         // When the subreddit is clicked, open the selected subreddit in a new activity
