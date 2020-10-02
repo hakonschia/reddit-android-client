@@ -63,10 +63,12 @@ public class VoteBar extends ConstraintLayout {
 
         VoteType finalVoteType = voteType;
 
-        this.redditApi.vote(listing, voteType, (resp) -> {
-            listing.setVoteType(finalVoteType);
-            updateVoteStatus();
-        }, (code, t) -> Util.handleGenericResponseErrors(this, code, t));
+        // Assume it's successful as it feels like the buttons aren't pressed when you have to wait
+        // until the colors are updated
+        listing.setVoteType(finalVoteType);
+        updateVoteStatus();
+
+        this.redditApi.vote(listing, voteType, resp -> { }, (code, t) -> Util.handleGenericResponseErrors(this, code, t));
     }
 
 
