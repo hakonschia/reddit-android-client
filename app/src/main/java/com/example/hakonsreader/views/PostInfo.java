@@ -195,6 +195,6 @@ public class PostInfo extends ConstraintLayout {
     public void reset() {
         // Reset author text (from when comment is by a mod)
         binding.author.setBackground(null);
-        binding.author.setTextColor(ContextCompat.getColor(getContext(), R.color.linkColor));
+        binding.author.setTextColor(ContextCompat.getColor(getContext(), R.color.secondaryTextColor));
     }
 }
