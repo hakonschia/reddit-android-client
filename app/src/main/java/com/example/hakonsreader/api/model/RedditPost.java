@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api.model;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.PostableListing;
@@ -151,6 +149,15 @@ public class RedditPost implements VotableListing, PostableListing {
         private static class GalleryData {
             @SerializedName("items")
             private List<GalleryItem> items;
+        }
+
+
+        @SerializedName("preview")
+        private Preview preview;
+
+        private static class Preview {
+            @SerializedName("images")
+            ImagesWrapper images;
         }
     }
 
@@ -393,6 +400,31 @@ public class RedditPost implements VotableListing, PostableListing {
      */
     public List<GalleryItem> getGalleryItems() {
          return data.galleryData.items;
+    }
+
+    /**
+     * Retrieves the source image for the post. For image posts this will be the same image as
+     * that returned by {@link RedditPost#getURL()}. It will point to a different image, but the
+     * images will be identical.
+     *
+     * <p>See {@link RedditPost#getPreviewImages()} for a list of different resolutions of the image</p>
+     *
+     * @return The source image for the post
+     */
+    public PreviewImage getSourcePreview() {
+        return data.preview.images.source;
+    }
+
+    /**
+     * Retrieves the list of preview images the post has. This list will usually hold a number
+     * of images with different resolutions.
+     *
+     * <p>See {@link RedditPost#getSourcePreview()} for the source resolution</p>
+     *
+     * @return A list of preview images
+     */
+    public List<PreviewImage> getPreviewImages() {
+        return data.preview.images.resolutions;
     }
 
 
