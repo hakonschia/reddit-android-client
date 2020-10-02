@@ -160,7 +160,7 @@ public class RedditPost implements VotableListing, PostableListing {
 
         private static class Preview {
             @SerializedName("images")
-            ImagesWrapper images;
+            List<ImagesWrapper> images;
         }
     }
 
@@ -436,7 +436,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The source image for the post
      */
     public PreviewImage getSourcePreview() {
-        return data.preview.images.source;
+        return data.preview.images.get(0).source;
     }
 
     /**
@@ -448,7 +448,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return A list of preview images
      */
     public List<PreviewImage> getPreviewImages() {
-        return data.preview.images.resolutions;
+        return data.preview.images.get(0).resolutions;
     }
 
 
