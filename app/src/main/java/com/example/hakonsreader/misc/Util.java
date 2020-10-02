@@ -22,7 +22,10 @@ import com.example.hakonsreader.views.CustomQuoteSpan;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.LocalTime;
+import java.util.Date;
 import java.util.Locale;
 
 public class Util {
@@ -190,5 +193,15 @@ public class Util {
         }
 
         return spannable;
+    }
+
+    /**
+     * Create a duration string in the format of "mm:ss" that can be used in videos
+     *
+     * @param seconds The amount of seconds to display
+     * @return A string formatted as "mm:ss"
+     */
+    public static String createVideoDuration(int seconds) {
+        return String.format("%02d:%02d", (seconds % 3600) / 60, seconds % 60);
     }
 }

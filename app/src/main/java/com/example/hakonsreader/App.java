@@ -1,7 +1,6 @@
 package com.example.hakonsreader;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatDelegate;

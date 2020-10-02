@@ -93,8 +93,9 @@
             app:played_color="@color/accent"
             app:unplayed_color="@android:color/darker_gray" />
 
+        <!-- Apparently I can't update exo_duration, so use a brand new view -->
         <TextView
-            android:id="@id/exo_duration"
+            android:id="@+id/duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 

@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
@@ -20,6 +22,7 @@ import com.example.hakonsreader.activites.VideoActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditVideo;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.misc.VideoCache;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -132,12 +135,8 @@ public class ContentVideo extends PlayerView {
         this.setupExoPlayer();
         setPlayer(exoPlayer);
 
-        /*
-        // TODO this doesnt work
-        TextView duration = findViewById(R.id.exo_duration);
-        duration.setText(String.valueOf(post.getVideoDuration()));
-
-         */
+        TextView duration = findViewById(R.id.duration);
+        duration.setText(Util.createVideoDuration(redditVideo.getDuration()));
 
         this.loadThumbnail();
         this.setFullscreenListener();
