@@ -1,6 +1,10 @@
 package com.example.hakonsreader.views;
 
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -9,13 +13,18 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.util.Pair;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +72,13 @@ public class Post extends RelativeLayout {
      */
     public void setPostData(RedditPost post) {
         this.postData = post;
+
+        super.setOnClickListener(v -> this.openPost());
+        super.setOnLongClickListener(v -> {
+            this.copyLinkToClipBoard();
+            return true;
+        });
+
         this.updateView();
     }
 
@@ -203,6 +219,40 @@ public class Post extends RelativeLayout {
             content.setTransitionName(context.getString(R.string.transition_post_content));
         }
         return content;
+    }
+
+    /**
+     * Opens {@link Post#postData} in a new activity
+     */
+    private void openPost() {
+        Intent intent = new Intent(getContext(), PostActivity.class);
+        intent.putExtra(PostActivity.POST, new Gson().toJson(postData));
+
+        Bundle extras = getExtras();
+        intent.putExtra("extras", extras);
+
+        pauseVideo();
+
+        Activity activity = (Activity)getContext();
+
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, getTransitionViews());
+        activity.startActivity(intent, options.toBundle());
+    }
+
+    /**
+     * Copies the link to {@link Post#postData} to the clipboard and shows a toast that it has been copied
+     */
+    private void copyLinkToClipBoard() {
+        Activity activity = (Activity)getContext();
+
+        ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("reddit post", postData.getPermalink());
+        clipboard.setPrimaryClip(clip);
+
+        Toast.makeText(activity, R.string.linkCopied, Toast.LENGTH_SHORT).show();
+
+        // DEBUG
+        Log.d(TAG, "copyLinkToClipboard: " + new GsonBuilder().setPrettyPrinting().create().toJson(postData));
     }
 
     /**

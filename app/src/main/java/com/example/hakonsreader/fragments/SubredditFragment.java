@@ -129,41 +129,6 @@ public class SubredditFragment extends Fragment {
     }
 
     /**
-     * Opens a Reddit post in a new activity to show comments
-     *
-     * @param view The view holder of the post clicked
-     */
-    private void openPost(PostsAdapter.ViewHolder view) {
-        Intent intent = new Intent(requireActivity(), PostActivity.class);
-        intent.putExtra(PostActivity.POST, new Gson().toJson(view.getRedditPost()));
-
-        Bundle extras = view.getExtraPostInfo();
-        intent.putExtra("extras", extras);
-
-        view.pauseVideo();
-
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), view.getPostTransitionViews());
-        startActivity(intent, options.toBundle());
-    }
-
-    /**
-     * For long clicks on a post, copy the post URL
-     *
-     * @param post The post clicked on
-     */
-    private void copyLinkToClipboard(RedditPost post) {
-        ClipboardManager clipboard = (ClipboardManager) requireActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("reddit post", post.getPermalink());
-        clipboard.setPrimaryClip(clip);
-
-        Toast.makeText(getActivity(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
-
-        // DEBUG
-        Log.d(TAG, "copyLinkToClipboard: " + new GsonBuilder().setPrettyPrinting().create().toJson(post));
-    }
-
-
-    /**
      * Called when the refresh button has been clicked
      * <p>Clears the items in the list, scrolls to the top, and loads new posts</p>
      *
@@ -200,12 +165,6 @@ public class SubredditFragment extends Fragment {
         lastLoadAttemptCount = 0;
 
         adapter = new PostsAdapter();
-
-        // Open post with comments when clicked
-        adapter.setOnClickListener(this::openPost);
-
-        // Set long clicks to copy the post link
-        adapter.setOnLongClickListener(this::copyLinkToClipboard);
 
         postsViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
         postsViewModel.getPosts().observe(this, adapter::addPosts);

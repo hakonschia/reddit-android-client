@@ -33,32 +33,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     private List<RedditPost> posts = new ArrayList<>();
 
-    // Listener for when a list item has been clicked
-    private OnClickListener<ViewHolder> onClickListener;
-
-    // Listener for when a list item has been long clicked
-    private OnClickListener<RedditPost> onLongClickListener;
-
-
-    /**
-     * Sets the click listener for when an item in the list has been clicked
-     *
-     * @param onClickListener The listener :)
-     */
-    public void setOnClickListener(OnClickListener<ViewHolder> onClickListener) {
-        this.onClickListener = onClickListener;
-    }
-
-    /**
-     * Sets the listener for long clicks
-     *
-     * @param onLongClickListener The listener :-)
-     */
-    public void setOnLongClickListener(OnClickListener<RedditPost> onLongClickListener) {
-        this.onLongClickListener = onLongClickListener;
-    }
-
-
     /**
      * Adds a list of posts to the current list of posts
      * <p>Duplicate posts are filtered out</p>
@@ -113,7 +87,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final RedditPost post = this.posts.get(position);
-        holder.redditPost = post;
 
         // Don't show text posts here (only show when a post is opened)
         holder.post.setShowContent(post.getPostType() != PostType.TEXT);
@@ -133,72 +106,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     /**
      * The view for the items in the list
      */
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private RedditPost redditPost;
-
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private Post post;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             post = itemView.findViewById(R.id.post);
-
-            // Call the registered onClick listener when an item is clicked
-            itemView.setOnClickListener(view -> {
-                int pos = getAdapterPosition();
-
-                if (onClickListener != null && pos != RecyclerView.NO_POSITION) {
-                    onClickListener.onClick(this);
-                }
-            });
-
-            // Call the registered onClick listener when an item is long clicked
-            itemView.setOnLongClickListener(view -> {
-                int pos = getAdapterPosition();
-
-                if (onLongClickListener != null && pos != RecyclerView.NO_POSITION) {
-                    onLongClickListener.onClick(posts.get(pos));
-
-                    return true;
-                }
-
-                return false;
-            });
-        }
-
-        /**
-         * Gets a list of pairs of the views that should be transitioned to the post activity
-         *
-         * @return An array of {@link Pair} mapping the view to its transition name in the new activity
-         */
-        public Pair<View, String>[] getPostTransitionViews() {
-            return post.getTransitionViews();
-        }
-
-        /**
-         * The post this view holder currently holds
-         *
-         * @return The Reddit post shown in this view holder
-         */
-        public RedditPost getRedditPost() {
-            return redditPost;
-        }
-
-        /**
-         * Retrieves any extra information about the content of the post
-         *
-         * <p>Currently only returns the timestamp of the video, if the post is a video post</p>
-         * @return A bundle that might include extra information about the state of the post
-         */
-        public Bundle getExtraPostInfo() {
-            return post.getExtras();
-        }
-
-        /**
-         * Pauses the video content
-         */
-        public void pauseVideo() {
-            post.pauseVideo();
         }
 
         /**
