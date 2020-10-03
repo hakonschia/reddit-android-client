@@ -1,7 +1,11 @@
 package com.example.hakonsreader;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -134,7 +138,7 @@ public class App extends Application {
      * Updates the theme (night mode) based on what is in the default SharedPreferences
      */
     public void updateTheme() {
-        if (settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_theme), false)) {
+        if (settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_theme), getResources().getBoolean(R.bool.prefs_default_theme))) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -147,7 +151,7 @@ public class App extends Application {
      * @return True if videos/images should be cached
      */
     public boolean dontCacheNSFW() {
-        return !settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_cache_nsfw), false);
+        return !settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_cache_nsfw), getResources().getBoolean(R.bool.prefs_default_value_cache_nsfw));
     }
 
     /**
@@ -156,8 +160,39 @@ public class App extends Application {
      * @return True if videos should be automatically played
      */
     public boolean autoPlayVideos() {
-        return settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_auto_play_videos), false);
+        Context context = getApplicationContext();
+        String value = settings.getString(
+                context.getString(R.string.prefs_key_auto_play_videos),
+                context.getString(R.string.prefs_default_value_auto_play_videos)
+        );
+
+        if (value.equals(context.getString(R.string.prefs_key_auto_play_videos_always))) {
+            return true;
+        } else if (value.equals(context.getString(R.string.prefs_key_auto_play_videos_never))) {
+            return false;
+        }
+
+        return false;
+
+        /*
+        // If we get here we are on wi-fi only, return true if on wi-fi, else false
+
+        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        // Wi-Fi adapter is on, check if we are also connected to a network
+        if (wifiMgr.isWifiEnabled()) {
+            WifiInfo wifiInfo;
+            wifiInfo = wifiMgr.getConnectionInfo();
+
+            // Return if we are connected to a network
+            return wifiInfo.getNetworkId() != -1;
+        }
+        else {
+            // Wi-Fi adapter is OFF
+            return false;
+        }
+         */
     }
+
 
     /**
      * Returns if videos should be muted by default
@@ -165,6 +200,6 @@ public class App extends Application {
      * @return True if the video should be muted
      */
     public boolean muteVideoByDefault() {
-        return settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_play_muted_videos), false);
+        return settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_play_muted_videos), getResources().getBoolean(R.bool.prefs_default_play_muted_videos));
     }
 }

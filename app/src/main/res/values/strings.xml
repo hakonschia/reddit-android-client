@@ -45,14 +45,20 @@
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark Mode</string>
     <string name="prefs_title_auto_play_videos">Automatically play videos</string>
+    <string name="prefs_title_auto_play_videos_always">Always</string>
+    <string name="prefs_title_auto_play_videos_never">Never</string>
+    <string name="prefs_title_auto_play_videos_wifi_only">Wi-Fi only</string>
     <string name="prefs_title_play_muted_videos">Start videos muted</string>
     <string name="prefs_title_cache_nsfw">Cache NSFW videos/posts</string>
 
     <!-- Preferences keys -->
     <string name="prefs_key_theme">theme</string>
-    <string name="prefs_key_auto_play_videos">auto_play_videos</string>
-    <string name="prefs_key_play_muted_videos">play_muted_videos</string>
     <string name="prefs_key_cache_nsfw">cache_nsfw</string>
+    <string name="prefs_key_auto_play_videos">auto_play_videos</string>
+    <string name="prefs_key_auto_play_videos_always">always</string>
+    <string name="prefs_key_auto_play_videos_never">never</string>
+    <string name="prefs_key_auto_play_videos_wifi_only">wifi_only</string>
+    <string name="prefs_key_play_muted_videos">play_muted_videos</string>
 
 
     <plurals name="postAgeMinutes">
