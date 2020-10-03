@@ -135,7 +135,7 @@ public class Post extends RelativeLayout {
             return;
         }
 
-        View content = generatePostContent(postData, getContext(), this);
+        View content = generatePostContent(postData, getContext());
         if (content != null) {
             binding.content.addView(content);
 
@@ -181,7 +181,7 @@ public class Post extends RelativeLayout {
      * @param post The post to generate for
      * @return A view with the content of the post
      */
-    private View generatePostContent(RedditPost post, Context context, RelativeLayout parent) {
+    private View generatePostContent(RedditPost post, Context context) {
         View content;
 
         switch (post.getPostType()) {
@@ -199,13 +199,21 @@ public class Post extends RelativeLayout {
                 break;
 
             case CROSSPOST:
-                // For crossposts the content is the parent crosspost post itself
-                Post c = new Post(context);
-                c.setPostData(postData.getCrossposts().get(0));
+                RedditPost parent = postData.getCrossposts().get(0);
 
-                // Add a border around to show where the crosspost post is and where the actual post it
-                c.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border));
-                content = c;
+                // If we are in a post only care about the actual post content, as it's not enough space
+                // to show the entire parent post info
+                if (getContext() instanceof PostActivity) {
+                    content = new ContentVideo(context, parent);
+                } else {
+                    // Otherwise the content is the entire parents info
+                    Post c = new Post(context);
+                    c.setPostData(parent);
+
+                    // Add a border around to show where the crosspost post is and where the actual post it
+                    c.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border));
+                    content = c;
+                }
                 break;
 
             case LINK:
