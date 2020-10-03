@@ -72,12 +72,18 @@ public class ContentVideo extends PlayerView {
      * The lowest width ratio (compared to the screen width) that a video can be, ie. the
      * minimum percentage of the screen the video will take
      */
-    private static final float MIN_WIDTH_RATIO = 0.7f;
+    private static final float MIN_WIDTH_RATIO = 1.0f;
     /**
      * The max width ratio (compared to the screen width) that a video will be, ie. the
      * maximum percentage of the screen the video will take
      */
     private static final float MAX_WIDTH_RATIO = 1.0f;
+
+    /**
+     * The max height ratio (compared to the screen height) that a video will be, ie. the maximum
+     * percentage of the height the video will take
+     */
+    private static final float MAX_HEIGHT_RATIO = 0.85f;
 
     /**
      * The amount of milliseconds it takes before the controller is automatically hidden
@@ -238,7 +244,7 @@ public class ContentVideo extends PlayerView {
         ImageButton fullscreen = findViewById(R.id.fullscreen);
 
         // Open video if we are not in a video activity
-        if (!((Activity)context instanceof VideoActivity)) {
+        if (!(context instanceof VideoActivity)) {
             fullscreen.setOnClickListener(view -> {
                 // TODO resume at the same point where we ended (for fullscreen and in posts)
 
@@ -396,24 +402,33 @@ public class ContentVideo extends PlayerView {
     /**
      * Sets the size of the video. Ensures that the video is scaled up if it is too small, and
      * doesn't go too large, while keeping the aspect ratio the same
-     *
-     * <p>Updates the layout parameters</p>
      */
     private void setSize() {
         // Ensure the video size to screen ratio isn't too large or too small
-        float videoRatio = (float) redditVideo.getWidth() / App.get().getScreenWidth();
-        if (videoRatio > MAX_WIDTH_RATIO) {
-            videoRatio = MAX_WIDTH_RATIO;
-        } else if (videoRatio < MIN_WIDTH_RATIO) {
-            videoRatio = MIN_WIDTH_RATIO;
+        float widthRatio = (float) redditVideo.getWidth() / App.get().getScreenWidth();
+        if (widthRatio > MAX_WIDTH_RATIO) {
+            widthRatio = MAX_WIDTH_RATIO;
+        } else if (widthRatio < MIN_WIDTH_RATIO) {
+            widthRatio = MIN_WIDTH_RATIO;
         }
 
         // Calculate and set the new width and height
-        int width = (int)(App.get().getScreenWidth() * videoRatio);
+        int width = (int)(App.get().getScreenWidth() * widthRatio);
 
         // Find how much the width was scaled by and use that to find the new height
         float widthScaledBy = redditVideo.getWidth() / (float)width;
         int height = (int)(redditVideo.getHeight() / widthScaledBy);
+
+
+        float heightRatio = (float) height / App.get().getScreenHeight();
+        if (heightRatio > MAX_HEIGHT_RATIO) {
+            heightRatio = MAX_HEIGHT_RATIO;
+        }
+
+        height = (int)(App.get().getScreenHeight() * heightRatio);
+
+        float heightScaledBy = redditVideo.getHeight() / (float)height;
+        width = (int)(redditVideo.getWidth() / heightScaledBy);
 
         setLayoutParams(new ViewGroup.LayoutParams(width, height));
     }

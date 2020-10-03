@@ -25,6 +25,10 @@ public class App extends Application {
      * The width of the screen of the current device
      */
     private int screenWidth;
+    /**
+     * The height of the screen of the current device
+     */
+    private int screenHeight;
 
     // The random string generated for OAuth authentication
     private String oauthState;
@@ -39,6 +43,7 @@ public class App extends Application {
         set();
 
         screenWidth = getResources().getDisplayMetrics().widthPixels;
+        screenHeight = getResources().getDisplayMetrics().heightPixels;
 
         SharedPreferences prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferencesManager.create(prefs);
@@ -71,6 +76,13 @@ public class App extends Application {
     public int getScreenWidth() {
         return screenWidth;
     }
+    /**
+     * @return The height of the screen in pixels
+     */
+    public int getScreenHeight() {
+        return screenHeight;
+    }
+
 
     /**
      * Sets up the reddit API object
