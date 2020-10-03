@@ -202,4 +202,16 @@ public class App extends Application {
     public boolean muteVideoByDefault() {
         return settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_play_muted_videos), getResources().getBoolean(R.bool.prefs_default_play_muted_videos));
     }
+
+    /**
+     * Returns if videos should be muted by default when viewed in fullscreen
+     *
+     * @return True if the video should be muted
+     */
+    public boolean muteVideoByDefaultInFullscreen() {
+        return settings.getBoolean(
+                getApplicationContext().getString(R.string.prefs_key_play_muted_videos_fullscreen),
+                getResources().getBoolean(R.bool.prefs_default_play_muted_videos_fullscreen)
+        );
+    }
 }

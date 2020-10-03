@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.views.ContentVideo;
@@ -56,6 +57,10 @@ public class VideoActivity extends AppCompatActivity {
 
             Bundle extras = getIntent().getExtras().getBundle("extras");
 
+            if (!App.get().muteVideoByDefaultInFullscreen()) {
+                extras.putBoolean(ContentVideo.EXTRA_VOLUME, true);
+            }
+
             Post post = new Post(this);
             post.setPostData(redditPost);
             post.resumeVideoPost(extras);
@@ -68,6 +73,8 @@ public class VideoActivity extends AppCompatActivity {
             contentLayout.removeView(content);
 
             video.addView(content);
+
+
         } else {
             finish();
         }

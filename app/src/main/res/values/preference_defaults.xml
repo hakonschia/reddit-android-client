@@ -4,4 +4,5 @@
     <bool name="prefs_default_value_cache_nsfw">false</bool>
     <string name="prefs_default_value_auto_play_videos">@string/prefs_title_auto_play_videos_never</string>
     <bool name="prefs_default_play_muted_videos">true</bool>
+    <bool name="prefs_default_play_muted_videos_fullscreen">true</bool>
 </resources>
