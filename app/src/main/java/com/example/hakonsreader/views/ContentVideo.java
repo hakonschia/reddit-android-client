@@ -83,7 +83,7 @@ public class ContentVideo extends PlayerView {
      * The max height ratio (compared to the screen height) that a video will be, ie. the maximum
      * percentage of the height the video will take
      */
-    private static final float MAX_HEIGHT_RATIO = 0.85f;
+    private static final float MAX_HEIGHT_RATIO = 0.65f;
 
     /**
      * The amount of milliseconds it takes before the controller is automatically hidden
