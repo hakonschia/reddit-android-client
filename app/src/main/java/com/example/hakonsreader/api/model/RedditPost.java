@@ -5,6 +5,7 @@ import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.PostableListing;
 import com.example.hakonsreader.api.interfaces.VotableListing;
 import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
+import com.example.hakonsreader.api.jsonadapters.ParentCrosspostAdapter;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
@@ -101,6 +102,7 @@ public class RedditPost implements VotableListing, PostableListing {
         private String crosspostParentID;
 
         @SerializedName("crosspost_parent_list")
+        @JsonAdapter(ParentCrosspostAdapter.class)
         private List<RedditPost> crossposts;
 
 

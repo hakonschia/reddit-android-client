@@ -3,6 +3,7 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -178,6 +179,12 @@ public class Post extends RelativeLayout {
             case RICH_VIDEO:
                 // Links such as youtube, gfycat etc are rich video posts
                 content = null;
+                break;
+
+            case CROSSPOST:
+                Post c = new Post(context);
+                c.setPostData(postData.getCrossposts().get(0));
+                content = c;
                 break;
 
             case LINK:
