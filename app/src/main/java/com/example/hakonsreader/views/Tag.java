@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -94,7 +95,7 @@ public class Tag extends LinearLayout {
         TextView tv = new TextView(getContext());
         tv.setText(text);
         tv.setTextColor(textColor);
-        tv.setTextSize(getContext().getResources().getDimension(R.dimen.tagTextSize));
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, getContext().getResources().getDimension(R.dimen.tagTextSize));
 
         this.add(tv);
     }
