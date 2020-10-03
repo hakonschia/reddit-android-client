@@ -85,22 +85,6 @@ public class SubredditFragment extends Fragment {
         }
     };
 
-    private RecyclerView.OnChildAttachStateChangeListener attachStateChangeListener = new RecyclerView.OnChildAttachStateChangeListener() {
-        @Override
-        public void onChildViewAttachedToWindow(@NonNull View view) {
-            // The video is started in the scroll listener, as that can find when the view is the first visible
-            // instead of when it is attached. It is attached before it is completely visible, so it would start
-            // playing before the user would see most if it
-        }
-
-        @Override
-        public void onChildViewDetachedFromWindow(@NonNull View view) {
-            Post post = view.findViewById(R.id.post);
-            post.pauseVideo();
-        }
-    };
-
-
     /**
      * Creates a new instance of the fragment
      *
@@ -152,7 +136,6 @@ public class SubredditFragment extends Fragment {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
         binding.posts.setOnScrollChangeListener(scrollListener);
-        binding.posts.addOnChildAttachStateChangeListener(attachStateChangeListener);
 
         ListDivider divider = new ListDivider(ContextCompat.getDrawable(getContext(), R.drawable.list_divider));
         binding.posts.addItemDecoration(divider);

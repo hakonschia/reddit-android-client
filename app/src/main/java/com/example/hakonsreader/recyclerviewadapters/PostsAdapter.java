@@ -103,6 +103,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.reset();
     }
 
+    @Override
+    public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.post.pauseVideo();
+    }
+
     /**
      * The view for the items in the list
      */
