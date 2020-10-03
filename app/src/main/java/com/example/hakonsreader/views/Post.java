@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
 import com.example.hakonsreader.R;
@@ -198,8 +199,12 @@ public class Post extends RelativeLayout {
                 break;
 
             case CROSSPOST:
+                // For crossposts the content is the parent crosspost post itself
                 Post c = new Post(context);
                 c.setPostData(postData.getCrossposts().get(0));
+
+                // Add a border around to show where the crosspost post is and where the actual post it
+                c.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border));
                 content = c;
                 break;
 
