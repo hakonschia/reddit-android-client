@@ -204,7 +204,7 @@ public class Post extends RelativeLayout {
                 // If we are in a post only care about the actual post content, as it's not enough space
                 // to show the entire parent post info
                 if (getContext() instanceof PostActivity) {
-                    content = new ContentVideo(context, parent);
+                    content = generatePostContent(parent, context);
                 } else {
                     // Otherwise the content is the entire parents info
                     Post c = new Post(context);
