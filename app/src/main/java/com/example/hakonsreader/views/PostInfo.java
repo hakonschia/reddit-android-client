@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Space;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -108,10 +109,10 @@ public class PostInfo extends ConstraintLayout {
         binding.tags.removeAllViews();
 
         if (post.isSpoiler()) {
-            binding.tags.addView(ViewUtil.createSpoilerTag(getContext()));
+            this.addTag(ViewUtil.createSpoilerTag(getContext()));
         }
         if (post.isNSFW()) {
-            binding.tags.addView(ViewUtil.createNSFWTag(getContext()));
+            this.addTag(ViewUtil.createNSFWTag(getContext()));
         }
 
         this.addFlairs();
@@ -164,7 +165,21 @@ public class PostInfo extends ConstraintLayout {
             });
         }
 
+        this.addTag(tag);
+    }
+
+
+    /**
+     * Adds a tag to {@link PostInfoBinding#tags} and adds space between
+     *
+     * @param tag The tag to add
+     */
+    private void addTag(Tag tag) {
         binding.tags.addView(tag);
+
+        Space space = new Space(getContext());
+        space.setMinimumWidth((int)getResources().getDimension(R.dimen.tagSpace));
+        binding.tags.addView(space);
     }
 
     /**

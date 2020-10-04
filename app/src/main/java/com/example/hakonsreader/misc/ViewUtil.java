@@ -22,14 +22,10 @@ public class ViewUtil {
     public static Tag createSpoilerTag(Context context) {
         Resources resources = context.getResources();
 
-        TextView tv = new TextView(context);
-        tv.setText(resources.getString(R.string.tagSpoiler));
-        tv.setTextSize(resources.getDimension(R.dimen.tagTextSize));
-        tv.setTextColor(ContextCompat.getColor(context, R.color.tagSpoilerText));
-
         Tag tag = new Tag(context);
-        tag.add(tv);
         tag.setFillColor(ContextCompat.getColor(context, R.color.tagSpoiler));
+        tag.setTextColor(ContextCompat.getColor(context, R.color.tagSpoilerText));
+        tag.addText(resources.getString(R.string.tagSpoiler));
 
         return tag;
     }
@@ -43,14 +39,10 @@ public class ViewUtil {
     public static Tag createNSFWTag(Context context) {
         Resources resources = context.getResources();
 
-        TextView tv = new TextView(context);
-        tv.setText(resources.getString(R.string.tagNSFW));
-        tv.setTextSize(resources.getDimension(R.dimen.tagTextSize));
-        tv.setTextColor(ContextCompat.getColor(context, R.color.tagNSFWText));
-
         Tag tag = new Tag(context);
-        tag.add(tv);
         tag.setFillColor(ContextCompat.getColor(context, R.color.tagNSFW));
+        tag.setTextColor(ContextCompat.getColor(context, R.color.tagNSFWText));
+        tag.addText(resources.getString(R.string.tagNSFW));
 
         return tag;
     }
