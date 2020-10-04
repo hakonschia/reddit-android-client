@@ -185,6 +185,10 @@ public class ContentVideo extends PlayerView {
                 .setTrackSelector(new DefaultTrackSelector(context, new AdaptiveTrackSelection.Factory()))
                 .build();
 
+        if (App.get().autoLoopVideos()) {
+            exoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
+        }
+
         // Add listener for buffering changes, playback changes etc.
         exoPlayer.addListener(new Player.EventListener() {
             private ProgressBar loader;

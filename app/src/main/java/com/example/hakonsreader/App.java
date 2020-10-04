@@ -214,4 +214,16 @@ public class App extends Application {
                 getResources().getBoolean(R.bool.prefs_default_play_muted_videos_fullscreen)
         );
     }
+
+    /**
+     * Returns if videos should be automatically looped when finished
+     *
+     * @return True if videos should be looped
+     */
+    public boolean autoLoopVideos() {
+        return settings.getBoolean(
+                getApplicationContext().getString(R.string.prefs_key_loop_videos),
+                getResources().getBoolean(R.bool.prefs_default_loop_videos)
+        );
+    }
 }
