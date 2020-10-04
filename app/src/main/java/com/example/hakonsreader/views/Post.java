@@ -357,9 +357,12 @@ public class Post extends RelativeLayout {
      * Pauses the video content
      */
     public void pauseVideo() {
-        View video = binding.content.getChildAt(0);
-        if (video instanceof ContentVideo) {
-            ((ContentVideo)video).setPlayback(false);
+        View content = binding.content.getChildAt(0);
+        if (content instanceof ContentVideo) {
+            ((ContentVideo)content).setPlayback(false);
+        } else if (content instanceof Post) {
+            // If the content is a crosspost pause the video in the crosspost post
+            ((Post)content).pauseVideo();
         }
     }
 
@@ -367,9 +370,12 @@ public class Post extends RelativeLayout {
      * Plays the video content
      */
     public void playVideo() {
-        View video = binding.content.getChildAt(0);
-        if (video instanceof ContentVideo) {
-            ((ContentVideo)video).setPlayback(true);
+        View content = binding.content.getChildAt(0);
+        if (content instanceof ContentVideo) {
+            ((ContentVideo)content).setPlayback(true);
+        } else if (content instanceof Post) {
+            // If the content is a crosspost play the video in the crosspost post
+            ((Post)content).playVideo();
         }
     }
 }

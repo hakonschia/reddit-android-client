@@ -103,11 +103,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.reset();
     }
 
-    @Override
-    public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
-        super.onViewDetachedFromWindow(holder);
-        holder.post.pauseVideo();
-    }
 
     /**
      * The view for the items in the list
@@ -136,7 +131,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         /**
-         * Call when the view holder has been selected (ie. just been shown on the screen)
+         * Call when the view holder has been selected (ie. it is now the main visible view holder)
          *
          * <p>Plays a video if auto play is selected</p>
          */
@@ -144,6 +139,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             if (App.get().autoPlayVideos()) {
                 post.playVideo();
             }
+        }
+
+        /**
+         * Call when the view holder has been unselected (ie. not the main visible view holder anymore)
+         *
+         * <p>If the view holder holds video content it is paused</p>
+         */
+        public void onUnSelected() {
+            post.pauseVideo();
         }
     }
 }

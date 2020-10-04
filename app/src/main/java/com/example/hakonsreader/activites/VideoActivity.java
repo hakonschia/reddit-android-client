@@ -73,8 +73,6 @@ public class VideoActivity extends AppCompatActivity {
             contentLayout.removeView(content);
 
             video.addView(content);
-
-
         } else {
             finish();
         }

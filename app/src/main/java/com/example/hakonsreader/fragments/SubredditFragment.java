@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -54,6 +55,7 @@ public class SubredditFragment extends Fragment {
      * The amount of items in the list at the last attempt at loading more posts
      */
     private int lastLoadAttemptCount;
+    private int screenHeight = App.get().getScreenHeight();
 
     private PostsViewModel postsViewModel;
     private PostsAdapter adapter;
@@ -63,25 +65,53 @@ public class SubredditFragment extends Fragment {
     /**
      * Listener for scrolling in the posts list that automatically tries to load more posts
      */
-    private View.OnScrollChangeListener scrollListener = (view, i, i1, i2, i3) -> {
-        // Get the last item visible in the current list
+    private View.OnScrollChangeListener scrollListener = (view, scrollX, scrollY, oldX, oldY) -> {
+        // Find the positions of first and last visible items to find all visible items
+        int posFirstItem = layoutManager.findFirstVisibleItemPosition();
         int posLastItem = layoutManager.findLastVisibleItemPosition();
+
         int listSize = adapter.getItemCount();
 
         // Load more posts before we reach the end to create an "infinite" list
-        if (posLastItem + NUM_REMAINING_POSTS_BEFORE_LOAD > listSize) {
-
-            // Only load posts if there hasn't been an attempt at loading more posts
-            if (lastLoadAttemptCount < listSize) {
-                lastLoadAttemptCount = adapter.getPosts().size();
-                postsViewModel.loadPosts(binding.parentLayout, subreddit);
-            }
+        // Only load posts if there hasn't been an attempt at loading more posts
+        if (posLastItem + NUM_REMAINING_POSTS_BEFORE_LOAD > listSize && lastLoadAttemptCount < listSize) {
+            lastLoadAttemptCount = adapter.getPosts().size();
+            postsViewModel.loadPosts(binding.parentLayout, subreddit);
         }
 
-        int posFirstItem = layoutManager.findFirstVisibleItemPosition();
-        PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(posFirstItem);
-        if (viewHolder != null) {
-            viewHolder.onSelected();
+
+        // Go through all visible views and select/unselect the view holder based on where on the screen they are
+        for (int i = posFirstItem; i <= posLastItem; i++) {
+            PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
+            // If we have no view holder there isn't anything we can do later
+            if (viewHolder == null) {
+                continue;
+            }
+
+            // Get the views position on the screen
+            View v = layoutManager.findViewByPosition(i);
+
+            int[] location = new int[2];
+            v.getLocationOnScreen(location);
+
+            int y = location[1];
+            int viewBottom = y + v.getMeasuredHeight();
+
+            // (0, 0) is top left
+
+            // When scrolling up and view is under the screen it is "unselected"
+            if (oldY > 0 && viewBottom > screenHeight) {
+                viewHolder.onUnSelected();
+            } else {
+                // If the view is above the screen (< 0) it is "unselected"
+                // If the view is visible 3/4th the way up it is "selected"
+                if (y < 0) {
+                    viewHolder.onUnSelected();
+                } else if (y < screenHeight / 4f) {
+                    viewHolder.onSelected();
+                }
+            }
+
         }
     };
 
@@ -93,8 +123,6 @@ public class SubredditFragment extends Fragment {
      */
     public static SubredditFragment newInstance(String subreddit) {
         Bundle args = new Bundle();
-        Log.d(TAG, "newInstance: " + subreddit);
-
         args.putString("subreddit", subreddit);
 
         SubredditFragment fragment = new SubredditFragment();
