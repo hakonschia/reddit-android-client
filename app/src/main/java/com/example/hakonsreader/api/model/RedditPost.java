@@ -95,6 +95,9 @@ public class RedditPost implements VotableListing, PostableListing {
         @SerializedName("spoiler")
         private boolean spoiler;
 
+        @SerializedName("selftext")
+        private String selftext;
+
         @SerializedName("selftext_html")
         private String selftextHtml;
 
@@ -351,7 +354,21 @@ public class RedditPost implements VotableListing, PostableListing {
     }
 
     /**
-     * @return The HTML of the text of the post if the post is {@link PostType#TEXT}
+     * Retrieve the markdown text of the post.
+     *
+     * @param adjustFormatting Reddit markdown accepts some tags without a space. If {@code adjustFormatting}
+     *                         is set to true the space is added, as markdown formatters might not accept
+     *                         this.
+     *                         <p>For example a header from Reddit might be returned as {@code #Header}, when
+     *                         it should be {@code # Header}</p>
+     * @return The markdown text of the post if the post is {@link PostType#TEXT}
+     */
+    public String getSelftext(boolean adjustFormatting) {
+        return data.selftext;
+    }
+
+    /**
+     * @return The HTML text of the post if the post is {@link PostType#TEXT}
      */
     public String getSelftextHTML() {
         return data.selftextHtml;

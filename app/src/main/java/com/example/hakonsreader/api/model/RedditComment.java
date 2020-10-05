@@ -275,16 +275,17 @@ public class RedditComment implements VotableListing, PostableListing {
 
 
     /**
-     * Retrieves the raw body. For HTML use {@link RedditComment#getBodyHtml()}
+     * Retrieves the markdown body. For HTML use {@link RedditComment#getBodyHtml()}
      *
-     * @return The raw string of the comment
+     * @return The markdown string of the comment
      */
-    public String getBody() {
+    public String getBody(boolean adjustFormatting) {
+        // TODO if a user posted a link just as a comment it should add the link formatting around it (can probably just do some regex)
         return data.body;
     }
 
     /**
-     * Retrieves the body in HTML. For raw text use {@link RedditComment#getBody()}
+     * Retrieves the body in HTML. For markdown text use {@link RedditComment#getBody(boolean)}
      *
      * @return The HTML string of the comment
      */

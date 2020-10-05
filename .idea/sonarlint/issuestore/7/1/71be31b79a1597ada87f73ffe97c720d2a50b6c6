@@ -1,21 +1,27 @@
 
-ƒ
-java:S3252]"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(âªÊÐüÿÿÿÿ
+c
+java:S1128"HRemove this unused import 'com.example.hakonsreader.views.ContentVideo'.(ü‹æáüÿÿÿÿ
+~
+java:S3252N"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(†ÄÚƒ
+e
+java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ
+R
+java:S1128"0Remove this unused import 'java.time.LocalTime'.(à®øÃùÿÿÿÿ8®¥©ÇÎ.
 b
 java:S1128"GRemove this unused import 'com.example.hakonsreader.views.ContentText'.(‡µ•üÿÿÿÿÿ
-\
-java:S1128"GRemove this unused import 'com.example.hakonsreader.views.ContentLink'.(™Ä…P
-~
-java:S3252T"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(Ý³ÍÙ
 c
 java:S1128"HRemove this unused import 'com.example.hakonsreader.views.ContentImage'.(¤»ù¾úÿÿÿÿ
 `
 java:S1128	"CRemove this unused import 'android.text.style.BackgroundColorSpan'.(”ŸâÙ8ÇÜ„ÚÍ.
-e
-java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ
 ~
-java:S3252K"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(†ÄÚƒ
-c
-java:S1128"HRemove this unused import 'com.example.hakonsreader.views.ContentVideo'.(ü‹æáüÿÿÿÿ
+java:S3252W"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(Ý³ÍÙ
+ƒ
+java:S3252`"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(âªÊÐüÿÿÿÿ
+T
+java:S1128"7Remove this unused import 'java.text.SimpleDateFormat'.(ú¡ÙÛ8”¶¬ÇÎ.
+H
+java:S1128"+Remove this unused import 'java.util.Date'.(¸…¼ü8”¶¬ÇÎ.
+\
+java:S1128"GRemove this unused import 'com.example.hakonsreader.views.ContentLink'.(™Ä…P
 ~
-java:S3252B"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(„–¦û
+java:S3252E"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(„–¦û

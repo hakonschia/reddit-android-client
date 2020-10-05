@@ -1,12 +1,27 @@
 
-L
-java:S2696)"6Make the enclosing method "static" or remove this set.(÷„Çİ
+f
+java:S1128"IRemove this unused import 'io.noties.markwon.syntax.Prism4jThemeDarkula'.(Ç¶Õ8Ô´şÏ.
+P
+java:S1135©"2Complete the task associated to this TODO comment.(Æÿä8‰½‚¡Ï.
+Y	java:S125Ş"<This block of commented-out lines of code should be removed.(ÑÉŒ8àŞùÎ.
+n
+java:S1128"LRemove this unused import 'io.noties.markwon.syntax.Prism4jSyntaxHighlight'.(Á€ËŠùÿÿÿÿ8Ô´şÏ.
+b
+java:S1128"@Remove this unused import 'androidx.core.content.ContextCompat'.(üäÂùÿÿÿÿ8àåèŸÏ.
+X
+java:S1128"6Remove this unused import 'io.noties.prism4j.Prism4j'.(Ï¦íŸøÿÿÿÿ8Ô´şÏ.
+g
+java:S1128"ERemove this unused import 'io.noties.markwon.syntax.SyntaxHighlight'.(‘Ñ±ëıÿÿÿÿ8Ô´şÏ.
+m
+java:S1128"KRemove this unused import 'io.noties.markwon.syntax.SyntaxHighlightPlugin'.(‚¯‹şÿÿÿÿ8Ô´şÏ.
 I
-java:S1068"'Remove this unused "TAG" private field.(ÁÌ¡„ıÿÿÿÿ8¸—‚’Ë.
-S
-java:S2696/"6Make the enclosing method "static" or remove this set.(—ÈëÕ8÷å“œÎ.
-X	java:S125E"<This block of commented-out lines of code should be removed.(Åé8ÒÈÍÍ.
-R
-java:S2696."6Make the enclosing method "static" or remove this set.(âìı?8ç»È›Î.
-L
-java:S2696B"6Make the enclosing method "static" or remove this set.(šæ»å
+java:S1068%"'Remove this unused "TAG" private field.(ÁÌ¡„ıÿÿÿÿ8Ñæù–Ï.
+e
+java:S1128"HRemove this unused import 'io.noties.markwon.core.spans.BlockQuoteSpan'.(¡ÂËÜ8ÄÔû Ï.
+a
+java:S1128"DRemove this unused import 'io.noties.markwon.ext.tables.TableTheme'.(Ùêï8àåèŸÏ.
+X	java:S125o"<This block of commented-out lines of code should be removed.(Åé8ÒÈÍÍ.
+_
+java:S1128"=Remove this unused import 'io.noties.prism4j.GrammarLocator'.(ğ·­æûÿÿÿÿ8íşüÏ.
+U
+java:S1135ª"2Complete the task associated to this TODO comment.(ùæ§³ûÿÿÿÿ8ü†¡Ï.

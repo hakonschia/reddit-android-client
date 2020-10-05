@@ -84,12 +84,10 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        /*
         // For testing purposes hardcode going into a subreddit
         Intent intent = new Intent(this, SubredditActivity.class);
-        intent.putExtra("subreddit", "lilgrabbies");
+        intent.putExtra("subreddit", "globaloffensive");
         startActivity(intent);
-         */
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);

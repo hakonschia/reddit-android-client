@@ -399,8 +399,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         private void asNormalComment(RedditComment comment) {
             Context context = itemView.getContext();
 
-            content.setText(Util.fromHtml(comment.getBodyHtml(), context));
             content.setMovementMethod(InternalLinkMovementMethod.getInstance(context));
+            App.get().getMark().setMarkdown(content, comment.getBody(true));
 
             author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));
 

@@ -1,16 +1,18 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
-import com.example.hakonsreader.misc.Util;
+
 
 public class ContentText extends ScrollView {
 
@@ -43,17 +45,17 @@ public class ContentText extends ScrollView {
     private void updateView() {
         this.textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));
 
-        String html = post.getSelftextHTML();
+        String markdown = post.getSelftext(true);
 
         // Self text posts with only a title won't have a body
-        if (html != null) {
-            this.textView.setMovementMethod(InternalLinkMovementMethod.getInstance(getContext()));
-            this.textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
-            this.textView.setText(Util.fromHtml(html, getContext()));
+        if (markdown != null) {
+            // Note the movement method must be set before applying the markdown
+            textView.setMovementMethod(InternalLinkMovementMethod.getInstance(getContext()));
+            textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
+            App.get().getMark().setMarkdown(textView, markdown);
         }
 
         int padding = (int) getResources().getDimension(R.dimen.defaultIndent);
-
         setPadding(padding, 0, padding, 0);
     }
 

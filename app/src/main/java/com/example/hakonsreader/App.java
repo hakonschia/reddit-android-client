@@ -3,9 +3,6 @@ package com.example.hakonsreader;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -18,6 +15,12 @@ import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 
 import java.util.UUID;
+
+import io.noties.markwon.Markwon;
+import io.noties.markwon.core.CorePlugin;
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
+import io.noties.markwon.ext.tables.TablePlugin;
+
 
 /**
  * Entry point for the application. Sets up various static variables used throughout the app
@@ -38,6 +41,7 @@ public class App extends Application {
     private String oauthState;
     private RedditApi redditApi;
     private SharedPreferences settings;
+    private Markwon markwon;
     private static App app;
 
 
@@ -133,6 +137,37 @@ public class App extends Application {
         return oauthState;
     }
 
+    /**
+     * Retrieve the {@link Markwon} object that is used to format markdown text
+     *
+     * <p>The object has various plugins set, such as support for tables</p>
+     *
+     * @return A {@link Markwon} object used to format text in TextViews with markdown text
+     */
+    public Markwon getMark() {
+        if (markwon == null) {
+            markwon = createMark();
+        }
+
+        return markwon;
+    }
+
+    /**
+     * Creates a {@link Markwon} object with plugins set
+     *
+     * @return A {@link Markwon} object ready to format some markdown :)
+     */
+    private Markwon createMark() {
+        // TODO spoiler tags https://github.com/noties/Markwon/blob/master/app-sample/src/main/java/io/noties/markwon/app/samples/RedditSpoilerSample.java
+        // TODO add formatting to blockquote
+        // TODO superscript
+        return Markwon.builder(this)
+                // Headers, blockquote etc. are a part of the core
+                .usePlugin(CorePlugin.create())
+                .usePlugin(TablePlugin.create(this))
+                .usePlugin(StrikethroughPlugin.create())
+                .build();
+    }
 
     /**
      * Updates the theme (night mode) based on what is in the default SharedPreferences
