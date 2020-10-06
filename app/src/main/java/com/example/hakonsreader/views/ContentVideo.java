@@ -210,8 +210,11 @@ public class ContentVideo extends PlayerView {
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
                 // Ensure the thumbnail isn't visible when the video is playing
-                if (isPlaying && thumbnail.getVisibility() == VISIBLE) {
+                if (isPlaying) {
                     thumbnail.setVisibility(GONE);
+
+                    // Hide the controller instantly when the state changes
+                    hideController();
                 }
             }
 
