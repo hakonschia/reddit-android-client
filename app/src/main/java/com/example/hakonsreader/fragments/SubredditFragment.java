@@ -162,12 +162,8 @@ public class SubredditFragment extends Fragment {
                 continue;
             }
 
-            // Get the views position on the screen
-            int[] location = new int[2];
-            view.getLocationOnScreen(location);
-
-            int y = location[1];
-            int viewBottom = y + view.getMeasuredHeight();
+            int y = viewHolder.getContentY();
+            int viewBottom = viewHolder.getContentBottomY();
 
             // (0, 0) is top left
 

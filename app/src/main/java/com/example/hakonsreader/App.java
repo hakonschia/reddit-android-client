@@ -247,6 +247,9 @@ public class App extends Application {
             return false;
         }
 
+        // TODO This doesn't actually work, as if you have wifi enabled, but not connected to a network
+        //  it will still autoplay
+
         // If we get here we are on wi-fi only, return true if on wi-fi, else false
         return wifiEnabled;
     }

@@ -149,5 +149,27 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public void onUnSelected() {
             post.pauseVideo();
         }
+
+        /**
+         * Gets the position of the contents Y position on the screen
+         * <p>Crossposts is taken into account and will return the position of the actual content
+         * inside the crosspost</p>
+         *
+         * @return The Y position of the content
+         */
+        public int getContentY() {
+            return post.getContentY();
+        }
+
+        /**
+         * Gets the bottom position of the contents Y position on the screen
+         * <p>Crossposts is taken into account and will return the position of the actual content
+         * inside the crosspost</p>
+         *
+         * @return The Y position of the bottom of the content
+         */
+        public int getContentBottomY() {
+            return post.getContentBottomY();
+        }
     }
 }

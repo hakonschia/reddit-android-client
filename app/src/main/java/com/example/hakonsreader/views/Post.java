@@ -376,4 +376,29 @@ public class Post extends RelativeLayout {
             ((Post)content).playVideo();
         }
     }
+
+    /**
+     * Gets the position of the contents Y position on the screen
+     * <p>Crossposts is taken into account and will return the position of the actual content
+     * inside the crosspost</p>
+     *
+     * @return The Y position of the content
+     */
+    public int getContentY() {
+        // Get the views position on the screen
+        int[] location = new int[2];
+        binding.content.getLocationOnScreen(location);
+        return location[1];
+    }
+
+    /**
+     * Gets the bottom position of the contents Y position on the screen
+     * <p>Crossposts is taken into account and will return the position of the actual content
+     * inside the crosspost</p>
+     *
+     * @return The Y position of the bottom of the content
+     */
+    public int getContentBottomY() {
+        return getContentY() + binding.content.getMeasuredHeight();
+    }
 }
