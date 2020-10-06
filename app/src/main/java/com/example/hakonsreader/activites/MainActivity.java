@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
         // For testing purposes hardcode going into a subreddit
         Intent intent = new Intent(this, SubredditActivity.class);
-        intent.putExtra("subreddit", "gifs");
+        intent.putExtra("subreddit", "reactiongifs");
         startActivity(intent);
 
         if (savedInstanceState != null) {

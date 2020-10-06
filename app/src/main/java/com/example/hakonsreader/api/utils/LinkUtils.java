@@ -1,5 +1,10 @@
 package com.example.hakonsreader.api.utils;
 
+
+/**
+ * Utility class that contains various regex matchers and functions to deal with common problems for
+ * links from Reddit
+ */
 public final class LinkUtils {
 
     /**
@@ -8,10 +13,15 @@ public final class LinkUtils {
     public static final String IMGUR_IMAGE_REGEX = "^https://imgur.com/[A-Za-z0-9]{5,7}$";
 
     /**
-     * Regex matching imgur gif URLs.
+     * Regex matching imgur GIF URLs.
      * <p>Matches both gif and gifv extensions</p>
      */
     public static final String IMGUR_GIF_REGEX = "^https://i.imgur.com/[A-Za-z0-9]{5,7}.(gif|gifv)$";
+
+    /**
+     * Regex for GIF URLs
+     */
+    public static final String GIF_REGEX = "^.*(gif(v){0,1})$";
 
     private LinkUtils() {}
 
@@ -27,7 +37,9 @@ public final class LinkUtils {
         if (url.matches(IMGUR_IMAGE_REGEX)) {
             return url + ".png";
         }
-        if (url.matches(IMGUR_GIF_REGEX)) {
+
+        // Replace .gif or .gifv with .mp4
+        if (url.matches(GIF_REGEX)) {
             String u = url.replace("gifv", "mp4");
             u = u.replace("gif", "mp4");
 

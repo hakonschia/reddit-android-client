@@ -266,6 +266,7 @@ public class ContentVideo extends PlayerView {
                 url = LinkUtils.convertToDirectUrl(url);
             }
 
+            Log.d(TAG, "createMediaSource: " + url);
             media = new ProgressiveMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(url));
 
