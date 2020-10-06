@@ -1,8 +1,14 @@
 package com.example.hakonsreader;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -42,6 +48,7 @@ public class App extends Application {
     private RedditApi redditApi;
     private SharedPreferences settings;
     private Markwon markwon;
+    private boolean wifiEnabled;
     private static App app;
 
 
@@ -60,7 +67,37 @@ public class App extends Application {
 
         setupRedditApi();
         updateTheme();
+
+        // Get initial WiFi state
+        WifiManager mngr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiEnabled = mngr.isWifiEnabled();
+
+        // Register Wi-Fi broadcast receiver to be notified when Wi-Fi is enabled/disabled
+        IntentFilter intentFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(wifiStateReceiver, intentFilter);
     }
+
+    /**
+     * Unregisters any receivers that have been registered
+     */
+    public void unregisterReceivers() {
+        unregisterReceiver(wifiStateReceiver);
+    }
+
+    /**
+     * Broadcast receiver for Wi-Fi state
+     */
+    private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int wifiStateExtra = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
+                    WifiManager.WIFI_STATE_UNKNOWN);
+
+            wifiEnabled = wifiStateExtra == WifiManager.WIFI_STATE_ENABLED;
+            Log.d(TAG, "onReceive: wifi is " + (wifiEnabled ? "on" : "off"));
+        }
+    };
+
 
     /**
      * Sets the app instance
@@ -192,6 +229,9 @@ public class App extends Application {
     /**
      * Returns if videos should be automatically played or not
      *
+     * <p>The value returned here checks based on the setting and Wi-Fi status, so the value
+     * can be used directly</p>
+     *
      * @return True if videos should be automatically played
      */
     public boolean autoPlayVideos() {
@@ -207,25 +247,8 @@ public class App extends Application {
             return false;
         }
 
-        return false;
-
-        /*
         // If we get here we are on wi-fi only, return true if on wi-fi, else false
-
-        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        // Wi-Fi adapter is on, check if we are also connected to a network
-        if (wifiMgr.isWifiEnabled()) {
-            WifiInfo wifiInfo;
-            wifiInfo = wifiMgr.getConnectionInfo();
-
-            // Return if we are connected to a network
-            return wifiInfo.getNetworkId() != -1;
-        }
-        else {
-            // Wi-Fi adapter is OFF
-            return false;
-        }
-         */
+        return wifiEnabled;
     }
 
 

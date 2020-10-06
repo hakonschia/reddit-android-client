@@ -99,6 +99,12 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         this.setupNavBar(savedInstanceState);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        App.get().unregisterReceivers();
+    }
+
     /**
      * Saves the state of the fragments and active nav item
      */
