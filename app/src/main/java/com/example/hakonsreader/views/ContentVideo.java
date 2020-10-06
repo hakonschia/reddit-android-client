@@ -4,15 +4,18 @@ import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
@@ -148,9 +151,8 @@ public class ContentVideo extends PlayerView {
         this.setFullscreenListener();
         this.setVolumeListener();
 
-        // The default volume is on, so if the video should be muted toggle it
         if (App.get().muteVideoByDefault()) {
-            this.toggleVolume();
+            this.toggleVolume(false);
         }
     }
 
@@ -320,8 +322,8 @@ public class ContentVideo extends PlayerView {
                 ((Activity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             });
         } else {
+            // If we are in a video activity and press fullscreen, show an "Exit fullscreen" icon and exit the activity
             fullscreen.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_fullscreen_exit_24));
-            // If we are in a video activity and press fullscreen, exit instead (should probably have a different icon)
             fullscreen.setOnClickListener(view -> ((Activity)context).finish());
         }
     }
@@ -340,26 +342,35 @@ public class ContentVideo extends PlayerView {
             if (audioComponent == null) {
                 button.setVisibility(GONE);
             } else {
-                toggleVolume();
+                toggleVolume(null);
             }
         });
     }
 
     /**
      * Toggles the volume on/off
-     * <p>The drawable of</p>
+     *
+     * @param on Optional parameter: If set to true the volume is turned on, if false the volume is turned off.
+     *           If this is null, the volume will be toggled based on the current state
      */
-    private void toggleVolume() {
+    private void toggleVolume(@Nullable Boolean on) {
         Player.AudioComponent audioComponent = exoPlayer.getAudioComponent();
 
         if (audioComponent != null) {
             float volume = audioComponent.getVolume();
 
             // If volume is off (not 1), set it to on
-            this.setVolume((int)volume != 1);
+            if (on == null) {
+                on = (int) volume != 1;
+            }
+            ImageButton button = findViewById(R.id.volumeButton);
+
+            Drawable drawable = ContextCompat.getDrawable(getContext(), on ? R.drawable.ic_baseline_volume_up_24 : R.drawable.ic_baseline_volume_off_24);
+            button.setImageDrawable(drawable);
+
+            audioComponent.setVolume(on ? 1f : 0f);
         }
     }
-
 
     /**
      * Retrieves the position in the video
@@ -437,35 +448,14 @@ public class ContentVideo extends PlayerView {
         }
     }
 
-    /**
-     * Sets if the volume should be on or off
-     *
-     * @param on True if the volume should be on
-     */
-    public void setVolume(boolean on) {
-        Context context = getContext();
-        Player.AudioComponent audioComponent = exoPlayer.getAudioComponent();
-
-        if (audioComponent != null) {
-            ImageButton button = findViewById(R.id.volumeButton);
-
-            if (on) {
-                audioComponent.setVolume(1f);
-                button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_volume_up_24));}
-            else {
-                audioComponent.setVolume(0f);
-                button.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_volume_off_24));
-            }
-        }
-    }
-
 
     /**
      * Sets the size of the video. Ensures that the video is scaled up if it is too small, and
      * doesn't go too large, while keeping the aspect ratio the same
      */
     private void setSize() {
-        int videoWidth, videoHeight;
+        int videoWidth;
+        int videoHeight;
 
         // Video uploaded to reddit directly
         if (redditVideo != null) {
@@ -551,6 +541,6 @@ public class ContentVideo extends PlayerView {
         setPosition(timestamp);
         setPlayback(isPlaying);
         setControllerVisible(showController);
-        setVolume(volumeOn);
+        toggleVolume(volumeOn);
     }
 }

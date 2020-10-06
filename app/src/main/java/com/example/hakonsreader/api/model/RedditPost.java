@@ -492,8 +492,6 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The {@link RedditVideo} holding the data for GIF posts
      */
     public RedditVideo getVideoGif() {
-        Log.d(TAG, "getVideoGif: Getting for " + getTitle());
-        Log.d(TAG, "getVideoGif: " + new Gson().toJson(data.preview));
         return data.preview.videoPreview;
     }
 
