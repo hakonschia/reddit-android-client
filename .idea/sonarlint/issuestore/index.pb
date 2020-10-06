@@ -111,3 +111,5 @@ Xapp/src/main/java/com/example/hakonsreader/api/jsonadapters/BooleanPrimitiveAda
 Wapp/src/main/java/com/example/hakonsreader/api/jsonadapters/ParentCrosspostAdapter.java,3\b\3bff624182e02dfc71511b816ded4315188bc6af
 X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
+s
+Capp/src/main/java/com/example/hakonsreader/api/utils/LinkUtils.java,c\8\c8a3b1deab73b97e5cb614e345c63faf4f2a773a

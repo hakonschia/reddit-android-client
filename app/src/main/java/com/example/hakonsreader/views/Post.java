@@ -190,12 +190,10 @@ public class Post extends RelativeLayout {
                 break;
 
             case VIDEO:
-                content = new ContentVideo(context, post);
-                break;
-
+            case GIF:
+            // Links such as youtube, gfycat etc are rich video posts
             case RICH_VIDEO:
-                // Links such as youtube, gfycat etc are rich video posts
-                content = null;
+                content = new ContentVideo(context, post);
                 break;
 
             case CROSSPOST:

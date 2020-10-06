@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.model;
 
+import android.util.Log;
+
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.PostableListing;
@@ -7,6 +9,7 @@ import com.example.hakonsreader.api.interfaces.VotableListing;
 import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
 import com.example.hakonsreader.api.jsonadapters.ParentCrosspostAdapter;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
+import com.google.gson.Gson;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -165,7 +168,13 @@ public class RedditPost implements VotableListing, PostableListing {
 
         private static class Preview {
             @SerializedName("images")
-            List<ImagesWrapper> images;
+            private List<ImagesWrapper> images;
+
+            /**
+             * For gifs uploaded to gfycat this object holds an object pointing to the DASH url for the video
+             */
+            @SerializedName("reddit_video_preview")
+            private RedditVideo videoPreview;
         }
     }
 
@@ -427,11 +436,15 @@ public class RedditPost implements VotableListing, PostableListing {
 
     /**
      * Retrieve the {@link RedditVideo} object. If {@link RedditPost#getPostType()} isn't
-     * {@link PostType#VIDEO}, this will be null
+     * {@link PostType#VIDEO}, this will be null.
      *
      * @return The video object containing information about the video post
      */
-    public RedditVideo getRedditVideo() {
+    public RedditVideo getVideo() {
+        if (data.media == null) {
+            return null;
+        }
+
         return data.media.redditVideo;
     }
 
@@ -468,6 +481,46 @@ public class RedditPost implements VotableListing, PostableListing {
      */
     public List<PreviewImage> getPreviewImages() {
         return data.preview.images.get(0).resolutions;
+    }
+
+    /**
+     * Retrieves the video for GIF posts from sources such as Gfycat
+     *
+     * <p>Note: not all GIFs will be found here. Some GIFs will be returned as a {@link PreviewImage}
+     * with a link to the external URL. See {@link RedditPost#getMp4Source()} and {@link RedditPost#getMp4Previews()}</p>
+     *
+     * @return The {@link RedditVideo} holding the data for GIF posts
+     */
+    public RedditVideo getVideoGif() {
+        Log.d(TAG, "getVideoGif: Getting for " + getTitle());
+        Log.d(TAG, "getVideoGif: " + new Gson().toJson(data.preview));
+        return data.preview.videoPreview;
+    }
+
+    /**
+     * Gets the MP4 source for the post. Note that this is only set when the post is a GIF
+     * uploaded to reddit directly.
+     *
+     * <p>Note: Some GIF posts will be as a separate {@link RedditVideo} that is retrieved with
+     * {@link RedditPost#getVideoGif()}</p>
+     * <p>For a list of other resolutions see {@link RedditPost#getMp4Previews()}</p>
+     *
+     * @return The source MP4
+     */
+    public PreviewImage getMp4Source() {
+        return data.preview.images.get(0).variants.mp4.source;
+    }
+
+    /**
+     * Gets the list of MP4 resolutions for the post. Note that this is only set when the post is a GIF
+     * uploaded to reddit directly.
+     *
+     * <p>For the source resolution see {@link RedditPost#getMp4Source()}</p>
+     *
+     * @return The list of MP4 resolutions
+     */
+    public List<PreviewImage> getMp4Previews() {
+        return data.preview.images.get(0).variants.mp4.resolutions;
     }
 
 

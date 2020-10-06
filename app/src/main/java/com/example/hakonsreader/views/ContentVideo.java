@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -21,6 +20,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.VideoActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditVideo;
+import com.example.hakonsreader.api.utils.LinkUtils;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.misc.VideoCache;
@@ -30,6 +30,7 @@ import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
@@ -42,7 +43,7 @@ import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 /**
- * The view for video posts
+ * The view for video posts (also includes GIFs)
  */
 public class ContentVideo extends PlayerView {
     private static final String TAG = "PostContentVideo";
@@ -112,7 +113,6 @@ public class ContentVideo extends PlayerView {
         super(context);
 
         this.post = post;
-        this.redditVideo = post.getRedditVideo();
         this.updateView();
     }
     public ContentVideo(Context context) {
@@ -139,11 +139,10 @@ public class ContentVideo extends PlayerView {
         setLayoutTransition(transition);
         setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
 
+        this.setVideo();
+
         this.setupExoPlayer();
         setPlayer(exoPlayer);
-
-        TextView duration = findViewById(R.id.duration);
-        duration.setText(Util.createVideoDuration(redditVideo.getDuration()));
 
         this.loadThumbnail();
         this.setFullscreenListener();
@@ -152,6 +151,29 @@ public class ContentVideo extends PlayerView {
         // The default volume is on, so if the video should be muted toggle it
         if (App.get().muteVideoByDefault()) {
             this.toggleVolume();
+        }
+    }
+
+    /**
+     * Sets {@link ContentVideo#redditVideo} if one is available for the post. If not, it will be null.
+     * The duration text is also updated here if it is available. If there is no duration available
+     * the default exo_duration is made visible to show the duration when the video is loaded.
+     */
+    private void setVideo() {
+        TextView duration = findViewById(R.id.duration);
+
+        redditVideo = post.getVideo();
+        if (redditVideo == null) {
+            redditVideo = post.getVideoGif();
+        }
+        // Not all GIFs are returned as a RedditVideo, but if it is we can set the duration now
+        if (redditVideo != null) {
+            duration.setText(Util.createVideoDuration(redditVideo.getDuration()));
+        } else {
+            // If we have a GIF with no information about the length of the GIF make it set automatically
+            // when the GIf loads with the default duration
+            findViewById(R.id.exo_duration).setVisibility(VISIBLE);
+            duration.setVisibility(GONE);
         }
     }
 
@@ -168,16 +190,7 @@ public class ContentVideo extends PlayerView {
                 .setBufferDurationsMs(2500, 7500, 1000, 500)
                 .createDefaultLoadControl();
 
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
-        // Convert the data source into a cache source if the user has selected to cache NSFW videos
-        if (!(post.isNSFW() && App.get().dontCacheNSFW())) {
-            dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
-        }
-
-        // With dash video the video gets cached, but it wont play offline (when playing again it doesn't use any
-        // network which is the main point)
-        mediaSource = new DashMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse(redditVideo.getDashURL()));
+        mediaSource = this.createMediaSource();
 
         exoPlayer = new SimpleExoPlayer.Builder(context)
                 .setLoadControl(loadControl)
@@ -217,6 +230,49 @@ public class ContentVideo extends PlayerView {
                 }
             }
         });
+    }
+
+    /**
+     * Creates the correct media source for the content depending on what type of video should
+     * be displayed
+     *
+     * @return A {@link MediaSource} object that can be used to display a video
+     */
+    private MediaSource createMediaSource() {
+        Context context = getContext();
+        MediaSource media;
+
+        // Data source is constant for all media sources
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
+        // Convert the data source into a cache source if the user has selected to cache NSFW videos
+        if (!(post.isNSFW() && App.get().dontCacheNSFW())) {
+            dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
+        }
+
+        // If the video is a standard reddit video create as a DASH source
+        if (redditVideo != null) {
+            // With dash video the video gets cached, but it wont play offline (but when playing again
+            // it doesn't use any network which is the main point)
+            media = new DashMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(Uri.parse(redditVideo.getDashUrl()));
+        } else {
+            String url = post.getURL();
+
+            // Gif uploaded to reddit directly
+            if (url.matches("^https://i.redd.it/.*")) {
+                url = post.getMp4Source().getUrl();
+            } else {
+                url = LinkUtils.convertToDirectUrl(url);
+            }
+
+            media = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(Uri.parse(url));
+
+            // Progressive media sources won't have audio to play, so remove the volume button
+            findViewById(R.id.volumeButton).setVisibility(GONE);
+        }
+
+        return media;
     }
 
 
@@ -409,8 +465,23 @@ public class ContentVideo extends PlayerView {
      * doesn't go too large, while keeping the aspect ratio the same
      */
     private void setSize() {
+        int videoWidth, videoHeight;
+
+        // Video uploaded to reddit directly
+        if (redditVideo != null) {
+            videoWidth = redditVideo.getWidth();
+            videoHeight = redditVideo.getHeight();
+        } else {
+            // Video not uploaded to reddit (
+            // Get width and height from the preview thing
+
+            // If the gif is uploaded to reddit directly the width/height is found in the source preview image
+            videoWidth = post.getSourcePreview().getWidth();
+            videoHeight = post.getSourcePreview().getHeight();
+        }
+
         // Ensure the video size to screen ratio isn't too large or too small
-        float widthRatio = (float) redditVideo.getWidth() / App.get().getScreenWidth();
+        float widthRatio = (float) videoWidth / App.get().getScreenWidth();
         if (widthRatio > MAX_WIDTH_RATIO) {
             widthRatio = MAX_WIDTH_RATIO;
         } else if (widthRatio < MIN_WIDTH_RATIO) {
@@ -421,8 +492,8 @@ public class ContentVideo extends PlayerView {
         int width = (int)(App.get().getScreenWidth() * widthRatio);
 
         // Find how much the width was scaled by and use that to find the new height
-        float widthScaledBy = redditVideo.getWidth() / (float)width;
-        int height = (int)(redditVideo.getHeight() / widthScaledBy);
+        float widthScaledBy = videoWidth / (float)width;
+        int height = (int)(videoHeight / widthScaledBy);
 
 
         float heightRatio = (float) height / App.get().getScreenHeight();
@@ -432,8 +503,8 @@ public class ContentVideo extends PlayerView {
 
         height = (int)(App.get().getScreenHeight() * heightRatio);
 
-        float heightScaledBy = redditVideo.getHeight() / (float)height;
-        width = (int)(redditVideo.getWidth() / heightScaledBy);
+        float heightScaledBy = videoHeight / (float)height;
+        width = (int)(videoWidth / heightScaledBy);
 
         setLayoutParams(new ViewGroup.LayoutParams(width, height));
     }

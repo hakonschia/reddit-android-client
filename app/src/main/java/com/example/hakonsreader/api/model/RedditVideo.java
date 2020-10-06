@@ -21,6 +21,9 @@ public class RedditVideo {
     @SerializedName("width")
     private int width;
 
+    @SerializedName("is_gif")
+    private boolean isGif;
+
 
     public int getDuration() {
         return duration;
@@ -36,7 +39,7 @@ public class RedditVideo {
     /**
      * Gets the url to the DASH (Dynamic Adaptive Streaming over HTTP) video for the post
      */
-    public String getDashURL() {
+    public String getDashUrl() {
         return dashURL;
     }
 
@@ -60,5 +63,12 @@ public class RedditVideo {
      */
     public int getHeight() {
         return height;
+    }
+
+    /**
+     * @return True if the video is a gif
+     */
+    public boolean isGif() {
+        return isGif;
     }
 }

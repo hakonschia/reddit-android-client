@@ -88,4 +88,4 @@ lint/tmp/
 *.hprof
 
 # SonarLint
-idea/SonarLint
+.idea/SonarLint

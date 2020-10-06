@@ -111,6 +111,27 @@
             tools:textColor="@color/accent"
             tools:text="05:32"/>
 
+        <!-- For GIFs that have no duration information from before use the default duration
+         which sets automatically when the video loads -->
+        <TextView
+            android:id="@id/exo_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:includeFontPadding="false"
+
+            android:visibility="gone"
+
+            android:layout_gravity="center"
+            tools:textColor="@color/accent"
+            tools:text="05:32"/>
+
         <ImageButton
             android:id="@+id/fullscreen"
 
