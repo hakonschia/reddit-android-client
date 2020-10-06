@@ -21,7 +21,7 @@ public interface RedditListing {
     /**
      * @return The URL of the listing
      */
-    String getURL();
+    String getUrl();
 
     /**
      * @return The fullname of the listing (equivalent to "{@link RedditListing#getKind()} + "_" + {@link RedditListing#getID()})

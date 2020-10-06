@@ -256,7 +256,7 @@ public class ContentVideo extends PlayerView {
             media = new DashMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(redditVideo.getDashUrl()));
         } else {
-            String url = post.getURL();
+            String url = post.getUrl();
 
             // Gif uploaded to reddit directly
             if (url.matches("^https://i.redd.it/.*")) {

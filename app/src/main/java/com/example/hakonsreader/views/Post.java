@@ -257,7 +257,7 @@ public class Post extends RelativeLayout {
         Activity activity = (Activity)getContext();
 
         ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("reddit post", postData.getPermalink());
+        ClipData clip = ClipData.newPlainText("reddit post", postData.getUrl());
         clipboard.setPrimaryClip(clip);
 
         Toast.makeText(activity, R.string.linkCopied, Toast.LENGTH_SHORT).show();

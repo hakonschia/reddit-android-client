@@ -140,7 +140,7 @@ public class RedditComment implements VotableListing, PostableListing {
      * {@inheritDoc}
      */
     @Override
-    public String getURL() {
+    public String getUrl() {
         return data.url;
     }
 

@@ -91,7 +91,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
                 if (subredditSelected != null && pos != RecyclerView.NO_POSITION) {
                     Subreddit subreddit = subreddits.get(pos);
                     
-                    String k = String.format("{\n\tname:%s\n\ticonURL:%s\n\turl:%s\n}", subreddit.getName(), subreddit.getIconImage(), subreddit.getURL());
+                    String k = String.format("{\n\tname:%s\n\ticonURL:%s\n\turl:%s\n}", subreddit.getName(), subreddit.getIconImage(), subreddit.getUrl());
                     Log.d(TAG, "onBindViewHolder: \n" +k);
                 }
                 return true;

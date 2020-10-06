@@ -201,7 +201,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * {@inheritDoc}
      */
     @Override
-    public String getURL() {
+    public String getUrl() {
         return data.url;
     }
 
@@ -460,7 +460,7 @@ public class RedditPost implements VotableListing, PostableListing {
 
     /**
      * Retrieves the source image for the post. For image posts this will be the same image as
-     * that returned by {@link RedditPost#getURL()}. It will point to a different image, but the
+     * that returned by {@link RedditPost#getUrl()}. It will point to a different image, but the
      * images will be identical.
      *
      * <p>See {@link RedditPost#getPreviewImages()} for a list of different resolutions of the image</p>

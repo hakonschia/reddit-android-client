@@ -88,7 +88,7 @@ public class Subreddit implements RedditListing {
      * {@inheritDoc}
      */
     @Override
-    public String getURL() {
+    public String getUrl() {
         return data.url;
     }
 
