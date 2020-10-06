@@ -138,10 +138,10 @@ public class ContentVideo extends PlayerView {
 
         // Equivalent to "android:animateLayoutChanges="true"", makes the controller fade in/out
         // TODO this creates some weird issues with the lists, see: https://stackoverflow.com/a/32692703/7750841
-        LayoutTransition transition = new LayoutTransition();
-        transition.setDuration(CONTROLLER_ANIMATION_DURATION);
-        setLayoutTransition(transition);
-        setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
+       // LayoutTransition transition = new LayoutTransition();
+       // transition.setDuration(CONTROLLER_ANIMATION_DURATION);
+       // setLayoutTransition(transition);
+       // setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
 
         this.setupExoPlayer();
         setPlayer(exoPlayer);
