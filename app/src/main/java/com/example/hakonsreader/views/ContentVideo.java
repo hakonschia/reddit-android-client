@@ -133,6 +133,7 @@ public class ContentVideo extends PlayerView {
      * Creates the exo player and updates the view
      */
     private void updateView() {
+        this.setVideo();
         this.setSize();
 
         // Equivalent to "android:animateLayoutChanges="true"", makes the controller fade in/out
@@ -141,8 +142,6 @@ public class ContentVideo extends PlayerView {
         transition.setDuration(CONTROLLER_ANIMATION_DURATION);
         setLayoutTransition(transition);
         setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
-
-        this.setVideo();
 
         this.setupExoPlayer();
         setPlayer(exoPlayer);
