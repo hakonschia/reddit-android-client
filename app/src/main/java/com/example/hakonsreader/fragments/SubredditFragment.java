@@ -47,7 +47,6 @@ public class SubredditFragment extends Fragment {
 
 
     private FragmentSubredditBinding binding;
-    private ItemLoadingListener loadingListener;
 
     private String subreddit;
 
@@ -96,15 +95,6 @@ public class SubredditFragment extends Fragment {
         fragment.setArguments(args);
 
         return fragment;
-    }
-
-    /**
-     * Sets the listener to be notified for when this listener has started/finished loading something
-     *
-     * @param loadingListener The listener
-     */
-    public void setLoadingListener(ItemLoadingListener loadingListener) {
-        this.loadingListener = loadingListener;
     }
 
     /**
@@ -196,10 +186,7 @@ public class SubredditFragment extends Fragment {
         postsViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
         postsViewModel.getPosts().observe(this, adapter::addPosts);
         postsViewModel.onLoadingChange().observe(this, up -> {
-            if (loadingListener == null) {
-                return;
-            }
-            loadingListener.onCountChange(up);
+            binding.loadingIcon.onCountChange(up);
         });
     }
 

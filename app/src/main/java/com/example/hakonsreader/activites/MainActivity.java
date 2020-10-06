@@ -33,7 +33,7 @@ import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.snackbar.Snackbar;
 
-public class MainActivity extends AppCompatActivity implements ItemLoadingListener, OnSubredditSelected {
+public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
     private SubredditFragment globalOffensive;
 
 
@@ -63,8 +63,6 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
 
     // Handler for token responses. If an access token is given user information is automatically retrieved
     private OnResponse<Void> onTokenResponse = ignored -> {
-        this.binding.loadingIcon.decreaseLoadCount();
-
         // Re-create the start fragment as it now should load posts for the logged in user
         // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
         this.setupStartFragment();
@@ -72,8 +70,6 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         Snackbar.make(this.binding.parentLayout, R.string.loggedIn, Snackbar.LENGTH_SHORT).show();
     };
     private OnFailure onTokenFailure = (code, t) -> {
-        binding.loadingIcon.decreaseLoadCount();
-
         Util.handleGenericResponseErrors(this.binding.parentLayout, code, t);
     };
 
@@ -166,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
             getIntent().setData(null);
             getIntent().setFlags(0);
 
-            binding.loadingIcon.increaseLoadCount();
             redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
         }
     }
@@ -180,33 +175,6 @@ public class MainActivity extends AppCompatActivity implements ItemLoadingListen
         if (binding.bottomNav.getSelectedItemId() != R.id.navHome) {
             binding.bottomNav.setSelectedItemId(R.id.navHome);
             // Else do something else probably
-        }
-    }
-
-    @Override
-    public void onAttachFragment(@NonNull Fragment fragment) {
-        super.onAttachFragment(fragment);
-
-        // When the PostsContainer has been attached, register listener for when it has started/finished loading something
-        if (fragment instanceof PostsContainerFragment) {
-            PostsContainerFragment f = (PostsContainerFragment) fragment;
-
-            f.setLoadingListener(this);
-        }
-    }
-
-    /**
-     * Called when an item has started/finished loading. Depending on the action {@link ActivityMainBinding#loadingIcon}
-     * is either increased or decreased
-     *
-     * @param up If true, an item has started loading. If false an item has finished loading
-     */
-    @Override
-    public void onCountChange(boolean up) {
-        if (up) {
-            binding.loadingIcon.increaseLoadCount();
-        } else {
-            binding.loadingIcon.decreaseLoadCount();
         }
     }
 

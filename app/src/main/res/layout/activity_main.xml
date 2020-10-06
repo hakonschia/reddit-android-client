@@ -23,14 +23,4 @@
         app:itemIconTint="@color/iconColor"
         app:menu="@menu/bottom_navigation"/>
 
-    <com.example.hakonsreader.views.LoadingIcon
-        android:id="@+id/loadingIcon"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:indeterminateTint="@color/accent"
-
-        tools:visibility="visible"/>
-
 </RelativeLayout>

@@ -19,20 +19,11 @@ import com.example.hakonsreader.misc.SectionsPageAdapter;
 /**
  * Fragment that contains the subreddit fragments
  */
-public class PostsContainerFragment extends Fragment implements ItemLoadingListener {
+public class PostsContainerFragment extends Fragment  {
     private static final String TAG = "PostsContainerFragment";
 
     private SubredditFragment[] fragments;
     private ItemLoadingListener loadingListener;
-
-    /**
-     * Sets the listener to be notified for when this listener has started/finished loading something
-     *
-     * @param loadingListener The listener
-     */
-    public void setLoadingListener(ItemLoadingListener loadingListener) {
-        this.loadingListener = loadingListener;
-    }
 
     /**
      * Creates and initializes the fragments needed. Sets {@link PostsContainerFragment#fragments}
@@ -59,7 +50,6 @@ public class PostsContainerFragment extends Fragment implements ItemLoadingListe
 
         for (SubredditFragment fragment : this.fragments) {
             adapter.addFragment(fragment);
-            fragment.setLoadingListener(this);
         }
 
         viewPager.setAdapter(adapter);
@@ -80,17 +70,5 @@ public class PostsContainerFragment extends Fragment implements ItemLoadingListe
         this.setupViewPager(viewPager);
 
         return view;
-    }
-
-    /**
-     * Listener for when something has changed its loading status (something has started/finished loading)
-     *
-     * @param up True if the count has gone up
-     */
-    @Override
-    public void onCountChange(boolean up) {
-        if (this.loadingListener != null) {
-            this.loadingListener.onCountChange(up);
-        }
     }
 }

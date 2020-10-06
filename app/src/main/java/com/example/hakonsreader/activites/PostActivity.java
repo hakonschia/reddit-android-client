@@ -85,11 +85,7 @@ public class PostActivity extends AppCompatActivity {
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
         commentsViewModel.getComments().observe(this, commentsAdapter::addComments);
         commentsViewModel.onLoadingChange().observe(this, up -> {
-            if (Boolean.TRUE.equals(up)) {
-                binding.loadingIcon.increaseLoadCount();
-            } else {
-                binding.loadingIcon.decreaseLoadCount();
-            }
+            binding.loadingIcon.onCountChange(up);
         });
 
         // TODO when going into a post and going to landscape and then back the animation of going

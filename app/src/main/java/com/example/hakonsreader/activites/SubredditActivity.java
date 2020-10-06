@@ -17,7 +17,7 @@ import com.r0adkll.slidr.Slidr;
 /**
  * Activity for a subreddit (used when a subreddit is clicked from a post)
  */
-public class SubredditActivity extends AppCompatActivity implements ItemLoadingListener {
+public class SubredditActivity extends AppCompatActivity {
     private static final String TAG = "SubredditActivity";
 
     /**
@@ -64,7 +64,6 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
             //subreddit = "sports";
 
             fragment = SubredditFragment.newInstance(subreddit);
-            fragment.setLoadingListener(this);
             getSupportFragmentManager().beginTransaction().add(R.id.subredditActivityFragment, fragment, SAVED_SUBREDDIT).commit();
         }
     }
@@ -82,14 +81,5 @@ public class SubredditActivity extends AppCompatActivity implements ItemLoadingL
 
         // Slide the activity out
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-    }
-
-    @Override
-    public void onCountChange(boolean up) {
-        if (up) {
-            this.loadingIcon.increaseLoadCount();
-        } else {
-            this.loadingIcon.decreaseLoadCount();
-        }
     }
 }

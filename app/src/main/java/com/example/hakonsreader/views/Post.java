@@ -192,6 +192,8 @@ public class Post extends RelativeLayout {
             case VIDEO:
             case GIF:
             // Links such as youtube, gfycat etc are rich video posts
+            // TODO For rich video, create a function to check if it's on a domain that allows for direct videos
+            //  otherwise just provide it as link content
             case RICH_VIDEO:
                 content = new ContentVideo(context, post);
                 break;

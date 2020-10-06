@@ -52,7 +52,7 @@ public class Util {
         } else if (code == 429) {
             Util.showTooManyRequestsSnackbar(parent);
             handled = true;
-        } else if (code == 503) {
+        } else if (code >= 500) {
             Util.showGenericServerErrorSnackbar(parent);
             handled = true;
         }
