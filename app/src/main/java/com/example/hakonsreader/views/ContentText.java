@@ -1,7 +1,6 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 import android.widget.TextView;

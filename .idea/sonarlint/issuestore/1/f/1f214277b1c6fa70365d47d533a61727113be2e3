@@ -1,5 +1,11 @@
 
-D
-java:S1068."'Remove this unused "TAG" private field.(áÿ™í8ÄŠÖ®Ë.
+y
+java:S1128"WRemove this unused import 'com.example.hakonsreader.api.responses.RedditPostsResponse'.(Ş¿Õóúÿÿÿÿ8Ëï•Ğ.
+O
+java:S1602Ô",Remove useless curly braces around statement( Ğ¯Áşÿÿÿÿ8å¯ÙĞ.
+l
+java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8ßªìĞ.
 G
-java:S1068x",Remove this unused "clientID" private field.(©ÁúÂıÿÿÿÿ
+java:S1068}",Remove this unused "clientID" private field.(©ÁúÂıÿÿÿÿ
+p
+java:S1128"SRemove this unused import 'com.example.hakonsreader.api.interfaces.VotableListing'.(”·ú¤8²Ã‰Ğ.

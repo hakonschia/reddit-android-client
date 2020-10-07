@@ -12,8 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
-import com.example.hakonsreader.api.interfaces.PostableListing;
-import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityReplyBinding;
 import com.example.hakonsreader.misc.Util;
@@ -28,7 +27,7 @@ public class ReplyActivity extends AppCompatActivity {
     private ActivityReplyBinding binding;
 
     private RedditApi redditApi = App.get().getApi();
-    private PostableListing replyingTo;
+    private RedditListing replyingTo;
 
 
     @Override
@@ -51,7 +50,7 @@ public class ReplyActivity extends AppCompatActivity {
                 replyingTo = new Gson().fromJson(jsonData, RedditPost.class);
                 Log.d(TAG, "onCreate: Replying to a post");
             } else if (kind.equals(Thing.COMMENT.getValue())) {
-                replyingTo = new Gson().fromJson(jsonData, RedditComment.class);
+               // replyingTo = new Gson().fromJson(jsonData, RedditComment.class);
                 Log.d(TAG, "onCreate: Replying to a comment");
             }
         }

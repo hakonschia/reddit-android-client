@@ -1,10 +1,8 @@
 package com.example.hakonsreader.api.service;
 
 import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
-import com.example.hakonsreader.api.responses.RedditCommentsResponse;
-import com.example.hakonsreader.api.responses.RedditPostsResponse;
-import com.example.hakonsreader.api.responses.SubredditResponse;
 
 import java.util.List;
 
@@ -66,7 +64,7 @@ public interface RedditApiService {
      * @return A Call object ready to retrieve posts from a subreddit
      */
     @GET("{subreddit}/{sort}.json")
-    Call<RedditPostsResponse> getPosts(
+    Call<ListingResponse> getPosts(
             @Path("subreddit") String subreddit,
             @Path("sort") String sort,
             @Query("after") String after,
@@ -84,11 +82,11 @@ public interface RedditApiService {
      * @param postID The ID of the post to retrieve comments for
      * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
      *                    to retrieve comments without a logged in user
-     * @return A list of {@link RedditCommentsResponse}. Note that this is a list since the first element
-     * returned is the post itself. The actual comments is found in the second element of the list
+     * @return A list of {@link ListingResponse}. The first item in this list is the post itself.
+     * The actual comments is found in the second element of the list
      */
     @GET("comments/{postID}.json")
-    Call<List<RedditCommentsResponse>> getComments(
+    Call<List<ListingResponse>> getComments(
             @Path("postID") String postID,
             @Query("raw_json") int rawJson,
 
@@ -168,7 +166,7 @@ public interface RedditApiService {
      * @return
      */
     @GET("subreddits/mine/subscriber")
-    Call<SubredditResponse> getSubscribedSubreddits(
+    Call<ListingResponse> getSubscribedSubreddits(
             @Query("after") String after,
             @Query("count") int count,
             @Query("limit") int limit,
@@ -186,7 +184,7 @@ public interface RedditApiService {
      * @return
      */
     @GET("subreddits/default")
-    Call<SubredditResponse> getDefaultSubreddits(
+    Call<ListingResponse> getDefaultSubreddits(
             @Query("after") String after,
             @Query("count") int count,
             @Query("limit") int limit,

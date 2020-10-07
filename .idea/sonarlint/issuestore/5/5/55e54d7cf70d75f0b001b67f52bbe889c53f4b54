@@ -1,18 +1,28 @@
 
-I
-java:S1135º"2Complete the task associated to this TODO comment.(Ò¦‹Ã
-F
-java:S1066"/Merge this if statement with the enclosing one.(ß¸é
 U
 java:S1128
 "8Remove this unused import 'androidx.annotation.NonNull'.(ˆÛúÜ8ÕÈÍÍ.
-u
-java:S1845="_Rename field "post" to prevent any misunderstanding/clash with field "POST" defined on line 37.(Â·„
-E
-java:S1066"/Merge this if statement with the enclosing one.(• İ=
-T
-java:S1135n"2Complete the task associated to this TODO comment.(¿ü””ùÿÿÿÿ8èÎÎÍ.
+I
+java:S1602Y",Remove useless curly braces around statement(¶Šö8õåùÏ.
+I
+java:S1135¸"2Complete the task associated to this TODO comment.(Ò¦‹Ã
 q
 java:S1128"ORemove this unused import 'androidx.recyclerview.widget.DividerItemDecoration'.(µÍáçÿÿÿÿÿ8ÕÈÍÍ.
+z
+java:S1845?"_Rename field "post" to prevent any misunderstanding/clash with field "POST" defined on line 39.(‚ê¯æşÿÿÿÿ
+T
+java:S1135l"2Complete the task associated to this TODO comment.(¿ü””ùÿÿÿÿ8èÎÎÍ.
+o
+java:S1128"RRemove this unused import 'com.example.hakonsreader.api.interfaces.RedditListing'.(æÙÑ®8Ì¼’Ğ.
+F
+java:S1066"/Merge this if statement with the enclosing one.(ß¸é
 O
-java:S1135_"2Complete the task associated to this TODO comment.(óË½‰8ÕÈÍÍ.
+java:S1135í"2Complete the task associated to this TODO comment.(¦½ƒn8ï†‘Ğ.
+E
+java:S1066Œ"/Merge this if statement with the enclosing one.(• İ=
+l
+java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8¿è’Ğ.
+Y	java:S125î"<This block of commented-out lines of code should be removed.(Œ²İŸ8ï†‘Ğ.
+O
+java:S1135]"2Complete the task associated to this TODO comment.(óË½‰8ÕÈÍÍ.
+^	java:S125•"<This block of commented-out lines of code should be removed.(¥‡ì¨ûÿÿÿÿ8›“Ğ.

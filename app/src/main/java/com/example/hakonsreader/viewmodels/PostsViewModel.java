@@ -1,6 +1,5 @@
 package com.example.hakonsreader.viewmodels;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
@@ -8,7 +7,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.hakonsreader.App;
-import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.Util;
 
@@ -57,7 +55,7 @@ public class PostsViewModel extends ViewModel {
             count = previousPosts.size();
 
             if (count > 0) {
-                after = Thing.POST.getValue() + "_" + previousPosts.get(count - 1).getID();
+                after =  previousPosts.get(count - 1).getFullname();
             }
         }
 

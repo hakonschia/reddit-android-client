@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api;
 
+import android.util.Log;
+
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
@@ -7,17 +9,14 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
-import com.example.hakonsreader.api.interfaces.PostableListing;
-import com.example.hakonsreader.api.interfaces.VotableListing;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
-import com.example.hakonsreader.api.responses.RedditCommentsResponse;
-import com.example.hakonsreader.api.responses.RedditPostsResponse;
-import com.example.hakonsreader.api.responses.SubredditResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
 
@@ -442,23 +441,23 @@ public class RedditApi {
             subreddit = "r/" + subreddit;
         }
 
-        this.api.getPosts(
+        api.getPosts(
                 subreddit,
                 "hot",
                 after,
                 count,
                 RAW_JSON,
-                this.accessToken.generateHeaderString()
-        ).enqueue(new Callback<RedditPostsResponse>() {
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<ListingResponse>() {
             @Override
-            public void onResponse(Call<RedditPostsResponse> call, Response<RedditPostsResponse> response) {
-                RedditPostsResponse body = null;
+            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+                ListingResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
 
                 if (body != null) {
-                    List<RedditPost> posts = body.getPosts();
+                    List<RedditPost> posts = (List<RedditPost>) body.getListings();
                     onResponse.onResponse(posts);
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
@@ -466,7 +465,7 @@ public class RedditApi {
             }
 
             @Override
-            public void onFailure(Call<RedditPostsResponse> call, Throwable t) {
+            public void onFailure(Call<ListingResponse> call, Throwable t) {
                 onFailure.onFailure(-1, t);
             }
         });
@@ -482,25 +481,27 @@ public class RedditApi {
      *
      * @param postID The ID of the post to retrieve comments for
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
+     * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
      * @param onFailure The callback for failed requests
      */
     @EverythingIsNonNull
-    public void getComments(String postID, OnResponse<List<RedditComment>> onResponse, OnFailure onFailure) {
+    public void getComments(String postID, OnResponse<List<RedditComment>> onResponse, OnResponse<RedditPost> onPostResponse, OnFailure onFailure) {
         this.api.getComments(
                 postID,
                 RAW_JSON,
                 this.accessToken.generateHeaderString()
-        ).enqueue(new Callback<List<RedditCommentsResponse>>() {
+        ).enqueue(new Callback<List<ListingResponse>>() {
             @Override
-            public void onResponse(Call<List<RedditCommentsResponse>> call, Response<List<RedditCommentsResponse>> response) {
-                List<RedditCommentsResponse> body = null;
+            public void onResponse(Call<List<ListingResponse>> call, Response<List<ListingResponse>> response) {
+                List<ListingResponse> body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
 
                 if (body != null) {
                     // For comments the first listing object is the post itself and the second its comments
-                    List<RedditComment> topLevelComments = body.get(1).getComments();
+                    RedditPost post = (RedditPost) body.get(0).getListings().get(0);
+                    List<RedditComment> topLevelComments = (List<RedditComment>) body.get(1).getListings();
 
                     List<RedditComment> allComments = new ArrayList<>();
                     topLevelComments.forEach(comment -> {
@@ -509,6 +510,7 @@ public class RedditApi {
                         allComments.addAll(comment.getReplies());
                     });
 
+                    onPostResponse.onResponse(post);
                     onResponse.onResponse(allComments);
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
@@ -516,7 +518,7 @@ public class RedditApi {
             }
 
             @Override
-            public void onFailure(Call<List<RedditCommentsResponse>> call, Throwable t) {
+            public void onFailure(Call<List<ListingResponse>> call, Throwable t) {
                 onFailure.onFailure(-1, t);
             }
         });
@@ -554,15 +556,16 @@ public class RedditApi {
             }
         }
 
-        this.api.getMoreComments(
+        api.getMoreComments(
                 childrenBuilder.toString(),
                 postFullname,
                 API_TYPE,
                 RAW_JSON,
-                this.accessToken.generateHeaderString()
+                accessToken.generateHeaderString()
         ).enqueue(new Callback<MoreCommentsResponse>() {
             @Override
             public void onResponse(Call<MoreCommentsResponse> call, Response<MoreCommentsResponse> response) {
+                Log.d(TAG, "onResponse: nice");
                 MoreCommentsResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -570,6 +573,7 @@ public class RedditApi {
 
                 if (body != null) {
                     List<RedditComment> comments = body.getComments();
+
                     if (parent != null) {
                         parent.addReplies(comments);
                     }
@@ -581,6 +585,7 @@ public class RedditApi {
 
             @Override
             public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
+                Log.d(TAG, "onResponse: not nice");
                 onFailure.onFailure(-1, t);
             }
         });
@@ -598,7 +603,7 @@ public class RedditApi {
      * @param onResponse Callback for successful responses. Holds the newly created comment
      * @param onFailure Callback for failed requests
      */
-    public void postComment(String comment, PostableListing thing, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+    public void postComment(String comment, RedditListing thing, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
         try {
             this.verifyLoggedInToken();
         } catch (InvalidAccessTokenException e) {
@@ -606,7 +611,7 @@ public class RedditApi {
             return;
         }
 
-        String fullname = thing.getKind() + "_" + thing.getID();
+        String fullname = thing.getFullname();
 
         // The depth of the new comment
         int depth = 0;
@@ -616,11 +621,11 @@ public class RedditApi {
         }
 
         int finalDepth = depth;
-        this.api.postComment(
+        api.postComment(
                 comment,
                 fullname, API_TYPE,
                 false,
-                this.accessToken.generateHeaderString()
+                accessToken.generateHeaderString()
         ).enqueue(new Callback<MoreCommentsResponse>() {
             @Override
             public void onResponse(Call<MoreCommentsResponse> call, Response<MoreCommentsResponse> response) {
@@ -660,7 +665,7 @@ public class RedditApi {
      * @param onFailure The callback for failed requests
      */
     @EverythingIsNonNull
-    public void vote(VotableListing thing, VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
+    public void vote(RedditListing thing, VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
         try {
             this.verifyLoggedInToken();
         } catch (InvalidAccessTokenException e) {
@@ -668,10 +673,10 @@ public class RedditApi {
             return;
         }
 
-        this.api.vote(
+        api.vote(
                 thing.getFullname(),
                 type.getValue(),
-                this.accessToken.generateHeaderString()
+                accessToken.generateHeaderString()
         ).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -707,28 +712,29 @@ public class RedditApi {
             return;
         }
 
-        this.api.getSubscribedSubreddits(
+        api.getSubscribedSubreddits(
                 after,
                 count,
                 100,
-                this.accessToken.generateHeaderString()
-        ).enqueue(new Callback<SubredditResponse>() {
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<ListingResponse>() {
             @Override
-            public void onResponse(Call<SubredditResponse> call, Response<SubredditResponse> response) {
-                SubredditResponse body = null;
+            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+                ListingResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
 
                 if (body != null) {
-                    onResponse.onResponse(body.getSubreddits());
+                    List<Subreddit> subreddits = (List<Subreddit>) body.getListings();
+                    onResponse.onResponse(subreddits);
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
 
             @Override
-            public void onFailure(Call<SubredditResponse> call, Throwable t) {
+            public void onFailure(Call<ListingResponse> call, Throwable t) {
                 onFailure.onFailure(-1, t);
             }
         });
@@ -744,28 +750,29 @@ public class RedditApi {
      * @param onFailure The response handler for failed requests
      */
     public void getDefaultSubreddits(String after, int count, OnResponse<List<Subreddit>> onResponse, OnFailure onFailure) {
-        this.api.getDefaultSubreddits(
+        api.getDefaultSubreddits(
                 after,
                 count,
                 100,
-                this.accessToken.generateHeaderString()
-        ).enqueue(new Callback<SubredditResponse>() {
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<ListingResponse>() {
             @Override
-            public void onResponse(Call<SubredditResponse> call, Response<SubredditResponse> response) {
-                SubredditResponse body = null;
+            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+                ListingResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
 
                 if (body != null) {
-                    onResponse.onResponse(body.getSubreddits());
+                    List<Subreddit> subreddits = (List<Subreddit>) body.getListings();
+                    onResponse.onResponse(subreddits);
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
 
             @Override
-            public void onFailure(Call<SubredditResponse> call, Throwable t) {
+            public void onFailure(Call<ListingResponse> call, Throwable t) {
                 onFailure.onFailure(-1, t);
             }
         });
@@ -781,10 +788,10 @@ public class RedditApi {
     private AccessToken newNonLoggedInToken() {
         AccessToken newToken = null;
         try {
-            String device = (this.deviceID == null || this.deviceID.isEmpty() ? "DO_NOT_TRACK_THIS_DEVICE" : this.deviceID);
+            String device = (deviceID == null || deviceID.isEmpty() ? "DO_NOT_TRACK_THIS_DEVICE" : deviceID);
 
-            newToken = this.oauthService.getAccessTokenNoUser(
-                    this.basicAuthHeader,
+            newToken = oauthService.getAccessTokenNoUser(
+                    basicAuthHeader,
                     OAuthConstants.GRANT_TYPE_INSTALLED_CLIENT,
                     device
             ).execute().body();

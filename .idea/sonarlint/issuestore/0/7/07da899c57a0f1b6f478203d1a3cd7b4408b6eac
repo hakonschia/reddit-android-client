@@ -1,8 +1,16 @@
 
-P
-java:S1135Ÿ"2Complete the task associated to this TODO comment.(àîµ‡8ª‚ÌÏ.
-`
-java:S1128"CRemove this unused import 'com.example.hakonsreader.api.RedditApi'.(Ş×ƒ8ïÌÏ.
-E	java:S108x")Either remove or fill this block of code.(ÖÑµ8²è—ÌÏ.
+^	java:S125"<This block of commented-out lines of code should be removed.(†ûğûÿÿÿÿ8˜ÂøÏ.
+l
+java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8¤‚Ğ.
+G
+java:S5411÷"*Use the primitive boolean expression here.(òíİc8˜ÂøÏ.
 U
 java:S1135"2Complete the task associated to this TODO comment.(¼öşãıÿÿÿÿ8–ù–Ï.
+M
+java:S5411ô"*Use the primitive boolean expression here.(„Á±™ÿÿÿÿÿ8˜ÂøÏ.
+P
+java:S1135¼"2Complete the task associated to this TODO comment.(àîµ‡8ª‚ÌÏ.
+X
+java:S1068`"6Remove this unused "CONTROLLER_TIMEOUT" private field.(çÄ¬üÿÿÿÿ8˜ÂøÏ.
+^
+java:S1068d"ARemove this unused "CONTROLLER_ANIMATION_DURATION" private field.(é¤„‚8˜ÂøÏ.

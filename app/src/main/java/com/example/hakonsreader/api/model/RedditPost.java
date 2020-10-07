@@ -1,365 +1,132 @@
 package com.example.hakonsreader.api.model;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.enums.PostType;
-import com.example.hakonsreader.api.enums.VoteType;
-import com.example.hakonsreader.api.interfaces.PostableListing;
-import com.example.hakonsreader.api.interfaces.VotableListing;
-import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
-import com.example.hakonsreader.api.jsonadapters.ParentCrosspostAdapter;
+import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
-import com.google.gson.Gson;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-/**
- * Class representing a Reddit post
- */
-public class RedditPost implements VotableListing, PostableListing {
-    private static final String TAG = "RedditPost";
+public class RedditPost extends RedditListing {
 
-    @SerializedName("kind")
-    private String kind;
+    @SerializedName("title")
+    private String title;
 
-    @SerializedName("data")
-    public Data data;
+    @SerializedName("num_comments")
+    private int amountOfComments;
 
+    @SerializedName("thumbnail")
+    private String thumbnail;
+
+    @SerializedName("spoiler")
+    private boolean spoiler;
+
+    @SerializedName("selftext")
+    private String selftext;
+
+    @SerializedName("selftext_html")
+    private String selftextHtml;
+
+    @SerializedName("crosspost_parent")
+    private String crosspostParentID;
+
+    @SerializedName("crosspost_parent_list")
+   // @JsonAdapter(ParentCrosspostAdapter.class)
+    private List<RedditPost> crossposts;
+
+
+    @SerializedName("is_self")
+    private boolean isText;
+
+    @SerializedName("is_video")
+    private boolean isVideo;
+
+    @SerializedName("is_gallery")
+    private boolean isGallery;
+
+    @SerializedName("post_hint")
+    private String postHint;
+
+
+    @SerializedName("link_flair_background_color")
+    private String linkFlairBackgroundColor;
+
+    @SerializedName("link_flair_text_color")
+    private String linkFlairTextColor;
+
+    @SerializedName("link_flair_text")
+    private String linkFlairText;
+
+    @SerializedName("link_flair_richtext")
+    private List<RichtextFlair> linkRichtextFlairs;
+
+
+    @SerializedName("media")
+    private Media media;
 
     /**
-     * Post specific data
+     * Data for video posts
      */
-    private static class Data {
-        /* ------------- RedditListing ------------- */
-        @SerializedName("id")
-        private String id;
+    private static class Media {
 
-        @SerializedName("url")
-        private String url;
+        @SerializedName("reddit_video")
+        private RedditVideo redditVideo;
+    }
 
-        @SerializedName("name")
-        private String fullname;
 
-        @SerializedName("created_utc")
-        private float createdAt;
+    @SerializedName("gallery_data")
+    private GalleryData galleryData;
 
-        @SerializedName("over_18")
-        private boolean nsfw;
-        /* ------------- End RedditListing ------------- */
+    /**
+     * Data for gallery posts (multiple images
+     */
+    private static class GalleryData {
+        @SerializedName("items")
+        private List<GalleryItem> items;
+    }
 
-        /* ------------- PostableListing ------------- */
-        @SerializedName("subreddit")
-        private String subreddit;
 
-        @SerializedName("author")
-        private String author;
+    @SerializedName("preview")
+    private Preview preview;
 
-        @SerializedName("permalink")
-        private String permalink;
-
-        @SerializedName("locked")
-        private boolean isLocked;
-
-        @SerializedName("stickied")
-        private boolean isStickied;
+    private static class Preview {
+        @SerializedName("images")
+        private List<ImagesWrapper> images;
 
         /**
-         * What the listing is distinguished as (such as "moderator")
+         * For gifs uploaded to gfycat this object holds an object pointing to the DASH url for the video
          */
-        @SerializedName("distinguished")
-        private String distinguished;
-        /* ------------- End PostableListing ------------- */
-
-        /* ------------- End VoteableListing ------------- */
-        @SerializedName("score")
-        private int score;
-
-        @SerializedName("score_hidden")
-        private boolean scoreHidden;
-
-        @SerializedName("likes")
-        @JsonAdapter(BooleanPrimitiveAdapter.class)
-        private Boolean liked;
-        /* ------------- End VoteableListing ------------- */
-
-
-
-        @SerializedName("title")
-        private String title;
-
-        @SerializedName("num_comments")
-        private int amountOfComments;
-
-        @SerializedName("thumbnail")
-        private String thumbnail;
-
-        @SerializedName("spoiler")
-        private boolean spoiler;
-
-        @SerializedName("selftext")
-        private String selftext;
-
-        @SerializedName("selftext_html")
-        private String selftextHtml;
-
-        @SerializedName("crosspost_parent")
-        private String crosspostParentID;
-
-        @SerializedName("crosspost_parent_list")
-        @JsonAdapter(ParentCrosspostAdapter.class)
-        private List<RedditPost> crossposts;
-
-
-        @SerializedName("is_self")
-        private boolean isText;
-
-        @SerializedName("is_video")
-        private boolean isVideo;
-
-        @SerializedName("is_gallery")
-        private boolean isGallery;
-
-        @SerializedName("post_hint")
-        private String postHint;
-
-
-        @SerializedName("link_flair_background_color")
-        private String linkFlairBackgroundColor;
-
-        @SerializedName("link_flair_text_color")
-        private String linkFlairTextColor;
-
-        @SerializedName("link_flair_text")
-        private String linkFlairText;
-
-        @SerializedName("link_flair_richtext")
-        private List<RichtextFlair> linkRichtextFlairs;
-
-
-        @SerializedName("media")
-        private Media media;
-
-        /**
-         * Data for video posts
-         */
-        private static class Media {
-
-            @SerializedName("reddit_video")
-            private RedditVideo redditVideo;
-        }
-
-
-        @SerializedName("gallery_data")
-        private GalleryData galleryData;
-
-        /**
-         * Data for gallery posts (multiple images
-         */
-        private static class GalleryData {
-            @SerializedName("items")
-            private List<GalleryItem> items;
-        }
-
-
-        @SerializedName("preview")
-        private Preview preview;
-
-        private static class Preview {
-            @SerializedName("images")
-            private List<ImagesWrapper> images;
-
-            /**
-             * For gifs uploaded to gfycat this object holds an object pointing to the DASH url for the video
-             */
-            @SerializedName("reddit_video_preview")
-            private RedditVideo videoPreview;
-        }
+        @SerializedName("reddit_video_preview")
+        private RedditVideo videoPreview;
     }
-
-
-    /* --------------------- Inherited --------------------- */
-    /* ------------- RedditListing ------------- */
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getKind() {
-        return kind;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getID() {
-        return data.id;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getUrl() {
-        return data.url;
-    }
-
-    /**
-     * {@inheritDoc}
-     */@Override
-    public String getFullname() {
-        return data.fullname;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getCreatedAt() {
-        return (long)data.createdAt;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isNSFW() {
-        return data.nsfw;
-    }
-    /* ------------- End RedditListing ------------- */
-
-    /* ------------- PostableListing ------------- */
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getSubreddit() {
-        return data.subreddit;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getAuthor() {
-        return data.author;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPermalink() {
-        return data.permalink;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isLocked() {
-        return data.isLocked;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isStickied() {
-        return data.isStickied;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isMod() {
-        if (data.distinguished == null) {
-            return false;
-        }
-
-        return data.distinguished.equals("moderator");
-    }
-    /* ------------- End PostableListing ------------- */
-
-    /* ------------- VoteableListing ------------- */
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getScore() {
-        return data.score;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isScoreHidden() {
-        return data.scoreHidden;
-    }
-
-    /**
-     * Retrieves the logged in users vote on the post
-     *
-     * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
-     */
-    public VoteType getVoteType() {
-        if (data.liked == null) {
-            return VoteType.NO_VOTE;
-        }
-
-        return (data.liked ? VoteType.UPVOTE : VoteType.DOWNVOTE);
-    }
-
-    /**
-     * @param voteType The vote type for this post for the current user
-     */
-    public void setVoteType(VoteType voteType) {
-        // Update the internal data as that is used in getVoteType
-        switch (voteType) {
-            case UPVOTE:
-                data.liked = true;
-                break;
-            case DOWNVOTE:
-                data.liked = false;
-                break;
-            case NO_VOTE:
-                data.liked = null;
-                break;
-        }
-    }
-    /* ------------- End VoteableListing ------------- */
-    /* --------------------- End inherited --------------------- */
 
 
     /**
      * @return The title of the post
      */
     public String getTitle() {
-        return data.title;
+        return title;
     }
 
     /**
      * @return The amount of comments the post has
      */
     public int getAmountOfComments() {
-        return data.amountOfComments;
+        return amountOfComments;
     }
 
     /**
      * @return The URL to the thumbnail of the post
      */
     public String getThumbnail() {
-        return data.thumbnail;
+        return thumbnail;
     }
 
     /**
      * @return True if the post is marked as a spoiler
      */
     public boolean isSpoiler() {
-        return data.spoiler;
+        return spoiler;
     }
 
     /**
@@ -373,28 +140,28 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The markdown text of the post if the post is {@link PostType#TEXT}
      */
     public String getSelftext(boolean adjustFormatting) {
-        return data.selftext;
+        return selftext;
     }
 
     /**
      * @return The HTML text of the post if the post is {@link PostType#TEXT}
      */
     public String getSelftextHTML() {
-        return data.selftextHtml;
+        return selftextHtml;
     }
 
     /**
      * @return The ID of the post this post is a crosspost from
      */
     public String getCrosspostParentID() {
-        return data.crosspostParentID;
+        return crosspostParentID;
     }
 
     /**
      * @return The list of parent crossposts of this post
      */
     public List<RedditPost> getCrossposts() {
-        return data.crossposts;
+        return crossposts;
     }
 
 
@@ -402,14 +169,14 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The background color of the flair
      */
     public String getLinkFlairBackgroundColor() {
-        return data.linkFlairBackgroundColor;
+        return linkFlairBackgroundColor;
     }
 
     /**
      * @return The text color of the link flair
      */
     public String getLinkFlairTextColor() {
-        return data.linkFlairTextColor;
+        return linkFlairTextColor;
     }
 
     /**
@@ -420,7 +187,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The text of the link flair
      */
     public String getLinkFlairText() {
-        return data.linkFlairText;
+        return linkFlairText;
     }
 
     /**
@@ -431,7 +198,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The list of richtext flairs for the post
      */
     public List<RichtextFlair> getLinkRichtextFlairs() {
-        return data.linkRichtextFlairs;
+        return linkRichtextFlairs;
     }
 
     /**
@@ -441,11 +208,11 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The video object containing information about the video post
      */
     public RedditVideo getVideo() {
-        if (data.media == null) {
+        if (media == null) {
             return null;
         }
 
-        return data.media.redditVideo;
+        return media.redditVideo;
     }
 
     /**
@@ -455,7 +222,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The list of gallery items this post has
      */
     public List<GalleryItem> getGalleryItems() {
-         return data.galleryData.items;
+        return galleryData.items;
     }
 
     /**
@@ -468,7 +235,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The source image for the post
      */
     public PreviewImage getSourcePreview() {
-        return data.preview.images.get(0).source;
+        return preview.images.get(0).source;
     }
 
     /**
@@ -480,7 +247,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return A list of preview images
      */
     public List<PreviewImage> getPreviewImages() {
-        return data.preview.images.get(0).resolutions;
+        return preview.images.get(0).resolutions;
     }
 
     /**
@@ -492,7 +259,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The {@link RedditVideo} holding the data for GIF posts
      */
     public RedditVideo getVideoGif() {
-        return data.preview.videoPreview;
+        return preview.videoPreview;
     }
 
     /**
@@ -506,7 +273,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The source MP4
      */
     public PreviewImage getMp4Source() {
-        return data.preview.images.get(0).variants.mp4.source;
+        return preview.images.get(0).variants.mp4.source;
     }
 
     /**
@@ -518,7 +285,7 @@ public class RedditPost implements VotableListing, PostableListing {
      * @return The list of MP4 resolutions
      */
     public List<PreviewImage> getMp4Previews() {
-        return data.preview.images.get(0).variants.mp4.resolutions;
+        return preview.images.get(0).variants.mp4.resolutions;
     }
 
 
@@ -527,17 +294,17 @@ public class RedditPost implements VotableListing, PostableListing {
      */
     public PostType getPostType() {
         // TODO make this less bad
-        if (data.isVideo) {
+        if (isVideo) {
             return PostType.VIDEO;
-        } else if (data.isText) {
+        } else if (isText) {
             return PostType.TEXT;
-        } else if (data.isGallery) {
+        } else if (isGallery) {
             return PostType.GALLERY;
-        } else if (data.crosspostParentID != null) {
+        } else if (crosspostParentID != null) {
             return PostType.CROSSPOST;
         }
 
-        String hint = data.postHint;
+        String hint = postHint;
 
         // Text posts don't have a hint
         if (hint == null) {
@@ -550,18 +317,18 @@ public class RedditPost implements VotableListing, PostableListing {
             // If we have a link post that is a link to imgur, redirect it to get the image directly
             // The IDs are (as far as I know) alphanumerical (upper and lowercase) and 0-9 with 5 or 7 digits
             // (it's currently between 5 and 7 characters but it works good enough I guess)
-            if (data.url.matches("^https://imgur.com/[A-Za-z0-9]{5,7}$")) {
+            if (url.matches("^https://imgur.com/[A-Za-z0-9]{5,7}$")) {
                 // Technically the URL needs to be "i.imgur.com/...", but imgur does the redirection for us
                 // Which suffix is added (.png or .jpg or .jpeg) seemingly doesn't matter
-                data.url += ".png";
+                url += ".png";
             }
 
             // Link posts might be images not uploaded to reddit
             // Technically this doesn't match just URLs as anything can preceed the .png/.jpg/.jpeg
             // but that shouldn't really matter
-            if (data.url.matches(".+(.png|.jpeg|.jpg)$")) {
+            if (url.matches(".+(.png|.jpeg|.jpg)$")) {
                 return PostType.IMAGE;
-            } else if (data.url.endsWith(".gifv")) {
+            } else if (url.endsWith(".gifv")) {
                 return PostType.GIF;
             }
 
@@ -571,7 +338,7 @@ public class RedditPost implements VotableListing, PostableListing {
         switch (hint) {
             case "image":
                 // .gif is treated as image
-                if (data.url.endsWith(".gif")) {
+                if (url.endsWith(".gif")) {
                     return PostType.GIF;
                 }
 

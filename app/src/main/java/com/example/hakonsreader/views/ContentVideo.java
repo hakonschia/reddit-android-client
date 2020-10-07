@@ -1,6 +1,5 @@
 package com.example.hakonsreader.views;
 
-import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -249,7 +248,7 @@ public class ContentVideo extends PlayerView {
         // Data source is constant for all media sources
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
         // Convert the data source into a cache source if the user has selected to cache NSFW videos
-        if (!(post.isNSFW() && App.get().dontCacheNSFW())) {
+        if (!(post.isNsfw() && App.get().dontCacheNSFW())) {
             dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
         }
 

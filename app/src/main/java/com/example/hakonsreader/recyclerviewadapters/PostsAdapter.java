@@ -1,22 +1,16 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
-import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.interfaces.OnClickListener;
-import com.example.hakonsreader.views.ContentVideo;
 import com.example.hakonsreader.views.Post;
 
 import java.util.ArrayList;
@@ -44,9 +38,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // so filter out any posts that are already in the list
         List<RedditPost> filtered = newPosts.stream()
                 .filter(post -> {
-                    for (RedditPost p : this.posts) {
+                    for (RedditPost p : posts) {
                         // Filter out the post on matching ID
-                        if (p.getID().equals(post.getID())) {
+                        if (p.getId().equals(post.getId())) {
                             return false;
                         }
                     }

@@ -6,26 +6,17 @@ import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.QuoteSpan;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.views.ContentImage;
-import com.example.hakonsreader.views.ContentLink;
-import com.example.hakonsreader.views.ContentText;
-import com.example.hakonsreader.views.ContentVideo;
 import com.example.hakonsreader.views.CustomQuoteSpan;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.time.LocalTime;
-import java.util.Date;
 import java.util.Locale;
 
 public class Util {

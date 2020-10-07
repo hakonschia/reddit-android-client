@@ -10,7 +10,7 @@ public class GalleryItem {
      * The media ID of the item
      */
     @SerializedName("media_id")
-    private String mediaID;
+    private String mediaId;
 
     /**
      * The ID of the item

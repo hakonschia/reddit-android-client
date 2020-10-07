@@ -1,11 +1,21 @@
 
 F
-java:S3398Û"#Move this method into "ViewHolder".(¹˜ö²ıÿÿÿÿ8ßºÚ÷Í.
+java:S3398Ü"#Move this method into "ViewHolder".(¹˜ö²ıÿÿÿÿ8ßºÚ÷Í.
+y
+java:S14509"\Remove the "replyListener" field and declare it as a local variable in the relevant methods.(¼°Ë®8ê«•Ğ.
 U
-java:S1135©"2Complete the task associated to this TODO comment.(ìííüÿÿÿÿ8ßºÚ÷Í.
-J
-java:S1602Ñ",Remove useless curly braces around statement(ãî¼á8ßºÚ÷Í.
+java:S1135¬"2Complete the task associated to this TODO comment.(ä‡íÀÿÿÿÿÿ8ßºÚ÷Í.
+U
+java:S1135ª"2Complete the task associated to this TODO comment.(ìííüÿÿÿÿ8ßºÚ÷Í.
+l
+java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8üĞĞ.
+^	java:S125¨"<This block of commented-out lines of code should be removed.(ˆ‰¢Öÿÿÿÿÿ8ê«•Ğ.
+N
+java:S10689"1Remove this unused "replyListener" private field.(¼°Ë®8ê«•Ğ.
 I
-java:S1068""'Remove this unused "TAG" private field.(ä¹õ½üÿÿÿÿ8ßºÚ÷Í.
+java:S1068#"'Remove this unused "TAG" private field.(ä¹õ½üÿÿÿÿ8ßºÚ÷Í.
+J
+java:S1602Ò",Remove useless curly braces around statement(ãî¼á8ßºÚ÷Í.
+^	java:S125ª"<This block of commented-out lines of code should be removed.(©Ñìşşÿÿÿÿ8®ÙĞ.
 U
-java:S1135«"2Complete the task associated to this TODO comment.(ä‡íÀÿÿÿÿÿ8ßºÚ÷Í.
+java:S1135§"2Complete the task associated to this TODO comment.(ÖÜğ±ıÿÿÿÿ8ê†–Ğ.

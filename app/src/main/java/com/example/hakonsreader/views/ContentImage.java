@@ -50,7 +50,7 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
                  .resize(App.get().getScreenWidth(), 0);
 
         // Post is NSFW and user has chosen not to cache NSFW
-        if (post.isNSFW() && App.get().dontCacheNSFW()) {
+        if (post.isNsfw() && App.get().dontCacheNSFW()) {
             // Don't store in cache and don't look in cache as this image will never be there
             c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
         }

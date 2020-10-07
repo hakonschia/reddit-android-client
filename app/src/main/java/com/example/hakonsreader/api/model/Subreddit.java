@@ -1,141 +1,66 @@
 package com.example.hakonsreader.api.model;
 
-import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.google.gson.annotations.SerializedName;
 
-public class Subreddit implements RedditListing {
 
-    @SerializedName("kind")
-    private String kind;
+/**
+ * Class representing a subreddit
+ */
+public class Subreddit extends RedditListing {
 
-    @SerializedName("data")
-    public Data data;
+    @SerializedName("display_name")
+    private String name;
 
-    /**
-     * Subreddit specific data
-     */
-    private static class Data {
-        /* ------------- RedditListing ------------- */
-        @SerializedName("id")
-        private String id;
+    @SerializedName("title")
+    private String title;
 
-        @SerializedName("url")
-        private String url;
+    @SerializedName("subscribers")
+    private int subscribers;
 
-        @SerializedName("name")
-        private String fullname;
+    @SerializedName("description")
+    private String description;
 
-        @SerializedName("created_utc")
-        private float createdAt;
+    @SerializedName("description_html")
+    private String descriptionHTML;
 
-        @SerializedName("over18")
-        private boolean nsfw;
-        /* ------------- End RedditListing ------------- */
+    @SerializedName("icon_img")
+    private String iconImage;
 
-        @SerializedName("display_name")
-        private String name;
+    @SerializedName("header_img")
+    private String headerImage;
 
-        @SerializedName("title")
-        private String title;
+    @SerializedName("quarantine")
+    private boolean quarantine;
 
-        @SerializedName("subscribers")
-        private int subscribers;
+    @SerializedName("user_has_favorited")
+    private boolean userHasFavorited;
 
-        @SerializedName("description")
-        private String description;
+    @SerializedName("submit_text")
+    private String submitText;
 
-        @SerializedName("description_html")
-        private String descriptionHTML;
+    @SerializedName("subreddit_type")
+    private String subredditType;
 
-        @SerializedName("icon_img")
-        private String iconImage;
-
-        @SerializedName("header_img")
-        private String headerImage;
-
-        @SerializedName("quarantine")
-        private boolean quarantine;
-
-        @SerializedName("user_has_favorited")
-        private boolean userHasFavorited;
-
-        @SerializedName("submit_text")
-        private String submitText;
-
-        @SerializedName("subreddit_type")
-        private String subredditType;
-    }
-
-    /* --------------------- Inherited --------------------- */
-    /* ------------- RedditListing ------------- */
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getKind() {
-        return kind;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getID() {
-        return data.id;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getUrl() {
-        return data.url;
-    }
-
-    /**
-     * {@inheritDoc}
-     */@Override
-    public String getFullname() {
-        return data.fullname;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getCreatedAt() {
-        return (long)data.createdAt;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isNSFW() {
-        return data.nsfw;
-    }
-    /* ------------- End RedditListing ------------- */
-    /* --------------------- End inherited --------------------- */
 
     /**
      * @return The name of the subreddit
      */
     public String getName() {
-        return data.name;
+        return name;
     }
 
     /**
      * @return The title (short description) of the subreddit
      */
     public String getTitle() {
-        return data.title;
+        return title;
     }
 
     /**
      * @return The amount of subscribers the subreddit has
      */
     public int getSubscribers() {
-        return data.subscribers;
+        return subscribers;
     }
 
     /**
@@ -144,7 +69,7 @@ public class Subreddit implements RedditListing {
      * @return The markdown text of the description of the subreddit
      */
     public String getDescription() {
-        return data.description;
+        return description;
     }
 
     /**
@@ -153,48 +78,48 @@ public class Subreddit implements RedditListing {
      * @return The HTML text of the description of the subreddit
      */
     public String getDescriptionHTML() {
-        return data.descriptionHTML;
+        return descriptionHTML;
     }
 
     /**
      * @return The URL to the subreddit's icon
      */
     public String getIconImage() {
-        return data.iconImage;
+        return iconImage;
     }
 
     /**
      * @return The URL to the subreddit's header image
      */
     public String getHeaderImage() {
-        return data.headerImage;
+        return headerImage;
     }
 
     /**
      * @return True if the subreddit is quarantined
      */
     public boolean isQuarantined() {
-        return data.quarantine;
+        return quarantine;
     }
 
     /**
      * @return True if the currently logged in user has favorited the subreddit
      */
     public boolean userHasFavorited() {
-        return data.userHasFavorited;
+        return userHasFavorited;
     }
 
     /**
      * @return The text to display when submitting a post to the subreddit
      */
     public String getSubmitText() {
-        return data.submitText;
+        return submitText;
     }
 
     /**
      * @return The type of subreddit this is. For user subreddit this is "user"
      */
     public String getSubredditType() {
-        return data.subredditType;
+        return subredditType;
     }
 }

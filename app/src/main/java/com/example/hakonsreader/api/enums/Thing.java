@@ -5,7 +5,9 @@ package com.example.hakonsreader.api.enums;
  */
 public enum Thing {
     COMMENT("t1"),
-    POST("t3");
+    POST("t3"),
+    SUBREDDIT("t5"),
+    MORE("more");
 
 
     private String value;

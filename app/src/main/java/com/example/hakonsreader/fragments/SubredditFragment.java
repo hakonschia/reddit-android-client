@@ -1,38 +1,23 @@
 package com.example.hakonsreader.fragments;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.PostActivity;
-import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
-import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.views.ListDivider;
-import com.example.hakonsreader.views.Post;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * Fragment containing a subreddit
@@ -159,6 +144,7 @@ public class SubredditFragment extends Fragment {
             int viewBottom = viewHolder.getContentBottomY();
 
             if (scrollingUp) {
+                // TODO this might be a bit weird as scrolling up on the first item wont autplay
                 if (viewBottom > screenHeight) {
                     viewHolder.onUnSelected();
                 }

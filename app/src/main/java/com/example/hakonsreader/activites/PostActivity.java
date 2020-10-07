@@ -7,17 +7,15 @@ import android.transition.TransitionListenerAdapter;
 import android.util.Log;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
-import com.example.hakonsreader.api.interfaces.RedditListing;
 import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
@@ -73,7 +71,6 @@ public class PostActivity extends AppCompatActivity {
         post = gson.fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
 
         if (post.isLocked()) {
-            Log.d(TAG, "onCreate: POST IS LOCKED");
             binding.replyPost.setVisibility(View.GONE);
         }
 
@@ -144,7 +141,7 @@ public class PostActivity extends AppCompatActivity {
                         commentsAdapter.addComment(newComment);
                     } else {
                         // Replying to a comment
-                        commentsAdapter.addComment(newComment, (RedditComment)replyingTo);
+                       // commentsAdapter.addComment(newComment, (RedditComment)replyingTo);
                     }
                 }
             }

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.interfaces.OnReplyListener;
@@ -198,7 +199,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * @param parent The parent comment of {@code comment}
      */
     public void getMoreComments(RedditComment comment, RedditComment parent) {
-        this.redditApi.getMoreComments(post.getID(), comment.getChildren(), parent, newComments -> {
+        this.redditApi.getMoreComments(post.getId(), comment.getChildren(), parent, newComments -> {
             // Find the parent index to know where to insert the new comments
             int commentPos = comments.indexOf(comment);
             this.insertComments(newComments, commentPos);
@@ -207,6 +208,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             this.removeComment(comment);
             parent.removeReply(comment);
         }, (code, t) -> {
+            t.printStackTrace();
             Util.handleGenericResponseErrors(parentLayout, code, t);
         });
     }
@@ -294,8 +296,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             holder.asPoster();
         }
 
-        // TODO remove magic string and create "listing" enum or something
-        if (comment.getKind().equals("more")) {
+        // If the comment is a "more comments" comment
+        if (Thing.MORE.getValue().equals(comment.getKind())) {
             // TODO the parent comment isn't necessarily the previous, get the comment before in the list whos depth is one lower
             holder.asMoreComments(comment, this.comments.get(position - 1));
         } else {
@@ -400,7 +402,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             Context context = itemView.getContext();
 
             content.setMovementMethod(InternalLinkMovementMethod.getInstance(context));
-            App.get().getMark().setMarkdown(content, comment.getBody(true));
+
+            String body = comment.getBody(true);
+            if (body != null) {
+                App.get().getMark().setMarkdown(content, body);
+            }
 
             author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));
 

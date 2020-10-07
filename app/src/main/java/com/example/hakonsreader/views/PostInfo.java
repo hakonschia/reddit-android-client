@@ -4,12 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.Space;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +20,6 @@ import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.databinding.PostInfoBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.misc.ViewUtil;
-import com.squareup.picasso.Picasso;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -111,7 +106,7 @@ public class PostInfo extends ConstraintLayout {
         if (post.isSpoiler()) {
             this.addTag(ViewUtil.createSpoilerTag(getContext()));
         }
-        if (post.isNSFW()) {
+        if (post.isNsfw()) {
             this.addTag(ViewUtil.createNSFWTag(getContext()));
         }
 
@@ -125,6 +120,10 @@ public class PostInfo extends ConstraintLayout {
     private void addFlairs() {
         List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
         String flairText = post.getLinkFlairText();
+
+        if (flairs == null || flairText == null) {
+            return;
+        }
 
         // No flair to add
         if (flairs.isEmpty() && (flairText == null || flairText.isEmpty())) {

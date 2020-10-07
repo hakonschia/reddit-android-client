@@ -1,11 +1,10 @@
 package com.example.hakonsreader.api.model;
 
-import com.example.hakonsreader.api.enums.VoteType;
-import com.example.hakonsreader.api.interfaces.PostableListing;
-import com.example.hakonsreader.api.interfaces.VotableListing;
-import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
+import android.util.Log;
+
+import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter;
-import com.example.hakonsreader.api.responses.RedditCommentsResponse;
+import com.example.hakonsreader.api.responses.ListingResponse;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -15,263 +14,44 @@ import java.util.List;
 /**
  * Class representing a Reddit comment
  */
-public class RedditComment implements VotableListing, PostableListing {
+public class RedditComment extends RedditListing {
     private static final String TAG = "RedditComment";
 
-    @SerializedName("kind")
-    private String kind;
 
-    @SerializedName("data")
-    private Data data;
+    @SerializedName("body")
+    private String body;
+
+    @SerializedName("body_html")
+    private String bodyHtml;
 
     /**
-     * Replies is set from {@link Data#replies}
+     * How far in the comment is in a comment chain
      */
-    private List<RedditComment> replies;
+    @SerializedName("depth")
+    private int depth;
 
+    // If there are no replies the replies is {"replies" : ""} which would cause an error
+    // as gson tries to convert it to a string, so convert to null instead
+    @JsonAdapter(EmptyStringAsNullAdapter.class)
+    @SerializedName("replies")
+    private ListingResponse repliesInternal;
 
     /**
-     * Comment specific data
+     * The replies are retrieved from {@link RedditComment#repliesInternal} and set here when they are
+     * retrieved with {@link RedditComment#getReplies()}
      */
-    private static class Data {
-        /* ------------- RedditListing ------------- */
-        @SerializedName("id")
-        private String id;
-
-        @SerializedName("url")
-        private String url;
-
-        @SerializedName("name")
-        private String fullname;
-
-        @SerializedName("created_utc")
-        private float createdAt;
-
-        @SerializedName("over_18")
-        private boolean nsfw;
-        /* ------------- End RedditListing ------------- */
-
-        /* ------------- PostableListing ------------- */
-        @SerializedName("subreddit")
-        private String subreddit;
-
-        @SerializedName("author")
-        private String author;
-
-        @SerializedName("permalink")
-        private String permalink;
-
-        @SerializedName("locked")
-        private boolean isLocked;
-
-        @SerializedName("stickied")
-        private boolean isStickied;
-
-        /**
-         * What the listing is distinguished as (such as "moderator")
-         */
-        @SerializedName("distinguished")
-        private String distinguished;
-        /* ------------- End PostableListing ------------- */
-
-        /* ------------- VoteableListing ------------- */
-        @SerializedName("score")
-        private int score;
-
-        @SerializedName("score_hidden")
-        private boolean scoreHidden;
-
-        @SerializedName("likes")
-        @JsonAdapter(BooleanPrimitiveAdapter.class)
-        private Boolean liked;
-        /* ------------- End VoteableListing ------------- */
+    private List<RedditComment> repliesActual;
 
 
-        @SerializedName("body")
-        private String body;
+    /* Fields for when the comment is a "load more comments" comment */
+    @SerializedName("count")
+    private int extraCommentsCount;
 
-        @SerializedName("body_html")
-        private String bodyHtml;
-
-        /**
-         * How far in the comment is in a comment chain
-         */
-        @SerializedName("depth")
-        private int depth;
-
-        // If there are no replies the replies is {"replies" : ""} which would cause an error
-        // as gson tries to convert it to a string, so convert to null instead
-        @JsonAdapter(EmptyStringAsNullAdapter.class)
-        @SerializedName("replies")
-        private RedditCommentsResponse replies;
-
-        /* Fields for when the comment is a "load more comments" comment */
-        @SerializedName("count")
-        private int extraCommentsCount;
-
-        /**
-         * The list of IDs of more comments to be loaded
-         */
-        @SerializedName("children")
-        private List<String> children;
-    }
-
-
-
-    /* --------------------- Inherited --------------------- */
-    /* ------------- RedditListing ------------- */
     /**
-     * {@inheritDoc}
+     * The list of IDs of more comments to be loaded
      */
-    @Override
-    public String getKind() {
-        return kind;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getID() {
-        return data.id;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getUrl() {
-        return data.url;
-    }
-
-    /**
-     * {@inheritDoc}
-     */@Override
-    public String getFullname() {
-        return data.fullname;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getCreatedAt() {
-        return (long)data.createdAt;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isNSFW() {
-        return data.nsfw;
-    }
-    /* ------------- End RedditListing ------------- */
-
-    /* ------------- PostableListing ------------- */
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getSubreddit() {
-        return data.subreddit;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getAuthor() {
-        return data.author;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getPermalink() {
-        return data.permalink;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isLocked() {
-        return data.isLocked;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isStickied() {
-        return data.isStickied;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isMod() {
-        if (data.distinguished == null) {
-            return false;
-        }
-
-        return data.distinguished.equals("moderator");
-    }
-    /* ------------- End PostableListing ------------- */
-
-    /* ------------- VoteableListing ------------- */
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getScore() {
-        return data.score;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isScoreHidden() {
-        return data.scoreHidden;
-    }
-
-    /**
-     * Retrieves the logged in users vote on the post
-     *
-     * @return If upvoted, VoteType.Upvote. If downvoted VoteType.Downvote
-     */
-    public VoteType getVoteType() {
-        if (data.liked == null) {
-            return VoteType.NO_VOTE;
-        }
-
-        return (data.liked ? VoteType.UPVOTE : VoteType.DOWNVOTE);
-    }
-
-    /**
-     * @param voteType The vote type for this post for the current user
-     */
-    public void setVoteType(VoteType voteType) {
-        // Update the internal data as that is used in getVoteType
-        switch (voteType) {
-            case UPVOTE:
-                data.liked = true;
-                break;
-            case DOWNVOTE:
-                data.liked = false;
-                break;
-            case NO_VOTE:
-                data.liked = null;
-                break;
-        }
-    }
-    /* ------------- End VoteableListing ------------- */
-    /* --------------------- End inherited --------------------- */
-
+    @SerializedName("children")
+    private List<String> children;
 
 
     /**
@@ -281,7 +61,7 @@ public class RedditComment implements VotableListing, PostableListing {
      */
     public String getBody(boolean adjustFormatting) {
         // TODO if a user posted a link just as a comment it should add the link formatting around it (can probably just do some regex)
-        return data.body;
+        return body;
     }
 
     /**
@@ -290,7 +70,7 @@ public class RedditComment implements VotableListing, PostableListing {
      * @return The HTML string of the comment
      */
     public String getBodyHtml() {
-        return data.bodyHtml;
+        return bodyHtml;
     }
 
     /**
@@ -299,7 +79,7 @@ public class RedditComment implements VotableListing, PostableListing {
      * @return The depth of the comment
      */
     public int getDepth() {
-        return data.depth;
+        return depth;
     }
 
     /**
@@ -311,9 +91,8 @@ public class RedditComment implements VotableListing, PostableListing {
      * @param depth The depth of the comment
      */
     public void setDepth(int depth) {
-        data.depth = depth;
+        depth = depth;
     }
-
 
     /**
      * Retrieves the list of replies this comment has
@@ -322,16 +101,16 @@ public class RedditComment implements VotableListing, PostableListing {
      */
     public List<RedditComment> getReplies() {
         // First time retrieving replies, create the list from data.replies
-        if (replies == null) {
-            if (data.replies != null) {
-                replies = getRepliesInternal();
+        if (repliesActual == null) {
+            if (repliesInternal != null) {
+                repliesActual = getRepliesInternal();
             } else {
                 // No more for the comment
-                replies = new ArrayList<>();
+                repliesActual = new ArrayList<>();
             }
         }
 
-        return replies;
+        return repliesActual;
     }
 
     private List<RedditComment> getRepliesInternal() {
@@ -339,14 +118,15 @@ public class RedditComment implements VotableListing, PostableListing {
         List<RedditComment> all = new ArrayList<>();
 
         // Loop through the list of replies and add the reply and the replies to the reply
-        replies = data.replies.getComments();
-        for (RedditComment reply : replies) {
+        repliesActual = (List<RedditComment>) repliesInternal.getListings();
+        for (RedditComment reply : repliesActual) {
             all.add(reply);
             all.addAll(reply.getReplies());
         }
 
         return all;
     }
+
 
     /**
      * Removes a reply from the comment
@@ -356,7 +136,7 @@ public class RedditComment implements VotableListing, PostableListing {
      * @param reply The reply to remove
      */
     public void removeReply(RedditComment reply) {
-        replies.remove(reply);
+        repliesActual.remove(reply);
     }
 
 
@@ -367,7 +147,7 @@ public class RedditComment implements VotableListing, PostableListing {
      * @return The list of ID's of the child comments
      */
     public List<String> getChildren() {
-        return data.children;
+        return children;
     }
 
     /**
@@ -385,7 +165,7 @@ public class RedditComment implements VotableListing, PostableListing {
         }
 
         // Add all as replies to this comment
-        this.replies.addAll(replies);
+        this.repliesActual.addAll(replies);
 
         // Each comment holds a list of the replies to itself, so for every reply add the rest of
         // the comment chain as a reply to it
@@ -394,10 +174,10 @@ public class RedditComment implements VotableListing, PostableListing {
 
             // Create the chain of this replies comments and add them
             List<RedditComment> replyChain = createCommentChain(replies, i);
-            if (reply.replies == null) {
-                reply.replies = new ArrayList<>();
+            if (reply.repliesActual == null) {
+                reply.repliesActual = new ArrayList<>();
             }
-            reply.replies.addAll(replyChain);
+            reply.repliesActual.addAll(replyChain);
         }
     }
 
@@ -432,6 +212,6 @@ public class RedditComment implements VotableListing, PostableListing {
      * @return
      */
     public int getExtraCommentsCount() {
-        return data.extraCommentsCount;
+        return extraCommentsCount;
     }
 }

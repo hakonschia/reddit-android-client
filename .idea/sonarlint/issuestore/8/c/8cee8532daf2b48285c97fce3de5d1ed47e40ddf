@@ -1,32 +1,40 @@
 
+T
+java:S1135o"2Complete the task associated to this TODO comment.(î—ãúÿÿÿÿ8ÖºÙ–Ï.
+M
+java:S1172v"+Remove this unused method parameter "view".(Æîœ¥ÿÿÿÿÿ8ÖºÙ–Ï.
+O
+java:S1602¾",Remove useless curly braces around statement(ÆØ€ßûÿÿÿÿ8ø½ÜùÏ.
+D
+java:S1068)"'Remove this unused "TAG" private field.(¢ª¦8Ê•È—Ï.
+O
+java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8Ê•È—Ï.
 _
 java:S1128"=Remove this unused import 'android.content.ClipboardManager'.(ŠİÒ¬ùÿÿÿÿ8ÜûîÎ.
-l
-java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8ÜûîÎ.
+N
+java:S1128""1Remove this unused import 'com.google.gson.Gson'.(–§8ÙÛîÎ.
+Q
+java:S1128"4Remove this unused import 'android.content.Context'.(©Ê‰è8ÜûîÎ.
+a
+java:S1128"DRemove this unused import 'androidx.core.app.ActivityOptionsCompat'.(êàà¯8ÙÛîÎ.
+]	java:S125p"<This block of commented-out lines of code should be removed.(ä»Å¡ûÿÿÿÿ8ÖºÙ–Ï.
 n
 java:S1128"LRemove this unused import 'com.example.hakonsreader.activites.PostActivity'.(»øà’şÿÿÿÿ8ÙÛîÎ.
-T
-java:S1135y"2Complete the task associated to this TODO comment.(î—ãúÿÿÿÿ8ÖºÙ–Ï.
-N
-java:S1172€"+Remove this unused method parameter "view".(Æîœ¥ÿÿÿÿÿ8ÖºÙ–Ï.
-S
-java:S1128"1Remove this unused import 'android.widget.Toast'.(©›ïÍúÿÿÿÿ8ÜûîÎ.
+l
+java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8ÜûîÎ.
 W
 java:S1128"5Remove this unused import 'android.content.ClipData'.(°ú‚üÿÿÿÿ8ÜûîÎ.
 j
 java:S1128"ORemove this unused import 'androidx.recyclerview.widget.DividerItemDecoration'.(µÍáçÿÿÿÿÿ
-]	java:S125z"<This block of commented-out lines of code should be removed.(ä»Å¡ûÿÿÿÿ8ÖºÙ–Ï.
+q
+java:S1128"TRemove this unused import 'com.example.hakonsreader.interfaces.ItemLoadingListener'.(ìÄƒñ8¡ÛùÏ.
 O
-java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8Ê•È—Ï.
-D
-java:S1068)"'Remove this unused "TAG" private field.(¢ª¦8Ê•È—Ï.
+java:S1612¾",Replace this lambda with a method reference.(ÆØ€ßûÿÿÿÿ8éŒâùÏ.
 Z
 java:S1128#"8Remove this unused import 'com.google.gson.GsonBuilder'.(”«à¬ÿÿÿÿÿ8ÜûîÎ.
+S
+java:S1128"1Remove this unused import 'android.widget.Toast'.(©›ïÍúÿÿÿÿ8ÜûîÎ.
 O
 java:S1128"3Remove this unused import 'android.content.Intent'.(³ğ‹G8ÙÛîÎ.
-a
-java:S1128"DRemove this unused import 'androidx.core.app.ActivityOptionsCompat'.(êàà¯8ÙÛîÎ.
-Q
-java:S1128"4Remove this unused import 'android.content.Context'.(©Ê‰è8ÜûîÎ.
-N
-java:S1128""1Remove this unused import 'com.google.gson.Gson'.(–§8ÙÛîÎ.
+]
+java:S1128!"@Remove this unused import 'com.example.hakonsreader.views.Post'.(Íæ˜¡8÷†‰øÏ.

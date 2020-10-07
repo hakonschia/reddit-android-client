@@ -1,9 +1,13 @@
 
+M
+java:S1135C"2Complete the task associated to this TODO comment.(À–÷¿øÿÿÿÿ
+Š
+java:S3252F"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(Ü¦›úÿÿÿÿ8Ï¢ºìÎ.
+q
+java:S1128"TRemove this unused import 'com.example.hakonsreader.interfaces.ItemLoadingListener'.(ìÄƒñ8ù²ÙùÏ.
 D
 java:S10680"'Remove this unused "TAG" private field.(Ö—ÈÚ8¯¦ëíÎ.
-M
-java:S1135E"2Complete the task associated to this TODO comment.(À–÷¿øÿÿÿÿ
-Š
-java:S3252H"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(Ü¦›úÿÿÿÿ8Ï¢ºìÎ.
+I
+java:S1602H",Remove useless curly braces around statement(¨úøŠ8ÑÂØùÏ.
 U
 java:S1068%"3Remove this unused "globalOffensive" private field.(àŸêşÿÿÿÿ8”·ëÎÍ.

@@ -2,7 +2,6 @@ package com.example.hakonsreader.activites;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;

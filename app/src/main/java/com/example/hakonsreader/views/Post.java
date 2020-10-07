@@ -72,7 +72,7 @@ public class Post extends RelativeLayout {
      * @param post The post to use
      */
     public void setPostData(RedditPost post) {
-        this.postData = post;
+        postData = post;
 
         super.setOnClickListener(v -> this.openPost());
         super.setOnLongClickListener(v -> {

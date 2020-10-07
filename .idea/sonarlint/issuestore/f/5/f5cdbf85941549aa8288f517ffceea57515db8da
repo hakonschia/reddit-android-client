@@ -1,16 +1,18 @@
 
+j
+java:S1128"HRemove this unused import 'com.example.hakonsreader.views.ContentVideo'.(ü‹æáüÿÿÿÿ8ÉÚ¶ÍÍ.
+V
+java:S1128"4Remove this unused import 'androidx.core.util.Pair'.(©Ğûúşÿÿÿÿ8˜Ü“îÎ.
+r
+java:S1128"PRemove this unused import 'com.example.hakonsreader.interfaces.OnClickListener'.(“´÷îøÿÿÿÿ8æ£îÎ.
 P
 java:S1128".Remove this unused import 'android.os.Bundle'.(°şÊóøÿÿÿÿ8˜Ü“îÎ.
 O
 java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8éÃÉ–Ï.
-r
-java:S1128"PRemove this unused import 'com.example.hakonsreader.interfaces.OnClickListener'.(“´÷îøÿÿÿÿ8æ£îÎ.
-D
-java:S1068"'Remove this unused "TAG" private field.(¡…”‰8éÃÉ–Ï.
 b
 java:S1128
 "@Remove this unused import 'androidx.core.content.ContextCompat'.(üäÂùÿÿÿÿ8ìé†÷Í.
-j
-java:S1128"HRemove this unused import 'com.example.hakonsreader.views.ContentVideo'.(ü‹æáüÿÿÿÿ8ÉÚ¶ÍÍ.
-V
-java:S1128"4Remove this unused import 'androidx.core.util.Pair'.(©Ğûúşÿÿÿÿ8˜Ü“îÎ.
+D
+java:S1068 "'Remove this unused "TAG" private field.(¡…”‰8éÃÉ–Ï.
+l
+java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8éğòĞ.

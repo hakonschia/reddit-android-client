@@ -22,7 +22,7 @@ public class AccessToken {
     private int expiresIn;
 
     @SerializedName("device_id")
-    private String deviceID;
+    private String deviceId;
 
 
     /**
@@ -39,21 +39,21 @@ public class AccessToken {
      * @return The actual token this {@link AccessToken} represents
      */
     public String getAccessToken() {
-        return this.accessToken;
+        return accessToken;
     }
 
     /**
      * @return The type of token this is
      */
     public String getTokenType() {
-        return this.tokenType;
+        return tokenType;
     }
 
     /**
      * @return The token used to refresh the token value when expired
      */
     public String getRefreshToken() {
-        return this.refreshToken;
+        return refreshToken;
     }
 
     /**
@@ -61,17 +61,15 @@ public class AccessToken {
      * the token expires, but how many seconds it is valid for from when the token was retrieved
      */
     public int getExpiresIn() {
-        return this.expiresIn;
+        return expiresIn;
     }
 
     /**
-     * Retrieve the device ID the token is for. This is only applicable for access tokens for non-logged in
-     * users. See <a href="https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth">Reddit OAuth documentation</a> for more information
-     *
-     * @return
+     * @return The device ID the token is for. This is only applicable for access tokens for non-logged in
+     *      * users. See <a href="https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth">Reddit OAuth documentation</a> for more information
      */
-    public String getDeviceID() {
-        return deviceID;
+    public String getDeviceId() {
+        return deviceId;
     }
 
     /**
@@ -80,7 +78,7 @@ public class AccessToken {
      * @return An array of the scopes
      */
     public String[] getScopes() {
-        return this.scope.split(" ");
+        return scope.split(" ");
     }
 
 
@@ -90,10 +88,10 @@ public class AccessToken {
      * @return "tokenType tokenValue". If either the type or value is null an empty string is returned
      */
     public String generateHeaderString() {
-        if (this.tokenType == null || this.accessToken == null) {
+        if (tokenType == null || accessToken == null) {
             return  "";
         } else {
-            return this.tokenType + " " + this.accessToken;
+            return tokenType + " " + accessToken;
         }
     }
 
@@ -106,7 +104,7 @@ public class AccessToken {
                 ", scope='" + scope + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
                 ", expiresIn=" + expiresIn +
-                ", deviceID='" + deviceID + '\'' +
+                ", deviceID='" + deviceId + '\'' +
                 '}';
     }
 }
