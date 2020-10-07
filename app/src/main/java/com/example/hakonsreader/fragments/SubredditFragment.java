@@ -131,35 +131,37 @@ public class SubredditFragment extends Fragment {
      * and {@link PostsAdapter.ViewHolder#onUnSelected()} based on if a post has been "selected" (ie. is the main
      * item on the screen) or "unselected" (ie. no longer the main item)
      *
-     * @param startPost The index of the post to start at
-     * @param endPost The index of the post to end at
+     * @param startPost The index of the post to start at (from {@link PostsAdapter#getPosts()} or {@link SubredditFragment#layoutManager}
+     * @param endPost The index of the post to end at (from {@link PostsAdapter#getPosts()} or {@link SubredditFragment#layoutManager}
      * @param scrollingUp Whether or not we are scrolling up or down in the list
      */
     private void checkSelectedPost(int startPost, int endPost, boolean scrollingUp) {
         // The behavior is:
-        // 1. If the list is being scrolled UP and the bottom of the view is under the screen, the view is UN SELECTED
-        // 2. If the top of the view is above the screen, the view is UN SELECTED
-        // 3. If the top of the view is above 3/4th of the screen, the view is SELECTED
+        // When scrolling UP:
+        // 1. If the bottom of the content is under the screen, the view is UN SELECTED
+
+        // When scrolling DOWN:
+        // 1. If the top of the content is above the screen, the view is UN SELECTED
+        // 2. If the top of the content is above 3/4th of the screen, the view is SELECTED
 
 
-        // Go through all visible views and select/unselect the view holder based on where on the screen they are
+        // Go through all visible views and select/un select the view holder based on where on the screen they are
         for (int i = startPost; i <= endPost; i++) {
             PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
-            View view = layoutManager.findViewByPosition(i);
 
             // If we have no view holder there isn't anything we can do later
-            if (viewHolder == null || view == null) {
+            if (viewHolder == null) {
                 continue;
             }
 
+            // (0, 0) is top left
             int y = viewHolder.getContentY();
             int viewBottom = viewHolder.getContentBottomY();
 
-            // (0, 0) is top left
-
-            // When scrolling up and view is under the screen it is "unselected"
-            if (scrollingUp && viewBottom > screenHeight) {
-                viewHolder.onUnSelected();
+            if (scrollingUp) {
+                if (viewBottom > screenHeight) {
+                    viewHolder.onUnSelected();
+                }
             } else {
                 // If the view is above the screen (< 0) it is "unselected"
                 // If the view is visible 3/4th the way up it is "selected"
