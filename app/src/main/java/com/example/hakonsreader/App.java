@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
@@ -26,6 +25,7 @@ import io.noties.markwon.Markwon;
 import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TablePlugin;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 
 /**
@@ -130,18 +130,21 @@ public class App extends Application {
 
 
     /**
-     * Sets up the reddit API object
+     * Sets up {@link App#redditApi}
      */
     private void setupRedditApi() {
-        // Set the previously stored token, and the listener for new tokens
-        redditApi = RedditApi.getInstance(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID);
-        redditApi.setToken(TokenManager.getToken());
-        redditApi.setOnNewToken(TokenManager::saveToken);
-        //redditApi.setLoggingLevel(HttpLoggingInterceptor.Level.BODY);
-        redditApi.setCallbackURL(NetworkConstants.CALLBACK_URL);
-        redditApi.setDeviceID(UUID.randomUUID().toString());
+         redditApi = new RedditApi.Builder(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID)
+                 .accessToken(TokenManager.getToken())
+                 .onNewToken(TokenManager::saveToken)
+                 .loggerLevel(HttpLoggingInterceptor.Level.BODY)
+                 .callbackUrl(NetworkConstants.CALLBACK_URL)
+                 .deviceId(UUID.randomUUID().toString())
+                 .build();
     }
 
+    /**
+     * @return The {@link RedditApi} object to use for API calls
+     */
     public RedditApi getApi() {
         return redditApi;
     }

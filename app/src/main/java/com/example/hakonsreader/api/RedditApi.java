@@ -20,6 +20,8 @@ import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -111,7 +113,7 @@ public class RedditApi {
     /**
      * The callback URL used for OAuth
      */
-    private String callbackURL;
+    private String callbackUrl;
 
     /**
      * The client ID for the application
@@ -131,7 +133,7 @@ public class RedditApi {
     /**
      * The device ID to send to Reddit for non-logged in user access tokens
      */
-    private String deviceID;
+    private String deviceId;
 
 
     private RedditApi(String userAgent, String clientID) {
@@ -182,88 +184,128 @@ public class RedditApi {
         this.oauthService = oauthRetrofit.create(RedditOAuthService.class);
     }
 
-
     /**
-     * Retrieves the singleton instance of the API.
-     *
-     * <p>Use relevant setters when getting the instance for the first time</p>
-     * <p>Setters</p>
-     *
-     * @param userAgent The user agent for the application. This cannot be changed after the instance is created
-     *                  <p>See <a href="https://github.com/reddit-archive/reddit/wiki/API">Reddit documentation</a>
-     *                  on creating your user agent</p>
-     * @param clientID The client ID of the application
-     *                 <p>To find your client ID see <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
-     *
-     * @return The RedditApi instance
+     * Builder for API objects
      */
-    public static RedditApi getInstance(String userAgent, String clientID) {
-        if (instance == null) {
-            instance = new RedditApi(userAgent, clientID);
+    public static class Builder {
+        private boolean built = false;
+
+        private String userAgent;
+        private String clientId;
+
+        private AccessToken accessToken;
+        private OnNewToken onNewToken;
+        private HttpLoggingInterceptor logger;
+        private String callbackUrl;
+        private String deviceId;
+
+
+        /**
+         * Creates a new API builder. The required parameters for the API are User-Agent and client ID, which
+         * are the parameters to this constructor.
+         *
+         * @param userAgent The user agent for the application. This cannot be changed after the instance is created
+         *                  <p>See <a href="https://github.com/reddit-archive/reddit/wiki/API">Reddit documentation</a>
+         *                  on creating your user agent</p>
+         * @param clientId The client ID of the application
+         *                 <p>To find your client ID see <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
+         */
+        public Builder(@NotNull String userAgent, @NotNull String clientId) {
+            if (userAgent.isEmpty()) {
+                throw new IllegalStateException("User Agent must not be empty. See https://github.com/reddit-archive/reddit/wiki/API for more information");
+            } else if (clientId.isEmpty()) {
+                throw new IllegalStateException("Client ID must not be empty. See https://www.reddit.com/prefs/apps for more information");
+            }
+
+            this.userAgent = userAgent;
+            this.clientId = clientId;
         }
 
-        return instance;
-    }
+        /**
+         * Sets the access token to use for authorized API calls
+         *
+         * <p>This only has to be set during the initial initialization. When new tokens are retrieved
+         * the internal value is set automatically. To retrieve the new token use {@link RedditApi.Builder#onNewToken(OnNewToken)}</p>
+         *
+         * @param accessToken The token to use
+         */
+        public Builder accessToken(AccessToken accessToken) {
+            this.accessToken = accessToken;
+            return this;
+        }
 
-    /**
-     * If an access token is set a new one is automatically retrieved when a request is attempted with
-     * an invalid token. This sets the listener for what to do when a new token is received by the API
-     *
-     * @param onNewToken The token listener. Holds an {@link AccessToken} object
-     */
-    public void setOnNewToken(OnNewToken onNewToken) {
-        this.onNewToken = onNewToken;
-    }
+        /**
+         * Sets the callback for when new access tokens have been received. If an access token is set a
+         * new one is automatically retrieved when a request is attempted with an invalid token.
+         * This sets the listener for what to do when a new token is received by the API
+         *
+         * @param onNewToken The token listener. Holds an {@link AccessToken} object
+         */
+        public Builder onNewToken(OnNewToken onNewToken) {
+            this.onNewToken = onNewToken;
+            return this;
+        }
 
-    /**
-     * Sets the {@link HttpLoggingInterceptor.Level} to use
-     *
-     * @param loggingLevel The level at what to log
-     */
-    public void setLoggingLevel(HttpLoggingInterceptor.Level loggingLevel) {
-        this.logger.setLevel(loggingLevel);
-    }
+        /**
+         * Sets the {@link HttpLoggingInterceptor.Level} to use for logging of the API calls.
+         *
+         * @param level The level to log
+         */
+        public Builder loggerLevel(HttpLoggingInterceptor.Level level) {
+            this.logger = new HttpLoggingInterceptor();
+            this.logger.setLevel(level);
+            return this;
+        }
+
+        /**
+         * Sets the callback URL used for OAuth. This is used when retrieving access tokens
+         * <p>This must match the callback URL set in <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
+         *
+         * @param callbackUrl The URL to use for OAuth access tokens
+         */
+        public Builder callbackUrl(String callbackUrl) {
+            this.callbackUrl = callbackUrl;
+            return this;
+        }
+
+        /**
+         * Sets the device ID to use to receive access tokens for non-logged in users
+         *
+         * <p>If this is null or empty "DO_NOT_TRACK_THIS_DEVICE" will be used. See
+         * <a href="https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth">
+         *     Reddit OAuth documentation</a> for more information</p>
+         *
+         * @param deviceId The device ID to use
+         */
+        public Builder deviceId(String deviceId) {
+            this.deviceId = deviceId;
+            return this;
+        }
 
 
-    /**
-     * Sets the access token to use for authorized API calls
-     * 
-     * <p>This only has to be set during the initial initialization. When new tokens are retrieved
-     * the internal value is set automatically. To retrieve the new token use {@link RedditApi#setOnNewToken(OnNewToken)}</p>
-     *
-     * @param token The token to use
-     */
-    public void setToken(AccessToken token) {
-        if (token != null) {
-            this.accessToken = token;
-        } else {
-            this.accessToken = new AccessToken();
+        /**
+         * Builds the API
+         *
+         * @throws IllegalStateException if the builder has already been built
+         * @return An API object with the corresponding values set
+         */
+        public RedditApi build() {
+            if (!built) {
+                built = true;
+            } else {
+                throw new IllegalStateException("Builder is already used. Use new RedditApi.Builder() to create a new one");
+            }
+
+            RedditApi api = new RedditApi(userAgent, clientId);
+            api.accessToken = accessToken;
+            api.onNewToken = onNewToken;
+            api.logger = logger;
+            api.callbackUrl = callbackUrl;
+            api.deviceId = deviceId;
+
+            return api;
         }
     }
-
-    /**
-     * Sets the callback URL used for OAuth. This is used when retrieving access tokens
-     * <p>This must match the callback URL set in <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
-     *
-     * @param callbackURL The URL to use for OAuth access tokens
-     */
-    public void setCallbackURL(String callbackURL) {
-        this.callbackURL = callbackURL;
-    }
-
-    /**
-     * Set the device ID to use to receive access tokens for non-logged in users
-     *
-     * <p>If this is null or empty "DO_NOT_TRACK_THIS_DEVICE" will be used. See
-     * <a href="https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth">
-     *     Reddit OAuth documentation</a> for more information</p>
-     *
-     * @param deviceID The device ID to use
-     */
-    public void setDeviceID(String deviceID) {
-        this.deviceID = deviceID;
-    }
-
 
     /**
      * Convenience method to set the internal token. This calls the registered token listener
@@ -286,8 +328,8 @@ public class RedditApi {
      * Asynchronously retrieves an access token from Reddit.
      *
      * <p>Note: The new access token is given with the registered token listener. Use
-     * {@link RedditApi#setOnNewToken(OnNewToken)} to retrieve the new token</p>
-     * <p>Note: The callback URL must be set with {@link RedditApi#setCallbackURL(String)}</p>
+     * {@link RedditApi.Builder#onNewToken(OnNewToken)} when creating the API object to retrieve the new token</p>
+     * <p>Note: The callback URL must be set with {@link RedditApi.Builder#callbackUrl(String)}</p>
      *
      * @param code The authorization code retrieved from the initial login process
      * @param onResponse The callback for successful requests. Does not hold anything, but is called with
@@ -296,16 +338,15 @@ public class RedditApi {
      */
     @EverythingIsNonNull
     public void getAccessToken(String code, OnResponse<Void> onResponse, OnFailure onFailure) {
-        if (this.callbackURL == null) {
-            onFailure.onFailure(-1, new Throwable("Callback URL is not set. Use RedditApi.setCallbackURL()"));
-            return;
+        if (this.callbackUrl == null) {
+            throw new IllegalStateException("Callback URL is not set. Use RedditApi.Builder.callbackUrl()");
         }
 
         this.oauthService.getAccessToken(
                 this.basicAuthHeader,
                 code,
                 OAuthConstants.GRANT_TYPE_AUTHORIZATION,
-                this.callbackURL
+                this.callbackUrl
         ).enqueue(new Callback<AccessToken>() {
             @Override
             public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
@@ -788,7 +829,7 @@ public class RedditApi {
     private AccessToken newNonLoggedInToken() {
         AccessToken newToken = null;
         try {
-            String device = (deviceID == null || deviceID.isEmpty() ? "DO_NOT_TRACK_THIS_DEVICE" : deviceID);
+            String device = (deviceId == null || deviceId.isEmpty() ? "DO_NOT_TRACK_THIS_DEVICE" : deviceId);
 
             newToken = oauthService.getAccessTokenNoUser(
                     basicAuthHeader,
