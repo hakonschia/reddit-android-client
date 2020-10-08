@@ -92,26 +92,25 @@ public class MarkdownAdjuster {
         // not super important to be strictly compliant here)
         // If we are in a link [](#here) it isn't actually a header, so we shouldn't add a space
 
+        // Markdown works on lines, so for headers we only need to care about the first section of hashtags as a header
+        // So if another hashtag that would be seen as a header appears, nothing will be done (as it should be)
+        String[] lines = markdown.split("\n");
 
-        // TODO I can probably find the position of a # and find the position of the first non-hashtag
-        //  and just insert a space there if needed (without looping through the entire text)
-        //  Not Sure if that would actually be faster, but I would assume so
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            line = this.addSpacesToHeader(line);
 
-        for (int i = 0; i < markdown.length(); i++) {
-            char character = markdown.charAt(i);
+            // The line object has now either been edited, or is as it should be, so append it on the builder
+            builder.append(line);
 
-            char previous = '\0';
-            if (i != 0) {
-                previous = markdown.charAt(i - 1);
-            }
-
-            // Now on a header (#) and the previous character wasn't a '(' (as in inside a link)
-            if (character == '#' && previous != '(') {
-                markdown = this.addSpacesToHeader(markdown, i);
+            // Add back the newline unless we are at the end
+            if (i + 1 != lines.length) {
+                builder.append('\n');
             }
         }
 
-        return markdown;
+        return builder.toString();
     }
 
     private String adjustRedditSpecificLinks(String markdown) {
@@ -126,17 +125,22 @@ public class MarkdownAdjuster {
      * Adds spaces between a header symbol and the content
      *
      * @param markdown The markdown to change
-     * @param startPos The position of the first header symbol
      * @return A string with the markdown adjusted (if necessary)
      */
-    private String addSpacesToHeader(String markdown, int startPos) {
+    private String addSpacesToHeader(String markdown) {
+        // Not a header, return the text
+        if (markdown.charAt(0) != '#') {
+            return markdown;
+        }
 
         // The starting point of the actual header
-        int startText = -1;
-
+        int textStart = -1;
         boolean startTextFound = false;
-        int i = startPos + 1;
 
+        // Start at the next character
+        int i = 1;
+
+        // Find the starting point of the text content
         while (!startTextFound && i < markdown.length()) {
             char character = markdown.charAt(i);
 
@@ -147,17 +151,17 @@ public class MarkdownAdjuster {
                 if (character == ' ') {
                     break;
                 }
-                startText = i;
+                textStart = i;
             }
 
-            startTextFound = startText != -1;
+            startTextFound = textStart != -1;
             i++;
         }
 
         // If we need to insert the space
-        if (startText != -1) {
+        if (textStart != -1) {
             StringBuilder stringBuilder = new StringBuilder(markdown);
-            stringBuilder.insert(startText, ' ');
+            stringBuilder.insert(textStart, ' ');
             markdown = stringBuilder.toString();
         }
 

@@ -67,6 +67,10 @@ public class MarkdownAdjusterTest {
         assertEquals(expected, actual);
     }
 
+    /**
+     * Tests that if a line has what technically would look like multiple headers, space is only added
+     * for the first header as you can't have nested headers
+     */
     @Test
     public void testMultipleHeadersInOneLine() {
         MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
