@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
@@ -118,7 +116,7 @@ public class RedditApi {
     /**
      * The client ID for the application
      */
-    private String clientID;
+    private String clientId;
 
     /**
      * The basic authentication header with client ID. Includes "Basic " prefix
@@ -136,18 +134,19 @@ public class RedditApi {
     private String deviceId;
 
 
-    private RedditApi(String userAgent, String clientID) {
+    private RedditApi(String userAgent, String clientId) {
         this.userAgent = userAgent;
+        this.clientId = clientId;
 
-        this.clientID = clientID;
         // Create the header value now as it is unnecessary to re-create it for every call
         // The username:password is the client ID + client secret (for installed apps there is no secret)
-        this.basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((clientID + ":").getBytes());
+        basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((clientId + ":").getBytes());
+    }
 
-        this.accessToken = new AccessToken();
-        this.logger = new HttpLoggingInterceptor();
-
-
+    /**
+     * Creates the service objects used for API calls
+     */
+    private void createServices() {
         OkHttpClient apiClient = new OkHttpClient.Builder()
                 // Automatically refresh access token on authentication errors (401)
                 .authenticator(new Authenticator())
@@ -156,7 +155,7 @@ public class RedditApi {
                 // Ensure that an access token is always set before sending a request
                 .addInterceptor(new NoTokenInterceptor())
                 // Logger has to be at the end or else it won't log what has been added before
-                .addInterceptor(this.logger)
+                .addInterceptor(logger)
                 .build();
 
         // Create the API service used to make calls towards oauth.reddit.com
@@ -165,14 +164,14 @@ public class RedditApi {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(apiClient)
                 .build();
-        this.api = apiRetrofit.create(RedditApiService.class);
+        api = apiRetrofit.create(RedditApiService.class);
 
         // The OAuth client does not need interceptors/authenticators for tokens as it doesn't
         // use the access tokens for authorization
         OkHttpClient oauthClient = new OkHttpClient.Builder()
                 // Add User-Agent header to every request
                 .addInterceptor(new UserAgentInterceptor())
-                .addInterceptor(this.logger)
+                .addInterceptor(logger)
                 .build();
 
         // Create the API service used to make API calls towards www.reddit.com
@@ -181,7 +180,7 @@ public class RedditApi {
                 .baseUrl(REDDIT_URL)
                 .client(oauthClient)
                 .build();
-        this.oauthService = oauthRetrofit.create(RedditOAuthService.class);
+        oauthService = oauthRetrofit.create(RedditOAuthService.class);
     }
 
     /**
@@ -219,6 +218,10 @@ public class RedditApi {
 
             this.userAgent = userAgent;
             this.clientId = clientId;
+
+            // Variables that cannot be null
+            this.accessToken = new AccessToken();
+            this.logger = new HttpLoggingInterceptor();
         }
 
         /**
@@ -227,10 +230,14 @@ public class RedditApi {
          * <p>This only has to be set during the initial initialization. When new tokens are retrieved
          * the internal value is set automatically. To retrieve the new token use {@link RedditApi.Builder#onNewToken(OnNewToken)}</p>
          *
+         * <p>If the passed access token is null it is not added</p>
+         *
          * @param accessToken The token to use
          */
         public Builder accessToken(AccessToken accessToken) {
-            this.accessToken = accessToken;
+            if (accessToken != null) {
+                this.accessToken = accessToken;
+            }
             return this;
         }
 
@@ -252,7 +259,6 @@ public class RedditApi {
          * @param level The level to log
          */
         public Builder loggerLevel(HttpLoggingInterceptor.Level level) {
-            this.logger = new HttpLoggingInterceptor();
             this.logger.setLevel(level);
             return this;
         }
@@ -293,7 +299,7 @@ public class RedditApi {
             if (!built) {
                 built = true;
             } else {
-                throw new IllegalStateException("Builder is already used. Use new RedditApi.Builder() to create a new one");
+                throw new IllegalStateException("Builder is already used. Use 'new RedditApi.Builder()' to create a new one");
             }
 
             RedditApi api = new RedditApi(userAgent, clientId);
@@ -302,6 +308,8 @@ public class RedditApi {
             api.logger = logger;
             api.callbackUrl = callbackUrl;
             api.deviceId = deviceId;
+
+            api.createServices();
 
             return api;
         }
@@ -606,7 +614,6 @@ public class RedditApi {
         ).enqueue(new Callback<MoreCommentsResponse>() {
             @Override
             public void onResponse(Call<MoreCommentsResponse> call, Response<MoreCommentsResponse> response) {
-                Log.d(TAG, "onResponse: nice");
                 MoreCommentsResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -626,7 +633,6 @@ public class RedditApi {
 
             @Override
             public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
-                Log.d(TAG, "onResponse: not nice");
                 onFailure.onFailure(-1, t);
             }
         });
