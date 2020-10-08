@@ -1,11 +1,9 @@
 package com.example.hakonsreader.activites;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -31,19 +29,26 @@ public class PostActivity extends AppCompatActivity {
     private static final String TAG = "PostActivity";
 
     /**
-     * The key used for sending the ID of the post to this activity
+     * The key used for sending the post to this activity
      */
-    public static final String POST = "post";
+    public static final String POST_KEY = "post";
+
+    /**
+     * The key used for sending the ID of the post to this activity
+     *
+     * <p>Use this is the post isn't retrieved when starting the activity</p>
+     */
+    public static final String POST_ID_KEY = "post_id";
 
     /**
      * They key used to tell what kind of listing something is
      */
-    public static final String KIND = "kind";
+    public static final String KIND_KEY = "kind";
 
     /**
      * The key used in intent extras for listings
      */
-    public static final String LISTING = "listing";
+    public static final String LISTING_KEY = "listing";
 
     /**
      * Request code for opening a reply activity
@@ -111,7 +116,7 @@ public class PostActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_REPLY) {
                 if (data != null) {
-                    RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING), RedditComment.class);
+                    RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING_KEY), RedditComment.class);
 
                     // Adding a top-level comment
                     if (replyingTo instanceof RedditPost) {
@@ -131,18 +136,14 @@ public class PostActivity extends AppCompatActivity {
      */
     private void loadComments() {
         Intent intent = getIntent();
-        Uri uri = intent.getData();
+        Bundle extras = intent.getExtras();
 
         String postId;
+        String p = extras.getString(POST_KEY);
 
-        // The activity was started from a URL intent (ie. https://reddit.com/r/.../comments/...
-        if (uri != null) {
-            // The URI will look like: reddit.com/r/<subreddit>/comments/<postId/...
-            postId = uri.getPathSegments().get(3);
-        } else {
-            Bundle extras = intent.getExtras();
-
-            post = new Gson().fromJson(extras.getString(POST), RedditPost.class);
+        // If activity is started with post data
+        if (p != null) {
+            post = new Gson().fromJson(p, RedditPost.class);
             postId = post.getId();
 
             this.onPostLoaded();
@@ -162,6 +163,9 @@ public class PostActivity extends AppCompatActivity {
                     }
                 }
             });
+        } else {
+            // If post is started with only the ID of the post
+            postId = extras.getString(POST_ID_KEY);
         }
 
         commentsViewModel.loadComments(binding.parentLayout, postId);
@@ -270,8 +274,8 @@ public class PostActivity extends AppCompatActivity {
 
         // Open activity or fragment or something to allow reply
         Intent intent = new Intent(this, ReplyActivity.class);
-        intent.putExtra(KIND, listing.getKind());
-        intent.putExtra(LISTING, new Gson().toJson(listing));
+        intent.putExtra(KIND_KEY, listing.getKind());
+        intent.putExtra(LISTING_KEY, new Gson().toJson(listing));
 
         startActivityForResult(intent, REQUEST_REPLY);
         overridePendingTransition(R.anim.slide_up, R.anim.slide_down);

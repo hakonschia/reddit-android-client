@@ -1,11 +1,11 @@
 
-I
-java:S1068"'Remove this unused "TAG" private field.(˜Ó×Ïúÿÿÿÿ8ì øôÍ.
-T
-java:S18745"7Remove this use of "FLAG_FULLSCREEN"; it is deprecated.(­‰ı›8ÚîÚ—Î.
-Y
-java:S18744"7Remove this use of "FLAG_FULLSCREEN"; it is deprecated.(ÛŒ şÿÿÿÿ8ÚîÚ—Î.
 P
 java:S1128".Remove this unused import 'android.view.View'.(Ø½­äşÿÿÿÿ8–ì°õÍ.
+T
+java:S18743"7Remove this use of "FLAG_FULLSCREEN"; it is deprecated.(­‰ı›8ÚîÚ—Î.
+I
+java:S1068"'Remove this unused "TAG" private field.(˜Ó×Ïúÿÿÿÿ8ì øôÍ.
 l
-java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8¸â–Ğ.
+java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8¸â–Ğ.
+Y
+java:S18742"7Remove this use of "FLAG_FULLSCREEN"; it is deprecated.(ÛŒ şÿÿÿÿ8ÚîÚ—Î.

@@ -43,8 +43,8 @@ public class ReplyActivity extends AppCompatActivity {
         // TODO get comment/post
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String jsonData = extras.getString(PostActivity.LISTING);
-            String kind = extras.getString(PostActivity.KIND);
+            String jsonData = extras.getString(PostActivity.LISTING_KEY);
+            String kind = extras.getString(PostActivity.KIND_KEY);
 
             if (kind.equals(Thing.POST.getValue())) {
                 replyingTo = new Gson().fromJson(jsonData, RedditPost.class);
@@ -89,7 +89,7 @@ public class ReplyActivity extends AppCompatActivity {
 
             // Pass the new comment back and finish
             Intent data = new Intent()
-                    .putExtra(PostActivity.LISTING, new Gson().toJson(comment));
+                    .putExtra(PostActivity.LISTING_KEY, new Gson().toJson(comment));
 
             setResult(RESULT_OK, data);
             finish();

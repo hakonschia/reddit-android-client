@@ -1,18 +1,7 @@
 
-l
-java:S1128"JRemove this unused import 'com.example.hakonsreader.api.model.RedditPost'.(€°Ñ˜ÿÿÿÿÿ8ñ±ôĞ.
-V
-java:S1128"4Remove this unused import 'android.widget.TextView'.(„Ë‚ˆÿÿÿÿÿ8İ‰åÇÎ.
-D
-java:S1068&"'Remove this unused "TAG" private field.(Ò€í´8ä³èÇÎ.
-V
-java:S1128"9Remove this unused import 'com.squareup.picasso.Picasso'.(£œ¿×8ÈˆÖÇÎ.
-U
-java:S1135Æ"2Complete the task associated to this TODO comment.( ‰¬‰şÿÿÿÿ8íÊô—Ï.
-W
-java:S1128
-"5Remove this unused import 'android.widget.ImageView'.(ú¯ëàüÿÿÿÿ8ÈˆÖÇÎ.
-O
-java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8ä³èÇÎ.
 [
-java:S2589‡"8Remove this expression which always evaluates to "false"(¢õ®âøÿÿÿÿ8üÿšĞ.
+java:S2589"8Remove this expression which always evaluates to "false"(¢õ®âøÿÿÿÿ8üÿšĞ.
+U
+java:S1135À"2Complete the task associated to this TODO comment.( ‰¬‰şÿÿÿÿ8íÊô—Ï.
+D
+java:S1068 "'Remove this unused "TAG" private field.(Ò€í´8ä³èÇÎ.

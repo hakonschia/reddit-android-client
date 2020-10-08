@@ -1,7 +1,5 @@
 
-M
-java:S5411·"*Use the primitive boolean expression here.(¼ÈŸıÿÿÿÿ8¼¢ÕĞ.
-I
-java:S1068"'Remove this unused "TAG" private field.(ÿ´¶‰üÿÿÿÿ8¼¢ÕĞ.
-j
-java:S1128"HRemove this unused import 'com.example.hakonsreader.api.enums.PostType'.(’öîêøÿÿÿÿ8ï©æĞ.
+U
+java:S1135¨"2Complete the task associated to this TODO comment.(ï±˜Ûıÿÿÿÿ8ĞÊæĞ.
+b
+java:S1128"ERemove this unused import 'com.example.hakonsreader.api.enums.Thing'.(¯ôÄø8Æéé“Ğ.

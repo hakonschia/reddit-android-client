@@ -1,9 +1,17 @@
 
-P
-java:S1135›"2Complete the task associated to this TODO comment.(ˆŸá8€õè¡Ï.
-Z
-java:S1172š"7Remove this unused method parameter "adjustFormatting".(ãƒŒÒúÿÿÿÿ8ÿÕÿ Ï.
-M
-java:S5411ü"*Use the primitive boolean expression here.(¼ÈŸıÿÿÿÿ8°ŸúöÍ.
+€
+java:S4165^"cRemove this useless assignment; "depth" already holds the assigned value along all execution paths.( ğÀÏ8½˜ÔĞ.
+O
+java:S1135?"2Complete the task associated to this TODO comment.(ˆŸá8Ä‚äĞ.
 I
-java:S1068"'Remove this unused "TAG" private field.(Â™ÌÚùÿÿÿÿ8°ŸúöÍ.
+java:S1068"'Remove this unused "TAG" private field.(Â™ÌÚùÿÿÿÿ8È·Ú“Ğ.
+V
+java:S1854^"9Remove this useless assignment to local variable "depth".( ğÀÏ8Ä‚äĞ.
+O
+java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8È·Ú“Ğ.
+L
+java:S1656^"/Remove or correct this useless self-assignment.( ğÀÏ8Ä‚äĞ.
+Y
+java:S1172>"7Remove this unused method parameter "adjustFormatting".(ãƒŒÒúÿÿÿÿ8Ä‚äĞ.
+b
+java:S1128"ERemove this unused import 'com.example.hakonsreader.api.enums.Thing'.(¯ôÄø8É·é“Ğ.

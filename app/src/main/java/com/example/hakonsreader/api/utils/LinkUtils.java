@@ -8,6 +8,48 @@ package com.example.hakonsreader.api.utils;
 public final class LinkUtils {
 
     /**
+     * Regex for matching a subreddit URL
+     *
+     * <p>Note that this doesn't check for the start of the string (^) so it can be used for
+     * both stand-alone subreddit references (only r/...) and full URLs (reddit.com/r/...)</p>
+     *
+     * <p>Examples:</p>
+     * <ol>
+     * <li>r/GlobalOffensive</li>
+     * <li>/r/instant_karma</li>
+     * <li>R/GlobalOffensive</li>
+     * <li>/R/Hello</li>
+     * </ol>
+     */
+    public static final String SUBREDDIT_REGEX = ".*/?(r|R)/[A-Za-z_]+/?$";
+
+    /**
+     * Regex for matching a URL to a user
+     *
+     * <p>Note that this doesn't check for the start of the string (^) so it can be used for
+     * both stand-alone user references (only u/...) and full URLs (reddit.com/u/...)</p>
+     *
+     * <p>Examples:</p>
+     * <ol>
+     * <li>u/hakonschia</li>
+     * <li>/u/hakonschia</li>
+     * <li>user/hakonschia</li>
+     * <li>/user/hakonschia_two</li>
+     * </ol>
+     */
+    public static final String USER_REGEX = ".*/?u(ser)?/[A-Za-z_]+/?$";
+
+    /**
+     * Regex matching a post URL
+     *
+     * <p>Note that this doesn't check for the start of the string (^) so it can be used for
+     * both stand-alone subreddit references (only r/...) and full URLs (reddit.com/r/...)</p>
+     *
+     * <p>Example: r/GlobalOffensive/comments/55ter/FaZe_Wins_major</p>
+     */
+    public static final String POST_REGEX = ".*/?(r|R)/[A-Za-z]+/comments/.+/.+/?$";
+
+    /**
      * Regex matching imgur image URLs
      */
     public static final String IMGUR_IMAGE_REGEX = "^https://imgur.com/[A-Za-z0-9]{5,7}$";

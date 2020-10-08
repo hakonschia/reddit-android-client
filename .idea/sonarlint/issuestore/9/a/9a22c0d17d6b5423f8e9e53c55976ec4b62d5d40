@@ -1,9 +1,9 @@
 
-=
-java:S1068"'Remove this unused "TAG" private field.(§ï©é
-=
-java:S11850"(Remove this method to simply inherit it.(¥Ë©
 w
 java:S1450"\Remove the "layoutManager" field and declare it as a local variable in the relevant methods.(Çòçöûÿÿÿÿ
+=
+java:S11850"(Remove this method to simply inherit it.(¥Ë©
+=
+java:S1068"'Remove this unused "TAG" private field.(§ï©é
 v
 java:S1450"`Remove the "subredditsAdapter" field and declare it as a local variable in the relevant methods.(¼ÆÛ‡

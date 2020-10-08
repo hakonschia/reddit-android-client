@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.DispatcherActivity;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
 
@@ -41,48 +42,11 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
     public static InternalLinkMovementMethod getInstance(Context context) {
         if (subredditAndUserInstance == null) {
             subredditAndUserInstance = new InternalLinkMovementMethod(linkText -> {
-                // Match either "r/something" or "/r/something"
-                String subredditRegex = "^/?r/.*";
-
-                // Match either "u/hakonschia" or "/u/hakonschia/", and "user/hakonschia" or "/user/hakonschia"
-                String userRegex = "^/?u(ser)?/.*";
-
-
-                if (linkText.matches(subredditRegex)) {
-                    // Extract only the subreddit. Probably an easier way to do this, but this way I don't have to
-                    // worry about if it's "r/" or "/r/" as it
-
-                    // TODO this can probably be extracted for users as well when a UserActivity is created
-                    // Ensure it's a always "/r/" not "r/" as this makes extracting the subreddit easier
-                    linkText = (linkText.charAt(0) == '/' ? "" : "/") + linkText;
-                    String[] segments = linkText.split("/");
-
-                    // The segments include an empty string before the first slash
-                    String subreddit = segments[2];
-
-                    Intent intent = new Intent(context, SubredditActivity.class);
-                    intent.putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit);
-                    context.startActivity(intent);
-                    return true;
-                } else if (linkText.matches(userRegex)) {
-                    Log.d(TAG, "asNormalComment: Trying to open user profile");
-
-                    return true;
-                } else if (linkText.matches("^https://imgur.com/[A-Za-z0-9]{5,7}$")) {
-                    // If the image links to a standard imgur URL add .png to redirect to the direct image
-                    linkText += ".png";
-                }
-
-                // Open images directly in the app
-                if (linkText.matches(".+(.png|.jpeg|.jpg)$")) {
-                    Intent intent = new Intent(context, ImageActivity.class);
-                    intent.putExtra(ImageActivity.IMAGE_URL, linkText);
-                    context.startActivity(intent);
-                    ((Activity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    return true;
-                }
-
-                return false;
+                // Let the dispatch activity handle all links
+                Intent intent = new Intent(context, DispatcherActivity.class);
+                intent.putExtra(DispatcherActivity.URL_KEY, linkText);
+                context.startActivity(intent);
+                return true;
             });
         }
 

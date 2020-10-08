@@ -1,10 +1,10 @@
 
-I
-java:S1068"'Remove this unused "TAG" private field.(¿˜°ßÿÿÿÿÿ8Ïø›óÍ.
 |
-java:S1450""ZRemove the "loadingIcon" field and declare it as a local variable in the relevant methods.(™ÒÕòúÿÿÿÿ8Í­æùÏ.
-X	java:S125@"<This block of commented-out lines of code should be removed.(ÏğåÁ8Š¬’óÍ.
-O
-java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8Ïø›óÍ.
+java:S1450#"ZRemove the "loadingIcon" field and declare it as a local variable in the relevant methods.(™ÒÕòúÿÿÿÿ8Í­æùÏ.
 q
-java:S1128"TRemove this unused import 'com.example.hakonsreader.interfaces.ItemLoadingListener'.(ìÄƒñ8ˆÅæùÏ.
+java:S1128"TRemove this unused import 'com.example.hakonsreader.interfaces.ItemLoadingListener'.(ìÄƒñ8ˆÅæùÏ.
+O
+java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8ÃîÆ»Ğ.
+I
+java:S1068"'Remove this unused "TAG" private field.(¿˜°ßÿÿÿÿÿ8ÃîÆ»Ğ.
+X	java:S125E"<This block of commented-out lines of code should be removed.(ÏğåÁ8Š¬’óÍ.

@@ -244,7 +244,7 @@ public class Post extends RelativeLayout {
      */
     private void openPost() {
         Intent intent = new Intent(getContext(), PostActivity.class);
-        intent.putExtra(PostActivity.POST, new Gson().toJson(postData));
+        intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(postData));
 
         Bundle extras = getExtras();
         intent.putExtra("extras", extras);

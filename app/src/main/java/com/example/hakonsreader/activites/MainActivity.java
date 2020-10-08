@@ -17,6 +17,7 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.Subreddit;
+import com.example.hakonsreader.api.utils.LinkUtils;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.databinding.ActivityMainBinding;
@@ -32,6 +33,12 @@ import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import retrofit2.http.Url;
 
 public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
     private SubredditFragment globalOffensive;
@@ -81,8 +88,10 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         setContentView(binding.getRoot());
 
         // For testing purposes hardcode going into a subreddit
-        Intent intent = new Intent(this, SubredditActivity.class);
+        //Intent intent = new Intent(this, SubredditActivity.class);
+        Intent intent = new Intent(this, DispatcherActivity.class);
         intent.putExtra("subreddit", "test");
+        intent.putExtra(DispatcherActivity.URL_KEY, "/r/globaloffensive");
         startActivity(intent);
 
         if (savedInstanceState != null) {
