@@ -18,8 +18,18 @@ public class CommentsViewModel extends ViewModel {
 
     private List<RedditComment> commentsDataSet = new ArrayList<>();
 
+    private MutableLiveData<RedditPost> post;
     private MutableLiveData<List<RedditComment>> comments;
     private MutableLiveData<Boolean> loadingChange;
+
+
+    public LiveData<RedditPost> getPost() {
+        if (post == null) {
+            post = new MutableLiveData<>();
+        }
+
+        return post;
+    }
 
     /**
      * @return The comments
@@ -47,14 +57,14 @@ public class CommentsViewModel extends ViewModel {
         return loadingChange;
     }
 
-    public void loadComments(View parentLayout, RedditPost post) {
+    public void loadComments(View parentLayout, String postId) {
         loadingChange.setValue(true);
 
-        App.get().getApi().getComments(post.getId(), newComments -> {
+        App.get().getApi().getComments(postId, newComments -> {
             comments.setValue(newComments);
             loadingChange.setValue(false);
         }, newPost -> {
-
+            post.setValue(newPost);
         }, ((code, t) -> {
             t.printStackTrace();
             loadingChange.setValue(false);

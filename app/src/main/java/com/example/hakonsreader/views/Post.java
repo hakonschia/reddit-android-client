@@ -125,6 +125,11 @@ public class Post extends RelativeLayout {
         binding.postFullBar.setPost(postData);
     }
 
+    public void updatePostInfo(RedditPost post) {
+        binding.postInfo.setPost(post);
+        binding.postFullBar.setPost(post);
+    }
+
     /**
      * Adds the post content
      *

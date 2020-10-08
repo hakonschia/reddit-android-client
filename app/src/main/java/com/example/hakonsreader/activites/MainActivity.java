@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
         // For testing purposes hardcode going into a subreddit
         Intent intent = new Intent(this, SubredditActivity.class);
-        intent.putExtra("subreddit", "publicfreakout");
+        intent.putExtra("subreddit", "test");
         startActivity(intent);
 
         if (savedInstanceState != null) {

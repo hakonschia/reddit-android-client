@@ -1,6 +1,7 @@
 package com.example.hakonsreader.activites;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
@@ -30,7 +31,7 @@ public class PostActivity extends AppCompatActivity {
     private static final String TAG = "PostActivity";
 
     /**
-     * The key used for sending the post data to this activity
+     * The key used for sending the ID of the post to this activity
      */
     public static final String POST = "post";
 
@@ -67,23 +68,23 @@ public class PostActivity extends AppCompatActivity {
         binding = ActivityPostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Gson gson = new Gson();
-        post = gson.fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
+        commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
+        commentsViewModel.onLoadingChange().observe(this, binding.loadingIcon::onCountChange);
+        commentsViewModel.getPost().observe(this, newPost -> {
+            boolean postPreviouslySet = post != null;
+            post = newPost;
 
-        if (post.isLocked()) {
-            binding.replyPost.setVisibility(View.GONE);
-        }
-
-        this.setupCommentsList();
+            // If we have a post already just update the info (the content gets reloaded which looks weird for videos)
+            if (postPreviouslySet) {
+                this.updatePostInfo();
+            } else {
+                this.onPostLoaded();
+            }
+        });
 
         binding.post.setMaxContentHeight((int)getResources().getDimension(R.dimen.postContentMaxHeight));
-        binding.post.setPostData(post);
 
-        commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
-        commentsViewModel.getComments().observe(this, commentsAdapter::addComments);
-        commentsViewModel.onLoadingChange().observe(this, up -> {
-            binding.loadingIcon.onCountChange(up);
-        });
+        this.loadComments();
 
         // TODO when going into a post and going to landscape and then back the animation of going
         //  back to the subreddit goes under the screen
@@ -92,30 +93,6 @@ public class PostActivity extends AppCompatActivity {
         // Previous is upwards, next is down
         binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment);
         binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment);
-        
-        getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
-            @Override
-            public void onTransitionEnd(Transition transition) {
-                super.onTransitionEnd(transition);
-
-                // Start videos again when the transition is finished, as playing videos during the transition
-                // can make the view weird.
-                // TODO the thumbnail is shown the entire time, make it so the frame the video
-                //  ended at is shown instead
-                if (post.getPostType() == PostType.VIDEO) {
-                    binding.post.resumeVideoPost(getIntent().getExtras().getBundle("extras"));
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (commentsAdapter.getItemCount() == 0) {
-            commentsViewModel.loadComments(binding.parentLayout, post);
-        }
     }
 
     @Override
@@ -141,11 +118,73 @@ public class PostActivity extends AppCompatActivity {
                         commentsAdapter.addComment(newComment);
                     } else {
                         // Replying to a comment
-                       // commentsAdapter.addComment(newComment, (RedditComment)replyingTo);
+                        commentsAdapter.addComment(newComment, (RedditComment)replyingTo);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Gets the post ID from either the intent extras or the intent URI data if the activity was started
+     * from a URI intent
+     */
+    private void loadComments() {
+        Intent intent = getIntent();
+        Uri uri = intent.getData();
+
+        String postId;
+
+        // The activity was started from a URL intent (ie. https://reddit.com/r/.../comments/...
+        if (uri != null) {
+            // The URI will look like: reddit.com/r/<subreddit>/comments/<postId/...
+            postId = uri.getPathSegments().get(3);
+        } else {
+            Bundle extras = intent.getExtras();
+
+            post = new Gson().fromJson(extras.getString(POST), RedditPost.class);
+            postId = post.getId();
+
+            this.onPostLoaded();
+
+            // Since we have the post loaded we have a transition as well
+            getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    super.onTransitionEnd(transition);
+
+                    // Start videos again when the transition is finished, as playing videos during the transition
+                    // can make the view weird.
+                    // TODO the thumbnail is shown the entire time, make it so the frame the video
+                    //  ended at is shown instead
+                    if (post.getPostType() == PostType.VIDEO) {
+                        binding.post.resumeVideoPost(getIntent().getExtras().getBundle("extras"));
+                    }
+                }
+            });
+        }
+
+        commentsViewModel.loadComments(binding.parentLayout, postId);
+    }
+
+    /**
+     * Called when {@link PostActivity#post} has been set.
+     * <p>Notifies the view about the new post data and calls {@link PostActivity#setupCommentsList()}</p>
+     */
+    private void onPostLoaded() {
+        binding.post.setPostData(post);
+        if (!post.isLocked()) {
+            binding.replyPost.setVisibility(View.VISIBLE);
+        }
+
+        this.setupCommentsList();
+    }
+
+    /**
+     * Update the information about the post in the UI
+     */
+    private void updatePostInfo() {
+        binding.post.updatePostInfo(post);
     }
 
 
@@ -161,6 +200,8 @@ public class PostActivity extends AppCompatActivity {
 
         binding.comments.setAdapter(commentsAdapter);
         binding.comments.setLayoutManager(layoutManager);
+
+        commentsViewModel.getComments().observe(this, commentsAdapter::addComments);
     }
 
     /**

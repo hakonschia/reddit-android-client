@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.hakonsreader">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -31,9 +32,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activites.SubredditActivity"
+        <activity
+            android:name=".activites.SubredditActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme">
 
+            <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -43,21 +46,38 @@
                 <data
                     android:scheme="https"
                     android:host="www.reddit.com"
-                    android:pathPrefix="/r/"/>
+                    android:pathPattern="/r/.*/" />
             </intent-filter>
-
         </activity>
 
-        <activity android:name=".activites.PostActivity"
+        <activity
+            android:name=".activites.PostActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme">
+
+            <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/comments/j72qmj/furias_buy_against_triumph_at_iem_new_york/" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.reddit.com"
+                    android:pathPattern="/r/.*/comments/.*/.*" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activites.ImageActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
 
-        <activity android:name=".activites.ImageActivity"
+        <activity
+            android:name=".activites.VideoActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
 
-        <activity android:name=".activites.VideoActivity"
-            android:theme="@style/AppTheme.SlidrActivityTheme" />
-
-        <activity android:name=".activites.ReplyActivity"
+        <activity
+            android:name=".activites.ReplyActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
     </application>
 

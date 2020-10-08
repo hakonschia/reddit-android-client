@@ -136,7 +136,7 @@ public class App extends Application {
          redditApi = new RedditApi.Builder(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID)
                  .accessToken(TokenManager.getToken())
                  .onNewToken(TokenManager::saveToken)
-                 .loggerLevel(HttpLoggingInterceptor.Level.BODY)
+                 //.loggerLevel(HttpLoggingInterceptor.Level.BODY)
                  .callbackUrl(NetworkConstants.CALLBACK_URL)
                  .deviceId(UUID.randomUUID().toString())
                  .build();
