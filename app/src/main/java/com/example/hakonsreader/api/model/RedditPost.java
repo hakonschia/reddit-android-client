@@ -3,6 +3,7 @@ package com.example.hakonsreader.api.model;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
+import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -140,7 +141,17 @@ public class RedditPost extends RedditListing {
      * @return The markdown text of the post if the post is {@link PostType#TEXT}
      */
     public String getSelftext(boolean adjustFormatting) {
-        return selftext;
+        String text = selftext;
+        if (adjustFormatting) {
+            MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
+                    .checkHeaderSpaces()
+                    .checkRedditSpecificLinks()
+                    .build();
+
+            text = adjuster.adjust(selftext);
+        };
+
+        return text;
     }
 
     /**
