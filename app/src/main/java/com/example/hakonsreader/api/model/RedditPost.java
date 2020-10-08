@@ -149,7 +149,7 @@ public class RedditPost extends RedditListing {
                     .build();
 
             text = adjuster.adjust(selftext);
-        };
+        }
 
         return text;
     }

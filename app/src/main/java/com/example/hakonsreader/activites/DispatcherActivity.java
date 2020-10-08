@@ -84,9 +84,11 @@ public class DispatcherActivity extends AppCompatActivity {
         Uri asUri = Uri.parse(url);
         List<String> pathSegments = asUri.getPathSegments();
 
+        String lastSegment = "";
         // Get the last segment to check for file extensions
-        String lastSegment = pathSegments.get(pathSegments.size() - 1);
-
+        if (pathSegments.size() > 0) {
+            lastSegment = pathSegments.get(pathSegments.size() - 1);
+        }
 
         if (url.matches(LinkUtils.SUBREDDIT_REGEX)) {
             // First is "r", second is the subreddit

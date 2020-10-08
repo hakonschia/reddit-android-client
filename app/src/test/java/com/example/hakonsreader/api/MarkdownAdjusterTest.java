@@ -24,6 +24,11 @@ public class MarkdownAdjusterTest {
         String actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
+        markdown = "# Header with a space";
+        expected = "# Header with a space";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
         markdown = "#Header without a space\nNormal comment on next line";
         expected = "# Header without a space\nNormal comment on next line";
         actual = adjuster.adjust(markdown);
@@ -34,11 +39,34 @@ public class MarkdownAdjusterTest {
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
+        markdown = "### Smaller header with a space";
+        expected = "### Smaller header with a space";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
         markdown = "##Smaller header without a space\nComment on next line";
         expected = "## Smaller header without a space\nComment on next line";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
+
+        markdown = "##Smaller header without a space\nComment on next line\n#And now a large header";
+        expected = "## Smaller header without a space\nComment on next line\n# And now a large header";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        markdown = "For some reason, I have chosen to not start this text with a header\n#Instead, the header is on the second line";
+        expected = "For some reason, I have chosen to not start this text with a header\n# Instead, the header is on the second line";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // Sometimes *cough* on GlobalOffensive *cough* there is a link with a #, I'm assuming this is
+        // for linking to a part on the web page
+        markdown = "[I'm putting a header tag inside a link](#not-actually-a-header-but-follows-the-same-syntax)";
+        expected = "[I'm putting a header tag inside a link](#not-actually-a-header-but-follows-the-same-syntax)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
     }
+
 
     @Test
     public void testRedditLinks() {
