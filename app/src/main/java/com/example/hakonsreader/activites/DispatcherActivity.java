@@ -13,6 +13,8 @@ import com.example.hakonsreader.api.utils.LinkUtils;
 
 import java.util.List;
 
+import retrofit2.http.Url;
+
 
 /**
  * Activity to dispatch links. This activity never renders any UI, but serves as a proxy that redirects
@@ -62,6 +64,8 @@ public class DispatcherActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: Dispatcher dispacthing " + url);
 
+        // If the URL can be converted to a direct link (eg. as an image) ensure it is
+        url = LinkUtils.convertToDirectUrl(url);
         Intent intent = createIntent(url);
 
         if (fadeTransition) {
