@@ -96,9 +96,9 @@ public class MarkdownAdjusterTest {
         String actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
-        // Check that "/r/<subreddit>" gets wrapped with a markdown link
+        // Check that "/r/<subreddit>" gets wrapped with a markdown link. Reddit itself removes the first slash, so we do too
         markdown = "You should check out /r/GlobalOffensive, it's a really cool subreddit";
-        expected = "You should check out [/r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive/), it's a really cool subreddit";
+        expected = "You should check out [r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive/), it's a really cool subreddit";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
@@ -110,9 +110,34 @@ public class MarkdownAdjusterTest {
         assertEquals(expected, actual);
 
         markdown = "/u/hakonschia has 8-5 followers!";
-        expected = "[/u/hakonschia](https://www.reddit.com/u/hakonschia/) has 8-5 followers!";
+        expected = "[u/hakonschia](https://www.reddit.com/u/hakonschia/) has 8-5 followers!";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
+    }
+
+
+    /**
+     * Tests that normal links (ie. https://...) get wrapped with markdown correctly
+     */
+    @Test
+    public void testNormalLinks() {
+        MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
+                .checkNormalLinks()
+                .build();
+
+        // Check that "https://..." gets wrapped with a markdown link
+        String markdown = "You should check out https://nrk.no, it's a pretty good news site";
+        String expected = "You should check out [https://nrk.no](https://nrk.no), it's a pretty good news site";
+        String actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Tests that links already wrapped with markdown don't get modified
+     */
+    @Test
+    public void testAlreadyWrappedLinks() {
+
     }
 
 

@@ -1,22 +1,20 @@
 package com.example.hakonsreader.api.utils;
 
-import android.util.Log;
-
-import com.google.android.exoplayer2.extractor.mp4.PsshAtomUtil;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MarkdownAdjuster {
+    private static final String ALLOWED_SUBREDDIT_CHARACTERS = "_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     private boolean checkRedditSpecificLinks;
     private boolean checkHeaderSpaces;
+    private boolean checkNormalLinks;
+
 
     private MarkdownAdjuster() {}
 
     public static class Builder {
         boolean bCheckRedditSpecificLinks = false;
         boolean bCheckHeaderSpaces = false;
+        boolean bCheckNormalLinks = false;
 
 
         /**
@@ -33,13 +31,27 @@ public class MarkdownAdjuster {
         }
 
         /**
-         * Sets if the adjuster should look for strings such as "r/GlobalOffensive" and wrap them in
+         * Sets if the adjuster should look for strings such as "r/GlobalOffensive" and wraps them in
          * markdown links
          *
          * @return This builder
          */
         public Builder checkRedditSpecificLinks() {
             bCheckRedditSpecificLinks = true;
+            return this;
+        }
+
+        /**
+         * Sets if the adjuster should look for normal links (ie. https://...) and wraps them
+         * in markdown links
+         *
+         * <p>This only checks for https links, not http</p>
+         *
+         * @return This builder
+         */
+        public Builder checkNormalLinks() {
+            // TODO add flag to only keep domain (ie https://nrk.no -> nrk.no)
+            bCheckNormalLinks = true;
             return this;
         }
 
@@ -52,6 +64,7 @@ public class MarkdownAdjuster {
             MarkdownAdjuster adjuster = new MarkdownAdjuster();
             adjuster.checkHeaderSpaces = bCheckHeaderSpaces;
             adjuster.checkRedditSpecificLinks = bCheckRedditSpecificLinks;
+            adjuster.checkNormalLinks = bCheckNormalLinks;
 
             return adjuster;
         }
@@ -70,6 +83,9 @@ public class MarkdownAdjuster {
         }
         if (checkRedditSpecificLinks) {
             markdown = this.adjustRedditSpecificLinks(markdown);
+        }
+        if (checkNormalLinks) {
+            markdown = this.replaceNormalLinks(markdown);
         }
 
         return markdown;
@@ -99,14 +115,16 @@ public class MarkdownAdjuster {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            line = this.addSpacesToHeader(line);
+            if (!line.isEmpty()) {
+                line = this.addSpacesToHeader(line);
 
-            // The line object has now either been edited, or is as it should be, so append it on the builder
-            builder.append(line);
+                // The line object has now either been edited, or is as it should be, so append it on the builder
+                builder.append(line);
 
-            // Add back the newline unless we are at the end
-            if (i + 1 != lines.length) {
-                builder.append('\n');
+                // Add back the newline unless we are at the end
+                if (i + 1 != lines.length) {
+                    builder.append('\n');
+                }
             }
         }
 
@@ -117,9 +135,84 @@ public class MarkdownAdjuster {
         // Find every /r/, r/ and wrap that and the rest of the text until a non A-Za-z or _ character appears
         // Find every /u/, u/ and wrap that and the rest of the text until a non A-Za-z0-9, -, or _ character appears
 
+        markdown = this.replaceSubredditLinks(markdown);
+        markdown = this.replaceRedditUserLinks(markdown);
+
         return markdown;
     }
 
+
+    /**
+     * Wraps reddit links to subreddits (r/... and /r/...) with markdown links
+     *
+     * @param markdown The markdown to adjust
+     * @return The adjuset markdown
+     */
+    private String replaceSubredditLinks(String markdown) {
+        // Contains the name of every subreddit (the /r/ is removed)
+        // TODO this should only match exactly r/... and /r/... as if there are already linked subreddits it messes stuff up
+        String[] subreddits = markdown.split("/?r/");
+
+        StringBuilder builder = new StringBuilder();
+
+        // The first element will never be an actual subreddit. If the markdown starts with a "/r/"
+        // it will be an empty string, otherwise it will be the text before the first actual sub
+        builder.append(subreddits[0]);
+
+        for (int i = 1; i < subreddits.length; i++) {
+            String s = subreddits[i];
+
+            int endPos = s.length();
+            boolean endFound = false;
+
+            // Find where the subreddit ends (ie. where the first character not allowed in a subreddit is)
+            int j = 0;
+            while (!endFound && j < s.length()){
+                if (ALLOWED_SUBREDDIT_CHARACTERS.indexOf(s.charAt(j)) == -1) {
+                    endPos = j;
+                }
+                j++;
+                endFound = endPos != s.length();
+            }
+
+            // Get the subreddit name and create the link around it
+            String sub = s.substring(0, endPos);
+            String linked = String.format("[r/%1$s](https://www.reddit.com/r/%1$s/)", sub);
+
+            // The string after the link
+            String after = "";
+            if (endPos < s.length()) {
+                after = s.substring(endPos);
+            }
+
+            String full = linked + after;
+            builder.append(full);
+        }
+
+        markdown = builder.toString();
+
+        return markdown;
+    }
+
+    /**
+     * Wraps reddit links to user profiles (u/... and /u/...) with markdown links
+     *
+     * @param markdown The markdown to adjust
+     * @return The adjuset markdown
+     */
+    private String replaceRedditUserLinks(String markdown) {
+        return markdown;
+    }
+
+    /**
+     * Wraps normal links that aren't already wrapped with markdown links
+     *
+     * @param markdown The markdown to adjust
+     * @return The adjuset markdown
+     */
+    private String replaceNormalLinks(String markdown) {
+        return markdown;
+    }
 
     /**
      * Adds spaces between a header symbol and the content

@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter;
 import com.example.hakonsreader.api.responses.ListingResponse;
+import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -16,6 +17,11 @@ import java.util.List;
  */
 public class RedditComment extends RedditListing {
     private static final String TAG = "RedditComment";
+
+    private static MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
+            .checkHeaderSpaces()
+            .checkRedditSpecificLinks()
+            .build();
 
 
     @SerializedName("body")
@@ -60,8 +66,12 @@ public class RedditComment extends RedditListing {
      * @return The markdown string of the comment
      */
     public String getBody(boolean adjustFormatting) {
-        // TODO if a user posted a link just as a comment it should add the link formatting around it (can probably just do some regex)
-        return body;
+        String text = body;
+        if (adjustFormatting) {
+            text = adjuster.adjust(body);
+        }
+
+        return text;
     }
 
     /**
@@ -91,7 +101,7 @@ public class RedditComment extends RedditListing {
      * @param depth The depth of the comment
      */
     public void setDepth(int depth) {
-        depth = depth;
+        this.depth = depth;
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.example.hakonsreader.api.model;
 
 import com.example.hakonsreader.api.enums.PostType;
-import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.google.gson.annotations.SerializedName;
@@ -9,6 +8,12 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class RedditPost extends RedditListing {
+
+    private static MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
+            .checkHeaderSpaces()
+            .checkRedditSpecificLinks()
+            .build();
+
 
     @SerializedName("title")
     private String title;
@@ -143,11 +148,6 @@ public class RedditPost extends RedditListing {
     public String getSelftext(boolean adjustFormatting) {
         String text = selftext;
         if (adjustFormatting) {
-            MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
-                    .checkHeaderSpaces()
-                    .checkRedditSpecificLinks()
-                    .build();
-
             text = adjuster.adjust(selftext);
         }
 
