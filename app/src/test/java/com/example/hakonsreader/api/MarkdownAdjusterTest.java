@@ -67,6 +67,18 @@ public class MarkdownAdjusterTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void testMultipleHeadersInOneLine() {
+        MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
+                .checkHeaderSpaces()
+                .build();
+
+        String markdown = "#Header without a space, and without a new line ##i am trying to add another header";
+        String expected = "# Header without a space, and without a new line ##i am trying to add another header";
+        String actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+    }
+
 
     @Test
     public void testRedditLinks() {
@@ -76,27 +88,45 @@ public class MarkdownAdjusterTest {
 
         // Check that "r/<subreddit>" gets wrapped with a markdown link
         String markdown = "You should check out r/GlobalOffensive, it's a really cool subreddit";
-        String expected = "You should check out [r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive), it's a really cool subreddit";
+        String expected = "You should check out [r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive/), it's a really cool subreddit";
         String actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
         // Check that "/r/<subreddit>" gets wrapped with a markdown link
         markdown = "You should check out /r/GlobalOffensive, it's a really cool subreddit";
-        expected = "You should check out [/r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive), it's a really cool subreddit";
+        expected = "You should check out [/r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive/), it's a really cool subreddit";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
 
         // Check that it also works for user links
         markdown = "u/hakonschia has 3 followers!";
-        expected = "[u/hakonschia](https://www.reddit.com/u/hakonschia) has 3 followers!";
+        expected = "[u/hakonschia](https://www.reddit.com/u/hakonschia/) has 3 followers!";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
         markdown = "/u/hakonschia has 8-5 followers!";
-        expected = "[/u/hakonschia](https://www.reddit.com/u/hakonschia) has 8-5 followers!";
+        expected = "[/u/hakonschia](https://www.reddit.com/u/hakonschia/) has 8-5 followers!";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
     }
 
+
+    @Test
+    public void testHeadersAndLinks() {
+        MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
+                .checkRedditSpecificLinks()
+                .checkHeaderSpaces()
+                .build();
+
+        String markdown = "#Here are 5 reason why you should check out GlobalOffensive, number 9 will shock you!\nYou should check out r/GlobalOffensive, it's a really cool subreddit";
+        String expected = "# Here are 5 reason why you should check out GlobalOffensive, number 9 will shock you!\nYou should check out [r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive/), it's a really cool subreddit";
+        String actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        markdown = "#This is a header with a link to a r/subreddit";
+        expected = "# This is a header with a link to a [r/subreddit](https://www.reddit.com/r/subreddit)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+    }
 }
