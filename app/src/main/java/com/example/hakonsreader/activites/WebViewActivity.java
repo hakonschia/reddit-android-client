@@ -48,6 +48,7 @@ public class WebViewActivity extends AppCompatActivity {
         });
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(url);
+        urlToolbar.setText(url);
 
         findViewById(R.id.webViewClose).setOnClickListener(v -> finish());
     }
