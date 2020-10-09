@@ -186,11 +186,19 @@ public class MarkdownAdjusterTest {
     }
 
     /**
-     * Tests that links already wrapped with markdown don't get modified
+     * Tests that "^" gets replaced with "<sup>" tags
      */
     @Test
-    public void testAlreadyWrappedLinks() {
+    public void testSuperScript() {
+        MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
+                .checkSuperScript()
+                .build();
 
+        // Check that "https://..." gets wrapped with a markdown link
+        String markdown = "You should check how to use ^(superscript) in markdown, it's a pretty good news site";
+        String expected = "You should check how to use <sup>superscript</sup> in markdown, it's a pretty good news site";
+        String actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
     }
 
 

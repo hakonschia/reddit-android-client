@@ -6,12 +6,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MarkdownAdjuster {
-    private static final String ALLOWED_SUBREDDIT_CHARACTERS = "_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
+/**
+ * Class for adjusting some generic markdown faults
+ *
+ * <p>Use {@link MarkdownAdjuster.Builder} to create new objects</p>
+ */
+public class MarkdownAdjuster {
     private boolean checkRedditSpecificLinks;
     private boolean checkHeaderSpaces;
     private boolean checkNormalLinks;
+    private boolean checkSuperScript;
 
 
     private MarkdownAdjuster() {}
@@ -20,6 +25,7 @@ public class MarkdownAdjuster {
         boolean bCheckRedditSpecificLinks = false;
         boolean bCheckHeaderSpaces = false;
         boolean bCheckNormalLinks = false;
+        boolean bCheckSuperScript = false;
 
 
         /**
@@ -61,6 +67,18 @@ public class MarkdownAdjuster {
         }
 
         /**
+         * Sets if the adjuster should look for superscript symbols (^) and replace them with
+         * {@code <sup>} HTML tags. If you are using this ensure that your markdown renderer supports
+         * HTML tags
+         *
+         * @return This builder
+         */
+        public Builder checkSuperScript() {
+            bCheckSuperScript = true;
+            return this;
+        }
+
+        /**
          * Builds the MarkdownAdjuster
          *
          * @return The MarkdownAdjuster
@@ -70,6 +88,7 @@ public class MarkdownAdjuster {
             adjuster.checkHeaderSpaces = bCheckHeaderSpaces;
             adjuster.checkRedditSpecificLinks = bCheckRedditSpecificLinks;
             adjuster.checkNormalLinks = bCheckNormalLinks;
+            adjuster.checkSuperScript = bCheckSuperScript;
 
             return adjuster;
         }
@@ -90,7 +109,10 @@ public class MarkdownAdjuster {
             markdown = this.adjustRedditSpecificLinks(markdown);
         }
         if (checkNormalLinks) {
-            markdown = this.replaceNormalLinks(markdown);
+            markdown = this.adjustNormalLinks(markdown);
+        }
+        if (checkSuperScript) {
+            markdown = this.adjustSuperScript(markdown);
         }
 
         return markdown;
@@ -149,6 +171,28 @@ public class MarkdownAdjuster {
         return markdown;
     }
 
+    /**
+     * Wraps normal links that aren't already wrapped with markdown links
+     *
+     * @param markdown The markdown to adjust
+     * @return The adjuset markdown
+     */
+    private String adjustNormalLinks(String markdown) {
+        return markdown;
+    }
+
+    /**
+     * Adjusts superscript tags from ^() to {@code <sup></sup>}
+     *
+     * @param markdown The markdown to adjust
+     * @return The adjuset markdown
+     */
+    private String adjustSuperScript(String markdown) {
+        return markdown;
+    }
+
+
+
 
     /**
      * Wraps reddit links to subreddits (r/... and /r/...) with markdown links
@@ -175,16 +219,6 @@ public class MarkdownAdjuster {
         String replaceFormat = "[%s](https://www.reddit.com/%s/)";
 
         return this.replaceRedditLinks(markdown, pattern, replaceFormat);
-    }
-
-    /**
-     * Wraps normal links that aren't already wrapped with markdown links
-     *
-     * @param markdown The markdown to adjust
-     * @return The adjuset markdown
-     */
-    private String replaceNormalLinks(String markdown) {
-        return markdown;
     }
 
     /**

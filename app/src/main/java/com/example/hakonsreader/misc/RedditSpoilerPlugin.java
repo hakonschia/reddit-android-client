@@ -1,6 +1,5 @@
 package com.example.hakonsreader.misc;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.text.Spannable;
 import android.text.Spanned;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +19,7 @@ import io.noties.markwon.utils.ColorUtils;
 
 
 /**
- * Markown plugin for Reddit spoilers
+ * Markwon plugin for Reddit spoilers
  *
  * <p>Taken from the Markown samples: https://github.com/noties/Markwon/blob/master/app-sample/src/main/java/io/noties/markwon/app/samples/RedditSpoilerSample.java</p>
  */

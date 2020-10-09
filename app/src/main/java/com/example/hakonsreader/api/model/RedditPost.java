@@ -143,6 +143,8 @@ public class RedditPost extends RedditListing {
      *                         this.
      *                         <p>For example a header from Reddit might be returned as {@code #Header}, when
      *                         it should be {@code # Header}</p>
+     *                         <p>If you want to adjust only some parts, see {@link MarkdownAdjuster} and create
+     *                         your own adjuster</p>
      * @return The markdown text of the post if the post is {@link PostType#TEXT}
      */
     public String getSelftext(boolean adjustFormatting) {
