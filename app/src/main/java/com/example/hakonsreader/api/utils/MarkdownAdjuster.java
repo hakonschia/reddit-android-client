@@ -193,6 +193,8 @@ public class MarkdownAdjuster {
      * @return The adjusted markdown
      */
     private String adjustSuperScript(String markdown) {
+        // Every ^( needs to be replaced with "<sup>" and every ) that matches with a ^( needs to be
+        // replaced with "</sup>"
         return markdown;
     }
 

@@ -176,6 +176,19 @@ public class MarkdownAdjusterTest {
         String expected = "You should check how to use <sup>superscript</sup> in markdown, it's a pretty good news site";
         String actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
+
+        // Test nested superscripts
+        markdown = "^(^(s)uper)";
+        expected = "<sup><sup>s</sup>per</sup>";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+
+        // Test nested superscripts
+        markdown = "Superscript is pretty ^(^(^(c))ool)";
+        expected = "Superscript is pretty <sup><sup><sup>c</sup></sup>ool</sup>";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
     }
 
 
