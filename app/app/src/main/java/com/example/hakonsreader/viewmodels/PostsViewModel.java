@@ -60,6 +60,7 @@ public class PostsViewModel extends ViewModel {
         }
 
         loadingChange.setValue(true);
+        // TODO this creates issues as the posts currently in the list gets refreshed, causing videos to restart
         App.get().getApi().getPosts(subreddit, after, count, newPosts -> {
             posts.setValue(newPosts);
             loadingChange.setValue(false);

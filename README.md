@@ -6,6 +6,12 @@ An unofficial Reddit client for Android. There is currently no support for mod a
 Includes a Java wrapper for the Reddit API that provides basic functionality.
 
 
+## Screenshots
+
+<img src="/images/iscrolling-in-posts.png" alt="Scrolling posts" width="250"/>
+<img src="/images/profile.png" alt="User profile" width="250"/>
+<img src="/images/in-post.png" alt="In post" width="250"/>
+
 ## Installation
 
 To retrieve the latest version clone the repository and install manually via Android Studio.
