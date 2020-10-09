@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Thumbnail spanning across the entire view -->
+    <ImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ProgressBar
+        android:id="@+id/buffering"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+
+        android:indeterminateTint="@color/accent"
+
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        tools:visibility="visible"/>
+
+    <ImageButton
+        android:id="@id/exo_play"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+
+        android:background="@drawable/rounded_square_black_bg"
+        style="@style/ExoMediaButton.Play"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@id/exo_pause"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+
+        android:background="@drawable/rounded_square_black_bg"
+        style="@style/ExoMediaButton.Pause"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/seekLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="#CC000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@id/exo_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:includeFontPadding="false"
+
+            android:layout_gravity="center"
+
+            tools:textColor="@color/accent"
+            tools:text="00:01"/>
+
+        <com.google.android.exoplayer2.ui.DefaultTimeBar
+            android:id="@id/exo_progress"
+            android:layout_width="0dp"
+            android:layout_height="26dp"
+            android:layout_weight="1"
+            app:buffered_color="@android:color/white"
+            app:played_color="@color/accent"
+            app:unplayed_color="@android:color/darker_gray" />
+
+        <!-- Apparently I can't update exo_duration, so use a brand new view -->
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:includeFontPadding="false"
+
+            android:layout_gravity="center"
+            tools:textColor="@color/accent"
+            tools:text="05:32"/>
+
+        <!-- For GIFs that have no duration information from before use the default duration
+         which sets automatically when the video loads -->
+        <TextView
+            android:id="@id/exo_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:includeFontPadding="false"
+
+            android:visibility="gone"
+
+            android:layout_gravity="center"
+            tools:textColor="@color/accent"
+            tools:text="05:32"/>
+
+        <ImageButton
+            android:id="@+id/fullscreen"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:background="@null"
+            android:src="@drawable/ic_baseline_fullscreen_24"/>
+
+        <ImageButton
+            android:id="@+id/volumeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:background="@null"
+            android:src="@drawable/ic_baseline_volume_up_24"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

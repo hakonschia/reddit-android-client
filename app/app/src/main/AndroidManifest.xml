@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.hakonsreader">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity android:name=".activites.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="callback"
+                    android:scheme="hakonreader" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activites.SubredditActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
+
+        <activity
+            android:name=".activites.PostActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
+
+        <activity
+            android:name=".activites.ImageActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
+
+        <activity
+            android:name=".activites.VideoActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
+
+        <activity
+            android:name=".activites.ReplyActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
+
+        <activity
+            android:name=".activites.WebViewActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
+
+
+        <activity
+            android:name=".activites.DispatcherActivity"
+            android:theme="@style/AppTheme.DispatcherTheme">
+
+            <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.reddit.com"
+                    android:pathPattern="/r/.*/" />
+            </intent-filter>
+
+            <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/comments/j72qmj/furias_buy_against_triumph_at_iem_new_york/" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.reddit.com"
+                    android:pathPattern="/r/.*/comments/.*/.*" />
+            </intent-filter>
+
+        </activity>
+    </application>
+
+</manifest>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@+id/parentLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondaryBackground"
+    tools:context=".activites.PostActivity">
+
+    <!-- Post info, content etc -->
+    <!-- Treat this as a toolbar so it can be hidden away when scrolled -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/secondaryBackground">
+
+        <androidx.appcompat.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:contentInsetStart="0dp"
+            app:layout_scrollFlags="enterAlways|scroll">
+
+            <com.example.hakonsreader.views.Post
+                android:id="@+id/post"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:transitionName="post" />
+
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <!-- Comments -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/comments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:background="@color/background"
+
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
+
+        android:paddingBottom="75dp"
+        android:clipToPadding="false"
+
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
+        tools:listitem="@layout/list_item_comment" />
+
+
+    <!-- Reply, navigation buttons -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+
+        android:layout_gravity="bottom|end" >
+
+        <!-- Reply button -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_square"
+            android:layout_marginEnd="5dp" >
+
+            <ImageButton
+                android:id="@+id/replyPost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_reply_24"
+                android:backgroundTint="@color/secondaryBackground"
+                android:onClick="replyToPost"/>
+        </LinearLayout>
+
+
+        <!-- Navigation buttons -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:background="@drawable/rounded_square">
+
+            <ImageButton
+                android:id="@+id/goToPreviousTopLevelComment"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/secondaryBackground"
+
+                android:onClick="goToPreviousTopLevelComment"
+                android:src="@drawable/ic_baseline_arrow_upward_24" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/divider"
+
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp" />
+
+            <ImageButton
+                android:id="@+id/goToNextTopLevelComment"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:backgroundTint="@color/secondaryBackground"
+
+                android:onClick="goToNextTopLevelComment"
+                android:src="@drawable/ic_baseline_arrow_downward_24" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <com.example.hakonsreader.views.LoadingIcon
+        android:id="@+id/loadingIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/accent"
+
+        tools:visibility="visible" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
