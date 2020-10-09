@@ -1,4 +1,5 @@
-# An unofficial Reddit client for Android
+
+# ![logo](/images/logo.png) An unofficial Reddit client for Android
 
 An unofficial Reddit client for Android. There is currently no support for mod actions, and is not planned at this time.
 
