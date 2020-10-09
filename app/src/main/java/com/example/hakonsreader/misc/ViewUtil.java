@@ -60,7 +60,7 @@ public class ViewUtil {
         }
 
         // No flair to add
-        if (flairs.isEmpty() && (flairText == null || flairText.isEmpty())) {
+        if (flairs.isEmpty() || flairText.isEmpty()) {
             return null;
         }
 

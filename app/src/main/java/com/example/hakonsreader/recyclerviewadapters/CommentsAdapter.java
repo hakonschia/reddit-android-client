@@ -416,7 +416,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             }
 
             author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));
-            
+
             Tag tag = ViewUtil.createFlair(comment.getAuthorRichtextFlairs(), comment.getAuthorFlairText(), comment.getAuthorFlairTextColor(), comment.getAuthorFlairBackgroundColor(), itemView.getContext());
             if (tag != null) {
                 authorFlair.addView(tag);

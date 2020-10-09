@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Tag extends LinearLayout {
+    private static final String TAG = "Tag";
+    
     private TagBinding binding;
     private String text;
     private int textColor;
@@ -78,6 +81,10 @@ public class Tag extends LinearLayout {
      * @param hexColor A hex string representing a color
      */
     public void setFillColor(String hexColor) {
+        if (hexColor.equals("transparent")) {
+            hexColor = "#80000000";
+        }
+
         binding.cardView.setCardBackgroundColor(Color.parseColor(hexColor));
     }
 
