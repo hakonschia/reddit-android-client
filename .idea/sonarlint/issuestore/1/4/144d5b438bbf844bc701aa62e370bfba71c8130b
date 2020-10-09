@@ -1,11 +1,0 @@
-
->
-java:S1068"(Remove this unused "text" private field.(š²ûÁ
-F
-java:S1128"+Remove this unused import 'java.util.List'.(Õë±Äøÿÿÿÿ
-F
-java:S1128"0Remove this unused import 'java.util.ArrayList'.(÷‰îƒ
-H
-java:S1068"-Remove this unused "fillColor" private field.(ÂÆÛ¥ûÿÿÿÿ
-N
-java:S1128"1Remove this unused import 'android.widget.Space'.(÷Ì×¸8¡ğ—Ï.
