@@ -135,3 +135,13 @@ x
 Happ/src/main/java/com/example/hakonsreader/misc/OAuthStateGenerator.java,c\7\c7e23cd8674eba9f489b634f14d753b0e2b766a5
 w
 Gapp/src/main/java/com/example/hakonsreader/api/model/RedditListing.java,3\e\3e79f93f924f2f05a9a084a8781596558cb1c4c3
+y
+Iapp/src/main/java/com/example/hakonsreader/activites/WebViewActivity.java,6\a\6af5657b6fd0036ba8f3b406833ee06f6b793b62
+|
+Lapp/src/main/java/com/example/hakonsreader/activites/DispatcherActivity.java,1\0\1058ab6c5bd29de3c11007f84290cced8bf4649c
+x
+Happ/src/main/java/com/example/hakonsreader/misc/RedditSpoilerPlugin.java,4\8\4897552bb91a8a0763d6ec121947e3c7ec602d01
+x
+Happ/src/test/java/com/example/hakonsreader/api/MarkdownAdjusterTest.java,c\9\c99d915a99875dff96026c7b060c8f86e8842722
+z
+Japp/src/main/java/com/example/hakonsreader/api/utils/MarkdownAdjuster.java,4\0\40da4f3a9d47055e2bed459c38837820d6b66f6c

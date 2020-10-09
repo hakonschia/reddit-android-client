@@ -1,9 +1,19 @@
 
 O
-java:S11357"2Complete the task associated to this TODO comment.(ÓÅÆä8¾©ˆóÍ.
+java:S1128"-Remove this unused import 'android.util.Log'.(Ô¦Ø²øÿÿÿÿ8Á”ôÂĞ.
+o
+java:S1128"MRemove this unused import 'com.example.hakonsreader.activites.ImageActivity'.(É‹õÀşÿÿÿÿ8Á”ôÂĞ.
+I
+java:S1068"'Remove this unused "TAG" private field.(°ÇÖ‰øÿÿÿÿ8Á”ôÂĞ.
+N
+java:S1128"1Remove this unused import 'android.app.Activity'.(‡ÊÍÆ8Á”ôÂĞ.
+n
+java:S1128"QRemove this unused import 'com.example.hakonsreader.activites.SubredditActivity'.(™ƒœ½8Á”ôÂĞ.
 M
-java:S1128"+Remove this unused import 'java.util.List'.(Õë±Äøÿÿÿÿ8¢¾ûòÍ.
+java:S1128"+Remove this unused import 'java.util.List'.(Õë±Äøÿÿÿÿ8¢¾ûòÍ.
+\
+java:S1161?":Add the "@Override" annotation above this method signature(à©àÑúÿÿÿÿ8‡õóóÍ.
 N
 java:S1128",Remove this unused import 'android.net.Uri'.(òêû‘ıÿÿÿÿ8“’ÿòÍ.
-\
-java:S1161c":Add the "@Override" annotation above this method signature(à©àÑúÿÿÿÿ8‡õóóÍ.
+T
+java:S1128"7Remove this unused import 'com.example.hakonsreader.R'.(ïÙ©¯8Á”ôÂĞ.
