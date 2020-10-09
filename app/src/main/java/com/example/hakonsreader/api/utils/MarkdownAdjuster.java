@@ -182,7 +182,8 @@ public class MarkdownAdjuster {
         String pattern = "(^|\\s)https://[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
         String replaceFormat = "[%s](%s)";
 
-        return this.replaceRedditLinks(markdown, pattern, replaceFormat);
+        // Need to escape characters like ?
+        return this.replace(markdown, pattern, replaceFormat);
     }
 
     /**
@@ -206,7 +207,7 @@ public class MarkdownAdjuster {
         String pattern = "(^|\\s)/?(r|R)/[A-Za-z_]+";
         String replaceFormat = "[%s](https://www.reddit.com/%s/)";
 
-        return this.replaceRedditLinks(markdown, pattern, replaceFormat);
+        return this.replace(markdown, pattern, replaceFormat);
     }
 
     /**
@@ -219,18 +220,20 @@ public class MarkdownAdjuster {
         String pattern = "(^|\\s)/?(u|U)/[0-9A-Za-z_-]+";
         String replaceFormat = "[%s](https://www.reddit.com/%s/)";
 
-        return this.replaceRedditLinks(markdown, pattern, replaceFormat);
+        return this.replace(markdown, pattern, replaceFormat);
     }
 
     /**
-     * Replaces every occurrence of a reddit link pattern with a given format
+     * Replaces every occurrence of a pattern with a given format
+     *
+     * <p>For reddit links that start with a slash (ie. /r/...) the first slash is removed</p>
      *
      * @param markdown The text to replace in
      * @param pattern The pattern to replace
      * @param replaceFormat The format to use for the replacement
      * @return The full replaced text
      */
-    private String replaceRedditLinks(String markdown, String pattern, String replaceFormat) {
+    private String replace(String markdown, String pattern, String replaceFormat) {
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(markdown);
 
