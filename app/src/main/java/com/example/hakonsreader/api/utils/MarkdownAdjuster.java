@@ -175,30 +175,31 @@ public class MarkdownAdjuster {
      * Wraps normal links that aren't already wrapped with markdown links
      *
      * @param markdown The markdown to adjust
-     * @return The adjuset markdown
+     * @return The adjusted markdown
      */
     private String adjustNormalLinks(String markdown) {
-        return markdown;
+        // This regex is taken (mostly) from: https://stackoverflow.com/a/3809435/7750841
+        String pattern = "(^|\\s)https://[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
+        String replaceFormat = "[%s](%s)";
+
+        return this.replaceRedditLinks(markdown, pattern, replaceFormat);
     }
 
     /**
      * Adjusts superscript tags from ^() to {@code <sup></sup>}
      *
      * @param markdown The markdown to adjust
-     * @return The adjuset markdown
+     * @return The adjusted markdown
      */
     private String adjustSuperScript(String markdown) {
         return markdown;
     }
 
-
-
-
     /**
      * Wraps reddit links to subreddits (r/... and /r/...) with markdown links
      *
      * @param markdown The markdown to adjust
-     * @return The adjuset markdown
+     * @return The adjusted markdown
      */
     private String replaceSubredditLinks(String markdown) {
         // Matches either the start of the text, or a whitespace preceding the subreddit
@@ -212,7 +213,7 @@ public class MarkdownAdjuster {
      * Wraps reddit links to user profiles (u/... and /u/...) with markdown links
      *
      * @param markdown The markdown to adjust
-     * @return The adjuset markdown
+     * @return The adjusted markdown
      */
     private String replaceRedditUserLinks(String markdown) {
         String pattern = "(^|\\s)/?(u|U)/[0-9A-Za-z_-]+";
@@ -243,7 +244,7 @@ public class MarkdownAdjuster {
 
             String withoutSlash = replaced;
 
-            // Remove the first slash if present
+            // Remove the first slash if present (for reddit links)
             if (replaced.charAt(0) == '/') {
                 withoutSlash = replaced.substring(1);
             }

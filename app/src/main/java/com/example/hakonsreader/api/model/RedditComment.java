@@ -1,8 +1,5 @@
 package com.example.hakonsreader.api.model;
 
-import android.util.Log;
-
-import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
@@ -21,7 +18,8 @@ public class RedditComment extends RedditListing {
     private static MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
             .checkHeaderSpaces()
             .checkRedditSpecificLinks()
-            .build();
+            .checkSuperScript()
+            .checkNormalLinks().build();
 
 
     @SerializedName("body")

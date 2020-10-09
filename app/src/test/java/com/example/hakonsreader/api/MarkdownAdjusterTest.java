@@ -183,6 +183,11 @@ public class MarkdownAdjusterTest {
         String expected = "You should check out [https://nrk.no](https://nrk.no), it's a pretty good news site";
         String actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
+
+        markdown = "Link [https://nrk.no](https://nrk.no) already wrapped";
+        expected = "Link [https://nrk.no](https://nrk.no) already wrapped";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
     }
 
     /**
