@@ -1,6 +1,8 @@
 package com.example.hakonsreader.activites;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -126,9 +128,18 @@ public class DispatcherActivity extends AppCompatActivity {
             //  and then send that
 
         } else {
-            // If we don't know how to handle the URL pass it to a web view
-            intent = new Intent(this, WebViewActivity.class);
-            intent.putExtra(WebViewActivity.URL_KEY, url);
+            // Create an intent that would redirect to another app if installed
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+
+            PackageManager packageManager = getPackageManager();
+            List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+            // If it wouldn't resolve to an activity, open in a WebView instead
+            // Web pages will always resolve to a chrome activity, so ignore that as we are looking for actual apps
+            if (activities.size() <= 1) {
+                // If we don't know how to handle the URL pass it to a web view
+                intent = new Intent(this, WebViewActivity.class);
+                intent.putExtra(WebViewActivity.URL_KEY, url);}
         }
 
         return intent;
