@@ -79,8 +79,9 @@ public class PostInfo extends ConstraintLayout {
         String authorText = String.format(context.getString(R.string.authorPrefixed), post.getAuthor());
 
         binding.subreddit.setText(subredditText);
-        binding.author.setText(authorText);
+        binding.domain.setText(post.getDomain());
         binding.age.setText(Util.createAgeText(getResources(), between));
+        binding.author.setText(authorText);
         binding.title.setText(post.getTitle());
 
         if (post.isLocked()) {
@@ -101,6 +102,7 @@ public class PostInfo extends ConstraintLayout {
      */
     private void createAndAddTags() {
         // If this view has been used in a RecyclerView make sure it is fresh
+        binding.authorFlair.removeAllViews();
         binding.tags.removeAllViews();
 
         if (post.isSpoiler()) {
@@ -110,61 +112,22 @@ public class PostInfo extends ConstraintLayout {
             this.addTag(ViewUtil.createNSFWTag(getContext()));
         }
 
-        this.addFlairs();
+        this.addAuthorFlair();
+        this.addLinkFlair();
     }
 
-
-    /**
-     * Adds the link flair to the post
-     */
-    private void addFlairs() {
-        List<RichtextFlair> flairs = post.getLinkRichtextFlairs();
-        String flairText = post.getLinkFlairText();
-
-        if (flairs == null || flairText == null) {
-            return;
+    private void addAuthorFlair() {
+        Tag tag = ViewUtil.createFlair(post.getAuthorRichtextFlairs(), post.getAuthorFlairText(), post.getAuthorFlairTextColor(), post.getAuthorFlairBackgroundColor(), getContext());
+        if (tag != null) {
+            binding.authorFlair.addView(tag);
         }
+    }
 
-        // No flair to add
-        if (flairs.isEmpty() && (flairText == null || flairText.isEmpty())) {
-            return;
+    private void addLinkFlair() {
+        Tag tag = ViewUtil.createFlair(post.getLinkRichtextFlairs(), post.getLinkFlairText(), post.getLinkFlairTextColor(), post.getLinkFlairBackgroundColor(), getContext());
+        if (tag != null) {
+            this.addTag(tag);
         }
-
-        Tag tag = new Tag(getContext());
-
-        int textColor;
-        if (post.getLinkFlairTextColor().equals("dark")) {
-            textColor = ContextCompat.getColor(getContext(), R.color.flairTextDark);
-            tag.setFillColor(ContextCompat.getColor(getContext(), R.color.flairBackgroundDark));
-        } else {
-            textColor = ContextCompat.getColor(getContext(), R.color.flairTextLight);
-            tag.setFillColor(ContextCompat.getColor(getContext(), R.color.flairBackgroundLight));
-        }
-
-        String fillColor = post.getLinkFlairBackgroundColor();
-        if (fillColor != null && !fillColor.isEmpty()) {
-            tag.setFillColor(fillColor);
-        }
-
-        tag.setTextColor(textColor);
-
-        // If no richtext flairs, try to see if there is a text flair
-        // Apparently some subs set both text and richtext flairs *cough* GlobalOffensive *cough*
-        // so make sure only one is
-        if (flairs.isEmpty()) {
-            tag.addText(flairText);
-        } else {
-            // Add all views the flair has
-            flairs.forEach(flair -> {
-                if (flair.getType().equals("text")) {
-                    tag.addText(flair.getText());
-                } else if (flair.getType().equals("emoji")) {
-                    tag.addImage(flair.getUrl());
-                }
-            });
-        }
-
-        this.addTag(tag);
     }
 
 

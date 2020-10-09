@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.model;
 
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter;
+import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.google.gson.annotations.JsonAdapter;
@@ -19,7 +20,8 @@ public class RedditComment extends RedditListing {
             .checkHeaderSpaces()
             .checkRedditSpecificLinks()
             .checkSuperScript()
-            .checkNormalLinks().build();
+            .checkNormalLinks()
+            .build();
 
 
     @SerializedName("body")
@@ -56,6 +58,20 @@ public class RedditComment extends RedditListing {
      */
     @SerializedName("children")
     private List<String> children;
+
+
+    @SerializedName("author_flair_background_color")
+    private String authorFlairBackgroundColor;
+
+    @SerializedName("author_flair_text_color")
+    private String authorFlairTextColor;
+
+    @SerializedName("author_flair_text")
+    private String authorFlairText;
+
+    @SerializedName("author_flair_richtext")
+    private List<RichtextFlair> authorRichtextFlairs;
+
 
 
     /**
@@ -221,5 +237,42 @@ public class RedditComment extends RedditListing {
      */
     public int getExtraCommentsCount() {
         return extraCommentsCount;
+    }
+
+
+    /**
+     * @return The background color of the flair
+     */
+    public String getAuthorFlairBackgroundColor() {
+        return authorFlairBackgroundColor;
+    }
+
+    /**
+     * @return The text color of the author flair
+     */
+    public String getAuthorFlairTextColor() {
+        return authorFlairTextColor;
+    }
+
+    /**
+     * Retrieve the raw text of a author flair.
+     *
+     * <p>For rich text flairs see {@link RedditPost#getAuthorRichtextFlairs()}</p>
+     *
+     * @return The text of the author flair
+     */
+    public String getAuthorFlairText() {
+        return authorFlairText;
+    }
+
+    /**
+     * Retrieve the list of richtext flairs this author flair is comprised of.
+     *
+     * <p>For standard text flairs see {@link RedditPost#getAuthorFlairText()}</p>
+     *
+     * @return The list of richtext flairs for the post
+     */
+    public List<RichtextFlair> getAuthorRichtextFlairs() {
+        return authorRichtextFlairs;
     }
 }

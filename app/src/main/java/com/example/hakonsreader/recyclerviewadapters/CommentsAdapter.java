@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,6 +23,8 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
+import com.example.hakonsreader.misc.ViewUtil;
+import com.example.hakonsreader.views.Tag;
 import com.example.hakonsreader.views.VoteBar;
 
 import java.time.Duration;
@@ -336,6 +339,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView author;
+        private FrameLayout authorFlair;
         private TextView age;
         private TextView content;
         private ImageView locked;
@@ -347,6 +351,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             super(itemView);
 
             author = itemView.findViewById(R.id.commentAuthor);
+            authorFlair = itemView.findViewById(R.id.authorFlair);
             age = itemView.findViewById(R.id.commentAge);
             content = itemView.findViewById(R.id.commentContent);
             locked = itemView.findViewById(R.id.lock);
@@ -363,6 +368,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             // Reset author text (from when comment is by poster/mod)
             author.setBackground(null);
             author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.linkColor));
+
+            authorFlair.removeAllViews();
 
             // Reset if holder previously was a hidden comment
             author.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
@@ -409,6 +416,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             }
 
             author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));
+            
+            Tag tag = ViewUtil.createFlair(comment.getAuthorRichtextFlairs(), comment.getAuthorFlairText(), comment.getAuthorFlairTextColor(), comment.getAuthorFlairBackgroundColor(), itemView.getContext());
+            if (tag != null) {
+                authorFlair.addView(tag);
+
+            }
 
             // Calculate the time since the comment was posted
             Instant created = Instant.ofEpochSecond(comment.getCreatedAt());

@@ -18,11 +18,21 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="u/hakonschia" />
 
+    <FrameLayout
+        android:id="@+id/authorFlair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+
+        app:layout_constraintBottom_toBottomOf="@+id/commentAuthor"
+        app:layout_constraintStart_toEndOf="@+id/commentAuthor"
+        app:layout_constraintTop_toTopOf="@+id/commentAuthor" />
+
     <TextView
         android:id="@+id/commentAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/commentAuthor"
+        app:layout_constraintStart_toEndOf="@id/authorFlair"
         app:layout_constraintTop_toTopOf="parent"
 
         android:layout_marginStart="15dp"

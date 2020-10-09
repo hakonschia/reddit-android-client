@@ -55,6 +55,21 @@ public class RedditPost extends RedditListing {
     @SerializedName("post_hint")
     private String postHint;
 
+    @SerializedName("domain")
+    private String domain;
+
+
+    @SerializedName("author_flair_background_color")
+    private String authorFlairBackgroundColor;
+
+    @SerializedName("author_flair_text_color")
+    private String authorFlairTextColor;
+
+    @SerializedName("author_flair_text")
+    private String authorFlairText;
+
+    @SerializedName("author_flair_richtext")
+    private List<RichtextFlair> authorRichtextFlairs;
 
     @SerializedName("link_flair_background_color")
     private String linkFlairBackgroundColor;
@@ -177,6 +192,49 @@ public class RedditPost extends RedditListing {
      */
     public List<RedditPost> getCrossposts() {
         return crossposts;
+    }
+
+    /**
+     * @return The domain the post is posted to
+     */
+    public String getDomain() {
+        return domain;
+    }
+
+    /**
+     * @return The background color of the flair
+     */
+    public String getAuthorFlairBackgroundColor() {
+        return authorFlairBackgroundColor;
+    }
+
+    /**
+     * @return The text color of the author flair
+     */
+    public String getAuthorFlairTextColor() {
+        return authorFlairTextColor;
+    }
+
+    /**
+     * Retrieve the raw text of a author flair.
+     *
+     * <p>For rich text flairs see {@link RedditPost#getAuthorRichtextFlairs()}</p>
+     *
+     * @return The text of the author flair
+     */
+    public String getAuthorFlairText() {
+        return authorFlairText;
+    }
+
+    /**
+     * Retrieve the list of richtext flairs this author flair is comprised of.
+     *
+     * <p>For standard text flairs see {@link RedditPost#getAuthorFlairText()}</p>
+     *
+     * @return The list of richtext flairs for the post
+     */
+    public List<RichtextFlair> getAuthorRichtextFlairs() {
+        return authorRichtextFlairs;
     }
 
 

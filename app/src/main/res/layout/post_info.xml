@@ -25,19 +25,19 @@
         tools:text="r/GlobalOffensive" />
 
     <TextView
-        android:id="@+id/author"
+        android:id="@+id/domain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
 
-        android:layout_marginStart="12dp"
-
-        android:textSize="13sp"
         android:textColor="@color/secondaryTextColor"
+        android:textSize="13sp"
 
+        app:layout_constraintBottom_toBottomOf="@+id/subreddit"
         app:layout_constraintStart_toEndOf="@+id/subreddit"
-        app:layout_constraintTop_toTopOf="@+id/subreddit"
 
-        tools:text="u/hakonschia" />
+        app:layout_constraintTop_toTopOf="@+id/subreddit"
+        tools:text="v.redd.it" />
 
     <TextView
         android:id="@+id/age"
@@ -45,13 +45,36 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
 
-        android:textSize="13sp"
         android:textColor="@color/secondaryTextColor"
+        android:textSize="13sp"
 
-        app:layout_constraintStart_toEndOf="@+id/author"
-        app:layout_constraintTop_toTopOf="@+id/author"
+        app:layout_constraintBottom_toBottomOf="@+id/domain"
+        app:layout_constraintStart_toEndOf="@+id/domain"
 
+        app:layout_constraintTop_toTopOf="@+id/domain"
         tools:text="2h" />
+
+    <TextView
+        android:id="@+id/author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:textColor="@color/secondaryTextColor"
+        android:textSize="13sp"
+
+        app:layout_constraintStart_toStartOf="@+id/subreddit"
+        app:layout_constraintTop_toBottomOf="@+id/subreddit"
+        tools:text="u/hakonschia" />
+
+    <FrameLayout
+        android:id="@+id/authorFlair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+
+        app:layout_constraintBottom_toBottomOf="@+id/author"
+        app:layout_constraintStart_toEndOf="@+id/author"
+        app:layout_constraintTop_toTopOf="@+id/author" />
 
     <!-- Extra icons such as stickied, locked etc. -->
     <LinearLayout
@@ -88,8 +111,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        app:layout_constraintStart_toStartOf="@+id/subreddit"
-        app:layout_constraintTop_toBottomOf="@+id/subreddit"
+        app:layout_constraintStart_toStartOf="@+id/author"
+        app:layout_constraintTop_toBottomOf="@+id/author"
         android:orientation="horizontal" />
 
     <TextView

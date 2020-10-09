@@ -206,6 +206,7 @@ public class MarkdownAdjuster {
      */
     private String replaceSubredditLinks(String markdown) {
         // Matches either the start of the text, or a whitespace preceding the subreddit
+        // TODO it should also match at the start anything not a normal character (so that superscript with ^r/subreddit) works correctly
         String pattern = "(^|\\s)/?(r|R)/[A-Za-z_]+";
         String replaceFormat = "[%s](https://www.reddit.com/%s/)";
 
