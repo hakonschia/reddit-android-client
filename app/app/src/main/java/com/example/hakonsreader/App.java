@@ -55,6 +55,8 @@ public class App extends Application {
 
     @Override
     public void onCreate() {
+        // Switch back to the app theme (from the launcher theme)
+        setTheme(R.style.AppTheme);
         super.onCreate();
         set();
 

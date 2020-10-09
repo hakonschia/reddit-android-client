@@ -1,0 +1,11 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="opaque">
+
+    <!-- There isn't any information about if we are on dark mode or not here so always use black -->
+    <item android:drawable="@android:color/black"/>
+
+    <item>
+        <bitmap
+            android:src="@drawable/ic_logo"
+            android:gravity="center"/>
+    </item>
+</layer-list>
