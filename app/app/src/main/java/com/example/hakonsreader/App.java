@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
@@ -26,7 +27,6 @@ import io.noties.markwon.Markwon;
 import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TablePlugin;
-import okhttp3.logging.HttpLoggingInterceptor;
 
 
 /**
@@ -49,7 +49,7 @@ public class App extends Application {
     private RedditApi redditApi;
     private SharedPreferences settings;
     private Markwon markwon;
-    private boolean wifiEnabled;
+    private boolean wifiConnected;
     private static App app;
 
 
@@ -71,12 +71,8 @@ public class App extends Application {
         setupRedditApi();
         updateTheme();
 
-        // Get initial WiFi state
-        WifiManager mngr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        wifiEnabled = mngr.isWifiEnabled();
-
         // Register Wi-Fi broadcast receiver to be notified when Wi-Fi is enabled/disabled
-        IntentFilter intentFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        IntentFilter intentFilter = new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         registerReceiver(wifiStateReceiver, intentFilter);
     }
 
@@ -93,11 +89,14 @@ public class App extends Application {
     private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int wifiStateExtra = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
-                    WifiManager.WIFI_STATE_UNKNOWN);
+            final String action = intent.getAction();
 
-            wifiEnabled = wifiStateExtra == WifiManager.WIFI_STATE_ENABLED;
-            Log.d(TAG, "onReceive: wifi is " + (wifiEnabled ? "on" : "off"));
+            if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)){
+                NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                boolean connected = info.isConnected();
+
+                wifiConnected = connected;
+            }
         }
     };
 
@@ -253,11 +252,8 @@ public class App extends Application {
             return false;
         }
 
-        // TODO This doesn't actually work, as if you have wifi enabled, but not connected to a network
-        //  it will still autoplay
-
-        // If we get here we are on wi-fi only, return true if on wi-fi, else false
-        return wifiEnabled;
+        // If we get here we are on Wi-Fi only, return true if Wi-Fi is connected, else false
+        return wifiConnected;
     }
 
 
