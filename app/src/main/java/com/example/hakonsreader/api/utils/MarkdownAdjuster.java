@@ -1,6 +1,11 @@
 package com.example.hakonsreader.api.utils;
 
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class MarkdownAdjuster {
     private static final String ALLOWED_SUBREDDIT_CHARACTERS = "_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -106,7 +111,6 @@ public class MarkdownAdjuster {
     private String adjustHeaderSpaces(String markdown) {
         // Find everywhere where there are # without a space next, and insert a space (technically max 6 # but it's
         // not super important to be strictly compliant here)
-        // If we are in a link [](#here) it isn't actually a header, so we shouldn't add a space
 
         // Markdown works on lines, so for headers we only need to care about the first section of hashtags as a header
         // So if another hashtag that would be seen as a header appears, nothing will be done (as it should be)
@@ -123,7 +127,7 @@ public class MarkdownAdjuster {
 
                 // Add back the newline unless we are at the end
                 if (i + 1 != lines.length) {
-                    builder.append('\n');
+                    builder.append("\n");
                 }
             }
         }
@@ -150,49 +154,11 @@ public class MarkdownAdjuster {
      * @return The adjuset markdown
      */
     private String replaceSubredditLinks(String markdown) {
-        // Contains the name of every subreddit (the /r/ is removed)
-        // TODO this should only match exactly r/... and /r/... as if there are already linked subreddits it messes stuff up
-        String[] subreddits = markdown.split("/?r/");
+        // Matches either the start of the text, or a whitespace preceding the subreddit
+        String pattern = "(^|\\s)/?(r|R)/[A-Za-z_]+";
+        String replaceFormat = "[%s](https://www.reddit.com/%s/)";
 
-        StringBuilder builder = new StringBuilder();
-
-        // The first element will never be an actual subreddit. If the markdown starts with a "/r/"
-        // it will be an empty string, otherwise it will be the text before the first actual sub
-        builder.append(subreddits[0]);
-
-        for (int i = 1; i < subreddits.length; i++) {
-            String s = subreddits[i];
-
-            int endPos = s.length();
-            boolean endFound = false;
-
-            // Find where the subreddit ends (ie. where the first character not allowed in a subreddit is)
-            int j = 0;
-            while (!endFound && j < s.length()){
-                if (ALLOWED_SUBREDDIT_CHARACTERS.indexOf(s.charAt(j)) == -1) {
-                    endPos = j;
-                }
-                j++;
-                endFound = endPos != s.length();
-            }
-
-            // Get the subreddit name and create the link around it
-            String sub = s.substring(0, endPos);
-            String linked = String.format("[r/%1$s](https://www.reddit.com/r/%1$s/)", sub);
-
-            // The string after the link
-            String after = "";
-            if (endPos < s.length()) {
-                after = s.substring(endPos);
-            }
-
-            String full = linked + after;
-            builder.append(full);
-        }
-
-        markdown = builder.toString();
-
-        return markdown;
+        return this.replaceRedditLinks(markdown, pattern, replaceFormat);
     }
 
     /**
@@ -202,7 +168,10 @@ public class MarkdownAdjuster {
      * @return The adjuset markdown
      */
     private String replaceRedditUserLinks(String markdown) {
-        return markdown;
+        String pattern = "(^|\\s)/?(u|U)/[0-9A-Za-z_-]+";
+        String replaceFormat = "[%s](https://www.reddit.com/%s/)";
+
+        return this.replaceRedditLinks(markdown, pattern, replaceFormat);
     }
 
     /**
@@ -214,6 +183,51 @@ public class MarkdownAdjuster {
     private String replaceNormalLinks(String markdown) {
         return markdown;
     }
+
+    /**
+     * Replaces every occurrence of a reddit link pattern with a given format
+     *
+     * @param markdown The text to replace in
+     * @param pattern The pattern to replace
+     * @param replaceFormat The format to use for the replacement
+     * @return
+     */
+    private String replaceRedditLinks(String markdown, String pattern, String replaceFormat) {
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(markdown);
+
+        // Map holding the "r/subreddit" mapped to its linked string "[r/subreddit](https://...)"
+        Map<String, String> map = new HashMap<>();
+
+        while (m.find()) {
+            // Although we do care about the whitespace in front, we will later just replace
+            // the subreddit text itself, so the whitespace won't matter
+            String replaced = m.group().trim();
+
+            String withoutSlash = replaced;
+
+            // Remove the first slash if present
+            if (replaced.charAt(0) == '/') {
+                withoutSlash = replaced.substring(1);
+            }
+
+            String formatted = String.format(replaceFormat, replaced, withoutSlash);
+
+            map.put(replaced, formatted);
+        }
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String sub = entry.getKey();
+            String formatted = entry.getValue();
+
+            // replaceAll is probably bad to use since we're actually only replacing the exact match each time
+            markdown = markdown.replaceAll(sub, formatted);
+        }
+
+        return markdown;
+    }
+
+
 
     /**
      * Adds spaces between a header symbol and the content

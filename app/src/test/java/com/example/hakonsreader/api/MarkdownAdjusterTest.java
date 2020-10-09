@@ -3,10 +3,57 @@ package com.example.hakonsreader.api;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.junit.Assert.*;
 
 public class MarkdownAdjusterTest {
 
+
+    @Test
+    public void k() {
+        String markdown = "Hello r/GlobalOffensive, how are you doing /r/hydro_homies.good thanks on this fine day?";
+
+        Pattern p = Pattern.compile("(^|\\s)/?(r|R)/[A-Za-z_]+");
+        Matcher m = p.matcher(markdown);
+
+        // Map holding the "r/subreddit" mapped to its linked string "[r/subreddit](https://...)"
+        Map<String, String> subredditMap = new HashMap<>();
+
+        while (m.find()) {
+            // Although we do care about the whitespace in front, we will later just replace
+            // the subreddit text itself, so the whitespace won't matter
+            String sub = m.group().trim();
+
+            String withoutSlash = sub;
+
+            // Remove the first slash if present
+            System.out.println(sub);
+            if (sub.charAt(0) == '/') {
+                withoutSlash = sub.substring(1);
+            }
+
+            // The hypertext should still have the slash present, but for the link we need it without
+            String linked = String.format("[%s](https://www.reddit.com/%s/)", sub, withoutSlash);
+
+            System.out.println(linked);
+            subredditMap.put(sub, linked);
+        }
+
+        for (Map.Entry<String, String> entry : subredditMap.entrySet()) {
+            String sub = entry.getKey();
+            String linked = entry.getValue();
+
+            // replaceAll is probably bad to use since we're actually only replacing the exact match each time
+            markdown = markdown.replaceAll(sub, linked);
+        }
+
+        System.out.println(markdown);
+    }
 
     /**
      * Tests that headers are adjusted as expected
@@ -96,9 +143,15 @@ public class MarkdownAdjusterTest {
         String actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
-        // Check that "/r/<subreddit>" gets wrapped with a markdown link. Reddit itself removes the first slash, so we do too
+        // Check that "/r/<subreddit>" gets wrapped with a markdown link
         markdown = "You should check out /r/GlobalOffensive, it's a really cool subreddit";
-        expected = "You should check out [r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive/), it's a really cool subreddit";
+        expected = "You should check out [/r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive/), it's a really cool subreddit";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // Check that already linked subs don't get wrapped again
+        markdown = "This linked [r/subreddit](https://www.reddit.com/r/subreddit/) already has a link around it";
+        expected = "This linked [r/subreddit](https://www.reddit.com/r/subreddit/) already has a link around it";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
@@ -110,7 +163,7 @@ public class MarkdownAdjusterTest {
         assertEquals(expected, actual);
 
         markdown = "/u/hakonschia has 8-5 followers!";
-        expected = "[u/hakonschia](https://www.reddit.com/u/hakonschia/) has 8-5 followers!";
+        expected = "[/u/hakonschia](https://www.reddit.com/u/hakonschia/) has 8-5 followers!";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
     }
