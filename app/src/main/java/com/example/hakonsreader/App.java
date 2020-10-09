@@ -16,6 +16,7 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.misc.OAuthStateGenerator;
+import com.example.hakonsreader.misc.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 
@@ -198,7 +199,6 @@ public class App extends Application {
      * @return A {@link Markwon} object ready to format some markdown :)
      */
     private Markwon createMark() {
-        // TODO spoiler tags https://github.com/noties/Markwon/blob/master/app-sample/src/main/java/io/noties/markwon/app/samples/RedditSpoilerSample.java
         // TODO add formatting to blockquote
         // TODO superscript
         return Markwon.builder(this)
@@ -206,6 +206,7 @@ public class App extends Application {
                 .usePlugin(CorePlugin.create())
                 .usePlugin(TablePlugin.create(this))
                 .usePlugin(StrikethroughPlugin.create())
+                .usePlugin(new RedditSpoilerPlugin())
                 .build();
     }
 

@@ -86,7 +86,7 @@ public class DispatcherActivity extends AppCompatActivity {
 
         String lastSegment = "";
         // Get the last segment to check for file extensions
-        if (pathSegments.size() > 0) {
+        if (!pathSegments.isEmpty()) {
             lastSegment = pathSegments.get(pathSegments.size() - 1);
         }
 

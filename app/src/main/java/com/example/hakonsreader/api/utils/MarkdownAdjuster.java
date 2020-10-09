@@ -135,6 +135,7 @@ public class MarkdownAdjuster {
         // Find every /r/, r/ and wrap that and the rest of the text until a non A-Za-z or _ character appears
         // Find every /u/, u/ and wrap that and the rest of the text until a non A-Za-z0-9, -, or _ character appears
 
+        // TODO check if it is already in a link, if so dont wrap again
         markdown = this.replaceSubredditLinks(markdown);
         markdown = this.replaceRedditUserLinks(markdown);
 
