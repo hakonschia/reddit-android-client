@@ -135,11 +135,14 @@ public class MarkdownAdjuster {
         return builder.toString();
     }
 
+    /**
+     * Adjusts reddit specific links (to subreddits, r/..., and users, u/...) and wraps them
+     * in markdown links
+     *
+     * @param markdown The markdown to adjust
+     * @return The adjusted markdown
+     */
     private String adjustRedditSpecificLinks(String markdown) {
-        // Find every /r/, r/ and wrap that and the rest of the text until a non A-Za-z or _ character appears
-        // Find every /u/, u/ and wrap that and the rest of the text until a non A-Za-z0-9, -, or _ character appears
-
-        // TODO check if it is already in a link, if so dont wrap again
         markdown = this.replaceSubredditLinks(markdown);
         markdown = this.replaceRedditUserLinks(markdown);
 
@@ -190,7 +193,7 @@ public class MarkdownAdjuster {
      * @param markdown The text to replace in
      * @param pattern The pattern to replace
      * @param replaceFormat The format to use for the replacement
-     * @return
+     * @return The full replaced text
      */
     private String replaceRedditLinks(String markdown, String pattern, String replaceFormat) {
         Pattern p = Pattern.compile(pattern);
