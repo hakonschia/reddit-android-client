@@ -71,8 +71,6 @@ public class App extends Application {
 
     @Override
     public void onCreate() {
-        // Switch back to the app theme (from the launcher theme)
-        setTheme(R.style.AppTheme);
         super.onCreate();
         set();
 
@@ -86,7 +84,12 @@ public class App extends Application {
 
         setupRedditApi();
         updateTheme();
+    }
 
+    /**
+     * Unregisters any receivers that have been registered
+     */
+    public void registerReceivers() {
         // Register Wi-Fi broadcast receiver to be notified when Wi-Fi is enabled/disabled
         IntentFilter intentFilter = new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         registerReceiver(wifiStateReceiver, intentFilter);

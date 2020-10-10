@@ -83,12 +83,13 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Switch back to the app theme (from the launcher theme)
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // For testing purposes hardcode going into a subreddit
-        //Intent intent = new Intent(this, SubredditActivity.class);
         Intent intent = new Intent(this, DispatcherActivity.class);
         intent.putExtra("subreddit", "test");
         intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/test/comments/j8g7bq/what_did_the_horse_say_to_the_other_horse/");
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         }
 
         this.setupNavBar(savedInstanceState);
+        App.get().registerReceivers();
     }
 
     @Override
