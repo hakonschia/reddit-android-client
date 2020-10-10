@@ -410,7 +410,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             content.setMovementMethod(InternalLinkMovementMethod.getInstance(context));
 
-            String body = comment.getBody(true);
+            String body = comment.getBody();
             if (body != null) {
                 App.get().getMark().setMarkdown(content, body);
             }

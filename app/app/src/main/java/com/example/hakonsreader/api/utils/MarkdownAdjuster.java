@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * Class for adjusting some generic markdown faults
+ * Class for adjusting some generic Reddit markdown faults
  *
  * <p>Use {@link MarkdownAdjuster.Builder} to create new objects</p>
  */
@@ -16,7 +16,6 @@ public class MarkdownAdjuster {
     private boolean checkRedditSpecificLinks;
     private boolean checkHeaderSpaces;
     private boolean checkNormalLinks;
-    private boolean checkSuperScript;
 
 
     private MarkdownAdjuster() {}
@@ -61,7 +60,6 @@ public class MarkdownAdjuster {
          * @return This builder
          */
         public Builder checkNormalLinks() {
-            // TODO add flag to only keep domain (ie https://nrk.no -> nrk.no)
             bCheckNormalLinks = true;
             return this;
         }
@@ -88,7 +86,6 @@ public class MarkdownAdjuster {
             adjuster.checkHeaderSpaces = bCheckHeaderSpaces;
             adjuster.checkRedditSpecificLinks = bCheckRedditSpecificLinks;
             adjuster.checkNormalLinks = bCheckNormalLinks;
-            adjuster.checkSuperScript = bCheckSuperScript;
 
             return adjuster;
         }
@@ -110,9 +107,6 @@ public class MarkdownAdjuster {
         }
         if (checkNormalLinks) {
             markdown = this.adjustNormalLinks(markdown);
-        }
-        if (checkSuperScript) {
-            markdown = this.adjustSuperScript(markdown);
         }
 
         return markdown;
@@ -136,6 +130,7 @@ public class MarkdownAdjuster {
 
         // Markdown works on lines, so for headers we only need to care about the first section of hashtags as a header
         // So if another hashtag that would be seen as a header appears, nothing will be done (as it should be)
+        // TODO this ruins the formatting
         String[] lines = markdown.split("\n");
 
         StringBuilder builder = new StringBuilder();

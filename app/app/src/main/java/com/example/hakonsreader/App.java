@@ -25,10 +25,13 @@ import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 
+import org.commonmark.node.Node;
+
 import java.util.UUID;
 
 import io.noties.markwon.AbstractMarkwonPlugin;
 import io.noties.markwon.Markwon;
+import io.noties.markwon.MarkwonVisitor;
 import io.noties.markwon.SoftBreakAddsNewLinePlugin;
 import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.core.MarkwonTheme;
@@ -207,16 +210,16 @@ public class App extends Application {
      * @return A {@link Markwon} object ready to format some markdown :)
      */
     private Markwon createMark() {
-        // TODO add formatting to blockquote
-        // TODO superscript
         return Markwon.builder(this)
                 // Headers, blockquote etc. are a part of the core
                 .usePlugin(CorePlugin.create())
                 .usePlugin(TablePlugin.create(this))
                 .usePlugin(StrikethroughPlugin.create())
                 .usePlugin(SoftBreakAddsNewLinePlugin.create())
+
+                // Custom plugins
                 .usePlugin(new RedditSpoilerPlugin())
-                .usePlugin(new RedditLinkPlugin(getApplicationContext()))
+                .usePlugin(new RedditLinkPlugin(this))
                 .usePlugin(new SuperScriptPlugin())
                 .usePlugin(new ThemePlugin(this))
                 .build();

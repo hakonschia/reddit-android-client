@@ -47,7 +47,7 @@ public class ContentText extends ScrollView {
         textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));
         textView.setAutoLinkMask(Linkify.WEB_URLS);
 
-        String markdown = post.getSelftext(true);
+        String markdown = post.getSelftext();
 
         // Self text posts with only a title won't have a body
         if (markdown != null) {

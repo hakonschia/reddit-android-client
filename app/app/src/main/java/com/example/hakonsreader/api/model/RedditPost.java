@@ -12,11 +12,6 @@ import java.util.List;
  */
 public class RedditPost extends RedditListing {
 
-    private static MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
-            .checkHeaderSpaces()
-            .checkSuperScript()
-            .build();
-
 
     @SerializedName("title")
     private String title;
@@ -155,22 +150,13 @@ public class RedditPost extends RedditListing {
     /**
      * Retrieve the markdown text of the post.
      *
-     * @param adjustFormatting Reddit markdown accepts some tags without a space. If {@code adjustFormatting}
-     *                         is set to true the space is added, as markdown formatters might not accept
-     *                         this.
-     *                         <p>For example a header from Reddit might be returned as {@code #Header}, when
-     *                         it should be {@code # Header}</p>
-     *                         <p>If you want to adjust only some parts, see {@link MarkdownAdjuster} and create
-     *                         your own adjuster</p>
+     * <p>Note: Some Reddit markdown differs from the specification, such as no space between
+     * the markdown symbol and the text. See {@link MarkdownAdjuster} to fix these errors</p>
+     *
      * @return The markdown text of the post if the post is {@link PostType#TEXT}
      */
-    public String getSelftext(boolean adjustFormatting) {
-        String text = selftext;
-        if (adjustFormatting) {
-            text = adjuster.adjust(selftext);
-        }
-
-        return text;
+    public String getSelftext() {
+        return selftext;
     }
 
     /**

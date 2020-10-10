@@ -16,11 +16,6 @@ import java.util.List;
 public class RedditComment extends RedditListing {
     private static final String TAG = "RedditComment";
 
-    private static MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
-            .checkHeaderSpaces()
-            .checkSuperScript()
-            .build();
-
 
     @SerializedName("body")
     private String body;
@@ -75,19 +70,17 @@ public class RedditComment extends RedditListing {
     /**
      * Retrieves the markdown body. For HTML use {@link RedditComment#getBodyHtml()}
      *
+     * <p>Note: Some Reddit markdown differs from the specification, such as no space between
+     * the markdown symbol and the text. See {@link MarkdownAdjuster} to fix these errors</p>
+     *
      * @return The markdown string of the comment
      */
-    public String getBody(boolean adjustFormatting) {
-        String text = body;
-        if (adjustFormatting) {
-            text = adjuster.adjust(body);
-        }
-
-        return text;
+    public String getBody() {
+        return body;
     }
 
     /**
-     * Retrieves the body in HTML. For markdown text use {@link RedditComment#getBody(boolean)}
+     * Retrieves the body in HTML. For markdown text use {@link RedditComment#getBody()}
      *
      * @return The HTML string of the comment
      */
