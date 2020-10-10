@@ -16,6 +16,7 @@
     <dimen name="tagIconSize">14dp</dimen>
     <dimen name="tagSpace">3dp</dimen>
 
-    <dimen name="quoteLineWidth">2dp</dimen>
-    <dimen name="quoteGap">5dp</dimen>
+    <dimen name="quoteWidth">4dp</dimen>
+    <!-- The margin is from the start of the quote stripe to the start of the text -->
+    <dimen name="quoteMargin">15dp</dimen>
 </resources>

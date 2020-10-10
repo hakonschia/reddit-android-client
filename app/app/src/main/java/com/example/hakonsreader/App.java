@@ -9,13 +9,16 @@ import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.markwonplugins.SuperScriptPlugin;
+import com.example.hakonsreader.markwonplugins.ThemePlugin;
 import com.example.hakonsreader.misc.OAuthStateGenerator;
 import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
 import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
@@ -24,8 +27,11 @@ import com.example.hakonsreader.misc.TokenManager;
 
 import java.util.UUID;
 
+import io.noties.markwon.AbstractMarkwonPlugin;
 import io.noties.markwon.Markwon;
+import io.noties.markwon.SoftBreakAddsNewLinePlugin;
 import io.noties.markwon.core.CorePlugin;
+import io.noties.markwon.core.MarkwonTheme;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TablePlugin;
 
@@ -208,9 +214,11 @@ public class App extends Application {
                 .usePlugin(CorePlugin.create())
                 .usePlugin(TablePlugin.create(this))
                 .usePlugin(StrikethroughPlugin.create())
+                .usePlugin(SoftBreakAddsNewLinePlugin.create())
                 .usePlugin(new RedditSpoilerPlugin())
                 .usePlugin(new RedditLinkPlugin(getApplicationContext()))
                 .usePlugin(new SuperScriptPlugin())
+                .usePlugin(new ThemePlugin(this))
                 .build();
     }
 

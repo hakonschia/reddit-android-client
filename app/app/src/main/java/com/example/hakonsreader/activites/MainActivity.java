@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         //Intent intent = new Intent(this, SubredditActivity.class);
         Intent intent = new Intent(this, DispatcherActivity.class);
         intent.putExtra("subreddit", "test");
-        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/test");
+        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/test/comments/j8g7bq/what_did_the_horse_say_to_the_other_horse/");
         startActivity(intent);
 
         if (savedInstanceState != null) {
