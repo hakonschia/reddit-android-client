@@ -33,8 +33,9 @@ public class MarkdownAdjusterTest {
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
-        markdown = "#Header without a space\nNormal comment on next line";
-        expected = "# Header without a space\nNormal comment on next line";
+        // A single newline in markdown doesn't do anything, so for the next line two have to be used
+        markdown = "#Header without a space\n\nNormal comment on next line";
+        expected = "# Header without a space\n\nNormal comment on next line";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
@@ -48,18 +49,18 @@ public class MarkdownAdjusterTest {
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
-        markdown = "##Smaller header without a space\nComment on next line";
-        expected = "## Smaller header without a space\nComment on next line";
+        markdown = "##Smaller header without a space\n\nComment on next line";
+        expected = "## Smaller header without a space\n\nComment on next line";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
-        markdown = "##Smaller header without a space\nComment on next line\n#And now a large header";
-        expected = "## Smaller header without a space\nComment on next line\n# And now a large header";
+        markdown = "##Smaller header without a space\n\nComment on next line\n\n#And now a large header";
+        expected = "## Smaller header without a space\n\nComment on next line\n\n# And now a large header";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
-        markdown = "For some reason, I have chosen to not start this text with a header\n#Instead, the header is on the second line";
-        expected = "For some reason, I have chosen to not start this text with a header\n# Instead, the header is on the second line";
+        markdown = "For some reason, I have chosen to not start this text with a header\n\n#Instead, the header is on the second line";
+        expected = "For some reason, I have chosen to not start this text with a header\n\n# Instead, the header is on the second line";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
@@ -199,8 +200,8 @@ public class MarkdownAdjusterTest {
                 .checkHeaderSpaces()
                 .build();
 
-        String markdown = "#Here are 5 reason why you should check out GlobalOffensive, number 9 will shock you!\nYou should check out r/GlobalOffensive, it's a really cool subreddit";
-        String expected = "# Here are 5 reason why you should check out GlobalOffensive, number 9 will shock you!\nYou should check out [r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive/), it's a really cool subreddit";
+        String markdown = "#Here are 5 reason why you should check out GlobalOffensive, number 9 will shock you!\n\nYou should check out r/GlobalOffensive, it's a really cool subreddit";
+        String expected = "# Here are 5 reason why you should check out GlobalOffensive, number 9 will shock you!\n\nYou should check out [r/GlobalOffensive](https://www.reddit.com/r/GlobalOffensive/), it's a really cool subreddit";
         String actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
