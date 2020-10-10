@@ -1,7 +1,6 @@
 package com.example.hakonsreader.viewmodels;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
@@ -12,7 +11,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.Util;
-import com.example.hakonsreader.persistence.AppDatabase;
+import com.example.hakonsreader.api.persistence.AppDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +23,8 @@ public class PostsViewModel extends ViewModel {
     // The way this works is that the database holds all RedditPosts
     // We store the IDs of the post this ViewModel keeps track of, and asks the database for those posts
     // When we retrieve posts we add them to the shared database for all PostsViewModel
+    // TODO posts should be removed 1 day (or something) after they have been inserted, so not massive amounts of posts are
+    //  stored that wont ever be used
 
     private AppDatabase database;
 
@@ -38,7 +39,7 @@ public class PostsViewModel extends ViewModel {
      * @return The observable for the posts
      */
     public LiveData<List<RedditPost>> getPosts() {
-        return database.listingDao().getPostsById(postIds);
+        return database.posts().getPostsById(postIds);
     }
 
     /**
@@ -79,7 +80,7 @@ public class PostsViewModel extends ViewModel {
 
             // Store (or update) the posts in the database
             new Thread(() -> {
-                database.listingDao().insertAll(newPosts);
+                database.posts().insertAll(newPosts);
             }).start();
         }, (code, t) -> {
             loadingChange.setValue(false);

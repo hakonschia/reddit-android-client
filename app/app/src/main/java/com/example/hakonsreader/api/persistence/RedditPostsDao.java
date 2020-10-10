@@ -1,4 +1,4 @@
-package com.example.hakonsreader.persistence;
+package com.example.hakonsreader.api.persistence;
 
 
 import androidx.lifecycle.LiveData;

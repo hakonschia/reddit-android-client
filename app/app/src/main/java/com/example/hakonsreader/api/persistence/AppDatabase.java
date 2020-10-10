@@ -1,4 +1,4 @@
-package com.example.hakonsreader.persistence;
+package com.example.hakonsreader.api.persistence;
 
 import android.content.Context;
 
@@ -15,7 +15,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance; // The instance of the database
-    public abstract RedditPostsDao listingDao();
+    public abstract RedditPostsDao posts();
 
 
     /**
