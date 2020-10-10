@@ -412,6 +412,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             String body = comment.getBody();
             if (body != null) {
+                body = App.get().getAdjuster().adjust(body);
                 App.get().getMark().setMarkdown(content, body);
             }
 

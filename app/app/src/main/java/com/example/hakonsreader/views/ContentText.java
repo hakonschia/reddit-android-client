@@ -45,7 +45,6 @@ public class ContentText extends ScrollView {
 
     private void updateView() {
         textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));
-        textView.setAutoLinkMask(Linkify.WEB_URLS);
 
         String markdown = post.getSelftext();
 
@@ -56,6 +55,7 @@ public class ContentText extends ScrollView {
             textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
             // TODO this crashes the app with some tables, such as https://www.reddit.com/r/test/comments/j7px9a/sadasd/
             //  not sure what happens here as the same text can be rendered fine in a stand-alone app
+            markdown = App.get().getAdjuster().adjust(markdown);
             App.get().getMark().setMarkdown(textView, markdown);
         }
 

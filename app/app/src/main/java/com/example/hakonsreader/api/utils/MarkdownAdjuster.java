@@ -136,16 +136,14 @@ public class MarkdownAdjuster {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            if (!line.isEmpty()) {
-                line = this.addSpacesToHeader(line);
+            line = this.addSpacesToHeader(line);
 
-                // The line object has now either been edited, or is as it should be, so append it on the builder
-                builder.append(line);
+            // The line object has now either been edited, or is as it should be, so append it on the builder
+            builder.append(line);
 
-                // Add back the newline unless we are at the end
-                if (i + 1 != lines.length) {
-                    builder.append("\n");
-                }
+            // Add back the newline unless we are at the end
+            if (i + 1 != lines.length) {
+                builder.append("\n");
             }
         }
 
@@ -276,7 +274,7 @@ public class MarkdownAdjuster {
      */
     private String addSpacesToHeader(String markdown) {
         // Not a header, return the text
-        if (markdown.charAt(0) != '#') {
+        if (markdown.isEmpty() || markdown.charAt(0) != '#') {
             return markdown;
         }
 

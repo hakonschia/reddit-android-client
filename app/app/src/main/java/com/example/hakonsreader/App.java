@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.markwonplugins.SuperScriptPlugin;
@@ -58,8 +59,11 @@ public class App extends Application {
     private String oauthState;
     private RedditApi redditApi;
     private SharedPreferences settings;
-    private Markwon markwon;
     private boolean wifiConnected;
+
+    private Markwon markwon;
+    private MarkdownAdjuster adjuster;
+
     private static App app;
 
 
@@ -223,6 +227,23 @@ public class App extends Application {
                 .usePlugin(new SuperScriptPlugin())
                 .usePlugin(new ThemePlugin(this))
                 .build();
+    }
+
+    /**
+     * Retrieves the markdown adjuster
+     *
+     * <p>The adjuster only checks for missing header spaces</p>
+     *
+     * @return The markdown adjuster
+     */
+    public MarkdownAdjuster getAdjuster() {
+        if (adjuster == null) {
+            adjuster = new MarkdownAdjuster.Builder()
+                    .checkHeaderSpaces()
+                    .build();
+        }
+
+        return adjuster;
     }
 
     /**
