@@ -1,5 +1,9 @@
 package com.example.hakonsreader.api.model;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
 import com.example.hakonsreader.api.jsonadapters.ListingAdapter;
@@ -10,11 +14,14 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Base class with data common for all types of listings
  */
+@Entity
 @JsonAdapter(ListingAdapter.class)
 public abstract class RedditListing {
     @SerializedName("kind")
     protected String kind;
 
+    @PrimaryKey
+    @NonNull
     @SerializedName("id")
     protected String id;
 
@@ -139,17 +146,6 @@ public abstract class RedditListing {
     }
 
     /**
-     * @return True if the listing is distinguished as a moderator
-     */
-    public boolean isMod() {
-        if (distinguished == null) {
-            return false;
-        }
-
-        return distinguished.equals("moderator");
-    }
-
-    /**
      * @return The score of the listing
      */
     public int getScore() {
@@ -162,6 +158,88 @@ public abstract class RedditListing {
     public boolean isScoreHidden() {
         return scoreHidden;
     }
+
+    public String getDistinguished() {
+        return distinguished;
+    }
+
+    public Boolean getLiked() {
+        return liked;
+    }
+
+
+    public void setKind(String kind) {
+        this.kind = kind;
+    }
+
+    public void setId(@NonNull String id) {
+        this.id = id;
+    }
+
+    public void setSubreddit(String subreddit) {
+        this.subreddit = subreddit;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public void setCreatedAt(float createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setNsfw(boolean nsfw) {
+        this.nsfw = nsfw;
+    }
+
+    public void setPermalink(String permalink) {
+        this.permalink = permalink;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
+    }
+
+    public void setStickied(boolean stickied) {
+        isStickied = stickied;
+    }
+
+    public void setDistinguished(String distinguished) {
+        this.distinguished = distinguished;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void setScoreHidden(boolean scoreHidden) {
+        this.scoreHidden = scoreHidden;
+    }
+
+    public void setLiked(Boolean liked) {
+        this.liked = liked;
+    }
+
+
+    /**
+     * @return True if the listing is distinguished as a moderator
+     */
+    public boolean isMod() {
+        if (distinguished == null) {
+            return false;
+        }
+
+        return distinguished.equals("moderator");
+    }
+
     /**
      * Retrieves the logged in users vote on the post
      *

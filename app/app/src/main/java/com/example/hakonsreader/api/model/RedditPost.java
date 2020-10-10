@@ -1,5 +1,8 @@
 package com.example.hakonsreader.api.model;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
@@ -10,6 +13,7 @@ import java.util.List;
 /**
  * Class representing a Reddit post
  */
+@Entity(tableName = "posts")
 public class RedditPost extends RedditListing {
 
 
@@ -35,6 +39,7 @@ public class RedditPost extends RedditListing {
     private String crosspostParentID;
 
     @SerializedName("crosspost_parent_list")
+    @Ignore
     private List<RedditPost> crossposts;
 
 
@@ -64,6 +69,7 @@ public class RedditPost extends RedditListing {
     private String authorFlairText;
 
     @SerializedName("author_flair_richtext")
+    @Ignore
     private List<RichtextFlair> authorRichtextFlairs;
 
     @SerializedName("link_flair_background_color")
@@ -76,10 +82,12 @@ public class RedditPost extends RedditListing {
     private String linkFlairText;
 
     @SerializedName("link_flair_richtext")
+    @Ignore
     private List<RichtextFlair> linkRichtextFlairs;
 
 
     @SerializedName("media")
+    @Ignore
     private Media media;
 
     /**
@@ -88,11 +96,13 @@ public class RedditPost extends RedditListing {
     private static class Media {
 
         @SerializedName("reddit_video")
+        @Ignore
         private RedditVideo redditVideo;
     }
 
 
     @SerializedName("gallery_data")
+    @Ignore
     private GalleryData galleryData;
 
     /**
@@ -100,11 +110,13 @@ public class RedditPost extends RedditListing {
      */
     private static class GalleryData {
         @SerializedName("items")
+        @Ignore
         private List<GalleryItem> items;
     }
 
 
     @SerializedName("preview")
+    @Ignore
     private Preview preview;
 
     private static class Preview {
@@ -347,6 +359,135 @@ public class RedditPost extends RedditListing {
         return preview.images.get(0).variants.mp4.resolutions;
     }
 
+    public String getSelftextHtml() {
+        return selftextHtml;
+    }
+
+    public boolean isText() {
+        return isText;
+    }
+
+    public boolean isVideo() {
+        return isVideo;
+    }
+
+    public boolean isGallery() {
+        return isGallery;
+    }
+
+    public String getPostHint() {
+        return postHint;
+    }
+
+    public Media getMedia() {
+        return media;
+    }
+
+    public GalleryData getGalleryData() {
+        return galleryData;
+    }
+
+    public Preview getPreview() {
+        return preview;
+    }
+
+
+    /* ----------------- Setters ----------------- */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setAmountOfComments(int amountOfComments) {
+        this.amountOfComments = amountOfComments;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public void setSpoiler(boolean spoiler) {
+        this.spoiler = spoiler;
+    }
+
+    public void setSelftext(String selftext) {
+        this.selftext = selftext;
+    }
+
+    public void setSelftextHtml(String selftextHtml) {
+        this.selftextHtml = selftextHtml;
+    }
+
+    public void setCrosspostParentID(String crosspostParentID) {
+        this.crosspostParentID = crosspostParentID;
+    }
+
+    public void setCrossposts(List<RedditPost> crossposts) {
+        this.crossposts = crossposts;
+    }
+
+    public void setText(boolean text) {
+        isText = text;
+    }
+
+    public void setVideo(boolean video) {
+        isVideo = video;
+    }
+
+    public void setGallery(boolean gallery) {
+        isGallery = gallery;
+    }
+
+    public void setPostHint(String postHint) {
+        this.postHint = postHint;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
+
+    public void setAuthorFlairBackgroundColor(String authorFlairBackgroundColor) {
+        this.authorFlairBackgroundColor = authorFlairBackgroundColor;
+    }
+
+    public void setAuthorFlairTextColor(String authorFlairTextColor) {
+        this.authorFlairTextColor = authorFlairTextColor;
+    }
+
+    public void setAuthorFlairText(String authorFlairText) {
+        this.authorFlairText = authorFlairText;
+    }
+
+    public void setAuthorRichtextFlairs(List<RichtextFlair> authorRichtextFlairs) {
+        this.authorRichtextFlairs = authorRichtextFlairs;
+    }
+
+    public void setLinkFlairBackgroundColor(String linkFlairBackgroundColor) {
+        this.linkFlairBackgroundColor = linkFlairBackgroundColor;
+    }
+
+    public void setLinkFlairTextColor(String linkFlairTextColor) {
+        this.linkFlairTextColor = linkFlairTextColor;
+    }
+
+    public void setLinkFlairText(String linkFlairText) {
+        this.linkFlairText = linkFlairText;
+    }
+
+    public void setLinkRichtextFlairs(List<RichtextFlair> linkRichtextFlairs) {
+        this.linkRichtextFlairs = linkRichtextFlairs;
+    }
+
+    public void setMedia(Media media) {
+        this.media = media;
+    }
+
+    public void setGalleryData(GalleryData galleryData) {
+        this.galleryData = galleryData;
+    }
+
+    public void setPreview(Preview preview) {
+        this.preview = preview;
+    }
 
     /**
      * @return The type of post (image, video, text, or link)

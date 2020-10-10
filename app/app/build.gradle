@@ -33,6 +33,8 @@ android {
 
 dependencies {
     final def markwon_version = '4.6.0'
+    final def exo_player_version = '2.11.8'
+    def room_version = '2.2.5'
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -40,9 +42,14 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.2.0'
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 
+    implementation "android.arch.lifecycle:extensions:1.1.0"
+
+    implementation 'com.google.android.material:material:1.2.0'
     implementation 'com.google.code.gson:gson:2.8.6'
+
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
@@ -50,10 +57,10 @@ dependencies {
 
     implementation 'com.r0adkll:slidableactivity:2.1.0'
 
-    implementation 'com.google.android.exoplayer:exoplayer:2.11.8'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.11.8'
-    implementation 'com.google.android.exoplayer:exoplayer-dash:2.11.8'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.11.8'
+    implementation "com.google.android.exoplayer:exoplayer:$exo_player_version"
+    implementation "com.google.android.exoplayer:exoplayer-core:$exo_player_version"
+    implementation "com.google.android.exoplayer:exoplayer-dash:$exo_player_version"
+    implementation "com.google.android.exoplayer:exoplayer-ui:$exo_player_version"
 
     implementation 'com.jsibbold:zoomage:1.3.1'
 

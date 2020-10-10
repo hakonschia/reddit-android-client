@@ -121,7 +121,7 @@ public class Post extends RelativeLayout {
         this.cleanUpContent();
 
         binding.postInfo.setPost(postData);
-        this.addContent();
+//        this.addContent();
         binding.postFullBar.setPost(postData);
     }
 

@@ -17,6 +17,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
+import com.example.hakonsreader.viewmodels.factories.PostsFactory;
 import com.example.hakonsreader.views.ListDivider;
 
 /**
@@ -171,7 +172,9 @@ public class SubredditFragment extends Fragment {
 
         adapter = new PostsAdapter();
 
-        postsViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
+        postsViewModel = new ViewModelProvider(this, new PostsFactory(
+                getContext()
+        )).get(PostsViewModel.class);
         postsViewModel.getPosts().observe(this, adapter::addPosts);
         postsViewModel.onLoadingChange().observe(this, up -> {
             binding.loadingIcon.onCountChange(up);
