@@ -30,6 +30,8 @@ public class ThemePlugin extends AbstractMarkwonPlugin {
                 .blockQuoteColor(ContextCompat.getColor(context, R.color.quoteLine))
                 .blockMargin((int)context.getResources().getDimension(R.dimen.quoteMargin))
                 .blockQuoteWidth((int)context.getResources().getDimension(R.dimen.quoteWidth))
+                .thematicBreakHeight((int)context.getResources().getDimension(R.dimen.thematicBreakHeight))
+                .linkColor(ContextCompat.getColor(context, R.color.linkColor))
                 .build();
     }
 }

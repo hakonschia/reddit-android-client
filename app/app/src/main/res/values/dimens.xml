@@ -19,4 +19,6 @@
     <dimen name="quoteWidth">4dp</dimen>
     <!-- The margin is from the start of the quote stripe to the start of the text -->
     <dimen name="quoteMargin">15dp</dimen>
+
+    <dimen name="thematicBreakHeight">2dp</dimen>
 </resources>
