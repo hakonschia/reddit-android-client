@@ -11,7 +11,6 @@ public class RedditPost extends RedditListing {
 
     private static MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
             .checkHeaderSpaces()
-            .checkRedditSpecificLinks()
             .checkSuperScript()
             .checkNormalLinks()
             .build();

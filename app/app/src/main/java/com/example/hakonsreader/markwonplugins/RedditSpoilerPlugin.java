@@ -1,4 +1,4 @@
-package com.example.hakonsreader.misc;
+package com.example.hakonsreader.markwonplugins;
 
 import android.graphics.Color;
 import android.text.Spannable;

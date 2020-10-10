@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -17,7 +16,8 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.misc.OAuthStateGenerator;
-import com.example.hakonsreader.misc.RedditSpoilerPlugin;
+import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
+import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 
@@ -208,6 +208,7 @@ public class App extends Application {
                 .usePlugin(TablePlugin.create(this))
                 .usePlugin(StrikethroughPlugin.create())
                 .usePlugin(new RedditSpoilerPlugin())
+                .usePlugin(new RedditLinkPlugin(getApplicationContext()))
                 .build();
     }
 
