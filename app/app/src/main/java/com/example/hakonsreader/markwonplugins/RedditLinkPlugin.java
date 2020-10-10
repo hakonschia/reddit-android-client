@@ -47,16 +47,15 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
 
     @Override
     public void beforeSetText(@NonNull TextView textView, @NonNull Spanned markdown) {
-        applySpoilerSpans((Spannable) markdown);
+        applyLinkSpan((Spannable) markdown);
     }
 
-    private void applySpoilerSpans(@NonNull Spannable spannable) {
+    private void applyLinkSpan(@NonNull Spannable spannable) {
         final String text = spannable.toString();
         final Matcher matcher = RE.matcher(text);
 
         while (matcher.find()) {
             final String textToSpan = matcher.group();
-            Log.d(TAG, "applySpoilerSpans: " + textToSpan);
 
             final ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override

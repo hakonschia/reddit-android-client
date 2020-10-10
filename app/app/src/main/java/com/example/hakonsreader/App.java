@@ -15,6 +15,7 @@ import androidx.preference.PreferenceManager;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
+import com.example.hakonsreader.markwonplugins.SuperScriptPlugin;
 import com.example.hakonsreader.misc.OAuthStateGenerator;
 import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
 import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
@@ -209,6 +210,7 @@ public class App extends Application {
                 .usePlugin(StrikethroughPlugin.create())
                 .usePlugin(new RedditSpoilerPlugin())
                 .usePlugin(new RedditLinkPlugin(getApplicationContext()))
+                .usePlugin(new SuperScriptPlugin())
                 .build();
     }
 

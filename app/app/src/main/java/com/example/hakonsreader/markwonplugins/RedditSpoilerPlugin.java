@@ -90,14 +90,4 @@ public class RedditSpoilerPlugin extends AbstractMarkwonPlugin {
             this.revealed = revealed;
         }
     }
-
-    // we also could make text size smaller (but then MetricAffectingSpan should be used)
-    private static class HideSpoilerSyntaxSpan extends CharacterStyle {
-
-        @Override
-        public void updateDrawState(TextPaint tp) {
-            // set transparent color
-            tp.setColor(0);
-        }
-    }
 }
