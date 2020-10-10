@@ -7,6 +7,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -45,6 +46,7 @@ public class ContentText extends ScrollView {
 
     private void updateView() {
         textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));
+        textView.setAutoLinkMask(Linkify.WEB_URLS);
 
         String markdown = post.getSelftext();
 
@@ -52,7 +54,8 @@ public class ContentText extends ScrollView {
         if (markdown != null) {
             // Note the movement method must be set before applying the markdown
             textView.setMovementMethod(InternalLinkMovementMethod.getInstance(getContext()));
-            textView.setLinkTextColor(getContext().getColor(R.color.linkColor));
+            textView.setLinkTextColor(ContextCompat.getColor(getContext(), R.color.linkColor));
+
             // TODO this crashes the app with some tables, such as https://www.reddit.com/r/test/comments/j7px9a/sadasd/
             //  not sure what happens here as the same text can be rendered fine in a stand-alone app
             markdown = App.get().getAdjuster().adjust(markdown);
