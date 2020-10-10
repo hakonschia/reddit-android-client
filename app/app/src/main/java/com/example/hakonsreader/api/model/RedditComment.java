@@ -19,7 +19,6 @@ public class RedditComment extends RedditListing {
     private static MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
             .checkHeaderSpaces()
             .checkSuperScript()
-            .checkNormalLinks()
             .build();
 
 

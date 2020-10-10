@@ -1,6 +1,7 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -24,8 +25,8 @@ public class ContentText extends ScrollView {
 
         this.setScrollbarFadingEnabled(false);
 
-        this.textView = new TextView(context);
-        this.addView(this.textView);
+        textView = new TextView(context);
+        this.addView(textView);
 
         this.post = post;
         this.updateView();
@@ -43,7 +44,8 @@ public class ContentText extends ScrollView {
 
 
     private void updateView() {
-        this.textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));
+        textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));
+        textView.setAutoLinkMask(Linkify.WEB_URLS);
 
         String markdown = post.getSelftext(true);
 

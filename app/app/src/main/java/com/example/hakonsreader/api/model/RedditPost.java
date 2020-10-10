@@ -7,12 +7,14 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * Class representing a Reddit post
+ */
 public class RedditPost extends RedditListing {
 
     private static MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
             .checkHeaderSpaces()
             .checkSuperScript()
-            .checkNormalLinks()
             .build();
 
 
@@ -38,7 +40,6 @@ public class RedditPost extends RedditListing {
     private String crosspostParentID;
 
     @SerializedName("crosspost_parent_list")
-   // @JsonAdapter(ParentCrosspostAdapter.class)
     private List<RedditPost> crossposts;
 
 
