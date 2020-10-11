@@ -64,7 +64,6 @@ public class DispatcherActivity extends AppCompatActivity {
             return;
         }
 
-        Log.d(TAG, "onCreate: Dispatcher dispacthing " + url);
 
         // If the URL can be converted to a direct link (eg. as an image) ensure it is
         url = LinkUtils.convertToDirectUrl(url);

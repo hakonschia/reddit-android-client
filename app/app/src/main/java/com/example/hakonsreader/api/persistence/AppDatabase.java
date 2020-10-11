@@ -11,7 +11,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 /**
  * The global database for the application, holds all entities
  */
-@Database(entities = {RedditPost.class}, version = 1)
+@Database(entities = {RedditPost.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance; // The instance of the database

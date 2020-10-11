@@ -36,5 +36,5 @@ public interface RedditPostsDao {
     LiveData<List<RedditPost>> getPosts();
 
     @Query("SELECT * FROM posts WHERE id IN (:ids)")
-    LiveData<List<RedditPost>> getPostsById(List<String> ids);
+    List<RedditPost> getPostsById(List<String> ids);
 }

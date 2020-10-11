@@ -121,7 +121,7 @@ public class Post extends RelativeLayout {
         this.cleanUpContent();
 
         binding.postInfo.setPost(postData);
-//        this.addContent();
+        this.addContent();
         binding.postFullBar.setPost(postData);
     }
 
@@ -187,7 +187,7 @@ public class Post extends RelativeLayout {
      * @return A view with the content of the post
      */
     private View generatePostContent(RedditPost post, Context context) {
-        View content;
+        View content = null;
 
         switch (post.getPostType()) {
             case IMAGE:
@@ -321,6 +321,7 @@ public class Post extends RelativeLayout {
     public void resumeVideoPost(Bundle data) {
         ContentVideo video = (ContentVideo)binding.content.getChildAt(0);
         video.setExtras(data);
+        Log.d(TAG, "resumeVideoPost: resuming video for " + postData.getTitle());
     }
 
 

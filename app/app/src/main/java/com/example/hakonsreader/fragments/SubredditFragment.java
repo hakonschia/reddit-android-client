@@ -1,6 +1,7 @@
 package com.example.hakonsreader.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,16 @@ public class SubredditFragment extends Fragment {
      * The amount of posts left in the list before attempting to load more posts automatically
      */
     private static final int NUM_REMAINING_POSTS_BEFORE_LOAD = 6;
+
+    /**
+     * The key representing how many list view states have been stored
+     */
+
+    private static final String FIRST_VIEW_STATE_STORED_KEY = "first_view_state_stored";
+    private static final String LAST_VIEW_STATE_STORED_KEY = "last_view_state_stored";
+
+
+    private static final String VIEW_STATE_STORED_KEY = "view_state_stored";
 
 
     private FragmentSubredditBinding binding;
@@ -101,7 +112,7 @@ public class SubredditFragment extends Fragment {
     /**
      * Sets up {@link FragmentSubredditBinding#posts}
      */
-    private void setupPostsList(View view) {
+    private void setupPostsList() {
         layoutManager = new LinearLayoutManager(getActivity());
 
         binding.posts.setAdapter(adapter);
@@ -163,13 +174,11 @@ public class SubredditFragment extends Fragment {
     }
 
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         lastLoadAttemptCount = 0;
-
         adapter = new PostsAdapter();
 
         postsViewModel = new ViewModelProvider(this, new PostsFactory(
@@ -184,9 +193,8 @@ public class SubredditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        this.binding = FragmentSubredditBinding.inflate(inflater);
-        View view = this.binding.getRoot();
-
+        binding = FragmentSubredditBinding.inflate(inflater);
+        View view = binding.getRoot();
 
         Bundle args = getArguments();
         if (args != null) {
@@ -195,14 +203,49 @@ public class SubredditFragment extends Fragment {
             // Set title in toolbar
             binding.subredditName.setText(subreddit.isEmpty() ? "Front page" : "r/" + subreddit);
         }
+        Log.d(TAG, "onCreateView: " + subreddit);
 
         // Bind the refresh button in the toolbar
         binding.subredditRefresh.setOnClickListener(this::onRefreshPostsClicked);
 
         // Setup the RecyclerView posts list
-        this.setupPostsList(view);
+        this.setupPostsList();
+
+        if (savedInstanceState != null) {
+            int firstVisible = savedInstanceState.getInt(FIRST_VIEW_STATE_STORED_KEY);
+            int lastVisible = savedInstanceState.getInt(LAST_VIEW_STATE_STORED_KEY);
+
+            for (int i = firstVisible; i <= lastVisible; i++) {
+                PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
+                Log.d(TAG, "onCreateView: " + layoutManager.findViewByPosition(i));
+
+                Bundle extras = savedInstanceState.getBundle(VIEW_STATE_STORED_KEY + i);
+                if (extras != null && viewHolder != null) {
+                    viewHolder.setExtras(extras);
+                }
+            }
+        }
 
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        int firstVisible = layoutManager.findFirstVisibleItemPosition();
+        int lastVisible = layoutManager.findLastVisibleItemPosition();
+        for (int i = firstVisible; i <= lastVisible; i++) {
+            PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
+
+            if (viewHolder != null) {
+                Bundle extras = viewHolder.getExtras();
+                outState.putBundle(VIEW_STATE_STORED_KEY + i, extras);
+            }
+        }
+
+        outState.putInt(FIRST_VIEW_STATE_STORED_KEY, firstVisible);
+        outState.putInt(LAST_VIEW_STATE_STORED_KEY, lastVisible);
     }
 
     @Override

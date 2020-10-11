@@ -2,6 +2,7 @@ package com.example.hakonsreader.api.model;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
 import com.example.hakonsreader.api.enums.VoteType;
@@ -21,6 +22,7 @@ public abstract class RedditListing {
     protected String kind;
 
     @PrimaryKey
+    @ForeignKey(entity = RedditListing.class, parentColumns = "id", childColumns = "id")
     @NonNull
     @SerializedName("id")
     protected String id;

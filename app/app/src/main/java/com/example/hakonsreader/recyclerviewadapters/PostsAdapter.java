@@ -1,5 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,8 +51,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 })
                 .collect(Collectors.toList());
 
-        this.posts.addAll(filtered);
-        notifyDataSetChanged();
+        // If we use "notifyDataSetChanged" all the items get re-drawn, which means if a video is playing
+        // it will be restarted. By using notifyItemRangeInserted the items on screen currently wont
+        // be re-drawn
+        int previousSize = posts.size();
+        posts.addAll(filtered);
+        notifyItemRangeInserted(previousSize, posts.size() - 1);
     }
 
     /**
@@ -164,6 +170,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         public int getContentBottomY() {
             return post.getContentBottomY();
+        }
+
+        public Bundle getExtras() {
+            return post.getExtras();
+        }
+
+        public void setExtras(Bundle data) {
+            post.resumeVideoPost(data);
         }
     }
 }

@@ -17,7 +17,6 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.Subreddit;
-import com.example.hakonsreader.api.utils.LinkUtils;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.databinding.ActivityMainBinding;
@@ -27,18 +26,12 @@ import com.example.hakonsreader.fragments.ProfileFragment;
 import com.example.hakonsreader.fragments.SelectSubredditFragment;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
-import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import retrofit2.http.Url;
 
 public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
     private SubredditFragment globalOffensive;
@@ -92,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         // For testing purposes hardcode going into a subreddit
         Intent intent = new Intent(this, DispatcherActivity.class);
         intent.putExtra("subreddit", "test");
-        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/test/comments/j8g7bq/what_did_the_horse_say_to_the_other_horse/");
+        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/publicfreakout");
         //startActivity(intent);
 
         if (savedInstanceState != null) {
@@ -118,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState: ");
 
         // If fragments aren't null, save them
         // Save which fragment is the active one as well
@@ -301,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 // Although we don't use the backstack to pop elements, it is needed to keep the state
                 // of the fragments (otherwise posts are reloaded when coming back)
-                .addToBackStack(null)
+               // .addToBackStack(null)
                 .commit();
     }
 

@@ -2,9 +2,11 @@ package com.example.hakonsreader.api.model;
 
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.TypeConverters;
 
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
+import com.example.hakonsreader.api.persistence.CrosspostConverter;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.google.gson.annotations.SerializedName;
 
@@ -14,6 +16,7 @@ import java.util.List;
  * Class representing a Reddit post
  */
 @Entity(tableName = "posts")
+@TypeConverters({CrosspostConverter.class})
 public class RedditPost extends RedditListing {
 
 
@@ -41,6 +44,8 @@ public class RedditPost extends RedditListing {
     @SerializedName("crosspost_parent_list")
     @Ignore
     private List<RedditPost> crossposts;
+
+    private List<String> crosspostIds;
 
 
     @SerializedName("is_self")
@@ -87,39 +92,34 @@ public class RedditPost extends RedditListing {
 
 
     @SerializedName("media")
-    @Ignore
     private Media media;
 
     /**
      * Data for video posts
      */
-    private static class Media {
+    public static class Media {
 
         @SerializedName("reddit_video")
-        @Ignore
         private RedditVideo redditVideo;
     }
 
 
     @SerializedName("gallery_data")
-    @Ignore
     private GalleryData galleryData;
 
     /**
      * Data for gallery posts (multiple images
      */
-    private static class GalleryData {
+    public static class GalleryData {
         @SerializedName("items")
-        @Ignore
         private List<GalleryItem> items;
     }
 
 
     @SerializedName("preview")
-    @Ignore
     private Preview preview;
 
-    private static class Preview {
+    public static class Preview {
         @SerializedName("images")
         private List<ImagesWrapper> images;
 
@@ -190,6 +190,10 @@ public class RedditPost extends RedditListing {
      */
     public List<RedditPost> getCrossposts() {
         return crossposts;
+    }
+
+    public List<String> getCrosspostIds() {
+        return crosspostIds;
     }
 
     /**
@@ -423,6 +427,10 @@ public class RedditPost extends RedditListing {
 
     public void setCrossposts(List<RedditPost> crossposts) {
         this.crossposts = crossposts;
+    }
+
+    public void setCrosspostIds(List<String> crosspostIds) {
+        this.crosspostIds = crosspostIds;
     }
 
     public void setText(boolean text) {

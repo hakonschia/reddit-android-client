@@ -23,23 +23,38 @@ public class PostsViewModel extends ViewModel {
     // The way this works is that the database holds all RedditPosts
     // We store the IDs of the post this ViewModel keeps track of, and asks the database for those posts
     // When we retrieve posts we add them to the shared database for all PostsViewModel
+
     // TODO posts should be removed 1 day (or something) after they have been inserted, so not massive amounts of posts are
     //  stored that wont ever be used
 
     private AppDatabase database;
 
     private List<String> postIds = new ArrayList<>();
+    private List<RedditPost> postsData = new ArrayList<>();
+    private MutableLiveData<List<RedditPost>> posts;
     private MutableLiveData<Boolean> loadingChange;
 
     public PostsViewModel(Context context) {
         database = AppDatabase.getInstance(context);
     }
 
+    public List<String> getPostIds() {
+        return postIds;
+    }
+
+    public void setPostIds(List<String> postIds) {
+        this.postIds = postIds;
+        // TODO get posts and make sure crossposts are set correctly
+    }
+
     /**
      * @return The observable for the posts
      */
     public LiveData<List<RedditPost>> getPosts() {
-        return database.posts().getPostsById(postIds);
+        if(posts == null) {
+            posts = new MutableLiveData<>();
+        }
+        return posts;
     }
 
     /**
@@ -71,23 +86,38 @@ public class PostsViewModel extends ViewModel {
         }
 
         loadingChange.setValue(true);
-        // TODO this creates issues as the posts currently in the list gets refreshed, causing videos to restart
+
         App.get().getApi().getPosts(subreddit, after, count, newPosts -> {
             loadingChange.setValue(false);
 
-            // Store which IDs this ViewModel is tracking
-            newPosts.forEach(post -> postIds.add(post.getId()));
-
             // Store (or update) the posts in the database
             new Thread(() -> {
-                database.posts().insertAll(newPosts);
+                for(RedditPost post : newPosts) {
+                    // Store which IDs this ViewModel is tracking
+                    postIds.add(post.getId());
+
+                    List<RedditPost> crossposts = post.getCrossposts();
+                    if (crossposts != null && !crossposts.isEmpty()) {
+                        List<String> crosspostIds = new ArrayList<>();
+
+                        // Insert crossposts as their own database record
+                        for (RedditPost crosspost : crossposts) {
+                            database.posts().insert(crosspost);
+                            crosspostIds.add(crosspost.getId());
+                        }
+
+                        post.setCrosspostIds(crosspostIds);
+                    }
+                    database.posts().insert(post);
+                }
+
+                postsData.addAll(newPosts);
+                posts.postValue(postsData);
             }).start();
         }, (code, t) -> {
-            loadingChange.setValue(false);
             t.printStackTrace();
-
+            loadingChange.setValue(false);
             Util.handleGenericResponseErrors(parentLayout, code, t);
         });
     }
-
 }
