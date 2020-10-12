@@ -49,6 +49,7 @@ public class SelectSubredditFragment extends Fragment {
         App.get().getApi().favoriteSubreddit(subreddit.getName(), !subreddit.userHasFavorited(), ignored -> {
             subreddit.setUserHasFavorited(!subreddit.userHasFavorited());
             subredditsAdapter.onFavorite(subreddit);
+            // TODO this should update the local database as well
         }, (code, t) -> {
             t.printStackTrace();
             Util.handleGenericResponseErrors(getView(), code, t);

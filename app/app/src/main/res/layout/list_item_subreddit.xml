@@ -6,13 +6,13 @@
     android:orientation="horizontal"
     android:paddingBottom="10dp">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/icon"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:layout_marginStart="15dp"
 
-        tools:src="@drawable/ic_baseline_arrow_upward_24"/>
+        tools:src="@drawable/ic_baseline_emoji_emotions_24"/>
 
     <TextView
         android:id="@+id/name"
