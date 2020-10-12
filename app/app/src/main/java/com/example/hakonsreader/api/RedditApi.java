@@ -19,6 +19,7 @@ import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
+import com.google.android.exoplayer2.C;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -897,6 +898,13 @@ public class RedditApi {
      * @param onFailure Callback for failed requests
      */
     public void subscribeToSubreddit(String subredditName, boolean subscribe, OnResponse<Void> onResponse, OnFailure onFailure) {
+        try {
+            this.verifyLoggedInToken();
+        } catch (InvalidAccessTokenException e) {
+            onFailure.onFailure(-1, new InvalidAccessTokenException("Subscribing to a subreddit requires a valid access token for a logged in user", e));
+            return;
+        }
+
         api.subscribeToSubreddit(subscribe ? "sub" : "unsub", subredditName).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -912,6 +920,42 @@ public class RedditApi {
                 onFailure.onFailure(-1, t);
             }
         });
+    }
+
+    /**
+     * Favorite or un-favorite a subreddit
+     *
+     * @param subredditName The subreddit to subscribe/unsubscribe to
+     * @param favorite True if the action should be to favorite, false to un-favorite
+     * @param onResponse The response handler for successful requests. Does not hold any data, but will
+     *                   be called when the request succeeds.
+     * @param onFailure Callback for failed requests
+     */
+    public void favoriteSubreddit(String subredditName, boolean favorite, OnResponse<Void> onResponse, OnFailure onFailure) {
+        try {
+            this.verifyLoggedInToken();
+        } catch (InvalidAccessTokenException e) {
+            onFailure.onFailure(-1, new InvalidAccessTokenException("Favoriting a subreddit requires a valid access token for a logged in user", e));
+            return;
+        }
+
+        api.favoriteSubreddit(subredditName, favorite, accessToken.generateHeaderString()).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    onResponse.onResponse(null);
+                } else {
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
+
+
     }
 
 

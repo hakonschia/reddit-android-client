@@ -13,9 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Subreddit;
+import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
+import com.example.hakonsreader.misc.Util;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -26,14 +29,36 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
     
     private OnSubredditSelected subredditSelected;
     private List<Subreddit> subreddits = new ArrayList<>();
+    private OnClickListener<Subreddit> favoriteClicked;
 
     public void setSubredditSelected(OnSubredditSelected subredditSelected) {
         this.subredditSelected = subredditSelected;
     }
 
+    public void setFavoriteClicked(OnClickListener<Subreddit> favoriteClicked) {
+        this.favoriteClicked = favoriteClicked;
+    }
+
     public void setSubreddits(List<Subreddit> subreddits) {
         this.subreddits = subreddits;
         notifyDataSetChanged();
+    }
+
+    /**
+     * Called when a subreddit has been favorited/un-favorited
+     *
+     * <p>The function uses {@link Subreddit#userHasFavorited()} to calculate where to now
+     * place the item in the list</p>
+     *
+     * @param subreddit The subreddit favorited/un-favorited
+     */
+    public void onFavorite(Subreddit subreddit) {
+        // TODO find out where it actually should go
+        int pos = subreddits.indexOf(subreddit);
+        subreddits.remove(pos);
+        subreddits.add(0, subreddit);
+
+        notifyItemMoved(pos, 0);
     }
 
 
@@ -43,14 +68,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
         holder.name.setText(subreddit.getName());
 
-        holder.favorite.setOnClickListener(v -> {
-
-        });
-        if (subreddit.userHasFavorited()) {
-            holder.favorite.setColorFilter(ContextCompat.getColor(holder.context, R.color.subredditFavorited));
-        } else {
-            holder.favorite.setColorFilter(ContextCompat.getColor(holder.context, R.color.iconColor));
-        }
+        holder.updateFavorited(subreddit.userHasFavorited());
 
         String iconURL = subreddit.getIconImage();
         if (iconURL != null && !iconURL.isEmpty()) {
@@ -103,7 +121,6 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
                 }
             });
 
-
             itemView.setOnLongClickListener(view -> {
                 int pos = getAdapterPosition();
 
@@ -115,6 +132,22 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
                 }
                 return true;
             });
+
+            favorite.setOnClickListener(view -> {
+                int pos = getAdapterPosition();
+
+                if (favoriteClicked != null && pos != RecyclerView.NO_POSITION) {
+                    favoriteClicked.onClick(subreddits.get(pos));
+                }
+            });
+        }
+
+        private void updateFavorited(boolean favorited) {
+            if (favorited) {
+                favorite.setColorFilter(ContextCompat.getColor(context, R.color.subredditFavorited));
+            } else {
+                favorite.setColorFilter(ContextCompat.getColor(context, R.color.iconColor));
+            }
         }
     }
 }

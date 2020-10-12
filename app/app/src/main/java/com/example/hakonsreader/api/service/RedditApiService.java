@@ -173,6 +173,13 @@ public interface RedditApiService {
     );
 
 
+    /**
+     * Retrieve information about a subreddit
+     *
+     * @param subreddit The name of the subreddit to get info from
+     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @return A call with a {@link RedditListing} that can be converted to a {@link Subreddit}
+     */
     @GET("r/{subreddit}/about")
     Call<RedditListing> getSubredditInfo(
             @Path("subreddit") String subreddit,
@@ -180,10 +187,33 @@ public interface RedditApiService {
             @Header("Authorization") String accessToken
     );
 
+    /**
+     *
+     * @param action "sub" to subscribe "unsub" to unsubscribe
+     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @return A Void call, does not return any data
+     */
     @POST("api/subscribe")
     @FormUrlEncoded
     Call<Void> subscribeToSubreddit(
             @Field("action") String action,
+
+            @Header("Authorization") String accessToken
+    );
+
+    /**
+     * Favorite or un-favorite a subreddit
+     *
+     * @param subredditName The name of the subreddit
+     * @param favorite True to favorite, false to un-favorite
+     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @return A Void call, does not return any data
+     */
+    @POST("api/favorite")
+    @FormUrlEncoded
+    Call<Void> favoriteSubreddit(
+            @Field("sr_name") String subredditName,
+            @Field("make_favorite") boolean favorite,
 
             @Header("Authorization") String accessToken
     );

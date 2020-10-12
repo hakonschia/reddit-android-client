@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.databinding.FragmentSelectSubredditBinding;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter;
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
 import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory;
@@ -43,11 +45,16 @@ public class SelectSubredditFragment extends Fragment {
         this.subredditSelected = subredditSelected;
     }
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void favoriteClicked(Subreddit subreddit) {
+        App.get().getApi().favoriteSubreddit(subreddit.getName(), !subreddit.userHasFavorited(), ignored -> {
+            subreddit.setUserHasFavorited(!subreddit.userHasFavorited());
+            subredditsAdapter.onFavorite(subreddit);
+        }, (code, t) -> {
+            t.printStackTrace();
+            Util.handleGenericResponseErrors(getView(), code, t);
+        });
     }
+
 
     @Nullable
     @Override
@@ -57,6 +64,7 @@ public class SelectSubredditFragment extends Fragment {
 
         subredditsAdapter = new SubredditsAdapter();
         subredditsAdapter.setSubredditSelected(subredditSelected);
+        subredditsAdapter.setFavoriteClicked(this::favoriteClicked);
         layoutManager = new LinearLayoutManager(getContext());
 
         binding.subreddits.setAdapter(subredditsAdapter);
