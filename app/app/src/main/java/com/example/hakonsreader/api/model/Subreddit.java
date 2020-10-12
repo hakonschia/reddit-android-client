@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.model;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 
 import com.google.gson.annotations.SerializedName;
 

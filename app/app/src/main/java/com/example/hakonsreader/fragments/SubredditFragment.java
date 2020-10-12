@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.enums.Thing;
+import com.example.hakonsreader.api.model.Subreddit;
+import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
@@ -58,8 +61,10 @@ public class SubredditFragment extends Fragment {
 
     private FragmentSubredditBinding binding;
 
+    private AppDatabase database;
     private Bundle saveState;
-    private String subreddit;
+    private String subredditName;
+    private Subreddit subreddit;
     private List<String> postIds;
 
     /**
@@ -87,7 +92,7 @@ public class SubredditFragment extends Fragment {
         // Only load posts if there hasn't been an attempt at loading more posts
         if (posLastItem + NUM_REMAINING_POSTS_BEFORE_LOAD > listSize && lastLoadAttemptCount < listSize) {
             lastLoadAttemptCount = adapter.getPosts().size();
-            postsViewModel.loadPosts(binding.parentLayout, subreddit);
+            postsViewModel.loadPosts(binding.parentLayout, subredditName);
         }
 
         this.checkSelectedPost(posFirstItem, posLastItem, oldY > 0);
@@ -207,6 +212,10 @@ public class SubredditFragment extends Fragment {
         }
     }
 
+    private void updateSubredditName() {
+        binding.subredditName.setText(subredditName.isEmpty() ? "Front page" : "r/" + subredditName);
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -216,6 +225,8 @@ public class SubredditFragment extends Fragment {
         adapter = new PostsAdapter();
         layoutManager = new LinearLayoutManager(getContext());
         postIds = new ArrayList<>();
+
+        database = AppDatabase.getInstance(getContext());
 
         postsViewModel = new ViewModelProvider(this, new PostsFactory(
                 getContext()
@@ -248,10 +259,21 @@ public class SubredditFragment extends Fragment {
 
         Bundle args = getArguments();
         if (args != null) {
-            subreddit = args.getString("subreddit", "");
+            subredditName = args.getString("subreddit", "").toUpperCase();
 
             // Set title in toolbar
-            binding.subredditName.setText(subreddit.isEmpty() ? "Front page" : "r/" + subreddit);
+            updateSubredditName();
+
+            new Thread(() -> {
+                subreddit = database.subreddits().get(subredditName);
+                if (subreddit != null){
+                    Log.d(TAG, "onCreateView:" + subreddit.getSubscribers());
+
+                    // In case the capitalization is different make sure it is updated
+                    subredditName = subreddit.getName();
+                    requireActivity().runOnUiThread(this::updateSubredditName);
+                }
+            }).start();
         }
 
         // Bind the refresh button in the toolbar
@@ -333,7 +355,7 @@ public class SubredditFragment extends Fragment {
 
         // If the fragment is selected without any posts load posts automatically
         if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
-            postsViewModel.loadPosts(binding.parentLayout, subreddit);
+            postsViewModel.loadPosts(binding.parentLayout, subredditName);
         }
 
         this.restoreViewHolderStates();
