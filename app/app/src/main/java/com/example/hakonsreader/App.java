@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -36,6 +37,7 @@ import io.noties.markwon.SoftBreakAddsNewLinePlugin;
 import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TablePlugin;
+import io.noties.markwon.linkify.LinkifyPlugin;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 
@@ -167,7 +169,7 @@ public class App extends Application {
          redditApi = new RedditApi.Builder(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID)
                  .accessToken(TokenManager.getToken())
                  .onNewToken(TokenManager::saveToken)
-                 .loggerLevel(HttpLoggingInterceptor.Level.BODY)
+                 //.loggerLevel(HttpLoggingInterceptor.Level.BODY)
                  .callbackUrl(NetworkConstants.CALLBACK_URL)
                  .deviceId(UUID.randomUUID().toString())
                  .build();
@@ -234,7 +236,6 @@ public class App extends Application {
                 .usePlugin(CorePlugin.create())
                 .usePlugin(TablePlugin.create(this))
                 .usePlugin(StrikethroughPlugin.create())
-                .usePlugin(SoftBreakAddsNewLinePlugin.create())
 
                 // Custom plugins
                 .usePlugin(new RedditSpoilerPlugin())
