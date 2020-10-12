@@ -63,10 +63,9 @@ public interface RedditPostsDao {
     /**
      * Delete posts from the database that are older than the given age
      *
-     * @param maxAge The max amount of seconds
      * @return The amount of posts deleted
      */
-    @Query("DELETE FROM posts WHERE insertedAt + :maxAge > (SELECT strftime('%s', 'now'))")
+    @Query("DELETE FROM posts WHERE insertedAt + :maxAge - strftime('%s', 'now') < 0")
     int deleteOld(long maxAge);
 
 
@@ -89,7 +88,7 @@ public interface RedditPostsDao {
      * @return A list of all the posts in the database
      */
     @Query("SELECT * FROM posts")
-    LiveData<List<RedditPost>> getPosts();
+    List<RedditPost> getPosts();
 
     /**
      * Retrieve a list of posts from the database, based on a list of IDs

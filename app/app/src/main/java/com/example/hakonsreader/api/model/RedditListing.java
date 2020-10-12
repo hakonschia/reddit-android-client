@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName;
 public abstract class RedditListing {
 
     // Store the timestamp the listing was created (ie. inserted at into the database) in seconds
-    private long insertedAt = System.currentTimeMillis() * 1000;
+    private long insertedAt = System.currentTimeMillis() / 1000;
 
     /**
      * @return The timestamp the listing was inserted into the database in seconds
