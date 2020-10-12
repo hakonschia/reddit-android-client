@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
@@ -44,6 +46,8 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
             Picasso.get()
                     .load(iconURL)
                     .into(holder.icon);
+        } else {
+            holder.icon.setImageDrawable(ContextCompat.getDrawable(holder.context, R.drawable.ic_baseline_emoji_emotions_24));
         }
     }
 
@@ -65,12 +69,14 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        private Context context;
 
         private ImageView icon;
         private TextView name;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            context = itemView.getContext();
 
             icon = itemView.findViewById(R.id.icon);
             name = itemView.findViewById(R.id.name);
