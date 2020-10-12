@@ -51,7 +51,7 @@ public class SelectSubredditsViewModel extends ViewModel {
      * </p>
      */
     public void loadSubscribed() {
-        App.get().getApi().getSubscribedSubreddits("", 0, loaded -> {
+        App.get().getApi().getSubreddits("", 0, loaded -> {
             List<Subreddit> sorted = loaded.stream()
                     // Sort based on subreddit name
                     .sorted((first, second) -> first.getName().compareTo(second.getName()))

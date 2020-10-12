@@ -825,8 +825,31 @@ public class RedditApi {
         });
     }
 
+    /**
+     * Retrieves subreddits. If there is a user logged in the users subscribed subreddits are retrieved, if
+     * not the default ones are retrieved.
+     *
+     * <p>See also {@link RedditApi#getSubscribedSubreddits(String, int, OnResponse, OnFailure)} and
+     * {@link RedditApi#getDefaultSubreddits(String, int, OnResponse, OnFailure)}</p>
+     *
+     * @param after The ID of the last subreddit seen (empty string if loading for the first time)
+     * @param count The amount of items fetched previously (0 if loading for the first time)
+     * @param onResponse The response handler for successful request. Holds the list of subreddits fetched.
+     *                   This list is not sorted
+     * @param onFailure The response handler for failed requests
+     */
+    public void getSubreddits(String after, int count, OnResponse<List<Subreddit>> onResponse, OnFailure onFailure) {
+        try {
+            this.verifyLoggedInToken();
+            getSubscribedSubreddits(after, count, onResponse, onFailure);
+        } catch (InvalidAccessTokenException e) {
+            getDefaultSubreddits(after, count, onResponse, onFailure);
+        }
+    }
 
-    /* ----------------- Misc ----------------- */
+
+
+        /* ----------------- Misc ----------------- */
     /**
      * Retrieve a new access token valid for non-logged in users
      *
