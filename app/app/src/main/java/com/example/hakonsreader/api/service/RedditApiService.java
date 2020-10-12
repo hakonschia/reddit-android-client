@@ -179,4 +179,12 @@ public interface RedditApiService {
 
             @Header("Authorization") String accessToken
     );
+
+    @POST("api/subscribe")
+    @FormUrlEncoded
+    Call<Void> subscribeToSubreddit(
+            @Field("action") String action,
+
+            @Header("Authorization") String accessToken
+    );
 }

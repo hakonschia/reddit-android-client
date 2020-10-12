@@ -43,6 +43,9 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
         holder.name.setText(subreddit.getName());
 
+        holder.favorite.setOnClickListener(v -> {
+
+        });
         if (subreddit.userHasFavorited()) {
             holder.favorite.setColorFilter(ContextCompat.getColor(holder.context, R.color.subredditFavorited));
         } else {

@@ -887,6 +887,33 @@ public class RedditApi {
         });
     }
 
+    /**
+     * Subscribe or unsubscribe to a subreddit
+     *
+     * @param subredditName The subreddit to subscribe/unsubscribe to
+     * @param subscribe True if the action should be to subscribe, false to unsubscribe
+     * @param onResponse The response handler for successful requests. Does not hold any data, but will
+     *                   be called when the request succeeds.
+     * @param onFailure Callback for failed requests
+     */
+    public void subscribeToSubreddit(String subredditName, boolean subscribe, OnResponse<Void> onResponse, OnFailure onFailure) {
+        api.subscribeToSubreddit(subscribe ? "sub" : "unsub", subredditName).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    onResponse.onResponse(null);
+                } else {
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
+    }
+
 
 
         /* ----------------- Misc ----------------- */
