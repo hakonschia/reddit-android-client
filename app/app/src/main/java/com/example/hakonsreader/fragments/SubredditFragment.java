@@ -269,7 +269,7 @@ public class SubredditFragment extends Fragment {
 
             App.get().getApi().getSubredditInfo(subredditName, sub -> {
                 new Thread(() -> {
-                    database.subreddits().insert(subreddit);
+                    database.subreddits().insert(sub);
                     subredditName = sub.getName();
                     requireActivity().runOnUiThread(this::updateSubredditName);
                 }).start();
