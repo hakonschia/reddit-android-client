@@ -865,23 +865,23 @@ public class RedditApi {
             return;
         }
 
-        api.getSubredditInfo(subredditName, accessToken.generateHeaderString()).enqueue(new Callback<Subreddit>() {
+        api.getSubredditInfo(subredditName, accessToken.generateHeaderString()).enqueue(new Callback<RedditListing>() {
             @Override
-            public void onResponse(Call<Subreddit> call, Response<Subreddit> response) {
-                Subreddit body = null;
+            public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
+                RedditListing body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
 
                 if (body != null) {
-                    onResponse.onResponse(body);
+                    onResponse.onResponse((Subreddit) body);
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
             }
 
             @Override
-            public void onFailure(Call<Subreddit> call, Throwable t) {
+            public void onFailure(Call<RedditListing> call, Throwable t) {
                 onFailure.onFailure(-1, t);
             }
         });

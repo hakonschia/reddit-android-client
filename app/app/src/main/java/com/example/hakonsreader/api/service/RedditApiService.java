@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.service;
 
+import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.ListingResponse;
@@ -173,7 +174,7 @@ public interface RedditApiService {
 
 
     @GET("r/{subreddit}/about")
-    Call<Subreddit> getSubredditInfo(
+    Call<RedditListing> getSubredditInfo(
             @Path("subreddit") String subreddit,
 
             @Header("Authorization") String accessToken
