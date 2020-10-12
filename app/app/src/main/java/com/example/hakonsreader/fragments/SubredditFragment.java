@@ -220,6 +220,7 @@ public class SubredditFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = FragmentSubredditBinding.inflate(getLayoutInflater());
 
         lastLoadAttemptCount = 0;
         adapter = new PostsAdapter();
@@ -249,19 +250,11 @@ public class SubredditFragment extends Fragment {
         postsViewModel.onLoadingChange().observe(this, up -> {
             binding.loadingIcon.onCountChange(up);
         });
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentSubredditBinding.inflate(inflater);
-        View view = binding.getRoot();
 
         Bundle args = getArguments();
         if (args != null) {
-            subredditName = args.getString("subreddit", "").toUpperCase();
+            subredditName = args.getString("subreddit", "");
 
-            // Set title in toolbar
             updateSubredditName();
 
             new Thread(() -> {
@@ -274,8 +267,24 @@ public class SubredditFragment extends Fragment {
                     requireActivity().runOnUiThread(this::updateSubredditName);
                 }
             }).start();
-        }
 
+            App.get().getApi().getSubredditInfo(subredditName, sub -> {
+                new Thread(() -> {
+                    database.subreddits().insert(subreddit);
+                    subredditName = sub.getName();
+                    requireActivity().runOnUiThread(this::updateSubredditName);
+                }).start();
+
+                // Update UI when there is more UI to update
+            }, (code, t) -> {
+                t.printStackTrace();
+            });
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Bind the refresh button in the toolbar
         binding.subredditRefresh.setOnClickListener(this::onRefreshPostsClicked);
 
@@ -287,7 +296,7 @@ public class SubredditFragment extends Fragment {
             postsViewModel.setPostIds(postIds);
         }
 
-        return view;
+        return binding.getRoot();
     }
 
     @Override

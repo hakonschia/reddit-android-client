@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.service;
 
+import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
@@ -19,28 +20,6 @@ import retrofit2.http.Query;
  * Service towards the Reddit API
  */
 public interface RedditApiService {
-    /* --------------------- API paths --------------------- */
-    /**
-     * The API path used to retrieve user information
-     */
-    String USER_INFO_PATH = "api/v1/me";
-
-    /**
-     * The API path used to vote on things (posts, comments)
-     */
-    String VOTE_PATH = "api/vote";
-
-    /**
-     * The API path used to get more comments
-     */
-    String MORE_COMMENTS_PATH = "api/morechildren";
-
-    /**
-     * API path used to submit a comment, either to a post, a reply to another comment, or a private message
-     */
-    String COMMENT = "api/comment";
-    /* --------------------- End API paths --------------------- */
-
 
     /**
      * Retrieves information about the logged in user
@@ -48,7 +27,7 @@ public interface RedditApiService {
      * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Call with {@link User}
      */
-    @GET(USER_INFO_PATH)
+    @GET("api/v1/me")
     Call<User> getUserInfo(@Header("Authorization") String accessToken);
 
     /**
@@ -63,7 +42,7 @@ public interface RedditApiService {
      *                    to retrieve posts without a logged in user
      * @return A Call object ready to retrieve posts from a subreddit
      */
-    @GET("{subreddit}/{sort}.json")
+    @GET("{subreddit}/{sort}")
     Call<ListingResponse> getPosts(
             @Path("subreddit") String subreddit,
             @Path("sort") String sort,
@@ -85,7 +64,7 @@ public interface RedditApiService {
      * @return A list of {@link ListingResponse}. The first item in this list is the post itself.
      * The actual comments is found in the second element of the list
      */
-    @GET("comments/{postID}.json")
+    @GET("comments/{postID}")
     Call<List<ListingResponse>> getComments(
             @Path("postID") String postID,
             @Query("raw_json") int rawJson,
@@ -104,7 +83,7 @@ public interface RedditApiService {
      *                    to retrieve comments without a logged in user
      * @return A call with {@link MoreCommentsResponse}
      */
-    @POST(MORE_COMMENTS_PATH)
+    @POST("api/morechildren")
     @FormUrlEncoded
     Call<MoreCommentsResponse> getMoreComments(
             @Field("children") String children,
@@ -125,7 +104,7 @@ public interface RedditApiService {
      * @param accessToken The type of token + the actual token. Form: "type token".
      * @return A call that holds the newly created comment
      */
-    @POST(COMMENT)
+    @POST("api/comment")
     @FormUrlEncoded
     Call<MoreCommentsResponse> postComment(
             @Field("text") String comment,
@@ -146,7 +125,7 @@ public interface RedditApiService {
      * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Call object ready to cast a vote
      */
-    @POST(VOTE_PATH)
+    @POST("api/vote")
     @FormUrlEncoded
     Call<Void> vote(
             @Field("id") String id,
@@ -188,6 +167,14 @@ public interface RedditApiService {
             @Query("after") String after,
             @Query("count") int count,
             @Query("limit") int limit,
+
+            @Header("Authorization") String accessToken
+    );
+
+
+    @GET("r/{subreddit}/about")
+    Call<Subreddit> getSubredditInfo(
+            @Path("subreddit") String subreddit,
 
             @Header("Authorization") String accessToken
     );

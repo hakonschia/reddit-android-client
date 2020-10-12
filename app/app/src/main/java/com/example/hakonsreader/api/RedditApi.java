@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api;
 
+import android.util.Log;
+
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
@@ -22,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -106,6 +109,7 @@ public class RedditApi {
      */
     private HttpLoggingInterceptor logger;
 
+    private static final List<String> STANDARD_SUBS = Arrays.asList("", "Popular", "All");
 
     /* ----------------- Client specific variables ----------------- */
     /**
@@ -845,6 +849,42 @@ public class RedditApi {
         } catch (InvalidAccessTokenException e) {
             getDefaultSubreddits(after, count, onResponse, onFailure);
         }
+    }
+
+    /**
+     * Retrieve information about a given subreddit
+     *
+     * @param subredditName The subreddit to retrieve information about
+     * @param onResponse The response handler for successful requests. Holds the {@link Subreddit} retrieved
+     * @param onFailure The response handler for failed requests. If the function is called with a "standard"
+     *                  subreddit (front page, popular, all) this will be called
+     */
+    public void getSubredditInfo(String subredditName, OnResponse<Subreddit> onResponse, OnFailure onFailure) {
+        if (STANDARD_SUBS.indexOf(subredditName) != -1) {
+            onFailure.onFailure(-1, new Throwable("The subreddits: " + STANDARD_SUBS.toString() + " do not have any info to retrieve"));
+            return;
+        }
+
+        api.getSubredditInfo(subredditName, accessToken.generateHeaderString()).enqueue(new Callback<Subreddit>() {
+            @Override
+            public void onResponse(Call<Subreddit> call, Response<Subreddit> response) {
+                Subreddit body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    onResponse.onResponse(body);
+                } else {
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Subreddit> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+            }
+        });
     }
 
 
