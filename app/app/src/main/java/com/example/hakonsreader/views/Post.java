@@ -314,14 +314,18 @@ public class Post extends RelativeLayout {
     }
 
     /**
-     * Resumes state of a video according to how it was when it was clicked
+     * Sets a bundle of information to restore the state of the post
+     *
+     * <p>Currently only restores state for video posts</p>
      *
      * @param data The data to use for restoring the state
      */
-    public void resumeVideoPost(Bundle data) {
-        ContentVideo video = (ContentVideo)binding.content.getChildAt(0);
-        video.setExtras(data);
-        Log.d(TAG, "resumeVideoPost: resuming video for " + postData.getTitle());
+    public void setExtras(Bundle data) {
+        View c = binding.content.getChildAt(0);
+
+        if (c instanceof ContentVideo) {
+            ContentVideo video = (ContentVideo)c;
+            video.setExtras(data); }
     }
 
 

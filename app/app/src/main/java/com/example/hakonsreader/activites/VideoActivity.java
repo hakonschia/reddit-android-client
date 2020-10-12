@@ -62,7 +62,7 @@ public class VideoActivity extends AppCompatActivity {
 
             Post post = new Post(this);
             post.setPostData(redditPost);
-            post.resumeVideoPost(extras);
+            post.setExtras(extras);
 
             FrameLayout video = findViewById(R.id.video);
 

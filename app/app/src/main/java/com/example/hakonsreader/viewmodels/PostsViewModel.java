@@ -1,6 +1,7 @@
 package com.example.hakonsreader.viewmodels;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
@@ -16,6 +17,7 @@ import com.example.hakonsreader.api.persistence.AppDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PostsViewModel extends ViewModel {
     private static final String TAG = "PostsViewModel";
@@ -60,7 +62,47 @@ public class PostsViewModel extends ViewModel {
      */
     public void setPostIds(List<String> postIds) {
         this.postIds = postIds;
-        // TODO get posts and make sure crossposts are set correctly
+
+        // Retrieve the posts
+        new Thread(() -> {
+            // The posts are not sorted in the database so they need to be added back in the way
+            // they originally were (sorting by a "inserted" field wouldn't work as one post might be
+            // in several ViewModels in a different order)
+            List<RedditPost> postsFromDb = database.posts().getPostsById(postIds);
+
+            for (String id : postIds) {
+                RedditPost post = find(postsFromDb, id);
+
+                if (post != null) {
+
+                    // If the post had crosspost posts, restore them
+                    List<String> crosspostIds = post.getCrosspostIds();
+                    if (crosspostIds != null && !crosspostIds.isEmpty()) {
+                        post.setCrossposts(database.posts().getPostsById(crosspostIds));
+                    }
+                    postsData.add(post);
+                }
+            }
+
+            posts.postValue(postsData);
+        }).start();
+    }
+
+    /**
+     * Find a post from a list of posts by a given ID
+     *
+     * @param posts The posts to look in
+     * @param id The ID to look for
+     * @return The post, or null if not found
+     */
+    private RedditPost find(List<RedditPost> posts, String id) {
+        for (RedditPost post : posts) {
+            if (post.getId().equals(id)) {
+                return post;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -91,20 +133,19 @@ public class PostsViewModel extends ViewModel {
     public void loadPosts(View parentLayout, String subreddit) {
         // Get the ID of the last post in the list
         String after = "";
-        int count = 0;
+        int count = postIds.size();
 
-        if (postIds != null) {
-            count = postIds.size();
-
-            if (count > 0) {
-                after = Thing.POST.getValue() + "_" + postIds.get(count - 1);
-            }
+        if (count > 0) {
+            after = Thing.POST.getValue() + "_" + postIds.get(count - 1);
         }
 
         loadingChange.setValue(true);
 
         App.get().getApi().getPosts(subreddit, after, count, newPosts -> {
             loadingChange.setValue(false);
+
+            postsData.addAll(newPosts);
+            posts.postValue(postsData);
 
             // Store (or update) the posts in the database
             new Thread(() -> {
@@ -124,11 +165,9 @@ public class PostsViewModel extends ViewModel {
 
                         post.setCrosspostIds(crosspostIds);
                     }
+
                     database.posts().insert(post);
                 }
-
-                postsData.addAll(newPosts);
-                posts.postValue(postsData);
             }).start();
         }, (code, t) -> {
             t.printStackTrace();

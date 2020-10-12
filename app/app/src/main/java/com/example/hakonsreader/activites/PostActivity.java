@@ -159,7 +159,7 @@ public class PostActivity extends AppCompatActivity {
                     // TODO the thumbnail is shown the entire time, make it so the frame the video
                     //  ended at is shown instead
                     if (post.getPostType() == PostType.VIDEO) {
-                        binding.post.resumeVideoPost(getIntent().getExtras().getBundle("extras"));
+                        binding.post.setExtras(getIntent().getExtras().getBundle("extras"));
                     }
                 }
             });

@@ -115,16 +115,16 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
         // If fragments aren't null, save them
         // Save which fragment is the active one as well
-        if (postsFragment != null) {
+        if (postsFragment != null && postsFragment.isAdded()) {
             getSupportFragmentManager().putFragment(outState, POSTS_FRAGMENT, postsFragment);
         }
-        if (activeSubreddit != null) {
+        if (activeSubreddit != null && activeSubreddit.isAdded()) {
             getSupportFragmentManager().putFragment(outState, ACTIVE_SUBREDDIT_FRAGMENT, activeSubreddit);
         }
-        if (selectSubredditFragment != null) {
+        if (selectSubredditFragment != null && selectSubredditFragment.isAdded()) {
             getSupportFragmentManager().putFragment(outState, SELECT_SUBREDDIT_FRAGMENT, selectSubredditFragment);
         }
-        if (profileFragment != null) {
+        if (profileFragment != null && profileFragment.isAdded()) {
             getSupportFragmentManager().putFragment(outState, PROFILE_FRAGMENT, profileFragment);
         }
         // Login/settings fragments can just be recreated when needed as they don't store any specific state
@@ -295,7 +295,10 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 // Although we don't use the backstack to pop elements, it is needed to keep the state
                 // of the fragments (otherwise posts are reloaded when coming back)
-               // .addToBackStack(null)
+                // With the use of a local database I can easily restore the state without the back stack
+                // Not sure whats best to use, with addToBackStack it's smoother as it doesn't have to load
+                // from db etc. (it doesn't take a long time) but it probably uses more ram to hold everything in memory?
+                //.addToBackStack(null)
                 .commit();
     }
 

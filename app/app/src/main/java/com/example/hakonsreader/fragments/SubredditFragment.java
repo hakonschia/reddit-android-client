@@ -1,6 +1,7 @@
 package com.example.hakonsreader.fragments;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,9 @@ import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
 import com.example.hakonsreader.views.ListDivider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Fragment containing a subreddit
  */
@@ -38,14 +42,25 @@ public class SubredditFragment extends Fragment {
 
     private static final String FIRST_VIEW_STATE_STORED_KEY = "first_view_state_stored";
     private static final String LAST_VIEW_STATE_STORED_KEY = "last_view_state_stored";
-
-
     private static final String VIEW_STATE_STORED_KEY = "view_state_stored";
+
+    /**
+     * The key used to store the post IDs the fragment is showing
+     */
+    private static final String POST_IDS_KEY = "post_ids";
+
+    /**
+     * The key used to store the state of {@link SubredditFragment#layoutManager}
+     */
+    private static final String LAYOUT_STATE_KEY = "layout_state";
+
 
 
     private FragmentSubredditBinding binding;
 
+    private Bundle saveState;
     private String subreddit;
+    private List<String> postIds;
 
     /**
      * The amount of items in the list at the last attempt at loading more posts
@@ -113,8 +128,6 @@ public class SubredditFragment extends Fragment {
      * Sets up {@link FragmentSubredditBinding#posts}
      */
     private void setupPostsList() {
-        layoutManager = new LinearLayoutManager(getActivity());
-
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
         binding.posts.setOnScrollChangeListener(scrollListener);
@@ -174,17 +187,54 @@ public class SubredditFragment extends Fragment {
     }
 
 
+    /**
+     * Restores the state of the visible ViewHolders based on {@link SubredditFragment#saveState}
+     */
+    private void restoreViewHolderStates() {
+        if (saveState != null) {
+            int firstVisible = saveState.getInt(FIRST_VIEW_STATE_STORED_KEY);
+            int lastVisible = saveState.getInt(LAST_VIEW_STATE_STORED_KEY);
+
+            for (int i = firstVisible; i <= lastVisible; i++) {
+                PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
+
+                // If the view has been destroyed the ViewHolders havent been created yet
+                Bundle extras = saveState.getBundle(VIEW_STATE_STORED_KEY + i);
+                if (extras != null && viewHolder != null) {
+                    viewHolder.setExtras(extras);
+                }
+            }
+        }
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         lastLoadAttemptCount = 0;
         adapter = new PostsAdapter();
+        layoutManager = new LinearLayoutManager(getContext());
+        postIds = new ArrayList<>();
 
         postsViewModel = new ViewModelProvider(this, new PostsFactory(
                 getContext()
         )).get(PostsViewModel.class);
-        postsViewModel.getPosts().observe(this, adapter::addPosts);
+        postsViewModel.getPosts().observe(this, posts -> {
+            int size = adapter.getItemCount();
+            adapter.addPosts(posts);
+
+            // Possible state to restore
+            if (saveState != null && size == 0) {
+                Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);
+                if (state != null) {
+                    layoutManager.onRestoreInstanceState(saveState.getParcelable(LAYOUT_STATE_KEY));
+
+                    // Resume videos etc etc
+                    this.restoreViewHolderStates();
+                }
+            }
+        });
         postsViewModel.onLoadingChange().observe(this, up -> {
             binding.loadingIcon.onCountChange(up);
         });
@@ -203,7 +253,6 @@ public class SubredditFragment extends Fragment {
             // Set title in toolbar
             binding.subredditName.setText(subreddit.isEmpty() ? "Front page" : "r/" + subreddit);
         }
-        Log.d(TAG, "onCreateView: " + subreddit);
 
         // Bind the refresh button in the toolbar
         binding.subredditRefresh.setOnClickListener(this::onRefreshPostsClicked);
@@ -211,19 +260,9 @@ public class SubredditFragment extends Fragment {
         // Setup the RecyclerView posts list
         this.setupPostsList();
 
-        if (savedInstanceState != null) {
-            int firstVisible = savedInstanceState.getInt(FIRST_VIEW_STATE_STORED_KEY);
-            int lastVisible = savedInstanceState.getInt(LAST_VIEW_STATE_STORED_KEY);
-
-            for (int i = firstVisible; i <= lastVisible; i++) {
-                PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
-                Log.d(TAG, "onCreateView: " + layoutManager.findViewByPosition(i));
-
-                Bundle extras = savedInstanceState.getBundle(VIEW_STATE_STORED_KEY + i);
-                if (extras != null && viewHolder != null) {
-                    viewHolder.setExtras(extras);
-                }
-            }
+        if (saveState != null) {
+            postIds = saveState.getStringArrayList(POST_IDS_KEY);
+            postsViewModel.setPostIds(postIds);
         }
 
         return view;
@@ -232,31 +271,59 @@ public class SubredditFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d(TAG, "onDestroyView: " + subreddit);
+
+        // onDestroyView is called when a fragment is no longer visible. We store the list state of the fragment
+        // here and when onCreateView is called again we restore the state (the fragment object itself is not
+        // destroyed, so saveState will be the same)
+        if (saveState == null) {
+            saveState = new Bundle();
+        }
+
+        saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
+        saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public void onPause() {
+        super.onPause();
 
-        int firstVisible = layoutManager.findFirstVisibleItemPosition();
-        int lastVisible = layoutManager.findLastVisibleItemPosition();
-        for (int i = firstVisible; i <= lastVisible; i++) {
+        if (saveState == null) {
+            saveState = new Bundle();
+        }
+
+        // It's probably not necessary to loop through all, but ViewHolders are still active even when not visible
+        // so just getting firstVisible and lastVisible probably won't be enough
+        for (int i = 0; i < adapter.getItemCount(); i++) {
             PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
 
             if (viewHolder != null) {
                 Bundle extras = viewHolder.getExtras();
-                outState.putBundle(VIEW_STATE_STORED_KEY + i, extras);
+                saveState.putBundle(VIEW_STATE_STORED_KEY + i, extras);
+
+                viewHolder.pause();
             }
         }
 
-        outState.putInt(FIRST_VIEW_STATE_STORED_KEY, firstVisible);
-        outState.putInt(LAST_VIEW_STATE_STORED_KEY, lastVisible);
+        int firstVisible = layoutManager.findFirstVisibleItemPosition();
+        int lastVisible = layoutManager.findLastVisibleItemPosition();
+
+        saveState.putInt(FIRST_VIEW_STATE_STORED_KEY, firstVisible);
+        saveState.putInt(LAST_VIEW_STATE_STORED_KEY, lastVisible);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Ensure that all videos are cleaned up
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
+
+            if (viewHolder != null) {
+                viewHolder.destroy();
+            }
+        }
+
         binding = null;
     }
 
@@ -265,8 +332,10 @@ public class SubredditFragment extends Fragment {
         super.onResume();
 
         // If the fragment is selected without any posts load posts automatically
-        if (adapter.getPosts().isEmpty()) {
+        if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
             postsViewModel.loadPosts(binding.parentLayout, subreddit);
         }
+
+        this.restoreViewHolderStates();
     }
 }

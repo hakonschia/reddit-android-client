@@ -1,7 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +68,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return this.posts.size();
+        return posts.size();
     }
 
     @NonNull
@@ -172,12 +171,38 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             return post.getContentBottomY();
         }
 
+        /**
+         * Gets a bundle of extras that include the ViewHolder state
+         *
+         * <p>Use {@link PostsAdapter.ViewHolder#setExtras(Bundle)} to restore the state</p>
+         *
+         * @return The state of the ViewHolder
+         */
         public Bundle getExtras() {
             return post.getExtras();
         }
 
+        /**
+         * Sets extras that have been saved to restore state.
+         *
+         * @param data The extras to set
+         */
         public void setExtras(Bundle data) {
-            post.resumeVideoPost(data);
+            post.setExtras(data);
+        }
+
+        /**
+         * Call when the ViewHolder should be destroyed. Any resources are freed up
+         */
+        public void destroy() {
+            post.cleanUpContent();
+        }
+
+        /**
+         * Call when the view holding the ViewHolder has been paused. Any videos will be paused
+         */
+        public void pause() {
+            post.pauseVideo();
         }
     }
 }

@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Class containing converter for various fields for Reddit posts
  */
-public abstract class PostConverter {
+public class PostConverter {
     private static final String TAG = "CrosspostConverter";
 
     // TODO there has to be a better way of doing this with generics or something else
