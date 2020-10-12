@@ -1,9 +1,9 @@
 
 # ![logo](/images/logo.png) An unofficial Reddit client for Android
 
-An unofficial Reddit client for Android. The application allows for users to log in with their Reddit account and perform actions such as voting, commenting, and retrieving customized front page posts. There is currently no mod support, and is not planned at this time.
+An unofficial Reddit client for Android. The application allows for users to log in with their Reddit account and perform actions such as voting, commenting, and retrieving customized front page posts. There is currently no mod support.
 
-Includes a Java wrapper for the Reddit API that provides basic functionality.
+Includes an Android/Java wrapper for the Reddit API that provides basic functionality.
 
 
 ## Screenshots
