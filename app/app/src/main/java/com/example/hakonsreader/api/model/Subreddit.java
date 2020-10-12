@@ -1,11 +1,14 @@
 package com.example.hakonsreader.api.model;
 
+import androidx.room.Entity;
+
 import com.google.gson.annotations.SerializedName;
 
 
 /**
  * Class representing a subreddit
  */
+@Entity(tableName = "subreddits")
 public class Subreddit extends RedditListing {
 
     @SerializedName("display_name")
@@ -98,7 +101,7 @@ public class Subreddit extends RedditListing {
     /**
      * @return True if the subreddit is quarantined
      */
-    public boolean isQuarantined() {
+    public boolean isQuarantine() {
         return quarantine;
     }
 
@@ -121,5 +124,53 @@ public class Subreddit extends RedditListing {
      */
     public String getSubredditType() {
         return subredditType;
+    }
+
+
+
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setSubscribers(int subscribers) {
+        this.subscribers = subscribers;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setDescriptionHTML(String descriptionHTML) {
+        this.descriptionHTML = descriptionHTML;
+    }
+
+    public void setIconImage(String iconImage) {
+        this.iconImage = iconImage;
+    }
+
+    public void setHeaderImage(String headerImage) {
+        this.headerImage = headerImage;
+    }
+
+    public void setQuarantine(boolean quarantine) {
+        this.quarantine = quarantine;
+    }
+
+    public void setUserHasFavorited(boolean userHasFavorited) {
+        this.userHasFavorited = userHasFavorited;
+    }
+
+    public void setSubmitText(String submitText) {
+        this.submitText = submitText;
+    }
+
+    public void setSubredditType(String subredditType) {
+        this.subredditType = subredditType;
     }
 }
