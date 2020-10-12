@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -40,7 +41,14 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Subreddit subreddit = subreddits.get(position);
 
-        holder.name.setText(subreddit.getName() + (subreddit.userHasFavorited() ? " (favorite)" : ""));
+        holder.name.setText(subreddit.getName());
+
+        if (subreddit.userHasFavorited()) {
+            holder.favorite.setColorFilter(ContextCompat.getColor(holder.context, R.color.subredditFavorited));
+        } else {
+            holder.favorite.setColorFilter(ContextCompat.getColor(holder.context, R.color.iconColor));
+        }
+
         String iconURL = subreddit.getIconImage();
         if (iconURL != null && !iconURL.isEmpty()) {
             Picasso.get()
@@ -73,6 +81,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
         private ImageView icon;
         private TextView name;
+        private ImageButton favorite;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -80,6 +89,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
             icon = itemView.findViewById(R.id.icon);
             name = itemView.findViewById(R.id.name);
+            favorite = itemView.findViewById(R.id.favoriteSub);
 
             // Call the registered onClick listener when an item is clicked
             itemView.setOnClickListener(view -> {

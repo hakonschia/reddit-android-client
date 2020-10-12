@@ -43,4 +43,6 @@
 
     <color name="quoteLine">#5EB8FF</color>
 
+    <color name="subredditFavorited">#FFE714</color>
+
 </resources>
