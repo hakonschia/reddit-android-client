@@ -70,7 +70,7 @@ public class SelectSubredditFragment extends Fragment {
             subredditsAdapter.setSubreddits(subreddits);
         });
 
-        //viewModel.loadSubscribed();
+        viewModel.loadSubreddits();
 
         return view;
     }

@@ -40,21 +40,22 @@ public class SelectSubredditsViewModel extends ViewModel {
     }
 
     /**
-     * Load the subreddits the logged in user is subscribed to.
+     * Load the subreddits. If a user is logged in their subscribed subreddits are loaded, otherwise
+     * default subs are loaded
      *
-     * <p>The order of the list will be:
+     * <p>The order of the list will be, sorted alphabetically:
      * <ol>
-     *     <li>Favorites</li>
-     *     <li>The rest of the subreddits sorted</li>
+     *     <li>Favorites (for logged in users)</li>
+     *     <li>The rest of the subreddits</li>
      *     <li>Users the user is following</li>
      * </ol>
      * </p>
      */
-    public void loadSubscribed() {
+    public void loadSubreddits() {
         App.get().getApi().getSubreddits("", 0, loaded -> {
             List<Subreddit> sorted = loaded.stream()
                     // Sort based on subreddit name
-                    .sorted((first, second) -> first.getName().compareTo(second.getName()))
+                    .sorted((first, second) -> first.getName().toLowerCase().compareTo(second.getName().toLowerCase()))
                     .collect(Collectors.toList());
 
             List<Subreddit> favorites = sorted.stream()
