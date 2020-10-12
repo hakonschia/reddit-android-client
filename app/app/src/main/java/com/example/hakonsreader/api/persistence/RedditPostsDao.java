@@ -40,6 +40,7 @@ public interface RedditPostsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<RedditPost> posts);
 
+
     /**
      * Deletes a post from the database.
      *
@@ -51,8 +52,22 @@ public interface RedditPostsDao {
     @Delete
     void delete(RedditPost post);
 
+    /**
+     * Deletes all posts from the database
+     *
+     * @return The amount of posts delete
+     */
     @Query("DELETE FROM posts")
-    void deleteAll();
+    int deleteAll();
+
+    /**
+     * Delete posts from the database that are older than the given age
+     *
+     * @param maxAge The max amount of seconds
+     * @return The amount of posts deleted
+     */
+    @Query("DELETE FROM posts WHERE insertedAt + :maxAge > (SELECT strftime('%s', 'now'))")
+    int deleteOld(long maxAge);
 
 
     /**

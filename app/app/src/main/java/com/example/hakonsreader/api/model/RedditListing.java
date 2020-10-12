@@ -18,6 +18,20 @@ import com.google.gson.annotations.SerializedName;
 @Entity
 @JsonAdapter(ListingAdapter.class)
 public abstract class RedditListing {
+
+    // Store the timestamp the listing was created (ie. inserted at into the database) in seconds
+    private long insertedAt = System.currentTimeMillis() * 1000;
+
+    /**
+     * @return The timestamp the listing was inserted into the database in seconds
+     */
+    public long getInsertedAt() {
+        return insertedAt;
+    }
+    public void setInsertedAt(long insertedAt) {
+        this.insertedAt = insertedAt;
+    }
+
     @SerializedName("kind")
     protected String kind;
 

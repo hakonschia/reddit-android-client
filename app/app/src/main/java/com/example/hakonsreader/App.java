@@ -8,14 +8,13 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.text.util.Linkify;
+import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
@@ -27,19 +26,13 @@ import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 
-import org.commonmark.node.Node;
-
 import java.util.UUID;
 
-import io.noties.markwon.AbstractMarkwonPlugin;
 import io.noties.markwon.Markwon;
-import io.noties.markwon.MarkwonVisitor;
 import io.noties.markwon.SoftBreakAddsNewLinePlugin;
 import io.noties.markwon.core.CorePlugin;
-import io.noties.markwon.core.MarkwonTheme;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TablePlugin;
-import io.noties.markwon.linkify.LinkifyPlugin;
 
 
 /**
@@ -84,6 +77,16 @@ public class App extends Application {
 
         setupRedditApi();
         updateTheme();
+
+        AppDatabase db = AppDatabase.getInstance(this);
+
+        // Remove records that are older than 24 hours, as they likely won't be used again
+        new Thread(() -> {
+            int count = db.posts().getCount();
+            int deleted = db.posts().deleteOld((long)60 * 60 * 24);
+
+            Log.d(TAG, "onCreate: # of records=" + count + "; # of deleted=" + deleted);
+        }).start();
     }
 
     /**
