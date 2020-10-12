@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.hakonsreader.api.model.Subreddit;
 
@@ -31,6 +32,13 @@ public interface RedditSubredditsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<Subreddit> subreddits);
 
+    /**
+     * Updates the subreddit
+     *
+     * @param subreddit The subreddit with new information
+     */
+    @Update
+    void update(Subreddit subreddit);
 
     /**
      * @return A list of all subreddits stored

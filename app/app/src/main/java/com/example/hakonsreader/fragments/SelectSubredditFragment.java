@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.Subreddit;
+import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.databinding.FragmentSelectSubredditBinding;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.misc.Util;
@@ -26,6 +27,7 @@ public class SelectSubredditFragment extends Fragment {
     private static final String TAG = "SelectSubredditFragment";
 
     private RedditApi redditApi = App.get().getApi();
+    private AppDatabase database;
 
     private SubredditsAdapter subredditsAdapter;
     private LinearLayoutManager layoutManager;
@@ -46,10 +48,15 @@ public class SelectSubredditFragment extends Fragment {
     }
 
     public void favoriteClicked(Subreddit subreddit) {
-        App.get().getApi().favoriteSubreddit(subreddit.getName(), !subreddit.userHasFavorited(), ignored -> {
+        redditApi.favoriteSubreddit(subreddit.getName(), !subreddit.userHasFavorited(), ignored -> {
             subreddit.setUserHasFavorited(!subreddit.userHasFavorited());
             subredditsAdapter.onFavorite(subreddit);
-            // TODO this should update the local database as well
+            new Thread(() -> database.subreddits().update(subreddit)).start();
+
+            // If the top is visible make sure the top is also visible after the item has moved
+            if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
+                layoutManager.scrollToPosition(0);
+            }
         }, (code, t) -> {
             t.printStackTrace();
             Util.handleGenericResponseErrors(getView(), code, t);
@@ -60,8 +67,8 @@ public class SelectSubredditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        this.binding = FragmentSelectSubredditBinding.inflate(inflater);
-        View view = this.binding.getRoot();
+        binding = FragmentSelectSubredditBinding.inflate(inflater);
+        database = AppDatabase.getInstance(getContext());
 
         subredditsAdapter = new SubredditsAdapter();
         subredditsAdapter.setSubredditSelected(subredditSelected);
@@ -81,7 +88,7 @@ public class SelectSubredditFragment extends Fragment {
 
         viewModel.loadSubreddits();
 
-        return view;
+        return binding.getRoot();
     }
 
     @Override

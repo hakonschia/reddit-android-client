@@ -20,6 +20,7 @@ import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
@@ -260,8 +261,6 @@ public class SubredditFragment extends Fragment {
             new Thread(() -> {
                 subreddit = database.subreddits().get(subredditName);
                 if (subreddit != null){
-                    Log.d(TAG, "onCreateView:" + subreddit.getSubscribers());
-
                     // In case the capitalization is different make sure it is updated
                     subredditName = subreddit.getName();
                     requireActivity().runOnUiThread(this::updateSubredditName);
@@ -277,7 +276,7 @@ public class SubredditFragment extends Fragment {
 
                 // Update UI when there is more UI to update
             }, (code, t) -> {
-                t.printStackTrace();
+                Util.handleGenericResponseErrors(getView(), code, t);
             });
         }
     }
