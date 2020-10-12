@@ -8,19 +8,17 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.databinding.FragmentSelectSubredditBinding;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
-import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter;
+import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
+import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class SelectSubredditFragment extends Fragment {
     private static final String TAG = "SelectSubredditFragment";
@@ -29,6 +27,8 @@ public class SelectSubredditFragment extends Fragment {
 
     private SubredditsAdapter subredditsAdapter;
     private LinearLayoutManager layoutManager;
+
+    private SelectSubredditsViewModel viewModel;
 
     private FragmentSelectSubredditBinding binding;
     private OnSubredditSelected subredditSelected;
@@ -55,7 +55,6 @@ public class SelectSubredditFragment extends Fragment {
         this.binding = FragmentSelectSubredditBinding.inflate(inflater);
         View view = this.binding.getRoot();
 
-
         subredditsAdapter = new SubredditsAdapter();
         subredditsAdapter.setSubredditSelected(subredditSelected);
         layoutManager = new LinearLayoutManager(getContext());
@@ -63,34 +62,15 @@ public class SelectSubredditFragment extends Fragment {
         binding.subreddits.setAdapter(subredditsAdapter);
         binding.subreddits.setLayoutManager(layoutManager);
 
-        redditApi.getSubscribedSubreddits("", 0, subreddits -> {
-            List<Subreddit> sorted = subreddits.stream()
-                    // Sort based on subreddit name
-                    .sorted((first, second) -> first.getName().compareTo(second.getName()))
-                    .collect(Collectors.toList());
+        viewModel = new ViewModelProvider(this, new SelectSubredditsFactory(
+                getContext()
+        )).get(SelectSubredditsViewModel.class);
 
-            List<Subreddit> favorites = sorted.stream()
-                    .filter(Subreddit::userHasFavorited)
-                    .collect(Collectors.toList());
-
-            List<Subreddit> users = sorted.stream()
-                    .filter(subreddit -> subreddit.getSubredditType().equals("user"))
-                    .collect(Collectors.toList());
-
-            // Remove the favorites to not include twice
-            sorted.removeAll(favorites);
-            sorted.removeAll(users);
-
-            List<Subreddit> combined = new ArrayList<>();
-            combined.addAll(favorites);
-            combined.addAll(sorted);
-            combined.addAll(users);
-
-            subredditsAdapter.setSubreddits(combined);
-        }, (code, t) -> {
-            t.printStackTrace();
-            Util.handleGenericResponseErrors(binding.parentLayout, code, t);
+        viewModel.getSubreddits().observe(getViewLifecycleOwner(), subreddits -> {
+            subredditsAdapter.setSubreddits(subreddits);
         });
+
+        //viewModel.loadSubscribed();
 
         return view;
     }
