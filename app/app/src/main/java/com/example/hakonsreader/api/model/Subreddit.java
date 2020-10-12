@@ -30,6 +30,9 @@ public class Subreddit extends RedditListing {
     @SerializedName("icon_img")
     private String iconImage;
 
+    @SerializedName("community_icon")
+    private String communityIcon;
+
     @SerializedName("header_img")
     private String headerImage;
 
@@ -86,10 +89,25 @@ public class Subreddit extends RedditListing {
     }
 
     /**
+     * Retrieve the icon image URL.
+     *
+     * <p>See also: {@link Subreddit#getCommunityIcon()}</p>
+     *
      * @return The URL to the subreddit's icon
      */
     public String getIconImage() {
         return iconImage;
+    }
+
+    /**
+     * Retrieve the community icon URL.
+     *
+     * <p>See also: {@link Subreddit#getIconImage()}</p>
+     *
+     * @return The URL to the subreddits community icon
+     */
+    public String getCommunityIcon() {
+        return communityIcon;
     }
 
     /**
@@ -153,6 +171,10 @@ public class Subreddit extends RedditListing {
 
     public void setIconImage(String iconImage) {
         this.iconImage = iconImage;
+    }
+
+    public void setCommunityIcon(String communityIcon) {
+        this.communityIcon = communityIcon;
     }
 
     public void setHeaderImage(String headerImage) {

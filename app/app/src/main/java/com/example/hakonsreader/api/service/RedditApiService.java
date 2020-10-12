@@ -145,7 +145,7 @@ public interface RedditApiService {
      * @param accessToken
      * @return
      */
-    @GET("subreddits/mine/subscriber")
+    @GET("subreddits/mine/subscriber?raw_json=1")
     Call<ListingResponse> getSubscribedSubreddits(
             @Query("after") String after,
             @Query("count") int count,
@@ -163,7 +163,7 @@ public interface RedditApiService {
      * @param accessToken
      * @return
      */
-    @GET("subreddits/default")
+    @GET("subreddits/default?raw_json=1")
     Call<ListingResponse> getDefaultSubreddits(
             @Query("after") String after,
             @Query("count") int count,
@@ -180,7 +180,7 @@ public interface RedditApiService {
      * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A call with a {@link RedditListing} that can be converted to a {@link Subreddit}
      */
-    @GET("r/{subreddit}/about")
+    @GET("r/{subreddit}/about?raw_json=1")
     Call<RedditListing> getSubredditInfo(
             @Path("subreddit") String subreddit,
 

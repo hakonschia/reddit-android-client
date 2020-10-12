@@ -71,9 +71,15 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
         holder.updateFavorited(subreddit.userHasFavorited());
 
         String iconURL = subreddit.getIconImage();
+        String communityURL = subreddit.getCommunityIcon();
         if (iconURL != null && !iconURL.isEmpty()) {
             Picasso.get()
                     .load(iconURL)
+                    .into(holder.icon);
+        } else if(communityURL != null && !communityURL.isEmpty()) {
+            Log.d(TAG, "onBindViewHolder: " + subreddit.getName() + " has community URL " + communityURL);
+            Picasso.get()
+                    .load(communityURL)
                     .into(holder.icon);
         } else {
             holder.icon.setImageDrawable(ContextCompat.getDrawable(holder.context, R.drawable.ic_baseline_emoji_emotions_24));
