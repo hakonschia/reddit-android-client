@@ -14,8 +14,14 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrosspostConverter {
+/**
+ * Class containing converter for various fields for Reddit posts
+ */
+public abstract class PostConverter {
     private static final String TAG = "CrosspostConverter";
+
+    // TODO there has to be a better way of doing this with generics or something else
+
 
     @TypeConverter
     public static List<String> fromListString(String value) {

@@ -6,7 +6,7 @@ import androidx.room.TypeConverters;
 
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
-import com.example.hakonsreader.api.persistence.CrosspostConverter;
+import com.example.hakonsreader.api.persistence.PostConverter;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.google.gson.annotations.SerializedName;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * Class representing a Reddit post
  */
 @Entity(tableName = "posts")
-@TypeConverters({CrosspostConverter.class})
+@TypeConverters({PostConverter.class})
 public class RedditPost extends RedditListing {
 
 

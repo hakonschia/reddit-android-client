@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.enums.Thing;
+import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.api.persistence.AppDatabase;
@@ -21,8 +22,8 @@ public class PostsViewModel extends ViewModel {
 
 
     // The way this works is that the database holds all RedditPosts
-    // We store the IDs of the post this ViewModel keeps track of, and asks the database for those posts
-    // When we retrieve posts we add them to the shared database for all PostsViewModel
+    // We store the posts here as well, and have a function to get posts from the database by their ID
+    // When our fragment/activity dies, we can get the posts back by storing the IDs
 
     // TODO posts should be removed 1 day (or something) after they have been inserted, so not massive amounts of posts are
     //  stored that wont ever be used
@@ -34,14 +35,29 @@ public class PostsViewModel extends ViewModel {
     private MutableLiveData<List<RedditPost>> posts;
     private MutableLiveData<Boolean> loadingChange;
 
+    /**
+     * @param context The context to use to create the database for the posts
+     */
     public PostsViewModel(Context context) {
         database = AppDatabase.getInstance(context);
     }
 
+
+    /**
+     * @return The list of IDs the ViewModel is keeping track of
+     */
     public List<String> getPostIds() {
         return postIds;
     }
 
+    /**
+     * Set the list of IDs the ViewModel should keep track of.
+     *
+     * <p>This function automatically retrieves the posts from the local database. Make sure
+     * {@link PostsViewModel#getPosts()} is called and is observed before this is called.</p>
+     *
+     * @param postIds The IDs to track
+     */
     public void setPostIds(List<String> postIds) {
         this.postIds = postIds;
         // TODO get posts and make sure crossposts are set correctly
