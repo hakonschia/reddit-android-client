@@ -6,8 +6,10 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
+import android.view.textclassifier.TextLinks;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,6 +31,7 @@ import io.noties.markwon.AbstractMarkwonPlugin;
 public class RedditLinkPlugin extends AbstractMarkwonPlugin {
     private static final String TAG = "RedditLinkPlugin";
 
+    // TODO this should NOT match anything already in a markdown link (as people like to be funny with fake subreddit links)
     // Subreddits are alphanumericals, numbers, and underscores. Users are the same and dashes
     private static final Pattern RE = Pattern.compile("/?(([rR]/[A-Za-z09_]+)|([uU]/[A-Za-z0-9_-]+))/?");
 
@@ -78,6 +81,7 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
             final int s = matcher.start();
             final int e = matcher.end();
             spannable.setSpan(clickableSpan, s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new UnderlineSpan(), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 
