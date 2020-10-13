@@ -9,7 +9,7 @@ import android.text.style.CharacterStyle;
  *
  * <p>Taken from the code originally from {@link RedditSpoilerPlugin}</p>
  */
-class HideSpoilerSyntaxSpan extends CharacterStyle {
+class HideSyntaxSpan extends CharacterStyle {
     // TODO find out how to actually remove the text so it doesnt take up more space than necessary
 
     @Override

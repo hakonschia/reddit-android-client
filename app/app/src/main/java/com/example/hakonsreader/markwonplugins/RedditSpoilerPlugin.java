@@ -65,8 +65,8 @@ public class RedditSpoilerPlugin extends AbstractMarkwonPlugin {
             spannable.setSpan(clickableSpan, s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             // we also can hide original syntax
-            spannable.setSpan(new HideSpoilerSyntaxSpan(), s, s + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new HideSpoilerSyntaxSpan(), e - 2, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new HideSyntaxSpan(), s, s + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new HideSyntaxSpan(), e - 2, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 

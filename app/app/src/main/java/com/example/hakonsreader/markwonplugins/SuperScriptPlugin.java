@@ -3,7 +3,6 @@ package com.example.hakonsreader.markwonplugins;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.SuperscriptSpan;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,7 +20,7 @@ public class SuperScriptPlugin extends AbstractMarkwonPlugin {
 
     // TODO this doesn't allow for nesting, so nested superscripts dont work
     // Subreddits are alphanumericals, numbers, and underscores. Users are the same and dashes
-    private static final Pattern RE = Pattern.compile("[\\^][(].*[)]");
+    public static final Pattern RE = Pattern.compile("[\\^][(].*[)]");
 
     @Override
     public void beforeSetText(@NonNull TextView textView, @NonNull Spanned markdown) {
@@ -39,8 +38,8 @@ public class SuperScriptPlugin extends AbstractMarkwonPlugin {
 
             // Hide the original syntax
             // The syntax is ^(...), so hide 2 characters at the start and one at the end
-            spannable.setSpan(new HideSpoilerSyntaxSpan(), s, s + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new HideSpoilerSyntaxSpan(), e - 1, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new HideSyntaxSpan(), s, s + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new HideSyntaxSpan(), e - 1, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 }
