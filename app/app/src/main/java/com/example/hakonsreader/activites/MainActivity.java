@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         Intent intent = new Intent(this, DispatcherActivity.class);
         intent.putExtra("subreddit", "test");
         intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/test");
-        startActivity(intent);
+        //startActivity(intent);
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);
@@ -231,6 +231,9 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
             switch (item.getItemId()) {
                 case R.id.navHome:
+                    if (postsFragment == null) {
+                        postsFragment = new PostsContainerFragment();
+                    }
                     selected = postsFragment;
                     break;
 
