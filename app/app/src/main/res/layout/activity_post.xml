@@ -67,7 +67,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_square"
+            android:background="@drawable/rounded_square_secondary_bg"
             android:layout_marginEnd="5dp" >
 
             <ImageButton
@@ -85,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:background="@drawable/rounded_square">
+            android:background="@drawable/rounded_square_secondary_bg">
 
             <ImageButton
                 android:id="@+id/goToPreviousTopLevelComment"

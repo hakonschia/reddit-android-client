@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
@@ -19,7 +17,6 @@ import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
-import com.google.android.exoplayer2.C;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -73,6 +70,10 @@ public class RedditApi {
      */
     public static final String REDDIT_OUATH_URL = "https://oauth.reddit.com/";
 
+    /**
+     * The list of standard subs
+     */
+    public static final List<String> STANDARD_SUBS = Arrays.asList("", "Popular", "All");
 
 
     /**
@@ -110,7 +111,6 @@ public class RedditApi {
      */
     private HttpLoggingInterceptor logger;
 
-    private static final List<String> STANDARD_SUBS = Arrays.asList("", "Popular", "All");
 
     /* ----------------- Client specific variables ----------------- */
     /**

@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
@@ -25,9 +27,11 @@ import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
 import com.example.hakonsreader.views.ListDivider;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Fragment containing a subreddit
@@ -123,8 +127,8 @@ public class SubredditFragment extends Fragment {
      */
     private void onRefreshPostsClicked(View view) {
         // Kinda weird to clear the posts here but works I guess?
-        this.adapter.getPosts().clear();
-        this.binding.posts.scrollToPosition(0);
+        adapter.getPosts().clear();
+        binding.posts.scrollToPosition(0);
 
         // TODO viewmodel load etc etc
         //this.loadPosts();
@@ -138,7 +142,7 @@ public class SubredditFragment extends Fragment {
         binding.posts.setLayoutManager(layoutManager);
         binding.posts.setOnScrollChangeListener(scrollListener);
 
-        ListDivider divider = new ListDivider(ContextCompat.getDrawable(getContext(), R.drawable.list_divider));
+        ListDivider divider = new ListDivider(ContextCompat.getDrawable(requireContext(), R.drawable.list_divider));
         binding.posts.addItemDecoration(divider);
     }
 
@@ -192,7 +196,6 @@ public class SubredditFragment extends Fragment {
         }
     }
 
-
     /**
      * Restores the state of the visible ViewHolders based on {@link SubredditFragment#saveState}
      */
@@ -213,9 +216,46 @@ public class SubredditFragment extends Fragment {
         }
     }
 
-    private void updateSubredditName() {
-        Log.d(TAG, "updateSubredditName: " + subredditName);
-        binding.subredditName.setText(subredditName.isEmpty() ? "Front page" : "r/" + subredditName);
+    /**
+     * Updates the UI based on {@link SubredditFragment#subreddit}
+     */
+    private void updateUi() {
+        if (subreddit != null && RedditApi.STANDARD_SUBS.indexOf(subreddit.getName()) == -1) {
+            String iconURL = subreddit.getIconImage();
+            String communityURL = subreddit.getCommunityIcon();
+            if (iconURL != null && !iconURL.isEmpty()) {
+                Picasso.get()
+                        .load(iconURL)
+                        .into(binding.subredditIcon);
+            } else if(communityURL != null && !communityURL.isEmpty()) {
+                Picasso.get()
+                        .load(communityURL)
+                        .into(binding.subredditIcon);
+            } else {
+                binding.subredditIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_emoji_emotions_24));
+            }
+
+            subredditName = subreddit.getName();
+            binding.subredditName.setText(subredditName.isEmpty() ? getString(R.string.front_page) : subredditName);
+
+            int subs = subreddit.getSubscribers();
+            binding.subredditSubscribers.setText(getResources().getQuantityString(R.plurals.amount_of_subscribers, subs, subs));
+            binding.subredditSubscribers.setVisibility(View.VISIBLE);
+
+            binding.subscribe.setOnClickListener(view -> this.subscribe());
+            binding.subscribe.setVisibility(View.VISIBLE);
+        } else {
+            // If subreddit is front page, popular or all remove some items like "subscribers" "subscribe" etc
+            // which aren't applicable to standard subs
+
+            binding.subredditName.setText(subredditName.isEmpty() ? getString(R.string.front_page) : subredditName);
+            binding.subredditSubscribers.setVisibility(View.GONE);
+            binding.subscribe.setVisibility(View.GONE);
+        }
+    }
+
+    private void subscribe() {
+
     }
 
 
@@ -257,14 +297,14 @@ public class SubredditFragment extends Fragment {
         if (args != null) {
             subredditName = args.getString("subreddit", "");
 
-            updateSubredditName();
+            updateUi();
 
             new Thread(() -> {
                 subreddit = database.subreddits().get(subredditName);
                 if (subreddit != null) {
                     // In case the capitalization is different make sure it is updated
                     subredditName = subreddit.getName();
-                    requireActivity().runOnUiThread(this::updateSubredditName);
+                    requireActivity().runOnUiThread(this::updateUi);
                 }
             }).start();
 
@@ -275,7 +315,7 @@ public class SubredditFragment extends Fragment {
                 }).start();
 
                 subredditName = sub.getName();
-                updateSubredditName();
+                updateUi();
                 // Update UI when there is more UI to update
             }, (code, t) -> {
                 Util.handleGenericResponseErrors(getView(), code, t);

@@ -95,4 +95,13 @@
     <string name="transition_post_info">post_info</string>
     <string name="transition_post_content">post_content</string>
     <string name="transition_post_full_bar">post_full_bar</string>
+
+    <string name="front_page">Front page</string>
+
+    <string name="subscribe_btn_subscribe">+ Subscribe</string>
+    <string name="subscribe_btn_unsubscribe">- Unsubscribe</string>
+    <plurals name="amount_of_subscribers">
+        <item quantity="one">%d subscriber</item>
+        <item quantity="other">%,d subscribers</item>
+    </plurals>
 </resources>

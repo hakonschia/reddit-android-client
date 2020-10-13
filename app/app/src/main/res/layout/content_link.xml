@@ -14,7 +14,7 @@
 
         android:layout_gravity="center"
         android:src="@drawable/ic_baseline_sort_24"
-        android:background="@drawable/rounded_square"
+        android:background="@drawable/rounded_square_secondary_bg"
 
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -34,7 +34,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
 
-        android:background="@drawable/rounded_square_black_bg"
+        android:background="@drawable/rounded_square_main_bg"
         style="@style/ExoMediaButton.Play"
 
         app:layout_constraintTop_toTopOf="parent"
@@ -47,7 +47,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
 
-        android:background="@drawable/rounded_square_black_bg"
+        android:background="@drawable/rounded_square_main_bg"
         style="@style/ExoMediaButton.Pause"
 
         app:layout_constraintTop_toTopOf="parent"
