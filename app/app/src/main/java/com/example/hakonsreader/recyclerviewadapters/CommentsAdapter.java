@@ -323,6 +323,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                 int barWidth = (int)holder.itemView.getResources().getDimension(R.dimen.comment_side_bar_width);
                 int indent = (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
 
+                // Ensure there are no sidebars already (loading more comments can cause issues because the holder
+                // wont be recycled before it is re-drawn)
+                holder.sideBars.removeAllViews();
+
                 // Every comment is only responsible for the lines to its side, so each line will match up
                 // with the line for the comment above and below to create a long line throughout the entire list
                 // Also top level comments don't have a side bar as that looks weird (i <= comment.getDepth() to add it)
