@@ -6,6 +6,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.CharacterStyle;
 import android.text.style.ClickableSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.widget.TextView;
 
@@ -65,8 +66,8 @@ public class RedditSpoilerPlugin extends AbstractMarkwonPlugin {
             spannable.setSpan(clickableSpan, s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             // we also can hide original syntax
-            spannable.setSpan(new HideSyntaxSpan(), s, s + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new HideSyntaxSpan(), e - 2, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new RelativeSizeSpan(0f), s, s + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new RelativeSizeSpan(0f), e - 2, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 

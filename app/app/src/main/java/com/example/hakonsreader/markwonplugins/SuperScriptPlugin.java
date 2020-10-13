@@ -49,20 +49,20 @@ public class SuperScriptPlugin extends AbstractMarkwonPlugin {
 
             // SuperscriptSpan puts it higher, and RelativeSizeSpan makes the text smaller
             spannable.setSpan(new SuperscriptSpan(), spanStart, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new RelativeSizeSpan(0.85f), spanStart, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new RelativeSizeSpan(0.9f), spanStart, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 
-            // Hide the original syntax
+            // Hide the original syntax. Using RelativeSizeSpan with 0 as proportion effectively removes the text
             // The syntax is ^(...), so hide 2 characters at the start and one at the end
-            spannable.setSpan(new HideSyntaxSpan(), spanStart, spanStart + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new RelativeSizeSpan(0f), spanStart, spanStart + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             // This is super hacky and I don't even know why this works, but for nested superscripts it doesn't match completely
             // and it would not hide the last ) unless we go to spanEnd + 1, but if we are at the end we obviously can't
             // go past the end
             if (end == spannable.length()) {
-                spannable.setSpan(new HideSyntaxSpan(), spanEnd - 1, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spannable.setSpan(new RelativeSizeSpan(0f), spanEnd - 1, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else {
-                spannable.setSpan(new HideSyntaxSpan(), spanEnd - 1, spanEnd + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spannable.setSpan(new RelativeSizeSpan(0f), spanEnd - 1, spanEnd + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
 
         }
