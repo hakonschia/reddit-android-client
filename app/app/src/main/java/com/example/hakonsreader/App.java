@@ -21,6 +21,7 @@ import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
+import com.example.hakonsreader.markwonplugins.LinkPlugin;
 import com.example.hakonsreader.markwonplugins.SuperScriptPlugin;
 import com.example.hakonsreader.markwonplugins.ThemePlugin;
 import com.example.hakonsreader.misc.OAuthStateGenerator;
@@ -241,6 +242,7 @@ public class App extends Application {
                 .usePlugin(new RedditSpoilerPlugin())
                 .usePlugin(new RedditLinkPlugin(this))
                 .usePlugin(new SuperScriptPlugin())
+                .usePlugin(new LinkPlugin(this))
                 .usePlugin(new ThemePlugin(this))
                 .build();
     }
