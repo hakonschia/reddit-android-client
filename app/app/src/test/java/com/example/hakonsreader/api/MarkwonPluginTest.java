@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api;
 
 import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
+import com.example.hakonsreader.markwonplugins.SuperScriptPlugin;
 
 import org.junit.Test;
 
@@ -50,5 +51,14 @@ public class MarkwonPluginTest {
         text = "The reason I like r/GlobalOffensive is that I, u/hakonschia, enjoy watching CS:GO";
         m = pattern.matcher(text);
         assertEquals(2, totalMatches(m));
+    }
+
+    @Test
+    public void superScriptPlugin() {
+        Pattern pattern = SuperScriptPlugin.RE;
+
+        String text = "hello ^(how ^(are) you) :)";
+        Matcher m = pattern.matcher(text);
+
     }
 }
