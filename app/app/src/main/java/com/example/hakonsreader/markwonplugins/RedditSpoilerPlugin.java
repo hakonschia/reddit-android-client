@@ -83,7 +83,7 @@ public class RedditSpoilerPlugin extends AbstractMarkwonPlugin {
                 tp.setColor(Color.GRAY);
             } else {
                 // for example keep a bit of black background to remind that it is a spoiler
-                tp.bgColor = ColorUtils.applyAlpha(Color.BLACK, 25);
+                tp.bgColor = ColorUtils.applyAlpha(Color.GRAY, 50);
             }
         }
 
