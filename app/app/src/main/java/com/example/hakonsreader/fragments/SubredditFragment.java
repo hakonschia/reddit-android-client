@@ -269,11 +269,13 @@ public class SubredditFragment extends Fragment {
 
             App.get().getApi().getSubredditInfo(subredditName, sub -> {
                 new Thread(() -> {
+                    // TODO this should probably just update as you might not want to store stuff like nsfw subs
                     database.subreddits().insert(sub);
-                    subredditName = sub.getName();
-                    requireActivity().runOnUiThread(this::updateSubredditName);
+
                 }).start();
 
+                subredditName = sub.getName();
+                updateSubredditName();
                 // Update UI when there is more UI to update
             }, (code, t) -> {
                 Util.handleGenericResponseErrors(getView(), code, t);

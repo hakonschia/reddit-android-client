@@ -8,7 +8,8 @@
 
     <dimen name="defaultIndent">15dp</dimen>
 
-    <dimen name="comment_depth_indent">10dp</dimen>
+    <dimen name="comment_depth_indent">12dp</dimen>
+    <dimen name="comment_side_bar_width">3dp</dimen>
 
     <dimen name="postContentMaxHeight">150dp</dimen>
 

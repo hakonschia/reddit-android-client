@@ -2,12 +2,15 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -311,10 +314,38 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             holder.commentHidden(() -> this.showComments(comment));
         }
 
-        int paddingStart = comment.getDepth() * (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
-        holder.itemView.setPadding(paddingStart, 0, 0, 0);
-        // Update the layout with new padding
-        holder.itemView.requestLayout();
+
+        // With preDrawListener we can get the height of the itemView before it is drawn, and then create the sidebars with that height
+        holder.itemView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                int height = holder.itemView.getMeasuredHeight();
+                int barWidth = (int)holder.itemView.getResources().getDimension(R.dimen.comment_side_bar_width);
+                int indent = (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
+
+                // Every comment is only responsible for the lines to its side, so each line will match up
+                // with the line for the comment above and below to create a long line throughout the entire list
+                // Also top level comments don't have a side bar as that looks weird (i <= comment.getDepth() to add it)
+                for (int i = 0; i < comment.getDepth(); i++) {
+                    View view = new View(holder.itemView.getContext());
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(barWidth, height);
+                    LinearLayout.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(params);
+                    marginLayoutParams.rightMargin = indent;
+
+                    view.setLayoutParams(marginLayoutParams);
+                    view.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.secondaryBackground));
+
+                    holder.sideBars.addView(view);
+                }
+
+                // Remove the listener to avoid infinite calls
+                holder.itemView.getViewTreeObserver().removeOnPreDrawListener(this);
+
+                // Returning false means to cancel the current scheduled draw, which would not include
+                // the sidebars and would cause them to appear a split second later
+                return false;
+            }
+        });
     }
 
     @Override
@@ -338,6 +369,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        private LinearLayout sideBars;
         private TextView author;
         private FrameLayout authorFlair;
         private TextView age;
@@ -350,6 +382,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            sideBars = itemView.findViewById(R.id.sideBars);
             author = itemView.findViewById(R.id.commentAuthor);
             authorFlair = itemView.findViewById(R.id.authorFlair);
             age = itemView.findViewById(R.id.commentAge);
@@ -382,6 +415,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             voteBar.setVisibility(View.VISIBLE);
             reply.setVisibility(View.VISIBLE);
             itemView.setOnClickListener(null);
+
+            sideBars.removeAllViews();
         }
 
         /**
