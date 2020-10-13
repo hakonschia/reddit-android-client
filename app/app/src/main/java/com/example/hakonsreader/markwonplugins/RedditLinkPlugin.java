@@ -34,8 +34,8 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
     // TODO this should NOT match anything already in a markdown link (as people like to be funny with fake subreddit links)
     // Subreddits are alphanumericals, numbers, and underscores. Users are the same and dashes
     public static final Pattern RE = Pattern.compile(
-            // Match whitespace, start of string, or in a superscript (^(r/...)
-            "(^|\\s|(\\^\\())" +
+            // Match whitespace, start of string, in a parenthesis, or not in a [] (ie. already a markdown link)
+            "(^|\\s|\\(|(?=\\[))" +
             // Optional "/" at the start
             "/?" +
             "(" +
@@ -72,9 +72,9 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
         while (matcher.find()) {
             String textToSpan = matcher.group();
 
-            // The link is inside a superscript, remove the superscript from what we want to send
-            if (textToSpan.startsWith("^(")) {
-                textToSpan = textToSpan.substring(2);
+            // The link is inside parenthesis such as a superscript, remove the parenthesis
+            if (textToSpan.startsWith("(")) {
+                textToSpan = textToSpan.substring(1);
             }
 
             final String link = textToSpan;
