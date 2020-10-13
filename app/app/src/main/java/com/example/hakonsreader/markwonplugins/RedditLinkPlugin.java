@@ -33,7 +33,19 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
 
     // TODO this should NOT match anything already in a markdown link (as people like to be funny with fake subreddit links)
     // Subreddits are alphanumericals, numbers, and underscores. Users are the same and dashes
-    public static final Pattern RE = Pattern.compile("(\\s|^)/?(([rR]/[A-Za-z09_]+)|([uU]/[A-Za-z0-9_-]+))/?");
+    public static final Pattern RE = Pattern.compile(
+            // Match whitespace, start of string, or in a superscript (^(r/...)
+            "(^|\\s|(\\^\\())" +
+            // Optional "/" at the start
+            "/?" +
+            "(" +
+            // Subreddits: Match either r or R preceded by a / and characters, 0-9, _
+            "([rR]/[A-Za-z09_]+)" +
+            // Users: Match either u or U preceded by a / and characters, 0-9, _, -
+            "|([uU]/[A-Za-z0-9_-]+)" +
+            ")" +
+            // Optional / at the end
+            "/?");
 
 
     private Context context;
@@ -58,13 +70,19 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
         final Matcher matcher = RE.matcher(text);
 
         while (matcher.find()) {
-            final String textToSpan = matcher.group();
+            String textToSpan = matcher.group();
 
+            // The link is inside a superscript, remove the superscript from what we want to send
+            if (textToSpan.startsWith("^(")) {
+                textToSpan = textToSpan.substring(2);
+            }
+
+            final String link = textToSpan;
             final ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
                     Intent intent = new Intent(context, DispatcherActivity.class);
-                    intent.putExtra(DispatcherActivity.URL_KEY, textToSpan);
+                    intent.putExtra(DispatcherActivity.URL_KEY, link);
 
                     // The plugin is created from App, which is not an activity
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

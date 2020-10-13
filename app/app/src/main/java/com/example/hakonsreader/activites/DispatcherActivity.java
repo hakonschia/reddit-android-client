@@ -95,6 +95,7 @@ public class DispatcherActivity extends AppCompatActivity {
         if (url.matches(LinkUtils.SUBREDDIT_REGEX)) {
             // First is "r", second is the subreddit
             String subreddit = pathSegments.get(1);
+            Log.d(TAG, "createIntent: Subreddit being dispatched = " + subreddit);
 
             intent = new Intent(this, SubredditActivity.class);
             intent.putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit);

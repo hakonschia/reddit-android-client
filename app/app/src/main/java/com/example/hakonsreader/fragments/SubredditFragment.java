@@ -214,6 +214,7 @@ public class SubredditFragment extends Fragment {
     }
 
     private void updateSubredditName() {
+        Log.d(TAG, "updateSubredditName: " + subredditName);
         binding.subredditName.setText(subredditName.isEmpty() ? "Front page" : "r/" + subredditName);
     }
 
@@ -260,7 +261,7 @@ public class SubredditFragment extends Fragment {
 
             new Thread(() -> {
                 subreddit = database.subreddits().get(subredditName);
-                if (subreddit != null){
+                if (subreddit != null) {
                     // In case the capitalization is different make sure it is updated
                     subredditName = subreddit.getName();
                     requireActivity().runOnUiThread(this::updateSubredditName);
@@ -271,7 +272,6 @@ public class SubredditFragment extends Fragment {
                 new Thread(() -> {
                     // TODO this should probably just update as you might not want to store stuff like nsfw subs
                     database.subreddits().insert(sub);
-
                 }).start();
 
                 subredditName = sub.getName();

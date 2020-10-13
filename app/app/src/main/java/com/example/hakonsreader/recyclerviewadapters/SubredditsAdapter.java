@@ -77,7 +77,6 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
                     .load(iconURL)
                     .into(holder.icon);
         } else if(communityURL != null && !communityURL.isEmpty()) {
-            Log.d(TAG, "onBindViewHolder: " + subreddit.getName() + " has community URL " + communityURL);
             Picasso.get()
                     .load(communityURL)
                     .into(holder.icon);
