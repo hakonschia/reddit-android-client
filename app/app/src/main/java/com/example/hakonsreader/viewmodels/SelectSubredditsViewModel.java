@@ -59,7 +59,7 @@ public class SelectSubredditsViewModel extends ViewModel {
                     .collect(Collectors.toList());
 
             List<Subreddit> favorites = sorted.stream()
-                    .filter(Subreddit::userHasFavorited)
+                    .filter(Subreddit::isFavorited)
                     .collect(Collectors.toList());
 
             List<Subreddit> users = sorted.stream()

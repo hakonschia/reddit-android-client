@@ -7,7 +7,7 @@
     android:id="@+id/parentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/secondaryBackground"
+    android:background="@color/secondary_background"
     tools:context=".activites.PostActivity">
 
     <!-- Post info, content etc -->
@@ -16,7 +16,7 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/secondaryBackground">
+        android:background="@color/secondary_background">
 
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
@@ -75,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_baseline_reply_24"
-                android:backgroundTint="@color/secondaryBackground"
+                android:backgroundTint="@color/secondary_background"
                 android:onClick="replyToPost"/>
         </LinearLayout>
 
@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
 
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/secondaryBackground"
+                android:backgroundTint="@color/secondary_background"
 
                 android:onClick="goToPreviousTopLevelComment"
                 android:src="@drawable/ic_baseline_arrow_upward_24" />
@@ -111,7 +111,7 @@
 
                 android:layout_height="wrap_content"
 
-                android:backgroundTint="@color/secondaryBackground"
+                android:backgroundTint="@color/secondary_background"
 
                 android:onClick="goToNextTopLevelComment"
                 android:src="@drawable/ic_baseline_arrow_downward_24" />

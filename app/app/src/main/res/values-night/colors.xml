@@ -6,8 +6,10 @@
 
     <color name="toolbar">#191919</color>
 
-    <color name="secondaryBackground">#121212</color>
     <color name="background">#000000</color>
+    <color name="secondary_background">#121212</color>
+    <color name="opposite_background">#FFFFFF</color>
+    <color name="opposite_secondaryBackground">#EAEAEA</color>
 
     <color name="textColor">#FFFFFF</color>
     <color name="textColorTextPosts">#DFDFDF</color>

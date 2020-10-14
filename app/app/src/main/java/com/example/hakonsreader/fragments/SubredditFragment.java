@@ -6,11 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.enums.Thing;
+import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
+import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
@@ -31,7 +32,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Fragment containing a subreddit
@@ -63,14 +63,52 @@ public class SubredditFragment extends Fragment {
     private static final String LAYOUT_STATE_KEY = "layout_state";
 
 
-
     private FragmentSubredditBinding binding;
 
     private AppDatabase database;
     private Bundle saveState;
-    private String subredditName;
-    private Subreddit subreddit;
     private List<String> postIds;
+
+    /**
+     * Observable that automatically updates the UI when the internal object
+     * is updated with {@link ObservableField#set(Object)}
+     */
+    private ObservableField<Subreddit> subreddit = new ObservableField<Subreddit>() {
+        @Override
+        public void set(Subreddit value) {
+            super.set(value);
+            // Probably not how ObservableField is supposed to be used? Works though
+
+            updateIcon();
+            binding.setSubreddit(value);
+        }
+
+        /**
+         * Updates the UI based on {@link SubredditFragment#subreddit}
+         *
+         * <p>Runs on the UI thread</p>
+         */
+        private void updateIcon() {
+            final Subreddit sub = get();
+
+            final String iconURL = sub.getIconImage();
+            final String communityURL = sub.getCommunityIcon();
+
+            requireActivity().runOnUiThread(() -> {
+                if (iconURL != null && !iconURL.isEmpty()) {
+                    Picasso.get()
+                            .load(iconURL)
+                            .into(binding.subredditIcon);
+                } else if(communityURL != null && !communityURL.isEmpty()) {
+                    Picasso.get()
+                            .load(communityURL)
+                            .into(binding.subredditIcon);
+                } else {
+                    binding.subredditIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_emoji_emotions_24));
+                }
+            });
+        }
+    };
 
     /**
      * The amount of items in the list at the last attempt at loading more posts
@@ -97,7 +135,7 @@ public class SubredditFragment extends Fragment {
         // Only load posts if there hasn't been an attempt at loading more posts
         if (posLastItem + NUM_REMAINING_POSTS_BEFORE_LOAD > listSize && lastLoadAttemptCount < listSize) {
             lastLoadAttemptCount = adapter.getPosts().size();
-            postsViewModel.loadPosts(binding.parentLayout, subredditName);
+            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName());
         }
 
         this.checkSelectedPost(posFirstItem, posLastItem, oldY > 0);
@@ -217,47 +255,27 @@ public class SubredditFragment extends Fragment {
     }
 
     /**
-     * Updates the UI based on {@link SubredditFragment#subreddit}
+     * Click listener for the "+ Subscribe/- Unsubscribe" button.
+     *
+     * <p>Sends an API request to Reddit to subscribe/unsubscribe</p>
+     *
+     * @param ignored Ignored
      */
-    private void updateUi() {
-        if (subreddit != null && RedditApi.STANDARD_SUBS.indexOf(subreddit.getName()) == -1) {
-            String iconURL = subreddit.getIconImage();
-            String communityURL = subreddit.getCommunityIcon();
-            if (iconURL != null && !iconURL.isEmpty()) {
-                Picasso.get()
-                        .load(iconURL)
-                        .into(binding.subredditIcon);
-            } else if(communityURL != null && !communityURL.isEmpty()) {
-                Picasso.get()
-                        .load(communityURL)
-                        .into(binding.subredditIcon);
-            } else {
-                binding.subredditIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_emoji_emotions_24));
-            }
+    public void subscribeOnClick(View ignored) {
+        // It's better if the internal values are also observable and auto update, but
+        final Subreddit sub = subreddit.get();
+        final boolean subscribed = sub.isSubscribed();
 
-            subredditName = subreddit.getName();
-            binding.subredditName.setText(subredditName.isEmpty() ? getString(R.string.front_page) : subredditName);
+        App.get().getApi().subscribeToSubreddit(sub.getName(), !subscribed, voidValue -> {
+            sub.setSubscribed(!subscribed);
+            subreddit.set(sub);
+        }, (code, t) -> {
+            t.printStackTrace();
+            Util.handleGenericResponseErrors(getView(), code, t);
+        });
 
-            int subs = subreddit.getSubscribers();
-            binding.subredditSubscribers.setText(getResources().getQuantityString(R.plurals.amount_of_subscribers, subs, subs));
-            binding.subredditSubscribers.setVisibility(View.VISIBLE);
-
-            binding.subscribe.setOnClickListener(view -> this.subscribe());
-            binding.subscribe.setVisibility(View.VISIBLE);
-        } else {
-            // If subreddit is front page, popular or all remove some items like "subscribers" "subscribe" etc
-            // which aren't applicable to standard subs
-
-            binding.subredditName.setText(subredditName.isEmpty() ? getString(R.string.front_page) : subredditName);
-            binding.subredditSubscribers.setVisibility(View.GONE);
-            binding.subscribe.setVisibility(View.GONE);
-        }
+        Log.d(TAG, "subscribeOnClick: Subscribe clicked");
     }
-
-    private void subscribe() {
-
-    }
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -295,16 +313,16 @@ public class SubredditFragment extends Fragment {
 
         Bundle args = getArguments();
         if (args != null) {
-            subredditName = args.getString("subreddit", "");
+            String subredditName = args.getString("subreddit", "");
+            subreddit.set(new Subreddit(subredditName));
 
-            updateUi();
+            binding.setStandardSub(RedditApi.STANDARD_SUBS.indexOf(subredditName) != -1);
+            binding.subscribe.setOnClickListener(this::subscribeOnClick);
 
             new Thread(() -> {
-                subreddit = database.subreddits().get(subredditName);
-                if (subreddit != null) {
-                    // In case the capitalization is different make sure it is updated
-                    subredditName = subreddit.getName();
-                    requireActivity().runOnUiThread(this::updateUi);
+                Subreddit sub = database.subreddits().get(subredditName);
+                if (sub != null) {
+                    subreddit.set(sub);
                 }
             }).start();
 
@@ -314,11 +332,12 @@ public class SubredditFragment extends Fragment {
                     database.subreddits().insert(sub);
                 }).start();
 
-                subredditName = sub.getName();
-                updateUi();
-                // Update UI when there is more UI to update
+                subreddit.set(sub);
             }, (code, t) -> {
-                Util.handleGenericResponseErrors(getView(), code, t);
+                // No point in showing this error to the user
+                if (!(t instanceof NoSubredditInfoException)) {
+                    Util.handleGenericResponseErrors(getView(), code, t);
+                }
             });
         }
     }
@@ -405,7 +424,7 @@ public class SubredditFragment extends Fragment {
 
         // If the fragment is selected without any posts load posts automatically
         if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
-            postsViewModel.loadPosts(binding.parentLayout, subredditName);
+            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName());
         }
 
         this.restoreViewHolderStates();

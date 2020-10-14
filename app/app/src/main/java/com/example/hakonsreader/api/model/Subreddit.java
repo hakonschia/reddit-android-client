@@ -1,7 +1,6 @@
 package com.example.hakonsreader.api.model;
 
 import androidx.room.Entity;
-import androidx.room.Index;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -11,6 +10,15 @@ import com.google.gson.annotations.SerializedName;
  */
 @Entity(tableName = "subreddits")
 public class Subreddit extends RedditListing {
+
+    /**
+     * Create a basic object with only the name of the subreddit set
+     *
+     * @param name The subreddit name
+     */
+    public Subreddit(String name) {
+        this.name = name;
+    }
 
     @SerializedName("display_name")
     private String name;
@@ -40,7 +48,10 @@ public class Subreddit extends RedditListing {
     private boolean quarantine;
 
     @SerializedName("user_has_favorited")
-    private boolean userHasFavorited;
+    private boolean favorited;
+
+    @SerializedName("user_is_subscriber")
+    private boolean subscribed;
 
     @SerializedName("submit_text")
     private String submitText;
@@ -127,8 +138,15 @@ public class Subreddit extends RedditListing {
     /**
      * @return True if the currently logged in user has favorited the subreddit
      */
-    public boolean userHasFavorited() {
-        return userHasFavorited;
+    public boolean isFavorited() {
+        return favorited;
+    }
+
+    /**
+     * @return True if the currently logged in user is subscribed to the subreddit
+     */
+    public boolean isSubscribed() {
+        return subscribed;
     }
 
     /**
@@ -144,9 +162,6 @@ public class Subreddit extends RedditListing {
     public String getSubredditType() {
         return subredditType;
     }
-
-
-
 
 
     public void setName(String name) {
@@ -185,8 +200,12 @@ public class Subreddit extends RedditListing {
         this.quarantine = quarantine;
     }
 
-    public void setUserHasFavorited(boolean userHasFavorited) {
-        this.userHasFavorited = userHasFavorited;
+    public void setFavorited(boolean favorited) {
+        this.favorited = favorited;
+    }
+
+    public void setSubscribed(boolean subscribed) {
+        this.subscribed = subscribed;
     }
 
     public void setSubmitText(String submitText) {

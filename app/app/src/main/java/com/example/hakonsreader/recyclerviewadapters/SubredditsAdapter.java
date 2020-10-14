@@ -13,12 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
-import com.example.hakonsreader.misc.Util;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -47,7 +45,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
     /**
      * Called when a subreddit has been favorited/un-favorited
      *
-     * <p>The function uses {@link Subreddit#userHasFavorited()} to calculate where to now
+     * <p>The function uses {@link Subreddit#isFavorited()} to calculate where to now
      * place the item in the list</p>
      *
      * @param subreddit The subreddit favorited/un-favorited
@@ -68,7 +66,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
         holder.name.setText(subreddit.getName());
 
-        holder.updateFavorited(subreddit.userHasFavorited());
+        holder.updateFavorited(subreddit.isFavorited());
 
         String iconURL = subreddit.getIconImage();
         String communityURL = subreddit.getCommunityIcon();

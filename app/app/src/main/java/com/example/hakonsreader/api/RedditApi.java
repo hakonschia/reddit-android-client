@@ -4,6 +4,7 @@ import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
+import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
@@ -862,7 +863,7 @@ public class RedditApi {
      */
     public void getSubredditInfo(String subredditName, OnResponse<Subreddit> onResponse, OnFailure onFailure) {
         if (STANDARD_SUBS.indexOf(subredditName) != -1) {
-            onFailure.onFailure(-1, new Throwable("The subreddits: " + STANDARD_SUBS.toString() + " do not have any info to retrieve"));
+            onFailure.onFailure(-1, new NoSubredditInfoException("The subreddits: " + STANDARD_SUBS.toString() + " do not have any info to retrieve"));
             return;
         }
 

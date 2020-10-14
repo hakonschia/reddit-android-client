@@ -48,8 +48,8 @@ public class SelectSubredditFragment extends Fragment {
     }
 
     public void favoriteClicked(Subreddit subreddit) {
-        redditApi.favoriteSubreddit(subreddit.getName(), !subreddit.userHasFavorited(), ignored -> {
-            subreddit.setUserHasFavorited(!subreddit.userHasFavorited());
+        redditApi.favoriteSubreddit(subreddit.getName(), !subreddit.isFavorited(), ignored -> {
+            subreddit.setFavorited(!subreddit.isFavorited());
             subredditsAdapter.onFavorite(subreddit);
             new Thread(() -> database.subreddits().update(subreddit)).start();
 

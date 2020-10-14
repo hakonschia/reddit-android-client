@@ -2,7 +2,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -337,7 +336,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                     marginLayoutParams.rightMargin = indent;
 
                     view.setLayoutParams(marginLayoutParams);
-                    view.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.secondaryBackground));
+                    view.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.secondary_background));
 
                     holder.sideBars.addView(view);
                 }

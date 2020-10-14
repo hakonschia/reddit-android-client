@@ -2,17 +2,12 @@ package com.example.hakonsreader.misc;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.QuoteSpan;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.views.CustomQuoteSpan;
+import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -24,31 +19,62 @@ public class Util {
 
 
     /**
-     * Handles generic errors that are common for all API responses.
-     * <p>Handles too many requests, server, and no internet errors
-     *
-     * <p>Shows a snackbar with error information</p>
+     * Handles generic errors that are common for all API responses and shows a snackbar to the user
      *
      * @param parent The view to attach the snackbar to
      * @param code The code for the request
      * @param t Throwable from the request
-     * @return True if the error is handled
      */
-    public static boolean handleGenericResponseErrors(View parent, int code, Throwable t) {
-        boolean handled = false;
-
+    public static void handleGenericResponseErrors(View parent, int code, Throwable t) {
         if (t instanceof IOException) {
             Util.showNoInternetSnackbar(parent);
-            handled = true;
+        } else if (t instanceof InvalidAccessTokenException) {
+            Util.showNotLoggedInSnackbar(parent);
+        } else if (code == 403) {
+            Util.showForbiddenErrorSnackbar(parent);
         } else if (code == 429) {
             Util.showTooManyRequestsSnackbar(parent);
-            handled = true;
         } else if (code >= 500) {
             Util.showGenericServerErrorSnackbar(parent);
-            handled = true;
+        } else {
+            Util.showUnknownError(parent);
         }
+    }
 
-        return handled;
+    /**
+     * Creates and shows a snackbar for errors caused by no internet connection
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showNoInternetSnackbar(View parent) {
+        Snackbar.make(parent, parent.getResources().getString(R.string.noInternetConnection), Snackbar.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Creates and shows a snackbar for when an action was attempted that requires the user to be logged in
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showNotLoggedInSnackbar(View parent) {
+        Snackbar snackbar = Snackbar.make(parent, parent.getResources().getString(R.string.notLoggedInError), Snackbar.LENGTH_LONG);
+        Context context = parent.getContext();
+
+        snackbar.setAction(context.getString(R.string.log_in), v -> {
+            // TODO Redirect to a login activity/fragment
+        });
+        snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.accent));
+        snackbar.show();
+    }
+
+    /**
+     * Creates and shows a snackbar for errors caused by no internet connection
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showForbiddenErrorSnackbar(View parent) {
+        // 403 errors are generally when the access token is outdated and new functionality has been
+        // added that requires more OAuth scopes
+        Snackbar.make(parent, parent.getResources().getString(R.string.forbiddenError), Snackbar.LENGTH_SHORT).show();
     }
 
     /**
@@ -83,9 +109,11 @@ public class Util {
      *
      * @param parent The view to attach the snackbar to
      */
-    public static void showNoInternetSnackbar(View parent) {
-        Snackbar.make(parent, parent.getResources().getString(R.string.noInternetConnection), Snackbar.LENGTH_SHORT).show();
+    public static void showUnknownError(View parent) {
+        Snackbar.make(parent, parent.getResources().getString(R.string.unknownError), Snackbar.LENGTH_SHORT).show();
     }
+
+
 
     /**
      * Creates the text for text age text fields
