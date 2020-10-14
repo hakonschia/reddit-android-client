@@ -906,7 +906,7 @@ public class RedditApi {
             return;
         }
 
-        api.subscribeToSubreddit(subscribe ? "sub" : "unsub", subredditName).enqueue(new Callback<Void>() {
+        api.subscribeToSubreddit(subscribe ? "sub" : "unsub", subredditName, accessToken.generateHeaderString()).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

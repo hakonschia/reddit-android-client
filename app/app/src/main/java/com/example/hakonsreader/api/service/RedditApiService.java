@@ -190,6 +190,7 @@ public interface RedditApiService {
     /**
      *
      * @param action "sub" to subscribe "unsub" to unsubscribe
+     * @param subredditName The name of the subreddit to sub/unsub to
      * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Void call, does not return any data
      */
@@ -197,6 +198,7 @@ public interface RedditApiService {
     @FormUrlEncoded
     Call<Void> subscribeToSubreddit(
             @Field("action") String action,
+            @Field("sr_name") String subredditName,
 
             @Header("Authorization") String accessToken
     );
