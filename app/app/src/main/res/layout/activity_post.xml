@@ -90,12 +90,12 @@
             <ImageButton
                 android:id="@+id/goToPreviousTopLevelComment"
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
+
                 android:backgroundTint="@color/secondary_background"
 
                 android:onClick="goToPreviousTopLevelComment"
-                android:src="@drawable/ic_baseline_arrow_upward_24" />
+                android:src="@drawable/ic_baseline_arrow_up_24" />
 
             <View
                 android:layout_width="1dp"
@@ -114,7 +114,7 @@
                 android:backgroundTint="@color/secondary_background"
 
                 android:onClick="goToNextTopLevelComment"
-                android:src="@drawable/ic_baseline_arrow_downward_24" />
+                android:src="@drawable/ic_baseline_arrow_down_24" />
         </LinearLayout>
 
     </LinearLayout>

@@ -459,7 +459,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             Tag tag = ViewUtil.createFlair(comment.getAuthorRichtextFlairs(), comment.getAuthorFlairText(), comment.getAuthorFlairTextColor(), comment.getAuthorFlairBackgroundColor(), itemView.getContext());
             if (tag != null) {
                 authorFlair.addView(tag);
-
             }
 
             // Calculate the time since the comment was posted
