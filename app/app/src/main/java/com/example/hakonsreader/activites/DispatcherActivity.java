@@ -111,6 +111,8 @@ public class DispatcherActivity extends AppCompatActivity {
             intent = new Intent(this, PostActivity.class);
             intent.putExtra(PostActivity.POST_ID_KEY, postId);
 
+            // TODO when the post is in a "user" subreddit it doesnt work
+            //  eg: https://www.reddit.com/user/HyperBirchyBoy/comments/jbkw1f/moon_landing_with_benny_hill_and_sped_up/?utm_source=share&utm_medium=ios_app&utm_name=iossmf
         } else if (lastSegment.matches(".+(.png|.jpeg|.jpg)$")) {
             intent = new Intent(this, ImageActivity.class);
             intent.putExtra(ImageActivity.IMAGE_URL, url);
@@ -128,7 +130,7 @@ public class DispatcherActivity extends AppCompatActivity {
 
         } else {
             // Create an intent that would redirect to another app if installed
-            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            intent = new Intent(Intent.ACTION_VIEW, asUri);
 
             PackageManager packageManager = getPackageManager();
             List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);

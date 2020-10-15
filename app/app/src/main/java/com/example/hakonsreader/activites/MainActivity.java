@@ -81,8 +81,8 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         // For testing purposes hardcode going into a subreddit
         Intent intent = new Intent(this, DispatcherActivity.class);
         intent.putExtra("subreddit", "test");
-        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/test/comments/ja7f64/taste/");
-       // startActivity(intent);
+        intent.putExtra(DispatcherActivity.URL_KEY, "/r/test");
+        //startActivity(intent);
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);

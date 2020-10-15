@@ -69,10 +69,19 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
 
         while (matcher.find()) {
             String textToSpan = matcher.group();
+            int s = matcher.start();
+            int e = matcher.end();
 
             // The link is inside parenthesis such as a superscript, remove the parenthesis
             if (textToSpan.startsWith("(")) {
                 textToSpan = textToSpan.substring(1);
+            }
+
+            // If the text starts with a space make sure the space isn't linked, ie. "a r/subreddit"
+            // would cause " r/subreddit" to be linked, which both looks weird and causes issues in
+            // DispatcherActivity with /r/ prefixes
+            if (textToSpan.startsWith(" ")) {
+                s++;
             }
 
             final String link = textToSpan;
@@ -94,8 +103,7 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
                 }
             };
 
-            final int s = matcher.start();
-            final int e = matcher.end();
+
             spannable.setSpan(clickableSpan, s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             spannable.setSpan(new UnderlineSpan(), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
