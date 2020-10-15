@@ -3,18 +3,46 @@ package com.example.hakonsreader.misc;
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Space;
 
 import androidx.core.content.ContextCompat;
+import androidx.databinding.BindingAdapter;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.views.Tag;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class ViewUtil {
     private ViewUtil() { }
+
+
+    /**
+     * Sets an ImageView to a subreddits icon. If no icon is found a default drawable is usde
+     *
+     * @param imageView The view to insert the image into
+     * @param subreddit The subreddit to set the image for
+     */
+    @BindingAdapter("subredditIcon")
+    public static void setSubredditIcon(ImageView imageView, Subreddit subreddit) {
+        String iconURL = subreddit.getIconImage();
+        String communityURL = subreddit.getCommunityIcon();
+        if (iconURL != null && !iconURL.isEmpty()) {
+            Picasso.get()
+                    .load(iconURL)
+                    .into(imageView);
+        } else if(communityURL != null && !communityURL.isEmpty()) {
+            Picasso.get()
+                    .load(communityURL)
+                    .into(imageView);
+        } else {
+            imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_baseline_emoji_emotions_24));
+        }
+    }
 
 
     /**

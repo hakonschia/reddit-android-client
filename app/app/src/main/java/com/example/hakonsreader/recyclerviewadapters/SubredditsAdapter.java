@@ -17,6 +17,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
+import com.example.hakonsreader.misc.ViewUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -68,19 +69,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
         holder.updateFavorited(subreddit.isFavorited());
 
-        String iconURL = subreddit.getIconImage();
-        String communityURL = subreddit.getCommunityIcon();
-        if (iconURL != null && !iconURL.isEmpty()) {
-            Picasso.get()
-                    .load(iconURL)
-                    .into(holder.icon);
-        } else if(communityURL != null && !communityURL.isEmpty()) {
-            Picasso.get()
-                    .load(communityURL)
-                    .into(holder.icon);
-        } else {
-            holder.icon.setImageDrawable(ContextCompat.getDrawable(holder.context, R.drawable.ic_baseline_emoji_emotions_24));
-        }
+        ViewUtil.setSubredditIcon(holder.icon, subreddit);
     }
 
     @NonNull

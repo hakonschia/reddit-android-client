@@ -79,9 +79,12 @@
                             android:layout_width="65dp"
                             android:layout_height="65dp"
                             android:layout_marginTop="5dp"
-                            android:src="@drawable/ic_baseline_emoji_emotions_24"
+
+                            app:subredditIcon="@{subreddit}"
                             app:civ_border_width="2dp"
-                            app:civ_border_color="#FFFFFF" />
+                            app:civ_border_color="#FFFFFF"
+
+                            tools:src="@drawable/ic_baseline_emoji_emotions_24" />
 
                         <TextView
                             android:id="@+id/subredditName"
