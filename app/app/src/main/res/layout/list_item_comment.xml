@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background"
-    android:layout_marginEnd="10dp"
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
@@ -71,15 +70,18 @@
 
     <TextView
         android:id="@+id/commentContent"
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
+        android:textColor="@color/textColor"
         android:textColorLink="@color/linkColor"
 
-        app:layout_constraintStart_toEndOf="@+id/sideBars"
+        app:layout_constraintStart_toStartOf="@+id/commentAuthor"
         app:layout_constraintTop_toBottomOf="@+id/commentAuthor"
-
-        android:textColor="@color/textColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0"
 
         tools:text="@tools:sample/lorem"/>
 

@@ -34,8 +34,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 
 public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
-    private SubredditFragment globalOffensive;
-
+    private static final String TAG = "MainActivity";
 
     private static final String POSTS_FRAGMENT = "postsFragment";
     private static final String ACTIVE_SUBREDDIT_FRAGMENT = "activeSubredditFragment";
@@ -43,9 +42,6 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private static final String PROFILE_FRAGMENT = "profileFragment";
     private static final String ACTIVE_NAV_ITEM = "activeNavItem";
 
-
-
-    private static final String TAG = "MainActivity";
 
     private ActivityMainBinding binding;
 

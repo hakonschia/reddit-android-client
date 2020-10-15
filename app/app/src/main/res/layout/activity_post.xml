@@ -7,7 +7,7 @@
     android:id="@+id/parentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/secondary_background"
+    android:background="@color/background"
     tools:context=".activites.PostActivity">
 
     <!-- Post info, content etc -->
@@ -43,8 +43,8 @@
 
         android:background="@color/background"
 
-        android:paddingStart="7dp"
-        android:paddingEnd="7dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
 
         android:paddingBottom="75dp"
         android:clipToPadding="false"

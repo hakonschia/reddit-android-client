@@ -1,7 +1,6 @@
 package com.example.hakonsreader.viewmodels;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
@@ -10,14 +9,12 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.enums.Thing;
-import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PostsViewModel extends ViewModel {
     private static final String TAG = "PostsViewModel";
