@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:textColor="@color/linkColor"
+        android:textColor="@color/link_color"
 
         app:layout_constraintStart_toEndOf="@+id/sideBars"
         app:layout_constraintTop_toTopOf="@+id/sideBars"
@@ -35,7 +35,7 @@
         app:layout_constraintTop_toTopOf="parent"
 
         android:layout_marginStart="15dp"
-        android:textColor="@color/secondaryTextColor"
+        android:textColor="@color/secondary_text_color"
 
         tools:text="2h ago" />
 
@@ -74,8 +74,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:textColor="@color/textColor"
-        android:textColorLink="@color/linkColor"
+        android:textColor="@color/text_color"
+        android:textColorLink="@color/link_color"
 
         app:layout_constraintStart_toStartOf="@+id/commentAuthor"
         app:layout_constraintTop_toBottomOf="@+id/commentAuthor"

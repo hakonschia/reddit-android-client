@@ -54,7 +54,7 @@
 
                         android:text="@{subreddit.subscribed ? @string/subscribe_btn_unsubscribe : @string/subscribe_btn_subscribe}"
                         android:textSize="12sp"
-                        android:textColor="@color/textColor"
+                        android:textColor="@color/text_color"
                         android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
                         android:background="@drawable/border_opposite_bg"
 
@@ -90,7 +90,7 @@
 
                             android:text="@{subreddit.name.empty ? @string/front_page : subreddit.name}"
                             android:textSize="25sp"
-                            android:textColor="@color/textColor"
+                            android:textColor="@color/text_color"
 
                             tools:text="GlobalOffensive"/>
 
@@ -100,7 +100,7 @@
                             android:layout_height="wrap_content"
 
                             android:text="@{@plurals/amount_of_subscribers(subreddit.subscribers, subreddit.subscribers)}"
-                            android:textColor="@color/secondaryTextColor"
+                            android:textColor="@color/secondary_text_color"
                             android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
 
                             tools:text="643 000 subscribers" />

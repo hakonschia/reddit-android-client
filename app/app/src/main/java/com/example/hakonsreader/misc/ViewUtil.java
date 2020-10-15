@@ -2,7 +2,8 @@ package com.example.hakonsreader.misc;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.widget.TextView;
+import android.view.ViewGroup;
+import android.widget.Space;
 
 import androidx.core.content.ContextCompat;
 
@@ -39,7 +40,7 @@ public class ViewUtil {
      * @param context The context for the tag
      * @return A {@link Tag} with NSFW text and formatting
      */
-    public static Tag createNSFWTag(Context context) {
+    public static Tag createNsfwTag(Context context) {
         Resources resources = context.getResources();
 
         Tag tag = new Tag(context);
@@ -52,7 +53,7 @@ public class ViewUtil {
 
 
     /**
-     * Adds the link flair to the post
+     * Creates a flair for a post or comment
      */
     public static Tag createFlair(List<RichtextFlair> flairs, String flairText, String flairColor, String backgroundColor, Context context) {
         if (flairs == null || flairText == null) {
@@ -98,6 +99,21 @@ public class ViewUtil {
         }
 
         return tag;
+    }
+
+
+    /**
+     * Adds a tag to the layout, with extra space after it
+     *
+     * @param layout The layout to add the tag to
+     * @param tag The tag to add
+     */
+    public static void addTagWithSpace(ViewGroup layout, Tag tag) {
+        layout.addView(tag);
+
+        Space space = new Space(layout.getContext());
+        space.setMinimumWidth((int)layout.getResources().getDimension(R.dimen.tagSpace));
+        layout.addView(space);
     }
 
 }

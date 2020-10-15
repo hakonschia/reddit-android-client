@@ -273,9 +273,15 @@ public class SubredditFragment extends Fragment {
             t.printStackTrace();
             Util.handleGenericResponseErrors(getView(), code, t);
         });
-
-        Log.d(TAG, "subscribeOnClick: Subscribe clicked");
     }
+
+    /**
+     * @return The name of the subreddit the fragment is for
+     */
+    public String getSubredditName() {
+        return subreddit.get().getName();
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

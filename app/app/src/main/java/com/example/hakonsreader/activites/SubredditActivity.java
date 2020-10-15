@@ -87,4 +87,12 @@ public class SubredditActivity extends AppCompatActivity {
         // Slide the activity out
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
+
+
+    /**
+     * @return The name of the subreddit the activity is displaying
+     */
+    public String getSubredditName() {
+        return fragment.getSubredditName();
+    }
 }

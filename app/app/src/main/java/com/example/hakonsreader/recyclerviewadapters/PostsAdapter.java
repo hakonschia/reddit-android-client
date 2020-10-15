@@ -90,16 +90,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // Don't show text posts here (only show when a post is opened)
         holder.post.setShowContent(post.getPostType() != PostType.TEXT);
         holder.post.setPostData(post);
-
-        if (post.isMod()) {
-            holder.asMod();
-        }
-    }
-
-    @Override
-    public void onViewRecycled(@NonNull ViewHolder holder) {
-        super.onViewRecycled(holder);
-        holder.reset();
     }
 
 
@@ -113,20 +103,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             super(itemView);
 
             post = itemView.findViewById(R.id.post);
-        }
-
-        /**
-         * Formats the post as a mod post
-         */
-        private void asMod() {
-            post.asMod();
-        }
-
-        /**
-         * Resets formatting to default
-         */
-        public void reset() {
-            post.reset();
         }
 
         /**

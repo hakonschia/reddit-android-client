@@ -350,20 +350,6 @@ public class Post extends RelativeLayout {
     }
 
     /**
-     * Formats the post as a mod post
-     */
-    public void asMod() {
-        binding.postInfo.asMod();
-    }
-
-    /**
-     * Resets formatting
-     */
-    public void reset() {
-        binding.postInfo.reset();
-    }
-
-    /**
      * Pauses the video content
      */
     public void pauseVideo() {

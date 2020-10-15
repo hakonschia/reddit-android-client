@@ -26,7 +26,7 @@
 
         android:layout_gravity="center"
 
-        android:textColor="@color/textColor"
+        android:textColor="@color/text_color"
 
         app:layout_constraintBottom_toBottomOf="@+id/postCommentsImg"
         app:layout_constraintStart_toEndOf="@+id/postCommentsImg"

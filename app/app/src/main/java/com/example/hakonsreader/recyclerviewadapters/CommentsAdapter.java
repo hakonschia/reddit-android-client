@@ -403,7 +403,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         private void reset() {
             // Reset author text (from when comment is by poster/mod)
             author.setBackground(null);
-            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.linkColor));
+            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.link_color));
 
             authorFlair.removeAllViews();
 
@@ -427,7 +427,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
          */
         private void asMod() {
             author.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.comment_by_mod));
-            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.textColor));
+            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.text_color));
         }
 
         /**
@@ -435,7 +435,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
          */
         private void asPoster() {
             author.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.comment_by_poster));
-            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.textColor));
+            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.text_color));
         }
 
         /**
@@ -454,7 +454,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                 App.get().getMark().setMarkdown(content, body);
             }
 
-            author.setText(String.format(context.getString(R.string.authorPrefixed), comment.getAuthor()));
+            author.setText(String.format(context.getString(R.string.author_prefixed), comment.getAuthor()));
 
             Tag tag = ViewUtil.createFlair(comment.getAuthorRichtextFlairs(), comment.getAuthorFlairText(), comment.getAuthorFlairTextColor(), comment.getAuthorFlairBackgroundColor(), itemView.getContext());
             if (tag != null) {

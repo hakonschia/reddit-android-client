@@ -26,7 +26,7 @@
         android:layout_marginStart="10dp"
 
         android:maxLines="3"
-        android:textColor="@color/linkColor"
+        android:textColor="@color/link_color"
         android:layout_gravity="center"
 
         tools:text="https://nrk.no" />

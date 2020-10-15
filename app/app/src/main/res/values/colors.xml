@@ -13,10 +13,10 @@
     <color name="opposite_background">#000000</color>
     <color name="opposite_secondaryBackground">#121212</color>
 
-    <color name="textColor">#000000</color>
+    <color name="text_color">#000000</color>
     <color name="textColorTextPosts">#202020</color>
-    <color name="secondaryTextColor">#5A5A5A</color>
-    <color name="linkColor">#03A9F4</color>
+    <color name="secondary_text_color">#5A5A5A</color>
+    <color name="link_color">#03A9F4</color>
     <color name="modTextColor">#00C130</color>
 
     <!-- Upvote/downvote button colors-->

@@ -87,7 +87,7 @@ public class VoteBar extends ConstraintLayout {
 
         Context context = getContext();
 
-        int color = R.color.textColor;
+        int color = R.color.text_color;
 
         // Reset both buttons as at least one will change
         // (to avoid keeping the color if going from upvote to downvote and vice versa)

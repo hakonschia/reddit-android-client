@@ -20,9 +20,9 @@
     <string name="scoreHidden">•</string>
     <string name="scoreThousands">%.1fK</string>
 
-    <string name="subredditPrefixed">r/%s</string>
-    <string name="authorPrefixed">u/%s</string>
-    <string name="commentByPoster">u/%s (OP)</string>
+    <string name="subreddit_prefixed">r/%s</string>
+    <string name="author_prefixed">u/%s</string>
+    <string name="comment_by_poster">u/%s (OP)</string>
 
     <string name="profileAge">User since %s</string>
     <string name="commentKarma">%d comment karma</string>

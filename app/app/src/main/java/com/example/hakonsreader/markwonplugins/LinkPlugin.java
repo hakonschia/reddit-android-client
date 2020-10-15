@@ -7,7 +7,6 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -63,7 +62,7 @@ public class LinkPlugin extends AbstractMarkwonPlugin {
 
                 @Override
                 public void updateDrawState(@NonNull TextPaint ds) {
-                    ds.linkColor = ContextCompat.getColor(context, R.color.linkColor);
+                    ds.linkColor = ContextCompat.getColor(context, R.color.link_color);
                     ds.setColor(ds.linkColor);
                 }
             };

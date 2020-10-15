@@ -31,7 +31,7 @@ public class ThemePlugin extends AbstractMarkwonPlugin {
                 .blockMargin((int)context.getResources().getDimension(R.dimen.quoteMargin))
                 .blockQuoteWidth((int)context.getResources().getDimension(R.dimen.quoteWidth))
                 .thematicBreakHeight((int)context.getResources().getDimension(R.dimen.thematicBreakHeight))
-                .linkColor(ContextCompat.getColor(context, R.color.linkColor))
+                .linkColor(ContextCompat.getColor(context, R.color.link_color))
                 .build();
     }
 }

@@ -24,8 +24,8 @@
         android:backgroundTint="@color/accent"
         android:hint="@string/searchForSubreddit"
         android:inputType="text"
-        android:textColor="@color/textColor"
-        android:textColorHint="@color/secondaryTextColor"
+        android:textColor="@color/text_color"
+        android:textColorHint="@color/secondary_text_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/searchIcon"
         app:layout_constraintTop_toTopOf="parent" />

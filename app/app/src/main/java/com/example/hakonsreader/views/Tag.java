@@ -4,13 +4,11 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Space;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -19,9 +17,6 @@ import androidx.core.content.ContextCompat;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.databinding.TagBinding;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Tag extends LinearLayout {
     private static final String TAG = "Tag";
@@ -44,7 +39,7 @@ public class Tag extends LinearLayout {
 
         try {
             text = a.getString(R.styleable.Tag_text);
-            textColor = a.getColor(R.styleable.Tag_textColor, ContextCompat.getColor(context, R.color.textColor));
+            textColor = a.getColor(R.styleable.Tag_textColor, ContextCompat.getColor(context, R.color.text_color));
             fillColor = a.getColor(R.styleable.Tag_textColor, ContextCompat.getColor(context, R.color.background));
         } finally {
             a.recycle();

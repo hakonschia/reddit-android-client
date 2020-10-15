@@ -11,10 +11,10 @@
     <color name="opposite_background">#FFFFFF</color>
     <color name="opposite_secondaryBackground">#EAEAEA</color>
 
-    <color name="textColor">#FFFFFF</color>
+    <color name="text_color">#FFFFFF</color>
     <color name="textColorTextPosts">#DFDFDF</color>
-    <color name="secondaryTextColor">#BDBDBD</color>
-    <color name="linkColor">#03A9F4</color>
+    <color name="secondary_text_color">#BDBDBD</color>
+    <color name="link_color">#03A9F4</color>
     <color name="modTextColor">#00C130</color>
 
     <!-- Upvote/downvote button colors-->

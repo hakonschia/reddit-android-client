@@ -13,7 +13,6 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
-import com.example.hakonsreader.misc.Util;
 
 
 public class ContentText extends ScrollView {
@@ -54,7 +53,7 @@ public class ContentText extends ScrollView {
         if (markdown != null) {
             // Note the movement method must be set before applying the markdown
             textView.setMovementMethod(InternalLinkMovementMethod.getInstance(getContext()));
-            textView.setLinkTextColor(ContextCompat.getColor(getContext(), R.color.linkColor));
+            textView.setLinkTextColor(ContextCompat.getColor(getContext(), R.color.link_color));
 
             // TODO this crashes the app with some tables, such as https://www.reddit.com/r/test/comments/j7px9a/sadasd/
             //  not sure what happens here as the same text can be rendered fine in a stand-alone app
