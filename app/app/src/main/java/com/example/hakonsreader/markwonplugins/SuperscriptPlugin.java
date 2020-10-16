@@ -4,6 +4,7 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,8 +27,8 @@ public class SuperscriptPlugin extends AbstractMarkwonPlugin {
     // ie. ^(hello) ^(there)
     public static final String RE_SENTENCES = "\\^\\([^)]+\\)";
 
-    // For words: match ^ and then any character not a whitespace as that is the end of the word
-    public static final String RE_WORDS = "\\^[^(][^\\s]+";
+    // For words: match ^ and then any character not a whitespace at least once
+    public static final String RE_WORDS = "\\^[^\\s]+";
 
     // Combine both patterns with an OR operator
     public static final Pattern RE = Pattern.compile(String.format("(%s)|(%s)", RE_SENTENCES, RE_WORDS));
