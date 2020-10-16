@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
 
-            android:text="@{@string/subreddit_prefixed(post.subreddit)}"
+            android:text='@{post.subreddit != null ? @string/subreddit_prefixed(post.subreddit) : ""}'
             android:textSize="14sp"
             android:textColor="@color/link_color"
 
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
 
-            android:text="@{post.domain}"
+            android:text='@{post.domain ?? ""}'
             android:textSize="13sp"
             android:textColor="@color/secondary_text_color"
 
@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
 
-            app:createAd="@{post.createdAt}"
+            app:createdAt="@{post != null ? post.createdAt : -1}"
             android:textSize="13sp"
             android:textColor="@color/secondary_text_color"
 
@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:text="@{@string/author_prefixed(post.author)}"
+            android:text='@{post != null ? @string/author_prefixed(post.author) : "" }'
             android:textSize="13sp"
             android:textColor="@{post.mod ? @color/text_color : @color/secondary_text_color}"
             android:background="@{post.mod ? @drawable/comment_by_mod : null}"
