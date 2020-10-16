@@ -3,6 +3,8 @@ package com.example.hakonsreader.activites;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
@@ -11,6 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.utils.LinkUtils;
+import com.github.chrisbanes.photoview.PhotoView;
+import com.github.chrisbanes.photoview.PhotoViewAttacher;
 import com.jsibbold.zoomage.ZoomageView;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -49,11 +54,41 @@ public class ImageActivity extends AppCompatActivity {
             }
 
             String imageUrl = data.getString(IMAGE_URL);
-            ZoomageView image = findViewById(R.id.image);
 
-            if (imageUrl.matches("^https://imgur.com/[A-Za-z0-9]{5,7}$")) {
-                imageUrl += ".png";
-            }
+            PhotoView image = findViewById(R.id.image);
+            PhotoViewAttacher attacher = image.getAttacher();
+            attacher.setMaximumScale(7f);
+
+            image.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
+                @Override
+                public boolean onDoubleTap(MotionEvent motionEvent) {
+
+                    // If we are zoomed in at all on double taps then go back to original size
+                    // otherwise zoom in. Default for PhotoView has two zoom states, this removes the
+                    // intermediate step (because I don't like that)
+                    // Comparing floats like this is probably bad? Doesn't seem to matter though
+                    if (attacher.getScale() > 1f) {
+                        attacher.setScale(1f, true);
+                    } else {
+                        attacher.setScale(3f, motionEvent.getX(), motionEvent.getY(), true);
+                    }
+
+                    return true;
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
+                    // Not implemented
+                    return false;
+                }
+                @Override
+                public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+                    // Not implemented
+                    return false;
+                }
+            });
+
+            imageUrl = LinkUtils.convertToDirectUrl(imageUrl);
 
             Picasso.get().load(imageUrl).into(image);
         } else {

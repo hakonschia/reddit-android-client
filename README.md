@@ -27,7 +27,7 @@ To retrieve the latest version clone the repository and install manually via And
 * [Retrofit](https://github.com/square/retrofit) - Used to create the wrapper for the Reddit API
 * [Picasso](https://github.com/square/picasso) - Used to download, cache, and process images
 * [Slidr](https://github.com/r0adkll/Slidr) - To (very) easily create swipeable activities
-* [zoomage](https://github.com/jsibbold/zoomage) - For zoomable ImageViews
+* [PhotoView](https://github.com/chrisbanes/PhotoView) - For zoomable ImageViews
 * [CircleImageView](https://github.com/hdodenhof/CircleImageView) - To create circular ImageViews
 * [Markwon](https://github.com/noties/Markwon) - For rendering of markdown text in TextViews
 * [ExoPlayer](https://github.com/google/ExoPlayer) - Used for playing videos

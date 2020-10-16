@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         Intent intent = new Intent(this, DispatcherActivity.class);
         intent.putExtra("subreddit", "test");
         intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/pcmasterrace/comments/jc9xj2/today_my_mouse_clicked_its_last_click_it_was_my/");
-        startActivity(intent);
+        //startActivity(intent);
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);
