@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 
 import androidx.annotation.Nullable;
 
@@ -11,11 +14,13 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.misc.PhotoViewDoubleTapListener;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 
-public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
+public class ContentImage extends PhotoView {
     private static final String TAG = "ContentImage";
 
 
@@ -57,13 +62,36 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
 
         c.into(this);
 
-        // Open image when clicked
-        this.setOnClickListener(view -> {
+        // TODO create a preference for "Enable zooming of images while scrolling"
+        setOnDoubleTapListener(doubleTapListener);
+    }
+
+    /**
+     * Listener for double taps. For single taps the image is opened in a fullscreen activity, and double
+     * tap zooms (with the use of {@link PhotoViewDoubleTapListener}
+     */
+    private final GestureDetector.OnDoubleTapListener doubleTapListener = new GestureDetector.OnDoubleTapListener() {
+        private final PhotoViewDoubleTapListener photoViewDoubleTapListener = new PhotoViewDoubleTapListener(getAttacher());
+
+        // Open image in fullscreen on single tap
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
             Intent intent = new Intent(getContext(), ImageActivity.class);
             intent.putExtra("imageUrl", post.getUrl());
             getContext().startActivity(intent);
             ((Activity)getContext()).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        });
-    }
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent motionEvent) {
+            return photoViewDoubleTapListener.onDoubleTap(motionEvent);
+        }
+
+        @Override
+        public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+            return false;
+        }
+    };
 }
 
