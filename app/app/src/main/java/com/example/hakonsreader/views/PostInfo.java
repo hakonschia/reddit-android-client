@@ -98,6 +98,9 @@ public class PostInfo extends ConstraintLayout {
      * @param post The post to create the flair for
      */
     public static void addLinkFlair(ViewGroup view, RedditPost post) {
+        if (post == null) {
+            return;
+        }
         Tag tag = ViewUtil.createFlair(
                 post.getLinkRichtextFlairs(),
                 post.getLinkFlairText(),
@@ -120,6 +123,9 @@ public class PostInfo extends ConstraintLayout {
      */
     @BindingAdapter("authorFlair")
     public static void addAuthorFlair(FrameLayout view, RedditPost post) {
+        if (post == null) {
+            return;
+        }
         Tag tag = ViewUtil.createFlair(
                 post.getAuthorRichtextFlairs(),
                 post.getAuthorFlairText(),

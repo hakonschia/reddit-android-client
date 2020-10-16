@@ -81,6 +81,7 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
             // would cause " r/subreddit" to be linked, which both looks weird and causes issues in
             // DispatcherActivity with /r/ prefixes
             if (textToSpan.startsWith(" ")) {
+                textToSpan = textToSpan.substring(1);
                 s++;
             }
 
