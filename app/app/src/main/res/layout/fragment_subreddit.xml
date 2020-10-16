@@ -110,7 +110,7 @@
 
                         <Space
                             android:layout_width="match_parent"
-                            android:layout_height="25dp"/>
+                            android:layout_height="5dp"/>
                     </LinearLayout>
 
                     <LinearLayout
