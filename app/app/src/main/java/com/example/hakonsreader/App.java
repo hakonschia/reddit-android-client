@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -16,13 +15,12 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.markwonplugins.LinkPlugin;
-import com.example.hakonsreader.markwonplugins.SuperScriptPlugin;
+import com.example.hakonsreader.markwonplugins.SuperscriptPlugin;
 import com.example.hakonsreader.markwonplugins.ThemePlugin;
 import com.example.hakonsreader.misc.OAuthStateGenerator;
 import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
@@ -30,16 +28,12 @@ import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 
-import java.util.List;
 import java.util.UUID;
 
 import io.noties.markwon.Markwon;
-import io.noties.markwon.SoftBreakAddsNewLinePlugin;
 import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TablePlugin;
-import io.noties.markwon.linkify.LinkifyPlugin;
-import okhttp3.logging.HttpLoggingInterceptor;
 
 
 /**
@@ -241,7 +235,7 @@ public class App extends Application {
                 // Custom plugins
                 .usePlugin(new RedditSpoilerPlugin())
                 .usePlugin(new RedditLinkPlugin(this))
-                .usePlugin(new SuperScriptPlugin())
+                .usePlugin(new SuperscriptPlugin())
                 .usePlugin(new LinkPlugin(this))
                 .usePlugin(new ThemePlugin(this))
                 .build();

@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api;
 
 import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
-import com.example.hakonsreader.markwonplugins.SuperScriptPlugin;
+import com.example.hakonsreader.markwonplugins.SuperscriptPlugin;
 
 import org.junit.Test;
 
@@ -55,7 +55,7 @@ public class MarkwonPluginTest {
 
     @Test
     public void superScriptPlugin() {
-        Pattern pattern = SuperScriptPlugin.RE;
+        Pattern pattern = SuperscriptPlugin.RE_SENTENCES;
 
         String text = "hello ^(how ^(are) you) :)";
         Matcher m = pattern.matcher(text);
