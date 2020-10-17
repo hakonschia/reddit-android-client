@@ -39,9 +39,17 @@ public class Post extends RelativeLayout {
     private static final int NO_MAX_HEIGHT = -1;
 
 
-    private PostBinding binding;
+    private final PostBinding binding;
     private RedditPost postData;
     private boolean showContent = true;
+    /**
+     * If set to true the post can be opened in a new activity
+     */
+    private boolean allowPostOpen = true;
+    /**
+     * If set to true the post has been opened in a new activity
+     */
+    private boolean postOpened = false;
     private int maxContentHeight = NO_MAX_HEIGHT;
 
 
@@ -93,6 +101,16 @@ public class Post extends RelativeLayout {
      */
     public void setShowContent(boolean showContent) {
         this.showContent = showContent;
+    }
+
+    /**
+     * Sets if the post should be allowed to be opened
+     *
+     * @param allowPostOpen True if clicking on the post should open it in a new {@link PostActivity}
+     *                      Default is true
+     */
+    public void setAllowPostOpen(boolean allowPostOpen) {
+        this.allowPostOpen = allowPostOpen;
     }
 
     /**
@@ -247,18 +265,36 @@ public class Post extends RelativeLayout {
      * Opens {@link Post#postData} in a new activity
      */
     private void openPost() {
-        Intent intent = new Intent(getContext(), PostActivity.class);
-        intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(postData));
+        // If the post has already been opened don't open it again
+        // This is to avoid if a user clicks on the post twice fast before it opens it will open twice
+        // which a) looks weird as two posts will be open twice, and b) when going back to the posts the post
+        // view will be missing
+        if (allowPostOpen && !postOpened) {
+            Intent intent = new Intent(getContext(), PostActivity.class);
+            intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(postData));
 
-        Bundle extras = getExtras();
-        intent.putExtra("extras", extras);
+            Bundle extras = getExtras();
+            intent.putExtra("extras", extras);
 
-        pauseVideo();
+            this.pauseVideo();
 
-        Activity activity = (Activity)getContext();
+            Activity activity = (Activity)getContext();
 
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, getTransitionViews());
-        activity.startActivity(intent, options.toBundle());
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, getTransitionViews());
+            activity.startActivity(intent, options.toBundle());
+
+            // Set it back to un-opened after a short amount of time so the user can open the post again after exiting
+            // The sleep time just has to be long enough to avoid double clicks, the sleep time is fairly arbitrary
+            postOpened = true;
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                postOpened = false;
+            }).start();
+        }
     }
 
     /**

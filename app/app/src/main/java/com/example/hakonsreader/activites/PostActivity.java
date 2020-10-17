@@ -88,6 +88,8 @@ public class PostActivity extends AppCompatActivity {
         });
 
         binding.post.setMaxContentHeight((int)getResources().getDimension(R.dimen.postContentMaxHeight));
+        // Don't allow to open the post again when we are now in the post
+        binding.post.setAllowPostOpen(false);
 
         this.loadComments();
 
