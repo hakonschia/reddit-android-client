@@ -4,11 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -26,12 +27,6 @@ public class ContentImage extends PhotoView {
 
     private RedditPost post;
 
-    public ContentImage(Context context, RedditPost post) {
-        super(context);
-
-        this.post = post;
-        this.updateView();
-    }
     public ContentImage(Context context) {
         super(context);
     }
@@ -42,17 +37,43 @@ public class ContentImage extends PhotoView {
         super(context, attrs, defStyleAttr);
     }
 
+    /**
+     * Sets the post the content is for and updates the view
+     *
+     * <p>If the image is NSFW it is not shown (but a drawable to indicate the post is NSFW is)</p>
+     *
+     * @param post The post to set
+     */
+    public void setPost(RedditPost post) {
+        this.post = post;
+
+        this.updateView();
+    }
 
     /**
      * Updates the view with the url from {@link ContentImage#post}
      */
     private void updateView() {
-         RequestCreator c = Picasso.get()
-                 .load(post.getUrl())
-                 .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
-                 .error(R.drawable.ic_baseline_wifi_tethering_150)
-                 // Scale so the image fits the width of the screen
-                 .resize(App.get().getScreenWidth(), 0);
+        // TODO create a preference for "Enable zooming of images while scrolling"
+        this.setOnDoubleTapListener(doubleTapListener);
+
+        // Dont show NSFW images until we are in fullscreen
+        if (post.isNsfw()) {
+            this.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_24));
+
+            // Set a border around to show what is clickable to open the window. Ideally the image would
+            // match the screen width, might have to adjust the drawable width somehow to do that
+            this.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border));
+
+            return;
+        }
+
+        RequestCreator c = Picasso.get()
+                .load(post.getUrl())
+                .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
+                .error(R.drawable.ic_baseline_wifi_tethering_150)
+                // Scale so the image fits the width of the screen
+                .resize(App.get().getScreenWidth(), 0);
 
         // Post is NSFW and user has chosen not to cache NSFW
         if (post.isNsfw() && App.get().dontCacheNSFW()) {
@@ -61,9 +82,6 @@ public class ContentImage extends PhotoView {
         }
 
         c.into(this);
-
-        // TODO create a preference for "Enable zooming of images while scrolling"
-        setOnDoubleTapListener(doubleTapListener);
     }
 
     /**

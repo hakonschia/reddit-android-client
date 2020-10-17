@@ -191,7 +191,9 @@ public class Post extends RelativeLayout {
 
         switch (post.getPostType()) {
             case IMAGE:
-                content = new ContentImage(context, post);
+                ContentImage image = new ContentImage(context);
+                image.setPost(postData);
+                content = image;
                 break;
 
             case VIDEO:
@@ -200,7 +202,9 @@ public class Post extends RelativeLayout {
             // TODO For rich video, create a function to check if it's on a domain that allows for direct videos
             //  otherwise just provide it as link content
             case RICH_VIDEO:
-                content = new ContentVideo(context, post);
+                ContentVideo video = new ContentVideo(context);
+                video.setPost(post);
+                content = video;
                 break;
 
             case CROSSPOST:

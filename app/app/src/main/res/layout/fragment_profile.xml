@@ -12,10 +12,9 @@
         android:id="@+id/topLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/layout_rounded_corner_profile"
-        android:elevation="-20dp"
+        android:background="@drawable/rounded_square_main_bg_gradient"
         android:layout_marginTop="100dp"
-        android:layout_marginBottom="-15dp" />
+        android:layout_marginBottom="-25dp" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profilePicture"

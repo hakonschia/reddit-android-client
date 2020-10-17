@@ -111,12 +111,6 @@ public class ContentVideo extends PlayerView {
     private boolean isPrepared = false;
 
 
-    public ContentVideo(Context context, RedditPost post) {
-        super(context);
-
-        this.post = post;
-        this.updateView();
-    }
     public ContentVideo(Context context) {
         super(context);
     }
@@ -127,6 +121,18 @@ public class ContentVideo extends PlayerView {
         super(context, attrs, defStyleAttr);
     }
 
+    /**
+     * Sets the post and updates the view
+     *
+     * <p>If the post is NSFW no thumbnail is shown</p>
+     *
+     * @param post The post to set
+     */
+    public void setPost(RedditPost post) {
+        this.post = post;
+
+        this.updateView();
+    }
 
     /**
      * Creates the exo player and updates the view
@@ -287,11 +293,20 @@ public class ContentVideo extends PlayerView {
         ViewGroup.LayoutParams params = getLayoutParams();
 
         thumbnail = findViewById(R.id.thumbnail);
-        // Show the thumbnail over the video before it is being played
-        Picasso.get()
-                .load(post.getThumbnail())
-                .resize(params.width, params.height)
-                .into(thumbnail);
+
+        // Don't show thumbnail for NSFW posts
+        // TODO maybe show thumbnail is autoplayed is enabled? It will load anyways so
+        //  maybe setting to autoload NSFW
+        if (post.isNsfw()) {
+            thumbnail.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_24));
+        } else {
+            // Show the thumbnail over the video before it is being played
+            Picasso.get()
+                    .load(post.getThumbnail())
+                    .resize(params.width, params.height)
+                    .into(thumbnail);
+        }
+
         // When the thumbnail is shown, clicking it (ie. clicking on the video but not on the controls)
         // "removes" the view so the view turns black
         thumbnail.setOnClickListener(null);

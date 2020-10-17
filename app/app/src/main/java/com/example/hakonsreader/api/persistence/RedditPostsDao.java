@@ -1,7 +1,6 @@
 package com.example.hakonsreader.api.persistence;
 
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -83,7 +82,7 @@ public interface RedditPostsDao {
      *
      * <p>Note: If a post has crossposts the crossposts will NOT be returned here. The database
      * stores the list of IDs of the crossposts. To retrieve the crossposts use {@link RedditPost#getCrosspostIds()}
-     * and then use {@link RedditPostsDao#getPostsById(List) to retrieve the posts}</p>
+     * and then use {@link RedditPostsDao#getPostsById(List)} to retrieve the posts</p>
      *
      * @return A list of all the posts in the database
      */
@@ -95,7 +94,7 @@ public interface RedditPostsDao {
      *
      * <p>Note: If a post has crossposts the crossposts will NOT be returned here. The database
      * stores the list of IDs of the crossposts. To retrieve the crossposts use {@link RedditPost#getCrosspostIds()}
-     * and then use {@link RedditPostsDao#getPostsById(List) to retrieve the posts}</p>
+     * and then use this function to retrieve the posts</p>
      *
      * @param ids The IDs of the posts to retrieve
      * @return A list of posts matching the IDs
