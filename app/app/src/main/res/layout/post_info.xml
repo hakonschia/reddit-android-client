@@ -45,7 +45,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
 
-            android:text='@{post.domain ?? ""}'
+            android:visibility='@{post != null &amp;&amp; !post.text ? View.VISIBLE : View.GONE}'
+            android:text='@{post != null &amp;&amp; !post.text ? post.domain : ""}'
             android:textSize="13sp"
             android:textColor="@color/secondary_text_color"
 
