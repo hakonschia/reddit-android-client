@@ -45,7 +45,6 @@ public class ContentText extends ScrollView {
 
     private void updateView() {
         textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));
-        textView.setAutoLinkMask(Linkify.WEB_URLS);
 
         String markdown = post.getSelftext();
 
