@@ -457,11 +457,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
         // The parent is the first comment upwards in the list that has a lower depth
         RedditComment parent = null;
-        for (int i = pos - 1; i >= 0; i--) {
-            RedditComment c = comments.get(i);
-            if (c.getDepth() < depth) {
-                parent = c;
-                break;
+
+        // On posts with a lot of comments the last comment is often a "771 more comments" which is a
+        // top level comment, which means it won't have a parent so it's no point in trying to find it
+        if (depth != 0) {
+            for (int i = pos - 1; i >= 0; i--) {
+                RedditComment c = comments.get(i);
+                if (c.getDepth() < depth) {
+                    parent = c;
+                    break;
+                }
             }
         }
 
@@ -474,7 +479,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             // Remove the previous comment (this is the "2 more comments" comment)
             this.removeComment(comment);
-            finalParent.removeReply(comment);
+
+
+            if (finalParent != null) {
+                finalParent.removeReply(comment);
+            }
         }, (code, t) -> {
             t.printStackTrace();
             Util.handleGenericResponseErrors(parentLayout, code, t);
