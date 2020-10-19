@@ -24,4 +24,5 @@
     <dimen name="thematicBreakHeight">2dp</dimen>
 
     <dimen name="topLevelCommentTopPadding">7dp</dimen>
+    <dimen name="hiddenCommentBottomPadding">12dp</dimen>
 </resources>
