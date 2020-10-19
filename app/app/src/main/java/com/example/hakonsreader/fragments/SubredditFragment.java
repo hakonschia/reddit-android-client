@@ -322,7 +322,7 @@ public class SubredditFragment extends Fragment {
             String subredditName = args.getString("subreddit", "");
             subreddit.set(new Subreddit(subredditName));
 
-            binding.setStandardSub(RedditApi.STANDARD_SUBS.indexOf(subredditName) != -1);
+            binding.setStandardSub(RedditApi.STANDARD_SUBS.contains(subredditName));
             binding.subscribe.setOnClickListener(this::subscribeOnClick);
 
             new Thread(() -> {
@@ -340,6 +340,9 @@ public class SubredditFragment extends Fragment {
 
                 subreddit.set(sub);
             }, (code, t) -> {
+                t.printStackTrace();
+
+                // TODO if SubredditNotFoundException do something with UI like "Subreddit doesn't exist, click here to create it" or something
                 // No point in showing this error to the user
                 if (!(t instanceof NoSubredditInfoException)) {
                     Util.handleGenericResponseErrors(getView(), code, t);

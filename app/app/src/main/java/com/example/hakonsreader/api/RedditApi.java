@@ -5,6 +5,7 @@ import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
+import com.example.hakonsreader.api.exceptions.SubredditNotFoundException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
@@ -862,7 +863,7 @@ public class RedditApi {
      *                  subreddit (front page, popular, all) this will be called
      */
     public void getSubredditInfo(String subredditName, OnResponse<Subreddit> onResponse, OnFailure onFailure) {
-        if (STANDARD_SUBS.indexOf(subredditName) != -1) {
+        if (STANDARD_SUBS.contains(subredditName)) {
             onFailure.onFailure(-1, new NoSubredditInfoException("The subreddits: " + STANDARD_SUBS.toString() + " do not have any info to retrieve"));
             return;
         }
@@ -876,7 +877,11 @@ public class RedditApi {
                 }
 
                 if (body != null) {
-                    onResponse.onResponse((Subreddit) body);
+                    if (body.getId() != null) {
+                        onResponse.onResponse((Subreddit) body);
+                    } else {
+                        onFailure.onFailure(response.code(), new SubredditNotFoundException("No subreddit found with name: " + subredditName));
+                    }
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }

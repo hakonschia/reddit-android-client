@@ -22,4 +22,6 @@
     <dimen name="quoteMargin">15dp</dimen>
 
     <dimen name="thematicBreakHeight">2dp</dimen>
+
+    <dimen name="topLevelCommentTopPadding">7dp</dimen>
 </resources>

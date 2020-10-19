@@ -52,8 +52,8 @@
 
             app:layout_constraintBottom_toBottomOf="@+id/subreddit"
             app:layout_constraintStart_toEndOf="@+id/subreddit"
-
             app:layout_constraintTop_toTopOf="@+id/subreddit"
+
             tools:text="v.redd.it" />
 
         <TextView

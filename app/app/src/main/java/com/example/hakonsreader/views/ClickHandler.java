@@ -13,12 +13,19 @@ public class ClickHandler {
     private static final String TAG = "ClickHandler";
 
     /**
+     * Empty function to consume long click events. This can be used in XML to handle
+     * a conditional {@code onLongClick} where one operand should be empty
+     *
+     * @return Always {@code true}
+     */
+    public static boolean emptyClickBoolean() { return true; }
+
+    /**
      * Opens an activity with the selected subreddit
      *
      * @param subreddit The subreddit to open
      */
     public void openSubredditInActivity(View view,  String subreddit) {
-        Log.d(TAG, "openSubredditInActivity: handler clicked");
         Context context = view.getContext();
         Activity activity = (Activity)context;
 

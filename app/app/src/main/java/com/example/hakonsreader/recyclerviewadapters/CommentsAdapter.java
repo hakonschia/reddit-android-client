@@ -2,6 +2,7 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.databinding.BindingAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
@@ -22,6 +25,8 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.databinding.ListItemCommentBinding;
+import com.example.hakonsreader.databinding.VoteBarBinding;
 import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
@@ -87,6 +92,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         this.replyListener = replyListener;
     }
 
+    public OnReplyListener getReplyListener() {
+        return replyListener;
+    }
+
     /**
      * Adds a new top level comment
      *
@@ -137,8 +146,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * @param comment The comment to remove
      */
     public void removeComment(RedditComment comment) {
-        int pos = this.comments.indexOf(comment);
-        this.comments.remove(pos);
+        int pos = comments.indexOf(comment);
+        comments.remove(pos);
         notifyItemRemoved(pos);
     }
 
@@ -197,33 +206,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     }
 
     /**
-     * Loads more comments and adds them to {@link CommentsAdapter#comments}
-     *
-     * @param comment The comment to load from. This comment has to be a "2 more comments" comment.
-     *               When the comments have been loaded this will be removed from {@link CommentsAdapter#comments}
-     * @param parent The parent comment of {@code comment}
-     */
-    public void getMoreComments(RedditComment comment, RedditComment parent) {
-        this.redditApi.getMoreComments(post.getId(), comment.getChildren(), parent, newComments -> {
-            // Find the parent index to know where to insert the new comments
-            int commentPos = comments.indexOf(comment);
-            this.insertComments(newComments, commentPos);
-
-            // Remove the previous comment (this is the "2 more comments" comment)
-            this.removeComment(comment);
-            parent.removeReply(comment);
-        }, (code, t) -> {
-            t.printStackTrace();
-            Util.handleGenericResponseErrors(parentLayout, code, t);
-        });
-    }
-
-    /**
      * Hides comments from being shown. Does not remove the comments from the actual list
      *
      * @param start The comment to start at. This comment and any replies will be hidden
      */
-    private void hideComments(RedditComment start) {
+    public void hideComments(RedditComment start) {
         int startPos = comments.indexOf(start);
 
         // Update the comment selected to show that it is now a hidden comment chain
@@ -243,7 +230,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      *
      * @param start The start of the chain
      */
-    private void showComments(RedditComment start) {
+    public void showComments(RedditComment start) {
         int pos = comments.indexOf(start);
 
         // This comment is no longer hidden
@@ -284,36 +271,30 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     }
 
 
-
+    @NonNull
     @Override
-    public int getItemCount() {
-        return comments.size();
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        ListItemCommentBinding binding = ListItemCommentBinding.inflate(layoutInflater, parent, false);
+
+        // The post will always be the same so set it now
+        binding.setPost(post);
+        binding.setAdapter(this);
+
+        return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RedditComment comment = comments.get(position);
+        holder.bind(comment);
 
-        // Format holder based on who the user is (mod, poster, or no one special)
-        if (comment.isMod()) {
-            holder.asMod();
-        } else if (post.getAuthor().equals(comment.getAuthor())) {
-            holder.asPoster();
-        }
-
-        // If the comment is a "more comments" comment
-        if (Thing.MORE.getValue().equals(comment.getKind())) {
-            // TODO the parent comment isn't necessarily the previous, get the comment before in the list whos depth is one lower
-            holder.asMoreComments(comment, this.comments.get(position - 1));
-        } else {
-            holder.asNormalComment(comment);
-        }
-
-        if (commentsHidden.contains(comment)) {
-            holder.commentHidden(() -> this.showComments(comment));
-        }
+        int indent = (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
+        holder.itemView.setPadding(indent * comment.getDepth(), 0, 0, 0);
 
 
+        // TODO this is extremely laggy when changes to the dataset happens
+        /*
         // With preDrawListener we can get the height of the itemView before it is drawn, and then create the sidebars with that height
         holder.itemView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -324,7 +305,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
                 // Ensure there are no sidebars already (loading more comments can cause issues because the holder
                 // wont be recycled before it is re-drawn)
-                holder.sideBars.removeAllViews();
+                holder.binding.sideBars.removeAllViews();
 
                 // Every comment is only responsible for the lines to its side, so each line will match up
                 // with the line for the comment above and below to create a long line throughout the entire list
@@ -338,7 +319,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                     view.setLayoutParams(marginLayoutParams);
                     view.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.secondary_background));
 
-                    holder.sideBars.addView(view);
+                    holder.binding.sideBars.addView(view);
                 }
 
                 // Remove the listener to avoid infinite calls
@@ -349,197 +330,180 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                 return false;
             }
         });
+         */
     }
 
     @Override
-    public void onViewRecycled(@NonNull ViewHolder holder) {
-        super.onViewRecycled(holder);
-        holder.reset();
+    public int getItemCount() {
+        return comments.size();
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.list_item_comment,
-                parent,
-                false
+
+    /**
+     * LongClick listener for views
+     *
+     * @param view Ignored
+     * @param comment The comment clicked
+     * @return True (event is always consumed)
+     */
+    public boolean hideCommentsLongClick(View view, RedditComment comment) {
+        hideComments(comment);
+        return true;
+    }
+
+    /**
+     * LongClick listener for text views. Hides a comment chain
+     *
+     * @param view The view clicked. Note this must be a {@link TextView}, or else the function will not
+     *             do anything but consume the event
+     * @param comment The comment clicked
+     * @return True (event is always consumed)
+     */
+    public boolean hideCommentsLongClickText(View view, RedditComment comment) {
+        if (view instanceof TextView) {
+            TextView tv = (TextView) view;
+
+            // Not a hyperlink (even long clicking on the hyperlink would open it, so don't collapse as well)
+            if (tv.getSelectionStart() == -1 && tv.getSelectionEnd() == -1) {
+                hideComments(comment);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Sets the markdown for the text and adds a movement method to handle reddit links
+     *
+     * @param textView The textview to add the markdown to
+     * @param markdown The markdown text
+     */
+    @BindingAdapter("commentMarkdown")
+    public static void setCommentMarkdown(TextView textView, @Nullable String markdown) {
+        if (markdown == null) {
+            return;
+        }
+        textView.setMovementMethod(InternalLinkMovementMethod.getInstance(textView.getContext()));
+        markdown = App.get().getAdjuster().adjust(markdown);
+        App.get().getMark().setMarkdown(textView, markdown);
+    }
+
+    /**
+     * Adds the authors flair to the comment. If the author has no flair the view is set to {@link View#GONE}
+     *
+     * @param view The view that holds the author flair
+     * @param comment The comment
+     */
+    @BindingAdapter("authorFlair")
+    public static void addAuthorFlair(FrameLayout view, @Nullable RedditComment comment) {
+        if (comment == null) {
+            return;
+        }
+        Tag tag = ViewUtil.createFlair(
+                comment.getAuthorRichtextFlairs(),
+                comment.getAuthorFlairText(),
+                comment.getAuthorFlairTextColor(),
+                comment.getAuthorFlairBackgroundColor(),
+                view.getContext()
         );
 
-        return new ViewHolder(view);
+        if (tag != null) {
+            // The view might still have old views
+            view.removeAllViews();
+            view.addView(tag);
+
+            view.setVisibility(View.VISIBLE);
+        } else {
+            // No author flair, remove the view so it doesn't take up space
+            view.setVisibility(View.GONE);
+        }
     }
 
+    /**
+     * Formats the author text based on whether or not it is posted by a mod, the poster.
+     *
+     * <p>If both {@code asMod} or {@code asPoster} are false the format is set to default</p>
+     *
+     * @param tv The TextView to format. Changes the text color and background drawable
+     * @param asMod True if posted (and distinguished) by a moderator
+     * @param asPoster True if posted by the poster of the post
+     */
+    @BindingAdapter({"asMod", "asPoster"})
+    public static void formatAuthor(TextView tv, boolean asMod, boolean asPoster) {
+        if (asMod) {
+            tv.setBackground(ContextCompat.getDrawable(tv.getContext(), R.drawable.comment_by_mod));
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.text_color));
+        } else if (asPoster) {
+            tv.setBackground(ContextCompat.getDrawable(tv.getContext(), R.drawable.comment_by_poster));
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.text_color));
+        } else {
+            tv.setBackground(null);
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.link_color));
+        }
+    }
+
+    /**
+     * OnClick listener for "2 more comments" comments.
+     *
+     * <p>Loads more comments and adds them to {@link CommentsAdapter#comments}</p>
+     *
+     * @param comment The comment to load from. This comment has to be a "2 more comments" comment.
+     *               When the comments have been loaded this will be removed from {@link CommentsAdapter#comments}
+     */
+    @BindingAdapter("getMoreComments")
+    public void getMoreComments(View view, RedditComment comment) {
+        int pos = comments.indexOf(comment);
+        int depth = comment.getDepth();
+
+        // The parent is the first comment upwards in the list that has a lower depth
+        RedditComment parent = null;
+        for (int i = pos - 1; i >= 0; i--) {
+            RedditComment c = comments.get(i);
+            if (c.getDepth() < depth) {
+                parent = c;
+                break;
+            }
+        }
+
+        // TODO move api call to ViewModel
+        final RedditComment finalParent = parent;
+        redditApi.getMoreComments(post.getId(), comment.getChildren(), finalParent, newComments -> {
+            // Find the parent index to know where to insert the new comments
+            int commentPos = comments.indexOf(comment);
+            this.insertComments(newComments, commentPos);
+
+            // Remove the previous comment (this is the "2 more comments" comment)
+            this.removeComment(comment);
+            finalParent.removeReply(comment);
+        }, (code, t) -> {
+            t.printStackTrace();
+            Util.handleGenericResponseErrors(parentLayout, code, t);
+        });
+    }
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private LinearLayout sideBars;
-        private TextView author;
-        private FrameLayout authorFlair;
-        private TextView age;
-        private TextView content;
-        private ImageView locked;
-        private ImageView stickied;
-        private ImageButton reply;
-        private VoteBar voteBar;
+        private final ListItemCommentBinding binding;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            sideBars = itemView.findViewById(R.id.sideBars);
-            author = itemView.findViewById(R.id.commentAuthor);
-            authorFlair = itemView.findViewById(R.id.authorFlair);
-            age = itemView.findViewById(R.id.commentAge);
-            content = itemView.findViewById(R.id.commentContent);
-            locked = itemView.findViewById(R.id.lock);
-            stickied = itemView.findViewById(R.id.stickied);
-            reply = itemView.findViewById(R.id.reply);
-            voteBar = itemView.findViewById(R.id.commentVoteBar);
-        }
-
-
-        /**
-         * Resets the view to default values so all views start out the same
-         */
-        private void reset() {
-            // Reset author text (from when comment is by poster/mod)
-            author.setBackground(null);
-            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.link_color));
-
-            authorFlair.removeAllViews();
-
-            // Reset if holder previously was a hidden comment
-            author.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-            age.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-
-            locked.setVisibility(View.GONE);
-            stickied.setVisibility(View.GONE);
-
-            // Reset it holder previously was "5 more comments"
-            voteBar.setVisibility(View.VISIBLE);
-            reply.setVisibility(View.VISIBLE);
-            itemView.setOnClickListener(null);
-
-            sideBars.removeAllViews();
+        public ViewHolder(ListItemCommentBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
         /**
-         * Formats the comment as a mod comment
-         */
-        private void asMod() {
-            author.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.comment_by_mod));
-            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.text_color));
-        }
-
-        /**
-         * Formats the comment as a comment posted by the OP of the post
-         */
-        private void asPoster() {
-            author.setBackground(ContextCompat.getDrawable(itemView.getContext(), R.drawable.comment_by_poster));
-            author.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.text_color));
-        }
-
-        /**
-         * Sets the contents of the the view holder as a standard comment with content, vote bars etc.
+         * Bind the ViewHolder to a comment
          *
-         * @param comment The comment to use for the holder
+         * @param comment The comment to bind
          */
-        private void asNormalComment(RedditComment comment) {
-            Context context = itemView.getContext();
+        public void bind(RedditComment comment) {
+            // TODO animations when hiding/unhiding comments sometimes look weird with data binding, might just have to revert it to normal
 
-            content.setMovementMethod(InternalLinkMovementMethod.getInstance(context));
+            binding.setComment(comment);
+            binding.setIsMoreComments(Thing.MORE.getValue().equals(comment.getKind()));
+            binding.setCommentHidden(commentsHidden.contains(comment));
 
-            String body = comment.getBody();
-            if (body != null) {
-                body = App.get().getAdjuster().adjust(body);
-                App.get().getMark().setMarkdown(content, body);
-            }
-
-            author.setText(String.format(context.getString(R.string.author_prefixed), comment.getAuthor()));
-
-            Tag tag = ViewUtil.createFlair(comment.getAuthorRichtextFlairs(), comment.getAuthorFlairText(), comment.getAuthorFlairTextColor(), comment.getAuthorFlairBackgroundColor(), itemView.getContext());
-            if (tag != null) {
-                authorFlair.addView(tag);
-            }
-
-            // Calculate the time since the comment was posted
-            Instant created = Instant.ofEpochSecond(comment.getCreatedAt());
-            Duration between = Duration.between(created, Instant.now());
-            age.setText(Util.createAgeText(context.getResources(), between));
-
-            if (post.isLocked()) {
-                reply.setVisibility(GONE);
-            }
-            if (comment.isLocked()) {
-                locked.setVisibility(View.VISIBLE);
-            }
-            if (comment.isStickied()) {
-                stickied.setVisibility(View.VISIBLE);
-            }
-
-            reply.setOnClickListener(view -> replyListener.replyTo(comment));
-
-            voteBar.setListing(comment);
-
-            // Hide comments on long clicks
-            // This has to be set on both the TextView as well as the entire holder since the TextView
-            // has movementMethod set to allow for clickable hyperlinks which makes setting it on only
-            // the holder not work for the TextView
-            content.setOnLongClickListener(view -> {
-                // Not a hyperlink (even long clicking on the hyperlink would open it, so don't collapse as well)
-                if (content.getSelectionStart() == -1 && content.getSelectionEnd() == -1) {
-                    hideComments(comment);
-                }
-                return true;
-            });
-            itemView.setOnLongClickListener(view -> {
-                hideComments(comment);
-                return true;
-            });
-        }
-
-        /**
-         * Sets a holder as a "4 more comments" comment
-         * <p>The only thing shown is the text of "more comments", everything else is hidden away</p>
-         *
-         * @param comment The comment to use for the holder
-         */
-        private void asMoreComments(RedditComment comment, RedditComment parent) {
-            int extraComments = comment.getExtraCommentsCount();
-
-            String extraCommentsText = itemView.getResources().getQuantityString(
-                    R.plurals.extraComments,
-                    extraComments,
-                    extraComments
-            );
-
-            // Clear everything except the author field which now holds the amount of extra comments
-            author.setText(extraCommentsText);
-            itemView.setOnClickListener(view -> getMoreComments(comment, parent));
-            itemView.setOnLongClickListener(null);
-
-            age.setText("");
-            content.setText("");
-            reply.setVisibility(GONE);
-            voteBar.setVisibility(GONE);
-        }
-
-        /**
-         * Formats the comment as a hidden comment. Only use this for the comment that was
-         * explicitly selected to be hidden, as the comment will still be shown, with adjusted
-         * formatting to show it contains a hidden comment chain
-         *
-         * @param runnable What to do when the comment is clicked again
-         */
-        private void commentHidden(Runnable runnable) {
-            author.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
-            age.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
-
-            content.setText("");
-            reply.setVisibility(GONE);
-            voteBar.setVisibility(GONE);
-
-            itemView.setOnClickListener(view -> runnable.run());
-            itemView.setOnLongClickListener(null);
+            // TODO when the vote bar uses data binding this can probably be set through xml
+            binding.commentVoteBar.setListing(comment);
         }
     }
 }
