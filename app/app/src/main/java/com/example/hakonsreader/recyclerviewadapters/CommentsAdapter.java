@@ -501,6 +501,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             binding.setComment(comment);
             binding.setIsMoreComments(Thing.MORE.getValue().equals(comment.getKind()));
             binding.setCommentHidden(commentsHidden.contains(comment));
+            binding.executePendingBindings();
 
             // TODO when the vote bar uses data binding this can probably be set through xml
             binding.commentVoteBar.setListing(comment);
