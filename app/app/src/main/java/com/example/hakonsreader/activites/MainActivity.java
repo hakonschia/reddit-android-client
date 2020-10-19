@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         Intent intent = new Intent(this, DispatcherActivity.class);
         intent.putExtra("subreddit", "test");
         intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/norge");
-        startActivity(intent);
+        //startActivity(intent);
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);

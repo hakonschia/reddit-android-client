@@ -496,8 +496,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
          * @param comment The comment to bind
          */
         public void bind(RedditComment comment) {
-            // TODO animations when hiding/unhiding comments sometimes look weird with data binding, might just have to revert it to normal
-
             binding.setComment(comment);
             binding.setIsMoreComments(Thing.MORE.getValue().equals(comment.getKind()));
             binding.setCommentHidden(commentsHidden.contains(comment));

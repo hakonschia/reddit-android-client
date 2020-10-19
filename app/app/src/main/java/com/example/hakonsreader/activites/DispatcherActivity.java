@@ -44,7 +44,7 @@ public class DispatcherActivity extends AppCompatActivity {
 
         // Activity started from a URL intent
         if (uri != null) {
-            url = uri.getPath();
+            url = uri.toString();
         } else {
             // Activity started from a manual intent
             Bundle data = startIntent.getExtras();
@@ -77,7 +77,6 @@ public class DispatcherActivity extends AppCompatActivity {
 
 
     public Intent createIntent(String url) {
-
         // The intent to start the new activity
         Intent intent;
 
@@ -93,7 +92,6 @@ public class DispatcherActivity extends AppCompatActivity {
         if (url.matches(LinkUtils.SUBREDDIT_REGEX)) {
             // First is "r", second is the subreddit
             String subreddit = pathSegments.get(1);
-            Log.d(TAG, "createIntent: Subreddit being dispatched = " + subreddit);
 
             intent = new Intent(this, SubredditActivity.class);
             intent.putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit);
@@ -113,6 +111,13 @@ public class DispatcherActivity extends AppCompatActivity {
 
             // TODO when the post is in a "user" subreddit it doesnt work
             //  eg: https://www.reddit.com/user/HyperBirchyBoy/comments/jbkw1f/moon_landing_with_benny_hill_and_sped_up/?utm_source=share&utm_medium=ios_app&utm_name=iossmf
+        } else if (url.matches("https://redd.it/.*")) {
+            // For shortened URLs the first (and only) path segment is the post ID
+            String postId = pathSegments.get(0);
+
+            intent = new Intent(this, PostActivity.class);
+            intent.putExtra(PostActivity.POST_ID_KEY, postId);
+
         } else if (lastSegment.matches(".+(.png|.jpeg|.jpg)$")) {
             intent = new Intent(this, ImageActivity.class);
             intent.putExtra(ImageActivity.IMAGE_URL, url);
