@@ -9,9 +9,10 @@ Includes an Android/Java wrapper for the Reddit API that provides basic function
 ## Screenshots
 
 <div>
+  <img src="/images/subreddit.png" alt="Subreddit" width="275"/>
   <img src="/images/scrolling-in-posts.png" alt="Scrolling posts" width="275"/>
-  <img src="/images/profile.png" alt="User profile" width="275"/>
   <img src="/images/in-post.png" alt="In post" width="275"/>
+  <img src="/images/profile.png" alt="User profile" width="275"/>
 </div>
 
 
