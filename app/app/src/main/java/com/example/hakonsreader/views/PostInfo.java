@@ -53,7 +53,6 @@ public class PostInfo extends ConstraintLayout {
      */
     public void setPost(@NonNull RedditPost post) {
         binding.setPost(post);
-        binding.setHandler(new ClickHandler());
     }
 
     /**

@@ -1,15 +1,10 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
-import android.content.Context;
-import android.graphics.Typeface;
-import android.util.Log;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -26,20 +21,15 @@ import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ListItemCommentBinding;
-import com.example.hakonsreader.databinding.VoteBarBinding;
 import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.misc.ViewUtil;
 import com.example.hakonsreader.views.Tag;
-import com.example.hakonsreader.views.VoteBar;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.view.View.GONE;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
@@ -288,49 +278,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RedditComment comment = comments.get(position);
         holder.bind(comment);
-
-        int indent = (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
-        holder.itemView.setPadding(indent * comment.getDepth(), 0, 0, 0);
-
-
-        // TODO this is extremely laggy when changes to the dataset happens
-        /*
-        // With preDrawListener we can get the height of the itemView before it is drawn, and then create the sidebars with that height
-        holder.itemView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                int height = holder.itemView.getMeasuredHeight();
-                int barWidth = (int)holder.itemView.getResources().getDimension(R.dimen.comment_side_bar_width);
-                int indent = (int)holder.itemView.getResources().getDimension(R.dimen.comment_depth_indent);
-
-                // Ensure there are no sidebars already (loading more comments can cause issues because the holder
-                // wont be recycled before it is re-drawn)
-                holder.binding.sideBars.removeAllViews();
-
-                // Every comment is only responsible for the lines to its side, so each line will match up
-                // with the line for the comment above and below to create a long line throughout the entire list
-                // Also top level comments don't have a side bar as that looks weird (i <= comment.getDepth() to add it)
-                for (int i = 0; i < comment.getDepth(); i++) {
-                    View view = new View(holder.itemView.getContext());
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(barWidth, height);
-                    LinearLayout.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(params);
-                    marginLayoutParams.rightMargin = indent;
-
-                    view.setLayoutParams(marginLayoutParams);
-                    view.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.secondary_background));
-
-                    holder.binding.sideBars.addView(view);
-                }
-
-                // Remove the listener to avoid infinite calls
-                holder.itemView.getViewTreeObserver().removeOnPreDrawListener(this);
-
-                // Returning false means to cancel the current scheduled draw, which would not include
-                // the sidebars and would cause them to appear a split second later
-                return false;
-            }
-        });
-         */
     }
 
     @Override
@@ -338,6 +285,37 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         return comments.size();
     }
 
+
+    /**
+     * Adds sidebars to the comment (to visually show the comment depth)
+     *
+     * @param layout The layout to add the sidebars to
+     * @param depth The depth of the comment
+     */
+    @BindingAdapter("sideBars")
+    public static void addSideBars(LinearLayout layout, int depth) {
+        Resources res = layout.getResources();
+        int barWidth = (int)res.getDimension(R.dimen.commentSideBarWidth);
+        int indent = (int)res.getDimension(R.dimen.commentDepthIndent);
+
+        // The layout is recycled so ensure the previos views are removed
+        layout.removeAllViews();
+
+        // Every comment is only responsible for the lines to its side, so each line will match up
+        // with the line for the comment above and below to create a long line throughout the entire list
+        // Also top level comments don't have a side bar as that looks weird (i <= comment.getDepth() to add it)
+        for (int i = 0; i < depth; i++) {
+            View view = new View(layout.getContext());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(barWidth, ViewGroup.LayoutParams.MATCH_PARENT);
+            ViewGroup.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(params);
+            marginLayoutParams.rightMargin = indent;
+
+            view.setLayoutParams(marginLayoutParams);
+            view.setBackgroundColor(ContextCompat.getColor(layout.getContext(), R.color.commentSideBar));
+
+            layout.addView(view);
+        }
+    }
 
     /**
      * LongClick listener for views

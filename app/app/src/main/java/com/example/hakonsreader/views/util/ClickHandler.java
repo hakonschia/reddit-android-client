@@ -1,16 +1,21 @@
-package com.example.hakonsreader.views;
+package com.example.hakonsreader.views.util;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.SubredditActivity;
 
+/**
+ * Various click handlers that can be used as click listeners for data binding
+ */
 public class ClickHandler {
     private static final String TAG = "ClickHandler";
+
+    private ClickHandler() { }
+
 
     /**
      * Empty function to consume long click events. This can be used in XML to handle
@@ -25,12 +30,13 @@ public class ClickHandler {
      *
      * @param subreddit The subreddit to open
      */
-    public void openSubredditInActivity(View view,  String subreddit) {
+    public static void openSubredditInActivity(View view,  String subreddit) {
         Context context = view.getContext();
         Activity activity = (Activity)context;
 
         // Don't open another activity if we are already in that subreddit (because why would you)
         // TODO also check if we are in PostActivity and the post was started from the same subreddit
+        // TODO also check for fragments
         if (activity instanceof SubredditActivity) {
             SubredditActivity subredditActivity = (SubredditActivity)activity;
             if (subredditActivity.getSubredditName().equals(subreddit)) {

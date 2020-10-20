@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="text_margin">16dp</dimen>
-    <dimen name="upvote_downvote_button_size">25dp</dimen>
+    <dimen name="textMargin">16dp</dimen>
+    <dimen name="upvoteDownvoteButtonsSize">25dp</dimen>
 
     <dimen name="postLinkThumnailHeight">60dp</dimen>
     <dimen name="postLinkThumnailWidth">75dp</dimen>
 
     <dimen name="defaultIndent">15dp</dimen>
 
-    <dimen name="comment_depth_indent">12dp</dimen>
-    <dimen name="comment_side_bar_width">2dp</dimen>
+    <dimen name="commentDepthIndent">12dp</dimen>
+    <dimen name="commentSideBarWidth">1dp</dimen>
+    <dimen name="topLevelCommentTopPadding">7dp</dimen>
+    <dimen name="hiddenCommentBottomPadding">12dp</dimen>
 
     <dimen name="postContentMaxHeight">150dp</dimen>
 
@@ -22,7 +24,4 @@
     <dimen name="quoteMargin">15dp</dimen>
 
     <dimen name="thematicBreakHeight">2dp</dimen>
-
-    <dimen name="topLevelCommentTopPadding">7dp</dimen>
-    <dimen name="hiddenCommentBottomPadding">12dp</dimen>
 </resources>

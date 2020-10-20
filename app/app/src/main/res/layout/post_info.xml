@@ -6,10 +6,7 @@
 
     <data>
         <import type="android.view.View" />
-
-        <variable
-            name="handler"
-            type="com.example.hakonsreader.views.ClickHandler" />
+        <import type="com.example.hakonsreader.views.util.ClickHandler"/>
 
         <variable
             name="post"
@@ -32,7 +29,7 @@
             android:textSize="14sp"
             android:textColor="@color/link_color"
 
-            android:onClick="@{(view) -> handler.openSubredditInActivity(view, post.subreddit)}"
+            android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, post.subreddit)}"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
