@@ -63,12 +63,16 @@ public class App extends Application {
     private static App app;
 
 
+
     @Override
     public void onCreate() {
         super.onCreate();
         set();
 
         DisplayMetrics dm = getResources().getDisplayMetrics();
+
+        // Technically this could go outdated if the user changes their resolution while the app is running
+        // but I highly doubt that would ever be a problem (worst case is posts wouldn't fit the screen)
         screenWidth = dm.widthPixels;
         screenHeight = dm.heightPixels;
 

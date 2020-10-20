@@ -10,8 +10,10 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.utils.LinkUtils;
+import com.jakewharton.processphoenix.ProcessPhoenix;
 
 import java.util.List;
 
@@ -89,7 +91,17 @@ public class DispatcherActivity extends AppCompatActivity {
             lastSegment = pathSegments.get(pathSegments.size() - 1);
         }
 
-        if (url.matches(LinkUtils.SUBREDDIT_REGEX)) {
+
+        if (url.matches("https://(www.)?reddit\\.com")) {
+
+            // When the app is started from a "reddit.com" intent we could load the front page as
+            // its own subreddit activity, but it makes more sense that this actually loads the application
+            // Since this activity is started without MainActivity being created we can just recreate the
+            // application from scratch, which makes it so the application starts as clicking on the app icon
+            // Alternatively this could probably just resolve to MainActivity directly
+            ProcessPhoenix.triggerRebirth(this);
+            return null;
+        } else if (url.matches(LinkUtils.SUBREDDIT_REGEX)) {
             // First is "r", second is the subreddit
             String subreddit = pathSegments.get(1);
 

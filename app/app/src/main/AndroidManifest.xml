@@ -18,8 +18,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -60,6 +62,23 @@
         <activity
             android:name=".activites.DispatcherActivity"
             android:theme="@style/AppTheme.DispatcherTheme">
+
+            <tools:validation testUrl="https://www.reddit.com" />
+            <tools:validation testUrl="https://reddit.com" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.reddit.com" />
+                <data
+                    android:scheme="https"
+                    android:host="reddit.com" />
+            </intent-filter>
+
 
             <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive" />
             <tools:validation testUrl="https://reddit.com/r/GlobalOffensive" />

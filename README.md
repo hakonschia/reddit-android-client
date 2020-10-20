@@ -31,5 +31,6 @@ To retrieve the latest version clone the repository and install manually via And
 * [CircleImageView](https://github.com/hdodenhof/CircleImageView) - To create circular ImageViews
 * [Markwon](https://github.com/noties/Markwon) - For rendering of markdown text in TextViews
 * [ExoPlayer](https://github.com/google/ExoPlayer) - Used for playing videos
+* [ProcessPhoenix](https://github.com/JakeWharton/ProcessPhoenix) - Used to restart the application
 
 As well as various code snippets acknowledged throughout the code, and Reddit for providing an open API to make this project possible.
