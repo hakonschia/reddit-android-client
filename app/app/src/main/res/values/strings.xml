@@ -64,18 +64,17 @@
     <string name="prefs_key_play_muted_videos_fullscreen">play_muted_videos_fullscreen</string>
     <string name="prefs_key_loop_videos">loop_videos</string>
 
-
     <plurals name="postAgeMinutes">
-        <item quantity="one">%d minute</item>
-        <item quantity="other">%d minutes</item>
+        <item quantity="one">%d minute ago</item>
+        <item quantity="other">%d minutes ago</item>
     </plurals>
     <plurals name="postAgeHours">
-        <item quantity="one">%d hour</item>
-        <item quantity="other">%d hours</item>
+        <item quantity="one">%d hour ago</item>
+        <item quantity="other">%d hours ago</item>
     </plurals>
     <plurals name="postAgeDays">
-        <item quantity="one">%d day</item>
-        <item quantity="other">%d days</item>
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
     </plurals>
 
     <!-- Error messages -->

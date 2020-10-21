@@ -78,11 +78,10 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // For testing purposes hardcode going into a subreddit
+        // For testing purposes hardcode going into a subreddit/post etc.
         Intent intent = new Intent(this, DispatcherActivity.class);
-        intent.putExtra("subreddit", "test");
-        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/norge");
-        //startActivity(intent);
+        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/i18n/comments/iydth3/are_you_interested_in_helping_translate_reddit");
+        startActivity(intent);
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);

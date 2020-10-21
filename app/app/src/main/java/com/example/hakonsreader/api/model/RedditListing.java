@@ -247,7 +247,7 @@ public abstract class RedditListing {
 
 
     /**
-     * @return True if the listing is distinguished as a moderator
+     * @return True if the listing is distinguished as posted by a moderator
      */
     public boolean isMod() {
         if (distinguished == null) {
@@ -255,6 +255,17 @@ public abstract class RedditListing {
         }
 
         return distinguished.equals("moderator");
+    }
+
+    /**
+     * @return True if the listing is distinguished as posted by an admin
+     */
+    public boolean isAdmin() {
+        if (distinguished == null) {
+            return false;
+        }
+
+        return distinguished.equals("admin");
     }
 
     /**

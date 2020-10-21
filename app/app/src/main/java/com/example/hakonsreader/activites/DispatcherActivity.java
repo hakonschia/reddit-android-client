@@ -64,7 +64,7 @@ public class DispatcherActivity extends AppCompatActivity {
             return;
         }
 
-        Log.d(TAG, "onCreate: Dispatching " + url);
+        Log.d(TAG, "Dispatching " + url);
 
         // If the URL can be converted to a direct link (eg. as an image) ensure it is
         url = LinkUtils.convertToDirectUrl(url);
@@ -90,6 +90,7 @@ public class DispatcherActivity extends AppCompatActivity {
         if (!pathSegments.isEmpty()) {
             lastSegment = pathSegments.get(pathSegments.size() - 1);
         }
+        Log.d(TAG, "Dispatching2 " + url);
 
 
         if (url.matches("https://(www.)?reddit\\.com")) {
@@ -120,6 +121,7 @@ public class DispatcherActivity extends AppCompatActivity {
 
             intent = new Intent(this, PostActivity.class);
             intent.putExtra(PostActivity.POST_ID_KEY, postId);
+            Log.d(TAG, "createIntent: is post");
 
             // TODO when the post is in a "user" subreddit it doesnt work
             //  eg: https://www.reddit.com/user/HyperBirchyBoy/comments/jbkw1f/moon_landing_with_benny_hill_and_sped_up/?utm_source=share&utm_medium=ios_app&utm_name=iossmf
@@ -158,6 +160,7 @@ public class DispatcherActivity extends AppCompatActivity {
                 // If we don't know how to handle the URL pass it to a web view
                 intent = new Intent(this, WebViewActivity.class);
                 intent.putExtra(WebViewActivity.URL_KEY, url);
+                Log.d(TAG, "createIntent: :L");
             }
         }
 

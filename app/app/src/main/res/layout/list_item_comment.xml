@@ -109,6 +109,7 @@
                 android:textColor="@color/link_color"
                 android:typeface="@{Typeface.defaultFromStyle(commentHidden ? Typeface.ITALIC : Typeface.NORMAL)}"
 
+                app:asAdmin="@{comment.admin}"
                 app:asMod="@{comment.mod}"
                 app:asPoster="@{post.author.equals(comment.author)}"
 
@@ -135,6 +136,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="@color/secondary_text_color"

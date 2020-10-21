@@ -400,15 +400,25 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     /**
      * Formats the author text based on whether or not it is posted by a mod, the poster.
      *
-     * <p>If both {@code asMod} or {@code asPoster} are false the format is set to default</p>
+     * <p>If multiple values are true, the precende is:
+     * <ol>
+     *     <li>Admin</li>
+     *     <li>Mod</li>
+     *     <li>Poster</li>
+     * </ol>
+     * </p>
      *
      * @param tv The TextView to format. Changes the text color and background drawable
      * @param asMod True if posted (and distinguished) by a moderator
      * @param asPoster True if posted by the poster of the post
+     * @param asAdmin True if posted by an admin of Reddit (ie. an employee of Reddit)
      */
-    @BindingAdapter({"asMod", "asPoster"})
-    public static void formatAuthor(TextView tv, boolean asMod, boolean asPoster) {
-        if (asMod) {
+    @BindingAdapter({"asMod", "asPoster", "asAdmin"})
+    public static void formatAuthor(TextView tv, boolean asMod, boolean asPoster, boolean asAdmin) {
+        if (asAdmin) {
+            tv.setBackground(ContextCompat.getDrawable(tv.getContext(), R.drawable.comment_by_admin));
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.text_color));
+        } else if (asMod) {
             tv.setBackground(ContextCompat.getDrawable(tv.getContext(), R.drawable.comment_by_mod));
             tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.text_color));
         } else if (asPoster) {

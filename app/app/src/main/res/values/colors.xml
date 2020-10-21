@@ -30,6 +30,7 @@
 
     <color name="commentByPosterBackground">#2196F3</color>
     <color name="commentByModBackground">#00C130</color>
+    <color name="commentByAdminBackground">#FF2727</color>
 
     <color name="imageVideoActivityBackground">#CCFFFFFF</color>
 

@@ -47,7 +47,7 @@ public final class LinkUtils {
      *
      * <p>Example: r/GlobalOffensive/comments/55ter/FaZe_Wins_major</p>
      */
-    public static final String POST_REGEX = ".*/?(r|R)/[A-Za-z]+/comments/.+/.+/?$";
+    public static final String POST_REGEX = ".*/?(r|R)/[A-Za-z0-9]+/comments/.+/.+/?$";
 
     /**
      * Regex matching imgur image URLs
