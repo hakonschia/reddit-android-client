@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.model;
 
+import android.util.Log;
+
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.TypeConverters;
@@ -512,14 +514,17 @@ public class RedditPost extends RedditListing {
             return PostType.CROSSPOST;
         }
 
-        String hint = postHint;
-
-        // Text posts don't have a hint
-        if (hint == null) {
-            return PostType.TEXT;
+        // Usually no hint means it's a text post, but sometimes it means it's a link post
+        // If the url for the post isn't to reddit, it's a link post (these link posts don't have a thumbnail for some reason)
+        if (postHint == null) {
+            if (url.matches("https://www\\.reddit\\.com")) {
+                return PostType.TEXT;
+            } else {
+                return PostType.LINK;
+            }
         }
 
-        if (hint.equals("link")) {
+        if (postHint.equals("link")) {
             // If link matches "imgur.com/...", add a .png to the end and it will redirect to the direct link
 
             // If we have a link post that is a link to imgur, redirect it to get the image directly
@@ -543,7 +548,7 @@ public class RedditPost extends RedditListing {
             return PostType.LINK;
         }
 
-        switch (hint) {
+        switch (postHint) {
             case "image":
                 // .gif is treated as image
                 if (url.endsWith(".gif")) {
@@ -558,9 +563,9 @@ public class RedditPost extends RedditListing {
             case "rich:video":
                 return PostType.RICH_VIDEO;
 
-            // No hint means it's a text post
+            // This should never happen, so if it does it's better to get a NPE to find cause an exception
             default:
-                return PostType.TEXT;
+                return null;
         }
     }
 }

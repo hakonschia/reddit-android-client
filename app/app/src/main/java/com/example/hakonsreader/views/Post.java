@@ -205,7 +205,7 @@ public class Post extends RelativeLayout {
      * @return A view with the content of the post
      */
     private View generatePostContent(RedditPost post, Context context) {
-        View content = null;
+        View content;
 
         switch (post.getPostType()) {
             case IMAGE:
