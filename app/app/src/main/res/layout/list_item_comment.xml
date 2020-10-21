@@ -117,29 +117,36 @@
             <!-- Note: the visibility of this is set to GONE if there is no authorFlair -->
             <FrameLayout
                 android:id="@+id/authorFlair"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
 
                 android:visibility="@{commentHidden ? View.GONE : View.VISIBLE}"
                 app:authorFlair="@{comment}"
 
+                app:layout_constraintWidth_default="wrap"
+                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintBottom_toBottomOf="@+id/commentAuthor"
                 app:layout_constraintStart_toEndOf="@+id/commentAuthor"
-                app:layout_constraintTop_toTopOf="@+id/commentAuthor" />
+                app:layout_constraintTop_toTopOf="@+id/commentAuthor"/>
 
             <TextView
                 android:id="@+id/commentAge"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/secondary_text_color"
                 android:typeface="@{Typeface.defaultFromStyle(commentHidden ? Typeface.ITALIC : Typeface.NORMAL)}"
                 app:createdAt="@{comment != null ? comment.createdAt : -1}"
 
+                app:layout_constraintEnd_toStartOf="@+id/stickied"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@id/authorFlair"
                 app:layout_constraintTop_toTopOf="parent"
+
+                app:layout_constraintWidth_default="wrap"
                 tools:text="2h ago" />
 
             <!-- Stickied and locked icons
@@ -165,8 +172,8 @@
 
                 android:src="@drawable/ic_baseline_lock_24"
                 android:visibility="@{comment.locked ? View.VISIBLE : View.GONE, default=gone}"
-                app:layout_constraintEnd_toEndOf="parent"
 
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/commentAuthor"
 
                 tools:visibility="visible" />

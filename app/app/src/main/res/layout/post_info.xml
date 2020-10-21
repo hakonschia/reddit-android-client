@@ -25,63 +25,105 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
 
+            android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, post.subreddit)}"
             android:text='@{post.subreddit != null ? @string/subreddit_prefixed(post.subreddit) : ""}'
-            android:textSize="14sp"
             android:textColor="@color/link_color"
 
-            android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, post.subreddit)}"
+            android:textSize="14sp"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-
             tools:text="r/GlobalOffensive" />
+
+        <!-- Technically if the age text expands too long the domain would disappear
+          but that *knock on wood* wont happen as it's just "2 minutes" "1 day" etc. -->
+        <TextView
+            android:id="@+id/age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+
+            android:textColor="@color/secondary_text_color"
+            android:textSize="13sp"
+            app:createdAt="@{post != null ? post.createdAt : -1}"
+
+            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
+            app:layout_constraintEnd_toStartOf="@+id/stickied"
+            app:layout_constraintStart_toEndOf="@+id/subreddit"
+            app:layout_constraintTop_toTopOf="@+id/subreddit"
+            app:layout_constraintHorizontal_bias="0.0"
+
+            tools:text="2 hours" />
 
         <TextView
             android:id="@+id/domain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
 
-            android:visibility='@{post != null &amp;&amp; !post.text ? View.VISIBLE : View.GONE}'
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text='@{post != null &amp;&amp; !post.text ? post.domain : ""}'
-            android:textSize="13sp"
             android:textColor="@color/secondary_text_color"
+            android:textSize="13sp"
+            android:visibility='@{post != null &amp;&amp; !post.text ? View.VISIBLE : View.GONE}'
 
+            app:layout_constrainedWidth="true"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintBottom_toBottomOf="@+id/subreddit"
-            app:layout_constraintStart_toEndOf="@+id/subreddit"
+            app:layout_constraintEnd_toStartOf="@+id/stickied"
+            app:layout_constraintStart_toEndOf="@+id/age"
             app:layout_constraintTop_toTopOf="@+id/subreddit"
 
-            tools:text="v.redd.it" />
+            tools:text="ihopeiactually.seeadomainthatwillcutoff.com" />
 
-        <TextView
-            android:id="@+id/age"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <!-- Extra icons such as stickied, locked etc. -->
+        <ImageView
+            android:id="@+id/stickied"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:layout_marginStart="10dp"
 
-            app:createdAt="@{post != null ? post.createdAt : -1}"
-            android:textSize="13sp"
-            android:textColor="@color/secondary_text_color"
+            android:src="@drawable/ic_stickied"
+            android:visibility="@{post.stickied ? View.VISIBLE : View.GONE, default=gone}"
 
-            app:layout_constraintBottom_toBottomOf="@+id/domain"
-            app:layout_constraintStart_toEndOf="@+id/domain"
+            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
+            app:layout_constraintEnd_toStartOf="@+id/lock"
 
-            app:layout_constraintTop_toTopOf="@+id/domain"
-            tools:text="2h" />
+            app:layout_constraintTop_toTopOf="@+id/subreddit"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/lock"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+
+            android:src="@drawable/ic_baseline_lock_24"
+            android:visibility="@{post.locked ? View.VISIBLE : View.GONE, default=gone}"
+
+            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            app:layout_constraintTop_toTopOf="@+id/subreddit"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:text='@{post != null ? @string/author_prefixed(post.author) : "" }'
-            android:textSize="13sp"
-            android:textColor="@{post.mod ? @color/text_color : @color/secondary_text_color}"
             android:background="@{post.mod ? @drawable/comment_by_mod : null}"
+            android:text='@{post != null ? @string/author_prefixed(post.author) : "" }'
+            android:textColor="@{post.mod ? @color/text_color : @color/secondary_text_color}"
+            android:textSize="13sp"
+
+            app:layout_constraintEnd_toEndOf="@+id/subreddit"
+            app:layout_constraintHorizontal_bias="0.0"
 
             app:layout_constraintStart_toStartOf="@+id/subreddit"
             app:layout_constraintTop_toBottomOf="@+id/subreddit"
-
             tools:text="u/hakonschia" />
 
         <FrameLayout
@@ -96,35 +138,6 @@
             app:layout_constraintStart_toEndOf="@+id/author"
             app:layout_constraintTop_toTopOf="@+id/author" />
 
-        <!-- Extra icons such as stickied, locked etc. -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/subreddit" >
-
-            <ImageView
-                android:id="@+id/stickied"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-
-                android:src="@drawable/ic_stickied"
-                android:visibility="@{post.stickied ? View.VISIBLE : View.GONE}"
-
-                tools:visibility="visible" />
-
-            <ImageView
-                android:id="@+id/lock"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-
-                android:src="@drawable/ic_baseline_lock_24"
-                android:visibility="@{post.locked ? View.VISIBLE : View.GONE}"
-
-                tools:visibility="visible" />
-        </LinearLayout>
-
         <LinearLayout
             android:id="@+id/tags"
             android:layout_width="wrap_content"
@@ -132,28 +145,30 @@
             android:layout_marginTop="5dp"
             android:orientation="horizontal"
 
-            app:spoiler="@{post.spoiler}"
-            app:nsfw="@{post.nsfw}"
-            app:linkFlair="@{post}"
 
-            app:layout_constraintStart_toStartOf="@+id/author"
-            app:layout_constraintTop_toBottomOf="@+id/author" />
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/subreddit"
+            app:layout_constraintEnd_toEndOf="@+id/subreddit"
+            app:layout_constraintTop_toBottomOf="@+id/author"
+
+            app:linkFlair="@{post}"
+            app:nsfw="@{post.nsfw}"
+            app:spoiler="@{post.spoiler}" />
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
 
-            android:paddingBottom="8dp"
-
             android:text="@{post.title}"
-            android:textSize="17sp"
             android:textColor="@color/text_color"
+            android:textSize="16sp"
 
-            app:layout_constraintStart_toStartOf="@+id/tags"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tags"
 
-            tools:text="FaZe wins major /s. To show how this layout looks for long titles I am adding a bunch of random text here" />
-
+            tools:text="FaZe wins major /s. To  am adding a bunch of random text here" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
