@@ -52,13 +52,13 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="@id/subredditInfo"
 
-                        android:text="@{subreddit.subscribed ? @string/subscribe_btn_unsubscribe : @string/subscribe_btn_subscribe}"
+                        android:text="@{subreddit.subscribed ? @string/btnSubscrubeUnsubscribe : @string/btnSubscribeSubscribe}"
                         android:textSize="12sp"
                         android:textColor="@color/text_color"
                         android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
                         android:background="@drawable/border_opposite_bg"
 
-                        tools:text="@string/subscribe_btn_subscribe"/>
+                        tools:text="@string/btnSubscribeSubscribe"/>
 
                     <LinearLayout
                         android:id="@+id/subredditInfo"
@@ -102,7 +102,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:text="@{@plurals/amount_of_subscribers(subreddit.subscribers, subreddit.subscribers)}"
+                            android:text="@{@plurals/amountOfSubscribers(subreddit.subscribers, subreddit.subscribers)}"
                             android:textColor="@color/secondary_text_color"
                             android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
 

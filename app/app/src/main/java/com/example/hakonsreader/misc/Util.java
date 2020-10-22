@@ -2,6 +2,7 @@ package com.example.hakonsreader.misc;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
@@ -117,6 +118,7 @@ public class Util {
 
     /**
      * Creates the text for text age text fields
+     *
      * <p>Formats to make sure that it says 3 hours, 5 minutes etc. based on what makes sense</p>
      *
      * @param resources Resources to retrieve strings from
@@ -133,6 +135,9 @@ public class Util {
             format = resources.getQuantityString(R.plurals.postAgeHours, (int) t);
         } else {
             t = time.toMinutes();
+            if (t < 1) {
+                return resources.getString(R.string.postAgeJustPosted);
+            }
             format = resources.getQuantityString(R.plurals.postAgeMinutes, (int) t);
         }
 

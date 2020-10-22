@@ -11,6 +11,13 @@
     <string name="btnLogIn">Log in</string>
     <string name="btnLogOut">Log out</string>
 
+    <string name="btnSubscribeSubscribe">+ Subscribe</string>
+    <string name="btnSubscrubeUnsubscribe">- Unsubscribe</string>
+    <plurals name="amountOfSubscribers">
+        <item quantity="one">%d subscriber</item>
+        <item quantity="other">%,d subscribers</item>
+    </plurals>
+
     <string name="numCommentsThousands">%.1fK comments</string>
     <plurals name="numComments">
         <item quantity="one">%d comment</item>
@@ -64,6 +71,8 @@
     <string name="prefs_key_play_muted_videos_fullscreen">play_muted_videos_fullscreen</string>
     <string name="prefs_key_loop_videos">loop_videos</string>
 
+    <!-- String for post ages that are "just posted", ie. < 1 minute -->
+    <string name="postAgeJustPosted">Just posted</string>
     <plurals name="postAgeMinutes">
         <item quantity="one">%d minute ago</item>
         <item quantity="other">%d minutes ago</item>
@@ -100,11 +109,4 @@
     <string name="transition_post_full_bar">post_full_bar</string>
 
     <string name="front_page">Front page</string>
-
-    <string name="subscribe_btn_subscribe">+ Subscribe</string>
-    <string name="subscribe_btn_unsubscribe">- Unsubscribe</string>
-    <plurals name="amount_of_subscribers">
-        <item quantity="one">%d subscriber</item>
-        <item quantity="other">%,d subscribers</item>
-    </plurals>
 </resources>
