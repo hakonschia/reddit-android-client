@@ -62,41 +62,13 @@ public class SelectSubredditsViewModel extends ViewModel {
      * Load the subreddits. If a user is logged in their subscribed subreddits are loaded, otherwise
      * default subs are loaded.
      *
-     * <p>The IDs are stored in SharedPreferences with the key {@link SelectSubredditsViewModel#SUBSCRIBED_SUBREDDITS_KEY}</p>
+     * <p>The list returned is not sorted</p>
      *
-     * <p>The order of the list will be, sorted alphabetically:
-     * <ol>
-     *     <li>Favorites (for logged in users)</li>
-     *     <li>The rest of the subreddits</li>
-     *     <li>Users the user is following</li>
-     * </ol>
-     * </p>
+     * <p>The IDs are stored in SharedPreferences with the key {@link SelectSubredditsViewModel#SUBSCRIBED_SUBREDDITS_KEY}</p>
      */
     public void loadSubreddits() {
         App.get().getApi().getSubreddits("", 0, subs -> {
-            List<Subreddit> sorted = subs.stream()
-                    // Sort based on subreddit name
-                    .sorted((first, second) -> first.getName().toLowerCase().compareTo(second.getName().toLowerCase()))
-                    .collect(Collectors.toList());
-
-            List<Subreddit> favorites = sorted.stream()
-                    .filter(Subreddit::isFavorited)
-                    .collect(Collectors.toList());
-
-            List<Subreddit> users = sorted.stream()
-                    .filter(subreddit -> subreddit.getSubredditType().equals("user"))
-                    .collect(Collectors.toList());
-
-            // Remove the favorites to not include twice
-            sorted.removeAll(favorites);
-            sorted.removeAll(users);
-
-            List<Subreddit> combined = new ArrayList<>();
-            combined.addAll(favorites);
-            combined.addAll(sorted);
-            combined.addAll(users);
-
-            subreddits.setValue(combined);
+            subreddits.setValue(subs);
 
             String[] ids = new String[subs.size()];
             for (int i = 0; i < subs.size(); i++) {
@@ -105,7 +77,7 @@ public class SelectSubredditsViewModel extends ViewModel {
 
             // Although NSFW subs might be inserted with this, it's fine as if the user
             // has subscribed to them it's fine (for non-logged in users, default subs don't include NSFW)
-            new Thread(() -> database.subreddits().insertAll(combined)).start();
+            new Thread(() -> database.subreddits().insertAll(subs)).start();
 
             SharedPreferencesManager.put(SUBSCRIBED_SUBREDDITS_KEY, ids);
         }, (code, t) -> {

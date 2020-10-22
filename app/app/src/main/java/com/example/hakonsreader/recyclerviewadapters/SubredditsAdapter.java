@@ -22,6 +22,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.ViewHolder> {
     private static final String TAG = "SubredditsAdapter";
@@ -40,7 +41,45 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
     public void setSubreddits(List<Subreddit> subreddits) {
         this.subreddits = subreddits;
+        this.sortSubreddits();
         notifyDataSetChanged();
+    }
+
+    /**
+     * Sorts {@link SubredditsAdapter#subreddits}
+     *
+     * <p>The order of the list will be, sorted alphabetically:
+     * <ol>
+     *     <li>Favorites (for logged in users)</li>
+     *     <li>The rest of the subreddits</li>
+     *     <li>Users the user is following</li>
+     * </ol>
+     * </p>
+     */
+    private void sortSubreddits() {
+        List<Subreddit> sorted = subreddits.stream()
+                // Sort based on subreddit name
+                .sorted((first, second) -> first.getName().toLowerCase().compareTo(second.getName().toLowerCase()))
+                .collect(Collectors.toList());
+
+        List<Subreddit> favorites = sorted.stream()
+                .filter(Subreddit::isFavorited)
+                .collect(Collectors.toList());
+
+        List<Subreddit> users = sorted.stream()
+                .filter(subreddit -> subreddit.getSubredditType().equals("user"))
+                .collect(Collectors.toList());
+
+        // Remove the favorites to not include twice
+        sorted.removeAll(favorites);
+        sorted.removeAll(users);
+
+        List<Subreddit> combined = new ArrayList<>();
+        combined.addAll(favorites);
+        combined.addAll(sorted);
+        combined.addAll(users);
+
+        subreddits = combined;
     }
 
     /**
