@@ -31,13 +31,20 @@ public class ViewUtil {
     public static void setSubredditIcon(ImageView imageView, Subreddit subreddit) {
         String iconURL = subreddit.getIconImage();
         String communityURL = subreddit.getCommunityIcon();
+
+        // We use error and placeholder as the default icon. In case no internet it would override
+        // the android:src in the layout, and the error isn't shown until the attempt to get the image has been made
         if (iconURL != null && !iconURL.isEmpty()) {
             Picasso.get()
                     .load(iconURL)
+                    .placeholder(R.drawable.ic_baseline_emoji_emotions_24)
+                    .error(R.drawable.ic_baseline_emoji_emotions_24)
                     .into(imageView);
         } else if(communityURL != null && !communityURL.isEmpty()) {
             Picasso.get()
                     .load(communityURL)
+                    .placeholder(R.drawable.ic_baseline_emoji_emotions_24)
+                    .error(R.drawable.ic_baseline_emoji_emotions_24)
                     .into(imageView);
         } else {
             imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_baseline_emoji_emotions_24));
