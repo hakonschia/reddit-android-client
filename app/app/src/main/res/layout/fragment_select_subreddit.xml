@@ -37,16 +37,16 @@
             android:id="@+id/subredditSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/searchForSubredditHint"
-
-            android:singleLine = "true"
-            android:imeOptions="actionDone"
-            android:inputType="text"
             android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_"
 
-            android:textCursorDrawable="@null"
+            android:hint="@string/searchForSubredditHint"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:singleLine="true"
+
             android:textColor="@color/text_color"
-            android:textColorHint="@color/secondary_text_color" />
+            android:textColorHint="@color/secondary_text_color"
+            android:textCursorDrawable="@drawable/edit_text_cursor_main_bg" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.recyclerview.widget.RecyclerView
