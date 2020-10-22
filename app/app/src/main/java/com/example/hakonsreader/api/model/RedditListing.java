@@ -37,7 +37,6 @@ public abstract class RedditListing {
     protected String kind;
 
     @PrimaryKey
-    @ForeignKey(entity = RedditListing.class, parentColumns = "id", childColumns = "id")
     @NonNull
     @SerializedName("id")
     protected String id;
@@ -57,7 +56,8 @@ public abstract class RedditListing {
     @SerializedName("created_utc")
     protected float createdAt;
 
-    @SerializedName("over_18")
+    // Posts use over_18, subreddits use over18. ¯\_(ツ)_/¯
+    @SerializedName(value = "over_18", alternate = "over18")
     protected boolean nsfw;
 
     @SerializedName("permalink")

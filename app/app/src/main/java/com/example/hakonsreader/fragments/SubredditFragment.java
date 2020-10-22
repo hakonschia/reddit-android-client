@@ -73,7 +73,7 @@ public class SubredditFragment extends Fragment {
      * Observable that automatically updates the UI when the internal object
      * is updated with {@link ObservableField#set(Object)}
      */
-    private ObservableField<Subreddit> subreddit = new ObservableField<Subreddit>() {
+    private final ObservableField<Subreddit> subreddit = new ObservableField<Subreddit>() {
         @Override
         public void set(Subreddit value) {
             super.set(value);
@@ -114,7 +114,7 @@ public class SubredditFragment extends Fragment {
      * The amount of items in the list at the last attempt at loading more posts
      */
     private int lastLoadAttemptCount;
-    private int screenHeight = App.get().getScreenHeight();
+    private final int screenHeight = App.get().getScreenHeight();
 
     private PostsViewModel postsViewModel;
     private PostsAdapter adapter;
@@ -124,7 +124,7 @@ public class SubredditFragment extends Fragment {
     /**
      * Listener for scrolling in the posts list that automatically tries to load more posts
      */
-    private View.OnScrollChangeListener scrollListener = (view, scrollX, scrollY, oldX, oldY) -> {
+    private final View.OnScrollChangeListener scrollListener = (view, scrollX, scrollY, oldX, oldY) -> {
         // Find the positions of first and last visible items to find all visible items
         int posFirstItem = layoutManager.findFirstVisibleItemPosition();
         int posLastItem = layoutManager.findLastVisibleItemPosition();
@@ -282,6 +282,37 @@ public class SubredditFragment extends Fragment {
         return subreddit.get().getName();
     }
 
+    /**
+     * Retrieves information for a subreddit from the Reddit API
+     *
+     * <p>{@link SubredditFragment#subreddit} is updated with the information retrieved from the API
+     * and is inserted into the local DB (if it is not a NSFW sub)</p>
+     *
+     * @param subredditName The name of the subreddit to get information for
+     */
+    private void retrieveSubredditInfo(String subredditName) {
+        App.get().getApi().getSubredditInfo(subredditName, sub -> {
+            new Thread(() -> {
+                // Lets assume the user doesn't want to store NSFW. We could use the setting for caching
+                // images/videos but it's somewhat going beyond the intent of the setting
+                if (!sub.isNsfw()) {
+                    Log.d(TAG, "onCreate: inserting sub");
+                    database.subreddits().insert(sub);
+                }
+            }).start();
+
+            subreddit.set(sub);
+        }, (code, t) -> {
+
+            // TODO 403 errors for subreddit means you must be invited to the subreddit
+            // TODO if SubredditNotFoundException do something with UI like "Subreddit doesn't exist, click here to create it" or something
+            // No point in showing this error to the user
+            if (!(t instanceof NoSubredditInfoException)) {
+                Util.handleGenericResponseErrors(getView(), code, t);
+            }
+        });
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -332,22 +363,7 @@ public class SubredditFragment extends Fragment {
                 }
             }).start();
 
-            App.get().getApi().getSubredditInfo(subredditName, sub -> {
-                new Thread(() -> {
-                    // TODO this should probably just update as you might not want to store stuff like nsfw subs
-                    database.subreddits().insert(sub);
-                }).start();
-
-                subreddit.set(sub);
-            }, (code, t) -> {
-
-                // TODO 403 errors for subreddit means you must be invited to the subreddit
-                // TODO if SubredditNotFoundException do something with UI like "Subreddit doesn't exist, click here to create it" or something
-                // No point in showing this error to the user
-                if (!(t instanceof NoSubredditInfoException)) {
-                    Util.handleGenericResponseErrors(getView(), code, t);
-                }
-            });
+            this.retrieveSubredditInfo(subredditName);
         }
     }
 
@@ -386,6 +402,7 @@ public class SubredditFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(TAG, "onPause: ");
 
         if (saveState == null) {
             saveState = new Bundle();
