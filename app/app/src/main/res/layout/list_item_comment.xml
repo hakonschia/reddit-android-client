@@ -34,67 +34,75 @@
             type="boolean" />
     </data>
 
+    <!-- TODO flatten this layout -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background">
+        android:background="@color/background"
 
-        <LinearLayout
-            android:id="@+id/sideBars"
+        android:onClick="@{view -> commentHidden ? adapter.showComments(comment) : void}"
+        android:onLongClick="@{view -> commentHidden ? ClickHandler.emptyClickBoolean() : adapter.hideCommentsLongClick(view, comment)}"
+
+        android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}"
+        android:paddingBottom="@{commentHidden ? @dimen/hiddenCommentBottomPadding : 0}">
+
+        <!-- The barrier for the side bars. The sidebars are referenced by the barrier, and everything else is
+         put to the right of the barrier-->
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/sideBarsBarrier"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
 
-            android:orientation="horizontal"
-            app:sideBars="@{comment.depth}"
+            app:barrierDirection="right"
 
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
 
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:layout_width="50dp"/>
+            app:sideBars="@{comment.depth}" />
 
         <!-- Layout for '2 more comments' comments (when clicked load the comments) -->
-        <LinearLayout
+        <TextView
+            android:id="@+id/moreComments"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-
             android:onClick="@{(view) -> adapter.getMoreComments(view, comment)}"
+            android:text="@{@plurals/extraComments(comment.extraCommentsCount, comment.extraCommentsCount)}"
+
+            android:textColor="@color/link_color"
             android:visibility="@{isMoreComments ? View.VISIBLE : View.GONE}"
 
-            app:layout_constraintStart_toEndOf="@+id/sideBars"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/sideBarsBarrier"
+            app:layout_constraintTop_toTopOf="parent"
 
-            tools:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:text="@{@plurals/extraComments(comment.extraCommentsCount, comment.extraCommentsCount)}"
-                android:textColor="@color/link_color" />
-        </LinearLayout>
+            tools:visibility="gone" />
 
         <!-- Normal comment layout. Even if the layout visibility is set to GONE it might still render
          the view, which is probably inefficient (function calls are still called). Might be better for
          performance to do something with this in code instead -->
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/normalComment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}"
-            android:paddingBottom="@{commentHidden ? @dimen/hiddenCommentBottomPadding : 0}"
 
-            android:onClick="@{view -> commentHidden ? adapter.showComments(comment) : void}"
-            android:onLongClick="@{view -> commentHidden ? ClickHandler.emptyClickBoolean() : adapter.hideCommentsLongClick(view, comment)}"
             android:visibility="@{isMoreComments ? View.GONE : View.VISIBLE}"
-
-            app:layout_constraintStart_toEndOf="@+id/sideBars"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintStart_toEndOf="@+id/sideBarsBarrier"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Group to hide elements when the comment is hidden
+            Everything but the author and age are hidden -->
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/commentHiddenGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:visibility="@{commentHidden ? View.GONE : View.VISIBLE}"
+                app:constraint_referenced_ids="authorFlair, commentContent, commentVoteBar, reply" />
 
             <!-- TODO set onClick for author to go to their profile -->
             <TextView
@@ -102,16 +110,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-
                 android:text='@{comment != null ? @string/author_prefixed(comment.author) : "" }'
                 android:textColor="@color/link_color"
-                android:typeface="@{Typeface.defaultFromStyle(commentHidden ? Typeface.ITALIC : Typeface.NORMAL)}"
 
+                android:typeface="@{Typeface.defaultFromStyle(commentHidden ? Typeface.ITALIC : Typeface.NORMAL)}"
                 app:asAdmin="@{comment.admin}"
                 app:asMod="@{comment.mod}"
+
                 app:asPoster="@{post.author.equals(comment.author)}"
+                app:layout_constraintStart_toEndOf="@+id/sideBarsBarrier"
+                app:layout_constraintTop_toTopOf="parent"
 
                 tools:text="u/hakonschia" />
 
@@ -122,14 +130,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
 
-                android:visibility="@{commentHidden ? View.GONE : View.VISIBLE}"
                 app:authorFlair="@{comment}"
 
-                app:layout_constraintWidth_default="wrap"
-                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintBottom_toBottomOf="@+id/commentAuthor"
                 app:layout_constraintStart_toEndOf="@+id/commentAuthor"
-                app:layout_constraintTop_toTopOf="@+id/commentAuthor"/>
+                app:layout_constraintTop_toTopOf="@+id/commentAuthor" />
 
             <TextView
                 android:id="@+id/commentAge"
@@ -147,8 +152,8 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@id/authorFlair"
                 app:layout_constraintTop_toTopOf="parent"
-
                 app:layout_constraintWidth_default="wrap"
+
                 tools:text="2h ago" />
 
             <!-- Stickied and locked icons
@@ -189,7 +194,6 @@
                 android:onLongClick="@{(view) -> adapter.hideCommentsLongClickText(view, comment)}"
                 android:textColor="@color/text_color"
                 android:textColorLink="@color/link_color"
-                android:visibility="@{commentHidden ? View.GONE : View.VISIBLE}"
 
                 app:commentMarkdown="@{comment.body}"
 
@@ -211,7 +215,7 @@
                 android:onClick="@{(view) -> adapter.replyListener.replyTo(comment)}"
                 android:src="@drawable/ic_baseline_reply_24"
 
-                android:visibility="@{post.locked || commentHidden ? View.GONE : View.VISIBLE}"
+                android:visibility="@{post.locked ? View.GONE : View.VISIBLE}"
 
                 app:layout_constraintEnd_toStartOf="@+id/commentVoteBar"
                 app:layout_constraintTop_toBottomOf="@+id/commentContent" />
@@ -220,8 +224,6 @@
                 android:id="@+id/commentVoteBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:visibility="@{commentHidden ? View.GONE : View.VISIBLE}"
 
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/reply" />

@@ -5,11 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.Barrier;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +31,8 @@ import com.example.hakonsreader.views.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION;
 
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
@@ -289,32 +293,81 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     /**
      * Adds sidebars to the comment (to visually show the comment depth)
      *
-     * @param layout The layout to add the sidebars to
+     * @param barrier The layout to add the sidebars to
      * @param depth The depth of the comment
      */
     @BindingAdapter("sideBars")
-    public static void addSideBars(LinearLayout layout, int depth) {
-        Resources res = layout.getResources();
+    public static void addSideBars(Barrier barrier, int depth) {
+        final String childDescription = "sidebar";
+        final ConstraintLayout parent = (ConstraintLayout) barrier.getParent();
+
+        // Find the previous sidebars and remove them
+        ArrayList<View> outputViews = new ArrayList<>();
+        parent.findViewsWithText(outputViews, childDescription, FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
+        outputViews.forEach(parent::removeView);
+
+        // Top level comments don't have sidebars
+        if (depth == 0) {
+            return;
+        }
+
+        Resources res = barrier.getResources();
         int barWidth = (int)res.getDimension(R.dimen.commentSideBarWidth);
         int indent = (int)res.getDimension(R.dimen.commentDepthIndent);
 
-        // The layout is recycled so ensure the previos views are removed
-        layout.removeAllViews();
+        View previous = null;
+        // The reference IDs the barrier will use
+        int[] referenceIds = new int[depth];
 
         // Every comment is only responsible for the lines to its side, so each line will match up
         // with the line for the comment above and below to create a long line throughout the entire list
-        // Also top level comments don't have a side bar as that looks weird (i <= comment.getDepth() to add it)
         for (int i = 0; i < depth; i++) {
-            View view = new View(layout.getContext());
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(barWidth, ViewGroup.LayoutParams.MATCH_PARENT);
-            ViewGroup.MarginLayoutParams marginLayoutParams = new ViewGroup.MarginLayoutParams(params);
-            marginLayoutParams.rightMargin = indent;
+            int id = View.generateViewId();
+            referenceIds[i] = id;
 
-            view.setLayoutParams(marginLayoutParams);
-            view.setBackgroundColor(ContextCompat.getColor(layout.getContext(), R.color.commentSideBar));
+            View view = new View(barrier.getContext());
 
-            layout.addView(view);
+            view.setBackgroundColor(ContextCompat.getColor(barrier.getContext(), R.color.commentSideBar));
+            view.setContentDescription(childDescription);
+            view.setId(id);
+
+            // Set constraints
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(parent);
+
+            // The width of the view is set with this
+            constraintSet.constrainWidth(id, barWidth);
+
+            // With the sidebar constrained to top/bottom of parent, MATCH_CONSTRAINT height will match the parent height
+            // bottom_toBottomOf=parent
+            constraintSet.connect(id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+            // top_toTopOf=parent
+            constraintSet.connect(id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+
+            // If previous is null, set start_toStart to parent (the first sidebar), otherwise set start_toEnd to previous
+            if (previous == null) {
+                // start_toStartOf=parent
+                constraintSet.connect(id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+            } else {
+                // start_toEndOf=<previous side bar>
+                constraintSet.connect(id, ConstraintSet.START, previous.getId(), ConstraintSet.END, indent);
+            }
+
+            // Last sidebar, connect the end to the end of the barrier to create a margin
+            if (i == depth - 1) {
+                constraintSet.connect(id, ConstraintSet.END, barrier.getId(), ConstraintSet.END, indent);
+            }
+
+            // The view has to be added to the layout BEFORE the constraints are set, otherwise they wont work
+            parent.addView(view);
+            previous = view;
+
+            constraintSet.applyTo(parent);
         }
+
+        // The barrier will move to however long out it has to, so we don't have to adjust anything
+        // with the layout itself
+        barrier.setReferencedIds(referenceIds);
     }
 
     /**
@@ -467,7 +520,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             // Remove the previous comment (this is the "2 more comments" comment)
             this.removeComment(comment);
-
 
             if (finalParent != null) {
                 finalParent.removeReply(comment);

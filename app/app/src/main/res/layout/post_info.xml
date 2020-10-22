@@ -15,9 +15,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingStart="@dimen/defaultIndent"
-        android:paddingEnd="@dimen/defaultIndent">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/subreddit"
@@ -35,33 +33,11 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="r/GlobalOffensive" />
 
-        <!-- Technically if the age text expands too long the domain would disappear
-          but that *knock on wood* wont happen as it's just "2 minutes" "1 day" etc. -->
-        <TextView
-            android:id="@+id/age"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-
-            android:textColor="@color/secondary_text_color"
-            android:textSize="13sp"
-            app:createdAt="@{post != null ? post.createdAt : -1}"
-
-            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
-            app:layout_constraintEnd_toStartOf="@+id/stickied"
-            app:layout_constraintStart_toEndOf="@+id/subreddit"
-            app:layout_constraintTop_toTopOf="@+id/subreddit"
-            app:layout_constraintHorizontal_bias="0.0"
-
-            tools:text="2 hours" />
-
         <TextView
             android:id="@+id/domain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="8dp"
 
             android:ellipsize="end"
             android:maxLines="1"
@@ -72,26 +48,48 @@
 
             app:layout_constrainedWidth="true"
             app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintBottom_toBottomOf="@+id/subreddit"
-            app:layout_constraintEnd_toStartOf="@+id/stickied"
-            app:layout_constraintStart_toEndOf="@+id/age"
+            app:layout_constraintEnd_toStartOf="@+id/age"
+            app:layout_constraintStart_toEndOf="@+id/subreddit"
             app:layout_constraintTop_toTopOf="@+id/subreddit"
 
-            tools:text="ihopeiactually.seeadomainthatwillcutoff.com" />
+            tools:text="ihopeiactually.seeadomainthatwillcutsoff.com" />
+
+        <TextView
+            android:id="@+id/age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/secondary_text_color"
+
+            android:textSize="13sp"
+            app:createdAt="@{post != null ? post.createdAt : -1}"
+            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
+
+            app:layout_constraintEnd_toStartOf="@+id/stickied"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/domain"
+
+            app:layout_constraintTop_toTopOf="@+id/subreddit"
+            tools:text="2 hours ago" />
+
 
         <!-- Extra icons such as stickied, locked etc. -->
         <ImageView
             android:id="@+id/stickied"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:layout_marginStart="10dp"
 
+            android:layout_marginEnd="8dp"
             android:src="@drawable/ic_stickied"
-            android:visibility="@{post.stickied ? View.VISIBLE : View.GONE, default=gone}"
 
+            android:visibility="@{post.stickied ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintBottom_toBottomOf="@+id/subreddit"
             app:layout_constraintEnd_toStartOf="@+id/lock"
-
             app:layout_constraintTop_toTopOf="@+id/subreddit"
             tools:visibility="visible" />
 
@@ -105,7 +103,6 @@
 
             app:layout_constraintBottom_toBottomOf="@+id/subreddit"
             app:layout_constraintEnd_toEndOf="parent"
-
             app:layout_constraintTop_toTopOf="@+id/subreddit"
             tools:visibility="visible" />
 
@@ -145,10 +142,9 @@
             android:layout_marginTop="5dp"
             android:orientation="horizontal"
 
-
+            app:layout_constraintEnd_toEndOf="@+id/subreddit"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/subreddit"
-            app:layout_constraintEnd_toEndOf="@+id/subreddit"
             app:layout_constraintTop_toBottomOf="@+id/author"
 
             app:linkFlair="@{post}"
@@ -167,8 +163,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tags"
 
-            tools:text="FaZe wins major /s. To  am adding a bunch of random text here" />
+            app:layout_constraintTop_toBottomOf="@+id/tags"
+            tools:text="FaZe wins major /s. To show a long title I am adding a bunch of random text here Lorem ipsum etc etc" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

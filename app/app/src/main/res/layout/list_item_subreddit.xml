@@ -1,41 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
-    android:paddingBottom="10dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginBottom="8dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/icon"
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="16dp"
 
-        tools:src="@drawable/ic_baseline_emoji_emotions_24"/>
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_baseline_emoji_emotions_24" />
 
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_color"
-        android:textSize="20sp"
-        android:layout_marginStart="10dp"
-        tools:text="GlobalOffensive"/>
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:maxLines="1"
+        android:textColor="@color/text_color"
+
+        android:textSize="20sp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@+id/favoriteSub"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="GlobalOffensiveReallyLongSubreddit" />
 
     <ImageButton
         android:id="@+id/favoriteSub"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|end"
-        android:layout_marginEnd="15dp"
+        android:layout_marginEnd="16dp"
 
         android:background="?android:selectableItemBackground"
-        android:src="@drawable/ic_baseline_star_24" />
+        android:src="@drawable/ic_baseline_star_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
