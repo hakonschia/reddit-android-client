@@ -46,6 +46,16 @@ public interface RedditSubredditsDao {
     @Query("SELECT * FROM subreddits")
     List<Subreddit> getAll();
 
+
+    /**
+     * Retrieves a list of subreddits based on an array of IDs
+     *
+     * @param ids The IDs to retrieve
+     * @return A list of subreddits based on the IDs
+     */
+    @Query("SELECT * FROM subreddits WHERE id IN (:ids)")
+    List<Subreddit> getSubsById(String[] ids);
+
     /**
      * Get the subreddit object from its name
      *

@@ -91,14 +91,10 @@ public class SelectSubredditFragment extends Fragment {
         viewModel = new ViewModelProvider(this, new SelectSubredditsFactory(
                 getContext()
         )).get(SelectSubredditsViewModel.class);
-
-        viewModel.getSubreddits().observe(getViewLifecycleOwner(), subreddits -> {
-            subredditsAdapter.setSubreddits(subreddits);
-        });
+        viewModel.getSubreddits().observe(getViewLifecycleOwner(), subredditsAdapter::setSubreddits);
+        viewModel.loadSubreddits();
 
         binding.subredditSearch.setOnEditorActionListener(actionDoneListener);
-
-        viewModel.loadSubreddits();
 
         return binding.getRoot();
     }
