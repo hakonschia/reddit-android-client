@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+import androidx.databinding.BindingAdapter;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
@@ -13,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Locale;
 
 public class Util {
@@ -115,9 +118,9 @@ public class Util {
     }
 
 
-
     /**
-     * Creates the text for text age text fields
+     * Creates the text for text age text fields. For a shorter text see 
+     * {@link Util#createAgeShortenedText(Resources, Duration)}
      *
      * <p>Formats to make sure that it says 3 hours, 5 minutes etc. based on what makes sense</p>
      *
@@ -143,6 +146,70 @@ public class Util {
 
         return String.format(Locale.getDefault(), format, t);
     }
+    /**
+     * Binding adapter for setting the age text on the post. The text is formatted as "2 hours", "1 day" etc.
+     * For a shortened text (5m etc.) use {@link Util#setAgeTextShortened(TextView, long)}
+     *
+     * @param textView The textView to set the text on
+     * @param createdAt The timestamp the post was created at. If this is negative nothing is done
+     */
+    @BindingAdapter({"createdAt"})
+    public static void setAgeText(TextView textView, long createdAt) {
+        if (createdAt >= 0) {
+            Instant created = Instant.ofEpochSecond(createdAt);
+            Instant now = Instant.now();
+            Duration between = Duration.between(created, now);
+
+            textView.setText(Util.createAgeText(textView.getResources(), between));
+        }
+    }
+
+    /**
+     * Creates the text for text age text fields with a shorter text than with
+     * {@link Util#createAgeText(Resources, Duration)}
+     *
+     * <p>Formats to make sure that it says 3h, 5m etc. based on what makes sense</p>
+     *
+     * @param resources Resources to retrieve strings from
+     * @param time The time to format as
+     * @return The time formatted as a string
+     */
+    public static String createAgeTextShortened(Resources resources, Duration time) {
+        String format;
+        long t;
+
+        if ((t = time.toDays()) > 0) {
+            format = resources.getString(R.string.postAgeDaysShortened, (int) t);
+        } else if ((t = time.toHours()) > 0) {
+            format = resources.getString(R.string.postAgeHoursShortened, (int) t);
+        } else {
+            t = time.toMinutes();
+            if (t < 1) {
+                return resources.getString(R.string.postAgeJustPosted);
+            }
+            format = resources.getString(R.string.postAgeMinutesShortened, (int) t);
+        }
+
+        return String.format(Locale.getDefault(), format, t);
+    }
+    /**
+     * Binding adapter for setting the age text on the post. The text is formatted as "2h", "1d" etc..
+     * For a longer text (5 minutes etc.) use {@link Util#setAgeText(TextView, long)}
+     *
+     * @param textView The textView to set the text on
+     * @param createdAt The timestamp the post was created at. If this is negative nothing is done
+     */
+    @BindingAdapter({"createdAtShortened"})
+    public static void setAgeTextShortened(TextView textView, long createdAt) {
+        if (createdAt >= 0) {
+            Instant created = Instant.ofEpochSecond(createdAt);
+            Instant now = Instant.now();
+            Duration between = Duration.between(created, now);
+
+            textView.setText(Util.createAgeTextShortened(textView.getResources(), between));
+        }
+    }
+
 
     /**
      * Create a duration string in the format of "mm:ss" that can be used in videos

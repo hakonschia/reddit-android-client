@@ -146,7 +146,7 @@
                 android:maxLines="1"
                 android:textColor="@color/secondary_text_color"
                 android:typeface="@{Typeface.defaultFromStyle(commentHidden ? Typeface.ITALIC : Typeface.NORMAL)}"
-                app:createdAt="@{comment != null ? comment.createdAt : -1}"
+                app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"
 
                 app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toStartOf="@+id/stickied"
@@ -154,7 +154,7 @@
                 app:layout_constraintStart_toEndOf="@id/authorFlair"
                 app:layout_constraintTop_toTopOf="parent"
 
-                tools:text="2h ago" />
+                tools:text="2h" />
 
             <!-- Stickied and locked icons
             These need default to GONE or else they will appear for a split second before

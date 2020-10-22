@@ -56,23 +56,6 @@ public class PostInfo extends ConstraintLayout {
     }
 
     /**
-     * Binding adapter for setting the age text on the post. The text is formatted as "2 hours", "1 day" etc.
-     *
-     * @param textView The textView to set the text on
-     * @param createdAt The timestamp the post was created at. If this is negative nothing is done
-     */
-    @BindingAdapter({"createdAt"})
-    public static void setAgeText(TextView textView, long createdAt) {
-        if (createdAt >= 0) {
-            Instant created = Instant.ofEpochSecond(createdAt);
-            Instant now = Instant.now();
-            Duration between = Duration.between(created, now);
-
-            textView.setText(Util.createAgeText(textView.getResources(), between));
-        }
-    }
-
-    /**
      * Creates and adds the tags for the post
      */
     @BindingAdapter({"spoiler", "nsfw", "linkFlair"})

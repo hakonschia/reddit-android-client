@@ -44,6 +44,7 @@
             android:inputType="text"
             android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_"
 
+            android:textCursorDrawable="@null"
             android:textColor="@color/text_color"
             android:textColorHint="@color/secondary_text_color" />
     </com.google.android.material.textfield.TextInputLayout>
