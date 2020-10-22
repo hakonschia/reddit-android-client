@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         // For testing purposes hardcode going into a subreddit/post etc.
         Intent intent = new Intent(this, DispatcherActivity.class);
         intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/test/");
-        startActivity(intent);
+        //startActivity(intent);
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);
@@ -182,12 +182,12 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
      * Called when a subreddit has been selected from a {@link SelectSubredditFragment} fragment
      * <p>A new instance of {@link SubredditFragment} is created and shown</p>
      *
-     * @param subreddit The subreddit selected
+     * @param subredditName The subreddit selected
      */
     @Override
-    public void subredditSelected(Subreddit subreddit) {
+    public void subredditSelected(String subredditName) {
         // Create new subreddit fragment and replace
-        activeSubreddit = SubredditFragment.newInstance(subreddit.getName());
+        activeSubreddit = SubredditFragment.newInstance(subredditName);
         replaceFragment(activeSubreddit);
     }
 

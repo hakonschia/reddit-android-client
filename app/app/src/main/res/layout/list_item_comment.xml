@@ -138,9 +138,9 @@
 
             <TextView
                 android:id="@+id/commentAge"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="8dp"
 
                 android:ellipsize="end"
                 android:maxLines="1"
@@ -148,11 +148,11 @@
                 android:typeface="@{Typeface.defaultFromStyle(commentHidden ? Typeface.ITALIC : Typeface.NORMAL)}"
                 app:createdAt="@{comment != null ? comment.createdAt : -1}"
 
+                app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toStartOf="@+id/stickied"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@id/authorFlair"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_default="wrap"
 
                 tools:text="2h ago" />
 
@@ -187,7 +187,6 @@
 
             <TextView
                 android:id="@+id/commentContent"
-
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 

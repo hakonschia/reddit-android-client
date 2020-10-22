@@ -14,7 +14,6 @@
 
         android:src="@drawable/ic_baseline_message_24"
 
-
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

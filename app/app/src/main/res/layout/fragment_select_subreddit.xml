@@ -13,31 +13,51 @@
         android:id="@+id/searchIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_baseline_search_40"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:layout_marginStart="8dp"
 
-    <EditText
-        android:id="@+id/subredditSearch"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/searchForSubredditHint"
+
+        android:src="@drawable/ic_baseline_search_40"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/subredditSearchLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/accent"
-        android:hint="@string/searchForSubreddit"
-        android:inputType="text"
-        android:textColor="@color/text_color"
-        android:textColorHint="@color/secondary_text_color"
+
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/searchIcon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/searchIcon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/searchIcon">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/subredditSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/searchForSubredditHint"
+
+            android:singleLine = "true"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_"
+
+            android:textColor="@color/text_color"
+            android:textColorHint="@color/secondary_text_color" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/subreddits"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subredditSearch"
+        app:layout_constraintTop_toBottomOf="@id/subredditSearchLayout"
         tools:listitem="@layout/list_item_subreddit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

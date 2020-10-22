@@ -10,7 +10,6 @@
         android:id="@+id/icon"
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:layout_marginStart="16dp"
 
         app:layout_constraintStart_toStartOf="parent"
 
@@ -34,14 +33,13 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/icon"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="GlobalOffensiveReallyLongSubreddit" />
+        tools:text="GlobalOffensiveReallyReallyLongSubreddit" />
 
     <ImageButton
         android:id="@+id/favoriteSub"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|end"
-        android:layout_marginEnd="16dp"
 
         android:background="?android:selectableItemBackground"
         android:src="@drawable/ic_baseline_star_24"

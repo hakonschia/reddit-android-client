@@ -102,7 +102,8 @@
     <string name="tagNSFW">NSFW</string>
     <string name="tagSpoiler">Spoiler</string>
 
-    <string name="searchForSubreddit">Search for subreddit</string>
+    <string name="searchForSubredditHint">Search for subreddit</string>
+    <string name="subredditMustBeBetweenLength">Subreddit name must be between 3 and 21 characters</string>
 
     <string name="transition_post_info">post_info</string>
     <string name="transition_post_content">post_content</string>

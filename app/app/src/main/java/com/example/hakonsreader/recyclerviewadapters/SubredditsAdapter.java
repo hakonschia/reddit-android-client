@@ -109,7 +109,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
                 int pos = getAdapterPosition();
 
                 if (subredditSelected != null && pos != RecyclerView.NO_POSITION) {
-                    subredditSelected.subredditSelected(subreddits.get(pos));
+                    subredditSelected.subredditSelected(subreddits.get(pos).getName());
                 }
             });
 

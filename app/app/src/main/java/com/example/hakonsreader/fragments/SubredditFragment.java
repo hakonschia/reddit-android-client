@@ -340,6 +340,8 @@ public class SubredditFragment extends Fragment {
 
                 subreddit.set(sub);
             }, (code, t) -> {
+
+                // TODO 403 errors for subreddit means you must be invited to the subreddit
                 // TODO if SubredditNotFoundException do something with UI like "Subreddit doesn't exist, click here to create it" or something
                 // No point in showing this error to the user
                 if (!(t instanceof NoSubredditInfoException)) {
