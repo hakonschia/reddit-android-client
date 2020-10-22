@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -100,6 +101,18 @@ public class PostActivity extends AppCompatActivity {
         // Previous is upwards, next is down
         binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment);
         binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        binding.post.pauseVideo();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        binding.post.playVideo();
     }
 
     @Override
