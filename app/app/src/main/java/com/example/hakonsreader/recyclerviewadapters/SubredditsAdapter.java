@@ -40,8 +40,12 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
     }
 
     public void setSubreddits(List<Subreddit> subreddits) {
+        List<Subreddit> previous = this.subreddits;
         this.subreddits = subreddits;
         this.sortSubreddits();
+
+        // Find differences between previous and this.subreddits to show animation with notifyItemInserted, notifyItemRemoved etc
+
         notifyDataSetChanged();
     }
 

@@ -39,6 +39,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="16dp"
                     android:background="@drawable/rounded_square_main_bg_gradient">
 
                     <TextView
@@ -46,97 +47,87 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
-                        android:layout_marginStart="15dp"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginStart="8dp"
 
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toBottomOf="@id/subredditInfo"
-
-                        android:text="@{subreddit.subscribed ? @string/btnSubscrubeUnsubscribe : @string/btnSubscribeSubscribe}"
-                        android:textSize="12sp"
-                        android:textColor="@color/text_color"
-                        android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
                         android:background="@drawable/border_opposite_bg"
+                        android:text="@{subreddit.subscribed ? @string/btnSubscrubeUnsubscribe : @string/btnSubscribeSubscribe}"
 
-                        tools:text="@string/btnSubscribeSubscribe"/>
-
-                    <LinearLayout
-                        android:id="@+id/subredditInfo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-
-                        app:layout_constraintTop_toTopOf="parent"
+                        android:textColor="@color/text_color"
+                        android:textSize="12sp"
+                        android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
+
+                        tools:text="@string/btnSubscribeSubscribe" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/subredditIcon"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_marginTop="5dp"
+
+                        app:subredditIcon="@{subreddit}"
+                        app:civ_border_width="2dp"
+                        app:civ_border_color="#FFFFFF"
+
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
 
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        tools:src="@drawable/ic_baseline_emoji_emotions_24" />
 
-                        <de.hdodenhof.circleimageview.CircleImageView
-                            android:id="@+id/subredditIcon"
-                            android:layout_width="65dp"
-                            android:layout_height="65dp"
-                            android:layout_marginTop="5dp"
-
-                            app:subredditIcon="@{subreddit}"
-                            app:civ_border_width="2dp"
-                            app:civ_border_color="#FFFFFF"
-
-                            tools:src="@drawable/ic_baseline_emoji_emotions_24" />
-
-                        <TextView
-                            android:id="@+id/subredditName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-
-                            android:text="@{subreddit.name.empty ? @string/front_page : subreddit.name}"
-                            android:textSize="25sp"
-                            android:textColor="@color/text_color"
-
-                            tools:text="GlobalOffensive"/>
-
-                        <TextView
-                            android:id="@+id/subredditSubscribers"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-
-                            android:text="@{@plurals/amountOfSubscribers(subreddit.subscribers, subreddit.subscribers)}"
-                            android:textColor="@color/secondary_text_color"
-                            android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
-
-                            tools:text="643 000 subscribers" />
-
-                        <Space
-                            android:layout_width="match_parent"
-                            android:layout_height="5dp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/subredditName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginEnd="15dp"
-                        app:layout_constraintBottom_toBottomOf="@id/subredditInfo"
-                        app:layout_constraintEnd_toEndOf="parent">
 
-                        <ImageButton
-                            android:id="@+id/subredditRefresh"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                        android:text="@{subreddit.name.empty ? @string/front_page : subreddit.name}"
+                        android:textSize="25sp"
+                        android:textColor="@color/text_color"
 
-                            android:background="?android:selectableItemBackground"
-                            android:src="@drawable/ic_baseline_autorenew_24" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/subredditIcon"
 
-                        <ImageButton
-                            android:id="@+id/subredditSort"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                        tools:text="GlobalOffensive"/>
 
-                            android:background="?android:selectableItemBackground"
-                            android:src="@drawable/ic_baseline_sort_24"/>
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/subredditSubscribers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:text="@{@plurals/amountOfSubscribers(subreddit.subscribers, subreddit.subscribers)}"
+                        android:textColor="@color/secondary_text_color"
+                        android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
+
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/subredditName"
+
+                        tools:text="643 000 subscribers" />
+
+                    <ImageButton
+                        android:id="@+id/subredditRefresh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginEnd="8dp"
+                        android:background="?android:selectableItemBackground"
+                        android:src="@drawable/ic_baseline_autorenew_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/subredditSort" />
+
+                    <ImageButton
+                        android:id="@+id/subredditSort"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginEnd="8dp"
+                        android:background="?android:selectableItemBackground"
+
+                        android:src="@drawable/ic_baseline_sort_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.appcompat.widget.Toolbar>
