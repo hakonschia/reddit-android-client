@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.DispatcherActivity;
+import com.example.hakonsreader.api.utils.LinkUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,19 +35,13 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
     public static final Pattern RE = Pattern.compile(
             // Match whitespace, start of string, in a parenthesis, or not in a [] (ie. already a markdown link)
             "(^|\\s|\\(|(?=\\[))" +
-            // Optional "/" at the start
-            "/?" +
-            "(" +
-            // Subreddits: Match either r or R preceded by a / and characters, 0-9, _
-            "([rR]/[A-Za-z09_]+)" +
-            // Users: Match either u or U preceded by a / and characters, 0-9, _, -
-            "|([uU]/[A-Za-z0-9_-]+)" +
-            ")" +
-            // Optional / at the end
-            "/?");
+            // Match either subreddit or user regex
+            "(" + LinkUtils.SUBREDDIT_REGEX + ")" +
+            "(|" + LinkUtils.SUBREDDIT_REGEX + ")"
+    );
 
 
-    private Context context;
+    private final Context context;
 
     /**
      * Creates a new reddit link plugin

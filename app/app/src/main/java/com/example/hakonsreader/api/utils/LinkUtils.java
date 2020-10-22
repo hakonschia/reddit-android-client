@@ -8,10 +8,7 @@ package com.example.hakonsreader.api.utils;
 public final class LinkUtils {
 
     /**
-     * Regex for matching a subreddit URL
-     *
-     * <p>Note that this doesn't check for the start of the string (^) so it can be used for
-     * both stand-alone subreddit references (only r/...) and full URLs (reddit.com/r/...)</p>
+     * Regex for matching a subreddit URL. Matches either a full URL (only https, www optional) or only "r/...."
      *
      * <p>Examples:</p>
      * <ol>
@@ -19,15 +16,17 @@ public final class LinkUtils {
      * <li>/r/instant_karma</li>
      * <li>R/GlobalOffensive</li>
      * <li>/R/Hello</li>
+     * <li>https://www.reddit.com/r/test</li>
+     * <li>https://reddit.com/r/test</li>
      * </ol>
      */
-    public static final String SUBREDDIT_REGEX = ".*/?(r|R)/[A-Za-z_]+/?$";
+    // TODO this isn't 100 % as it will match "..reddit.comr/subreddit" since the first slash is optional
+    //  it has to be there for the full link, but if it's added to the actual link part that is optional, adding
+    //  as an optional to the rest will make it so you can match two (ie ".com//r/subreddit")
+    public static final String SUBREDDIT_REGEX = "(https://(www.)?reddit.com)?/?(r|R)/[A-Za-z0-9_]+/?";
 
     /**
-     * Regex for matching a URL to a user
-     *
-     * <p>Note that this doesn't check for the start of the string (^) so it can be used for
-     * both stand-alone user references (only u/...) and full URLs (reddit.com/u/...)</p>
+     * Regex for matching a URL to a user. Matches either a full URL (only https, www optional) or only "u/...."
      *
      * <p>Examples:</p>
      * <ol>
@@ -35,9 +34,10 @@ public final class LinkUtils {
      * <li>/u/hakonschia</li>
      * <li>user/hakonschia</li>
      * <li>/user/hakonschia_two</li>
+     * <li>/user/hakonschia-three</li>
      * </ol>
      */
-    public static final String USER_REGEX = ".*/?u(ser)?/[A-Za-z_]+/?$";
+    public static final String USER_REGEX = "(https://(www.)?reddit.com)?/?u(ser)?/[A-Za-z0-9_-]+/?";
 
     /**
      * Regex matching a post URL
