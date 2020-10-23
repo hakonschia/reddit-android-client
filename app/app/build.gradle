@@ -76,6 +76,9 @@ dependencies {
 
     implementation 'com.jakewharton:process-phoenix:2.0.0'
 
+    implementation 'com.robinhood.ticker:ticker:2.0.2'
+
+
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.7.22'
 

@@ -3,6 +3,7 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -59,6 +60,12 @@ public class Tag extends LinearLayout {
     public void add(View view) {
         view.setPadding(5, 0, 5, 1);
         binding.tags.addView(view);
+
+        // Constrain top to top of parent, bottom to bottom of parent
+        // Constrain start to end of previous (to start of parent if first)
+        // Constrain end to end of parent
+
+        // Constrain the start of the previous (if not first) to end of this view
     }
 
     /**
@@ -92,13 +99,21 @@ public class Tag extends LinearLayout {
      *
      * <p>Note the text color must be set with {@link Tag#setTextColor(int)} before this is called</p>
      *
-     * @param text The text to add
+     * @param text The text to add. If this is empty nothing is added to the tag
      */
     public void addText(String text) {
+        if (text.isEmpty()) {
+            return;
+        }
+        // TODO check if previous with added was a textview, if so we can probably just add the text to that instead (with a space)
         TextView tv = new TextView(getContext());
+
         tv.setText(text);
         tv.setTextColor(textColor);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, getContext().getResources().getDimension(R.dimen.tagTextSize));
+
+        tv.setEllipsize(TextUtils.TruncateAt.END);
+        tv.setMaxLines(1);
 
         this.add(tv);
     }

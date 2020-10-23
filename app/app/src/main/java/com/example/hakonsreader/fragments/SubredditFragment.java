@@ -28,10 +28,14 @@ import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
 import com.example.hakonsreader.views.ListDivider;
+import com.robinhood.ticker.TickerUtils;
+import com.robinhood.ticker.TickerView;
 import com.squareup.picasso.Picasso;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Fragment containing a subreddit
@@ -372,6 +376,10 @@ public class SubredditFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Bind the refresh button in the toolbar
         binding.subredditRefresh.setOnClickListener(this::onRefreshPostsClicked);
+
+        // Although only the numbers will actually change, we need to add alphabet characters as well
+        //  for the initial animation when going from an empty string to "341 subscribers"
+        binding.subredditSubscribers.setCharacterLists(TickerUtils.provideAlphabeticalList(), TickerUtils.provideAlphabeticalList());
 
         // Setup the RecyclerView posts list
         this.setupPostsList();

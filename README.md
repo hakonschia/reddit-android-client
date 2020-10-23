@@ -3,7 +3,7 @@
 
 An unofficial Reddit client for Android. The application allows for users to log in with their Reddit account and perform actions such as voting, commenting, and retrieving customized front page posts. There is currently no mod support.
 
-Includes an Android/Java wrapper for the Reddit API that provides basic functionality.
+Includes an Android wrapper for the Reddit API that provides basic functionality, as well as basic persistence with [Room](https://developer.android.com/training/data-storage/room).
 
 
 ## Screenshots
@@ -26,12 +26,14 @@ To retrieve the latest version clone the repository and install manually via And
 ## Thank you to these libraries
 
 * [Retrofit](https://github.com/square/retrofit) - Used to create the wrapper for the Reddit API
-* [Picasso](https://github.com/square/picasso) - Used to download, cache, and process images
-* [Slidr](https://github.com/r0adkll/Slidr) - To (very) easily create swipeable activities
+  * [Gson](https://github.com/google/gson) - For API serialization and other JSON needs
+* [Picasso](https://github.com/square/picasso) - Image processing, downloading, and caching
 * [PhotoView](https://github.com/chrisbanes/PhotoView) - For zoomable ImageViews
 * [CircleImageView](https://github.com/hdodenhof/CircleImageView) - To create circular ImageViews
-* [Markwon](https://github.com/noties/Markwon) - For rendering of markdown text in TextViews
+* [Slidr](https://github.com/r0adkll/Slidr) - To (very) easily create swipeable activities
+* [Markwon](https://github.com/noties/Markwon) - Markdown text rendering in TextViews
 * [ExoPlayer](https://github.com/google/ExoPlayer) - Used for playing videos
+* [Ticker](https://github.com/robinhood/ticker) - A ticker style TextView that smoothly animates changes (by sliding characters up/down)
 * [ProcessPhoenix](https://github.com/JakeWharton/ProcessPhoenix) - Used to restart the application
 
 As well as various code snippets acknowledged throughout the code, and Reddit for providing an open API to make this project possible.

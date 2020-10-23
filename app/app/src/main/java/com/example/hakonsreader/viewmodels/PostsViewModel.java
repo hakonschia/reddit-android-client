@@ -1,6 +1,7 @@
 package com.example.hakonsreader.viewmodels;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;

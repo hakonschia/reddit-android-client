@@ -32,14 +32,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
-                android:layout_marginBottom="-10dp"
+                android:layout_marginBottom="-16dp"
                 app:layout_scrollFlags="enterAlways|scroll"
                 app:contentInsetStart="0dp">
 
+                <!-- The padding for 24dp here is technically only an 8dp since the toolbar above has -16dp -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="16dp"
+                    android:paddingBottom="24dp"
                     android:background="@drawable/rounded_square_main_bg_gradient">
 
                     <TextView
@@ -68,7 +69,7 @@
 
                         app:subredditIcon="@{subreddit}"
                         app:civ_border_width="2dp"
-                        app:civ_border_color="#FFFFFF"
+                        app:civ_border_color="@color/opposite_background"
 
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -91,7 +92,7 @@
 
                         tools:text="GlobalOffensive"/>
 
-                    <TextView
+                    <com.robinhood.ticker.TickerView
                         android:id="@+id/subredditSubscribers"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -100,6 +101,7 @@
                         android:textColor="@color/secondary_text_color"
                         android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
 
+                        app:ticker_animationDuration="@integer/tickerAnimationDefault"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/subredditName"
@@ -133,19 +135,13 @@
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/posts"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/layout_rounded_corner_profile"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/posts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/list_item_post" />
-        </FrameLayout>
-
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/list_item_post" />
 
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"

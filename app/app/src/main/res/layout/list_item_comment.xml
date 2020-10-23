@@ -142,8 +142,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
 
-                android:ellipsize="end"
-                android:maxLines="1"
                 android:textColor="@color/secondary_text_color"
                 android:typeface="@{Typeface.defaultFromStyle(commentHidden ? Typeface.ITALIC : Typeface.NORMAL)}"
                 app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"

@@ -32,7 +32,7 @@ public class LinkPlugin extends AbstractMarkwonPlugin {
     private static final Pattern RE = Pattern.compile("https://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)");
 
 
-    private Context context;
+    private final Context context;
 
     public LinkPlugin(Context context) {
         this.context = context;

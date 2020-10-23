@@ -6,7 +6,7 @@
     <dimen name="postLinkThumnailHeight">60dp</dimen>
     <dimen name="postLinkThumnailWidth">75dp</dimen>
 
-    <dimen name="defaultIndent">10dp</dimen>
+    <dimen name="defaultIndent">8dp</dimen>
 
     <dimen name="commentDepthIndent">12dp</dimen>
     <dimen name="commentSideBarWidth">1dp</dimen>
@@ -25,4 +25,7 @@
 
     <!-- The height -->
     <dimen name="markdownThematicBreakHeight">2dp</dimen>
+
+    <!-- The default time for TickerView animations -->
+    <integer name="tickerAnimationDefault">750</integer>
 </resources>
