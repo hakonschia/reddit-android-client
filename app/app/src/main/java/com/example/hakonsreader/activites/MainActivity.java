@@ -171,10 +171,17 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
      */
     @Override
     public void onBackPressed() {
-        // Always go back to the home page on back presses
-        if (binding.bottomNav.getSelectedItemId() != R.id.navHome) {
+        // TODO we should actually go back to the previous navbar, not always just go back like this
+        if (binding.bottomNav.getSelectedItemId() == R.id.navSubreddit && activeSubreddit != null) {
+            activeSubreddit = null;
+
+            // Since we are in a way going back in the same navbar item, use the close transition
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, selectSubredditFragment)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                    .commit();
+        } else {
             binding.bottomNav.setSelectedItemId(R.id.navHome);
-            // Else do something else probably
         }
     }
 
@@ -226,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private void setupNavBar(Bundle restoredState) {
         binding.bottomNav.setOnNavigationItemSelectedListener(item -> {
             Fragment selected;
-            Log.d(TAG, "setupNavBar: " + binding.bottomNav.getSelectedItemId() + ", now=" + item.getItemId());
 
             int previousPos = navBarPos;
 
