@@ -96,6 +96,7 @@ public class SelectSubredditFragment extends Fragment {
 
         binding.subredditSearch.setOnEditorActionListener(actionDoneListener);
 
+        // TODO save state of list so it resumes the scroll position
         return binding.getRoot();
     }
 

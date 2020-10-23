@@ -16,7 +16,6 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
-import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.databinding.ActivityMainBinding;
@@ -52,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private ProfileFragment profileFragment;
     private LogInFragment logInFragment;
     private SettingsFragment settingsFragment;
+    private int navBarPos;
 
     // Interface towards the Reddit API
     private RedditApi redditApi = App.get().getApi();
@@ -188,7 +188,10 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     public void subredditSelected(String subredditName) {
         // Create new subreddit fragment and replace
         activeSubreddit = SubredditFragment.newInstance(subredditName);
-        replaceFragment(activeSubreddit);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, activeSubreddit)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
     }
 
     /**
@@ -210,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         if (postsFragment == null) {
             postsFragment = new PostsContainerFragment();
         }
-        replaceFragment(postsFragment);
+        replaceNavBarFragment(postsFragment, true);
     }
 
     /**
@@ -223,9 +226,13 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private void setupNavBar(Bundle restoredState) {
         binding.bottomNav.setOnNavigationItemSelectedListener(item -> {
             Fragment selected;
+            Log.d(TAG, "setupNavBar: " + binding.bottomNav.getSelectedItemId() + ", now=" + item.getItemId());
+
+            int previousPos = navBarPos;
 
             switch (item.getItemId()) {
                 case R.id.navHome:
+                    navBarPos = 1;
                     if (postsFragment == null) {
                         postsFragment = new PostsContainerFragment();
                     }
@@ -233,14 +240,17 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                     break;
 
                 case R.id.navSubreddit:
+                    navBarPos = 2;
                     selected = this.onNavBarSubreddit();
                     break;
 
                 case R.id.navProfile:
+                    navBarPos = 3;
                     selected = this.onNavBarProfile();
                     break;
 
                 case R.id.navSettings:
+                    navBarPos = 4;
                     if (settingsFragment == null) {
                         settingsFragment = new SettingsFragment();
                     }
@@ -251,15 +261,16 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                     return false;
             }
 
-            replaceFragment(selected);
+            // Example: previous = 2, current = 3. We are going right
+            boolean goingRight = previousPos < navBarPos;
+
+            replaceNavBarFragment(selected, goingRight);
 
             return true;
         });
 
         // Set listener for when an item has been clicked when already selected
         binding.bottomNav.setOnNavigationItemReselectedListener(item -> {
-            Fragment selected = null;
-
             // When the subreddit is clicked when already in subreddit go back to the subreddit list
             if (item.getItemId() == R.id.navSubreddit) {
                 activeSubreddit = null;
@@ -268,11 +279,12 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                     selectSubredditFragment = new SelectSubredditFragment();
                     selectSubredditFragment.setSubredditSelected(this);
                 }
-                selected = selectSubredditFragment;
-            }
 
-            if (selected != null) {
-                replaceFragment(selected);
+                // Since we are in a way going back in the same navbar item, use the close transition
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainer, selectSubredditFragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                        .commit();
             }
         });
 
@@ -283,14 +295,18 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     }
 
     /**
-     * Replaces the fragment in {@link ActivityMainBinding#fragmentContainer}
+     * Replaces the fragment in {@link ActivityMainBinding#fragmentContainer}. This should
+     * be used in accordance with the nav bar
      *
      * @param fragment The new fragment to show
+     * @param goingRight True if going from right in the nav bar items, this changes the way
+     *                   the animation slides so it makes sense based on the nav bar
      */
-    private void replaceFragment(Fragment fragment) {
+    private void replaceNavBarFragment(Fragment fragment, boolean goingRight) {
         getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(goingRight ? R.anim.slide_in_right : R.anim.slide_in_left, goingRight ? R.anim.slide_out_left : R.anim.slide_out_right)
                 .replace(R.id.fragmentContainer, fragment)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                //.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 // Although we don't use the backstack to pop elements, it is needed to keep the state
                 // of the fragments (otherwise posts are reloaded when coming back)
                 // With the use of a local database I can easily restore the state without the back stack
