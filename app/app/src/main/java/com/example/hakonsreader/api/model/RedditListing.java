@@ -1,9 +1,9 @@
 package com.example.hakonsreader.api.model;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
-import androidx.databinding.BaseObservable;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
 import com.example.hakonsreader.api.enums.VoteType;
@@ -282,11 +282,29 @@ public abstract class RedditListing {
     }
 
     /**
-     * @param voteType The vote type for this post for the current user
+     * Sets the new vote type for the listing. The score for the listing retrieved with
+     * {@link RedditListing#getScore()} is automatically
+     *
+     * @param newVote The vote type for this post for the current user. If this is the same as
+     *                {@link RedditListing#getVoteType()} nothing is done
      */
-    public void setVoteType(VoteType voteType) {
+    public void setVoteType(VoteType newVote) {
+        VoteType original = getVoteType();
+
+        // Don't do anything if there is no update to the vote
+        if (original == newVote) {
+            return;
+        }
+
+        // Going from upvote to downvote: -1 - 1
+        // Going from downvote to upvote: 1 - (-1)
+        // Going from downvote to no vote: 0 - (-1)
+        int difference = newVote.getValue() - original.getValue();
+
+        score += difference;
+
         // Update the internal data as that is used in getVoteType
-        switch (voteType) {
+        switch (newVote) {
             case UPVOTE:
                 liked = true;
                 break;
