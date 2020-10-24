@@ -2,6 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,8 @@ import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.databinding.VoteBarBinding;
 import com.example.hakonsreader.misc.Util;
+import com.robinhood.ticker.TickerUtils;
+import com.robinhood.ticker.TickerView;
 
 import java.util.Locale;
 
@@ -23,31 +26,41 @@ import java.util.Locale;
  * <p>Layout file: {@code layout/vote_bar.xml}</p>
  */
 public class VoteBar extends ConstraintLayout {
-    private RedditApi redditApi = App.get().getApi();
-
-    private VoteBarBinding binding;
-
+    private final RedditApi redditApi = App.get().getApi();
+    private final VoteBarBinding binding;
     private RedditListing listing;
 
 
     public VoteBar(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater inflater = LayoutInflater.from(context);
-        this.binding = VoteBarBinding.inflate(inflater, this, true);
+        binding = VoteBarBinding.inflate(inflater, this, true);
 
-        this.binding.upvote.setOnClickListener(v -> this.vote(VoteType.UPVOTE));
-        this.binding.downvote.setOnClickListener(v -> this.vote(VoteType.DOWNVOTE));
+        binding.upvote.setOnClickListener(v -> this.vote(VoteType.UPVOTE));
+        binding.downvote.setOnClickListener(v -> this.vote(VoteType.DOWNVOTE));
+
+        binding.score.setCharacterLists(TickerUtils.provideNumberList(), TickerUtils.provideAlphabeticalList());
     }
 
     /**
      * Sets the listing to use in this VoteBar and sets the initial state of the vote status
      *
      * @param listing The listing to set
+     * @param animateChange True if the TickerView should animate the change. This only changes for
+     *                      the current change, and does not affect the value set with 
+     *                      {@link VoteBar#enableTickerAnimation(boolean)}
      */
-    public void setListing(@NonNull RedditListing listing) {
+    public void setListing(@NonNull RedditListing listing, boolean animateChange) {
         this.listing = listing;
         // Make sure the initial status is up to date
+
+        boolean currentAnimationState = tickerAnimationEnabled();
+
+        this.enableTickerAnimation(animateChange);
         this.updateVoteStatus();
+
+        // Set back to previous state
+        this.enableTickerAnimation(currentAnimationState);
     }
 
     /**
@@ -91,8 +104,8 @@ public class VoteBar extends ConstraintLayout {
 
         // Reset both buttons as at least one will change
         // (to avoid keeping the color if going from upvote to downvote and vice versa)
-        this.binding.upvote.setColorFilter(context.getColor(R.color.noVote));
-        this.binding.downvote.setColorFilter(context.getColor(R.color.noVote));
+        binding.upvote.setColorFilter(context.getColor(R.color.noVote));
+        binding.downvote.setColorFilter(context.getColor(R.color.noVote));
 
         switch (voteType) {
             case UPVOTE:
@@ -136,6 +149,15 @@ public class VoteBar extends ConstraintLayout {
      * @param enable True to enable
      */
     public void enableTickerAnimation(boolean enable) {
-        binding.score.setAnimationDelay(enable ? (long)getResources().getInteger(R.integer.tickerAnimationDefault) : 0);
+        binding.score.setAnimationDuration(enable ? (long)getResources().getInteger(R.integer.tickerAnimationDefault) : 0);
+    }
+
+    /**
+     * Check if the TickerView for the score has animation enabled
+     *
+     * @return True if the animation is enabled
+     */
+    public boolean tickerAnimationEnabled() {
+        return binding.score.getAnimationDuration() != 0;
     }
 }

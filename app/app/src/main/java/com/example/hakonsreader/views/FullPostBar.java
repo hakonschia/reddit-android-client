@@ -33,9 +33,8 @@ public class FullPostBar extends ConstraintLayout {
      */
     public void setPost(RedditPost post) {
         this.post = post;
-        binding.voteBar.setListing(post);
-        // TODO the TickerViews shouldn't update the value in RecyclerViews when an item has been recycled (it makes
-        //  no sense for the value to show an animation as it's updating from the previous item, not updating its own value)
+
+        binding.voteBar.setListing(post, false);
 
         this.updateView();
     }

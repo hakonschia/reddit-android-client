@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     private static final String TAG = "PostsAdapter";
     
+    private final List<RedditPost> posts = new ArrayList<>();
 
-    private List<RedditPost> posts = new ArrayList<>();
 
     /**
      * Adds a list of posts to the current list of posts
@@ -87,13 +87,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final RedditPost post = posts.get(position);
 
-        // TODO find out how to disable the animation for new items to avoid animating from the previous post
-        holder.post.enableTickerAnimation(false);
         // Don't show text posts here (only show when a post is opened)
         holder.post.setShowContent(post.getPostType() != PostType.TEXT);
         holder.post.setPostData(post);
-
-        holder.post.enableTickerAnimation(true);
     }
 
 
