@@ -116,4 +116,6 @@
     <string name="transition_post_full_bar">post_full_bar</string>
 
     <string name="front_page">Front page</string>
+
+    <string name="content_description_link_image">Link to website</string>
 </resources>

@@ -148,6 +148,18 @@ public class Post extends RelativeLayout {
         binding.postFullBar.setPost(post);
     }
 
+
+    /**
+     * Enables or disables the animation for any {@link com.robinhood.ticker.TickerView} found
+     * in this view
+     *
+     * @param enable True to enable
+     */
+    public void enableTickerAnimation(boolean enable) {
+        binding.postFullBar.enableTickerAnimation(enable);
+    }
+
+
     /**
      * Adds the post content
      *

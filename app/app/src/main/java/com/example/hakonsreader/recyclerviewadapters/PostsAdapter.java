@@ -85,11 +85,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final RedditPost post = this.posts.get(position);
+        final RedditPost post = posts.get(position);
 
+        // TODO find out how to disable the animation for new items to avoid animating from the previous post
+        holder.post.enableTickerAnimation(false);
         // Don't show text posts here (only show when a post is opened)
         holder.post.setShowContent(post.getPostType() != PostType.TEXT);
         holder.post.setPostData(post);
+
+        holder.post.enableTickerAnimation(true);
     }
 
 
@@ -97,7 +101,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      * The view for the items in the list
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private Post post;
+        private final Post post;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

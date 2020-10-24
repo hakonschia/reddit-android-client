@@ -97,12 +97,12 @@ public class VoteBar extends ConstraintLayout {
         switch (voteType) {
             case UPVOTE:
                 color = R.color.upvoted;
-                this.binding.upvote.setColorFilter(context.getColor(color));
+                binding.upvote.setColorFilter(context.getColor(color));
                 break;
 
             case DOWNVOTE:
                 color = R.color.downvoted;
-                this.binding.downvote.setColorFilter(context.getColor(color));
+                binding.downvote.setColorFilter(context.getColor(color));
                 break;
 
             case NO_VOTE:
@@ -110,22 +110,32 @@ public class VoteBar extends ConstraintLayout {
                 break;
         }
 
+        binding.score.setTextColor(context.getColor(color));
+
         int scoreCount = listing.getScore();
 
         if (listing.isScoreHidden()) {
-            this.binding.score.setText(getResources().getString(R.string.scoreHidden));
+            binding.score.setText(getResources().getString(R.string.scoreHidden));
         } else {
             // For scores over 10000 show as "10.5k"
             if (scoreCount > 10000) {
-                this.binding.score.setText(String.format(
+                binding.score.setText(String.format(
                         Locale.getDefault(),
                         getResources().getString(R.string.scoreThousands), scoreCount / 1000f)
                 );
             } else {
-                this.binding.score.setText(String.format(Locale.getDefault(), "%d", listing.getScore()));
+                binding.score.setText(String.format(Locale.getDefault(), "%d", listing.getScore()));
             }
         }
+    }
 
-        this.binding.score.setTextColor(context.getColor(color));
+    /**
+     * Enables or disables the animation for any {@link com.robinhood.ticker.TickerView} found
+     * in this view
+     *
+     * @param enable True to enable
+     */
+    public void enableTickerAnimation(boolean enable) {
+        binding.score.setAnimationDelay(enable ? (long)getResources().getInteger(R.integer.tickerAnimationDefault) : 0);
     }
 }

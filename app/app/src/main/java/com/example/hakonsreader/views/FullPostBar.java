@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.FullPostBarBinding;
+import com.robinhood.ticker.TickerUtils;
 
 /**
  * View for the full bar underneath a Reddit post
@@ -18,7 +19,7 @@ import com.example.hakonsreader.databinding.FullPostBarBinding;
 public class FullPostBar extends ConstraintLayout {
     private RedditPost post;
 
-    private FullPostBarBinding binding;
+    private final FullPostBarBinding binding;
 
     public FullPostBar(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -33,6 +34,8 @@ public class FullPostBar extends ConstraintLayout {
     public void setPost(RedditPost post) {
         this.post = post;
         binding.voteBar.setListing(post);
+        // TODO the TickerViews shouldn't update the value in RecyclerViews when an item has been recycled (it makes
+        //  no sense for the value to show an animation as it's updating from the previous item, not updating its own value)
 
         this.updateView();
     }
@@ -58,6 +61,19 @@ public class FullPostBar extends ConstraintLayout {
             );
         }
 
+        // This has to inlcude both as it might go from "0 comments" to "1 comment"
+        binding.numComments.setCharacterLists(TickerUtils.provideNumberList(), TickerUtils.provideNumberList());
         binding.numComments.setText(commentsText);
+    }
+
+    /**
+     * Enables or disables the animation for any {@link com.robinhood.ticker.TickerView} found
+     * in this view
+     *
+     * @param enable True to enable
+     */
+    public void enableTickerAnimation(boolean enable) {
+        binding.voteBar.enableTickerAnimation(enable);
+        binding.numComments.setAnimationDelay(enable ? (long)getResources().getInteger(R.integer.tickerAnimationDefault) : 0);
     }
 }

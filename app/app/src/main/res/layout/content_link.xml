@@ -7,25 +7,30 @@
     android:paddingEnd="@dimen/defaultIndent"
     android:paddingStart="@dimen/defaultIndent">
 
-    <ImageButton
-        android:id="@+id/thumbnail"
+    <androidx.cardview.widget.CardView
         android:layout_width="@dimen/postLinkThumnailWidth"
         android:layout_height="@dimen/postLinkThumnailHeight"
+        app:cardCornerRadius="8dp">
 
-        android:layout_gravity="center"
-        android:src="@drawable/ic_baseline_sort_24"
-        android:background="@drawable/rounded_square_secondary_bg"
+        <ImageButton
+            android:id="@+id/thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_baseline_link_24"
+            android:contentDescription="@string/content_description_link_image"
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="@dimen/defaultIndent"
 
         android:maxLines="3"
+        android:ellipsize="end"
         android:textColor="@color/link_color"
         android:layout_gravity="center"
 

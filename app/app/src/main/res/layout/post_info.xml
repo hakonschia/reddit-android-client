@@ -155,16 +155,19 @@
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
 
             android:text="@{post.title}"
             android:textColor="@color/text_color"
             android:textSize="16sp"
 
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
 
             app:layout_constraintTop_toBottomOf="@+id/tags"
+            app:layout_constraintVertical_bias="0.0"
             tools:text="FaZe wins major /s. To show a long title I am adding a bunch of random text here Lorem ipsum etc etc" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
