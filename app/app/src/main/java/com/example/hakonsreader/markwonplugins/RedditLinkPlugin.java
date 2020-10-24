@@ -37,7 +37,7 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
             "(^|\\s|\\(|(?=\\[))" +
             // Match either subreddit or user regex
             "(" + LinkUtils.SUBREDDIT_REGEX + ")" +
-            "(|" + LinkUtils.SUBREDDIT_REGEX + ")"
+            "|(" + LinkUtils.USER_REGEX + ")"
     );
 
 

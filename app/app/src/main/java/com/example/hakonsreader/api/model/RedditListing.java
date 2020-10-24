@@ -296,9 +296,9 @@ public abstract class RedditListing {
             return;
         }
 
-        // Going from upvote to downvote: -1 - 1
-        // Going from downvote to upvote: 1 - (-1)
-        // Going from downvote to no vote: 0 - (-1)
+        // Going from upvote to downvote: -1 - 1 = -2
+        // Going from downvote to upvote: 1 - (-1) = 2
+        // Going from downvote to no vote: 0 - (-1) = 1
         int difference = newVote.getValue() - original.getValue();
 
         score += difference;

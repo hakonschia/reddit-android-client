@@ -2,9 +2,6 @@ package com.example.hakonsreader.activites;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
@@ -17,10 +14,7 @@ import com.example.hakonsreader.api.utils.LinkUtils;
 import com.example.hakonsreader.misc.PhotoViewDoubleTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.github.chrisbanes.photoview.PhotoViewAttacher;
-import com.jsibbold.zoomage.ZoomageView;
 import com.r0adkll.slidr.Slidr;
-import com.r0adkll.slidr.model.SlidrConfig;
-import com.r0adkll.slidr.model.SlidrPosition;
 import com.squareup.picasso.Picasso;
 
 /**

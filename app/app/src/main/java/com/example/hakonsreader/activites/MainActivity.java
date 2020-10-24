@@ -80,7 +80,9 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
         // For testing purposes hardcode going into a subreddit/post etc.
         Intent intent = new Intent(this, DispatcherActivity.class);
-        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/test/");
+        // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
+        //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
+        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/");
         //startActivity(intent);
 
         if (savedInstanceState != null) {
