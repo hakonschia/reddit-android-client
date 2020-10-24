@@ -280,10 +280,15 @@ public class SubredditFragment extends Fragment {
     }
 
     /**
-     * @return The name of the subreddit the fragment is for
+     * @return The name of the subreddit the fragment is for, or null if no subreddit is set
      */
     public String getSubredditName() {
-        return subreddit.get().getName();
+        Subreddit s = subreddit.get();
+        if (s != null) {
+            return subreddit.get().getName();
+        }
+
+        return null;
     }
 
     /**
@@ -321,6 +326,7 @@ public class SubredditFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate " + getSubredditName());
         binding = FragmentSubredditBinding.inflate(getLayoutInflater());
 
         lastLoadAttemptCount = 0;
@@ -374,6 +380,8 @@ public class SubredditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView " + getSubredditName());
+
         // Bind the refresh button in the toolbar
         binding.subredditRefresh.setOnClickListener(this::onRefreshPostsClicked);
 
@@ -393,24 +401,9 @@ public class SubredditFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        // onDestroyView is called when a fragment is no longer visible. We store the list state of the fragment
-        // here and when onCreateView is called again we restore the state (the fragment object itself is not
-        // destroyed, so saveState will be the same)
-        if (saveState == null) {
-            saveState = new Bundle();
-        }
-
-        saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
-        saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause: ");
+        Log.d(TAG, "onPause " + getSubredditName());
 
         if (saveState == null) {
             saveState = new Bundle();
@@ -437,8 +430,28 @@ public class SubredditFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume " + getSubredditName());
+
+        // If the fragment is selected without any posts load posts automatically
+        if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
+            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName());
+        }
+
+        this.restoreViewHolderStates();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState " + getSubredditName());
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy " + getSubredditName());
 
         // Ensure that all videos are cleaned up
         for (int i = 0; i < adapter.getItemCount(); i++) {
@@ -453,14 +466,18 @@ public class SubredditFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView " + getSubredditName());
 
-        // If the fragment is selected without any posts load posts automatically
-        if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
-            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName());
+        // onDestroyView is called when a fragment is no longer visible. We store the list state of the fragment
+        // here and when onCreateView is called again we restore the state (the fragment object itself is not
+        // destroyed, so saveState will be the same)
+        if (saveState == null) {
+            saveState = new Bundle();
         }
 
-        this.restoreViewHolderStates();
+        saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
+        saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
     }
 }

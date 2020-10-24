@@ -21,7 +21,7 @@
         android:layout_width="25dp"
         android:layout_height="25dp"
 
-        android:indeterminateTint="@color/accent"
+        android:indeterminateTint="@color/colorAccent"
 
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
@@ -89,7 +89,7 @@
             android:layout_height="26dp"
             android:layout_weight="1"
             app:buffered_color="@android:color/white"
-            app:played_color="@color/accent"
+            app:played_color="@color/colorAccent"
             app:unplayed_color="@android:color/darker_gray" />
 
         <!-- Apparently I can't update exo_duration, so use a brand new view -->
@@ -127,7 +127,7 @@
             android:visibility="gone"
 
             android:layout_gravity="center"
-            tools:textColor="@color/accent"
+            tools:textColor="@color/colorAccent"
             tools:text="05:32"/>
 
         <ImageButton

@@ -34,21 +34,17 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <!-- Comments -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/comments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:background="@color/background"
-
-        android:layout_marginStart="7dp"
-        android:layout_marginEnd="7dp"
-
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:paddingBottom="75dp"
         android:clipToPadding="false"
 
+        android:background="@color/background"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
 
         tools:listitem="@layout/list_item_comment" />
@@ -108,7 +104,6 @@
             <ImageButton
                 android:id="@+id/goToNextTopLevelComment"
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
 
                 android:backgroundTint="@color/secondary_background"
@@ -124,10 +119,8 @@
         android:id="@+id/loadingIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-
         android:layout_gravity="center"
-        android:indeterminateTint="@color/accent"
 
+        android:visibility="gone"
         tools:visibility="visible" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

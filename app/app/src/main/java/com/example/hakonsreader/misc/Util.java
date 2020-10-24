@@ -65,8 +65,9 @@ public class Util {
 
         snackbar.setAction(context.getString(R.string.log_in), v -> {
             // TODO Redirect to a login activity/fragment
+            // If getContext instance of MainAcitivty we can set the navbar item to profile and, otherwise create activity for logging in
         });
-        snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.accent));
+        snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
         snackbar.show();
     }
 

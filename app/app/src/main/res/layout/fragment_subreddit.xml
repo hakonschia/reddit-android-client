@@ -145,13 +145,12 @@
 
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:indeterminateTint="@color/accent"
             android:layout_gravity="center"
 
+            android:visibility="gone"
             tools:visibility="visible"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

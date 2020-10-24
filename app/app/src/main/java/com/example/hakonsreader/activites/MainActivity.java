@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState: ");
+        Log.d(TAG, "onSaveInstanceState");
 
         // If fragments aren't null, save them
         // Save which fragment is the active one as well
@@ -296,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
         if (restoredState != null) {
             int active = restoredState.getInt(ACTIVE_NAV_ITEM);
+            // TODO when changing dark mode it resets and this triggers, which looks weird as the animation plays
             binding.bottomNav.setSelectedItemId(active);
         }
     }

@@ -63,7 +63,6 @@ public class App extends Application {
     private static App app;
 
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -86,9 +85,9 @@ public class App extends Application {
 
         AppDatabase db = AppDatabase.getInstance(this);
 
-        // Remove records that are older than 24 hours, as they likely won't be used again
+        // Remove records that are older than 12 hours, as they likely won't be used again
         new Thread(() -> {
-            long maxAge = (long)60 * 60 * 24;
+            long maxAge = (long)60 * 60 * 12;
 
             int count = db.posts().getCount();
             int deleted = db.posts().deleteOld(maxAge);

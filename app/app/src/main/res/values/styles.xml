@@ -1,26 +1,38 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:statusBarColor">#121212</item>
         <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowBackground">@color/background</item>
+
+        <item name="android:textColorPrimary">@color/text_color</item>
+        <item name="android:textColorSecondary">@color/secondary_text_color</item>
+        <item name="android:textColorHint">@color/colorAccent</item>
+        <item name="android:textColorLink">@color/link_color</item>
     </style>
 
+    <!-- The launcher theme is the "default" for the App. It shows on start up (and should ONLY be
+    shown at startup) and shows the App logo-->
     <style name="AppTheme.Launcher">
         <item name="android:windowBackground">@drawable/launcher</item>
     </style>
+
+    <!-- For Slidr to work the theme has to be with a transparent background (or else the activity
+    being shown when swiping won't be shown, it will be the color of the background) -->
     <style name="AppTheme.SlidrActivityTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <!-- The theme for the DispatcherActivity. This theme is basically just making the activity
+    invisible, as that activity in itself should never be visible as it's a middle man activity-->
     <style name="AppTheme.DispatcherTheme">
-        <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 </resources>
