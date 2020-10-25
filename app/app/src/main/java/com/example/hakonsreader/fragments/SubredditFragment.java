@@ -183,9 +183,6 @@ public class SubredditFragment extends Fragment {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
         binding.posts.setOnScrollChangeListener(scrollListener);
-
-        ListDivider divider = new ListDivider(ContextCompat.getDrawable(requireContext(), R.drawable.list_divider));
-        binding.posts.addItemDecoration(divider);
     }
 
     /**

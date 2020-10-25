@@ -6,12 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.views.ListDivider;
 import com.example.hakonsreader.views.Post;
 
 import java.util.ArrayList;
@@ -95,6 +97,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.post.enableTickerAnimation(true);
     }
 
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+
+        ListDivider divider = new ListDivider(ContextCompat.getDrawable(recyclerView.getContext(), R.drawable.list_divider));
+        recyclerView.addItemDecoration(divider);
+    }
 
     /**
      * The view for the items in the list
