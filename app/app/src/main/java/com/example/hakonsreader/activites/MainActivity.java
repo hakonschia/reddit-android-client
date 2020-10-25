@@ -420,6 +420,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
          */
         private void replaceNavBarFragment(Fragment fragment, boolean goingRight) {
             getSupportFragmentManager().beginTransaction()
+                    // TODO if there is an ongoing transition and the user selects another nav bar item, the app crashes (need to somehow cancel the ongoing transition or something)
                     .setCustomAnimations(goingRight ? R.anim.slide_in_right : R.anim.slide_in_left, goingRight ? R.anim.slide_out_left : R.anim.slide_out_right)
                     .replace(R.id.fragmentContainer, fragment)
                     // Although we don't use the backstack to pop elements, it is needed to keep the state
