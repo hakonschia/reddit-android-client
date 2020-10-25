@@ -1027,6 +1027,12 @@ public class RedditApi {
             }
         }
 
+
+        /**
+         * Retrieve an object to make API calls for posts by the user
+         *
+         * @return
+         */
         public UserPostsRequets posts() {
             return new UserPostsRequets();
         }
@@ -1065,6 +1071,10 @@ public class RedditApi {
             });
         }
 
+        /**
+         * Class to retrieve posts from a user. The functions declared here define how to sort the posts
+         * (new, hot etc.)
+         */
         public class UserPostsRequets {
             /**
              * Get the current "hot" posts for the user
