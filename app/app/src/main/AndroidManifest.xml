@@ -63,8 +63,8 @@
             android:name=".activites.DispatcherActivity"
             android:theme="@style/AppTheme.DispatcherTheme">
 
-            <tools:validation testUrl="https://www.reddit.com" />
-            <tools:validation testUrl="https://reddit.com" />
+            <tools:validation testUrl="https://www.reddit.com/" />
+            <tools:validation testUrl="https://reddit.com/" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -73,10 +73,12 @@
 
                 <data
                     android:scheme="https"
-                    android:host="www.reddit.com" />
+                    android:host="www.reddit.com"
+                    android:path="/"/>
                 <data
                     android:scheme="https"
-                    android:host="reddit.com" />
+                    android:host="reddit.com"
+                    android:path="/"/>
             </intent-filter>
 
 

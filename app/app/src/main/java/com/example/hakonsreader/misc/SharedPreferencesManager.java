@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 
 public class SharedPreferencesManager {
     private static final String TAG = "SharedPreferencesManage";
+    private static final String PREFERENCES_NOT_SET_ERROR_MESSAGE = "Warning: preferences have not been created. Use SharedPreferencesManager.create()";
+
 
     private static SharedPreferences prefs;
     private static Gson gson;
@@ -19,7 +21,7 @@ public class SharedPreferencesManager {
 
     public static void put(String key, Object value) {
         if (prefs == null) {
-            throw new RuntimeException("Warning: preferefences have not been created. Use SharedPreferencesManager.create()");
+            throw new IllegalStateException(PREFERENCES_NOT_SET_ERROR_MESSAGE);
         }
 
         String asJson = gson.toJson(value);
@@ -39,7 +41,7 @@ public class SharedPreferencesManager {
      */
     public static <T> T get(String key, Class<T> type) {
         if (prefs == null) {
-            throw new RuntimeException("Warning: preferefences have not been created. Use SharedPreferencesManager.create()");
+            throw new IllegalStateException(PREFERENCES_NOT_SET_ERROR_MESSAGE);
         }
 
         return gson.fromJson(prefs.getString(key, ""), type);
@@ -48,7 +50,7 @@ public class SharedPreferencesManager {
 
     public static void remove(String key) {
         if (prefs == null) {
-            throw new RuntimeException("Warning: preferefences have not been created. Use SharedPreferencesManager.create()");
+            throw new IllegalStateException(PREFERENCES_NOT_SET_ERROR_MESSAGE);
         }
 
         prefs.edit()

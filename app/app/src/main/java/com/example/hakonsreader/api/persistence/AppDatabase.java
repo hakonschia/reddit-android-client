@@ -34,4 +34,15 @@ public abstract class AppDatabase extends RoomDatabase {
         }
         return instance;
     }
+
+    /**
+     * Clears user state from any records in the database
+     *
+     * <p>This effectively converts the records into what would be returned for non-logged in users.
+     * For example, all posts will convert {@link RedditPost#getVoteType()} to {@link com.example.hakonsreader.api.enums.VoteType#NO_VOTE}</p>
+     */
+    public void clearUserState() {
+        posts().clearUserState();
+        subreddits().clearUserState();
+    }
 }

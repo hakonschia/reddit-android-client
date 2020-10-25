@@ -2,7 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
@@ -18,8 +18,9 @@ import com.squareup.picasso.Picasso;
  * Class for post contents that are a link
  */
 public class ContentLink extends ConstraintLayout {
-    private ContentLinkBinding binding;
+    private static final String TAG = "ContentLink";
 
+    private ContentLinkBinding binding;
     private RedditPost post;
 
 
@@ -41,10 +42,12 @@ public class ContentLink extends ConstraintLayout {
 
 
     private void updateView() {
-        Picasso.get()
-                .load(post.getThumbnail())
-                .resize((int)getResources().getDimension(R.dimen.postLinkThumnailWidth), (int)getResources().getDimension(R.dimen.postLinkThumnailHeight))
-                .into(binding.thumbnail);
+        if (!post.getThumbnail().isEmpty()) {
+            Picasso.get()
+                    .load(post.getThumbnail())
+                    .resize((int)getResources().getDimension(R.dimen.postLinkThumnailWidth), (int)getResources().getDimension(R.dimen.postLinkThumnailHeight))
+                    .into(binding.thumbnail);
+        }
 
         binding.link.setText(post.getUrl());
     }

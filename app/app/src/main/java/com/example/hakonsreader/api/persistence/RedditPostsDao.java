@@ -101,4 +101,12 @@ public interface RedditPostsDao {
      */
     @Query("SELECT * FROM posts WHERE id IN (:ids)")
     List<RedditPost> getPostsById(List<String> ids);
+
+
+    /**
+     * Clears user specific information from all posts. Sets to the values that the Reddit API
+     * would return for non-logged in users
+     */
+    @Query("UPDATE posts SET liked=null")
+    void clearUserState();
 }

@@ -65,4 +65,12 @@ public interface RedditSubredditsDao {
      */
     @Query("SELECT * FROM subreddits WHERE name=:subredditName COLLATE NOCASE")
     Subreddit get(String subredditName);
+
+
+    /**
+     * Clears user specific information from all posts. Sets to the values that the Reddit API
+     * would return for non-logged in users
+     */
+    @Query("UPDATE subreddits SET subscribed=0")
+    void clearUserState();
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
+import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.databinding.ActivityMainBinding;
@@ -29,7 +31,10 @@ import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
+import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.jakewharton.processphoenix.ProcessPhoenix;
 
 
 public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
@@ -41,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private static final String PROFILE_FRAGMENT = "profileFragment";
     private static final String ACTIVE_NAV_ITEM = "activeNavItem";
 
-
     private ActivityMainBinding binding;
 
     // The fragments to show in the nav bar
@@ -51,23 +55,10 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private ProfileFragment profileFragment;
     private LogInFragment logInFragment;
     private SettingsFragment settingsFragment;
-    private int navBarPos;
+    private final BottomNavigationViewListener navigationViewListener = new BottomNavigationViewListener();
 
     // Interface towards the Reddit API
-    private RedditApi redditApi = App.get().getApi();
-
-
-    // Handler for token responses. If an access token is given user information is automatically retrieved
-    private OnResponse<Void> onTokenResponse = ignored -> {
-        // Re-create the start fragment as it now should load posts for the logged in user
-        // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
-        this.setupStartFragment();
-
-        Snackbar.make(this.binding.parentLayout, R.string.loggedIn, Snackbar.LENGTH_SHORT).show();
-    };
-    private OnFailure onTokenFailure = (code, t) -> {
-        Util.handleGenericResponseErrors(this.binding.parentLayout, code, t);
-    };
+    private final RedditApi redditApi = App.get().getApi();
 
 
     @Override
@@ -145,13 +136,13 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
             // Not a match from the state we generated, something weird is happening
             if (state == null || !state.equals(App.get().getOAuthState())) {
-                Util.showErrorLoggingInSnackbar(this.binding.parentLayout);
+                Util.showErrorLoggingInSnackbar(binding.parentLayout);
                 return;
             }
 
             String code = uri.getQueryParameter("code");
             if (code == null) {
-                Util.showErrorLoggingInSnackbar(this.binding.parentLayout);
+                Util.showErrorLoggingInSnackbar(binding.parentLayout);
                 return;
             }
 
@@ -164,7 +155,16 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             getIntent().setData(null);
             getIntent().setFlags(0);
 
-            redditApi.getAccessToken(code, this.onTokenResponse, this.onTokenFailure);
+            redditApi.getAccessToken(code, ignored -> {
+                // Re-create the start fragment as it now should load posts for the logged in user
+                // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
+                postsFragment = null;
+                this.setupStartFragment();
+
+                Snackbar.make(binding.parentLayout, R.string.loggedIn, Snackbar.LENGTH_SHORT).show();
+            }, (c, t) -> {
+                Util.handleGenericResponseErrors(binding.parentLayout, c, t);
+            });
         }
     }
 
@@ -222,7 +222,12 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         if (postsFragment == null) {
             postsFragment = new PostsContainerFragment();
         }
-        replaceNavBarFragment(postsFragment, true);
+
+        // Use an open transition since we're calling this when the app has been started
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, postsFragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
     }
 
     /**
@@ -233,49 +238,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
      *                      stored in the state
      */
     private void setupNavBar(Bundle restoredState) {
-        binding.bottomNav.setOnNavigationItemSelectedListener(item -> {
-            Fragment selected;
-
-            int previousPos = navBarPos;
-
-            switch (item.getItemId()) {
-                case R.id.navHome:
-                    navBarPos = 1;
-                    if (postsFragment == null) {
-                        postsFragment = new PostsContainerFragment();
-                    }
-                    selected = postsFragment;
-                    break;
-
-                case R.id.navSubreddit:
-                    navBarPos = 2;
-                    selected = this.onNavBarSubreddit();
-                    break;
-
-                case R.id.navProfile:
-                    navBarPos = 3;
-                    selected = this.onNavBarProfile();
-                    break;
-
-                case R.id.navSettings:
-                    navBarPos = 4;
-                    if (settingsFragment == null) {
-                        settingsFragment = new SettingsFragment();
-                    }
-                    selected = settingsFragment;
-                    break;
-
-                default:
-                    return false;
-            }
-
-            // Example: previous = 2, current = 3. We are going right
-            boolean goingRight = previousPos < navBarPos;
-
-            replaceNavBarFragment(selected, goingRight);
-
-            return true;
-        });
+        binding.bottomNav.setOnNavigationItemSelectedListener(navigationViewListener);
 
         // Set listener for when an item has been clicked when already selected
         binding.bottomNav.setOnNavigationItemReselectedListener(item -> {
@@ -298,75 +261,11 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
         if (restoredState != null) {
             int active = restoredState.getInt(ACTIVE_NAV_ITEM);
-            // TODO when changing dark mode it resets and this triggers, which looks weird as the animation plays
+
+            // When we're restoring a state we don't want to play an animation, as the user has manually
+            // selected a change
+            navigationViewListener.disableAnimationForNextChange();
             binding.bottomNav.setSelectedItemId(active);
-        }
-    }
-
-    /**
-     * Replaces the fragment in {@link ActivityMainBinding#fragmentContainer}. This should
-     * be used in accordance with the nav bar
-     *
-     * @param fragment The new fragment to show
-     * @param goingRight True if going from right in the nav bar items, this changes the way
-     *                   the animation slides so it makes sense based on the nav bar
-     */
-    private void replaceNavBarFragment(Fragment fragment, boolean goingRight) {
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(goingRight ? R.anim.slide_in_right : R.anim.slide_in_left, goingRight ? R.anim.slide_out_left : R.anim.slide_out_right)
-                .replace(R.id.fragmentContainer, fragment)
-                //.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                // Although we don't use the backstack to pop elements, it is needed to keep the state
-                // of the fragments (otherwise posts are reloaded when coming back)
-                // With the use of a local database I can easily restore the state without the back stack
-                // Not sure whats best to use, with addToBackStack it's smoother as it doesn't have to load
-                // from db etc. (it doesn't take a long time) but it probably uses more ram to hold everything in memory?
-                //.addToBackStack(null)
-                .commit();
-    }
-
-    /**
-     * Retrieves the correct fragment for when subreddit is clicked in the nav bar
-     *
-     * <p>If this is the first time clicking the icon the subreddit list is shown.
-     * If clicked when already in the subreddit nav bar the subreddit list is shown.
-     * If clicked when not already in the subreddit, the previous subreddit fragment selected is shown</p>
-     *
-     * @return The correct fragment to show
-     */
-    private Fragment onNavBarSubreddit() {
-        // No subreddit created (first time here), or we in a subreddit looking to get back
-        if (activeSubreddit == null) {
-            if (selectSubredditFragment == null) {
-                selectSubredditFragment = new SelectSubredditFragment();
-                selectSubredditFragment.setSubredditSelected(this);
-            }
-            return selectSubredditFragment;
-        } else {
-            return activeSubreddit;
-        }
-    }
-
-    /**
-     * Retrieves the correct fragment for profiles
-     *
-     * @return If a user is logged in a {@link ProfileFragment} is shown, otherwise a {@link LogInFragment}
-     * is shown so the user can log in
-     */
-    private Fragment onNavBarProfile() {
-        // If not logged in, show log in page
-        if (TokenManager.getToken().getRefreshToken() == null) {
-            if (logInFragment == null) {
-                logInFragment = new LogInFragment();
-            }
-
-            return logInFragment;
-        } else {
-            if (profileFragment == null) {
-                profileFragment = new ProfileFragment();
-            }
-
-            return profileFragment;
         }
     }
 
@@ -384,17 +283,191 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             // If failed because of internet connection try to revoke later
         });
 
-
         // Clear shared preferences
         this.clearUserInfo();
+
+        new Thread(() -> {
+            // Clear any user specific state from database records (such as vote status on posts)
+            AppDatabase.getInstance(this).clearUserState();
+
+            // Restarting the app completely is probably the easiest way to do this.
+            // Although this has to be done after the API call is at the very least sent, SharedPreferences
+            // have been updated (can maybe use the apply()/commit() that instantly does it)
+           // ProcessPhoenix.triggerRebirth(this);
+        }).start();
     }
 
     /**
-     * Clears any information stored locally about a logged in user
+     * Clears any information stored locally about a logged in user from SharedPreferences.
+     *
+     * <p>The preferences the user have chosen from the settings screen are not changed</p>
      */
     private void clearUserInfo() {
         TokenManager.removeToken();
-
         SharedPreferencesManager.remove(SharedPreferencesConstants.USER_INFO);
+        SharedPreferencesManager.remove(SelectSubredditsViewModel.SUBSCRIBED_SUBREDDITS_KEY);
+    }
+
+
+    /**
+     * Custom BottomNavigationView item selection listener
+     */
+    private class BottomNavigationViewListener implements BottomNavigationView.OnNavigationItemSelectedListener {
+
+        // TODO this class should probably be decoupled from MainActivity (need to pass the functions to call or something)
+
+        private boolean playAnimationForNextChange = true;
+
+        /**
+         * The current index the nav bar is in (from left to right). Used to determine what transition
+         * to play when changing the nav bar item
+         */
+        private int navBarPos;
+
+
+        /**
+         * Disables the animation for the next nav bar change. Note this only lasts for one change
+         */
+        public void disableAnimationForNextChange() {
+            this.playAnimationForNextChange = false;
+        }
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment selected;
+
+            int previousPos = navBarPos;
+
+            switch (item.getItemId()) {
+                case R.id.navHome:
+                    navBarPos = 1;
+                    if (postsFragment == null) {
+                        postsFragment = new PostsContainerFragment();
+                    }
+                    selected = postsFragment;
+                    break;
+
+                case R.id.navSubreddit:
+                    navBarPos = 2;
+                    selected = onNavBarSubreddit();
+                    break;
+
+                case R.id.navProfile:
+                    navBarPos = 3;
+                    selected = onNavBarProfile();
+                    break;
+
+                case R.id.navSettings:
+                    navBarPos = 4;
+                    if (settingsFragment == null) {
+                        settingsFragment = new SettingsFragment();
+                    }
+                    selected = settingsFragment;
+                    break;
+
+                default:
+                    return false;
+            }
+
+            // Example: previous = 2, current = 3. We are going right
+            boolean goingRight = previousPos < navBarPos;
+
+            if (!playAnimationForNextChange){
+                replaceNavBarFragmentNoAnimation(selected);
+                playAnimationForNextChange = true;
+            } else {
+                replaceNavBarFragment(selected, goingRight);
+            }
+
+            return true;
+        }
+
+        /**
+         * Replaces the fragment in {@link ActivityMainBinding#fragmentContainer} without any animation. This should
+         * be used in accordance with the nav bar.
+         *
+         * @param fragment The new fragment to show
+         */
+        private void replaceNavBarFragmentNoAnimation(Fragment fragment) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            transaction
+                    .replace(R.id.fragmentContainer, fragment)
+                    // Although we don't use the backstack to pop elements, it is needed to keep the state
+                    // of the fragments (otherwise posts are reloaded when coming back)
+                    // With the use of a local database I can easily restore the state without the back stack
+                    // Not sure whats best to use, with addToBackStack it's smoother as it doesn't have to load
+                    // from db etc. (it doesn't take a long time) but it probably uses more ram to hold everything in memory?
+                    //.addToBackStack(null)
+                    .commit();
+        }
+
+
+        /**
+         * Replaces the fragment in {@link ActivityMainBinding#fragmentContainer}. This should
+         * be used in accordance with the nav bar
+         *
+         * @param fragment The new fragment to show
+         * @param goingRight True if going from right in the nav bar items, this changes the way
+         *                   the animation slides so it makes sense based on the nav bar
+         */
+        private void replaceNavBarFragment(Fragment fragment, boolean goingRight) {
+            getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(goingRight ? R.anim.slide_in_right : R.anim.slide_in_left, goingRight ? R.anim.slide_out_left : R.anim.slide_out_right)
+                    .replace(R.id.fragmentContainer, fragment)
+                    // Although we don't use the backstack to pop elements, it is needed to keep the state
+                    // of the fragments (otherwise posts are reloaded when coming back)
+                    // With the use of a local database I can easily restore the state without the back stack
+                    // Not sure whats best to use, with addToBackStack it's smoother as it doesn't have to load
+                    // from db etc. (it doesn't take a long time) but it probably uses more ram to hold everything in memory?
+                    //.addToBackStack(null)
+                    .commit();
+        }
+
+        /**
+         * Retrieves the correct fragment for when subreddit is clicked in the nav bar
+         *
+         * <p>If this is the first time clicking the icon the subreddit list is shown.
+         * If clicked when already in the subreddit nav bar the subreddit list is shown.
+         * If clicked when not already in the subreddit, the previous subreddit fragment selected is shown</p>
+         *
+         * @return The correct fragment to show
+         */
+        private Fragment onNavBarSubreddit() {
+            // No subreddit created (first time here), or we in a subreddit looking to get back
+            if (activeSubreddit == null) {
+                if (selectSubredditFragment == null) {
+                    selectSubredditFragment = new SelectSubredditFragment();
+                    selectSubredditFragment.setSubredditSelected(MainActivity.this);
+                }
+                return selectSubredditFragment;
+            } else {
+                // There is an active subreddit selected, show that instead of the list to return to the subreddit
+                return activeSubreddit;
+            }
+        }
+
+        /**
+         * Retrieves the correct fragment for profiles
+         *
+         * @return If a user is logged in a {@link ProfileFragment} is shown, otherwise a {@link LogInFragment}
+         * is shown so the user can log in
+         */
+        private Fragment onNavBarProfile() {
+            // If not logged in, show log in page
+            if (TokenManager.getToken().getRefreshToken() == null) {
+                if (logInFragment == null) {
+                    logInFragment = new LogInFragment();
+                }
+
+                return logInFragment;
+            } else {
+                if (profileFragment == null) {
+                    profileFragment = new ProfileFragment();
+                }
+
+                return profileFragment;
+            }
+        }
     }
 }
