@@ -19,6 +19,7 @@ import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
+import com.google.android.exoplayer2.C;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -960,13 +961,41 @@ public class RedditApi {
                 onFailure.onFailure(-1, t);
             }
         });
+    }
 
+
+    public void getUserPosts(String username, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
+        api.getListingsFromUser(username, "submitted", accessToken.generateHeaderString()).enqueue(new Callback<ListingResponse>() {
+            @Override
+            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+                ListingResponse body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    List<RedditPost> posts = (List<RedditPost>) body.getListings();
+                    onResponse.onResponse(posts);
+                } else {
+                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListingResponse> call, Throwable t) {
+                onFailure.onFailure(-1, t);
+
+            }
+        });
+    }
+
+    public void getUserComments() {
 
     }
 
 
 
-        /* ----------------- Misc ----------------- */
+    /* ----------------- Misc ----------------- */
     /**
      * Retrieve a new access token valid for non-logged in users
      *

@@ -219,4 +219,31 @@ public interface RedditApiService {
 
             @Header("Authorization") String accessToken
     );
+
+
+    /**
+     *
+     * <p>Requires "history" OAuth scope</p>
+     *
+     * @param username The username of the user to get listings for
+     * @param what What kind of listings to get. Values possible:
+     *             <ol>
+     *                  <li>overview - A mix of comments and posts</li>
+     *                  <li>submitted - Posts by the user</li>
+     *                  <li>comments - Comments by the user</li>
+     *                  <li>upvoted - Posts/comments upvoted by the user. This is only accessible for the user itself</li>
+     *                  <li>downvoted - Posts/comments downvoted by the user. This is only accessible for the user itself</li>
+     *                  <li>hidden - Posts/comments hidden by the user. This is only accessible for the user itself</li>
+     *                  <li>saved - Posts/comments saved by the user. This is only accessible for the user itself</li>
+     *             </ol>
+     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @return A ListingResponse call. The listings returned depend on the value of "what" (comments, post, etc.)
+     */
+    @GET("user/{username}/{what}?raw_json=1")
+    Call<ListingResponse> getListingsFromUser(
+            @Path("username") String username,
+            @Path("what") String what,
+
+            @Header("Authorization") String accessToken
+    );
 }

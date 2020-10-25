@@ -139,7 +139,7 @@ public class SubredditFragment extends Fragment {
         // Only load posts if there hasn't been an attempt at loading more posts
         if (posLastItem + NUM_REMAINING_POSTS_BEFORE_LOAD > listSize && lastLoadAttemptCount < listSize) {
             lastLoadAttemptCount = adapter.getPosts().size();
-            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName());
+            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName(), false);
         }
 
         this.checkSelectedPost(posFirstItem, posLastItem, oldY > 0);
@@ -436,7 +436,7 @@ public class SubredditFragment extends Fragment {
 
         // If the fragment is selected without any posts load posts automatically
         if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
-            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName());
+            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName(), false);
         }
 
         this.restoreViewHolderStates();

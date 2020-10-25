@@ -2,6 +2,7 @@ package com.example.hakonsreader.fragments;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -18,6 +21,9 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.databinding.FragmentProfileBinding;
 import com.example.hakonsreader.misc.Util;
+import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
+import com.example.hakonsreader.viewmodels.PostsViewModel;
+import com.example.hakonsreader.viewmodels.factories.PostsFactory;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -33,43 +39,51 @@ public class ProfileFragment extends Fragment {
 
     private boolean firstLoad = true;
 
-    private RedditApi redditApi = App.get().getApi();
+    private final RedditApi redditApi = App.get().getApi();
+    private FragmentProfileBinding binding;
     private User user;
 
-    private FragmentProfileBinding binding;
+    private PostsViewModel postsViewModel;
+    private PostsAdapter adapter;
+    private LinearLayoutManager layoutManager;
 
 
-    // Response handler for retrieval of user information
-    private OnResponse<User> onUserResponse = user -> {
-        // Store the updated user information
-        User.storeUserInfo(user);
-        this.user = user;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = FragmentProfileBinding.inflate(getLayoutInflater());
 
-        this.updateViews();
-    };
-    private OnFailure onUserFailure = (code, t) -> {
-        Util.handleGenericResponseErrors(this.binding.parentLayout, code, t);
-    };
+        adapter = new PostsAdapter();
+        layoutManager = new LinearLayoutManager(getContext());
 
+        postsViewModel = new ViewModelProvider(this, new PostsFactory(
+                getContext()
+        )).get(PostsViewModel.class);
+        postsViewModel.getPosts().observe(this, posts -> {
+            adapter.addPosts(posts);
+        });
+        postsViewModel.loadPosts(binding.parentLayout, "hakonschia", true);
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        this.binding = FragmentProfileBinding.inflate(inflater);
-        View view = this.binding.getRoot();
-        this.user = User.getStoredUser();
+        binding.posts.setAdapter(adapter);
+        binding.posts.setLayoutManager(layoutManager);
+
+        user = User.getStoredUser();
 
         // Retrieve user info if there is no user previously stored, or if it's the fragments first time
         // loading (to ensure the information is up-to-date)
-        if (this.user == null || this.firstLoad) {
+        if (user == null || firstLoad) {
             // Retrieve user info and then update
             this.getUserInfo();
-            this.firstLoad = false;
+            firstLoad = false;
         } else {
             this.updateViews();
         }
 
-        return view;
+        return binding.getRoot();
     }
 
     @Override
@@ -86,25 +100,33 @@ public class ProfileFragment extends Fragment {
 
         // Format date as "5. September 2012"
         SimpleDateFormat dateFormat = new SimpleDateFormat("d. MMMM y", Locale.getDefault());
-        Date date = Date.from(Instant.ofEpochSecond(this.user.getCreatedAt()));
+        Date date = Date.from(Instant.ofEpochSecond(user.getCreatedAt()));
 
         String ageText = String.format(resources.getString(R.string.profileAge), dateFormat.format(date));
-        String commentKarmaText = String.format(resources.getString(R.string.commentKarma), this.user.getCommentKarma());
-        String postKarmaText = String.format(resources.getString(R.string.postKarma), this.user.getPostKarma());
+        String commentKarmaText = String.format(resources.getString(R.string.commentKarma), user.getCommentKarma());
+        String postKarmaText = String.format(resources.getString(R.string.postKarma), user.getPostKarma());
 
-        this.binding.username.setText(this.user.getName());
-        this.binding.profileAge.setText(ageText);
-        this.binding.commentKarma.setText(commentKarmaText);
-        this.binding.postKarma.setText(postKarmaText);
+        binding.username.setText(user.getName());
+        binding.profileAge.setText(ageText);
+        binding.commentKarma.setText(commentKarmaText);
+        binding.postKarma.setText(postKarmaText);
 
         // Load the users profile picture
-        Picasso.get().load(this.user.getProfilePictureUrl()).into(this.binding.profilePicture);
+        Picasso.get().load(user.getProfilePictureUrl()).into(binding.profilePicture);
     }
 
     /**
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
-        this.redditApi.getUserInfo(this.onUserResponse, this.onUserFailure);
+        redditApi.getUserInfo(user -> {
+            // Store the updated user information
+            User.storeUserInfo(user);
+            this.user = user;
+
+            this.updateViews();
+        }, (code, t) -> {
+            Util.handleGenericResponseErrors(binding.parentLayout, code, t);
+        });
     }
 }

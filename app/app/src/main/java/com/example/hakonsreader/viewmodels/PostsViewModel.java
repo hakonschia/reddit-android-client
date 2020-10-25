@@ -32,8 +32,8 @@ public class PostsViewModel extends ViewModel {
 
     private List<String> postIds = new ArrayList<>();
     private List<RedditPost> postsData = new ArrayList<>();
-    private MutableLiveData<List<RedditPost>> posts;
-    private MutableLiveData<Boolean> loadingChange;
+    private MutableLiveData<List<RedditPost>> posts = new MutableLiveData<>();
+    private MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();;
 
     /**
      * @param context The context to use to create the database for the posts
@@ -107,9 +107,6 @@ public class PostsViewModel extends ViewModel {
      * @return The observable for the posts
      */
     public LiveData<List<RedditPost>> getPosts() {
-        if(posts == null) {
-            posts = new MutableLiveData<>();
-        }
         return posts;
     }
 
@@ -120,15 +117,11 @@ public class PostsViewModel extends ViewModel {
      * it has finished loading it will be set to false
      */
     public LiveData<Boolean> onLoadingChange() {
-        if (loadingChange == null) {
-            loadingChange = new MutableLiveData<>();
-        }
-
         return loadingChange;
     }
 
 
-    public void loadPosts(View parentLayout, String subreddit) {
+    public void loadPosts(View parentLayout, String subreddit, boolean isUser) {
         // Get the ID of the last post in the list
         String after = "";
         int count = postIds.size();
@@ -139,38 +132,53 @@ public class PostsViewModel extends ViewModel {
 
         loadingChange.setValue(true);
 
-        App.get().getApi().getPosts(subreddit, after, count, newPosts -> {
-            loadingChange.setValue(false);
+        if (isUser) {
+            App.get().getApi().getUserPosts(subreddit, newPosts -> {
+                onPostsRetrieved(newPosts);
+            }, (code, t) -> {
+                t.printStackTrace();
+                loadingChange.setValue(false);
+                Util.handleGenericResponseErrors(parentLayout, code, t);
+            });
+        } else {
 
-            postsData.addAll(newPosts);
-            posts.postValue(postsData);
+            App.get().getApi().getPosts(subreddit, after, count, newPosts -> {
+                onPostsRetrieved(newPosts);
+            }, (code, t) -> {
+                t.printStackTrace();
+                loadingChange.setValue(false);
+                Util.handleGenericResponseErrors(parentLayout, code, t);
+            });
+        }
+    }
 
-            // Store (or update) the posts in the database
-            new Thread(() -> {
-                for(RedditPost post : newPosts) {
-                    // Store which IDs this ViewModel is tracking
-                    postIds.add(post.getId());
+    private void onPostsRetrieved(List<RedditPost> newPosts) {
+        loadingChange.setValue(false);
 
-                    List<RedditPost> crossposts = post.getCrossposts();
-                    if (crossposts != null && !crossposts.isEmpty()) {
-                        List<String> crosspostIds = new ArrayList<>();
+        postsData.addAll(newPosts);
+        posts.postValue(postsData);
 
-                        // Insert crossposts as their own database record
-                        for (RedditPost crosspost : crossposts) {
-                            database.posts().insert(crosspost);
-                            crosspostIds.add(crosspost.getId());
-                        }
+        // Store (or update) the posts in the database
+        new Thread(() -> {
+            for (RedditPost post : newPosts) {
+                // Store which IDs this ViewModel is tracking
+                postIds.add(post.getId());
 
-                        post.setCrosspostIds(crosspostIds);
+                List<RedditPost> crossposts = post.getCrossposts();
+                if (crossposts != null && !crossposts.isEmpty()) {
+                    List<String> crosspostIds = new ArrayList<>();
+
+                    // Insert crossposts as their own database record
+                    for (RedditPost crosspost : crossposts) {
+                        database.posts().insert(crosspost);
+                        crosspostIds.add(crosspost.getId());
                     }
 
-                    database.posts().insert(post);
+                    post.setCrosspostIds(crosspostIds);
                 }
-            }).start();
-        }, (code, t) -> {
-            t.printStackTrace();
-            loadingChange.setValue(false);
-            Util.handleGenericResponseErrors(parentLayout, code, t);
-        });
+
+                database.posts().insert(post);
+            }
+        }).start();
     }
 }

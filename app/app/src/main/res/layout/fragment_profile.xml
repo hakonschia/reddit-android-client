@@ -113,6 +113,18 @@
         app:layout_constraintStart_toStartOf="@+id/commentKarma"
         app:layout_constraintTop_toBottomOf="@id/commentKarma" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/posts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/btnLogOut"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileNameDivider"
+        app:layout_constraintVertical_bias="0.0"
+
+        tools:listitem="@layout/post"/>
+
     <Button
         android:id="@+id/btnLogOut"
         android:layout_width="wrap_content"
