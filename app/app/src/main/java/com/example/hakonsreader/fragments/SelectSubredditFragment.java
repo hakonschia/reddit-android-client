@@ -3,10 +3,7 @@ package com.example.hakonsreader.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,16 +33,16 @@ import com.google.android.material.snackbar.Snackbar;
 
 public class SelectSubredditFragment extends Fragment {
     private static final String TAG = "SelectSubredditFragment";
-
-    private RedditApi redditApi = App.get().getApi();
-    private AppDatabase database;
-
-    private SubredditsAdapter subredditsAdapter;
-    private LinearLayoutManager layoutManager;
-
-    private SelectSubredditsViewModel viewModel;
+    private static final String LIST_STATE_KEY = "listState";
 
     private FragmentSelectSubredditBinding binding;
+    private final RedditApi redditApi = App.get().getApi();
+    private AppDatabase database;
+
+    private Bundle saveState;
+    private SubredditsAdapter subredditsAdapter;
+    private LinearLayoutManager layoutManager;
+    private SelectSubredditsViewModel viewModel;
     private OnSubredditSelected subredditSelected;
 
 
@@ -74,10 +71,11 @@ public class SelectSubredditFragment extends Fragment {
         });
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentSelectSubredditBinding.inflate(inflater);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = FragmentSelectSubredditBinding.inflate(getLayoutInflater());
+
         database = AppDatabase.getInstance(getContext());
 
         subredditsAdapter = new SubredditsAdapter();
@@ -87,17 +85,36 @@ public class SelectSubredditFragment extends Fragment {
 
         binding.subreddits.setAdapter(subredditsAdapter);
         binding.subreddits.setLayoutManager(layoutManager);
+    }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this, new SelectSubredditsFactory(
                 getContext()
         )).get(SelectSubredditsViewModel.class);
-        viewModel.getSubreddits().observe(getViewLifecycleOwner(), subredditsAdapter::setSubreddits);
+        viewModel.getSubreddits().observe(getViewLifecycleOwner(), subreddits -> {
+            subredditsAdapter.setSubreddits(subreddits);
+            if (saveState != null) {
+                layoutManager.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY));
+            }
+        });
         viewModel.loadSubreddits();
 
         binding.subredditSearch.setOnEditorActionListener(actionDoneListener);
 
-        // TODO save state of list so it resumes the scroll position
         return binding.getRoot();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (saveState == null) {
+            saveState = new Bundle();
+        }
+
+        saveState.putParcelable(LIST_STATE_KEY, layoutManager.onSaveInstanceState());
     }
 
     @Override
