@@ -401,8 +401,28 @@ public class Post extends RelativeLayout {
         return pairs.toArray(new Pair[0]);
     }
 
+
+    /**
+     * @return Returns if the video content is currently playing. Always returns false if the content
+     * isn't video content
+     */
+    public boolean isVideoPlaying() {
+        View content = binding.content.getChildAt(0);
+        if (content instanceof ContentVideo) {
+            return ((ContentVideo)content).isPlaying();
+        } else if (content instanceof Post) {
+            // If the content is a crosspost pause the video in the crosspost post
+            return ((Post)content).isVideoPlaying();
+        }
+
+        // I suppose if the post isn't a video it's also not playing?
+        return false;
+    }
+
     /**
      * Pauses the video content
+     *
+     * <p>If the content isn't a video nothing is done</p>
      */
     public void pauseVideo() {
         View content = binding.content.getChildAt(0);
@@ -416,6 +436,8 @@ public class Post extends RelativeLayout {
 
     /**
      * Plays the video content
+     *
+     * <p>If the content isn't a video nothing is done</p>
      */
     public void playVideo() {
         View content = binding.content.getChildAt(0);

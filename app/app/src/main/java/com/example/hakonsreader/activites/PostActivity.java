@@ -62,6 +62,7 @@ public class PostActivity extends AppCompatActivity {
     private CommentsViewModel commentsViewModel;
     private CommentsAdapter commentsAdapter;
     private LinearLayoutManager layoutManager;
+    private boolean videoPlayingWhenPaused;
 
     private RedditPost post;
     private RedditListing replyingTo;
@@ -106,13 +107,19 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        videoPlayingWhenPaused = binding.post.isVideoPlaying();
         binding.post.pauseVideo();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        binding.post.playVideo();
+
+        // Only resume if the video was actually playing when pausing
+        if (videoPlayingWhenPaused) {
+            binding.post.playVideo();
+        }
     }
 
     @Override
