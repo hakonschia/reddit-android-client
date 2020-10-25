@@ -89,7 +89,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         // Don't show text posts here (only show when a post is opened)
         holder.post.setShowContent(post.getPostType() != PostType.TEXT);
+
+        holder.post.enableTickerAnimation(false);
         holder.post.setPostData(post);
+        holder.post.enableTickerAnimation(true);
     }
 
 

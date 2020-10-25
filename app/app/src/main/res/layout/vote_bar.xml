@@ -17,8 +17,6 @@
         android:layout_gravity="center"
         android:textColor="@color/text_color"
 
-        app:ticker_animationDuration="@integer/tickerAnimationDefault"
-
         tools:text="1523"/>
 
     <ImageButton

@@ -46,21 +46,12 @@ public class VoteBar extends ConstraintLayout {
      * Sets the listing to use in this VoteBar and sets the initial state of the vote status
      *
      * @param listing The listing to set
-     * @param animateChange True if the TickerView should animate the change. This only changes for
-     *                      the current change, and does not affect the value set with 
-     *                      {@link VoteBar#enableTickerAnimation(boolean)}
      */
-    public void setListing(@NonNull RedditListing listing, boolean animateChange) {
+    public void setListing(@NonNull RedditListing listing) {
         this.listing = listing;
         // Make sure the initial status is up to date
 
-        boolean currentAnimationState = tickerAnimationEnabled();
-
-        this.enableTickerAnimation(animateChange);
         this.updateVoteStatus();
-
-        // Set back to previous state
-        this.enableTickerAnimation(currentAnimationState);
     }
 
     /**
@@ -149,7 +140,7 @@ public class VoteBar extends ConstraintLayout {
      * @param enable True to enable
      */
     public void enableTickerAnimation(boolean enable) {
-        binding.score.setAnimationDuration(enable ? (long)getResources().getInteger(R.integer.tickerAnimationDefault) : 0);
+        binding.score.setAnimationDuration(enable ? (long)getResources().getInteger(R.integer.tickerAnimationFast) : 0);
     }
 
     /**

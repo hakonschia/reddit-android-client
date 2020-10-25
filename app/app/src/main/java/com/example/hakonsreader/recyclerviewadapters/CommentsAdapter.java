@@ -554,7 +554,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             binding.executePendingBindings();
 
             // TODO when the vote bar uses data binding this can probably be set through xml
-            binding.commentVoteBar.setListing(comment, false);
+            binding.commentVoteBar.enableTickerAnimation(false);
+            binding.commentVoteBar.setListing(comment);
+            binding.commentVoteBar.enableTickerAnimation(true);
         }
     }
 }

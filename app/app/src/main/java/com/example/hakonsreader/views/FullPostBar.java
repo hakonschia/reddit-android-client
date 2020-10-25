@@ -34,7 +34,7 @@ public class FullPostBar extends ConstraintLayout {
     public void setPost(RedditPost post) {
         this.post = post;
 
-        binding.voteBar.setListing(post, false);
+        binding.voteBar.setListing(post);
 
         this.updateView();
     }
@@ -46,7 +46,6 @@ public class FullPostBar extends ConstraintLayout {
         binding.voteBar.updateVoteStatus();
 
         float comments = post.getAmountOfComments();
-
         String commentsText;
 
         // Above 10k comments, show "1.5k comments" instead
@@ -60,7 +59,7 @@ public class FullPostBar extends ConstraintLayout {
             );
         }
 
-        // This has to inlcude both as it might go from "0 comments" to "1 comment"
+        // This has to include both as it might go from "0 comments" to "1 comment", also "999 comments" to "1.0K comments"
         binding.numComments.setCharacterLists(TickerUtils.provideNumberList(), TickerUtils.provideNumberList());
         binding.numComments.setText(commentsText);
     }
@@ -73,6 +72,16 @@ public class FullPostBar extends ConstraintLayout {
      */
     public void enableTickerAnimation(boolean enable) {
         binding.voteBar.enableTickerAnimation(enable);
-        binding.numComments.setAnimationDelay(enable ? (long)getResources().getInteger(R.integer.tickerAnimationDefault) : 0);
+        binding.numComments.setAnimationDuration(enable ? (long)getResources().getInteger(R.integer.tickerAnimationDefault) : 0);
+    }
+
+    /**
+     * Check if the TickerViews have animation enabled
+     *
+     * @return True if animation is enabled
+     */
+    public boolean tickerAnimationEnabled() {
+        // Technically voteBar and numComments can have different values, but assume they're always synced
+        return binding.voteBar.tickerAnimationEnabled();
     }
 }

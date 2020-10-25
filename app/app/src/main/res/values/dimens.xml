@@ -28,4 +28,6 @@
 
     <!-- The default time for TickerView animations -->
     <integer name="tickerAnimationDefault">750</integer>
+    <!-- The fast time for TickerView animations -->
+    <integer name="tickerAnimationFast">350</integer>
 </resources>
