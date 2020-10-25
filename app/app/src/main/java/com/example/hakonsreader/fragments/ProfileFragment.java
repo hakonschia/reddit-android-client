@@ -6,9 +6,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.BindingAdapter;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -134,33 +137,16 @@ public class ProfileFragment extends Fragment {
      * Updates the views with the information found in {@link ProfileFragment#user}
      */
     private void updateViews() {
-        Resources resources = getResources();
+        binding.setUser(user);
+        binding.setLoggedInUser(username == null);
 
-        // Format date as "5. September 2012"
-        SimpleDateFormat dateFormat = new SimpleDateFormat("d. MMMM y", Locale.getDefault());
-        Date date = Date.from(Instant.ofEpochSecond(user.getCreatedAt()));
-
-        String ageText = String.format(resources.getString(R.string.profileAge), dateFormat.format(date));
-        String commentKarmaText = String.format(resources.getString(R.string.commentKarma), user.getCommentKarma());
-        String postKarmaText = String.format(resources.getString(R.string.postKarma), user.getPostKarma());
-
-        binding.username.setText(user.getName());
-        binding.profileAge.setText(ageText);
-        binding.commentKarma.setText(commentKarmaText);
-        binding.postKarma.setText(postKarmaText);
-
-        // Load the users profile picture
-        Picasso.get()
-                .load(user.getProfilePictureUrl())
-                .placeholder(R.drawable.ic_baseline_person_100)
-                .error(R.drawable.ic_baseline_person_100)
-                .into(binding.profilePicture);
     }
 
     /**
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
+        // user(null) gets information about the logged in user, so we can use username directly
         redditApi.user(username).getInfo(user -> {
             // Load the posts for the user
             postsViewModel.loadPosts(binding.parentLayout, user.getName(), true);
@@ -176,5 +162,39 @@ public class ProfileFragment extends Fragment {
             t.printStackTrace();
             Util.handleGenericResponseErrors(binding.parentLayout, code, t);
         });
+    }
+
+
+    /**
+     * Binding adapter for setting the profile picture
+     *
+     * @param imageView The view to insert the profile picture into
+     * @param url The URL for the profile picture
+     */
+    @BindingAdapter("profilePicture")
+    public static void setProfilePicture(ImageView imageView, String url) {
+        // Load the users profile picture
+        Picasso.get()
+                .load(url)
+                .placeholder(R.drawable.ic_baseline_person_100)
+                .error(R.drawable.ic_baseline_person_100)
+                .into(imageView);
+    }
+
+    /**
+     * Binding adapter to set the profile age text. The text is formatted as "d. MMMM y",
+     * 5. September 2012"
+     *
+     * @param textView The TextView to set the text on
+     * @param createdAt The timestamp, in seconds, the profile was created
+     */
+    @BindingAdapter("profileAge")
+    public static void setProfileAge(TextView textView, long createdAt) {
+        // Format date as "5. September 2012"
+        SimpleDateFormat dateFormat = new SimpleDateFormat("d. MMMM y", Locale.getDefault());
+        Date date = Date.from(Instant.ofEpochSecond(createdAt));
+
+        String ageText = String.format(textView.getResources().getString(R.string.profileAge), dateFormat.format(date));
+        textView.setText(ageText);
     }
 }

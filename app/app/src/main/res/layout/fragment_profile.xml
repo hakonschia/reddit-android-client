@@ -1,140 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/parentLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/secondary_background" >
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View" />
 
-    <!-- This has a negative bottom margin to not get the rounded corners at the bottom -->
+        <variable
+            name="loggedInUser"
+            type="boolean" />
 
-    <ImageView
-        android:id="@+id/topLayout"
-        android:layout_width="0dp"
+        <variable
+            name="user"
+            type="com.example.hakonsreader.api.model.User" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/parentLayout"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="80dp"
-        android:layout_marginBottom="-35dp"
-        android:background="@drawable/rounded_square_main_bg_gradient"
+        android:background="@color/secondary_background" >
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        <!-- This has a negative bottom margin to not get the rounded corners at the bottom -->
+        <ImageView
+            android:id="@+id/topLayout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="80dp"
+            android:layout_marginBottom="-35dp"
+            android:background="@drawable/rounded_square_main_bg_gradient"
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profilePicture"
-        android:layout_width="140dp"
-        android:layout_height="140dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        android:src="@drawable/ic_baseline_person_100"
-        app:civ_border_width="2dp"
+        <Button
+            android:id="@+id/btnLogOut"
+            android:layout_width="88dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
 
-        app:layout_constraintTop_toTopOf="@id/topLayout"
-        app:layout_constraintBottom_toTopOf="@+id/topLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+            android:onClick="btnLogOutOnClick"
+            android:text="@string/btnLogOut"
+            android:visibility="@{loggedInUser ? View.VISIBLE : View.GONE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/topLayout" />
 
-    <TextView
-        android:id="@+id/username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profilePicture"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
 
-        android:textColor="@color/text_color"
-        android:textSize="35sp"
+            android:src="@drawable/ic_baseline_person_100"
+            app:profilePicture="@{user.profilePictureUrl}"
+            app:civ_border_width="2dp"
+            app:civ_border_color="@color/opposite_background"
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePicture"
+            app:layout_constraintTop_toTopOf="@id/topLayout"
+            app:layout_constraintBottom_toTopOf="@+id/topLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        tools:text="Hakonschia" />
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-    <TextView
-        android:id="@+id/profileAge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{user.name}"
 
-        android:textColor="@color/text_color"
+            android:textColor="@color/text_color"
+            android:textSize="35sp"
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profilePicture"
 
-        tools:text="User since 12. August 1997" />
+            tools:text="Hakonschia"/>
 
-    <TextView
-        android:id="@+id/commentKarma"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/profileAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-        android:layout_below="@id/profileAge"
+            android:textColor="@color/text_color"
 
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="16dp"
+            app:profileAge="@{user.createdAt}"
 
-        android:textColor="@color/text_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/username"
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profileAge"
+            tools:text="User since 12. August 1997" />
 
-        tools:text="1234 comment karma" />
+        <TextView
+            android:id="@+id/commentKarma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
 
-    <TextView
-        android:id="@+id/postKarma"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+            android:text='@{user != null ? @string/commentKarma(user.commentKarma) : ""}'
+            android:textColor="@color/text_color"
 
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileAge"
 
-        android:textColor="@color/text_color"
+            tools:text="1234 comment karma" />
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profileAge"
+        <TextView
+            android:id="@+id/postKarma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-        tools:text="51523 post karma" />
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
 
-    <!-- Rectangle divider -->
-    <View
-        android:id="@+id/profileNameDivider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="8dp"
+            android:text='@{user != null ? @string/postKarma(user.postKarma) : ""}'
+            android:textColor="@color/text_color"
 
-        android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileAge"
 
-        android:layout_marginEnd="8dp"
-        android:background="@color/divider"
-        app:layout_constraintEnd_toEndOf="@+id/postKarma"
-        app:layout_constraintStart_toStartOf="@+id/commentKarma"
-        app:layout_constraintTop_toBottomOf="@id/commentKarma" />
+            tools:text="51523 post karma" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/posts"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/btnLogOut"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profileNameDivider"
-        app:layout_constraintVertical_bias="0.0"
+        <!-- Rectangle divider -->
+        <View
+            android:id="@+id/profileNameDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="8dp"
 
-        tools:listitem="@layout/post"/>
+            android:layout_marginTop="8dp"
 
-    <Button
-        android:id="@+id/btnLogOut"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="8dp"
-        android:onClick="btnLogOutOnClick"
-        android:text="@string/btnLogOut"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_marginEnd="8dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="@+id/postKarma"
+            app:layout_constraintStart_toStartOf="@+id/commentKarma"
+            app:layout_constraintTop_toBottomOf="@id/commentKarma" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/posts"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+
+            app:layout_constraintTop_toBottomOf="@+id/profileNameDivider"
+            app:layout_constraintVertical_bias="0.0"
+            tools:listitem="@layout/post" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
