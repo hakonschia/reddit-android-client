@@ -89,8 +89,6 @@ public class DispatcherActivity extends AppCompatActivity {
         if (!pathSegments.isEmpty()) {
             lastSegment = pathSegments.get(pathSegments.size() - 1);
         }
-        Log.d(TAG, "Dispatching2 " + url);
-
 
         if (url.matches("https://(www.)?reddit\\.com")) {
 
@@ -160,7 +158,6 @@ public class DispatcherActivity extends AppCompatActivity {
                 // If we don't know how to handle the URL pass it to a web view
                 intent = new Intent(this, WebViewActivity.class);
                 intent.putExtra(WebViewActivity.URL_KEY, url);
-                Log.d(TAG, "createIntent: :L");
             }
         }
 

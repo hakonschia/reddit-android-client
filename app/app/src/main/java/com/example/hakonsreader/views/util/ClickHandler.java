@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.activites.ProfileActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
 
@@ -29,7 +32,7 @@ public class ClickHandler {
     /**
      * Opens an activity with the selected subreddit
      *
-     * @param view Ignored
+     * @param view The view itself is ignored, but this cannot be null as the context is needed
      * @param subreddit The subreddit to open
      */
     public static void openSubredditInActivity(View view, String subreddit) {
@@ -59,7 +62,7 @@ public class ClickHandler {
     /**
      * Opens an activity to show a users profile
      *
-     * @param view Ignored
+     * @param view The view itself is ignored, but this cannot be null as the context is needed
      * @param username The username of the profile to open
      */
     public static void openProfileInActivity(View view, String username) {
@@ -74,6 +77,27 @@ public class ClickHandler {
 
         // Slide the activity in
         activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
+
+    /**
+     * Opens an image in fullscreen
+     *
+     * @param view The view itself is ignored, but this cannot be null as the context is needed
+     * @param imageUrl The URL to the image
+     */
+    public static void openImageInFullscreen( View view, String imageUrl) {
+        Context context = view.getContext();
+        Activity activity = (Activity)context;
+
+        // Send some data like what sub it is etc etc so it knows what to load
+        Intent intent = new Intent(context, ImageActivity.class);
+        intent.putExtra(ImageActivity.IMAGE_URL, imageUrl);
+
+        activity.startActivity(intent);
+
+        // Slide the activity in
+        activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
 }

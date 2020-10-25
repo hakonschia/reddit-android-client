@@ -15,6 +15,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.PhotoViewDoubleTapListener;
+import com.example.hakonsreader.views.util.ClickHandler;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -94,10 +95,7 @@ public class ContentImage extends PhotoView {
         // Open image in fullscreen on single tap
         @Override
         public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
-            Intent intent = new Intent(getContext(), ImageActivity.class);
-            intent.putExtra("imageUrl", post.getUrl());
-            getContext().startActivity(intent);
-            ((Activity)getContext()).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            ClickHandler.openImageInFullscreen(ContentImage.this, post.getUrl());
             return true;
         }
 
