@@ -28,16 +28,15 @@ public class Tag extends LinearLayout {
     private int fillColor;
 
     public Tag(Context context) {
-        super(context);
-
-        LayoutInflater inflater = LayoutInflater.from(context);
-        binding = TagBinding.inflate(inflater, this, true);
+        this(context, null, 0);
     }
-
     public Tag(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.Tag, 0, 0);
+        this(context, attrs, 0);
+    }
+    public Tag(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
 
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.Tag, 0, 0);
         try {
             text = a.getString(R.styleable.Tag_text);
             textColor = a.getColor(R.styleable.Tag_textColor, ContextCompat.getColor(context, R.color.text_color));
@@ -45,9 +44,8 @@ public class Tag extends LinearLayout {
         } finally {
             a.recycle();
         }
-    }
-    public Tag(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        
+        binding = TagBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
     /**

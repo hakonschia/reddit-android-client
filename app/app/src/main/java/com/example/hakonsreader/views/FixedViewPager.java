@@ -18,12 +18,12 @@ import androidx.viewpager.widget.ViewPager;
  */
 public class FixedViewPager extends ViewPager {
     public FixedViewPager(@NonNull Context context) {
-        super(context);
+        this(context, null);
     }
-
     public FixedViewPager(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {

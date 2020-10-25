@@ -113,10 +113,10 @@ public class ContentVideo extends PlayerView {
 
 
     public ContentVideo(Context context) {
-        super(context);
+        this(context, null, 0);
     }
     public ContentVideo(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
     public ContentVideo(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -131,7 +131,6 @@ public class ContentVideo extends PlayerView {
      */
     public void setPost(RedditPost post) {
         this.post = post;
-
         this.updateView();
     }
 

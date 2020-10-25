@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * <p>Taken from: https://stackoverflow.com/a/46216274/7750841</p>
  */
 public class ListDivider extends RecyclerView.ItemDecoration {
-    private Drawable mDivider;
+    private final Drawable mDivider;
 
     public ListDivider(Drawable divider) {
         mDivider = divider;

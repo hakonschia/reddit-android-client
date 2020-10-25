@@ -2,10 +2,12 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
@@ -20,26 +22,35 @@ import com.squareup.picasso.Picasso;
 public class ContentLink extends ConstraintLayout {
     private static final String TAG = "ContentLink";
 
-    private ContentLinkBinding binding;
+    private final ContentLinkBinding binding;
     private RedditPost post;
 
-
-    public ContentLink(@NonNull Context context, RedditPost post) {
-        super(context);
+    public ContentLink(@NonNull Context context) {
+        this(context, null, 0, 0);
+    }
+    public ContentLink(@NonNull Context context, @Nullable AttributeSet attrs) {
+        this(context, attrs, 0, 0);
+    }
+    public ContentLink(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        this(context, attrs, defStyleAttr, 0);
+    }
+    public ContentLink(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
         binding = ContentLinkBinding.inflate(LayoutInflater.from(context), this, true);
-
-        this.post = post;
 
         binding.thumbnail.setOnClickListener(v -> this.openLink());
         binding.link.setOnClickListener(v -> this.openLink());
+    }
 
+    /**
+     * Sets the post this content is for and updates the view
+     *
+     * @param post The post
+     */
+    public void setPost(RedditPost post) {
+        this.post = post;
         this.updateView();
     }
-
-    public ContentLink(@NonNull Context context) {
-        super(context);
-    }
-
 
     private void updateView() {
         if (!post.getThumbnail().isEmpty()) {

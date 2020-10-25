@@ -54,16 +54,13 @@ public class Post extends RelativeLayout {
 
 
     public Post(Context context) {
-        super(context);
-        binding = PostBinding.inflate(LayoutInflater.from(context), this, true);
+        this(context, null, 0, 0);
     }
     public Post(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        binding = PostBinding.inflate(LayoutInflater.from(context), this, true);
+        this(context, attrs, 0, 0);
     }
     public Post(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        binding = PostBinding.inflate(LayoutInflater.from(context), this, true);
+        this(context, attrs, defStyleAttr, 0);
     }
     public Post(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -256,11 +253,15 @@ public class Post extends RelativeLayout {
                 break;
 
             case LINK:
-                content = new ContentLink(context, post);
+                ContentLink contentLink = new ContentLink(context);
+                contentLink.setPost(post);
+                content = contentLink;
                 break;
 
             case TEXT:
-                content = new ContentText(context, post);
+                ContentText contentText = new ContentText(context);
+                contentText.setPost(post);
+                content = contentText;
                 break;
 
             default:

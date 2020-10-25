@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,11 +14,8 @@ import androidx.databinding.BindingAdapter;
 
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostInfoBinding;
-import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.misc.ViewUtil;
 
-import java.time.Duration;
-import java.time.Instant;
 
 /**
  * View for info about posts (title, author, subreddit etc)
@@ -30,16 +26,13 @@ public class PostInfo extends ConstraintLayout {
     private PostInfoBinding binding;
 
     public PostInfo(@NonNull Context context) {
-        super(context);
-        binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
+        this(context, null, 0, 0);
     }
     public PostInfo(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
+        this(context, attrs, 0, 0);
     }
     public PostInfo(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
+        this(context, attrs, defStyleAttr, 0);
     }
     public PostInfo(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);

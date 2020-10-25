@@ -10,19 +10,16 @@ import androidx.annotation.Nullable;
 import com.example.hakonsreader.databinding.ContentGalleryBinding;
 
 public class ContentGallery extends LinearLayout {
-    private ContentGalleryBinding binding;
+    private final ContentGalleryBinding binding;
 
     public ContentGallery(Context context) {
-        super(context);
-        binding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true);
+        this(context, null, 0, 0);
     }
     public ContentGallery(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        binding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true);
+        this(context, attrs, 0, 0);
     }
     public ContentGallery(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        binding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true);
+        this(context, attrs, defStyleAttr, 0);
     }
     public ContentGallery(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);

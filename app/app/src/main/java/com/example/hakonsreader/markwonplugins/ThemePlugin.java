@@ -13,9 +13,6 @@ import io.noties.markwon.core.MarkwonTheme;
 
 /**
  * Markwon plugin that defines the theme
- *
- * <p>Sets block quote theme</p>
- * <p>Sets code theme</p>
  */
 public class ThemePlugin extends AbstractMarkwonPlugin {
     private Context context;

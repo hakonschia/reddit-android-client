@@ -2,7 +2,6 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
@@ -17,7 +16,6 @@ import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.databinding.VoteBarBinding;
 import com.example.hakonsreader.misc.Util;
 import com.robinhood.ticker.TickerUtils;
-import com.robinhood.ticker.TickerView;
 
 import java.util.Locale;
 
@@ -30,9 +28,18 @@ public class VoteBar extends ConstraintLayout {
     private final VoteBarBinding binding;
     private RedditListing listing;
 
-
+    public VoteBar(@NonNull Context context) {
+        this(context, null, 0, 0);
+    }
     public VoteBar(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0, 0);
+    }
+    public VoteBar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        this(context, attrs, defStyleAttr, 0);
+    }
+    public VoteBar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+
         LayoutInflater inflater = LayoutInflater.from(context);
         binding = VoteBarBinding.inflate(inflater, this, true);
 
@@ -41,6 +48,7 @@ public class VoteBar extends ConstraintLayout {
 
         binding.score.setCharacterLists(TickerUtils.provideNumberList(), TickerUtils.provideAlphabeticalList());
     }
+
 
     /**
      * Sets the listing to use in this VoteBar and sets the initial state of the vote status

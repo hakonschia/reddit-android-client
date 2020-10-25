@@ -21,8 +21,17 @@ public class FullPostBar extends ConstraintLayout {
 
     private final FullPostBarBinding binding;
 
+    public FullPostBar(@NonNull Context context) {
+        this(context, null, 0, 0);
+    }
     public FullPostBar(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0, 0);
+    }
+    public FullPostBar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        this(context, attrs, defStyleAttr, 0);
+    }
+    public FullPostBar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
         binding = FullPostBarBinding.inflate(LayoutInflater.from(context), this, true);
     }
 

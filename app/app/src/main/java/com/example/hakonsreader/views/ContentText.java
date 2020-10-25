@@ -1,7 +1,6 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
-import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -18,30 +17,30 @@ import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 public class ContentText extends ScrollView {
 
     private RedditPost post;
-    private TextView textView;
-
-    public ContentText(Context context, RedditPost post) {
-        super(context);
-
-        this.setScrollbarFadingEnabled(false);
-
-        textView = new TextView(context);
-        this.addView(textView);
-
-        this.post = post;
-        this.updateView();
-    }
+    private final TextView textView;
 
     public ContentText(Context context) {
-        super(context);
+        this(context, null, 0);
     }
     public ContentText(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
     public ContentText(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
+        textView = new TextView(context);
+        this.addView(textView);
     }
 
+    /**
+     * Sets the post this content is for and updates the view
+     *
+     * @param post The post
+     */
+    public void setPost(RedditPost post) {
+        this.post = post;
+        this.updateView();
+    }
 
     private void updateView() {
         textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -28,14 +27,15 @@ public class ContentImage extends PhotoView {
     private RedditPost post;
 
     public ContentImage(Context context) {
-        super(context);
+        this(context, null, 0);
     }
     public ContentImage(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
     public ContentImage(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
+
 
     /**
      * Sets the post the content is for and updates the view

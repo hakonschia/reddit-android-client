@@ -11,9 +11,14 @@ public class LoadingIcon extends ProgressBar {
     public LoadingIcon(Context context) {
         super(context);
     }
-
     public LoadingIcon(Context context, AttributeSet attrs) {
         super(context, attrs);
+    }
+    public LoadingIcon(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+    public LoadingIcon(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
     }
 
     /**
