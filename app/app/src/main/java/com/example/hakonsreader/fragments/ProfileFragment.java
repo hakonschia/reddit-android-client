@@ -2,7 +2,6 @@ package com.example.hakonsreader.fragments;
 
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.interfaces.OnFailure;
-import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.databinding.FragmentProfileBinding;
 import com.example.hakonsreader.misc.Util;
@@ -42,16 +39,56 @@ public class ProfileFragment extends Fragment {
     private final RedditApi redditApi = App.get().getApi();
     private FragmentProfileBinding binding;
     private User user;
+    /**
+     * The username of the user to retrieve information for. If this is null, the fragment is
+     * for logged in users
+     */
+    private String username;
 
     private PostsViewModel postsViewModel;
     private PostsAdapter adapter;
     private LinearLayoutManager layoutManager;
 
 
+    private ProfileFragment() {
+
+    }
+
+    /**
+     * Creates a new ProfileFragment for logged in users
+     *
+     * @return A new ProfileFragment for logged in users
+     */
+    public static ProfileFragment newInstance() {
+        return new ProfileFragment();
+    }
+
+    /**
+     * Create a new ProfileFragment for a user that is NOT the logged in user. For logged in users
+     * user {@link ProfileFragment#newInstance()}
+     *
+     * @param username The username to create the fragment for
+     * @return A ProfileFragment for a user
+     */
+    public static ProfileFragment newInstance(String username) {
+        Bundle args = new Bundle();
+        args.putString("username", username);
+
+        ProfileFragment fragment = new ProfileFragment();
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentProfileBinding.inflate(getLayoutInflater());
+
+        Bundle args = getArguments();
+        if (args != null) {
+            username = args.getString("username");
+        }
 
         adapter = new PostsAdapter();
         layoutManager = new LinearLayoutManager(getContext());
@@ -71,7 +108,12 @@ public class ProfileFragment extends Fragment {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
 
-//        user = User.getStoredUser();
+        // No username given, load profile for logged in user
+        if (username == null) {
+            user = User.getStoredUser();
+        } else {
+            binding.username.setText(username);
+        }
 
         // Retrieve user info if there is no user previously stored, or if it's the fragments first time
         // loading (to ensure the information is up-to-date)
@@ -119,9 +161,11 @@ public class ProfileFragment extends Fragment {
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
-        redditApi.user().getInfo(user -> {
-            // Store the updated user information
-            //User.storeUserInfo(user);
+        redditApi.user(username).getInfo(user -> {
+            // Store the updated user information if this profile is for the logged in user
+            if (username == null) {
+                User.storeUserInfo(user);
+            }
             this.user = user;
 
             this.updateViews();

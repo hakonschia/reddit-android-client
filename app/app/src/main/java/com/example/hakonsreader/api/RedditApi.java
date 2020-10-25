@@ -942,6 +942,8 @@ public class RedditApi {
      * Retrieve a {@link UserRequests} object that can get handle requests for non-logged in users.
      * For logged in users use {@link RedditApi#user()}.
      *
+     * <p>Passing {@code null} to this has the same effect as for logged in users</p>
+     *
      * @return An object that can perform various user related API requests for non-logged in users
      */
     public UserRequests user(String username) {
