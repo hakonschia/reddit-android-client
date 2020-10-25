@@ -99,7 +99,11 @@ public class ProfileFragment extends Fragment {
         postsViewModel.getPosts().observe(this, posts -> {
             adapter.addPosts(posts);
         });
-        postsViewModel.loadPosts(binding.parentLayout, "hakonschia", true);
+
+        if (username == null) {
+
+        } else {
+        }
     }
 
     @Nullable
@@ -162,11 +166,14 @@ public class ProfileFragment extends Fragment {
      */
     public void getUserInfo() {
         redditApi.user(username).getInfo(user -> {
+            // Load the posts for the user
+            postsViewModel.loadPosts(binding.parentLayout, user.getName(), true);
+            this.user = user;
+
             // Store the updated user information if this profile is for the logged in user
             if (username == null) {
                 User.storeUserInfo(user);
             }
-            this.user = user;
 
             this.updateViews();
         }, (code, t) -> {
