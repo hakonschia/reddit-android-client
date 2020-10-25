@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.MainActivity;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -17,6 +18,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
+
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
+import static com.google.android.material.snackbar.Snackbar.*;
 
 public class Util {
     private Util() { }
@@ -51,7 +55,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showNoInternetSnackbar(View parent) {
-        Snackbar.make(parent, parent.getResources().getString(R.string.noInternetConnection), Snackbar.LENGTH_SHORT).show();
+        make(parent, parent.getResources().getString(R.string.noInternetConnection), LENGTH_SHORT).show();
     }
 
     /**
@@ -60,12 +64,16 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showNotLoggedInSnackbar(View parent) {
-        Snackbar snackbar = Snackbar.make(parent, parent.getResources().getString(R.string.notLoggedInError), Snackbar.LENGTH_LONG);
+        Snackbar snackbar = make(parent, parent.getResources().getString(R.string.notLoggedInError), LENGTH_LONG);
         Context context = parent.getContext();
 
         snackbar.setAction(context.getString(R.string.log_in), v -> {
-            // TODO Redirect to a login activity/fragment
             // If getContext instance of MainAcitivty we can set the navbar item to profile and, otherwise create activity for logging in
+            if (context instanceof MainActivity) {
+                ((MainActivity)context).selectProfileNavBar();
+            }
+
+            // TODO if we're not in MainActivity we need to open a LogInActivity or something
         });
         snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
         snackbar.show();
@@ -79,7 +87,7 @@ public class Util {
     public static void showForbiddenErrorSnackbar(View parent) {
         // 403 errors are generally when the access token is outdated and new functionality has been
         // added that requires more OAuth scopes
-        Snackbar.make(parent, parent.getResources().getString(R.string.forbiddenError), Snackbar.LENGTH_SHORT).show();
+        make(parent, parent.getResources().getString(R.string.forbiddenError), LENGTH_SHORT).show();
     }
 
     /**
@@ -88,7 +96,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showGenericServerErrorSnackbar(View parent) {
-        Snackbar.make(parent, parent.getResources().getString(R.string.genericServerError), Snackbar.LENGTH_SHORT).show();
+        make(parent, parent.getResources().getString(R.string.genericServerError), LENGTH_SHORT).show();
     }
 
     /**
@@ -97,7 +105,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showTooManyRequestsSnackbar(View parent) {
-        Snackbar.make(parent, parent.getResources().getString(R.string.tooManyRequestsError), Snackbar.LENGTH_SHORT).show();
+        make(parent, parent.getResources().getString(R.string.tooManyRequestsError), LENGTH_SHORT).show();
     }
 
     /**
@@ -106,7 +114,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showErrorLoggingInSnackbar(View parent) {
-        Snackbar.make(parent, parent.getResources().getString(R.string.errorLoggingIn), Snackbar.LENGTH_SHORT).show();
+        make(parent, parent.getResources().getString(R.string.errorLoggingIn), LENGTH_SHORT).show();
     }
 
     /**
@@ -115,7 +123,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showUnknownError(View parent) {
-        Snackbar.make(parent, parent.getResources().getString(R.string.unknownError), Snackbar.LENGTH_SHORT).show();
+        make(parent, parent.getResources().getString(R.string.unknownError), LENGTH_SHORT).show();
     }
 
 

@@ -269,6 +269,13 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         }
     }
 
+    /**
+     * Selects the profile nav bar
+     */
+    public void selectProfileNavBar() {
+        binding.bottomNav.setSelectedItemId(R.id.navProfile);
+    }
+
 
     /**
      * Click listener for the "Log out" button

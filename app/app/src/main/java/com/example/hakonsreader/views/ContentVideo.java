@@ -45,7 +45,8 @@ import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 /**
- * The view for video posts (also includes GIFs)
+ * The view for video posts (no GIF support, although URLs that end in .gif/.gifv that are actually
+ * .mp4 are supported)
  */
 public class ContentVideo extends PlayerView {
     private static final String TAG = "PostContentVideo";
@@ -424,7 +425,7 @@ public class ContentVideo extends PlayerView {
     }
 
     /**
-     * Prepares the exo player
+     * Prepares the exo player. If the player has already been prepared, nothing is done
      */
     public void prepare() {
         if (mediaSource != null && !isPrepared) {
