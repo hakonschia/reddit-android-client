@@ -158,6 +158,12 @@ public class ContentVideo extends PlayerView {
         if (App.get().muteVideoByDefault()) {
             this.toggleVolume(false);
         }
+
+        // Match the width to the screen width. This makes the controller match the screen width, but the
+        // video player itself will be resized based on its actual size
+        ViewGroup.LayoutParams params = getLayoutParams();
+        params.width = App.get().getScreenWidth();
+        setLayoutParams(params);
     }
 
     /**
@@ -502,7 +508,6 @@ public class ContentVideo extends PlayerView {
         float widthScaledBy = videoWidth / (float)width;
         int height = (int)(videoHeight / widthScaledBy);
 
-
         float heightRatio = (float) height / App.get().getScreenHeight();
         if (heightRatio > MAX_HEIGHT_RATIO) {
             heightRatio = MAX_HEIGHT_RATIO;
@@ -514,6 +519,16 @@ public class ContentVideo extends PlayerView {
         width = (int)(videoWidth / heightScaledBy);
 
         setLayoutParams(new ViewGroup.LayoutParams(width, height));
+    }
+
+    /**
+     * Ensures that the video fits the screen
+     */
+    public void fitScreen() {
+        // TODO this is a pretty bad way of doing it as the controls get pushed to the bottom of the screen even
+        //  if the video itself isn't
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        setLayoutParams(params);
     }
 
 

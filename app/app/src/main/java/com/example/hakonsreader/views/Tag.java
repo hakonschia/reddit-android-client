@@ -44,7 +44,7 @@ public class Tag extends LinearLayout {
         } finally {
             a.recycle();
         }
-        
+
         binding = TagBinding.inflate(LayoutInflater.from(context), this, true);
     }
 

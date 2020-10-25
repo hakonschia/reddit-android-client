@@ -60,17 +60,12 @@ public class VideoActivity extends AppCompatActivity {
                 extras.putBoolean(ContentVideo.EXTRA_VOLUME, true);
             }
 
-            Post post = new Post(this);
-            post.setPostData(redditPost);
-            post.setExtras(extras);
+            content = new ContentVideo(this);
+            content.setPost(redditPost);
+            content.setExtras(extras);
+            content.fitScreen();
 
             FrameLayout video = findViewById(R.id.video);
-
-            // Retrieve and extract only the content view
-            FrameLayout contentLayout = post.getContentLayout();
-            content = (ContentVideo) contentLayout.getChildAt(0);
-            contentLayout.removeView(content);
-
             video.addView(content);
         } else {
             finish();
