@@ -85,7 +85,7 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
                 @Override
                 public void onClick(@NonNull View widget) {
                     Intent intent = new Intent(context, DispatcherActivity.class);
-                    intent.putExtra(DispatcherActivity.URL_KEY, link);
+                    intent.putExtra(DispatcherActivity.URL_KEY, link.trim());
 
                     // The plugin is created from App, which is not an activity
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -98,7 +98,6 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
                     ds.setColor(ds.linkColor);
                 }
             };
-
 
             spannable.setSpan(clickableSpan, s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             spannable.setSpan(new UnderlineSpan(), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
