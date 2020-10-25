@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api;
 
+import android.util.Log;
+
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.enums.Thing;
@@ -979,6 +981,7 @@ public class RedditApi {
             }
 
             if (username == null) {
+                Log.d(TAG, "getInfo: No username given, getting posts for logged in userimport android.widget.FrameLayout;\n");
                 api.getUserInfo(accessToken.generateHeaderString()).enqueue(new Callback<User>() {
                     @Override
                     public void onResponse(Call<User> call, Response<User> response) {
@@ -1000,6 +1003,7 @@ public class RedditApi {
                     }
                 });
             } else {
+                Log.d(TAG, "getInfo: Getting posts for " + username);
                 api.getUserInfoOtherUsers(username, accessToken.generateHeaderString()).enqueue(new Callback<RedditListing>() {
                     @Override
                     public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {

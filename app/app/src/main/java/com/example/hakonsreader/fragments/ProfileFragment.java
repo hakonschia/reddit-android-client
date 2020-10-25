@@ -50,10 +50,6 @@ public class ProfileFragment extends Fragment {
     private LinearLayoutManager layoutManager;
 
 
-    private ProfileFragment() {
-
-    }
-
     /**
      * Creates a new ProfileFragment for logged in users
      *

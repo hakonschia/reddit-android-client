@@ -39,6 +39,10 @@
             android:theme="@style/AppTheme.SlidrActivityTheme" />
 
         <activity
+            android:name=".activites.ProfileActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
+
+        <activity
             android:name=".activites.PostActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
 

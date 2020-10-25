@@ -10,7 +10,6 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.utils.LinkUtils;
 import com.jakewharton.processphoenix.ProcessPhoenix;
@@ -110,10 +109,11 @@ public class DispatcherActivity extends AppCompatActivity {
             intent.putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit);
 
         } else if (url.matches(LinkUtils.USER_REGEX)) {
-            // intent = new Intent(this, ProfileFragment.class);
-            // TODO create activity for profiles
-            intent = new Intent(this, SubredditActivity.class);
-            intent.putExtra(SubredditActivity.SUBREDDIT_KEY, "globaloffensive");
+            // Same as with subreddits, first is "u", second is the username
+            String username = pathSegments.get(1);
+
+            intent = new Intent(this, ProfileActivity.class);
+            intent.putExtra(ProfileActivity.USERNAME_KEY, username);
 
         } else if (url.matches(LinkUtils.POST_REGEX)) {
             // The URL will look like: reddit.com/r/<subreddit>/comments/<postId/...

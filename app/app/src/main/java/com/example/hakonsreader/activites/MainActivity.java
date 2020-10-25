@@ -471,7 +471,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 return logInFragment;
             } else {
                 if (profileFragment == null) {
-                    profileFragment = ProfileFragment.newInstance("ladyrouxx");
+                    profileFragment = ProfileFragment.newInstance();
                 }
 
                 return profileFragment;
