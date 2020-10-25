@@ -41,9 +41,6 @@ public abstract class RedditListing {
     @SerializedName("id")
     protected String id;
 
-    @SerializedName("subreddit")
-    protected String subreddit;
-
     @SerializedName("author")
     protected String author;
 
@@ -97,13 +94,6 @@ public abstract class RedditListing {
      */
     public String getId() {
         return id;
-    }
-
-    /**
-     * @return The subreddit the listing is located in
-     */
-    public String getSubreddit() {
-        return subreddit;
     }
 
     /**
@@ -191,10 +181,6 @@ public abstract class RedditListing {
 
     public void setId(@NonNull String id) {
         this.id = id;
-    }
-
-    public void setSubreddit(String subreddit) {
-        this.subreddit = subreddit;
     }
 
     public void setAuthor(String author) {

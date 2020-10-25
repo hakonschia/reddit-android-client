@@ -1,20 +1,20 @@
 package com.example.hakonsreader.api.enums;
 
 /**
- * A Reddit "Thing" (comment, post etc.)
+ * Enum for posts that can be sorted by time
  */
-public enum Thing {
-    COMMENT("t1"),
-    ACCOUNT("t2"),
-    POST("t3"),
-    MESSAGE("t4"),
-    SUBREDDIT("t5"),
-    MORE("more");
+public enum PostTimeSort {
+    HOUR("hour"),
+    DAY("day"),
+    WEEK("week"),
+    MONTH("month"),
+    YEAR("year"),
+    ALL_TIME("all");
 
 
-    private String value;
+    private final String value;
 
-    Thing(String value) {
+    PostTimeSort(String value) {
         this.value = value;
     }
 
@@ -30,4 +30,5 @@ public enum Thing {
     public String getValue() {
         return value;
     }
+
 }

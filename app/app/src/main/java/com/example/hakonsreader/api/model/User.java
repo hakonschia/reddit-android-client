@@ -7,9 +7,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Class representing a Reddit user
  */
-public class User {
-    private String name;
-
+public class User extends RedditListing {
     @SerializedName("comment_karma")
     private int commentKarma;
 
@@ -22,14 +20,13 @@ public class User {
     @SerializedName("icon_img")
     private String profilePictureUrl;
 
-    @SerializedName("created_utc")
-    private float createdAt;
 
     /**
      * @return The username of the user
      */
     public String getName() {
-        return name;
+        // Although fullnames are generally "t3_herg" etc., for users they are the actual name
+        return super.getFullname();
     }
 
     /**
@@ -51,13 +48,6 @@ public class User {
      */
     public String getProfilePictureUrl() {
         return profilePictureUrl;
-    }
-
-    /**
-     * @return The Unix timestamp the account was created at (in UTC)
-     */
-    public long getCreatedAt() {
-        return (long) createdAt;
     }
 
 

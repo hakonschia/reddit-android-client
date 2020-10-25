@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.hakonsreader.App;
+import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.Util;
@@ -133,7 +134,7 @@ public class PostsViewModel extends ViewModel {
         loadingChange.setValue(true);
 
         if (isUser) {
-            App.get().getApi().getUserPosts(subreddit, newPosts -> {
+            App.get().getApi().user(subreddit).posts(newPosts -> {
                 onPostsRetrieved(newPosts);
             }, (code, t) -> {
                 t.printStackTrace();
@@ -141,7 +142,6 @@ public class PostsViewModel extends ViewModel {
                 Util.handleGenericResponseErrors(parentLayout, code, t);
             });
         } else {
-
             App.get().getApi().getPosts(subreddit, after, count, newPosts -> {
                 onPostsRetrieved(newPosts);
             }, (code, t) -> {

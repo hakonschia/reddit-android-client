@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api;
 
 import com.example.hakonsreader.api.constants.OAuthConstants;
+import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
@@ -19,7 +20,6 @@ import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
-import com.google.android.exoplayer2.C;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -438,47 +438,6 @@ public class RedditApi {
     }
     /* --------------- End access token calls --------------- */
 
-
-
-    /**
-     * Asynchronously retrieves information about the user logged in
-     *
-     * <p>Requires OAuth scope "identity"</p>
-     * <p>Requires a valid access token for the request to be made</p>
-     *
-     * @param onResponse The callback for successful requests. Holds the {@link User} object representing the logged in user
-     * @param onFailure The callback for failed requests
-     */
-    @EverythingIsNonNull
-    public void getUserInfo(OnResponse<User> onResponse, OnFailure onFailure) {
-        try {
-            this.verifyLoggedInToken();
-        } catch (InvalidAccessTokenException e) {
-            onFailure.onFailure(-1, new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
-            return;
-        }
-
-        this.api.getUserInfo(this.accessToken.generateHeaderString()).enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                User body = null;
-                if (response.isSuccessful()) {
-                    body = response.body();
-                }
-
-                if (body != null) {
-                    onResponse.onResponse(body);
-                } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                onFailure.onFailure(-1, t);
-            }
-        });
-    }
 
 
     /**
@@ -964,36 +923,160 @@ public class RedditApi {
     }
 
 
-    public void getUserPosts(String username, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        api.getListingsFromUser(username, "submitted", accessToken.generateHeaderString()).enqueue(new Callback<ListingResponse>() {
-            @Override
-            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
-                ListingResponse body = null;
-                if (response.isSuccessful()) {
-                    body = response.body();
-                }
-
-                if (body != null) {
-                    List<RedditPost> posts = (List<RedditPost>) body.getListings();
-                    onResponse.onResponse(posts);
-                } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ListingResponse> call, Throwable t) {
-                onFailure.onFailure(-1, t);
-
-            }
-        });
-    }
-
     public void getUserComments() {
 
     }
 
 
+    /**
+     * Retrieve a {@link UserRequests} object for logged in users only. For non-logged in users
+     * use {@link RedditApi#user(String)}.
+     *
+     * @return An object that can perform various user related API requests
+     */
+    public UserRequests user() {
+        return new UserRequests();
+    }
+
+    /**
+     * Retrieve a {@link UserRequests} object that can get handle requests for non-logged in users.
+     * For logged in users use {@link RedditApi#user()}.
+     *
+     * @return An object that can perform various user related API requests for non-logged in users
+     */
+    public UserRequests user(String username) {
+        return new UserRequests(username);
+    }
+
+    public class UserRequests {
+        private String username;
+
+        private UserRequests() {
+
+        }
+
+        private UserRequests(String username) {
+            this.username = username;
+        }
+
+        /**
+         * Information about the user logged in
+         *
+         * <p>Requires OAuth scope "identity"</p>
+         * <p>Requires a valid access token for the request to be made</p>
+         *
+         * @param onResponse The callback for successful requests. Holds the {@link User} object representing the logged in user
+         * @param onFailure The callback for failed requests
+         */
+        public void getInfo(OnResponse<User> onResponse, OnFailure onFailure) {
+            try {
+                verifyLoggedInToken();
+            } catch (InvalidAccessTokenException e) {
+                onFailure.onFailure(-1, new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
+                return;
+            }
+
+            if (username == null) {
+                api.getUserInfo(accessToken.generateHeaderString()).enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(Call<User> call, Response<User> response) {
+                        User body = null;
+                        if (response.isSuccessful()) {
+                            body = response.body();
+                        }
+
+                        if (body != null) {
+                            onResponse.onResponse(body);
+                        } else {
+                            onFailure.onFailure(response.code(), newThrowable(response.code()));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<User> call, Throwable t) {
+                        onFailure.onFailure(-1, t);
+                    }
+                });
+            } else {
+                api.getUserInfoOtherUsers(username, accessToken.generateHeaderString()).enqueue(new Callback<RedditListing>() {
+                    @Override
+                    public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
+                        RedditListing body = null;
+                        if (response.isSuccessful()) {
+                            body = response.body();
+                        }
+
+                        if (body != null) {
+                            onResponse.onResponse((User) body);
+                        } else {
+                            onFailure.onFailure(response.code(), newThrowable(response.code()));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RedditListing> call, Throwable t) {
+                        onFailure.onFailure(-1, t);
+                    }
+                });
+            }
+        }
+
+        public UserPostsRequets posts() {
+            return new UserPostsRequets();
+        }
+
+        /**
+         * Get posts by a user
+         *
+         * <p>The posts retrieved here are sorted by "new", if you want to retrieve posts with a
+         * different sort use {@link UserRequests#posts()}</p>
+         *
+         * @param onResponse
+         * @param onFailure
+         */
+        public void posts(OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
+            api.getListingsFromUser(username, "submitted", accessToken.generateHeaderString()).enqueue(new Callback<ListingResponse>() {
+                @Override
+                public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+                    ListingResponse body = null;
+                    if (response.isSuccessful()) {
+                        body = response.body();
+                    }
+
+                    if (body != null) {
+                        List<RedditPost> posts = (List<RedditPost>) body.getListings();
+                        onResponse.onResponse(posts);
+                    } else {
+                        onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ListingResponse> call, Throwable t) {
+                    onFailure.onFailure(-1, t);
+
+                }
+            });
+        }
+
+        public class UserPostsRequets {
+            /**
+             * Get the current "hot" posts for the user
+             */
+            public void hot() {
+
+            }
+
+            /**
+             * Get the "top" posts for the user
+             *
+             * @param sort How to sort the posts
+             */
+            public void top(PostTimeSort sort) {
+
+            }
+        }
+    }
 
     /* ----------------- Misc ----------------- */
     /**

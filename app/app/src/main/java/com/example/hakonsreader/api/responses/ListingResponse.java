@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Response for any request that returns a list of listings
  */
-public class ListingResponse {
+public class ListingResponse extends RedditListing {
 
     private Data data;
     private static class Data {

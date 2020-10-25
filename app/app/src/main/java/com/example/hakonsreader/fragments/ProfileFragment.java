@@ -71,7 +71,7 @@ public class ProfileFragment extends Fragment {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
 
-        user = User.getStoredUser();
+//        user = User.getStoredUser();
 
         // Retrieve user info if there is no user previously stored, or if it's the fragments first time
         // loading (to ensure the information is up-to-date)
@@ -119,13 +119,14 @@ public class ProfileFragment extends Fragment {
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
-        redditApi.getUserInfo(user -> {
+        redditApi.user().getInfo(user -> {
             // Store the updated user information
-            User.storeUserInfo(user);
+            //User.storeUserInfo(user);
             this.user = user;
 
             this.updateViews();
         }, (code, t) -> {
+            t.printStackTrace();
             Util.handleGenericResponseErrors(binding.parentLayout, code, t);
         });
     }

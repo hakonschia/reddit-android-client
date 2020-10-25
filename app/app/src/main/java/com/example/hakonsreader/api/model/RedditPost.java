@@ -28,6 +28,9 @@ public class RedditPost extends RedditListing {
     @SerializedName("num_comments")
     private int amountOfComments;
 
+    @SerializedName("subreddit")
+    protected String subreddit;
+
     @SerializedName("thumbnail")
     private String thumbnail;
 
@@ -138,6 +141,13 @@ public class RedditPost extends RedditListing {
      */
     public String getTitle() {
         return title;
+    }
+
+    /**
+     * @return The subreddit the listing is located in
+     */
+    public String getSubreddit() {
+        return subreddit;
     }
 
     /**
@@ -401,6 +411,10 @@ public class RedditPost extends RedditListing {
     /* ----------------- Setters ----------------- */
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void setSubreddit(String subreddit) {
+        this.subreddit = subreddit;
     }
 
     public void setAmountOfComments(int amountOfComments) {

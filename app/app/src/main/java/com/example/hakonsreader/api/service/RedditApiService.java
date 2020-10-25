@@ -23,13 +23,29 @@ import retrofit2.http.Query;
 public interface RedditApiService {
 
     /**
-     * Retrieves information about the logged in user
+     * Retrieves information about the logged in user. For information about any user see
+     * {@link RedditApiService#getUserInfoOtherUsers(String, String)}
      *
      * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Call with {@link User}
      */
     @GET("api/v1/me")
     Call<User> getUserInfo(@Header("Authorization") String accessToken);
+
+    /**
+     * Retrieves information about a user. This can retrieve information about users that aren't
+     * the logged in user
+     *
+     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @return A Call with {@link User}
+     */
+    @GET("u/{username}/about")
+    Call<RedditListing> getUserInfoOtherUsers(
+            @Path("username") String username,
+
+            @Header("Authorization") String accessToken
+    );
+
 
     /**
      * Retrieves posts from Reddit
