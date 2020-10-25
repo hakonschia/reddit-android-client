@@ -87,8 +87,8 @@
             android:id="@+id/normalComment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-
             android:visibility="@{isMoreComments ? View.GONE : View.VISIBLE}"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/sideBarsBarrier"
@@ -104,21 +104,22 @@
                 android:visibility="@{commentHidden ? View.GONE : View.VISIBLE}"
                 app:constraint_referenced_ids="authorFlair, commentContent, commentVoteBar, reply" />
 
-            <!-- TODO set onClick for author to go to their profile -->
             <TextView
                 android:id="@+id/commentAuthor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
+                android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, comment.author)}"
+
                 android:text='@{comment != null ? @string/author_prefixed(comment.author) : "" }'
                 android:textColor="@color/link_color"
-
                 android:typeface="@{Typeface.defaultFromStyle(commentHidden ? Typeface.ITALIC : Typeface.NORMAL)}"
+
                 app:asAdmin="@{comment.admin}"
                 app:asMod="@{comment.mod}"
-
                 app:asPoster="@{post.author.equals(comment.author)}"
-                app:layout_constraintStart_toEndOf="@+id/sideBarsBarrier"
+
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
 
                 tools:text="u/hakonschia" />

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.view.View;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.ProfileActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
 
 /**
@@ -28,9 +29,10 @@ public class ClickHandler {
     /**
      * Opens an activity with the selected subreddit
      *
+     * @param view Ignored
      * @param subreddit The subreddit to open
      */
-    public static void openSubredditInActivity(View view,  String subreddit) {
+    public static void openSubredditInActivity(View view, String subreddit) {
         Context context = view.getContext();
         Activity activity = (Activity)context;
 
@@ -47,6 +49,26 @@ public class ClickHandler {
         // Send some data like what sub it is etc etc so it knows what to load
         Intent intent = new Intent(context, SubredditActivity.class);
         intent.putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit);
+
+        activity.startActivity(intent);
+
+        // Slide the activity in
+        activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
+    /**
+     * Opens an activity to show a users profile
+     *
+     * @param view Ignored
+     * @param username The username of the profile to open
+     */
+    public static void openProfileInActivity(View view, String username) {
+        Context context = view.getContext();
+        Activity activity = (Activity)context;
+
+        // Send some data like what sub it is etc etc so it knows what to load
+        Intent intent = new Intent(context, ProfileActivity.class);
+        intent.putExtra(ProfileActivity.USERNAME_KEY, username);
 
         activity.startActivity(intent);
 

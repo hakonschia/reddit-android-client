@@ -8,7 +8,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.fragments.ProfileFragment;
 
+/**
+ * Activity to show a users profile.
+ *
+ * <p>This activity only holds a {@link android.widget.FrameLayout} that shows a
+ * {@link ProfileFragment} with the given username</p>
+ */
 public class ProfileActivity extends AppCompatActivity {
+
     /**
      * The key used to send which username the profile is for
      */
@@ -26,5 +33,13 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.profileContainer, fragment)
                 .commit();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+
+        // Slide the activity out
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }

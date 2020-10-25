@@ -29,7 +29,7 @@ public interface RedditApiService {
      * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Call with {@link User}
      */
-    @GET("api/v1/me")
+    @GET("api/v1/me?raw_json=1")
     Call<User> getUserInfo(@Header("Authorization") String accessToken);
 
     /**
@@ -39,7 +39,7 @@ public interface RedditApiService {
      * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Call with {@link User}
      */
-    @GET("u/{username}/about")
+    @GET("u/{username}/about?raw_json=1")
     Call<RedditListing> getUserInfoOtherUsers(
             @Path("username") String username,
 
@@ -59,7 +59,7 @@ public interface RedditApiService {
      *                    to retrieve posts without a logged in user
      * @return A Call object ready to retrieve posts from a subreddit
      */
-    @GET("{subreddit}/{sort}")
+    @GET("{subreddit}/{sort}?raw_json=1")
     Call<ListingResponse> getPosts(
             @Path("subreddit") String subreddit,
             @Path("sort") String sort,
@@ -81,7 +81,7 @@ public interface RedditApiService {
      * @return A list of {@link ListingResponse}. The first item in this list is the post itself.
      * The actual comments is found in the second element of the list
      */
-    @GET("comments/{postID}")
+    @GET("comments/{postID}?raw_json=1")
     Call<List<ListingResponse>> getComments(
             @Path("postID") String postID,
             @Query("raw_json") int rawJson,

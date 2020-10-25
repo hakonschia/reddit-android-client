@@ -26,7 +26,6 @@
             android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, post.subreddit)}"
             android:text='@{post.subreddit != null ? @string/subreddit_prefixed(post.subreddit) : ""}'
             android:textColor="@color/link_color"
-
             android:textSize="14sp"
 
             app:layout_constraintStart_toStartOf="parent"
@@ -111,9 +110,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
+            android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, post.author)}"
             android:background="@{post.mod ? @drawable/comment_by_mod : null}"
             android:text='@{post != null ? @string/author_prefixed(post.author) : "" }'
-            android:textColor="@{post.mod ? @color/text_color : @color/secondary_text_color}"
+            android:textColor="@{post.mod ? @color/text_color : @color/link_color}"
             android:textSize="13sp"
 
             app:layout_constraintEnd_toEndOf="@+id/subreddit"

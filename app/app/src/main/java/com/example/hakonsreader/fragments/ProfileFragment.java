@@ -2,6 +2,7 @@ package com.example.hakonsreader.fragments;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,11 +96,6 @@ public class ProfileFragment extends Fragment {
         postsViewModel.getPosts().observe(this, posts -> {
             adapter.addPosts(posts);
         });
-
-        if (username == null) {
-
-        } else {
-        }
     }
 
     @Nullable
@@ -154,7 +150,11 @@ public class ProfileFragment extends Fragment {
         binding.postKarma.setText(postKarmaText);
 
         // Load the users profile picture
-        Picasso.get().load(user.getProfilePictureUrl()).into(binding.profilePicture);
+        Picasso.get()
+                .load(user.getProfilePictureUrl())
+                .placeholder(R.drawable.ic_baseline_person_100)
+                .error(R.drawable.ic_baseline_person_100)
+                .into(binding.profilePicture);
     }
 
     /**
