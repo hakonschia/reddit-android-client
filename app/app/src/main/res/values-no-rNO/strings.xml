@@ -49,4 +49,29 @@
     <string name="commentKarma">%d kommentar karma</string>
     <string name="numCommentsThousands">%.1fK kommentarer</string>
     <string name="scoreThousands">%.1fK</string>
+
+    <plurals name="postAgeMinutes">
+        <item quantity="one">%d minutt siden</item>
+        <item quantity="other">%d minutter siden</item>
+    </plurals>
+    <plurals name="postAgeHours">
+        <item quantity="one">%d time siden</item>
+        <item quantity="other">%d timer siden</item>
+    </plurals>
+    <plurals name="postAgeDays">
+        <item quantity="one">%d dag siden</item>
+        <item quantity="other">%d dager siden</item>
+    </plurals>
+    <plurals name="extraComments">
+        <item quantity="one">%d mer kommentar</item>
+        <item quantity="other">%d flere kommentarer</item>
+    </plurals>
+    <plurals name="numComments">
+        <item quantity="one">%d kommentar</item>
+        <item quantity="other">%d kommentarer</item>
+    </plurals>
+    <plurals name="amountOfSubscribers">
+        <item quantity="one">%d abonnent</item>
+        <item quantity="other">%,d abonnenter</item>
+    </plurals>
 </resources>
