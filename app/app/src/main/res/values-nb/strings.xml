@@ -44,7 +44,7 @@
     <string name="btnSubscribeSubscribe">+ Abonner</string>
     <string name="postKarma">%d post karma</string>
     <string name="postAgeMinutesShortened">%dm</string>
-    <string name="postAgeHoursShortened">%dh</string>
+    <string name="postAgeHoursShortened">%dt</string>
     <string name="postAgeDaysShortened">%dd</string>
     <string name="commentKarma">%d kommentar karma</string>
     <string name="numCommentsThousands">%.1fK kommentarer</string>

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.DisplayMetrics;
@@ -28,6 +30,7 @@ import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 
+import java.util.Locale;
 import java.util.UUID;
 
 import io.noties.markwon.Markwon;

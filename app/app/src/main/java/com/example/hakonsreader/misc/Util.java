@@ -2,12 +2,9 @@ package com.example.hakonsreader.misc;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
-import androidx.databinding.BindingAdapter;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.MainActivity;
@@ -18,11 +15,10 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Locale;
 
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
-import static com.google.android.material.snackbar.Snackbar.*;
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG;
 
 public class Util {
     private Util() { }
@@ -60,7 +56,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showNoInternetSnackbar(View parent) {
-        make(parent, parent.getResources().getString(R.string.noInternetConnection), LENGTH_SHORT).show();
+        Snackbar.make(parent, parent.getResources().getString(R.string.noInternetConnection), LENGTH_SHORT).show();
     }
 
     /**
@@ -69,7 +65,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showNotLoggedInSnackbar(View parent) {
-        Snackbar snackbar = make(parent, parent.getResources().getString(R.string.notLoggedInError), LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(parent, parent.getResources().getString(R.string.notLoggedInError), LENGTH_LONG);
         Context context = parent.getContext();
 
         snackbar.setAction(context.getString(R.string.log_in), v -> {
@@ -101,7 +97,7 @@ public class Util {
     public static void showForbiddenErrorSnackbar(View parent) {
         // 403 errors are generally when the access token is outdated and new functionality has been
         // added that requires more OAuth scopes
-        make(parent, parent.getResources().getString(R.string.forbiddenError), LENGTH_SHORT).show();
+        Snackbar.make(parent, parent.getResources().getString(R.string.forbiddenError), LENGTH_SHORT).show();
     }
 
     /**
@@ -110,7 +106,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showGenericServerErrorSnackbar(View parent) {
-        make(parent, parent.getResources().getString(R.string.genericServerError), LENGTH_SHORT).show();
+        Snackbar.make(parent, parent.getResources().getString(R.string.genericServerError), LENGTH_SHORT).show();
     }
 
     /**
@@ -119,7 +115,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showTooManyRequestsSnackbar(View parent) {
-        make(parent, parent.getResources().getString(R.string.tooManyRequestsError), LENGTH_SHORT).show();
+        Snackbar.make(parent, parent.getResources().getString(R.string.tooManyRequestsError), LENGTH_SHORT).show();
     }
 
     /**
@@ -128,7 +124,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showErrorLoggingInSnackbar(View parent) {
-        make(parent, parent.getResources().getString(R.string.errorLoggingIn), LENGTH_SHORT).show();
+        Snackbar.make(parent, parent.getResources().getString(R.string.errorLoggingIn), LENGTH_SHORT).show();
     }
 
     /**
@@ -137,7 +133,7 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showUnknownError(View parent) {
-        make(parent, parent.getResources().getString(R.string.unknownError), LENGTH_SHORT).show();
+        Snackbar.make(parent, parent.getResources().getString(R.string.unknownError), LENGTH_SHORT).show();
     }
 
 
@@ -169,23 +165,7 @@ public class Util {
 
         return String.format(Locale.getDefault(), format, t);
     }
-    /**
-     * Binding adapter for setting the age text on the post. The text is formatted as "2 hours", "1 day" etc.
-     * For a shortened text (5m etc.) use {@link Util#setAgeTextShortened(TextView, long)}
-     *
-     * @param textView The textView to set the text on
-     * @param createdAt The timestamp the post was created at. If this is negative nothing is done
-     */
-    @BindingAdapter({"createdAt"})
-    public static void setAgeText(TextView textView, long createdAt) {
-        if (createdAt >= 0) {
-            Instant created = Instant.ofEpochSecond(createdAt);
-            Instant now = Instant.now();
-            Duration between = Duration.between(created, now);
 
-            textView.setText(Util.createAgeText(textView.getResources(), between));
-        }
-    }
 
     /**
      * Creates the text for text age text fields with a shorter text than with
@@ -215,24 +195,6 @@ public class Util {
 
         return String.format(Locale.getDefault(), format, t);
     }
-    /**
-     * Binding adapter for setting the age text on the post. The text is formatted as "2h", "1d" etc..
-     * For a longer text (5 minutes etc.) use {@link Util#setAgeText(TextView, long)}
-     *
-     * @param textView The textView to set the text on
-     * @param createdAt The timestamp the post was created at. If this is negative nothing is done
-     */
-    @BindingAdapter({"createdAtShortened"})
-    public static void setAgeTextShortened(TextView textView, long createdAt) {
-        if (createdAt >= 0) {
-            Instant created = Instant.ofEpochSecond(createdAt);
-            Instant now = Instant.now();
-            Duration between = Duration.between(created, now);
-
-            textView.setText(Util.createAgeTextShortened(textView.getResources(), between));
-        }
-    }
-
 
     /**
      * Create a duration string in the format of "mm:ss" that can be used in videos
