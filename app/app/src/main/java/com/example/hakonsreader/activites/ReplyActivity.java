@@ -1,9 +1,12 @@
 package com.example.hakonsreader.activites;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -83,6 +86,13 @@ public class ReplyActivity extends AppCompatActivity {
             return;
         }
 
+        // Hide the keyboard
+        View v = getCurrentFocus();
+        if (v != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }
+
         // TODO get actual ID and thing instead of hardcoded values
         redditApi.postComment(text, replyingTo, comment -> {
             Log.d(TAG, "sendReply: Comment posted");
@@ -94,6 +104,7 @@ public class ReplyActivity extends AppCompatActivity {
             setResult(RESULT_OK, data);
             finish();
         }, (code, t) -> {
+            t.printStackTrace();
             Util.handleGenericResponseErrors(binding.parentLayout, code, t);
         });
 

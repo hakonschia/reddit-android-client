@@ -14,7 +14,8 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Response for retrieving more comments in a comment chain
+ * Response for retrieving more comments in a comment chain, and for adding comments to a chain
+ * (to a post or a comment chain)
  *
  * <p>The json returned for these requests differs from the standard listing response and as such
  * needs its own class</p>
@@ -33,6 +34,14 @@ public class MoreCommentsResponse {
      */
     public List<RedditComment> getComments() {
         return (List<RedditComment>) comments.getListings();
+    }
+
+    public boolean hasErrors() {
+        return comments.hasErrors();
+    }
+
+    public List<List<String>> errors() {
+        return comments.getErrors();
     }
 
     private class Des implements JsonDeserializer<List<RedditComment>> {

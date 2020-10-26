@@ -1,5 +1,8 @@
 package com.example.hakonsreader.api.exceptions;
 
+/**
+ * Exception for when an attempt to get information about a subreddit that does not exist
+ */
 public class SubredditNotFoundException extends Exception {
     public SubredditNotFoundException() {
     }

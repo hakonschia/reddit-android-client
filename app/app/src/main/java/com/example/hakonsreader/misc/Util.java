@@ -12,6 +12,8 @@ import androidx.databinding.BindingAdapter;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.MainActivity;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
+import com.example.hakonsreader.api.exceptions.RateLimitException;
+import com.example.hakonsreader.api.exceptions.ThreadLockedException;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -38,9 +40,12 @@ public class Util {
             Util.showNoInternetSnackbar(parent);
         } else if (t instanceof InvalidAccessTokenException) {
             Util.showNotLoggedInSnackbar(parent);
-        } else if (code == 403) {
+        } else if (t instanceof ThreadLockedException) {
+            Util.showThreadLockedException(parent);
+        }  else if (code == 403) {
             Util.showForbiddenErrorSnackbar(parent);
-        } else if (code == 429) {
+        } else if (code == 429 || t instanceof RateLimitException) {
+            // 429 = Too many requests. Reddit sometimes returns a 429, or 200 with a "RATELIMIT" error message
             Util.showTooManyRequestsSnackbar(parent);
         } else if (code >= 500) {
             Util.showGenericServerErrorSnackbar(parent);
@@ -77,6 +82,15 @@ public class Util {
         });
         snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
         snackbar.show();
+    }
+
+    /**
+     * Creates and shows a snackbar for errors caused by a thread being locked
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showThreadLockedException(View parent) {
+        Snackbar.make(parent, parent.getResources().getString(R.string.threadLockedError), LENGTH_SHORT).show();
     }
 
     /**
@@ -129,7 +143,7 @@ public class Util {
 
     /**
      * Creates the text for text age text fields. For a shorter text see 
-     * {@link Util#createAgeShortenedText(Resources, Duration)}
+     * {@link Util#createAgeTextShortened(Resources, Duration)}
      *
      * <p>Formats to make sure that it says 3 hours, 5 minutes etc. based on what makes sense</p>
      *

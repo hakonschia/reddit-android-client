@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.exceptions;
 
+// TODO what is the difference between this and SubredditNotFoundException?
 public class NoSubredditInfoException extends Exception {
 
     public NoSubredditInfoException() {

@@ -4,11 +4,14 @@ import android.util.Log;
 
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.PostTimeSort;
+import com.example.hakonsreader.api.enums.ResponseErrors;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
+import com.example.hakonsreader.api.exceptions.RateLimitException;
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException;
+import com.example.hakonsreader.api.exceptions.ThreadLockedException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
@@ -126,17 +129,17 @@ public class RedditApi {
     /**
      * The client ID for the application
      */
-    private String clientId;
+    private final String clientId;
 
     /**
      * The basic authentication header with client ID. Includes "Basic " prefix
      */
-    private String basicAuthHeader;
+    private final String basicAuthHeader;
 
     /**
      * The user agent of the client
      */
-    private String userAgent;
+    private final String userAgent;
 
     /**
      * The device ID to send to Reddit for non-logged in user access tokens
@@ -199,8 +202,8 @@ public class RedditApi {
     public static class Builder {
         private boolean built = false;
 
-        private String userAgent;
-        private String clientId;
+        private final String userAgent;
+        private final String clientId;
 
         private AccessToken accessToken;
         private OnNewToken onNewToken;
@@ -589,12 +592,16 @@ public class RedditApi {
                 }
 
                 if (body != null) {
-                    List<RedditComment> comments = body.getComments();
+                    if (!body.hasErrors()) {
+                        List<RedditComment> comments = body.getComments();
 
-                    if (parent != null) {
-                        parent.addReplies(comments);
+                        if (parent != null) {
+                            parent.addReplies(comments);
+                        }
+                        onResponse.onResponse(comments);
+                    } else {
+                        handleListingErrors(body.errors(), onFailure);
                     }
-                    onResponse.onResponse(comments);
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
@@ -639,7 +646,8 @@ public class RedditApi {
         int finalDepth = depth;
         api.postComment(
                 comment,
-                fullname, API_TYPE,
+                fullname,
+                API_TYPE,
                 false,
                 accessToken.generateHeaderString()
         ).enqueue(new Callback<MoreCommentsResponse>() {
@@ -651,9 +659,13 @@ public class RedditApi {
                 }
 
                 if (body != null) {
-                    RedditComment newComment = body.getComments().get(0);
-                    newComment.setDepth(finalDepth);
-                    onResponse.onResponse(newComment);
+                    if (!body.hasErrors()) {
+                        RedditComment newComment = body.getComments().get(0);
+                        newComment.setDepth(finalDepth);
+                        onResponse.onResponse(newComment);
+                    } else {
+                        handleListingErrors(body.errors(), onFailure);
+                    }
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
@@ -742,8 +754,12 @@ public class RedditApi {
                 }
 
                 if (body != null) {
-                    List<Subreddit> subreddits = (List<Subreddit>) body.getListings();
-                    onResponse.onResponse(subreddits);
+                    if (!body.hasErrors()) {
+                        List<Subreddit> subreddits = (List<Subreddit>) body.getListings();
+                        onResponse.onResponse(subreddits);
+                    } else {
+                        handleListingErrors(body.getErrors(), onFailure);
+                    }
                 } else {
                     onFailure.onFailure(response.code(), newThrowable(response.code()));
                 }
@@ -1126,6 +1142,30 @@ public class RedditApi {
     private Throwable newThrowable(int code) {
         return new Throwable("Error executing request: " + code);
     }
+
+    /**
+     * Handles listing errors (from {@link ListingResponse#hasErrors()}). Based on the error type
+     * an attempt to handle the error is done, otherwise a generic error message is sent.
+     *
+     * @param errors The errors for the response (as retrieved with {@link ListingResponse#getErrors()})
+     * @param onFailure The failure handler for the request
+     */
+    private void handleListingErrors(List<List<String>> errors, OnFailure onFailure) {
+        // There can be more errors, not sure the best way to handle it other than returning the info for the first
+        String errorType = errors.get(0).get(0);
+        String errorMessage = errors.get(0).get(1);
+
+        if (ResponseErrors.THREAD_LOCKED.getValue().equals(errorType)) {
+            // TODO should find out if this is a comment or thread and return different exception/message
+            // There isn't really a response code for this, as the HTTP code is still 200
+            onFailure.onFailure(-1, new ThreadLockedException("The thread has been locked"));
+        } else if (ResponseErrors.RATE_LIMIT.getValue().equals(errorType)) {
+            onFailure.onFailure(-1, new RateLimitException("The action has been done too many times too fast"));
+        } else {
+            onFailure.onFailure(-1, new Exception(String.format("Unknown error posting comment: %s; %s", errorType, errorMessage)));
+        }
+    }
+
     /* ----------------- End misc ----------------- */
 
 

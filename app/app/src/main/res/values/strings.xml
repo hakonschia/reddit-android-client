@@ -99,6 +99,7 @@
     <string name="errorLoggingIn">Error logging in</string>
     <string name="noInternetConnection">No internet connection</string>
     <string name="forbiddenError">Not allowed by Reddit. Try to log out and in again</string>
+    <string name="threadLockedError">The thread has been locked</string>
     <string name="unknownError">An unknown error occurred</string>
 
     <string name="log_in">Log in</string>
