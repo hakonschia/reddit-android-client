@@ -266,8 +266,9 @@ public class Post extends RelativeLayout {
                 break;
 
             case GALLERY:
-                List<Image> images = postData.getGalleryImages();
-                content = null;
+                ContentGallery contentGallery = new ContentGallery(context);
+                contentGallery.setPost(postData);
+                content = contentGallery;
                 break;
 
             default:

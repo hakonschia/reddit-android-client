@@ -86,7 +86,7 @@ public class ClickHandler {
      * @param view The view itself is ignored, but this cannot be null as the context is needed
      * @param imageUrl The URL to the image
      */
-    public static void openImageInFullscreen( View view, String imageUrl) {
+    public static void openImageInFullscreen(View view, String imageUrl) {
         Context context = view.getContext();
         Activity activity = (Activity)context;
 
