@@ -24,12 +24,12 @@
         <item quantity="other">%d comments</item>
     </plurals>
 
-    <string name="scoreHidden">•</string>
+    <string name="scoreHidden" translatable="false">•</string>
     <string name="scoreThousands">%.1fK</string>
 
-    <string name="subreddit_prefixed">r/%s</string>
-    <string name="author_prefixed">u/%s</string>
-    <string name="comment_by_poster">u/%s (OP)</string>
+    <string name="subreddit_prefixed" translatable="false">r/%s</string>
+    <string name="author_prefixed" translatable="false">u/%s</string>
+    <string name="comment_by_poster" translatable="false">u/%s (OP)</string>
 
     <string name="profileAge">User since %s</string>
     <string name="commentKarma">%d comment karma</string>
@@ -61,15 +61,15 @@
     <string name="prefs_title_loop_videos">Loop videos</string>
 
     <!-- Preferences keys -->
-    <string name="prefs_key_theme">theme</string>
-    <string name="prefs_key_cache_nsfw">cache_nsfw</string>
-    <string name="prefs_key_auto_play_videos">auto_play_videos</string>
-    <string name="prefs_key_auto_play_videos_always">always</string>
-    <string name="prefs_key_auto_play_videos_never">never</string>
-    <string name="prefs_key_auto_play_videos_wifi_only">wifi_only</string>
-    <string name="prefs_key_play_muted_videos">play_muted_videos</string>
-    <string name="prefs_key_play_muted_videos_fullscreen">play_muted_videos_fullscreen</string>
-    <string name="prefs_key_loop_videos">loop_videos</string>
+    <string name="prefs_key_theme" translatable="false">theme</string>
+    <string name="prefs_key_cache_nsfw" translatable="false">cache_nsfw</string>
+    <string name="prefs_key_auto_play_videos" translatable="false">auto_play_videos</string>
+    <string name="prefs_key_auto_play_videos_always" translatable="false">always</string>
+    <string name="prefs_key_auto_play_videos_never" translatable="false">never</string>
+    <string name="prefs_key_auto_play_videos_wifi_only" translatable="false">wifi_only</string>
+    <string name="prefs_key_play_muted_videos" translatable="false">play_muted_videos</string>
+    <string name="prefs_key_play_muted_videos_fullscreen" translatable="false">play_muted_videos_fullscreen</string>
+    <string name="prefs_key_loop_videos" translatable="false">loop_videos</string>
 
     <!-- String for post ages that are "just posted", ie. < 1 minute -->
     <string name="postAgeJustPosted">Just posted</string>
@@ -112,9 +112,9 @@
     <string name="searchForSubredditHint">Search for subreddit</string>
     <string name="subredditMustBeBetweenLength">Subreddit name must be between 3 and 21 characters</string>
 
-    <string name="transition_post_info">post_info</string>
-    <string name="transition_post_content">post_content</string>
-    <string name="transition_post_full_bar">post_full_bar</string>
+    <string name="transition_post_info" translatable="false">post_info</string>
+    <string name="transition_post_content" translatable="false">post_content</string>
+    <string name="transition_post_full_bar" translatable="false">post_full_bar</string>
 
     <string name="front_page">Front page</string>
 
