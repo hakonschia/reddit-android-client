@@ -10,8 +10,11 @@ import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.api.persistence.PostConverter;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.internal.LinkedTreeMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -111,16 +114,27 @@ public class RedditPost extends RedditListing {
         private RedditVideo redditVideo;
     }
 
-
-    @SerializedName("gallery_data")
-    private GalleryData galleryData;
-
     /**
-     * Data for gallery posts (multiple images
+     * This holds the data for gallery items. The objects in this are either strings or other
+     * {@link LinkedTreeMap}. The source image is found in a {@link LinkedTreeMap} called "s"
      */
-    public static class GalleryData {
-        @SerializedName("items")
-        private List<GalleryItem> items;
+    @SerializedName("media_metadata")
+    private LinkedTreeMap<String, Object> mediaMetadata;
+
+    public List<Image> getGalleryImages() {
+        List<Image> images = new ArrayList<>(mediaMetadata.size());
+        Gson gson = new Gson();
+
+        mediaMetadata.forEach((s, obj) -> {
+            // The source is found in the "s" object, which can be converted to a PreviewImage
+            LinkedTreeMap<String, Object> converted = (LinkedTreeMap<String, Object>) obj;
+            String asJson = gson.toJson(converted.get("s"));
+
+            Log.d("TAG", "getGalleryImages: " + asJson);
+            images.add(gson.fromJson(asJson, Image.class));
+        });
+
+        return images;
     }
 
 
@@ -313,16 +327,6 @@ public class RedditPost extends RedditListing {
     }
 
     /**
-     * Retrieves the list of gallery items. If {@link RedditPost#getPostType()} isn't {@link PostType#GALLERY}
-     * this will be null
-     *
-     * @return The list of gallery items this post has
-     */
-    public List<GalleryItem> getGalleryItems() {
-        return galleryData.items;
-    }
-
-    /**
      * Retrieves the source image for the post. For image posts this will be the same image as
      * that returned by {@link RedditPost#getUrl()}. It will point to a different image, but the
      * images will be identical.
@@ -331,7 +335,7 @@ public class RedditPost extends RedditListing {
      *
      * @return The source image for the post
      */
-    public PreviewImage getSourcePreview() {
+    public Image getSourcePreview() {
         return preview.images.get(0).source;
     }
 
@@ -343,14 +347,14 @@ public class RedditPost extends RedditListing {
      *
      * @return A list of preview images
      */
-    public List<PreviewImage> getPreviewImages() {
+    public List<Image> getPreviewImages() {
         return preview.images.get(0).resolutions;
     }
 
     /**
      * Retrieves the video for GIF posts from sources such as Gfycat
      *
-     * <p>Note: not all GIFs will be found here. Some GIFs will be returned as a {@link PreviewImage}
+     * <p>Note: not all GIFs will be found here. Some GIFs will be returned as a {@link Image}
      * with a link to the external URL. See {@link RedditPost#getMp4Source()} and {@link RedditPost#getMp4Previews()}</p>
      *
      * @return The {@link RedditVideo} holding the data for GIF posts
@@ -369,7 +373,7 @@ public class RedditPost extends RedditListing {
      *
      * @return The source MP4
      */
-    public PreviewImage getMp4Source() {
+    public Image getMp4Source() {
         return preview.images.get(0).variants.mp4.source;
     }
 
@@ -381,7 +385,7 @@ public class RedditPost extends RedditListing {
      *
      * @return The list of MP4 resolutions
      */
-    public List<PreviewImage> getMp4Previews() {
+    public List<Image> getMp4Previews() {
         return preview.images.get(0).variants.mp4.resolutions;
     }
 
@@ -409,14 +413,13 @@ public class RedditPost extends RedditListing {
         return media;
     }
 
-    public GalleryData getGalleryData() {
-        return galleryData;
-    }
-
     public Preview getPreview() {
         return preview;
     }
 
+    public LinkedTreeMap<String, Object> getMediaMetadata() {
+        return mediaMetadata;
+    }
 
     /* ----------------- Setters ----------------- */
     public void setTitle(String title) {
@@ -515,16 +518,16 @@ public class RedditPost extends RedditListing {
         this.media = media;
     }
 
-    public void setGalleryData(GalleryData galleryData) {
-        this.galleryData = galleryData;
-    }
-
     public void setPreview(Preview preview) {
         this.preview = preview;
     }
 
     public void setArchived(boolean archived) {
         isArchived = archived;
+    }
+
+    public void setMediaMetadata(LinkedTreeMap<String, Object> mediaMetadata) {
+        this.mediaMetadata = mediaMetadata;
     }
 
     /**

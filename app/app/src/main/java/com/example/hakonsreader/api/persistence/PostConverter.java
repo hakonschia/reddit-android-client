@@ -1,13 +1,10 @@
 package com.example.hakonsreader.api.persistence;
 
-import android.util.Log;
-
 import androidx.room.TypeConverter;
 
-import com.example.hakonsreader.api.model.GalleryItem;
-import com.example.hakonsreader.api.model.PreviewImage;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -20,52 +17,50 @@ import java.util.List;
 public class PostConverter {
     private static final String TAG = "CrosspostConverter";
 
+    private static final Gson gson = new Gson();
+
     // TODO there has to be a better way of doing this with generics or something else
 
 
     @TypeConverter
     public static List<String> fromListString(String value) {
         Type listType = new TypeToken<ArrayList<String>>() {}.getType();
-        return new Gson().fromJson(value, listType);
+        return gson.fromJson(value, listType);
     }
     @TypeConverter
     public static String fromList(List<String> list) {
-        Gson gson = new Gson();
         return gson.toJson(list);
     }
 
 
     @TypeConverter
     public static RedditPost.Media mediaFromString(String value) {
-        RedditPost.Media m = new Gson().fromJson(value, RedditPost.Media.class);
-        return m;
+        return gson.fromJson(value, RedditPost.Media.class);
     }
     @TypeConverter
     public static String fromMedia(RedditPost.Media media) {
-        Gson gson = new Gson();
-
-        String json = gson.toJson(media);
         return gson.toJson(media);
     }
 
+
+    // These converters are used for values such as media_metadata that hold an object that has
+    // an unknown amount of anonymous objects (these objects can be converted to a LinkedTreeMap)
     @TypeConverter
-    public static RedditPost.GalleryData galleryDataFromString(String value) {
-        return new Gson().fromJson(value, RedditPost.GalleryData.class);
+    public static LinkedTreeMap<String, Object> linkedTreeMapFromString(String value) {
+        return gson.fromJson(value, LinkedTreeMap.class);
     }
     @TypeConverter
-    public static String fromGalleryData(RedditPost.GalleryData media) {
-        Gson gson = new Gson();
-        return gson.toJson(media);
+    public static String fromLinkedTreeMap(LinkedTreeMap<String, Object> map) {
+        return gson.toJson(map);
     }
 
 
     @TypeConverter
     public static RedditPost.Preview previewFromString(String value) {
-        return new Gson().fromJson(value, RedditPost.Preview.class);
+        return gson.fromJson(value, RedditPost.Preview.class);
     }
     @TypeConverter
     public static String fromPreview(RedditPost.Preview preview) {
-        Gson gson = new Gson();
         return gson.toJson(preview);
     }
 }

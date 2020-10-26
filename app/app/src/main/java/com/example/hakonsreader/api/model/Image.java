@@ -3,16 +3,19 @@ package com.example.hakonsreader.api.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Class representing a preview image in a Reddit post
+ * Class representing an image in a Reddit post. This includes both gallery items, and preview images
+ * (different quality images for image posts, or thumbnails)
  */
-public class PreviewImage {
-    @SerializedName("url")
+public class Image {
+    // Gallery images use u, x, y. Other images like preview images use full names
+
+    @SerializedName(value = "url", alternate = "u")
     private String url;
 
-    @SerializedName("width")
+    @SerializedName(value = "width", alternate = "x")
     private int width;
 
-    @SerializedName("height")
+    @SerializedName(value = "height", alternate = "y")
     private int height;
 
 

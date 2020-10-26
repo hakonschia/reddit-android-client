@@ -9,10 +9,10 @@ import java.util.List;
  */
 class ImagesWrapper {
     @SerializedName("source")
-    PreviewImage source;
+    Image source;
 
     @SerializedName("resolutions")
-    List<PreviewImage> resolutions;
+    List<Image> resolutions;
 
 
     /**

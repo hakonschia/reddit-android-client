@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -21,9 +20,9 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.PostActivity;
+import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 import com.google.gson.Gson;
@@ -264,6 +263,11 @@ public class Post extends RelativeLayout {
                 ContentText contentText = new ContentText(context);
                 contentText.setPost(post);
                 content = contentText;
+                break;
+
+            case GALLERY:
+                List<Image> images = postData.getGalleryImages();
+                content = null;
                 break;
 
             default:
