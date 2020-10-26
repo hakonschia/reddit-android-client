@@ -45,7 +45,7 @@
             android:singleLine="true"
 
             android:textColor="@color/text_color"
-            android:textCursorDrawable="@drawable/edit_text_cursor_main_bg" />
+            android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.recyclerview.widget.RecyclerView

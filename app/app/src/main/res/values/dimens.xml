@@ -30,4 +30,10 @@
     <integer name="tickerAnimationDefault">750</integer>
     <!-- The fast time for TickerView animations -->
     <integer name="tickerAnimationFast">350</integer>
+
+    <!-- The corner radius to use for backgrounds such as comment by admin-->
+    <dimen name="userBackgroundCornerRadius">8dp</dimen>
+
+    <!-- The corner radius for tags (such as flairs, NSFW etc.) -->
+    <dimen name="tagCornerRadius">8dp</dimen>
 </resources>

@@ -95,7 +95,7 @@
 
             android:textColor="@color/text_color"
 
-            app:profileAge="@{user.createdAt}"
+            app:profileAge="@{user != null ? user.createdAt : -1}"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

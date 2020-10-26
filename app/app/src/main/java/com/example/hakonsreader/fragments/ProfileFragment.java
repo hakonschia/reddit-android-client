@@ -186,15 +186,17 @@ public class ProfileFragment extends Fragment {
      * 5. September 2012"
      *
      * @param textView The TextView to set the text on
-     * @param createdAt The timestamp, in seconds, the profile was created
+     * @param createdAt The timestamp, in seconds, the profile was created. If this is negative, nothing is done
      */
     @BindingAdapter("profileAge")
     public static void setProfileAge(TextView textView, long createdAt) {
-        // Format date as "5. September 2012"
-        SimpleDateFormat dateFormat = new SimpleDateFormat("d. MMMM y", Locale.getDefault());
-        Date date = Date.from(Instant.ofEpochSecond(createdAt));
+        if (createdAt >= 0) {
+            // Format date as "5. September 2012"
+            SimpleDateFormat dateFormat = new SimpleDateFormat("d. MMMM y", Locale.getDefault());
+            Date date = Date.from(Instant.ofEpochSecond(createdAt));
 
-        String ageText = String.format(textView.getResources().getString(R.string.profileAge), dateFormat.format(date));
-        textView.setText(ageText);
+            String ageText = String.format(textView.getResources().getString(R.string.profileAge), dateFormat.format(date));
+            textView.setText(ageText);
+        }
     }
 }
