@@ -65,6 +65,11 @@ public class ContentImage extends PhotoView {
      * Updates the view with the url from {@link ContentImage#post}
      */
     private void updateView() {
+        // Set with setPost() not setWithImageUrl()
+        if (imageUrl == null) {
+            imageUrl = post.getUrl();
+        }
+
         // TODO create a preference for "Enable zooming of images while scrolling"
         this.setOnDoubleTapListener(doubleTapListener);
 
@@ -77,11 +82,6 @@ public class ContentImage extends PhotoView {
             this.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border));
 
             return;
-        }
-
-        // Set with setPost() not setWithImageUrl()
-        if (imageUrl == null) {
-            imageUrl = post.getUrl();
         }
 
         RequestCreator c = Picasso.get()
