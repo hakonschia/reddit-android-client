@@ -99,5 +99,24 @@ public class ClickHandler {
         // Slide the activity in
         activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
+    /**
+     * Opens an image in fullscreen
+     *
+     * @param context The context to start ImageActivity
+     * @param imageUrl The URL to the image
+     */
+    public static void openImageInFullscreen(Context context, String imageUrl) {
+        Activity activity = (Activity)context;
+
+        // Send some data like what sub it is etc etc so it knows what to load
+        Intent intent = new Intent(context, ImageActivity.class);
+        intent.putExtra(ImageActivity.IMAGE_URL, imageUrl);
+
+        activity.startActivity(intent);
+
+        // Slide the activity in
+        activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+    }
+
 
 }

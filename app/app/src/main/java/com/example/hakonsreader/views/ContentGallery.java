@@ -16,10 +16,6 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentGalleryBinding;
-import com.example.hakonsreader.misc.PhotoViewDoubleTapListener;
-import com.example.hakonsreader.views.util.ClickHandler;
-import com.github.chrisbanes.photoview.PhotoView;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +24,9 @@ import java.util.Locale;
  * Class for gallery posts. A gallery post is simply a collection of multiple images
  */
 public class ContentGallery extends LinearLayout {
+    // This file and ContentImage is really coupled together, should be fixed to not be so terrible
+
+
     private final ContentGalleryBinding binding;
     private RedditPost post;
     private List<Image> images;
@@ -77,6 +76,11 @@ public class ContentGallery extends LinearLayout {
 
         ImageAdapter adapter = new ImageAdapter(getContext(), images);
         binding.galleryImages.setAdapter(adapter);
+
+        // Keep all images alive to not have to reload them
+        binding.galleryImages.setOffscreenPageLimit(images.size());
+
+        // Add listener to change the text saying which item we're on
         binding.galleryImages.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -112,7 +116,7 @@ public class ContentGallery extends LinearLayout {
     /**
      * The pager adapter responsible for handling the images in the post
      */
-    private static class ImageAdapter extends PagerAdapter {
+    private class ImageAdapter extends PagerAdapter {
         Context context;
         List<Image> images;
 
@@ -135,20 +139,13 @@ public class ContentGallery extends LinearLayout {
         public Object instantiateItem(ViewGroup container, final int position) {
             Image image = images.get(position);
 
-            PhotoView imageView = new PhotoView(context);
-            Picasso.get()
-                    .load(image.getUrl())
-                    .resize(App.get().getScreenWidth(), 0)
-                    .into(imageView);
+            // Use ContentImage as that already has listeners, NSFW caching etc already
+            ContentImage contentImage = new ContentImage(context);
+            contentImage.setWithImageUrl(post, image.getUrl());
 
+            container.addView(contentImage);
 
-            container.addView(imageView);
-
-            //listening to image click
-            imageView.setOnDoubleTapListener(new PhotoViewDoubleTapListener(imageView.getAttacher()));
-            imageView.setOnClickListener(v -> ClickHandler.openImageInFullscreen(imageView, image.getUrl()));
-
-            return imageView;
+            return contentImage;
         }
 
         @Override

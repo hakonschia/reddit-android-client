@@ -1,8 +1,6 @@
 package com.example.hakonsreader.views;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -12,7 +10,6 @@ import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.PhotoViewDoubleTapListener;
 import com.example.hakonsreader.views.util.ClickHandler;
@@ -26,6 +23,7 @@ public class ContentImage extends PhotoView {
 
 
     private RedditPost post;
+    private String imageUrl;
 
     public ContentImage(Context context) {
         this(context, null, 0);
@@ -47,7 +45,19 @@ public class ContentImage extends PhotoView {
      */
     public void setPost(RedditPost post) {
         this.post = post;
+        this.updateView();
+    }
 
+    /**
+     * Sets the post with a different image URL than the one retrieved with {@link RedditPost#getUrl()}.
+     * This can be used to create a PhotoView with a custom double tap listener
+     * that opens the image in fullscreen when single taped, and also respects the users NSFW caching choice
+     *
+     * @param imageUrl The image URL to set
+     */
+    public void setWithImageUrl(RedditPost post, String imageUrl) {
+        this.post = post;
+        this.imageUrl = imageUrl;
         this.updateView();
     }
 
@@ -69,8 +79,13 @@ public class ContentImage extends PhotoView {
             return;
         }
 
+        // Set with setPost() not setWithImageUrl()
+        if (imageUrl == null) {
+            imageUrl = post.getUrl();
+        }
+
         RequestCreator c = Picasso.get()
-                .load(post.getUrl())
+                .load(imageUrl)
                 .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
                 .error(R.drawable.ic_baseline_wifi_tethering_150)
                 // Scale so the image fits the width of the screen
@@ -95,7 +110,7 @@ public class ContentImage extends PhotoView {
         // Open image in fullscreen on single tap
         @Override
         public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
-            ClickHandler.openImageInFullscreen(ContentImage.this, post.getUrl());
+            ClickHandler.openImageInFullscreen(ContentImage.this, imageUrl);
             return true;
         }
 

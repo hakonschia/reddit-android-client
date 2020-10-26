@@ -129,8 +129,6 @@ public class RedditPost extends RedditListing {
             // The source is found in the "s" object, which can be converted to a PreviewImage
             LinkedTreeMap<String, Object> converted = (LinkedTreeMap<String, Object>) obj;
             String asJson = gson.toJson(converted.get("s"));
-
-            Log.d("TAG", "getGalleryImages: " + asJson);
             images.add(gson.fromJson(asJson, Image.class));
         });
 
