@@ -12,11 +12,10 @@
         android:layout_height="@dimen/postLinkThumnailHeight"
         app:cardCornerRadius="8dp">
 
-        <!-- Set the image size manually to not stretch the image, as it looks bad -->
         <ImageButton
             android:id="@+id/thumbnail"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/ic_baseline_link_24"
             android:contentDescription="@string/content_description_link_image"
             android:layout_gravity="center" />
