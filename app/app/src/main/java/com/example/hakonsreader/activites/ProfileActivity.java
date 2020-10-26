@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.fragments.ProfileFragment;
+import com.r0adkll.slidr.Slidr;
 
 /**
  * Activity to show a users profile.
@@ -33,6 +34,8 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.profileContainer, fragment)
                 .commit();
+
+        Slidr.attach(this);
     }
 
     @Override

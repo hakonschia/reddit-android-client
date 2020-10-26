@@ -51,7 +51,7 @@
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark Mode</string>
-    <string name="prefs_title_cache_nsfw">Cache NSFW videos/posts</string>
+    <string name="prefs_title_cache_nsfw">Cache NSFW videos and posts</string>
     <string name="prefs_title_auto_play_videos">Automatically play videos</string>
     <string name="prefs_title_auto_play_videos_always">Always</string>
     <string name="prefs_title_auto_play_videos_never">Never</string>
