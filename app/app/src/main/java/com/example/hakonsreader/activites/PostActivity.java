@@ -198,11 +198,8 @@ public class PostActivity extends AppCompatActivity {
      * <p>Notifies the view about the new post data and calls {@link PostActivity#setupCommentsList()}</p>
      */
     private void onPostLoaded() {
+        binding.setPost(post);
         binding.post.setPostData(post);
-        if (!post.isLocked()) {
-            binding.replyPost.setVisibility(View.VISIBLE);
-        }
-
         this.setupCommentsList();
     }
 
@@ -210,6 +207,7 @@ public class PostActivity extends AppCompatActivity {
      * Update the information about the post in the UI
      */
     private void updatePostInfo() {
+        binding.setPost(post);
         binding.post.updatePostInfo(post);
     }
 
@@ -243,8 +241,7 @@ public class PostActivity extends AppCompatActivity {
         binding.comments.stopScroll();
 
         // Scroll to the position, with 0 pixels offset from the top
-        // TODO smooth scroll
-        this.layoutManager.scrollToPositionWithOffset(next, 0);
+        layoutManager.scrollToPositionWithOffset(next, 0);
     }
 
     /**

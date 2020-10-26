@@ -102,7 +102,7 @@
                 android:layout_height="wrap_content"
 
                 android:visibility="@{commentHidden ? View.GONE : View.VISIBLE}"
-                app:constraint_referenced_ids="authorFlair, commentContent, commentVoteBar, reply" />
+                app:constraint_referenced_ids="authorFlair, commentContent, commentVoteBar" />
 
             <TextView
                 android:id="@+id/commentAuthor"
@@ -203,6 +203,9 @@
 
                 tools:text="@tools:sample/lorem" />
 
+            <!-- We have to add commentHidden to the visibility here instead of adding reply to the
+            moreComments group, since it would take precedence over post.locked/comment.locked and
+            always be shown-->
             <ImageButton
                 android:id="@+id/reply"
                 android:layout_width="wrap_content"
@@ -213,7 +216,9 @@
                 android:onClick="@{(view) -> adapter.replyListener.replyTo(comment)}"
                 android:src="@drawable/ic_baseline_reply_24"
 
-                android:visibility="@{post.locked ? View.GONE : View.VISIBLE}"
+                android:visibility="@{commentHidden || post.locked || comment.locked ? View.GONE : View.VISIBLE}"
+
+                android:contentDescription="@string/content_description_reply_to_comment"
 
                 app:layout_constraintEnd_toStartOf="@+id/commentVoteBar"
                 app:layout_constraintTop_toBottomOf="@+id/commentContent" />

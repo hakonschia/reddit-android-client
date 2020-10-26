@@ -453,7 +453,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     /**
      * Formats the author text based on whether or not it is posted by a mod, the poster.
      *
-     * <p>If multiple values are true, the precende is:
+     * <p>If multiple values are true, the precedence is:
      * <ol>
      *     <li>Admin</li>
      *     <li>Mod</li>

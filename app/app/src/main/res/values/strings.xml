@@ -119,4 +119,6 @@
     <string name="front_page">Front page</string>
 
     <string name="content_description_link_image">Link to website</string>
+    <string name="content_description_reply_to_post">Reply to post</string>
+    <string name="content_description_reply_to_comment">Reply to comment</string>
 </resources>
