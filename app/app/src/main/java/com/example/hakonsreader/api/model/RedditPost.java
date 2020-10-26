@@ -62,6 +62,9 @@ public class RedditPost extends RedditListing {
     @SerializedName("is_gallery")
     private boolean isGallery;
 
+    @SerializedName("archived")
+    private boolean isArchived;
+
     @SerializedName("post_hint")
     private String postHint;
 
@@ -169,6 +172,13 @@ public class RedditPost extends RedditListing {
      */
     public boolean isSpoiler() {
         return spoiler;
+    }
+
+    /**
+     * @return True if the post is archived. Archived posts cannot be voted/commented on
+     */
+    public boolean isArchived() {
+        return isArchived;
     }
 
     /**
@@ -511,6 +521,10 @@ public class RedditPost extends RedditListing {
 
     public void setPreview(Preview preview) {
         this.preview = preview;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
     }
 
     /**

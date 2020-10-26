@@ -91,8 +91,10 @@
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/sideBarsBarrier"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0">
 
             <!-- Group to hide elements when the comment is hidden
             Everything but the author and age are hidden -->
@@ -163,12 +165,13 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
 
+                android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_stickied"
+
                 android:visibility="@{comment.stickied ? View.VISIBLE : View.GONE, default=gone}"
-
                 app:layout_constraintEnd_toStartOf="@+id/lock"
-                app:layout_constraintTop_toTopOf="@+id/commentAuthor"
 
+                app:layout_constraintTop_toTopOf="@+id/commentAuthor"
                 tools:visibility="visible" />
 
             <ImageView
@@ -177,11 +180,11 @@
                 android:layout_height="18dp"
 
                 android:src="@drawable/ic_baseline_lock_24"
+
                 android:visibility="@{comment.locked ? View.VISIBLE : View.GONE, default=gone}"
-
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/commentAuthor"
 
+                app:layout_constraintTop_toTopOf="@+id/commentAuthor"
                 tools:visibility="visible" />
 
             <TextView
@@ -213,12 +216,12 @@
                 android:layout_marginEnd="10dp"
 
                 android:background="?android:selectableItemBackground"
+                android:contentDescription="@string/content_description_reply_to_comment"
                 android:onClick="@{(view) -> adapter.replyListener.replyTo(comment)}"
+
                 android:src="@drawable/ic_baseline_reply_24"
 
-                android:visibility="@{commentHidden || post.locked || comment.locked ? View.GONE : View.VISIBLE}"
-
-                android:contentDescription="@string/content_description_reply_to_comment"
+                android:visibility="@{commentHidden || post.locked || post.archived || comment.locked ? View.GONE : View.VISIBLE}"
 
                 app:layout_constraintEnd_toStartOf="@+id/commentVoteBar"
                 app:layout_constraintTop_toBottomOf="@+id/commentContent" />

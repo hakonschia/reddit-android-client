@@ -70,13 +70,12 @@
             android:layout_gravity="bottom|end" >
 
             <!-- Reply button -->
-            <!-- TODO locked or archived -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_square_secondary_bg"
                 android:layout_marginEnd="8dp"
-                android:visibility="@{post.locked ? View.GONE : View.VISIBLE}">
+                android:visibility="@{post.locked || post.archived ? View.GONE : View.VISIBLE}">
 
                 <ImageButton
                     android:id="@+id/replyPost"
