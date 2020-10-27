@@ -20,7 +20,7 @@
         android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/secondary_background" >
+        android:background="@color/secondary_background">
 
         <!-- This has a negative bottom margin to not get the rounded corners at the bottom -->
         <ImageView
@@ -57,15 +57,15 @@
             android:onClick="@{view -> ClickHandler.openImageInFullscreen(view, user.profilePictureUrl)}"
 
             android:src="@drawable/ic_baseline_person_100"
-            app:profilePicture="@{user.profilePictureUrl}"
-
-            app:civ_border_width="2dp"
             app:civ_border_color="@color/opposite_background"
 
-            app:layout_constraintTop_toTopOf="@id/topLayout"
+            app:civ_border_width="2dp"
             app:layout_constraintBottom_toTopOf="@+id/topLayout"
+
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/topLayout"
+            app:profilePicture="@{user.profilePictureUrl}" />
 
         <TextView
             android:id="@+id/username"
@@ -86,7 +86,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profilePicture"
 
-            tools:text="Hakonschia"/>
+            tools:text="Hakonschia" />
 
         <TextView
             android:id="@+id/profileAge"
@@ -95,11 +95,11 @@
 
             android:textColor="@color/text_color"
 
-            app:profileAge="@{user != null ? user.createdAt : -1}"
-
             app:layout_constraintEnd_toEndOf="parent"
+
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/username"
+            app:profileAge="@{user != null ? user.createdAt : -1}"
 
             tools:text="User since 12. August 1997" />
 
@@ -107,8 +107,8 @@
             android:id="@+id/commentKarma"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
 
             android:text='@{user != null ? @string/commentKarma(user.commentKarma) : ""}'
             android:textColor="@color/text_color"
@@ -162,5 +162,17 @@
             app:layout_constraintTop_toBottomOf="@+id/profileNameDivider"
             app:layout_constraintVertical_bias="0.0"
             tools:listitem="@layout/post" />
+
+        <com.example.hakonsreader.views.LoadingIcon
+            android:id="@+id/loadingIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            android:visibility="gone"
+            tools:visibility="visible"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

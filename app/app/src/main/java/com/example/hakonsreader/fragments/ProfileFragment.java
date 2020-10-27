@@ -112,6 +112,10 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
+
+        postsViewModel.onLoadingChange().observe(this, up -> {
+            binding.loadingIcon.onCountChange(up);
+        });
     }
 
     @Nullable
@@ -183,6 +187,7 @@ public class ProfileFragment extends Fragment {
      * Retrieves user information about the currently logged in user
      */
     public void getUserInfo() {
+        binding.loadingIcon.onCountChange(true);
         // user(null) gets information about the logged in user, so we can use username directly
         redditApi.user(username).info(user -> {
             // Load the posts for the user
@@ -195,9 +200,11 @@ public class ProfileFragment extends Fragment {
             }
 
             this.updateViews();
+            binding.loadingIcon.onCountChange(false);
         }, (code, t) -> {
             t.printStackTrace();
             Util.handleGenericResponseErrors(binding.parentLayout, code, t);
+            binding.loadingIcon.onCountChange(false);
         });
     }
 

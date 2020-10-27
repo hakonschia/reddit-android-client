@@ -120,6 +120,9 @@ public class PostsViewModel extends ViewModel {
      * it has finished loading it will be set to false
      */
     public LiveData<Boolean> onLoadingChange() {
+        // TODO this causes issues as if the observer is in a paused state they wont receive the update
+        //  which can cause the loading icon to stay even if it should be gone
+        //  using observeForever might work, is a poor solution as it relies on the user reading the documentation completely
         return loadingChange;
     }
 
