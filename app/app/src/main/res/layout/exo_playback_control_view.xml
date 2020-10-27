@@ -14,7 +14,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+
+        android:contentDescription="@string/content_description_video_thumbnail"/>
 
     <ProgressBar
         android:id="@+id/buffering"
@@ -34,26 +36,30 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
 
-        android:background="@drawable/rounded_square_main_bg"
+        android:background="@drawable/rounded_square_black_bg"
         style="@style/ExoMediaButton.Play"
 
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+
+        android:contentDescription="@string/content_description_play_video"/>
 
     <ImageButton
         android:id="@id/exo_pause"
         android:layout_width="50dp"
         android:layout_height="50dp"
 
-        android:background="@drawable/rounded_square_main_bg"
+        android:background="@drawable/rounded_square_black_bg"
         style="@style/ExoMediaButton.Pause"
 
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+
+        android:contentDescription="@string/content_description_pause_video"/>
 
     <LinearLayout
         android:id="@+id/seekLayout"
@@ -139,7 +145,9 @@
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:background="@null"
-            android:src="@drawable/ic_baseline_fullscreen_24"/>
+            android:src="@drawable/ic_baseline_fullscreen_24"
+
+            android:contentDescription="@string/content_description_fullscreen_video"/>
 
         <ImageButton
             android:id="@+id/volumeButton"
@@ -149,7 +157,9 @@
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:background="@null"
-            android:src="@drawable/ic_baseline_volume_up_24"/>
+            android:src="@drawable/ic_baseline_volume_up_24"
+
+            android:contentDescription="@string/content_description_mute_video"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -121,6 +121,11 @@
     <string name="content_description_link_image">Link to website</string>
     <string name="content_description_reply_to_post">Reply to post</string>
     <string name="content_description_reply_to_comment">Reply to comment</string>
+    <string name="content_description_video_thumbnail" translatable="false">Video thumbnail</string>
+    <string name="content_description_play_video" translatable="false">Play video</string>
+    <string name="content_description_pause_video" translatable="false">Pause video</string>
+    <string name="content_description_fullscreen_video" translatable="false">Fullscreen video</string>
+    <string name="content_description_mute_video" translatable="false">Mute video</string>
 
     <string name="postRemovedGeneric">The post has been removed</string>
     <string name="postRemovedByMods">The post has been removed by the moderators of r/%s</string>

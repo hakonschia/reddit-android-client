@@ -304,7 +304,7 @@ public class ContentVideo extends PlayerView {
         // TODO maybe show thumbnail is autoplayed is enabled? It will load anyways so
         //  maybe setting to autoload NSFW
         if (post.isNsfw()) {
-            thumbnail.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_24));
+            thumbnail.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_200));
         } else {
             // Show the thumbnail over the video before it is being played
             Picasso.get()

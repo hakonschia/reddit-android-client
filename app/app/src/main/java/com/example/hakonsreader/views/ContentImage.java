@@ -75,7 +75,7 @@ public class ContentImage extends PhotoView {
 
         // Dont show NSFW images until we are in fullscreen
         if (post.isNsfw()) {
-            this.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_24));
+            this.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_200));
 
             // Set a border around to show what is clickable to open the window. Ideally the image would
             // match the screen width, might have to adjust the drawable width somehow to do that
