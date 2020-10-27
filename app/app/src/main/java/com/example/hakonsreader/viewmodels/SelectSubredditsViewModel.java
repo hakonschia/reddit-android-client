@@ -23,7 +23,7 @@ public class SelectSubredditsViewModel extends ViewModel {
      */
     public static final String SUBSCRIBED_SUBREDDITS_KEY = "subscribedSubreddits";
 
-    private AppDatabase database;
+    private final AppDatabase database;
     private MutableLiveData<List<Subreddit>> subreddits;
 
 
@@ -67,7 +67,7 @@ public class SelectSubredditsViewModel extends ViewModel {
      * <p>The IDs are stored in SharedPreferences with the key {@link SelectSubredditsViewModel#SUBSCRIBED_SUBREDDITS_KEY}</p>
      */
     public void loadSubreddits() {
-        App.get().getApi().getSubreddits("", 0, subs -> {
+        App.get().getApi().subreddits().getSubreddits("", 0, subs -> {
             subreddits.setValue(subs);
 
             String[] ids = new String[subs.size()];

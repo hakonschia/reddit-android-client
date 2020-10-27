@@ -159,9 +159,7 @@ public class PostsViewModel extends ViewModel {
             });
             */
         } else {
-            App.get().getApi().getPosts(subreddit, after, count, newPosts -> {
-                onPostsRetrieved(newPosts);
-            }, (code, t) -> {
+            api.subreddit(subreddit).posts(after, count, this::onPostsRetrieved, (code, t) -> {
                 t.printStackTrace();
                 loadingChange.setValue(false);
                 Util.handleGenericResponseErrors(parentLayout, code, t);

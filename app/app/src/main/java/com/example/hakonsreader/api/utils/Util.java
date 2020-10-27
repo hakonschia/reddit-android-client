@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.utils;
 
 import com.example.hakonsreader.api.enums.ResponseErrors;
+import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.RateLimitException;
 import com.example.hakonsreader.api.exceptions.ThreadLockedException;
@@ -67,4 +68,14 @@ public class Util {
         }
     }
 
+    /**
+     * Creates the fullname for a thing
+     *
+     * @param thing The type of thing
+     * @param thingId The ID of the thing
+     * @return The fullname for the thing
+     */
+    public static String createFullName(Thing thing, String thingId) {
+        return thing.getValue() + "_" + thingId;
+    }
 }

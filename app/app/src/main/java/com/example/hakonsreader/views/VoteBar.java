@@ -12,7 +12,9 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.VoteType;
+import com.example.hakonsreader.api.interfaces.VoteableRequest;
 import com.example.hakonsreader.api.model.RedditListing;
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.VoteBarBinding;
 import com.example.hakonsreader.misc.Util;
 import com.robinhood.ticker.TickerUtils;
@@ -82,7 +84,13 @@ public class VoteBar extends ConstraintLayout {
         listing.setVoteType(finalVoteType);
         updateVoteStatus();
 
-        this.redditApi.vote(listing, voteType, resp -> { }, (code, t) -> {
+        String id = listing.getId();
+
+        // Retrieve the correct request
+        VoteableRequest request = listing instanceof RedditPost ? redditApi.post(id) : redditApi.comment(id);
+
+        // Cast the vote
+        request.vote(voteType, resp -> { }, (code, t) -> {
             // On failure set back to previous so the user doesn't think it updated when it didn't
             listing.setVoteType(current);
             updateVoteStatus();

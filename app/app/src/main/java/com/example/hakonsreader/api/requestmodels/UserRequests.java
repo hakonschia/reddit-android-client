@@ -9,7 +9,6 @@ import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.ListingResponse;
-import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
 

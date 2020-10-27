@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
@@ -27,15 +26,11 @@ import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
-import com.example.hakonsreader.views.ListDivider;
 import com.robinhood.ticker.TickerUtils;
-import com.robinhood.ticker.TickerView;
 import com.squareup.picasso.Picasso;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Fragment containing a subreddit
@@ -67,6 +62,7 @@ public class SubredditFragment extends Fragment {
     private static final String LAYOUT_STATE_KEY = "layout_state";
 
 
+    private final RedditApi api = App.get().getApi();
     private FragmentSubredditBinding binding;
 
     private AppDatabase database;
@@ -267,7 +263,7 @@ public class SubredditFragment extends Fragment {
         final Subreddit sub = subreddit.get();
         final boolean subscribed = sub.isSubscribed();
 
-        App.get().getApi().subscribeToSubreddit(sub.getName(), !subscribed, voidValue -> {
+        api.subreddit(sub.getName()).subscribe(!subscribed, voidValue -> {
             sub.setSubscribed(!subscribed);
             subreddit.set(sub);
         }, (code, t) -> {
@@ -297,7 +293,7 @@ public class SubredditFragment extends Fragment {
      * @param subredditName The name of the subreddit to get information for
      */
     private void retrieveSubredditInfo(String subredditName) {
-        App.get().getApi().getSubredditInfo(subredditName, sub -> {
+        api.subreddit(subredditName).info(subredditName, sub -> {
             new Thread(() -> {
                 // Lets assume the user doesn't want to store NSFW. We could use the setting for caching
                 // images/videos but it's somewhat going beyond the intent of the setting

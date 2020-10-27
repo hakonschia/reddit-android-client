@@ -36,7 +36,7 @@ public class SelectSubredditFragment extends Fragment {
     private static final String LIST_STATE_KEY = "listState";
 
     private FragmentSelectSubredditBinding binding;
-    private final RedditApi redditApi = App.get().getApi();
+    private final RedditApi api = App.get().getApi();
     private AppDatabase database;
 
     private Bundle saveState;
@@ -56,7 +56,7 @@ public class SelectSubredditFragment extends Fragment {
     }
 
     public void favoriteClicked(Subreddit subreddit) {
-        redditApi.favoriteSubreddit(subreddit.getName(), !subreddit.isFavorited(), ignored -> {
+        api.subreddit(subreddit.getName()).favorite(!subreddit.isFavorited(), ignored -> {
             subreddit.setFavorited(!subreddit.isFavorited());
             subredditsAdapter.onFavorite(subreddit);
             new Thread(() -> database.subreddits().update(subreddit)).start();

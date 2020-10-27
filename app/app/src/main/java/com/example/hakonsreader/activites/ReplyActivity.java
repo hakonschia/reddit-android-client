@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
+import com.example.hakonsreader.api.interfaces.ReplyableRequest;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityReplyBinding;
@@ -93,9 +94,13 @@ public class ReplyActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
 
-        // TODO get actual ID and thing instead of hardcoded values
-        redditApi.postComment(text, replyingTo, comment -> {
+        String id = replyingTo.getId();
+
+        ReplyableRequest request = replyingTo instanceof RedditPost ? redditApi.post(id) : redditApi.comment(id);
+        request.reply(text, comment -> {
             Log.d(TAG, "sendReply: Comment posted");
+
+            // TODO for replies to comments the depth has to be set manually
 
             // Pass the new comment back and finish
             Intent data = new Intent()
@@ -107,6 +112,5 @@ public class ReplyActivity extends AppCompatActivity {
             t.printStackTrace();
             Util.handleGenericResponseErrors(binding.parentLayout, code, t);
         });
-
     }
 }

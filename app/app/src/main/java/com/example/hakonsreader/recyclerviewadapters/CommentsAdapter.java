@@ -513,7 +513,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
         // TODO move api call to ViewModel
         final RedditComment finalParent = parent;
-        redditApi.getMoreComments(post.getId(), comment.getChildren(), finalParent, newComments -> {
+        redditApi.post(post.getId()).moreComments(comment.getChildren(), finalParent, newComments -> {
             // Find the parent index to know where to insert the new comments
             int commentPos = comments.indexOf(comment);
             this.insertComments(newComments, commentPos);

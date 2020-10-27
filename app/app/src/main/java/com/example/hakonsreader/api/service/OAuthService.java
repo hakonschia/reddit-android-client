@@ -11,7 +11,7 @@ import retrofit2.http.POST;
 /**
  * Service towards Reddit's OAuth authentication
  */
-public interface RedditOAuthService {
+public interface OAuthService {
     /**
      * The API path used to retrieve an access token
      */
