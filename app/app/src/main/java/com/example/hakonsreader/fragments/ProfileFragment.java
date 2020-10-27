@@ -1,6 +1,7 @@
 package com.example.hakonsreader.fragments;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,9 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -35,6 +38,8 @@ import java.util.Locale;
  */
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
+    private static final String POST_IDS_KEY = "post_ids";
+    private static final String LAYOUT_STATE_KEY = "layout_state";
 
     private boolean firstLoad = true;
 
@@ -47,6 +52,8 @@ public class ProfileFragment extends Fragment {
      */
     private String username;
 
+    private Bundle saveState;
+    private List<String> postIds;
     private PostsViewModel postsViewModel;
     private PostsAdapter adapter;
     private LinearLayoutManager layoutManager;
@@ -90,12 +97,20 @@ public class ProfileFragment extends Fragment {
 
         adapter = new PostsAdapter();
         layoutManager = new LinearLayoutManager(getContext());
+        postIds = new ArrayList<>();
 
         postsViewModel = new ViewModelProvider(this, new PostsFactory(
                 getContext()
         )).get(PostsViewModel.class);
         postsViewModel.getPosts().observe(this, posts -> {
             adapter.addPosts(posts);
+
+            if (saveState != null) {
+                Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);
+                if (state != null) {
+                    layoutManager.onRestoreInstanceState(saveState.getParcelable(LAYOUT_STATE_KEY));
+                }
+            }
         });
     }
 
@@ -122,7 +137,32 @@ public class ProfileFragment extends Fragment {
             this.updateViews();
         }
 
+        if (saveState != null) {
+            postIds = saveState.getStringArrayList(POST_IDS_KEY);
+            postsViewModel.setPostIds(postIds);
+        }
+
         return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
+            postsViewModel.loadPosts(binding.parentLayout, username, true);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (saveState == null) {
+            saveState = new Bundle();
+        }
+
+        saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
+        saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
     }
 
     @Override

@@ -125,6 +125,10 @@ public class PostsViewModel extends ViewModel {
 
 
     public void loadPosts(View parentLayout, String subreddit, boolean isUser) {
+        if (subreddit == null) {
+            return;
+        }
+
         // Get the ID of the last post in the list
         String after = "";
         int count = postIds.size();
@@ -136,7 +140,7 @@ public class PostsViewModel extends ViewModel {
         loadingChange.setValue(true);
 
         if (isUser) {
-            api.user(subreddit).posts().top(PostTimeSort.ALL_TIME, this::onPostsRetrieved, (code, t) -> {
+            api.user(subreddit).posts(this::onPostsRetrieved, (code, t) -> {
                 t.printStackTrace();
                 loadingChange.setValue(false);
                 Util.handleGenericResponseErrors(parentLayout, code, t);
