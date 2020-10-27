@@ -1,17 +1,12 @@
 package com.example.hakonsreader.api;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.constants.OAuthConstants;
-import com.example.hakonsreader.api.enums.PostTimeSort;
-import com.example.hakonsreader.api.enums.ResponseErrors;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
-import com.example.hakonsreader.api.exceptions.RateLimitException;
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException;
-import com.example.hakonsreader.api.exceptions.ThreadLockedException;
+import com.example.hakonsreader.api.interceptors.UserAgentInterceptor;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
@@ -20,11 +15,13 @@ import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
-import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.requestmodels.UserRequests;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.RedditApiService;
 import com.example.hakonsreader.api.service.RedditOAuthService;
+import com.example.hakonsreader.api.service.UserService;
+import com.example.hakonsreader.api.utils.Util;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -93,6 +90,11 @@ public class RedditApi {
      * The service object used to communicate with the Reddit API
      */
     private RedditApiService api;
+
+    /**
+     * The service object used to communicate with the reddit API about user related calls
+     */
+    private UserService userApi;
 
     /**
      * The service object used to communicate only with the part of the Reddit API
@@ -164,7 +166,7 @@ public class RedditApi {
                 // Automatically refresh access token on authentication errors (401)
                 .authenticator(new Authenticator())
                 // Add User-Agent header to every request
-                .addInterceptor(new UserAgentInterceptor())
+                .addInterceptor(new UserAgentInterceptor(userAgent))
                 // Ensure that an access token is always set before sending a request
                 .addInterceptor(new NoTokenInterceptor())
                 // Logger has to be at the end or else it won't log what has been added before
@@ -179,11 +181,14 @@ public class RedditApi {
                 .build();
         api = apiRetrofit.create(RedditApiService.class);
 
+        userApi = apiRetrofit.create(UserService.class);
+
+
         // The OAuth client does not need interceptors/authenticators for tokens as it doesn't
         // use the access tokens for authorization
         OkHttpClient oauthClient = new OkHttpClient.Builder()
                 // Add User-Agent header to every request
-                .addInterceptor(new UserAgentInterceptor())
+                .addInterceptor(new UserAgentInterceptor(userAgent))
                 .addInterceptor(logger)
                 .build();
 
@@ -221,6 +226,8 @@ public class RedditApi {
          *                  on creating your user agent</p>
          * @param clientId The client ID of the application
          *                 <p>To find your client ID see <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
+         *
+         * @throws IllegalStateException If userAgent or clientId is empty
          */
         public Builder(@NotNull String userAgent, @NotNull String clientId) {
             if (userAgent.isEmpty()) {
@@ -356,6 +363,8 @@ public class RedditApi {
      * @param onResponse The callback for successful requests. Does not hold anything, but is called with
      *                   {@code null} when successful.
      * @param onFailure The callback for failed requests
+     *
+     * @throws IllegalStateException If the callback URL was not set when the API object was built
      */
     @EverythingIsNonNull
     public void getAccessToken(String code, OnResponse<Void> onResponse, OnFailure onFailure) {
@@ -380,7 +389,7 @@ public class RedditApi {
                     setTokenInternal(token);
                     onResponse.onResponse(null);
                 }  else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -402,14 +411,14 @@ public class RedditApi {
      */
     @EverythingIsNonNull
     public void revokeRefreshToken(OnResponse<Void> onResponse, OnFailure onFailure) {
-        if (this.accessToken.getRefreshToken() == null) {
+        if (accessToken.getRefreshToken() == null) {
             onFailure.onFailure(-1, new Throwable("No token to revoke"));
             return;
         }
 
-        this.oauthService.revokeToken(
-                this.basicAuthHeader,
-                this.accessToken.getRefreshToken(),
+        oauthService.revokeToken(
+                basicAuthHeader,
+                accessToken.getRefreshToken(),
                 OAuthConstants.TOKEN_TYPE_REFRESH
         ).enqueue(new Callback<Void>() {
             @Override
@@ -417,7 +426,7 @@ public class RedditApi {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -427,19 +436,7 @@ public class RedditApi {
             }
         });
 
-        this.accessToken = new AccessToken();
-    }
-
-    /**
-     * Ensures that {@link RedditApi#accessToken} is set and is valid for a user that is logged in.
-     * Access tokens for non-logged in users do not count.
-     *
-     * @throws InvalidAccessTokenException If the access token has no refresh token (ie. not an actually logged in user)
-     */
-    private void verifyLoggedInToken() throws InvalidAccessTokenException {
-        if (this.accessToken.getRefreshToken() == null) {
-            throw new InvalidAccessTokenException("Valid access token was not found");
-        }
+        setTokenInternal(new AccessToken());
     }
     /* --------------- End access token calls --------------- */
 
@@ -447,7 +444,10 @@ public class RedditApi {
 
     /**
      * Asynchronously retrieves posts from a given subreddit
+     *
      * <p>If an access token is set posts are customized for the user</p>
+     *
+     * <p>No specific OAuth scope is required</p>
      *
      * @param subreddit The subreddit to retrieve posts from. For front page use an empty string
      * @param after The ID of the last post seen (or an empty string if first time loading)
@@ -481,7 +481,7 @@ public class RedditApi {
                     List<RedditPost> posts = (List<RedditPost>) body.getListings();
                     onResponse.onResponse(posts);
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -500,6 +500,8 @@ public class RedditApi {
      * <p>If a user access token is set comments are customized for the user (ie. vote status is set).
      * Requires OAuth scope "read"</p>
      *
+     * <p>No specific OAuth scope is required</p>
+     *
      * @param postID The ID of the post to retrieve comments for
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
@@ -507,7 +509,7 @@ public class RedditApi {
      */
     @EverythingIsNonNull
     public void getComments(String postID, OnResponse<List<RedditComment>> onResponse, OnResponse<RedditPost> onPostResponse, OnFailure onFailure) {
-        this.api.getComments(
+        api.getComments(
                 postID,
                 RAW_JSON,
                 this.accessToken.generateHeaderString()
@@ -534,7 +536,7 @@ public class RedditApi {
                     onPostResponse.onResponse(post);
                     onResponse.onResponse(allComments);
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -547,7 +549,10 @@ public class RedditApi {
 
     /**
      * Retrieves comments initially hidden (from "2 more comments" comments)
+     *
      * <p>If an access token is set comments are customized for the user (ie. vote status is set)</p>
+     *
+     * <p>OAuth scope required: {@code read}</p>
      *
      * @param postID The ID of the post to retrieve comments for
      * @param children The list of IDs of comments to get (retrieved via {@link RedditComment#getChildren()})
@@ -600,10 +605,10 @@ public class RedditApi {
                         }
                         onResponse.onResponse(comments);
                     } else {
-                        handleListingErrors(body.errors(), onFailure);
+                        Util.handleListingErrors(body.errors(), onFailure);
                     }
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -618,8 +623,14 @@ public class RedditApi {
      * Submit a new comment. This can either be a comment on a post (top-level comment), a reply,
      * or a private message.
      *
-     * <p>Comments to posts and replies requires OAuth scope "submit", and private message requires "privatemessage"</p>
      * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
+     *
+     * <p>OAuth scopes required:
+     * <ol>
+     *     <li>For comments to post and replies: {@code submit}</li>
+     *     <li>For private messages: {@code privatemessage}</li>
+     * </ol>
+     * </p>
      *
      * @param comment The comment to submit
      * @param thing The thing being replied to
@@ -628,7 +639,7 @@ public class RedditApi {
      */
     public void postComment(String comment, RedditListing thing, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
         try {
-            this.verifyLoggedInToken();
+            Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
             onFailure.onFailure(-1, new InvalidAccessTokenException("Posting comments requires a valid access token for a logged in user"));
             return;
@@ -664,10 +675,10 @@ public class RedditApi {
                         newComment.setDepth(finalDepth);
                         onResponse.onResponse(newComment);
                     } else {
-                        handleListingErrors(body.errors(), onFailure);
+                        Util.handleListingErrors(body.errors(), onFailure);
                     }
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -683,8 +694,9 @@ public class RedditApi {
     /**
      * Cast a vote on a listing
      *
-     * <p>Requires OAuth scope "vote"</p>
      * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
+     *
+     * <p>OAuth scope required: {@code vote}</p>
      *
      * @param thing The thing to cast a vote on
      * @param type The type of vote to cast
@@ -695,7 +707,7 @@ public class RedditApi {
     @EverythingIsNonNull
     public void vote(RedditListing thing, VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
         try {
-            this.verifyLoggedInToken();
+            Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
             onFailure.onFailure(-1, new InvalidAccessTokenException("Voting requires a valid access token for a logged in user", e));
             return;
@@ -711,7 +723,7 @@ public class RedditApi {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -726,6 +738,8 @@ public class RedditApi {
     /**
      * Retrieve the list of subreddits the logged in user is subscribed to
      *
+     * <p>OAuth scope required: {@code mysubreddits}</p>
+     *
      * @param after The ID of the last subreddit seen (empty string if loading for the first time)
      * @param count The amount of items fetched previously (0 if loading for the first time)
      * @param onResponse The response handler for successful request. Holds the list of subreddits fetched.
@@ -734,7 +748,7 @@ public class RedditApi {
      */
     public void getSubscribedSubreddits(String after, int count, OnResponse<List<Subreddit>> onResponse, OnFailure onFailure) {
         try {
-            this.verifyLoggedInToken();
+            Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
             onFailure.onFailure(-1, new InvalidAccessTokenException("Getting subscribed subreddits requires a valid access token for a logged in user", e));
             return;
@@ -758,10 +772,10 @@ public class RedditApi {
                         List<Subreddit> subreddits = (List<Subreddit>) body.getListings();
                         onResponse.onResponse(subreddits);
                     } else {
-                        handleListingErrors(body.getErrors(), onFailure);
+                        Util.handleListingErrors(body.getErrors(), onFailure);
                     }
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -774,6 +788,8 @@ public class RedditApi {
 
     /**
      * Retrieve the list of default subreddits (as selected by reddit)
+     *
+     * <p>OAuth scope required: {@code read}</p>
      *
      * @param after The ID of the last subreddit seen (empty string if loading for the first time)
      * @param count The amount of items fetched previously (0 if loading for the first time)
@@ -799,7 +815,7 @@ public class RedditApi {
                     List<Subreddit> subreddits = (List<Subreddit>) body.getListings();
                     onResponse.onResponse(subreddits);
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -817,6 +833,12 @@ public class RedditApi {
      * <p>See also {@link RedditApi#getSubscribedSubreddits(String, int, OnResponse, OnFailure)} and
      * {@link RedditApi#getDefaultSubreddits(String, int, OnResponse, OnFailure)}</p>
      *
+     * <ol>
+     *     <li>For a users subscribed subreddits: {@code mysubreddits}</li>
+     *     <li>For default subreddits: {@code read}</li>
+     * </ol>
+     * </p>
+     *
      * @param after The ID of the last subreddit seen (empty string if loading for the first time)
      * @param count The amount of items fetched previously (0 if loading for the first time)
      * @param onResponse The response handler for successful request. Holds the list of subreddits fetched.
@@ -825,7 +847,7 @@ public class RedditApi {
      */
     public void getSubreddits(String after, int count, OnResponse<List<Subreddit>> onResponse, OnFailure onFailure) {
         try {
-            this.verifyLoggedInToken();
+            Util.verifyLoggedInToken(accessToken);
             getSubscribedSubreddits(after, count, onResponse, onFailure);
         } catch (InvalidAccessTokenException e) {
             getDefaultSubreddits(after, count, onResponse, onFailure);
@@ -834,6 +856,8 @@ public class RedditApi {
 
     /**
      * Retrieve information about a given subreddit
+     *
+     * <p>OAuth scope required: {@code read}</p>
      *
      * @param subredditName The subreddit to retrieve information about
      * @param onResponse The response handler for successful requests. Holds the {@link Subreddit} retrieved
@@ -861,7 +885,7 @@ public class RedditApi {
                         onFailure.onFailure(response.code(), new SubredditNotFoundException("No subreddit found with name: " + subredditName));
                     }
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -875,6 +899,8 @@ public class RedditApi {
     /**
      * Subscribe or unsubscribe to a subreddit
      *
+     * <p>OAuth scope required: {@code subscribe}</p>
+     *
      * @param subredditName The subreddit to subscribe/unsubscribe to
      * @param subscribe True if the action should be to subscribe, false to unsubscribe
      * @param onResponse The response handler for successful requests. Does not hold any data, but will
@@ -883,7 +909,7 @@ public class RedditApi {
      */
     public void subscribeToSubreddit(String subredditName, boolean subscribe, OnResponse<Void> onResponse, OnFailure onFailure) {
         try {
-            this.verifyLoggedInToken();
+            Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
             onFailure.onFailure(-1, new InvalidAccessTokenException("Subscribing to a subreddit requires a valid access token for a logged in user", e));
             return;
@@ -895,7 +921,7 @@ public class RedditApi {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -909,6 +935,7 @@ public class RedditApi {
     /**
      * Favorite or un-favorite a subreddit
      *
+     *
      * @param subredditName The subreddit to subscribe/unsubscribe to
      * @param favorite True if the action should be to favorite, false to un-favorite
      * @param onResponse The response handler for successful requests. Does not hold any data, but will
@@ -917,7 +944,7 @@ public class RedditApi {
      */
     public void favoriteSubreddit(String subredditName, boolean favorite, OnResponse<Void> onResponse, OnFailure onFailure) {
         try {
-            this.verifyLoggedInToken();
+            Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
             onFailure.onFailure(-1, new InvalidAccessTokenException("Favoriting a subreddit requires a valid access token for a logged in user", e));
             return;
@@ -929,7 +956,7 @@ public class RedditApi {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), newThrowable(response.code()));
+                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
                 }
             }
 
@@ -940,12 +967,6 @@ public class RedditApi {
         });
     }
 
-
-    public void getUserComments() {
-
-    }
-
-
     /**
      * Retrieve a {@link UserRequests} object for logged in users only. For non-logged in users
      * use {@link RedditApi#user(String)}.
@@ -953,162 +974,22 @@ public class RedditApi {
      * @return An object that can perform various user related API requests
      */
     public UserRequests user() {
-        return new UserRequests();
+        return new UserRequests(userApi, accessToken);
     }
 
     /**
      * Retrieve a {@link UserRequests} object that can get handle requests for non-logged in users.
-     * For logged in users use {@link RedditApi#user()}.
+     * For logged in users use {@link RedditApi#user()}
      *
-     * <p>Passing {@code null} to this has the same effect as for logged in users</p>
+     * @param username the username to to make calls towards. Passing {@code null} to this has
+     *                 the same effect as using {@link RedditApi#user()}.
      *
      * @return An object that can perform various user related API requests for non-logged in users
      */
     public UserRequests user(String username) {
-        return new UserRequests(username);
+        return new UserRequests(userApi, accessToken, username);
     }
 
-    public class UserRequests {
-        private String username;
-
-        private UserRequests() {
-
-        }
-
-        private UserRequests(String username) {
-            this.username = username;
-        }
-
-        /**
-         * Information about the user logged in
-         *
-         * <p>Requires OAuth scope "identity"</p>
-         * <p>Requires a valid access token for the request to be made</p>
-         *
-         * @param onResponse The callback for successful requests. Holds the {@link User} object representing the logged in user
-         * @param onFailure The callback for failed requests
-         */
-        public void getInfo(OnResponse<User> onResponse, OnFailure onFailure) {
-            try {
-                verifyLoggedInToken();
-            } catch (InvalidAccessTokenException e) {
-                onFailure.onFailure(-1, new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
-                return;
-            }
-
-            if (username == null) {
-                Log.d(TAG, "getInfo: No username given, getting posts for logged in userimport android.widget.FrameLayout;\n");
-                api.getUserInfo(accessToken.generateHeaderString()).enqueue(new Callback<User>() {
-                    @Override
-                    public void onResponse(Call<User> call, Response<User> response) {
-                        User body = null;
-                        if (response.isSuccessful()) {
-                            body = response.body();
-                        }
-
-                        if (body != null) {
-                            onResponse.onResponse(body);
-                        } else {
-                            onFailure.onFailure(response.code(), newThrowable(response.code()));
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<User> call, Throwable t) {
-                        onFailure.onFailure(-1, t);
-                    }
-                });
-            } else {
-                Log.d(TAG, "getInfo: Getting posts for " + username);
-                api.getUserInfoOtherUsers(username, accessToken.generateHeaderString()).enqueue(new Callback<RedditListing>() {
-                    @Override
-                    public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
-                        RedditListing body = null;
-                        if (response.isSuccessful()) {
-                            body = response.body();
-                        }
-
-                        if (body != null) {
-                            onResponse.onResponse((User) body);
-                        } else {
-                            onFailure.onFailure(response.code(), newThrowable(response.code()));
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<RedditListing> call, Throwable t) {
-                        onFailure.onFailure(-1, t);
-                    }
-                });
-            }
-        }
-
-
-        /**
-         * Retrieve an object to make API calls for posts by the user
-         *
-         * @return
-         */
-        public UserPostsRequets posts() {
-            return new UserPostsRequets();
-        }
-
-        /**
-         * Get posts by a user
-         *
-         * <p>The posts retrieved here are sorted by "new", if you want to retrieve posts with a
-         * different sort use {@link UserRequests#posts()}</p>
-         *
-         * @param onResponse
-         * @param onFailure
-         */
-        public void posts(OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-            api.getListingsFromUser(username, "submitted", accessToken.generateHeaderString()).enqueue(new Callback<ListingResponse>() {
-                @Override
-                public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
-                    ListingResponse body = null;
-                    if (response.isSuccessful()) {
-                        body = response.body();
-                    }
-
-                    if (body != null) {
-                        List<RedditPost> posts = (List<RedditPost>) body.getListings();
-                        onResponse.onResponse(posts);
-                    } else {
-                        onFailure.onFailure(response.code(), newThrowable(response.code()));
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ListingResponse> call, Throwable t) {
-                    onFailure.onFailure(-1, t);
-
-                }
-            });
-        }
-
-        /**
-         * Class to retrieve posts from a user. The functions declared here define how to sort the posts
-         * (new, hot etc.)
-         */
-        public class UserPostsRequets {
-            /**
-             * Get the current "hot" posts for the user
-             */
-            public void hot() {
-
-            }
-
-            /**
-             * Get the "top" posts for the user
-             *
-             * @param sort How to sort the posts
-             */
-            public void top(PostTimeSort sort) {
-
-            }
-        }
-    }
 
     /* ----------------- Misc ----------------- */
     /**
@@ -1132,40 +1013,6 @@ public class RedditApi {
 
         return newToken;
     }
-
-    /**
-     * Create a new throwable with a generic request error message
-     *
-     * @param code The code of the request
-     * @return A throwable with a generic error message and the code
-     */
-    private Throwable newThrowable(int code) {
-        return new Throwable("Error executing request: " + code);
-    }
-
-    /**
-     * Handles listing errors (from {@link ListingResponse#hasErrors()}). Based on the error type
-     * an attempt to handle the error is done, otherwise a generic error message is sent.
-     *
-     * @param errors The errors for the response (as retrieved with {@link ListingResponse#getErrors()})
-     * @param onFailure The failure handler for the request
-     */
-    private void handleListingErrors(List<List<String>> errors, OnFailure onFailure) {
-        // There can be more errors, not sure the best way to handle it other than returning the info for the first
-        String errorType = errors.get(0).get(0);
-        String errorMessage = errors.get(0).get(1);
-
-        if (ResponseErrors.THREAD_LOCKED.getValue().equals(errorType)) {
-            // TODO should find out if this is a comment or thread and return different exception/message
-            // There isn't really a response code for this, as the HTTP code is still 200
-            onFailure.onFailure(-1, new ThreadLockedException("The thread has been locked"));
-        } else if (ResponseErrors.RATE_LIMIT.getValue().equals(errorType)) {
-            onFailure.onFailure(-1, new RateLimitException("The action has been done too many times too fast"));
-        } else {
-            onFailure.onFailure(-1, new Exception(String.format("Unknown error posting comment: %s; %s", errorType, errorMessage)));
-        }
-    }
-
     /* ----------------- End misc ----------------- */
 
 
@@ -1227,22 +1074,6 @@ public class RedditApi {
             }
 
             return newToken;
-        }
-    }
-
-
-    /**
-     * Interceptor that adds the User-Agent header to the request
-     */
-    private class UserAgentInterceptor implements Interceptor {
-        @Override
-        public okhttp3.Response intercept(Chain chain) throws IOException {
-            Request original = chain.request();
-            Request request = original.newBuilder()
-                    .header("User-Agent", userAgent)
-                    .build();
-
-            return chain.proceed(request);
         }
     }
 

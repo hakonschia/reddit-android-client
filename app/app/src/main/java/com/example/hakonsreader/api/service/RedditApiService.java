@@ -2,7 +2,6 @@ package com.example.hakonsreader.api.service;
 
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.Subreddit;
-import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 
@@ -21,31 +20,6 @@ import retrofit2.http.Query;
  * Service towards the Reddit API
  */
 public interface RedditApiService {
-
-    /**
-     * Retrieves information about the logged in user. For information about any user see
-     * {@link RedditApiService#getUserInfoOtherUsers(String, String)}
-     *
-     * @param accessToken The type of token + the actual token. Form: "type token"
-     * @return A Call with {@link User}
-     */
-    @GET("api/v1/me?raw_json=1")
-    Call<User> getUserInfo(@Header("Authorization") String accessToken);
-
-    /**
-     * Retrieves information about a user. This can retrieve information about users that aren't
-     * the logged in user
-     *
-     * @param accessToken The type of token + the actual token. Form: "type token"
-     * @return A Call with {@link User}
-     */
-    @GET("u/{username}/about?raw_json=1")
-    Call<RedditListing> getUserInfoOtherUsers(
-            @Path("username") String username,
-
-            @Header("Authorization") String accessToken
-    );
-
 
     /**
      * Retrieves posts from Reddit
@@ -236,30 +210,4 @@ public interface RedditApiService {
             @Header("Authorization") String accessToken
     );
 
-
-    /**
-     *
-     * <p>Requires "history" OAuth scope</p>
-     *
-     * @param username The username of the user to get listings for
-     * @param what What kind of listings to get. Values possible:
-     *             <ol>
-     *                  <li>overview - A mix of comments and posts</li>
-     *                  <li>submitted - Posts by the user</li>
-     *                  <li>comments - Comments by the user</li>
-     *                  <li>upvoted - Posts/comments upvoted by the user. This is only accessible for the user itself</li>
-     *                  <li>downvoted - Posts/comments downvoted by the user. This is only accessible for the user itself</li>
-     *                  <li>hidden - Posts/comments hidden by the user. This is only accessible for the user itself</li>
-     *                  <li>saved - Posts/comments saved by the user. This is only accessible for the user itself</li>
-     *             </ol>
-     * @param accessToken The type of token + the actual token. Form: "type token"
-     * @return A ListingResponse call. The listings returned depend on the value of "what" (comments, post, etc.)
-     */
-    @GET("user/{username}/{what}?raw_json=1")
-    Call<ListingResponse> getListingsFromUser(
-            @Path("username") String username,
-            @Path("what") String what,
-
-            @Header("Authorization") String accessToken
-    );
 }

@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.hakonsreader.App;
+import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -30,6 +31,7 @@ public class PostsViewModel extends ViewModel {
     //  stored that wont ever be used
 
     private AppDatabase database;
+    private final RedditApi api = App.get().getApi();
 
     private List<String> postIds = new ArrayList<>();
     private List<RedditPost> postsData = new ArrayList<>();
@@ -134,6 +136,13 @@ public class PostsViewModel extends ViewModel {
         loadingChange.setValue(true);
 
         if (isUser) {
+            api.user(subreddit).posts().top(PostTimeSort.ALL_TIME, this::onPostsRetrieved, (code, t) -> {
+                t.printStackTrace();
+                loadingChange.setValue(false);
+                Util.handleGenericResponseErrors(parentLayout, code, t);
+            });
+
+            /*
             App.get().getApi().user(subreddit).posts(newPosts -> {
                 onPostsRetrieved(newPosts);
             }, (code, t) -> {
@@ -141,6 +150,7 @@ public class PostsViewModel extends ViewModel {
                 loadingChange.setValue(false);
                 Util.handleGenericResponseErrors(parentLayout, code, t);
             });
+            */
         } else {
             App.get().getApi().getPosts(subreddit, after, count, newPosts -> {
                 onPostsRetrieved(newPosts);

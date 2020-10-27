@@ -1,8 +1,6 @@
 package com.example.hakonsreader.fragments;
 
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,7 +137,6 @@ public class ProfileFragment extends Fragment {
     private void updateViews() {
         binding.setUser(user);
         binding.setLoggedInUser(username == null);
-
     }
 
     /**
@@ -147,7 +144,7 @@ public class ProfileFragment extends Fragment {
      */
     public void getUserInfo() {
         // user(null) gets information about the logged in user, so we can use username directly
-        redditApi.user(username).getInfo(user -> {
+        redditApi.user(username).info(user -> {
             // Load the posts for the user
             postsViewModel.loadPosts(binding.parentLayout, user.getName(), true);
             this.user = user;
