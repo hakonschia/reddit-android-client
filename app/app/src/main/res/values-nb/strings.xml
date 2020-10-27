@@ -74,4 +74,6 @@
         <item quantity="one">%d abonnent</item>
         <item quantity="other">%,d abonnenter</item>
     </plurals>
+    <string name="postRemovedByMods">Posten har blitt fjernet av moderatorene av r/%s</string>
+    <string name="postRemovedGeneric">Posten har blitt fjernet</string>
 </resources>

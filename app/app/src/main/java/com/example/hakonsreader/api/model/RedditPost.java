@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api.model;
 
-import android.util.Log;
-
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.TypeConverters;
@@ -73,6 +71,9 @@ public class RedditPost extends RedditListing {
 
     @SerializedName("domain")
     private String domain;
+
+    @SerializedName("removed_by_category")
+    private String removedByCategory;
 
 
     @SerializedName("author_flair_background_color")
@@ -235,6 +236,14 @@ public class RedditPost extends RedditListing {
      */
     public String getDomain() {
         return domain;
+    }
+
+    /**
+     * @return Retrieves the category that removed the post (eg. "moderator"). If this is not null
+     * the post has been removed
+     */
+    public String getRemovedByCategory() {
+        return removedByCategory;
     }
 
     /**
@@ -526,6 +535,10 @@ public class RedditPost extends RedditListing {
 
     public void setMediaMetadata(LinkedTreeMap<String, Object> mediaMetadata) {
         this.mediaMetadata = mediaMetadata;
+    }
+
+    public void setRemovedByCategory(String removedByCategory) {
+        this.removedByCategory = removedByCategory;
     }
 
     /**

@@ -119,7 +119,6 @@ public class DispatcherActivity extends AppCompatActivity {
 
             intent = new Intent(this, PostActivity.class);
             intent.putExtra(PostActivity.POST_ID_KEY, postId);
-            Log.d(TAG, "createIntent: is post");
 
             // TODO when the post is in a "user" subreddit it doesnt work
             //  eg: https://www.reddit.com/user/HyperBirchyBoy/comments/jbkw1f/moon_landing_with_benny_hill_and_sped_up/?utm_source=share&utm_medium=ios_app&utm_name=iossmf

@@ -121,4 +121,7 @@
     <string name="content_description_link_image">Link to website</string>
     <string name="content_description_reply_to_post">Reply to post</string>
     <string name="content_description_reply_to_comment">Reply to comment</string>
+
+    <string name="postRemovedGeneric">The post has been removed</string>
+    <string name="postRemovedByMods">The post has been removed by the moderators of r/%s</string>
 </resources>

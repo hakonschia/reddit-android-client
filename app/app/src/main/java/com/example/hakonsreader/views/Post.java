@@ -215,6 +215,15 @@ public class Post extends RelativeLayout {
      * @return A view with the content of the post
      */
     private View generatePostContent(RedditPost post, Context context) {
+        // If the post has been removed don't try to render the content as it can cause a crash later
+        // Just show that the post has been removed
+        if (post.getRemovedByCategory() != null) {
+            Log.d(TAG, "generatePostContent: post has been removed!");
+            ContentPostRemoved c = new ContentPostRemoved(context);
+            c.setPost(post);
+            return c;
+        }
+
         View content;
 
         switch (post.getPostType()) {
