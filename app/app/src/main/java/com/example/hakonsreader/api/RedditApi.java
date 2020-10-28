@@ -49,17 +49,18 @@ import retrofit2.internal.EverythingIsNonNull;
  * and can therefore be omitted. </p>
  *
  * <p>Example usage of the builder:
- * <pre>
- *     // User-Agent and client ID must always be set and cannot be empty
- *     String userAgent = "User-Agent for your application";
- *     String clientId = "client ID for your application";
+ * <pre>{@code
+ * // User-Agent and client ID must always be set and cannot be empty
+ * String userAgent = "User-Agent for your application";
+ * String clientId = "client ID for your application";
  *
- *     RedditApi api = new RedditApi.Builder(userAgent, clientId)
- *             // Set the initial access token to use (when the application has previously saved one)
- *             .accessToken({@link AccessToken})
- *             // Register the callback for when new access tokens have been retrieved
- *             .onNewToken({@link OnNewToken})
- *             .build();
+ * RedditApi api = new RedditApi.Builder(userAgent, clientId)
+ *         // Set the initial access token to use (when the application has previously saved one)
+ *         .accessToken(savedAccessToken)
+ *         // Register the callback for when new access tokens have been retrieved
+ *         .onNewToken(saveTokenCallback)
+ *         .build();
+ * }
  * </pre>
  * </p>
  * <br>
