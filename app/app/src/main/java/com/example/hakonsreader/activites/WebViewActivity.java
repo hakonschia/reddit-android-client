@@ -47,6 +47,8 @@ public class WebViewActivity extends AppCompatActivity {
             }
         });
         webView.getSettings().setJavaScriptEnabled(true);
+        // Some websites wont load without this enabled (such as imgur albums)
+        webView.getSettings().setDomStorageEnabled(true);
         webView.loadUrl(url);
         urlToolbar.setText(url);
 
