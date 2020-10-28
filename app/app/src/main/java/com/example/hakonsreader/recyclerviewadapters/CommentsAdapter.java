@@ -233,7 +233,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         notifyItemChanged(startPos);
 
         // Remove all its replies
-        List<RedditComment> replies = start.getReplies();
+        List<RedditComment> replies = getShownReplies(start);
         comments.removeAll(replies);
 
         // The comment explicitly hidden isn't being removed, but its UI is updated
