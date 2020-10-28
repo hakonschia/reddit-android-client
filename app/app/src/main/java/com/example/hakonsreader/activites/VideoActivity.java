@@ -17,6 +17,8 @@ import com.example.hakonsreader.views.ContentVideo;
 import com.example.hakonsreader.views.Post;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
+import com.r0adkll.slidr.model.SlidrConfig;
+import com.r0adkll.slidr.model.SlidrPosition;
 
 /**
  * Activity to display a zoomable image taking the entire screen
@@ -71,7 +73,7 @@ public class VideoActivity extends AppCompatActivity {
             finish();
         }
 
-        Slidr.attach(this);
+        Slidr.attach(this, App.get().getVideoAndImageSlidrConfig());
     }
 
     @Override

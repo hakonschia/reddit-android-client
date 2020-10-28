@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.DisplayMetrics;
@@ -29,8 +27,9 @@ import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
 import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
+import com.r0adkll.slidr.model.SlidrConfig;
+import com.r0adkll.slidr.model.SlidrPosition;
 
-import java.util.Locale;
 import java.util.UUID;
 
 import io.noties.markwon.Markwon;
@@ -342,5 +341,16 @@ public class App extends Application {
                 getApplicationContext().getString(R.string.prefs_key_loop_videos),
                 getResources().getBoolean(R.bool.prefs_default_loop_videos)
         );
+    }
+
+    /**
+     * Retrieves the {@link SlidrConfig} to use for to slide away videos and images based
+     * on the users setting
+     *
+     * @return The SlidrConfig that should be used for videos and images
+     */
+    public SlidrConfig getVideoAndImageSlidrConfig() {
+        // TODO create setting for this
+        return new SlidrConfig.Builder().position(SlidrPosition.BOTTOM).build();
     }
 }

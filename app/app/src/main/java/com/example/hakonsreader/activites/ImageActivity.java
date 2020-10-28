@@ -9,12 +9,15 @@ import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.utils.LinkUtils;
 import com.example.hakonsreader.misc.PhotoViewDoubleTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.github.chrisbanes.photoview.PhotoViewAttacher;
 import com.r0adkll.slidr.Slidr;
+import com.r0adkll.slidr.model.SlidrConfig;
+import com.r0adkll.slidr.model.SlidrPosition;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -63,7 +66,7 @@ public class ImageActivity extends AppCompatActivity {
             finish();
         }
 
-        Slidr.attach(this);
+        Slidr.attach(this, App.get().getVideoAndImageSlidrConfig());
     }
 
     @Override
