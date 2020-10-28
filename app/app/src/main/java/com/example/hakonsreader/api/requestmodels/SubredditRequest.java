@@ -42,12 +42,11 @@ public class SubredditRequest {
      *
      * <p>OAuth scope required: {@code read}</p>
      *
-     * @param subredditName The subreddit to retrieve information about
      * @param onResponse The response handler for successful requests. Holds the {@link Subreddit} retrieved
      * @param onFailure The response handler for failed requests. If the function is called with a "standard"
      *                  subreddit (front page, popular, all) this will be called
      */
-    public void info(String subredditName, OnResponse<Subreddit> onResponse, OnFailure onFailure) {
+    public void info(OnResponse<Subreddit> onResponse, OnFailure onFailure) {
         if (RedditApi.STANDARD_SUBS.contains(subredditName)) {
             onFailure.onFailure(-1, new NoSubredditInfoException("The subreddits: " + RedditApi.STANDARD_SUBS.toString() + " do not have any info to retrieve"));
             return;

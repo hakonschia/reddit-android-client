@@ -293,12 +293,11 @@ public class SubredditFragment extends Fragment {
      * @param subredditName The name of the subreddit to get information for
      */
     private void retrieveSubredditInfo(String subredditName) {
-        api.subreddit(subredditName).info(subredditName, sub -> {
+        api.subreddit(subredditName).info(sub -> {
             new Thread(() -> {
                 // Lets assume the user doesn't want to store NSFW. We could use the setting for caching
                 // images/videos but it's somewhat going beyond the intent of the setting
                 if (!sub.isNsfw()) {
-                    Log.d(TAG, "onCreate: inserting sub");
                     database.subreddits().insert(sub);
                 }
             }).start();

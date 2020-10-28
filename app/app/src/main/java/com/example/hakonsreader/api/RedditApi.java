@@ -40,7 +40,68 @@ import retrofit2.internal.EverythingIsNonNull;
 
 
 /**
- * Wrapper for the Reddit API for installed applications
+ * Android wrapper for the Reddit API for installed applications.
+ * For an example application see <a href="https://github.com/hakonschia/reddit-android-client">reddit-android-client</a>
+ * <br>
+ *
+ *
+ * <p>The API objects are built with a builder. Some parameters used in the API might not be applicable
+ * and can therefore be omitted. </p>
+ *
+ * <p>Example usage of the builder:
+ * <pre>
+ *     // User-Agent and client ID must always be set and cannot be empty
+ *     String userAgent = "User-Agent for your application";
+ *     String clientId = "client ID for your application";
+ *
+ *     RedditApi api = new RedditApi.Builder(userAgent, clientId)
+ *             // Set the initial access token to use (when the application has previously saved one)
+ *             .accessToken({@link AccessToken})
+ *             // Register the callback for when new access tokens have been retrieved
+ *             .onNewToken({@link OnNewToken})
+ *             .build();
+ * </pre>
+ * </p>
+ * <br>
+ *
+ *
+ * <p>The class exposes request objects through functions that return these models (such as
+ * {@link RedditApi#subreddit(String)} returning a {@link SubredditRequest} object). These request objects expose API
+ * endpoints that are grouped together based on their functionality.</p>
+ *
+ * <p>The endpoints exposed handle responses back with the use of callback methods. There will be generally be
+ * two callbacks for each endpoint; one for successful responses ({@link OnResponse}) and one for failed responses
+ * ({@link OnFailure}). If the API endpoint returns multiple values that are of different types (such as
+ * {@link PostRequest#comments(OnResponse, OnResponse, OnFailure)}) there will be multiple {@link OnResponse} callbacks.
+ * The {@link OnFailure} includes an error code and a {@link Throwable} with error information. The error code
+ * will be the HTTP error code, or if another type of error occurred this will be -1 and the throwable
+ * will hold the information needed to debug the issue.</p>
+ *
+ * <p>Usage example:
+ *
+ * <pre>{@code
+ * // Build object with RedditApi.Builder
+ * RedditApi api = ...
+ *
+ * // Retrieve information about the "GlobalOffensive" subreddit
+ * api.subreddit("GlobalOffensive").info(subreddit -> {
+ *     String subredditName = subreddit.getName();
+ *     int subscribers = subreddit.getSubscribers();
+ * }, (errorCode, throwable) -> {
+ *     throwable.printStackTrace();
+ * });
+ *
+ * api.subreddit("Norge").subscribe(true, response -> {
+ *     // Some endpoints won't have a return value (they take a callback of OnResponse<Void>)
+ *     // For these endpoints this callbacks are still called to indicate that the response was
+ *     // successful, but will not have any data so "response" is never used
+ * }, (code, throwable) -> {
+ *     // This is still called as normal
+ *     throwable.printStackTrace();
+ * });
+ * }
+ * </pre>
+ * </p>
  */
 public class RedditApi {
     private static final String TAG = "RedditApi";
