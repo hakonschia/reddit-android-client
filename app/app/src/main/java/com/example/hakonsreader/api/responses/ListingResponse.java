@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Response for any request that returns a list of listings
  */
-public class ListingResponse extends RedditListing {
+public class ListingResponse  {
 
     @SerializedName("errors")
     private List<List<String>> errors;
