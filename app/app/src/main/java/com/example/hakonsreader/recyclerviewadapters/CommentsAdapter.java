@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,8 @@ import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ListItemCommentBinding;
+import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding;
+import com.example.hakonsreader.databinding.ListItemMoreCommentBinding;
 import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
@@ -35,10 +38,28 @@ import java.util.List;
 import static android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION;
 
 
-public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
+public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
+    /**
+     * The value returned from {@link CommentsAdapter#getItemViewType(int)} when the comment is
+     * a "more comments" comment
+     */
+    private static final int MORE_COMMETS_TYPE = 0;
 
-    private RedditApi redditApi = App.get().getApi();
+    /**
+     * The value returned from {@link CommentsAdapter#getItemViewType(int)} when the comment is
+     * a normal comment
+     */
+    private static final int NORMAL_COMMENT_TYPE = 1;
+
+    /**
+     * The value returned from {@link CommentsAdapter#getItemViewType(int)} when the comment is
+     * a hidden comment
+     */
+    private static final int HIDDEN_COMMENT_TYPE = 2;
+
+
+    private final RedditApi redditApi = App.get().getApi();
 
 
     /**
@@ -96,8 +117,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * @param newComment The comment to add
      */
     public void addComment(RedditComment newComment) {
-        this.comments.add(newComment);
-        notifyItemInserted(this.comments.size() - 1);
+        comments.add(newComment);
+        notifyItemInserted(comments.size() - 1);
     }
 
     /**
@@ -107,19 +128,19 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * @param parent The parent comment being replied to
      */
     public void addComment(RedditComment newComment, RedditComment parent) {
-        int pos = this.comments.indexOf(parent);
+        int pos = comments.indexOf(parent);
 
-        this.comments.add(pos + 1, newComment);
+        comments.add(pos + 1, newComment);
         notifyItemInserted(pos + 1);
     }
 
     /**
      * Appends comments to the current list of comments
      *
-     * @param comments The comments to add
+     * @param newComments The comments to add
      */
-    public void addComments(List<RedditComment> comments) {
-        this.comments.addAll(comments);
+    public void addComments(List<RedditComment> newComments) {
+        comments.addAll(newComments);
         notifyDataSetChanged();
     }
 
@@ -130,7 +151,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
      * @param at The position to insert the comments
      */
     public void insertComments(List<RedditComment> newComments, int at) {
-        this.comments.addAll(at, newComments);
+        comments.addAll(at, newComments);
         notifyItemRangeInserted(at, newComments.size());
     }
 
@@ -267,21 +288,62 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        ListItemCommentBinding binding = ListItemCommentBinding.inflate(layoutInflater, parent, false);
 
-        // The post will always be the same so set it now
-        binding.setPost(post);
-        binding.setAdapter(this);
+        // Create view holder based on which type of item we have
+        switch (viewType) {
+            case MORE_COMMETS_TYPE:
+                ListItemMoreCommentBinding b = ListItemMoreCommentBinding.inflate(layoutInflater, parent, false);
+                b.setAdapter(this);
+                return new MoreCommentsViewHolder(b);
 
-        return new ViewHolder(binding);
+            case HIDDEN_COMMENT_TYPE:
+                ListItemHiddenCommentBinding b1 = ListItemHiddenCommentBinding.inflate(layoutInflater, parent, false);
+                b1.setAdapter(this);
+                return new HiddenCommentViewHolder(b1);
+
+            default:
+            case NORMAL_COMMENT_TYPE:
+                ListItemCommentBinding b2 = ListItemCommentBinding.inflate(layoutInflater, parent, false);
+                b2.setPost(post);
+                b2.setAdapter(this);
+                return new NormalCommentViewHolder(b2);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         RedditComment comment = comments.get(position);
-        holder.bind(comment);
+
+        switch (holder.getItemViewType()) {
+            case MORE_COMMETS_TYPE:
+                ((MoreCommentsViewHolder)holder).bind(comment);
+                break;
+
+            case HIDDEN_COMMENT_TYPE:
+                ((HiddenCommentViewHolder)holder).bind(comment);
+                break;
+
+            default:
+            case NORMAL_COMMENT_TYPE:
+                ((NormalCommentViewHolder)holder).bind(comment);
+                break;
+        }
+
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        RedditComment comment = comments.get(position);
+
+        if (Thing.MORE.getValue().equals(comment.getKind())) {
+            return MORE_COMMETS_TYPE;
+        } else if (commentsHidden.contains(comment)) {
+            return HIDDEN_COMMENT_TYPE;
+        } else {
+            return NORMAL_COMMENT_TYPE;
+        }
     }
 
     @Override
@@ -531,10 +593,38 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class MoreCommentsViewHolder extends RecyclerView.ViewHolder {
+        private final ListItemMoreCommentBinding binding;
+
+        public MoreCommentsViewHolder(ListItemMoreCommentBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(RedditComment comment) {
+            binding.setComment(comment);
+            binding.executePendingBindings();
+        }
+    }
+
+    public static class HiddenCommentViewHolder extends RecyclerView.ViewHolder {
+        private final ListItemHiddenCommentBinding binding;
+
+        public HiddenCommentViewHolder(ListItemHiddenCommentBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(RedditComment comment) {
+            binding.setComment(comment);
+            binding.executePendingBindings();
+        }
+    }
+
+    public static class NormalCommentViewHolder extends RecyclerView.ViewHolder {
         private final ListItemCommentBinding binding;
 
-        public ViewHolder(ListItemCommentBinding binding) {
+        public NormalCommentViewHolder(ListItemCommentBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
@@ -546,8 +636,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
          */
         public void bind(RedditComment comment) {
             binding.setComment(comment);
-            binding.setIsMoreComments(Thing.MORE.getValue().equals(comment.getKind()));
-            binding.setCommentHidden(commentsHidden.contains(comment));
 
             // Execute all the bindings now, or else scrolling/changing to the dataset will have a
             // small, but noticeable delay, causing the old comment to still appear

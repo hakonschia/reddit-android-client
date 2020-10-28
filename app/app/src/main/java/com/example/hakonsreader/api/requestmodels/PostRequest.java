@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.requestmodels;
 
+import android.util.Log;
+
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;

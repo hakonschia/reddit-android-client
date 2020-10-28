@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="comment"
+            type="com.example.hakonsreader.api.model.RedditComment" />
+        <variable
+            name="adapter"
+            type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{view -> adapter.showComments(comment)}"
+        android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}"
+        android:layout_marginBottom="5dp">
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/sideBarsBarrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            app:barrierDirection="right"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            app:sideBars="@{comment.depth}" />
+
+        <TextView
+            android:id="@+id/commentAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text='@{comment != null ? @string/author_prefixed(comment.author) : "" }'
+            android:textColor="@color/link_color"
+            android:textStyle="italic"
+
+            app:layout_constraintStart_toEndOf="@id/sideBarsBarrier"
+            app:layout_constraintTop_toTopOf="parent"
+
+            tools:text="u/hakonschia" />
+
+        <TextView
+            android:id="@+id/commentAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+
+            android:textColor="@color/secondary_text_color"
+            android:textStyle="italic"
+            app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/commentAuthor"
+            app:layout_constraintTop_toTopOf="parent"
+
+            tools:text="2h" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

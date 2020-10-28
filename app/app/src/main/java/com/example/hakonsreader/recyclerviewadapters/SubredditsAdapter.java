@@ -147,6 +147,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
             name = itemView.findViewById(R.id.name);
             favorite = itemView.findViewById(R.id.favoriteSub);
 
+            // TODO switching orientation somehow disables the listener? subredditSelected is probably null?
             // Call the registered onClick listener when an item is clicked
             itemView.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
