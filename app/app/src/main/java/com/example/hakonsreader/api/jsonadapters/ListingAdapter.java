@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api.jsonadapters;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
@@ -28,7 +26,13 @@ public class ListingAdapter implements JsonDeserializer<RedditListing> {
         String kind = json.getAsJsonObject().get("kind").getAsString();
         JsonObject data = json.getAsJsonObject().getAsJsonObject("data");
 
-        // Set the kind in the innner object instead so it isn't lost
+        // For some reason, when going into ReplyActivity this (only sometimes) causes a NPE because
+        // data is null
+        if (data == null) {
+            data = new JsonObject();
+        }
+
+        // Set the kind in the inner object instead so it isn't lost
         data.addProperty("kind", kind);
 
         RedditListing listing;
@@ -39,7 +43,6 @@ public class ListingAdapter implements JsonDeserializer<RedditListing> {
             // So far at least "more" kinds are only comments
             listing = context.deserialize(data, RedditComment.class);
         } else if (Thing.ACCOUNT.getValue().equals(kind)) {
-            Log.d(TAG, "deserialize: Deserializing a user");
             listing = context.deserialize(data, User.class);
         } else {
             listing = context.deserialize(data, Subreddit.class);

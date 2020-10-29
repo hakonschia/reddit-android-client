@@ -36,4 +36,7 @@
 
     <!-- The corner radius for tags (such as flairs, NSFW etc.) -->
     <dimen name="tagCornerRadius">8dp</dimen>
+
+    <dimen name="markdownBtnWidth">70dp</dimen>
+    <dimen name="markdownBtnHeight">45dp</dimen>
 </resources>

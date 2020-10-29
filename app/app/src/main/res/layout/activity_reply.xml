@@ -1,38 +1,193 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
 
-    android:id="@+id/parentLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background">
+        <variable
+            name="listing"
+            type="com.example.hakonsreader.api.model.RedditListing" />
+    </data>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:textSize="20sp"
-        android:textColor="@color/text_color"
-
-        tools:text="Replying to hakonschia" />
-
-    <EditText
-        android:id="@+id/replyText"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/parentLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        android:orientation="vertical">
 
-        android:textColor="@color/text_color"
-        android:inputType="text"/>
+        <TextView
+            android:id="@+id/replyingTo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-    <Button
-        android:id="@+id/btnAddComment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:text="@{@string/replyingTo(listing.author)}"
 
-        android:onClick="sendReply"
-        android:textColor="@color/text_color"
-        android:text="@string/btnAddComment"/>
+            android:textColor="@color/text_color"
+            android:textSize="20sp"
 
-</LinearLayout>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Replying to hakonschia" />
+
+        <TextView
+            android:id="@+id/summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="3"
+
+            android:textColor="@color/secondary_text_color"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+
+            app:layout_constraintStart_toStartOf="@+id/replyingTo"
+            app:layout_constraintTop_toBottomOf="@+id/replyingTo"
+            tools:text="The reason the galactic empire fell was because they didn't have horses there" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/previewHeader"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/summary"
+            app:layout_constraintTop_toBottomOf="@+id/summary"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintVertical_chainStyle="packed">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/replyText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:hint="@string/replyHint"
+                android:inputType="none"
+
+                android:textColor="@color/text_color"
+                android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/previewHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+
+            android:layout_marginTop="8dp"
+            android:text="@string/replyPreview"
+            android:textColor="@color/secondary_text_color"
+
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+
+        <TextView
+            android:id="@+id/preview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+
+            android:textColor="@color/text_color"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/markdownBold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/previewHeader"
+            app:layout_constraintVertical_bias="0.0"
+            tools:text="Preview text goes here" />
+
+        <!--
+        <Button
+            android:id="@+id/btnAddComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginEnd="44dp"
+            android:layout_marginBottom="264dp"
+            android:onClick="sendReply"
+            android:text="@string/btnAddComment"
+            android:textColor="@color/text_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+            -->
+
+        <Button
+            android:id="@+id/markdownBold"
+            android:layout_width="@dimen/markdownBtnWidth"
+            android:layout_height="@dimen/markdownBtnHeight"
+
+            android:onClick="boldOnClick"
+            android:text="@string/markdownBtnBold"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/markdownItalic"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/markdownItalic"
+            android:layout_width="@dimen/markdownBtnWidth"
+            android:layout_height="@dimen/markdownBtnHeight"
+
+            android:onClick="italicOnClick"
+            android:text="@string/markdownBtnItalic"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/markdownStrikethrough"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/markdownBold" />
+
+        <Button
+            android:id="@+id/markdownStrikethrough"
+            android:layout_width="@dimen/markdownBtnWidth"
+            android:layout_height="@dimen/markdownBtnHeight"
+
+            android:onClick="strikethroughOnClick"
+            android:text="@string/markdownBtnStrikethrough"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/markdownLink"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/markdownItalic" />
+
+        <ImageButton
+            android:id="@+id/markdownLink"
+            android:layout_width="@dimen/markdownBtnWidth"
+            android:layout_height="@dimen/markdownBtnHeight"
+
+            android:onClick="linkOnClick"
+            android:src="@drawable/ic_baseline_link_24"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/markdownQuote"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/markdownStrikethrough" />
+
+        <Button
+            android:id="@+id/markdownQuote"
+            android:layout_width="@dimen/markdownBtnWidth"
+            android:layout_height="@dimen/markdownBtnHeight"
+
+            android:onClick="quoteOnClick"
+            android:text="@string/markdownBtnQuote"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/markdownLink" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

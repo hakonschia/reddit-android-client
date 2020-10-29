@@ -137,4 +137,14 @@
 
     <string name="subredditBanned">r/%s has been banned</string>
     <string name="subredditPrivate">r/%s is private. You must be invited to access this subreddit</string>
+
+    <string name="replyingTo">Replying to %s</string>
+    <string name="replyHint">Say something nice</string>
+    <string name="replyPreview">Preview</string>
+
+    <string name="markdownBtnBold" translatable="false"><b>B</b></string>
+    <string name="markdownBtnItalic" translatable="false"><i>I</i></string>
+    <string name="markdownBtnStrikethrough" translatable="false"><strike>S</strike></string>
+    <string name="markdownBtnQuote" translatable="false">></string>
+
 </resources>
