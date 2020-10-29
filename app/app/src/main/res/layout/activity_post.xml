@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
         <import type="android.view.View"/>
@@ -12,7 +13,8 @@
 
         <variable
             name="noComments"
-            type="boolean" />
+            type="boolean"
+            />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -47,7 +49,6 @@
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- Comments -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/comments"
             android:layout_width="match_parent"
@@ -62,20 +63,17 @@
 
             android:visibility="@{noComments ? View.GONE : View.VISIBLE}"
 
+            tools:visibility="gone"
             tools:listitem="@layout/list_item_comment" />
 
-        <TextView
-            android:id="@+id/noCommentsText"
+        <!-- TODO this can cause overlap with the post (if I can get rid of the
+         toolbar layout and swap with a ConstraintLayout this wont be an issue)-->
+        <include layout="@layout/no_comments_yet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
 
-            android:textColor="@color/text_color"
-
-            android:visibility="@{noComments ? View.VISIBLE : View.GONE}"
-
-            tools:text="@string/noComments" />
-
+            bind:isVisible="@{noComments}"/>
 
         <!-- Reply, navigation buttons -->
 

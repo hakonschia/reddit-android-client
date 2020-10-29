@@ -75,6 +75,10 @@ public class PostActivity extends AppCompatActivity {
         binding = ActivityPostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // This is kinda hacky, but it looks weird if the "No comments yet" appears before the comments
+        // have had a chance to load, so always assume there are comments (since there usually are)
+        binding.setNoComments(false);
+
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
         commentsViewModel.onLoadingChange().observe(this, binding.loadingIcon::onCountChange);
         commentsViewModel.getPost().observe(this, newPost -> {

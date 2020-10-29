@@ -37,7 +37,6 @@ public class CommentsViewModel extends ViewModel {
     public LiveData<List<RedditComment>> getComments() {
         if (comments == null) {
             comments = new MutableLiveData<>();
-            comments.setValue(commentsDataSet);
         }
 
         return comments;
