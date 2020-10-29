@@ -31,7 +31,7 @@
             android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/secondary_background">
+            android:background="@color/background">
 
             <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
@@ -80,46 +80,45 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
 
             android:layout_gravity="bottom|end" >
 
-            <!-- Reply button -->
-            <LinearLayout
+            <!-- The foreground clickable looks kinda weird since it ignores the rounded corners -->
+            <ImageButton
+                android:id="@+id/replyPost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded_square_secondary_bg"
                 android:layout_marginEnd="8dp"
-                android:visibility="@{post.locked || post.archived ? View.GONE : View.VISIBLE}">
+                android:padding="10dp"
 
-                <ImageButton
-                    android:id="@+id/replyPost"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_baseline_reply_24"
-                    android:backgroundTint="@color/secondary_background"
-                    android:onClick="replyToPost"
+                android:visibility="@{post.locked || post.archived ? View.GONE : View.VISIBLE}"
 
-                    android:contentDescription="@string/content_description_reply_to_post"/>
-            </LinearLayout>
+                android:src="@drawable/ic_baseline_reply_24"
+                android:background="@drawable/ripple_rounded_square_secondary_bg"
+                android:onClick="replyToPost"
+
+                android:contentDescription="@string/content_description_reply_to_post"/>
 
             <!-- Navigation buttons -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:background="@drawable/rounded_square_secondary_bg">
+                android:background="@drawable/ripple_rounded_square_secondary_bg">
 
                 <ImageButton
                     android:id="@+id/goToPreviousTopLevelComment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="10dp"
 
-                    android:backgroundTint="@color/secondary_background"
-
+                    android:src="@drawable/ic_baseline_arrow_up_24"
+                    android:background="@drawable/ripple_rounded_square_secondary_bg"
                     android:onClick="goToPreviousTopLevelComment"
-                    android:src="@drawable/ic_baseline_arrow_up_24" />
+
+                    android:contentDescription="@string/content_description_previous_top_level_comment"/>
 
                 <View
                     android:layout_width="1dp"
@@ -133,11 +132,13 @@
                     android:id="@+id/goToNextTopLevelComment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="10dp"
 
-                    android:backgroundTint="@color/secondary_background"
-
+                    android:src="@drawable/ic_baseline_arrow_down_24"
+                    android:background="@drawable/ripple_rounded_square_secondary_bg"
                     android:onClick="goToNextTopLevelComment"
-                    android:src="@drawable/ic_baseline_arrow_down_24" />
+
+                    android:contentDescription="@string/content_description_next_top_level_comment"/>
             </LinearLayout>
         </LinearLayout>
 

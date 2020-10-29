@@ -126,6 +126,8 @@
     <string name="content_description_pause_video" translatable="false">Pause video</string>
     <string name="content_description_fullscreen_video" translatable="false">Fullscreen video</string>
     <string name="content_description_mute_video" translatable="false">Mute video</string>
+    <string name="content_description_next_top_level_comment" translatable="false">Go to the next top level comment</string>
+    <string name="content_description_previous_top_level_comment" translatable="false">Go to the previous top level comment</string>
 
     <string name="postRemovedGeneric">The post has been removed</string>
     <string name="postRemovedByMods">The post has been removed by the moderators of r/%s</string>

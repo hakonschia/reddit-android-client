@@ -48,4 +48,5 @@
 
     <color name="commentSideBar">#424242</color>
 
+    <color name="ripplePressedColor">#AEAEAE</color>
 </resources>
