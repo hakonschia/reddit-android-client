@@ -81,6 +81,11 @@
     <string name="noCommentsHeader">Ingen kommentar på denne posten enda</string>
     <string name="noCommentsContent">Vær den som starter samtalen!</string>
     <string name="replyingTo">Svarer %s</string>
-    <string name="replyHint">Si noe fint</string>
+    <string name="replyHint">Si noe hyggelig</string>
     <string name="replyPreview">Forhåndsvisning</string>
+    <string name="replyAddLinkDialogHeader">Legg til lenke</string>
+    <string name="replyAddLinkDialogLinkTextHint">Tekst</string>
+    <string name="replyAddLinkDialogLinkUrlHint">Lenke</string>
+    <string name="add">Legg til</string>
+    <string name="cancel">Avbryt</string>
 </resources>

@@ -142,9 +142,18 @@
     <string name="replyHint">Say something nice</string>
     <string name="replyPreview">Preview</string>
 
+    <string name="replyAddLinkDialogHeader">Add link</string>
+    <string name="replyAddLinkDialogLinkTextHint">Text</string>
+    <string name="replyAddLinkDialogLinkUrlHint">Link</string>
+
     <string name="markdownBtnBold" translatable="false"><b>B</b></string>
     <string name="markdownBtnItalic" translatable="false"><i>I</i></string>
     <string name="markdownBtnStrikethrough" translatable="false"><strike>S</strike></string>
     <string name="markdownBtnQuote" translatable="false">></string>
+    <string name="markdownSuperscript" translatable="false">A<sup>B</sup></string>
+
+
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

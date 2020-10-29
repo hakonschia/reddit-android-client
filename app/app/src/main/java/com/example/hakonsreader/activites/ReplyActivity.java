@@ -1,16 +1,22 @@
 package com.example.hakonsreader.activites;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.App;
@@ -23,6 +29,7 @@ import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityReplyBinding;
+import com.example.hakonsreader.databinding.ReplyAddLinkDialogBinding;
 import com.example.hakonsreader.misc.Util;
 import com.google.gson.Gson;
 
@@ -78,14 +85,17 @@ public class ReplyActivity extends AppCompatActivity {
             binding.setListing(replyingTo);
         }
 
-
         // With adding a MarkwonEditor the text input shows some highlighting for what is markdown
+
+        // Using this markwon instance has the benefit of highlighting reddit links etc. in the preview
+        // Although it doesn't actually add the links around the markdown, reddit doesn't do that
+        // themselves so it's fine
         final Markwon markwon = App.get().getMark();
 
         // create editor
         final MarkwonEditor editor = MarkwonEditor.create(markwon);
 
-        // set edit listener
+        // Set edit listeners. Both the edit text field and and preview are updated
         binding.replyText.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(editor));
         binding.replyText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -100,12 +110,15 @@ public class ReplyActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // Not implemented
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // Not implemented
             }
         });
+
+        // TODO when the preview and edit text only takes up a limited amount of space this should scroll
+        //  and also has the benefit of removing the link clicker which is kinda weird to have
+        //binding.preview.setMovementMethod(ScrollingMovementMethod.getInstance());
     }
 
     @Override
@@ -244,7 +257,64 @@ public class ReplyActivity extends AppCompatActivity {
     public void linkOnClick(View view) {
         // Link in markdown: [Link text](https://link.com)
 
-        // Open a dialog with "Link text" and "Link"
+        // Create the dialog and open it
+        Dialog linkDialog = new Dialog(this);
+        linkDialog.setContentView(R.layout.reply_add_link_dialog);
+        linkDialog.setOnDismissListener(dialog -> {
+            Log.d(TAG, "linkOnClick: dismissed");
+        });
+        linkDialog.show();
+
+        TextView text = linkDialog.findViewById(R.id.textText);
+        TextView link = linkDialog.findViewById(R.id.linkText);
+
+        Button add = linkDialog.findViewById(R.id.btnAddLink);
+        Button cancel = linkDialog.findViewById(R.id.btnCancelLink);
+
+
+        add.setOnClickListener(v -> {
+            String textToAdd = text.getText().toString();
+            String linkToAdd = link.getText().toString();
+
+            int start = binding.replyText.getSelectionStart();
+            int end = binding.replyText.getSelectionEnd();
+
+            Editable editText = binding.replyText.getText();
+
+            // Insert the end first so we don't have to care about the length of the text and offset the end
+            editText.insert(end, String.format("(%s)", linkToAdd));
+            editText.insert(start, String.format("[%s]", textToAdd));
+            
+            linkDialog.dismiss();
+        });
+
+        cancel.setOnClickListener(v -> {
+            // TODO if text or link aren't empty ask "Do you want to dismiss" (which is weird since it
+            //  would have to open another dialog?
+            linkDialog.dismiss();
+        });
+
+        // Text listener that enables/disables the add button if either the text or link is empty
+        TextWatcher enableAddButtonTextWatcher = new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO it's pretty hard to see if the button is enabled or disabled
+                add.setEnabled(!text.getText().toString().isEmpty() && !link.getText().toString().isEmpty());
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not implemented
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not implemented
+            }
+        };
+
+        // Add the listener to both the text and the link
+        text.addTextChangedListener(enableAddButtonTextWatcher);
+        link.addTextChangedListener(enableAddButtonTextWatcher);
     }
 
     /**
