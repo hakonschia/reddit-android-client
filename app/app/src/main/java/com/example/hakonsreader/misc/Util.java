@@ -11,6 +11,7 @@ import com.example.hakonsreader.activites.MainActivity;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.RateLimitException;
 import com.example.hakonsreader.api.exceptions.ThreadLockedException;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -28,10 +29,12 @@ public class Util {
      * Handles generic errors that are common for all API responses and shows a snackbar to the user
      *
      * @param parent The view to attach the snackbar to
-     * @param code The code for the request
+     * @param error The error for the request
      * @param t Throwable from the request
      */
-    public static void handleGenericResponseErrors(View parent, int code, Throwable t) {
+    public static void handleGenericResponseErrors(View parent, GenericError error, Throwable t) {
+        int code = error.getCode();
+
         if (t instanceof IOException) {
             Util.showNoInternetSnackbar(parent);
         } else if (t instanceof InvalidAccessTokenException) {

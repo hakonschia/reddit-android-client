@@ -8,6 +8,7 @@ import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
@@ -67,7 +68,7 @@ public class UserRequests {
         try {
             Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
-            onFailure.onFailure(-1, new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
+            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
             return;
         }
 
@@ -83,13 +84,13 @@ public class UserRequests {
                     if (body != null) {
                         onResponse.onResponse(body);
                     } else {
-                        onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                        Util.handleHttpErrors(response, onFailure);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<User> call, Throwable t) {
-                    onFailure.onFailure(-1, t);
+                    onFailure.onFailure(new GenericError(-1), t);
                 }
             });
         } else {
@@ -104,13 +105,13 @@ public class UserRequests {
                     if (body != null) {
                         onResponse.onResponse((User) body);
                     } else {
-                        onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                        Util.handleHttpErrors(response, onFailure);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<RedditListing> call, Throwable t) {
-                    onFailure.onFailure(-1, t);
+                    onFailure.onFailure(new GenericError(-1), t);
                 }
             });
         }
@@ -207,13 +208,13 @@ public class UserRequests {
                     List<RedditPost> posts = (List<RedditPost>) body.getListings();
                     onResponse.onResponse(posts);
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<ListingResponse> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }

@@ -18,6 +18,7 @@ import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.service.SubredditsService;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
+import com.example.hakonsreader.api.responses.GenericError;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -74,9 +75,9 @@ import retrofit2.internal.EverythingIsNonNull;
  * two callbacks for each endpoint; one for successful responses ({@link OnResponse}) and one for failed responses
  * ({@link OnFailure}). If the API endpoint returns multiple values that are of different types (such as
  * {@link PostRequest#comments(OnResponse, OnResponse, OnFailure)}) there will be multiple {@link OnResponse} callbacks.
- * The {@link OnFailure} includes an error code and a {@link Throwable} with error information. The error code
- * will be the HTTP error code, or if another type of error occurred this will be -1 and the throwable
- * will hold the information needed to debug the issue.</p>
+ * The {@link OnFailure} includes a {@link GenericError} and a {@link Throwable} with error information.
+ * The error code in {@link GenericError} will be the HTTP error code, or if another type of error occurred this will be -1
+ * and the throwable will hold the information needed to debug the issue.</p>
  *
  * <p>Usage example:
  *
@@ -88,16 +89,18 @@ import retrofit2.internal.EverythingIsNonNull;
  * api.subreddit("GlobalOffensive").info(subreddit -> {
  *     String subredditName = subreddit.getName();
  *     int subscribers = subreddit.getSubscribers();
- * }, (errorCode, throwable) -> {
- *     throwable.printStackTrace();
+ * }, (error, throwable) -> {
+ *      int errorCode = error.getCode();
+ *      throwable.printStackTrace();
  * });
  *
  * api.subreddit("Norge").subscribe(true, response -> {
  *     // Some endpoints won't have a return value (they take a callback of OnResponse<Void>)
  *     // For these endpoints these callbacks are still called to indicate that the response was
  *     // successful, but will not have any data so "response" is never used
- * }, (code, throwable) -> {
+ * }, (error, throwable) -> {
  *     // This is still called as normal
+ *     int errorCode = error.getCode();
  *     throwable.printStackTrace();
  * });
  * }
@@ -458,13 +461,13 @@ public class RedditApi {
                     setTokenInternal(token);
                     onResponse.onResponse(null);
                 }  else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<AccessToken> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }
@@ -481,7 +484,7 @@ public class RedditApi {
     @EverythingIsNonNull
     public void revokeRefreshToken(OnResponse<Void> onResponse, OnFailure onFailure) {
         if (accessToken.getRefreshToken() == null) {
-            onFailure.onFailure(-1, new Throwable("No token to revoke"));
+            onFailure.onFailure(new GenericError(-1), new Throwable("No token to revoke"));
             return;
         }
 
@@ -495,13 +498,13 @@ public class RedditApi {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
 

@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api.requestmodels;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
@@ -12,6 +10,7 @@ import com.example.hakonsreader.api.interfaces.VoteableRequest;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.PostService;
@@ -92,13 +91,13 @@ public class PostRequest implements VoteableRequest, ReplyableRequest {
                     onPostResponse.onResponse(post);
                     onResponse.onResponse(allComments);
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<List<ListingResponse>> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }
@@ -156,13 +155,13 @@ public class PostRequest implements VoteableRequest, ReplyableRequest {
                         Util.handleListingErrors(body.errors(), onFailure);
                     }
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }

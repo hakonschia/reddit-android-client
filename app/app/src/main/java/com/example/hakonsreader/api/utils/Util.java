@@ -7,9 +7,14 @@ import com.example.hakonsreader.api.exceptions.RateLimitException;
 import com.example.hakonsreader.api.exceptions.ThreadLockedException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.model.AccessToken;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.ListingResponse;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.List;
+
+import retrofit2.Response;
 
 
 /**
@@ -60,12 +65,26 @@ public class Util {
 
         if (ResponseErrors.THREAD_LOCKED.getValue().equals(errorType)) {
             // TODO should find out if this is a comment or thread and return different exception/message
-            onFailure.onFailure(-1, new ThreadLockedException("The thread has been locked"));
+            onFailure.onFailure(new GenericError(-1), new ThreadLockedException("The thread has been locked"));
         } else if (ResponseErrors.RATE_LIMIT.getValue().equals(errorType)) {
-            onFailure.onFailure(-1, new RateLimitException("The action has been done too many times too fast"));
+            onFailure.onFailure(new GenericError(-1), new RateLimitException("The action has been done too many times too fast"));
         } else {
-            onFailure.onFailure(-1, new Exception(String.format("Unknown error posting comment: %s; %s", errorType, errorMessage)));
+            onFailure.onFailure(new GenericError(-1), new Exception(String.format("Unknown error posting comment: %s; %s", errorType, errorMessage)));
         }
+    }
+
+    public static <T> void handleHttpErrors(Response<T> response, OnFailure onFailure) {
+        GenericError error;
+
+        try {
+            error = new Gson().fromJson(response.errorBody().string(), GenericError.class);
+        } catch (IOException e) {
+            // The code will always be present as the http status code of the response, but message and reason
+            //  are set by Reddit as the response body so response.message() will be empty
+            error = new GenericError(response.code());
+        }
+
+        onFailure.onFailure(error, Util.newThrowable(response.code()));
     }
 
     /**

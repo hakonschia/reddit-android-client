@@ -10,6 +10,7 @@ import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.utils.Util;
@@ -48,7 +49,7 @@ public class SubredditRequest {
      */
     public void info(OnResponse<Subreddit> onResponse, OnFailure onFailure) {
         if (RedditApi.STANDARD_SUBS.contains(subredditName)) {
-            onFailure.onFailure(-1, new NoSubredditInfoException("The subreddits: " + RedditApi.STANDARD_SUBS.toString() + " do not have any info to retrieve"));
+            onFailure.onFailure(new GenericError(-1), new NoSubredditInfoException("The subreddits: " + RedditApi.STANDARD_SUBS.toString() + " do not have any info to retrieve"));
             return;
         }
 
@@ -64,16 +65,16 @@ public class SubredditRequest {
                     if (body.getId() != null) {
                         onResponse.onResponse((Subreddit) body);
                     } else {
-                        onFailure.onFailure(response.code(), new SubredditNotFoundException("No subreddit found with name: " + subredditName));
+                        onFailure.onFailure(new GenericError(response.code()), new SubredditNotFoundException("No subreddit found with name: " + subredditName));
                     }
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<RedditListing> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }
@@ -118,13 +119,13 @@ public class SubredditRequest {
                     List<RedditPost> posts = (List<RedditPost>) body.getListings();
                     onResponse.onResponse(posts);
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<ListingResponse> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }
@@ -142,7 +143,7 @@ public class SubredditRequest {
         try {
             Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
-            onFailure.onFailure(-1, new InvalidAccessTokenException("Favoriting a subreddit requires a valid access token for a logged in user", e));
+            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Favoriting a subreddit requires a valid access token for a logged in user", e));
             return;
         }
 
@@ -152,13 +153,13 @@ public class SubredditRequest {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }
@@ -177,7 +178,7 @@ public class SubredditRequest {
         try {
             Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
-            onFailure.onFailure(-1, new InvalidAccessTokenException("Subscribing to a subreddit requires a valid access token for a logged in user", e));
+            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Subscribing to a subreddit requires a valid access token for a logged in user", e));
             return;
         }
 
@@ -187,13 +188,13 @@ public class SubredditRequest {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }

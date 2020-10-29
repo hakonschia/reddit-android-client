@@ -5,6 +5,7 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.Subreddit;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.service.SubredditsService;
 import com.example.hakonsreader.api.utils.Util;
@@ -46,7 +47,7 @@ public class SubredditsRequest {
         try {
             Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
-            onFailure.onFailure(-1, new InvalidAccessTokenException("Getting subscribed subreddits requires a valid access token for a logged in user", e));
+            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Getting subscribed subreddits requires a valid access token for a logged in user", e));
             return;
         }
 
@@ -71,13 +72,13 @@ public class SubredditsRequest {
                         Util.handleListingErrors(body.getErrors(), onFailure);
                     }
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<ListingResponse> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }
@@ -111,13 +112,13 @@ public class SubredditsRequest {
                     List<Subreddit> subreddits = (List<Subreddit>) body.getListings();
                     onResponse.onResponse(subreddits);
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<ListingResponse> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }

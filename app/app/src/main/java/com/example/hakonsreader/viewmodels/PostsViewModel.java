@@ -148,21 +148,11 @@ public class PostsViewModel extends ViewModel {
                 loadingChange.setValue(false);
                 Util.handleGenericResponseErrors(parentLayout, code, t);
             });
-
-            /*
-            App.get().getApi().user(subreddit).posts(newPosts -> {
-                onPostsRetrieved(newPosts);
-            }, (code, t) -> {
-                t.printStackTrace();
-                loadingChange.setValue(false);
-                Util.handleGenericResponseErrors(parentLayout, code, t);
-            });
-            */
         } else {
-            api.subreddit(subreddit).posts(after, count, this::onPostsRetrieved, (code, t) -> {
+            api.subreddit(subreddit).posts(after, count, this::onPostsRetrieved, (error, t) -> {
                 t.printStackTrace();
                 loadingChange.setValue(false);
-                Util.handleGenericResponseErrors(parentLayout, code, t);
+                Util.handleGenericResponseErrors(parentLayout, error, t);
             });
         }
     }

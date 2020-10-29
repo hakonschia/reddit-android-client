@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api.model;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

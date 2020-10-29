@@ -7,6 +7,7 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.ReplyService;
 import com.example.hakonsreader.api.utils.Util;
@@ -53,7 +54,7 @@ class ReplyableRequestModel {
         try {
             Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
-            onFailure.onFailure(-1, new InvalidAccessTokenException("Posting comments requires a valid access token for a logged in user"));
+            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Posting comments requires a valid access token for a logged in user"));
             return;
         }
 
@@ -82,13 +83,13 @@ class ReplyableRequestModel {
                         Util.handleListingErrors(body.errors(), onFailure);
                     }
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }

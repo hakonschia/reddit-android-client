@@ -6,6 +6,7 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.service.VoteService;
 import com.example.hakonsreader.api.utils.Util;
 
@@ -45,7 +46,7 @@ class VoteableRequestModel {
         try {
             Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
-            onFailure.onFailure(-1, new InvalidAccessTokenException("Voting requires a valid access token for a logged in user", e));
+            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Voting requires a valid access token for a logged in user", e));
             return;
         }
 
@@ -59,13 +60,13 @@ class VoteableRequestModel {
                 if (response.isSuccessful()) {
                     onResponse.onResponse(null);
                 } else {
-                    onFailure.onFailure(response.code(), Util.newThrowable(response.code()));
+                    Util.handleHttpErrors(response, onFailure);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                onFailure.onFailure(-1, t);
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }
