@@ -225,7 +225,10 @@ public class PostActivity extends AppCompatActivity {
         binding.comments.setAdapter(commentsAdapter);
         binding.comments.setLayoutManager(layoutManager);
 
-        commentsViewModel.getComments().observe(this, commentsAdapter::addComments);
+        commentsViewModel.getComments().observe(this, comments -> {
+            commentsAdapter.addComments(comments);
+            binding.setNoComments(comments.isEmpty());
+        });
     }
 
     /**

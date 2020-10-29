@@ -94,7 +94,7 @@ import retrofit2.internal.EverythingIsNonNull;
  *
  * api.subreddit("Norge").subscribe(true, response -> {
  *     // Some endpoints won't have a return value (they take a callback of OnResponse<Void>)
- *     // For these endpoints this callbacks are still called to indicate that the response was
+ *     // For these endpoints these callbacks are still called to indicate that the response was
  *     // successful, but will not have any data so "response" is never used
  * }, (code, throwable) -> {
  *     // This is still called as normal

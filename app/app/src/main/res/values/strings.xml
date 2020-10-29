@@ -129,4 +129,6 @@
 
     <string name="postRemovedGeneric">The post has been removed</string>
     <string name="postRemovedByMods">The post has been removed by the moderators of r/%s</string>
+
+    <string name="noComments">No comments on this post yet, be the one to start the conversation!</string>
 </resources>

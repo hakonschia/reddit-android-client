@@ -2,6 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
@@ -84,20 +85,34 @@ public class ContentImage extends PhotoView {
             return;
         }
 
-        RequestCreator c = Picasso.get()
-                .load(imageUrl)
-                .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
-                .error(R.drawable.ic_baseline_wifi_tethering_150)
-                // Scale so the image fits the width of the screen
-                .resize(App.get().getScreenWidth(), 0);
+        // TODO this (I think) has caused crashes (at least on Samsung devices) because the canvas is trying
+        //  to draw a bitmap too large. It's hard to reproduce since it only seems to happen some times
+        //  and when it happens it might not even happen on the same post (and opening the post in the post itself
+        //  instead of just when scrolling works
+        //  Exception message: java.lang.RuntimeException: Canvas: trying to draw too large(107867520bytes) bitmap.
+        //  Since it's hard to reproduce I'm not even sure if wrapping this section in a try catch works or not
 
-        // Post is NSFW and user has chosen not to cache NSFW
-        if (post.isNsfw() && App.get().dontCacheNSFW()) {
-            // Don't store in cache and don't look in cache as this image will never be there
-            c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
+        try {
+            RequestCreator c = Picasso.get()
+                    .load(imageUrl)
+                    .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
+                    .error(R.drawable.ic_baseline_wifi_tethering_150)
+                    // Scale so the image fits the width of the screen
+                    .resize(App.get().getScreenWidth(), 0);
+
+            // Post is NSFW and user has chosen not to cache NSFW
+            if (post.isNsfw() && App.get().dontCacheNSFW()) {
+                // Don't store in cache and don't look in cache as this image will never be there
+                c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
+            }
+
+            c.into(this);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            Log.d(TAG, "updateView:\n\n\n\n--------------------------- ERROR LOADING IMAGE" +
+                    "\n\n " + post.getSubreddit() + ", " + post.getTitle() + " ---------------------------\n\n\n\n");
         }
 
-        c.into(this);
     }
 
     /**
