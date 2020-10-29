@@ -21,11 +21,13 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
+import com.google.android.material.snackbar.Snackbar;
 import com.robinhood.ticker.TickerUtils;
 import com.squareup.picasso.Picasso;
 
@@ -135,7 +137,7 @@ public class SubredditFragment extends Fragment {
         // Only load posts if there hasn't been an attempt at loading more posts
         if (posLastItem + NUM_REMAINING_POSTS_BEFORE_LOAD > listSize && lastLoadAttemptCount < listSize) {
             lastLoadAttemptCount = adapter.getPosts().size();
-            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName(), false);
+            postsViewModel.loadPosts(getSubredditName(), false);
         }
 
         this.checkSelectedPost(posFirstItem, posLastItem, oldY > 0);
@@ -303,15 +305,34 @@ public class SubredditFragment extends Fragment {
             }).start();
 
             subreddit.set(sub);
-        }, (code, t) -> {
+        }, this::handleErrors);
+    }
 
-            // TODO 403 errors for subreddit means you must be invited to the subreddit
-            // TODO if SubredditNotFoundException do something with UI like "Subreddit doesn't exist, click here to create it" or something
-            // No point in showing this error to the user
-            if (!(t instanceof NoSubredditInfoException)) {
-                Util.handleGenericResponseErrors(getView(), code, t);
+    /**
+     * Handles the errors received by the API
+     *
+     * @param error The error received
+     * @param throwable The throwable received
+     */
+    private void handleErrors(GenericError error, Throwable throwable) {
+        String errorReason = error.getReason();
+
+        // TODO if SubredditNotFoundException do something with UI like "Subreddit doesn't exist, click here to create it" or something
+
+        // TODO update UI of the fragment instead of showing a snackbar
+        if (GenericError.SUBREDDIT_BANNED.equals(errorReason)) {
+            Snackbar.make(binding.parentLayout, getString(R.string.subredditBanned, getSubredditName()), Snackbar.LENGTH_LONG).show();
+        } else if (GenericError.SUBREDDIT_PRIVATE.equals(errorReason)) {
+            Snackbar.make(binding.parentLayout, getString(R.string.subredditPrivate, getSubredditName()), Snackbar.LENGTH_LONG).show();
+        } else {
+            // NoSubredditInfoException is retrieved when trying to get info from front page, popular, or all
+            // and we don't need to show anything of this to the user
+            if (!(throwable instanceof NoSubredditInfoException)) {
+                return;
             }
-        });
+
+            Util.handleGenericResponseErrors(binding.parentLayout, error, throwable);
+        }
     }
 
 
@@ -348,6 +369,9 @@ public class SubredditFragment extends Fragment {
         });
         postsViewModel.onLoadingChange().observe(this, up -> {
             binding.loadingIcon.onCountChange(up);
+        });
+        postsViewModel.getError().observe(this, error -> {
+            this.handleErrors(error.getError(), error.getThrowable());
         });
 
         Bundle args = getArguments();
@@ -428,7 +452,7 @@ public class SubredditFragment extends Fragment {
 
         // If the fragment is selected without any posts load posts automatically
         if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
-            postsViewModel.loadPosts(binding.parentLayout, subreddit.get().getName(), false);
+            postsViewModel.loadPosts(getSubredditName(), false);
         }
 
         this.restoreViewHolderStates();

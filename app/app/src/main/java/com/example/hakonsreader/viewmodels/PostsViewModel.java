@@ -1,7 +1,6 @@
 package com.example.hakonsreader.viewmodels;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
@@ -10,7 +9,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.Util;
@@ -35,8 +33,9 @@ public class PostsViewModel extends ViewModel {
 
     private List<String> postIds = new ArrayList<>();
     private List<RedditPost> postsData = new ArrayList<>();
-    private MutableLiveData<List<RedditPost>> posts = new MutableLiveData<>();
-    private MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();;
+    private final MutableLiveData<List<RedditPost>> posts = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();
+    private final MutableLiveData<ErrorWrapper> error = new MutableLiveData<>();
 
     /**
      * @param context The context to use to create the database for the posts
@@ -126,8 +125,12 @@ public class PostsViewModel extends ViewModel {
         return loadingChange;
     }
 
+    public LiveData<ErrorWrapper> getError() {
+        return error;
+    }
 
-    public void loadPosts(View parentLayout, String subreddit, boolean isUser) {
+
+    public void loadPosts(String subreddit, boolean isUser) {
         if (subreddit == null) {
             return;
         }
@@ -143,16 +146,14 @@ public class PostsViewModel extends ViewModel {
         loadingChange.setValue(true);
 
         if (isUser) {
-            api.user(subreddit).posts(this::onPostsRetrieved, (code, t) -> {
-                t.printStackTrace();
+            api.user(subreddit).posts(this::onPostsRetrieved, (e, t) -> {
                 loadingChange.setValue(false);
-                Util.handleGenericResponseErrors(parentLayout, code, t);
+                error.setValue(new ErrorWrapper(e, t));
             });
         } else {
-            api.subreddit(subreddit).posts(after, count, this::onPostsRetrieved, (error, t) -> {
-                t.printStackTrace();
+            api.subreddit(subreddit).posts(after, count, this::onPostsRetrieved, (e, t) -> {
                 loadingChange.setValue(false);
-                Util.handleGenericResponseErrors(parentLayout, error, t);
+                error.setValue(new ErrorWrapper(e, t));
             });
         }
     }

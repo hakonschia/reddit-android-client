@@ -22,6 +22,8 @@ import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG;
 
 public class Util {
+    private static final String TAG = "Util";
+
     private Util() { }
 
 

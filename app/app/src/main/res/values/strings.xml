@@ -131,4 +131,7 @@
     <string name="postRemovedByMods">The post has been removed by the moderators of r/%s</string>
 
     <string name="noComments">No comments on this post yet, be the one to start the conversation!</string>
+
+    <string name="subredditBanned">r/%s has been banned</string>
+    <string name="subredditPrivate">r/%s is private. You must be invited to access this subreddit</string>
 </resources>

@@ -154,7 +154,7 @@ public class ProfileFragment extends Fragment {
         super.onResume();
 
         if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
-            postsViewModel.loadPosts(binding.parentLayout, username, true);
+            postsViewModel.loadPosts(username, true);
         }
     }
 
@@ -191,7 +191,7 @@ public class ProfileFragment extends Fragment {
         // user(null) gets information about the logged in user, so we can use username directly
         redditApi.user(username).info(user -> {
             // Load the posts for the user
-            postsViewModel.loadPosts(binding.parentLayout, user.getName(), true);
+            postsViewModel.loadPosts(user.getName(), true);
             this.user = user;
 
             // Store the updated user information if this profile is for the logged in user
