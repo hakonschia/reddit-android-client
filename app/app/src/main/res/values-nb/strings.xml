@@ -106,4 +106,7 @@
     <string name="content_description_markdown_btn_code_block">Legg til kode blokk</string>
     <string name="content_description_markdown_btn_numbered_list">Nummerert liste</string>
     <string name="content_description_markdown_btn_bullet_list">Punktliste</string>
+    <string name="replyConfirmBackPressDialogHeader">Du har tekst som ikke er sendt</string>
+    <string name="replyConfirmBackPressDialogContent">Det er tekst i skrivefeltet. Er du sikker på at du vil forkaste det?</string>
+    <string name="discard">Forkast</string>
 </resources>

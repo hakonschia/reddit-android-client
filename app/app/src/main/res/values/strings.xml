@@ -146,6 +146,9 @@
     <string name="replyAddLinkDialogLinkTextHint">Text</string>
     <string name="replyAddLinkDialogLinkUrlHint">Link</string>
 
+    <string name="replyConfirmBackPressDialogHeader">You have unsent text</string>
+    <string name="replyConfirmBackPressDialogContent">There is currently text in the input field. Are you sure you want to discard it?</string>
+
     <!-- The text inside the markdown buttons (these aren't language specific so marked as untranslatable) -->
     <string name="markdownBtnBold" translatable="false"><b>B</b></string>
     <string name="markdownBtnItalic" translatable="false"><i>I</i></string>
@@ -170,5 +173,7 @@
 
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
+    <string name="discard">Discard</string>
+
 
 </resources>

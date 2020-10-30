@@ -39,4 +39,6 @@
 
     <dimen name="markdownBtnWidth">60dp</dimen>
     <dimen name="markdownBtnHeight">45dp</dimen>
+
+    <dimen name="dialogWidth">350dp</dimen>
 </resources>

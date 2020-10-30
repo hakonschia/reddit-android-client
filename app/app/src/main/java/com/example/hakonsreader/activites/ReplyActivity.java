@@ -1,5 +1,6 @@
 package com.example.hakonsreader.activites;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -139,9 +140,29 @@ public class ReplyActivity extends AppCompatActivity {
         binding = null;
     }
 
+    /**
+     * If there is text a dialog is shown to warn the user that they are leaving text behind
+     * and makes the user confirm they want to discard the text
+     */
     @Override
     public void finish() {
-        super.finish();
+        if (!binding.replyText.getText().toString().isEmpty()) {
+            Dialog confirmDialog = new Dialog(this);
+            confirmDialog.setContentView(R.layout.dialog_reply_confirm_back_press);
+            confirmDialog.show();
+
+            Button discard = confirmDialog.findViewById(R.id.btnDiscard);
+            Button cancel = confirmDialog.findViewById(R.id.btnCancel);
+
+            discard.setOnClickListener(v -> super.finish());
+            cancel.setOnClickListener(v -> confirmDialog.dismiss());
+
+            // TODO add button for "discard and save" that saves the text and whats being responded to so we can resume later
+        } else {
+            super.finish();
+        }
+
+        // Might not actually finish, but it shouldn't matter
         overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
     }
 
@@ -294,7 +315,7 @@ public class ReplyActivity extends AppCompatActivity {
 
         // Create the dialog and open it
         Dialog linkDialog = new Dialog(this);
-        linkDialog.setContentView(R.layout.reply_add_link_dialog);
+        linkDialog.setContentView(R.layout.dialog_reply_add_link);
         linkDialog.setOnDismissListener(dialog -> {
             Log.d(TAG, "linkOnClick: dismissed");
         });
@@ -389,8 +410,6 @@ public class ReplyActivity extends AppCompatActivity {
         } else {
             binding.replyText.getText().insert(startPos, ">");
         }
-
-        Log.d(TAG, "quoteOnClick: indexOfLine=" + indexOfLine);
     }
 
     /**
