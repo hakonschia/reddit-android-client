@@ -104,4 +104,6 @@
     <string name="content_description_previous_top_level_comment">Gå til forrige øverste kommentar</string>
     <string name="content_description_markdown_btn_inline_code">Legg til kode snutt</string>
     <string name="content_description_markdown_btn_code_block">Legg til kode blokk</string>
+    <string name="content_description_markdown_btn_numbered_list">Nummerert liste</string>
+    <string name="content_description_markdown_btn_bullet_list">Punktliste</string>
 </resources>

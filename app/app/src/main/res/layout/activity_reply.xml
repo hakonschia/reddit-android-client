@@ -55,16 +55,15 @@
             android:id="@+id/textInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
 
+            android:layout_marginEnd="8dp"
             app:layout_constraintBottom_toBottomOf="@id/previewHeader"
-            app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/summary"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/summary"
-            app:layout_constraintVertical_bias="0.0"
-            app:layout_constraintVertical_chainStyle="packed">
+            app:layout_constraintVertical_bias="0.0">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/replyText"
@@ -72,7 +71,9 @@
                 android:layout_height="wrap_content"
 
                 android:hint="@string/replyHint"
-                android:inputType="none"
+
+                android:inputType="textMultiLine"
+                android:scrollbars="vertical"
 
                 android:textColor="@color/text_color"
                 android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg" />
@@ -82,13 +83,16 @@
             android:id="@+id/previewHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
 
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/replyPreview"
-            android:textColor="@color/secondary_text_color"
 
+            android:textColor="@color/secondary_text_color"
             android:textSize="15sp"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
@@ -98,19 +102,19 @@
             android:layout_height="wrap_content"
 
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
 
+            android:layout_marginEnd="8dp"
             android:textColor="@color/text_color"
             android:textSize="16sp"
 
             app:layout_constrainedHeight="true"
+
             app:layout_constraintBottom_toTopOf="@+id/markdownButtons"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/previewHeader"
             app:layout_constraintVertical_bias="0.0"
-
             tools:text="Preview text goes here" />
 
         <!--
@@ -136,6 +140,8 @@
             android:layout_marginEnd="8dp"
 
             android:fadeScrollbars="false"
+            android:scrollbarStyle="insideInset"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -233,9 +239,32 @@
 
                     android:contentDescription="@string/content_description_markdown_btn_code_block"
                     android:onClick="codeBlockOnClick"
-                    android:textAllCaps="false"
+                    android:text="@string/markdownCodeBlock"
 
-                    android:text="@string/markdownCodeBlock" />
+                    android:textAllCaps="false" />
+
+                <ImageButton
+                    android:id="@+id/markdownBulletList"
+                    android:layout_width="@dimen/markdownBtnWidth"
+                    android:layout_height="@dimen/markdownBtnHeight"
+
+                    android:contentDescription="@string/content_description_markdown_btn_bullet_list"
+                    android:onClick="bulletListOnClick"
+                    android:src="@drawable/ic_baseline_format_list_bulleted_24"
+
+                    android:textAllCaps="false" />
+
+                <ImageButton
+                    android:id="@+id/markdownNumberedList"
+                    android:layout_width="@dimen/markdownBtnWidth"
+                    android:layout_height="@dimen/markdownBtnHeight"
+
+                    android:contentDescription="@string/content_description_markdown_btn_numbered_list"
+                    android:onClick="numberedListOnClick"
+                    android:src="@drawable/ic_baseline_format_list_numbered_24"
+
+                    android:textAllCaps="false" />
+
             </LinearLayout>
         </HorizontalScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>

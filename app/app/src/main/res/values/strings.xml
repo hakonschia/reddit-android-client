@@ -165,6 +165,8 @@
     <string name="content_description_markdown_btn_superscript">Superscript text</string>
     <string name="content_description_markdown_btn_inline_code">Add code snippet</string>
     <string name="content_description_markdown_btn_code_block">Add code block</string>
+    <string name="content_description_markdown_btn_bullet_list">Bullet list</string>
+    <string name="content_description_markdown_btn_numbered_list">Numbered list</string>
 
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>

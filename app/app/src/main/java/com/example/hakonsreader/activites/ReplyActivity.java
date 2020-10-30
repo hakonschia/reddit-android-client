@@ -91,7 +91,8 @@ public class ReplyActivity extends AppCompatActivity {
         // themselves so it's fine
         final Markwon markwon = App.get().getMark();
 
-        // create editor
+        // TODO custom markwon plugins wont affect the edit text
+        // Create editor
         final MarkwonEditor editor = MarkwonEditor.create(markwon);
 
         // Set edit listeners. Both the edit text field and and preview are updated
@@ -112,6 +113,7 @@ public class ReplyActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // TODO If we're on a code block (4 spaces) and the new character is a newline, add 4 spaces automatically
+                //  if we're in a list (starts with * or 1. (or technically <any digit>. ) then continue the list
                 // Not implemented
             }
         });
@@ -435,5 +437,43 @@ public class ReplyActivity extends AppCompatActivity {
         // code blocks they do, so at the end we can add only one)
         // There isn't really an end for code blocks. They end when a new line doesn't have 4 spaces
         this.addMarkdownSyntax(binding.replyText.getText(), start, end, "\n\n    ", "\n");
+    }
+
+    /**
+     * onClick for the "Bullet list" button. Adds bullet list markdown to the text where the cursor is.
+     *
+     * <p>For code blocks use {@link ReplyActivity}</p>
+     *
+     * @param view Ignored
+     */
+    public void bulletListOnClick(View view) {
+        // Bullet list in markdown: Each list item starts with "* "
+
+        int start = binding.replyText.getSelectionStart();
+        int end = binding.replyText.getSelectionEnd();
+
+        // Add two newlines at the start, since one newline in markdown usually does nothing (but after
+        // code blocks they do, so at the end we can add only one)
+        // There isn't really an end for code blocks. They end when a new line doesn't have 4 spaces
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, "* ", "");
+    }
+
+    /**
+     * onClick for the "Numbered list" button. Adds numbered list markdown to the text where the cursor is.
+     *
+     * <p>For code blocks use {@link ReplyActivity}</p>
+     *
+     * @param view Ignored
+     */
+    public void numberedListOnClick(View view) {
+        // Bullet list in markdown: Each list item starts with "1. ", it doesn't matter which number in the
+        // list we are, having 1. at the start works for each and increments it correctly.
+        // Markwon allows to start at other numbers and increments from there, but Reddit doesn't recognize that
+        // Ie. first item is "3. " then the next item will always be 4, then 5 etc.
+
+        int start = binding.replyText.getSelectionStart();
+        int end = binding.replyText.getSelectionEnd();
+
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, "1. ", "");
     }
 }
