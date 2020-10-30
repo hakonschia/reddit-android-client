@@ -1,6 +1,5 @@
 package com.example.hakonsreader.activites;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -38,14 +37,39 @@ import io.noties.markwon.editor.MarkwonEditorTextWatcher;
 public class ReplyActivity extends AppCompatActivity {
     private static final String TAG = "ReplyActivity";
 
+    /**
+     * Key used to store the state of the reply text
+     */
     private static final String REPLY_TEXT = "replyText";
+    /**
+     * Key used to store the state of the preview text
+     */
     private static final String PREVIEW_TEXT = "previewText";
+
+    /**
+     * Key used to store if the URL dialog is shown
+     */
+    private static final String LINK_DIALOG_SHOWN = "urlDialogShown";
+    /**
+     * Key used to store the state of the URL dialog link text
+     */
+    private static final String LINK_DIALOG_TEXT = "urlDialogText";
+    /**
+     * Key used to store the state of the URL dialog link
+     */
+    private static final String LINK_DIALOG_LINK = "urlDialogLink";
+
 
 
     private ActivityReplyBinding binding;
 
     private final RedditApi redditApi = App.get().getApi();
     private RedditListing replyingTo;
+    /**
+     * The link dialog that allows the user to easily insert a markdown link. If this is
+     * not null a dialog is shown to the user
+     */
+    private Dialog linkDialog;
 
 
     @Override
@@ -57,6 +81,14 @@ public class ReplyActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             binding.replyText.setText(savedInstanceState.getString(REPLY_TEXT));
             binding.preview.setText(savedInstanceState.getString(PREVIEW_TEXT));
+
+            // Restore state of the link dialog
+            boolean showlinkDialog = savedInstanceState.getBoolean(LINK_DIALOG_SHOWN);
+            if (showlinkDialog) {
+                String text = savedInstanceState.getString(LINK_DIALOG_TEXT);
+                String link = savedInstanceState.getString(LINK_DIALOG_LINK);
+                this.showLinkDialog(text, link);
+            }
         }
 
         // TODO get comment/post
@@ -132,6 +164,21 @@ public class ReplyActivity extends AppCompatActivity {
         // Store what is in the edit text
         outState.putString(REPLY_TEXT, binding.replyText.getText().toString());
         outState.putString(PREVIEW_TEXT, binding.preview.getText().toString());
+
+        if (linkDialog != null) {
+            outState.putBoolean(LINK_DIALOG_SHOWN, true);
+
+            TextView text = linkDialog.findViewById(R.id.textText);
+            TextView link = linkDialog.findViewById(R.id.linkText);
+
+            outState.putString(LINK_DIALOG_TEXT, text.getText().toString());
+            outState.putString(LINK_DIALOG_LINK, link.getText().toString());
+
+            // Ensure the dialog is dismissed or else it will cause a leak
+            linkDialog.dismiss();
+        } else {
+            outState.putBoolean(LINK_DIALOG_SHOWN, false);
+        }
     }
 
     @Override
@@ -313,66 +360,7 @@ public class ReplyActivity extends AppCompatActivity {
     public void linkOnClick(View view) {
         // Link in markdown: [Link text](https://link.com)
 
-        // Create the dialog and open it
-        Dialog linkDialog = new Dialog(this);
-        linkDialog.setContentView(R.layout.dialog_reply_add_link);
-        linkDialog.setOnDismissListener(dialog -> {
-            Log.d(TAG, "linkOnClick: dismissed");
-        });
-        linkDialog.show();
-
-        TextView text = linkDialog.findViewById(R.id.textText);
-        TextView link = linkDialog.findViewById(R.id.linkText);
-
-        Button add = linkDialog.findViewById(R.id.btnAddLink);
-        Button cancel = linkDialog.findViewById(R.id.btnCancelLink);
-
-
-        add.setOnClickListener(v -> {
-            String textToAdd = text.getText().toString();
-            String linkToAdd = link.getText().toString();
-
-            int start = binding.replyText.getSelectionStart();
-            int end = binding.replyText.getSelectionEnd();
-
-            // We don't use addMarkdownSyntax here since we want to add the text and
-            // link for the user automatically
-            Editable editText = binding.replyText.getText();
-
-            // Insert the end first so we don't have to care about the length of the text and offset the end
-            editText.insert(end, String.format("(%s)", linkToAdd));
-            editText.insert(start, String.format("[%s]", textToAdd));
-            
-            linkDialog.dismiss();
-        });
-
-        cancel.setOnClickListener(v -> {
-            // TODO if text or link aren't empty ask "Do you want to dismiss" (which is weird since it
-            //  would have to open another dialog?
-            linkDialog.dismiss();
-        });
-
-        // Text listener that enables/disables the add button if either the text or link is empty
-        TextWatcher enableAddButtonTextWatcher = new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                // TODO it's pretty hard to see if the button is enabled or disabled
-                add.setEnabled(!text.getText().toString().isEmpty() && !link.getText().toString().isEmpty());
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not implemented
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Not implemented
-            }
-        };
-
-        // Add the listener to both the text and the link
-        text.addTextChangedListener(enableAddButtonTextWatcher);
-        link.addTextChangedListener(enableAddButtonTextWatcher);
+        this.showLinkDialog("", "");
     }
 
     /**
@@ -516,5 +504,80 @@ public class ReplyActivity extends AppCompatActivity {
         int end = binding.replyText.getSelectionEnd();
 
         this.addMarkdownSyntax(binding.replyText.getText(), start, end, "1. ", "");
+    }
+
+
+    /**
+     * Shows a dialog to let the user insert a link into the markdown text
+     *
+     * @param linkText The initial text to set for the link text
+     * @param link The initial text to set for the link
+     */
+    private void showLinkDialog(String linkText, String link) {
+        Log.d(TAG, String.format("showLinkDialog: linkText=%s, link=%s", linkText, link));
+        // Create the dialog and open it
+        linkDialog = new Dialog(this);
+        linkDialog.setContentView(R.layout.dialog_reply_add_link);
+        linkDialog.show();
+        linkDialog.setOnDismissListener(dialog -> {
+            linkDialog = null;
+        });
+
+        TextView textTv = linkDialog.findViewById(R.id.textText);
+        TextView linkTv = linkDialog.findViewById(R.id.linkText);
+
+        Button add = linkDialog.findViewById(R.id.btnAddLink);
+        Button cancel = linkDialog.findViewById(R.id.btnCancelLink);
+
+        add.setOnClickListener(v -> {
+            String textToAdd = textTv.getText().toString();
+            String linkToAdd = linkTv.getText().toString();
+
+            int start = binding.replyText.getSelectionStart();
+            int end = binding.replyText.getSelectionEnd();
+
+            // We don't use addMarkdownSyntax here since we want to add the text and
+            // link for the user automatically
+            Editable editText = binding.replyText.getText();
+
+            // Insert the end first so we don't have to care about the length of the text and offset the end
+            editText.insert(end, String.format("(%s)", linkToAdd));
+            editText.insert(start, String.format("[%s]", textToAdd));
+
+            linkDialog.dismiss();
+        });
+
+        cancel.setOnClickListener(v -> {
+            // TODO if text or link aren't empty ask "Do you want to dismiss" (which is weird since it
+            //  would have to open another dialog?
+            linkDialog.dismiss();
+        });
+
+        // Text listener that enables/disables the add button if either the text or link is empty
+        TextWatcher enableAddButtonTextWatcher = new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO it's pretty hard to see if the button is enabled or disabled
+                add.setEnabled(!textTv.getText().toString().isEmpty() && !linkTv.getText().toString().isEmpty());
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not implemented
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not implemented
+            }
+        };
+
+        // Add the listener to both the text and the link
+        textTv.addTextChangedListener(enableAddButtonTextWatcher);
+        linkTv.addTextChangedListener(enableAddButtonTextWatcher);
+
+        // If there's initial text to set it has to be set after the listener or else the listener
+        // won't trigger
+        textTv.setText(linkText == null ? "" : linkText);
+        linkTv.setText(link == null ? "" : link);
     }
 }

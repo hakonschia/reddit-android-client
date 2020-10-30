@@ -32,10 +32,7 @@ import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.jakewharton.processphoenix.ProcessPhoenix;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
