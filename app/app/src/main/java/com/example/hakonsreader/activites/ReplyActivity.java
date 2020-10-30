@@ -361,14 +361,36 @@ public class ReplyActivity extends AppCompatActivity {
      * @param view Ignored
      */
     public void quoteOnClick(View view) {
-        // Quote in markdown: > quote here
+        // Quote in markdown: >quote here
 
         // If we're on a line with a quote, remove it, if we're not, add at the start
         String text = binding.replyText.getText().toString();
 
-        if (text.isEmpty()) {
-            return;
+        int start = binding.replyText.getSelectionStart();
+
+        // Search backwards for a newline (start - 1 or else we might be on a newline if we're at the end of a line)
+        int indexOfLine = text.lastIndexOf("\n", start - 1);
+
+        int startPos = indexOfLine;
+
+        // No newline found means it's the first line, set pos to the start of the text
+        if (indexOfLine == -1) {
+            startPos = 0;
+        } else {
+            // If we're not on the first line we need to add one as we want to start after the newline
+            // not on it (the newline is on the end of the previous line, not the first character of the new line)
+            startPos++;
         }
+
+        // Already a quote, remove it (if text is empty we're guaranteed to not have a >)
+        if (!text.isEmpty() && text.charAt(startPos) == '>') {
+            // Remove ">"
+            binding.replyText.getText().delete(startPos, startPos + 1);
+        } else {
+            binding.replyText.getText().insert(startPos, ">");
+        }
+
+        Log.d(TAG, "quoteOnClick: indexOfLine=" + indexOfLine);
     }
 
     /**
