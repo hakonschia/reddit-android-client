@@ -2,12 +2,10 @@ package com.example.hakonsreader.activites;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -16,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.App;
@@ -29,7 +26,6 @@ import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityReplyBinding;
-import com.example.hakonsreader.databinding.ReplyAddLinkDialogBinding;
 import com.example.hakonsreader.misc.Util;
 import com.google.gson.Gson;
 
@@ -41,6 +37,7 @@ public class ReplyActivity extends AppCompatActivity {
     private static final String TAG = "ReplyActivity";
 
     private static final String REPLY_TEXT = "replyText";
+    private static final String PREVIEW_TEXT = "previewText";
 
 
     private ActivityReplyBinding binding;
@@ -57,6 +54,7 @@ public class ReplyActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             binding.replyText.setText(savedInstanceState.getString(REPLY_TEXT));
+            binding.preview.setText(savedInstanceState.getString(PREVIEW_TEXT));
         }
 
         // TODO get comment/post
@@ -126,6 +124,7 @@ public class ReplyActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         // Store what is in the edit text
         outState.putString(REPLY_TEXT, binding.replyText.getText().toString());
+        outState.putString(PREVIEW_TEXT, binding.preview.getText().toString());
     }
 
     @Override
