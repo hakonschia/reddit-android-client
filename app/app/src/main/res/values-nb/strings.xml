@@ -88,4 +88,20 @@
     <string name="replyAddLinkDialogLinkUrlHint">Lenke</string>
     <string name="add">Legg til</string>
     <string name="cancel">Avbryt</string>
+    <string name="content_description_markdown_btn_bold">Fet tekst</string>
+    <string name="content_description_markdown_btn_italic">Kursiv tekst</string>
+    <string name="content_description_markdown_btn_strikethrough">Gjennomstrekk tekst</string>
+    <string name="content_description_markdown_btn_link">Legg til en hyperlenke</string>
+    <string name="content_description_markdown_btn_quote">Legg til et stitat</string>
+    <string name="content_description_markdown_btn_spoiler">Legg til en spoiler</string>
+    <string name="content_description_markdown_btn_superscript">Hevet tekst</string>
+    <string name="content_description_video_thumbnail">Video miniatyrbilde</string>
+    <string name="content_description_play_video">Spill av video</string>
+    <string name="content_description_pause_video">Pause video</string>
+    <string name="content_description_fullscreen_video">Fullskjerm video</string>
+    <string name="content_description_mute_video">Demp video</string>
+    <string name="content_description_next_top_level_comment">Gå til neste øverste kommentar</string>
+    <string name="content_description_previous_top_level_comment">Gå til forrige øverste kommentar</string>
+    <string name="content_description_markdown_btn_inline_code">Legg til kode snutt</string>
+    <string name="content_description_markdown_btn_code_block">Legg til kode blokk</string>
 </resources>

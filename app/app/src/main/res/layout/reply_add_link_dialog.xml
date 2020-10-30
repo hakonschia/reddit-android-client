@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
 
             android:hint="@string/replyAddLinkDialogLinkUrlHint"
-            android:inputType="none"
+            android:inputType="text"
 
             android:textColor="@color/text_color"
             android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg" />

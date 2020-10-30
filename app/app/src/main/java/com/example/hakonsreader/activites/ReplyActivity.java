@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -110,6 +111,7 @@ public class ReplyActivity extends AppCompatActivity {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // TODO If we're on a code block (4 spaces) and the new character is a newline, add 4 spaces automatically
                 // Not implemented
             }
         });
@@ -117,6 +119,8 @@ public class ReplyActivity extends AppCompatActivity {
         // TODO when the preview and edit text only takes up a limited amount of space this should scroll
         //  and also has the benefit of removing the link clicker which is kinda weird to have
         //binding.preview.setMovementMethod(ScrollingMovementMethod.getInstance());
+
+        this.attachLongClickListenerToMarkdownButtons();
     }
 
     @Override
@@ -172,12 +176,68 @@ public class ReplyActivity extends AppCompatActivity {
 
             setResult(RESULT_OK, intent);
             finish();
-        }, (code, t) -> {
+        }, (error, t) -> {
             t.printStackTrace();
-            Util.handleGenericResponseErrors(binding.parentLayout, code, t);
+            Util.handleGenericResponseErrors(binding.parentLayout, error, t);
         });
     }
 
+    /**
+     * Attaches a longClick listener to each of the markdown syntax buttons.
+     *
+     * <p>The listener looks for the "contentDescription" attribute and shows a toast with
+     * the text if found</p>
+     */
+    private void attachLongClickListenerToMarkdownButtons() {
+        View.OnLongClickListener markdownButtonsLongClick = v -> {
+            CharSequence description = v.getContentDescription();
+
+            if (description != null) {
+                String desc = v.getContentDescription().toString();
+
+                if (!desc.isEmpty()) {
+                    Toast.makeText(ReplyActivity.this, description, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            // Always return true, otherwise a long click with no description would act like
+            // a single press, which is weird behaviour
+            return true;
+        };
+
+        // Find all the children in the inner layout and add the listener
+        int markdownButtonsCount = binding.markdownButtonsInnerLayout.getChildCount();
+        for (int i = 0; i < markdownButtonsCount; i++) {
+            View v = binding.markdownButtonsInnerLayout.getChildAt(i);
+            v.setOnLongClickListener(markdownButtonsLongClick);
+        }
+    }
+
+    /**
+     * Adds the specified markdown syntax to an editable text. The cursor of the editable is moved
+     * depending on if a selection of the text was highlighted, or moved to the middle of the syntax
+     * so the user can start typing right away
+     *
+     * @param text The editable text to insert the syntax into
+     * @param start The start of the text selection (where to insert the start syntax)
+     * @param end The end of the text selection (where to insert the end syntax)
+     * @param startSyntax The start of the markdown syntax, what comes before the text that defines
+     *                   the start of this markdown (eg. {@code **} for bold)
+     * @param endSyntax The end of the markdown syntax, what comes after the text that defines the closing
+     *                  of this markdown (eg. {@code **} for bold)
+     */
+    public void addMarkdownSyntax(Editable text, int start, int end, String startSyntax, String endSyntax) {
+        // Insert at the end first or else the end will be changed (or use end + startSyntax.length())
+        text.insert(end, endSyntax);
+        text.insert(start, startSyntax);
+
+        // When no text is selected start == end
+        // If we're not selecting a text to bold, set the cursor to the middle so we can start writing
+        if (start == end) {
+            // Set cursor to the middle
+            binding.replyText.setSelection(start + startSyntax.length());
+        }
+    }
 
     /**
      * onClick for the "Bold" button. Adds bold markdown to the text where the cursor is
@@ -190,16 +250,7 @@ public class ReplyActivity extends AppCompatActivity {
         int start = binding.replyText.getSelectionStart();
         int end = binding.replyText.getSelectionEnd();
 
-        // Insert at the end first or else the end will be changed (or use end + 2)
-        binding.replyText.getText().insert(end, "**");
-        binding.replyText.getText().insert(start, "**");
-
-        // When no text is selected start == end
-        // If we're not selecting a text to bold, set the cursor to the middle so we can start writing
-        if (start == end) {
-            // Set cursor to the middle
-            binding.replyText.setSelection(start + 2);
-        }
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, "**", "**");
     }
 
     /**
@@ -209,19 +260,11 @@ public class ReplyActivity extends AppCompatActivity {
      */
     public void italicOnClick(View view) {
         // Italic text in markdown: *italic text here*
+
         int start = binding.replyText.getSelectionStart();
         int end = binding.replyText.getSelectionEnd();
 
-        // Insert at the end first or else the end will be changed (or use end + 1)
-        binding.replyText.getText().insert(end, "*");
-        binding.replyText.getText().insert(start, "*");
-
-        // When no text is selected start == end
-        // If we're not selecting a text to bold, set the cursor to the middle so we can start writing
-        if (start == end) {
-            // Set cursor to the middle
-            binding.replyText.setSelection(start + 1);
-        }
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, "*", "*");
     }
 
     /**
@@ -235,16 +278,7 @@ public class ReplyActivity extends AppCompatActivity {
         int start = binding.replyText.getSelectionStart();
         int end = binding.replyText.getSelectionEnd();
 
-        // Insert at the end first or else the end will be changed (or use end + 2)
-        binding.replyText.getText().insert(end, "~~");
-        binding.replyText.getText().insert(start, "~~");
-
-        // When no text is selected start == end
-        // If we're not selecting a text to bold, set the cursor to the middle so we can start writing
-        if (start == end) {
-            // Set cursor to the middle
-            binding.replyText.setSelection(start + 2);
-        }
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, "~~", "~~");
     }
 
     /**
@@ -278,6 +312,8 @@ public class ReplyActivity extends AppCompatActivity {
             int start = binding.replyText.getSelectionStart();
             int end = binding.replyText.getSelectionEnd();
 
+            // We don't use addMarkdownSyntax here since we want to add the text and
+            // link for the user automatically
             Editable editText = binding.replyText.getText();
 
             // Insert the end first so we don't have to care about the length of the text and offset the end
@@ -331,5 +367,73 @@ public class ReplyActivity extends AppCompatActivity {
         if (text.isEmpty()) {
             return;
         }
+    }
+
+    /**
+     * onClick for the "Spoiler" button. Adds spoiler markdown to the text where the cursor is.
+     *
+     * <p>Note: The spoiler syntax is Reddit specific and not part of the official markdown specification</p>
+     *
+     * @param view Ignored
+     */
+    public void spoilerOnClick(View view) {
+        // Reddit spoiler markdown syntax: >!Spoiler goes here!<
+
+        int start = binding.replyText.getSelectionStart();
+        int end = binding.replyText.getSelectionEnd();
+
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, ">!", "!<");
+    }
+
+    /**
+     * onClick for the "Superscript" button. Adds superscript markdown to the text where the cursor is.
+     *
+     * @param view Ignored
+     */
+    public void superscriptOnClick(View view) {
+        // Superscript in markdown: ^(text goes here)
+        // It is also possible to use a single "^" for single words, but it's safer (and easier) to always add the full thing
+
+        int start = binding.replyText.getSelectionStart();
+        int end = binding.replyText.getSelectionEnd();
+
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, "^(", ")");
+    }
+
+    /**
+     * onClick for the "Inline code" button. Adds inline code markdown to the text where the cursor is.
+     *
+     * <p>For code blocks use {@link ReplyActivity}</p>
+     *
+     * @param view Ignored
+     */
+    public void inlineCodeOnClick(View view) {
+        // Code in markdown: `code goes here`
+        // Code in backticks are inlined, which means they can appear in the text (as opposed to code blocks
+        // which are multiline)
+
+        int start = binding.replyText.getSelectionStart();
+        int end = binding.replyText.getSelectionEnd();
+
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, "`", "`");
+    }
+
+    /**
+     * onClick for the "Code block" button. Adds code block markdown to the text where the cursor is.
+     *
+     * <p>For code blocks use {@link ReplyActivity}</p>
+     *
+     * @param view Ignored
+     */
+    public void codeBlockOnClick(View view) {
+        // Code blocks in markdown: "    code goes here" (four spaces at the start)
+
+        int start = binding.replyText.getSelectionStart();
+        int end = binding.replyText.getSelectionEnd();
+
+        // Add two newlines at the start, since one newline in markdown usually does nothing (but after
+        // code blocks they do, so at the end we can add only one)
+        // There isn't really an end for code blocks. They end when a new line doesn't have 4 spaces
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, "\n\n    ", "\n");
     }
 }
