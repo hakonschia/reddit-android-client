@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -563,6 +564,10 @@ public class ReplyActivity extends AppCompatActivity {
         linkDialog.setContentView(R.layout.dialog_reply_add_link);
         linkDialog.show();
 
+        // Because using match_parent in the layout file doesn't actually match the parent (screen width)
+        // This looks weird on horizontal orientation though
+        linkDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
         TextView textTv = linkDialog.findViewById(R.id.textText);
         TextView linkTv = linkDialog.findViewById(R.id.linkText);
 
@@ -632,6 +637,10 @@ public class ReplyActivity extends AppCompatActivity {
         }
         confirmDiscardDialog.setContentView(R.layout.dialog_reply_confirm_back_press);
         confirmDiscardDialog.show();
+
+        // Because using match_parent in the layout file doesn't actually match the parent (screen width)
+        // This looks weird on horizontal orientation though
+        confirmDiscardDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         Button discard = confirmDiscardDialog.findViewById(R.id.btnDiscard);
         Button cancel = confirmDiscardDialog.findViewById(R.id.btnCancel);
