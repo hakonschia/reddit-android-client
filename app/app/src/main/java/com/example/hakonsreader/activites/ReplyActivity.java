@@ -60,17 +60,29 @@ public class ReplyActivity extends AppCompatActivity {
      */
     private static final String LINK_DIALOG_LINK = "urlDialogLink";
 
+    /**
+     * The key used used to store if the confirm discard dialog is shown
+     */
+    private static final String CONFIRM_DIALOG_SHOWN = "confirmDialogShown";
+
 
 
     private ActivityReplyBinding binding;
 
     private final RedditApi redditApi = App.get().getApi();
     private RedditListing replyingTo;
+
     /**
-     * The link dialog that allows the user to easily insert a markdown link. If this is
+     * Dialog that allows the user to easily insert a markdown link. If this is
      * not null a dialog is shown to the user
      */
     private Dialog linkDialog;
+
+    /**
+     * Dialog displayed when the user wants to finish the activity with text in the input field
+     * that ensures the user wants to discard the text
+     */
+    private Dialog confirmDiscardDialog;
 
 
     @Override
@@ -89,6 +101,11 @@ public class ReplyActivity extends AppCompatActivity {
                 String text = savedInstanceState.getString(LINK_DIALOG_TEXT);
                 String link = savedInstanceState.getString(LINK_DIALOG_LINK);
                 this.showLinkDialog(text, link);
+            }
+
+            boolean showConfirmDialog = savedInstanceState.getBoolean(CONFIRM_DIALOG_SHOWN);
+            if (showConfirmDialog) {
+                this.showConfirmDialog();
             }
         }
 
@@ -133,6 +150,7 @@ public class ReplyActivity extends AppCompatActivity {
         outState.putString(REPLY_TEXT, binding.replyText.getText().toString());
         outState.putString(PREVIEW_TEXT, binding.preview.getText().toString());
 
+        // Store state of the link dialog
         if (linkDialog != null && linkDialog.isShowing()) {
             outState.putBoolean(LINK_DIALOG_SHOWN, true);
 
@@ -146,6 +164,15 @@ public class ReplyActivity extends AppCompatActivity {
             linkDialog.dismiss();
         } else {
             outState.putBoolean(LINK_DIALOG_SHOWN, false);
+        }
+
+        // Store state of the confirm discard dialog
+        if (confirmDiscardDialog != null && confirmDiscardDialog.isShowing()) {
+            outState.putBoolean(CONFIRM_DIALOG_SHOWN, true);
+
+            confirmDiscardDialog.dismiss();
+        } else {
+            outState.putBoolean(CONFIRM_DIALOG_SHOWN, false);
         }
     }
 
@@ -162,18 +189,7 @@ public class ReplyActivity extends AppCompatActivity {
     @Override
     public void finish() {
         if (!binding.replyText.getText().toString().isEmpty()) {
-            // TODO I suppose this dialog state should also be saved like with linkDialog?
-            Dialog confirmDialog = new Dialog(this);
-            confirmDialog.setContentView(R.layout.dialog_reply_confirm_back_press);
-            confirmDialog.show();
-
-            Button discard = confirmDialog.findViewById(R.id.btnDiscard);
-            Button cancel = confirmDialog.findViewById(R.id.btnCancel);
-
-            discard.setOnClickListener(v -> super.finish());
-            cancel.setOnClickListener(v -> confirmDialog.dismiss());
-
-            // TODO add button for "discard and save" that saves the text and whats being responded to so we can resume later
+            this.showConfirmDialog();
         } else {
             super.finish();
         }
@@ -540,9 +556,10 @@ public class ReplyActivity extends AppCompatActivity {
      * @param link The initial text to set for the link
      */
     private void showLinkDialog(String linkText, String link) {
-        Log.d(TAG, String.format("showLinkDialog: linkText=%s, link=%s", linkText, link));
-        // Create the dialog and open it
-        linkDialog = new Dialog(this);
+        if (linkDialog == null) {
+            linkDialog = new Dialog(this);
+        }
+
         linkDialog.setContentView(R.layout.dialog_reply_add_link);
         linkDialog.show();
 
@@ -604,6 +621,26 @@ public class ReplyActivity extends AppCompatActivity {
         linkTv.setText(link == null ? "" : link);
     }
 
+    /**
+     * Shows a dialog to let the user confirm they want to leave
+     *
+     * <p>If the user selects to leave, {@link super#finish()} is called</p>
+     */
+    private void showConfirmDialog() {
+        if (confirmDiscardDialog == null) {
+            confirmDiscardDialog = new Dialog(this);
+        }
+        confirmDiscardDialog.setContentView(R.layout.dialog_reply_confirm_back_press);
+        confirmDiscardDialog.show();
+
+        Button discard = confirmDiscardDialog.findViewById(R.id.btnDiscard);
+        Button cancel = confirmDiscardDialog.findViewById(R.id.btnCancel);
+
+        discard.setOnClickListener(v -> super.finish());
+        cancel.setOnClickListener(v -> confirmDiscardDialog.dismiss());
+
+        // TODO add button for "discard and save" that saves the text and whats being responded to so we can resume later
+    }
 
     /**
      * Class that implements {@link TextWatcher} that inserts automatically continues various
