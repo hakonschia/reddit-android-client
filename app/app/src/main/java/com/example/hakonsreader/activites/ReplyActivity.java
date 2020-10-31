@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -83,15 +84,14 @@ public class ReplyActivity extends AppCompatActivity {
             binding.preview.setText(savedInstanceState.getString(PREVIEW_TEXT));
 
             // Restore state of the link dialog
-            boolean showlinkDialog = savedInstanceState.getBoolean(LINK_DIALOG_SHOWN);
-            if (showlinkDialog) {
+            boolean showLinkDialog = savedInstanceState.getBoolean(LINK_DIALOG_SHOWN);
+            if (showLinkDialog) {
                 String text = savedInstanceState.getString(LINK_DIALOG_TEXT);
                 String link = savedInstanceState.getString(LINK_DIALOG_LINK);
                 this.showLinkDialog(text, link);
             }
         }
 
-        // TODO get comment/post
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String jsonData = extras.getString(PostActivity.LISTING_KEY);
@@ -117,44 +117,12 @@ public class ReplyActivity extends AppCompatActivity {
             binding.setListing(replyingTo);
         }
 
-        // With adding a MarkwonEditor the text input shows some highlighting for what is markdown
-
-        // Using this markwon instance has the benefit of highlighting reddit links etc. in the preview
-        // Although it doesn't actually add the links around the markdown, reddit doesn't do that
-        // themselves so it's fine
-        final Markwon markwon = App.get().getMark();
-
-        // TODO custom markwon plugins wont affect the edit text
-        // Create editor
-        final MarkwonEditor editor = MarkwonEditor.create(markwon);
-
-        // Set edit listeners. Both the edit text field and and preview are updated
-        binding.replyText.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(editor));
-        binding.replyText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                // It's probably horribly inefficient to update the entire markdown every text change
-                // Might be possible to implement onTextChanged and render only the markdown that changed
-                // and insert it into the text. This works for now
-                markwon.setMarkdown(binding.preview, s.toString());
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not implemented
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // TODO If we're on a code block (4 spaces) and the new character is a newline, add 4 spaces automatically
-                //  if we're in a list (starts with * or 1. (or technically <any digit>. ) then continue the list
-                // Not implemented
-            }
-        });
 
         // TODO when the preview and edit text only takes up a limited amount of space this should scroll
         //  and also has the benefit of removing the link clicker which is kinda weird to have
         //binding.preview.setMovementMethod(ScrollingMovementMethod.getInstance());
 
+        this.setTextListeners();
         this.attachLongClickListenerToMarkdownButtons();
     }
 
@@ -165,7 +133,7 @@ public class ReplyActivity extends AppCompatActivity {
         outState.putString(REPLY_TEXT, binding.replyText.getText().toString());
         outState.putString(PREVIEW_TEXT, binding.preview.getText().toString());
 
-        if (linkDialog != null) {
+        if (linkDialog != null && linkDialog.isShowing()) {
             outState.putBoolean(LINK_DIALOG_SHOWN, true);
 
             TextView text = linkDialog.findViewById(R.id.textText);
@@ -194,6 +162,7 @@ public class ReplyActivity extends AppCompatActivity {
     @Override
     public void finish() {
         if (!binding.replyText.getText().toString().isEmpty()) {
+            // TODO I suppose this dialog state should also be saved like with linkDialog?
             Dialog confirmDialog = new Dialog(this);
             confirmDialog.setContentView(R.layout.dialog_reply_confirm_back_press);
             confirmDialog.show();
@@ -281,6 +250,51 @@ public class ReplyActivity extends AppCompatActivity {
             View v = binding.markdownButtonsInnerLayout.getChildAt(i);
             v.setOnLongClickListener(markdownButtonsLongClick);
         }
+    }
+
+
+    /**
+     * Sets various text listeners on {@link ActivityReplyBinding#replyText} to update the
+     * text to highlight markdown syntax, to automatically continue markdown syntax, and to update the preview text
+     */
+    private void setTextListeners() {
+        // With a MarkwonEditor the text input shows some highlighting for what is markdown
+
+        // Using this markwon instance has the benefit of highlighting reddit links etc. in the preview
+        // Although it doesn't actually add the links around the markdown, reddit doesn't do that
+        // themselves so it's fine
+        final Markwon markwon = App.get().getMark();
+
+        // TODO custom markwon plugins wont affect the edit text
+        // Create editor
+        final MarkwonEditor editor = MarkwonEditor.create(markwon);
+
+        // Set text listeners
+        // Updates the EditText to show what is markdown syntax
+        binding.replyText.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(editor));
+
+        // Listens to changes and automatically continues markdown syntax
+        binding.replyText.addTextChangedListener(new MarkdownInsertTextWatcher());
+
+        // Updates the preview text
+        binding.replyText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                // It's probably horribly inefficient to update the entire markdown every text change
+                // Might be possible to implement onTextChanged and render only the markdown that changed
+                // and insert it into the text. This works for now
+                markwon.setMarkdown(binding.preview, s.toString());
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not implemented
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not implemented
+            }
+        });
     }
 
     /**
@@ -458,14 +472,26 @@ public class ReplyActivity extends AppCompatActivity {
      */
     public void codeBlockOnClick(View view) {
         // Code blocks in markdown: "    code goes here" (four spaces at the start)
+        // Technically markdown also supports "```code here```" which also supports multiline, but apparently
+        // Reddit doesn't support this on every client, so we always use four spaces
 
         int start = binding.replyText.getSelectionStart();
         int end = binding.replyText.getSelectionEnd();
+        String text = binding.replyText.getText().toString();
 
-        // Add two newlines at the start, since one newline in markdown usually does nothing (but after
-        // code blocks they do, so at the end we can add only one)
+        String startSyntax = "";
+
+        // Ensure there are two newlines before the code block, unless we're at the beginning of the text
+        // or we already have two newlines (one newline in markdown usually doesn't do anything, so we need two)
+        if (!(start == 0 || (text.length() >= 2 && text.startsWith("\n\n", start - 2)))) {
+            startSyntax = "\n\n";
+        }
+
+        // Add the four spaces which is the actual code block syntax
+        startSyntax += "    ";
+
         // There isn't really an end for code blocks. They end when a new line doesn't have 4 spaces
-        this.addMarkdownSyntax(binding.replyText.getText(), start, end, "\n\n    ", "\n");
+        this.addMarkdownSyntax(binding.replyText.getText(), start, end, startSyntax, "");
     }
 
     /**
@@ -519,9 +545,6 @@ public class ReplyActivity extends AppCompatActivity {
         linkDialog = new Dialog(this);
         linkDialog.setContentView(R.layout.dialog_reply_add_link);
         linkDialog.show();
-        linkDialog.setOnDismissListener(dialog -> {
-            linkDialog = null;
-        });
 
         TextView textTv = linkDialog.findViewById(R.id.textText);
         TextView linkTv = linkDialog.findViewById(R.id.linkText);
@@ -579,5 +602,122 @@ public class ReplyActivity extends AppCompatActivity {
         // won't trigger
         textTv.setText(linkText == null ? "" : linkText);
         linkTv.setText(link == null ? "" : link);
+    }
+
+
+    /**
+     * Class that implements {@link TextWatcher} that inserts automatically continues various
+     * markdown formatting.
+     *
+     * <p>Current markdown that is added:
+     * <ol>
+     *     <li>Code block</li>
+     * </ol>
+     * </p>
+     */
+    private static class MarkdownInsertTextWatcher implements TextWatcher {
+        /**
+         * When this is set to true the next call to onTextChanged is ignored
+         */
+        private boolean textModified = false;
+
+        /**
+         * When this is true the next call to afterTextChanged inserts code block formatting
+         * at the position specified by {@link MarkdownInsertTextWatcher#posToInsert}
+         */
+        private boolean insertCodeBlock = false;
+
+        /**
+         * The position in the editable text in afterTextChanged to insert formatting
+         */
+        private int posToInsert = -1;
+
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (insertCodeBlock) {
+                // Set that the text has been modified, so the next call to onTextChanged is ignored
+                textModified = true;
+
+                // Ensure this is reset
+                insertCodeBlock = false;
+
+                // The text has to be inserted as the last thing that happens, otherwise it will cause an infinite loop
+                s.insert(posToInsert, "    ");
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // TODO If we're on a code block (4 spaces) and the new character is a newline, add 4 spaces automatically
+            //  if we're in a list (starts with * or 1. (or technically <any digit>. ) then continue the list
+
+            // If the text has been modified in afterTextChanged don't do anything as it can cause
+            // an infinite loop
+            if (textModified) {
+                textModified = false;
+                return;
+            }
+
+            String text = s.toString();
+            int length = text.length();
+
+            // This seems to be correct?
+            // This seemingly gives the same value as "textView.getSelectionStart()"
+            int pos = start + count;
+
+            // So this doesn't really work as intended, since if we're removing a newline instead of adding it
+            // this will still trigger and can insert a code block/list at the start without being able to remove
+            // the newline
+            // TODO We really need to figure out how to check that the character inserted was a newline, not just
+            //  that the previous position is a newline
+            if (length > 0 && pos > 0 && text.charAt(pos - 1) == '\n') {
+
+                // Start at pos - 2 as we don't want to count the newly inserted newline
+                int lastNewline = text.lastIndexOf('\n', pos - 2);
+
+                // If we're at the first line, set to 0 to count the start of the line
+                if (lastNewline == -1) {
+                    lastNewline = 0;
+                } else {
+                    // If we're not on the first line, go one further as the newline is
+                    // actually on the end of the previous line
+                    lastNewline++;
+                }
+
+                // Find the next newline to find the entire line
+                int nextNewLine = text.indexOf('\n', pos);
+                if (nextNewLine == -1) {
+                    nextNewLine = text.length();
+                }
+
+                // substring(begin, end) is end exclusive, so the newline at the end isn't counted
+                String line = text.substring(lastNewline, nextNewLine);
+
+                // If the line starts with a code block, but isn't just the syntax (and a newline)
+                // This makes it so if the user presses enter and it inserts a new code block
+                // and press enter again it doesn't continue the code block, but continues as normal text
+                if (line.startsWith("    ") && !line.equals("    \n")) {
+                    // The pos is on the new line, so that's where the code block syntax should be inserted
+                    posToInsert = pos;
+                    insertCodeBlock = true;
+                }
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // Not implemented
+            // can probably find out here if a newline is added?
+        }
     }
 }
