@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityReplyBinding;
+import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
 import com.google.gson.Gson;
 
@@ -138,7 +140,8 @@ public class ReplyActivity extends AppCompatActivity {
 
         // TODO when the preview and edit text only takes up a limited amount of space this should scroll
         //  and also has the benefit of removing the link clicker which is kinda weird to have
-        //binding.preview.setMovementMethod(ScrollingMovementMethod.getInstance());
+
+        binding.preview.setMovementMethod(InternalLinkMovementMethod.getInstance(this));
 
         this.setTextListeners();
         this.attachLongClickListenerToMarkdownButtons();
