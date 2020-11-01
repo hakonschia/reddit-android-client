@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.PhotoViewDoubleTapListener;
 import com.example.hakonsreader.views.util.ClickHandler;
@@ -18,6 +19,8 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+
+import java.util.List;
 
 public class ContentImage extends PhotoView {
     private static final String TAG = "ContentImage";
@@ -66,9 +69,22 @@ public class ContentImage extends PhotoView {
      * Updates the view with the url from {@link ContentImage#post}
      */
     private void updateView() {
+        int screenWidth = App.get().getScreenWidth();
+
         // Set with setPost() not setWithImageUrl()
         if (imageUrl == null) {
             imageUrl = post.getUrl();
+
+            // This should be improved and is a pretty poor way of doing it, but this will reduce some
+            // unnecessary loading as it will get some lower resolution images (it will be scaled down to
+            // the same size later by Picasso, so it won't give loss of image quality)
+            List<Image> images = post.getPreviewImages();
+            for (Image image : images) {
+                if (image.getWidth() == screenWidth) {
+                    imageUrl = image.getUrl();
+                    break;
+                }
+            }
         }
 
         // TODO create a preference for "Enable zooming of images while scrolling"
