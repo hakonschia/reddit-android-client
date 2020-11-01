@@ -68,11 +68,11 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         setContentView(binding.getRoot());
 
         // For testing purposes hardcode going into a subreddit/post etc.
-        Intent intent = new Intent(this, ReplyActivity.class);
+        Intent intent = new Intent(this, DispatcherActivity.class);
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
-        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/bogdanoff");
-        //startActivity(intent);
+        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/test/comments/jlyqit/stream_discussion%E3%81%B1%E3%81%82%E3%81%B7%E3%81%86%E3%81%86%E3%81%86%E3%81%86%E3%81%86%E3%81%86%E3%81%86%E3%81%86%E3%81%86%E3%81%86%E3%81%86%E6%B9%8A%E3%81%82%E3%81%8F%E3%81%82%E3%83%9B%E3%83%AD%E3%83%A9%E3%82%A4%E3%83%96/");
+        startActivity(intent);
 
         if (savedInstanceState != null) {
             this.restoreFragmentStates(savedInstanceState);

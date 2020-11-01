@@ -148,13 +148,32 @@ public class DispatcherActivity extends AppCompatActivity {
             // Create an intent that would redirect to another app if installed
             intent = new Intent(Intent.ACTION_VIEW, asUri);
 
+            // Find all activities this intent would resolve to
             PackageManager packageManager = getPackageManager();
             List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
 
-            // If it wouldn't resolve to an activity, open in a WebView instead
-            // Web pages will always resolve to a chrome activity, so ignore that as we are looking for actual apps
-            if (activities.size() <= 1) {
-                // If we don't know how to handle the URL pass it to a web view
+            boolean appActivityFound = false;
+
+            // We can't use activities.size() > 1 to check if it matches a browser
+            // You would think a url would match both the app and the browser, but YouTube for instance
+            // matches only the app for YouTube links, not a browser, so the size is 1
+            // but for instance Twitch matches both the app and the browser (YouTube isn't even a standard
+            // app in the Android OS so not sure why it only resolves to the app)
+
+            // Check if there are intents not leading to a browser
+            for (ResolveInfo activity : activities) {
+
+                // TODO find out how to check if it matches a browser (because this is absolutely terrible)
+                if (!activity.activityInfo.packageName.matches(
+                        "com.android.chrome|com.sec.android.app.sbrowser|org.mozilla.firefox"
+                )) {
+                    appActivityFound = true;
+                    break;
+                }
+            }
+
+            // If no activity found, open in WebView (internal browser)
+            if (!appActivityFound) {
                 intent = new Intent(this, WebViewActivity.class);
                 intent.putExtra(WebViewActivity.URL_KEY, url);
             }
