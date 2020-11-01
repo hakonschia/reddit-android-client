@@ -207,13 +207,6 @@ public class RedditPost extends RedditListing {
     }
 
     /**
-     * @return The HTML text of the post if the post is {@link PostType#TEXT}
-     */
-    public String getSelftextHTML() {
-        return selftextHtml;
-    }
-
-    /**
      * @return The ID of the post this post is a crosspost from
      */
     public String getCrosspostParentID() {
@@ -349,6 +342,18 @@ public class RedditPost extends RedditListing {
     /**
      * Retrieves the list of preview images the post has. This list will usually hold a number
      * of images with different resolutions.
+     *
+     * <p>The resolutions found here typically follow the widths below (in order), with the height matching
+     * the aspect ratio:
+     * <ol>
+     *     <li>108</li>
+     *     <li>216</li>
+     *     <li>320</li>
+     *     <li>640</li>
+     *     <li>960</li>
+     *     <li>1080</li>
+     * </ol>
+     * </p>
      *
      * <p>See {@link RedditPost#getSourcePreview()} for the source resolution</p>
      *
