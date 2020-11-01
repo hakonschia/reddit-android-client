@@ -61,7 +61,14 @@ public class ImageActivity extends AppCompatActivity {
 
             imageUrl = LinkUtils.convertToDirectUrl(imageUrl);
 
-            Picasso.get().load(imageUrl).into(image);
+            // This needs to be resized or else we will get "Canvas: Trying to draw too large bitmap"
+            // TODO since we're resizing we can probably try to get a closer match in images from the
+            //  preview images (also for ContentImage)
+            Picasso
+                    .get()
+                    .load(imageUrl)
+                    .resize(App.get().getScreenWidth(), 0)
+                    .into(image);
         } else {
             finish();
         }

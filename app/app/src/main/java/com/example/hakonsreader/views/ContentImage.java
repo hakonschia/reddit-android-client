@@ -91,6 +91,7 @@ public class ContentImage extends PhotoView {
         //  instead of just when scrolling works
         //  Exception message: java.lang.RuntimeException: Canvas: trying to draw too large(107867520bytes) bitmap.
         //  Since it's hard to reproduce I'm not even sure if wrapping this section in a try catch works or not
+        //  The issue at least happens with extremely large images (although it didn't happen with large images the first time)
 
         try {
             RequestCreator c = Picasso.get()
