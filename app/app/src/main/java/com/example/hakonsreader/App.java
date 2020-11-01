@@ -345,12 +345,12 @@ public class App extends Application {
 
     /**
      * Retrieves the {@link SlidrConfig} to use for to slide away videos and images based
-     * on the users setting
+     * on the users setting. This also adjusts the threshold needed to peform a swipe
      *
      * @return The SlidrConfig that should be used for videos and images
      */
     public SlidrConfig getVideoAndImageSlidrConfig() {
         // TODO create setting for this
-        return new SlidrConfig.Builder().position(SlidrPosition.BOTTOM).build();
+        return new SlidrConfig.Builder().position(SlidrPosition.BOTTOM).distanceThreshold(0.15f).build();
     }
 }
