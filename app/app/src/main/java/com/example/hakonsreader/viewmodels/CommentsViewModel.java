@@ -16,18 +16,14 @@ import java.util.List;
 
 public class CommentsViewModel extends ViewModel {
 
-    private List<RedditComment> commentsDataSet = new ArrayList<>();
+    private final List<RedditComment> commentsDataSet = new ArrayList<>();
 
-    private MutableLiveData<RedditPost> post;
-    private MutableLiveData<List<RedditComment>> comments;
-    private MutableLiveData<Boolean> loadingChange;
+    private final MutableLiveData<RedditPost> post = new MutableLiveData<>();
+    private final MutableLiveData<List<RedditComment>> comments = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();
 
 
     public LiveData<RedditPost> getPost() {
-        if (post == null) {
-            post = new MutableLiveData<>();
-        }
-
         return post;
     }
 
@@ -35,10 +31,6 @@ public class CommentsViewModel extends ViewModel {
      * @return The comments
      */
     public LiveData<List<RedditComment>> getComments() {
-        if (comments == null) {
-            comments = new MutableLiveData<>();
-        }
-
         return comments;
     }
 
@@ -49,10 +41,6 @@ public class CommentsViewModel extends ViewModel {
      * it has finished loading it will be set to false
      */
     public LiveData<Boolean> onLoadingChange() {
-        if (loadingChange == null) {
-            loadingChange = new MutableLiveData<>();
-        }
-
         return loadingChange;
     }
 
