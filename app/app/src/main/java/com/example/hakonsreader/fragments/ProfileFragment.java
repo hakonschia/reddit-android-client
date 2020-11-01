@@ -72,10 +72,15 @@ public class ProfileFragment extends Fragment {
      * Create a new ProfileFragment for a user that is NOT the logged in user. For logged in users
      * user {@link ProfileFragment#newInstance()}
      *
-     * @param username The username to create the fragment for
+     * @param username The username to create the fragment for. If this is equal to "me", the fragment
+     *                 will be for the logged in user
      * @return A ProfileFragment for a user
      */
     public static ProfileFragment newInstance(String username) {
+        if (username.equals("me")) {
+            return ProfileFragment.newInstance();
+        }
+
         Bundle args = new Bundle();
         args.putString("username", username);
 
