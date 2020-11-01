@@ -31,6 +31,9 @@
     <!-- The fast time for TickerView animations -->
     <integer name="tickerAnimationFast">350</integer>
 
+    <!-- Delay used on sliding animations to ensure they're smooth (if UI takes some time to load it looks bad)-->
+    <integer name="slideAnimationDelay">150</integer>
+
     <!-- The corner radius to use for backgrounds such as comment by admin-->
     <dimen name="userBackgroundCornerRadius">8dp</dimen>
 
