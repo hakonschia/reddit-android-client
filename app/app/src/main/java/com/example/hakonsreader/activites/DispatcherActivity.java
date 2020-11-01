@@ -145,28 +145,25 @@ public class DispatcherActivity extends AppCompatActivity {
             //  and then send that
 
         } else {
+            // Redirect to the corresponding application for the url, or WebViewActivity if no app is found
+
             // Create an intent that would redirect to another app if installed
             intent = new Intent(Intent.ACTION_VIEW, asUri);
 
             // Find all activities this intent would resolve to
             PackageManager packageManager = getPackageManager();
-            List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            List<ResolveInfo> intentActivities = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+            // To check if the intent matches an app we need to find the default browser as that
+            // will usually be in the list of intent activities
+            Intent defaultBrowserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://"));
+            ResolveInfo defaultBrowserInfo = packageManager.resolveActivity(defaultBrowserIntent, PackageManager.MATCH_DEFAULT_ONLY);
 
             boolean appActivityFound = false;
 
-            // We can't use activities.size() > 1 to check if it matches a browser
-            // You would think a url would match both the app and the browser, but YouTube for instance
-            // matches only the app for YouTube links, not a browser, so the size is 1
-            // but for instance Twitch matches both the app and the browser (YouTube isn't even a standard
-            // app in the Android OS so not sure why it only resolves to the app)
-
             // Check if there are intents not leading to a browser
-            for (ResolveInfo activity : activities) {
-
-                // TODO find out how to check if it matches a browser (because this is absolutely terrible)
-                if (!activity.activityInfo.packageName.matches(
-                        "com.android.chrome|com.sec.android.app.sbrowser|org.mozilla.firefox"
-                )) {
+            for (ResolveInfo intentActivity : intentActivities) {
+                if (!intentActivity.activityInfo.packageName.equals(defaultBrowserInfo.activityInfo.packageName)) {
                     appActivityFound = true;
                     break;
                 }
