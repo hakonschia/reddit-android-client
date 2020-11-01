@@ -17,8 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="@{view -> adapter.showComments(comment)}"
-        android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}"
-        android:layout_marginBottom="5dp">
+        android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}">
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/sideBarsBarrier"
@@ -37,11 +36,13 @@
             android:id="@+id/commentAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
 
-            android:text='@{comment != null ? @string/author_prefixed(comment.author) : "" }'
+            android:text='@{comment != null ? @string/author_prefixed(comment.author) : ""}'
             android:textColor="@color/link_color"
             android:textStyle="italic"
 
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/sideBarsBarrier"
             app:layout_constraintTop_toTopOf="parent"
 

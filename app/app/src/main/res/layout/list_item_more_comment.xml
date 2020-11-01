@@ -18,7 +18,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content" >
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/sideBarsBarrier"
@@ -37,7 +37,7 @@
             android:id="@+id/moreComments"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             android:onClick="@{(view) -> adapter.getMoreComments(view, comment)}"
             android:text="@{@plurals/extraComments(comment.extraCommentsCount, comment.extraCommentsCount)}"
 
