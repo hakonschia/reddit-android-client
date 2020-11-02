@@ -6,13 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -137,10 +135,7 @@ public class ReplyActivity extends AppCompatActivity {
             binding.setListing(replyingTo);
         }
 
-
-        // TODO when the preview and edit text only takes up a limited amount of space this should scroll
-        //  and also has the benefit of removing the link clicker which is kinda weird to have
-
+        // Set this link movement method so links work the same way in the preview as the rest of the app
         binding.preview.setMovementMethod(InternalLinkMovementMethod.getInstance(this));
 
         this.setTextListeners();
@@ -394,6 +389,10 @@ public class ReplyActivity extends AppCompatActivity {
     public void linkOnClick(View view) {
         // Link in markdown: [Link text](https://link.com)
 
+        // TODO if a text is marked we can probably pass this here, but the question is if it makes sense
+        //  to put it as the link or the link text (probably as link?)
+        //  We probably need to remove the text selected as well if we add the link, otherwise the markdown link
+        //  would  be added as well as the previous text
         this.showLinkDialog("", "");
     }
 

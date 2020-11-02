@@ -21,16 +21,16 @@
             android:id="@+id/replyingTo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:text="@{@string/replyingTo(listing.author)}"
 
+            android:text="@{@string/replyingTo(listing.author)}"
             android:textColor="@color/text_color"
             android:textSize="20sp"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+
             tools:text="Replying to hakonschia" />
 
         <TextView
@@ -49,21 +49,26 @@
             app:layout_constraintStart_toStartOf="@+id/replyingTo"
             app:layout_constraintTop_toBottomOf="@+id/replyingTo"
 
-            tools:text="The reason the galactic empire fell was because they didn't have horses there" />
+            tools:text="@tools:sample/lorem/random" />
 
+        <!-- Ideally the preview and preview header would be right under
+        the input field (instead of at the middle of the screen), but it's
+        really hard to get both the input field and preview text to not go
+        over each other (either the input field will grow so it fills the screen or
+        the preview text will grow upwards and remove the input field) -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="8dp"
-
             android:layout_marginEnd="8dp"
-            app:layout_constraintBottom_toBottomOf="@id/previewHeader"
+
+            app:layout_constraintBottom_toTopOf="@id/previewHeader"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/summary"
-            app:layout_constraintVertical_bias="0.0">
+
+            app:layout_constrainedHeight="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/replyText"
@@ -71,13 +76,13 @@
                 android:layout_height="wrap_content"
 
                 android:hint="@string/replyHint"
-
-                android:textSize="14sp"
                 android:inputType="textMultiLine"
-                android:scrollbars="vertical"
 
                 android:textColor="@color/text_color"
-                android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg" />
+                android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg"
+                android:textSize="14sp"
+
+                tools:text="@tools:sample/lorem[10]" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -87,11 +92,12 @@
 
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="@string/replyPreview"
 
+            android:text="@string/replyPreview"
             android:textColor="@color/secondary_text_color"
             android:textSize="13sp"
 
+            app:layout_constraintBottom_toTopOf="@id/preview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -99,24 +105,22 @@
 
         <TextView
             android:id="@+id/preview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginStart="8dp"
-
             android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+
             android:textColor="@color/text_color"
             android:textSize="15sp"
 
-            app:layout_constrainedHeight="true"
+            android:scrollbars="vertical"
+            android:fadeScrollbars="false"
 
             app:layout_constraintBottom_toTopOf="@+id/markdownButtons"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/previewHeader"
-            app:layout_constraintVertical_bias="0.0"
-            tools:text="Preview text goes here" />
+            app:layout_constraintTop_toBottomOf="@+id/previewHeader"/>
 
         <!--
         <Button
