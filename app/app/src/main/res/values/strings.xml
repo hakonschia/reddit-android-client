@@ -51,7 +51,7 @@
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark Mode</string>
-    <string name="prefs_title_cache_nsfw">Cache NSFW videos and posts</string>
+    <string name="prefs_title_cache_nsfw">Cache NSFW videos and images</string>
     <string name="prefs_title_auto_play_videos">Automatically play videos</string>
     <string name="prefs_title_auto_play_videos_always">Always</string>
     <string name="prefs_title_auto_play_videos_never">Never</string>
@@ -59,6 +59,11 @@
     <string name="prefs_title_play_muted_videos">Start videos muted</string>
     <string name="prefs_title_play_muted_videos_fullscreen">Start videos muted in fullscreen</string>
     <string name="prefs_title_loop_videos">Loop videos</string>
+    <string name="prefs_title_fullscreen_swipe_direction">Direction to swipe away fullscreen posts</string>
+    <string name="prefs_title_fullscreen_swipe_direction_up">Up</string>
+    <string name="prefs_title_fullscreen_swipe_direction_down">Down</string>
+    <string name="prefs_title_fullscreen_swipe_direction_left">Left</string>
+    <string name="prefs_title_fullscreen_swipe_direction_right">Right</string>
 
     <!-- Preferences keys -->
     <string name="prefs_key_theme" translatable="false">theme</string>
@@ -70,6 +75,10 @@
     <string name="prefs_key_play_muted_videos" translatable="false">play_muted_videos</string>
     <string name="prefs_key_play_muted_videos_fullscreen" translatable="false">play_muted_videos_fullscreen</string>
     <string name="prefs_key_loop_videos" translatable="false">loop_videos</string>
+    <string name="prefs_key_fullscreen_swipe_direction" translatable="false">fullscreen_swipe_direction</string>
+    <string name="prefs_key_fullscreen_swipe_direction_up" translatable="false">fullscreen_swipe_direction_up</string>
+    <string name="prefs_key_fullscreen_swipe_direction_down" translatable="false">fullscreen_swipe_direction_down</string>
+    <string name="prefs_key_fullscreen_swipe_direction_left" translatable="false">fullscreen_swipe_direction_left</string>
 
     <!-- String for post ages that are "just posted", ie. < 1 minute -->
     <string name="postAgeJustPosted">Just posted</string>

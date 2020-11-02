@@ -36,8 +36,8 @@
     <string name="errorLoggingIn">Feil ved innlogging</string>
     <string name="prefs_title_theme">Nattmodus</string>
     <string name="genericServerError">Kan ikke koble til Reddit servere</string>
-    <string name="prefs_title_cache_nsfw">Cache NSFW videoer og poster</string>
-    <string name="prefs_title_auto_play_videos">Automatisk start videoer</string>
+    <string name="prefs_title_cache_nsfw">Cache NSFW videoer og bilder</string>
+    <string name="prefs_title_auto_play_videos">Start videoer automatisk</string>
     <string name="unknownError">En ukjent feil oppstod</string>
     <string name="prefs_title_auto_play_videos_always">Alltid</string>
     <string name="btnAddComment">Legg til kommentar</string>
@@ -109,4 +109,9 @@
     <string name="replyConfirmBackPressDialogHeader">Du har tekst som ikke er sendt</string>
     <string name="replyConfirmBackPressDialogContent">Det er tekst i skrivefeltet. Er du sikker på at du vil forkaste det?</string>
     <string name="discard">Forkast</string>
+    <string name="prefs_title_fullscreen_swipe_direction">Retning å sveipe bort fullskjerm poster</string>
+    <string name="prefs_title_fullscreen_swipe_direction_up">Opp</string>
+    <string name="prefs_title_fullscreen_swipe_direction_down">Ned</string>
+    <string name="prefs_title_fullscreen_swipe_direction_left">Venstre</string>
+    <string name="prefs_title_fullscreen_swipe_direction_right">Høyre</string>
 </resources>

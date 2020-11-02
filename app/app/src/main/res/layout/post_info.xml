@@ -131,7 +131,6 @@
             android:textColor="@{post.mod ? @color/text_color : @color/link_color}"
             android:textSize="13sp"
 
-            app:layout_constraintEnd_toEndOf="@+id/subreddit"
             app:layout_constraintHorizontal_bias="0.0"
 
             app:layout_constraintStart_toStartOf="parent"

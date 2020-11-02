@@ -8,6 +8,14 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/prefs_group_videos_images">
+        <ListPreference
+            app:key="@string/prefs_key_fullscreen_swipe_direction"
+            app:title="@string/prefs_title_fullscreen_swipe_direction"
+            app:useSimpleSummaryProvider="true"
+            app:entries="@array/fullscreen_swipe_entries"
+            app:entryValues="@array/fullscreen_swipe_values"
+            app:defaultValue="@string/prefs_default_fullscreen_swipe_direction"/>
+
         <SwitchPreference
             app:key="@string/prefs_key_cache_nsfw"
             app:title="@string/prefs_title_cache_nsfw"

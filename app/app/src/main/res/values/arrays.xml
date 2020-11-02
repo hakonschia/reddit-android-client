@@ -10,4 +10,17 @@
         <item>@string/prefs_key_auto_play_videos_never</item>
         <item>@string/prefs_key_auto_play_videos_wifi_only</item>
     </string-array>
+
+
+    <string-array name="fullscreen_swipe_entries">
+        <item>@string/prefs_title_fullscreen_swipe_direction_up</item>
+        <item>@string/prefs_title_fullscreen_swipe_direction_down</item>
+        <item>@string/prefs_title_fullscreen_swipe_direction_left</item>
+    </string-array>
+
+    <string-array name="fullscreen_swipe_values">
+        <item>@string/prefs_key_fullscreen_swipe_direction_up</item>
+        <item>@string/prefs_key_fullscreen_swipe_direction_down</item>
+        <item>@string/prefs_key_fullscreen_swipe_direction_left</item>
+    </string-array>
 </resources>

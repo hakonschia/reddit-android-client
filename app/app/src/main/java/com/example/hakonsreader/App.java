@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.DisplayMetrics;
@@ -295,13 +296,13 @@ public class App extends Application {
     public boolean autoPlayVideos() {
         Context context = getApplicationContext();
         String value = settings.getString(
-                context.getString(R.string.prefs_key_auto_play_videos),
-                context.getString(R.string.prefs_default_value_auto_play_videos)
+                getString(R.string.prefs_key_auto_play_videos),
+                getString(R.string.prefs_default_value_auto_play_videos)
         );
 
-        if (value.equals(context.getString(R.string.prefs_key_auto_play_videos_always))) {
+        if (value.equals(getString(R.string.prefs_key_auto_play_videos_always))) {
             return true;
-        } else if (value.equals(context.getString(R.string.prefs_key_auto_play_videos_never))) {
+        } else if (value.equals(getString(R.string.prefs_key_auto_play_videos_never))) {
             return false;
         }
 
@@ -350,7 +351,27 @@ public class App extends Application {
      * @return The SlidrConfig that should be used for videos and images
      */
     public SlidrConfig getVideoAndImageSlidrConfig() {
-        // TODO create setting for this
-        return new SlidrConfig.Builder().position(SlidrPosition.BOTTOM).distanceThreshold(0.15f).build();
+        String direction = settings.getString(
+                getString(R.string.prefs_key_fullscreen_swipe_direction),
+                getString(R.string.prefs_default_fullscreen_swipe_direction)
+        );
+
+        SlidrPosition pos;
+
+        // The SlidrPosition is kind of backwards, as SlidrPosition.BOTTOM means to "swipe from bottom" (which is swiping up)
+        if (direction.equals(getString(R.string.prefs_key_fullscreen_swipe_direction_up))) {
+            pos = SlidrPosition.BOTTOM;
+        } else if (direction.equals(getString(R.string.prefs_key_fullscreen_swipe_direction_down))) {
+            pos = SlidrPosition.TOP;
+        } else {
+            pos = SlidrPosition.LEFT;
+        }
+        // TODO this doesn't seem to work, if you start by going left, then it works, but otherwise it doesnt
+        /*else {
+            pos = SlidrPosition.RIGHT;
+            Log.d(TAG, "getVideoAndImageSlidrConfig: RIGHT");
+        }
+         */
+        return new SlidrConfig.Builder().position(pos).distanceThreshold(0.15f).build();
     }
 }

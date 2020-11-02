@@ -2,8 +2,9 @@
 <resources>
     <bool name="prefs_default_theme">false</bool>
     <bool name="prefs_default_value_cache_nsfw">false</bool>
-    <string name="prefs_default_value_auto_play_videos" translatable="false">@string/prefs_title_auto_play_videos_never</string>
+    <string name="prefs_default_value_auto_play_videos" translatable="false">@string/prefs_key_auto_play_videos_never</string>
     <bool name="prefs_default_play_muted_videos">true</bool>
     <bool name="prefs_default_play_muted_videos_fullscreen">true</bool>
     <bool name="prefs_default_loop_videos">false</bool>
+    <string name="prefs_default_fullscreen_swipe_direction" translatable="false">@string/prefs_key_fullscreen_swipe_direction_up</string>
 </resources>
