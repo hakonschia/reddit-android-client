@@ -10,6 +10,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
+    private static final String TAG = "SettingsFragment";
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {

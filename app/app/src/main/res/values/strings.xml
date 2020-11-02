@@ -46,11 +46,11 @@
 
 
     <!-- Preference groups -->
-    <string name="prefs_group_theme">Theme</string>
+    <string name="prefs_group_appearance">Appearance</string>
     <string name="prefs_group_videos_images">Videos and images</string>
 
     <!-- Preference titles/names -->
-    <string name="prefs_title_theme">Dark Mode</string>
+    <string name="prefs_title_theme">Dark mode</string>
     <string name="prefs_title_cache_nsfw">Cache NSFW videos and images</string>
     <string name="prefs_title_auto_play_videos">Automatically play videos</string>
     <string name="prefs_title_auto_play_videos_always">Always</string>
@@ -64,6 +64,12 @@
     <string name="prefs_title_fullscreen_swipe_direction_down">Down</string>
     <string name="prefs_title_fullscreen_swipe_direction_left">Left</string>
     <string name="prefs_title_fullscreen_swipe_direction_right">Right</string>
+    <string name="prefs_title_language">Language</string>
+    <!-- These are marked as non-translateable as they should always appear in the actual
+     language they represent -->
+    <string name="prefs_title_language_automatic">Automatic</string>
+    <string name="prefs_title_language_en" translatable="false">English</string>
+    <string name="prefs_title_language_nb" translatable="false">Norsk (bokmål)</string>
 
     <!-- Preferences keys -->
     <string name="prefs_key_theme" translatable="false">theme</string>
@@ -79,6 +85,11 @@
     <string name="prefs_key_fullscreen_swipe_direction_up" translatable="false">fullscreen_swipe_direction_up</string>
     <string name="prefs_key_fullscreen_swipe_direction_down" translatable="false">fullscreen_swipe_direction_down</string>
     <string name="prefs_key_fullscreen_swipe_direction_left" translatable="false">fullscreen_swipe_direction_left</string>
+    <string name="prefs_key_language" translatable="false">language</string>
+    <string name="prefs_key_language_automatic" translatable="false">language_automatic</string>
+    <string name="prefs_key_language_en" translatable="false">en</string>
+    <string name="prefs_key_language_nb" translatable="false">nb</string>
+
 
     <!-- String for post ages that are "just posted", ie. < 1 minute -->
     <string name="postAgeJustPosted">Just posted</string>

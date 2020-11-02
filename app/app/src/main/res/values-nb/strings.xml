@@ -7,7 +7,7 @@
     <string name="btnSubscrubeUnsubscribe">- Avabonner</string>
     <string name="tooManyRequestsError">For mange forespørsler sent. Prøv igjen om et par sekunder</string>
     <string name="threadLockedError">Tråden har blitt låst</string>
-    <string name="prefs_group_theme">Tema</string>
+    <string name="prefs_group_appearance">Utseende</string>
     <string name="subredditMustBeBetweenLength">Subreddit navn må være imellom 3 og 21 bokstaver</string>
     <string name="navbarSubreddit">Subreddit</string>
     <string name="prefs_title_play_muted_videos_fullscreen">Start videoer uten lyd i fullskjerm</string>
@@ -114,4 +114,6 @@
     <string name="prefs_title_fullscreen_swipe_direction_down">Ned</string>
     <string name="prefs_title_fullscreen_swipe_direction_left">Venstre</string>
     <string name="prefs_title_fullscreen_swipe_direction_right">Høyre</string>
+    <string name="prefs_title_language">Språk</string>
+    <string name="prefs_title_language_automatic">Automatisk</string>
 </resources>

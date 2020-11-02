@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -28,9 +29,11 @@ import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
 import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
+import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
+import java.util.Locale;
 import java.util.UUID;
 
 import io.noties.markwon.Markwon;
@@ -86,6 +89,7 @@ public class App extends Application {
 
         setupRedditApi();
         updateTheme();
+        updateLanguage();
 
         AppDatabase db = AppDatabase.getInstance(this);
 
@@ -273,6 +277,23 @@ public class App extends Application {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
+
+    /**
+     * Updates the language based on what is set in the settings
+     */
+    public void updateLanguage() {
+        String language = settings.getString(getString(R.string.prefs_key_language), getString(R.string.prefs_default_language));
+
+        Log.d(TAG, "updateLanguage: " + language);
+
+        if (language.equals(getString(R.string.prefs_key_language_en))) {
+
+        } else if (language.equals(getString(R.string.prefs_key_language_nb))) {
+
+        } else {
+            // Automatic, set to default locale
         }
     }
 
