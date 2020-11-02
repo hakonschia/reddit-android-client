@@ -66,14 +66,16 @@
             app:layout_constraintBottom_toTopOf="@id/previewHeader"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/summary"
+            app:layout_constraintTop_toBottomOf="@+id/summary">
 
-            app:layout_constrainedHeight="true">
-
+            <!-- The EditText has 4dp margin which makes the it look like
+            it's not lined up with the text above/below, so remove it with negative margin -->
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/replyText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="-4dp"
+                android:layout_marginEnd="-4dp"
 
                 android:hint="@string/replyHint"
                 android:inputType="textMultiLine"
@@ -91,7 +93,6 @@
             android:layout_height="wrap_content"
 
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
 
             android:text="@string/replyPreview"
             android:textColor="@color/secondary_text_color"
