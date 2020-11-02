@@ -561,9 +561,9 @@ public class ReplyActivity extends AppCompatActivity {
     private void showLinkDialog(String linkText, String link) {
         if (linkDialog == null) {
             linkDialog = new Dialog(this);
+            linkDialog.setContentView(R.layout.dialog_reply_add_link);
         }
 
-        linkDialog.setContentView(R.layout.dialog_reply_add_link);
         linkDialog.show();
 
         // Because using match_parent in the layout file doesn't actually match the parent (screen width)
@@ -636,8 +636,8 @@ public class ReplyActivity extends AppCompatActivity {
     private void showConfirmDialog() {
         if (confirmDiscardDialog == null) {
             confirmDiscardDialog = new Dialog(this);
+            confirmDiscardDialog.setContentView(R.layout.dialog_reply_confirm_back_press);
         }
-        confirmDiscardDialog.setContentView(R.layout.dialog_reply_confirm_back_press);
         confirmDiscardDialog.show();
 
         // Because using match_parent in the layout file doesn't actually match the parent (screen width)
