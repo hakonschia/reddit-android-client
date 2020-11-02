@@ -30,7 +30,7 @@
     <color name="commentByModBackground">#00C130</color>
     <color name="commentByAdminBackground">#FF2727</color>
 
-    <color name="imageVideoActivityBackground">#CCFFFFFF</color>
+    <color name="imageVideoActivityBackground">#CC060910</color>
 
     <color name="tagNSFW">#FF4747</color>
     <color name="tagSpoiler">#595959</color>

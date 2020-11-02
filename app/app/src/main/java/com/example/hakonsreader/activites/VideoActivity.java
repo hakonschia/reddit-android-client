@@ -1,7 +1,9 @@
 package com.example.hakonsreader.activites;
 
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
@@ -73,7 +75,19 @@ public class VideoActivity extends AppCompatActivity {
             finish();
         }
 
-        Slidr.attach(this, App.get().getVideoAndImageSlidrConfig());
+        int color = getColor(R.color.imageVideoActivityBackground);
+        int alpha = (color >> 24) & 0xFF;
+        float alphaPercentage = (float)alpha / 0xFF;
+
+        SlidrConfig config = App.get().getVideoAndImageSlidrConfig()
+                // To keep the background the same the entire way the alpha is always the same
+                // Otherwise the background of the activity slides with, which looks weird
+                .scrimStartAlpha(alphaPercentage)
+                .scrimEndAlpha(alphaPercentage)
+                .scrimColor(color)
+                .build();
+
+        Slidr.attach(this, config);
     }
 
     @Override

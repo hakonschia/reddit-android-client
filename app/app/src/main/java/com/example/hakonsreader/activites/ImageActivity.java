@@ -2,6 +2,7 @@ package com.example.hakonsreader.activites;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
@@ -17,6 +18,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.github.chrisbanes.photoview.PhotoViewAttacher;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrConfig;
+import com.r0adkll.slidr.model.SlidrListener;
 import com.r0adkll.slidr.model.SlidrPosition;
 import com.squareup.picasso.Picasso;
 
@@ -73,12 +75,27 @@ public class ImageActivity extends AppCompatActivity {
             finish();
         }
 
-        Slidr.attach(this, App.get().getVideoAndImageSlidrConfig());
+        // The color retrieved is "0x<alpha><red><green><blue>" (each one byte, 8 bits)
+        int color = getColor(R.color.imageVideoActivityBackground);
+
+        // Offset 3 bytes and get the value there to find the alpha
+        int alpha = (color >> 8 * 3) & 0xFF;
+        float alphaPercentage = (float)alpha / 0xFF;
+
+        SlidrConfig config = App.get().getVideoAndImageSlidrConfig()
+                // To keep the background the same the entire way the alpha is always the same
+                // Otherwise the background of the activity slides with, which looks weird
+                .scrimStartAlpha(alphaPercentage)
+                .scrimEndAlpha(alphaPercentage)
+                .scrimColor(color)
+                .build();
+
+        Slidr.attach(this, config);
     }
 
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        overridePendingTransition(R.anim.fade_out, R.anim.fade_out);
     }
 }

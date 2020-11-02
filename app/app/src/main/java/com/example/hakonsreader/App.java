@@ -345,12 +345,13 @@ public class App extends Application {
     }
 
     /**
-     * Retrieves the {@link SlidrConfig} to use for to slide away videos and images based
-     * on the users setting. This also adjusts the threshold needed to peform a swipe
+     * Retrieves the {@link SlidrConfig.Builder} to use for to slide away videos and images based
+     * on the users setting. This also adjusts the threshold needed to perform a swipe. This builder can
+     * be continued to set additional values
      *
      * @return The SlidrConfig that should be used for videos and images
      */
-    public SlidrConfig getVideoAndImageSlidrConfig() {
+    public SlidrConfig.Builder getVideoAndImageSlidrConfig() {
         String direction = settings.getString(
                 getString(R.string.prefs_key_fullscreen_swipe_direction),
                 getString(R.string.prefs_default_fullscreen_swipe_direction)
@@ -372,6 +373,6 @@ public class App extends Application {
             Log.d(TAG, "getVideoAndImageSlidrConfig: RIGHT");
         }
          */
-        return new SlidrConfig.Builder().position(pos).distanceThreshold(0.15f).build();
+        return new SlidrConfig.Builder().position(pos).distanceThreshold(0.15f);
     }
 }
