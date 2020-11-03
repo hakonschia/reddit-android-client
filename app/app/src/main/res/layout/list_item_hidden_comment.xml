@@ -59,11 +59,23 @@
             app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"
 
             app:layout_constrainedWidth="true"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/commentAuthor"
             app:layout_constraintTop_toTopOf="parent"
 
             tools:text="2h" />
+
+        <TextView
+            android:id="@+id/hiddenCommentNumChildren"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            android:text='@{comment != null ? @plurals/numReplies(comment.replies.size(), comment.replies.size()) : ""}'
+            android:textColor="@color/secondary_text_color"
+
+            tools:text="5 replies" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

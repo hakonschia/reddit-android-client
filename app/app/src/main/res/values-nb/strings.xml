@@ -118,4 +118,9 @@
     <string name="prefs_title_language_automatic">Automatisk</string>
     <string name="dialogReplyNotLoggedInTitle">Ikke innlogget</string>
     <string name="dialogReplyNotLoggedInContent">Du er ikke innlogget og vil ikke kunne sende et svar</string>
+
+    <plurals name="numReplies">
+        <item quantity="one">%d svar</item>
+        <item quantity="other">%d svar</item>
+    </plurals>
 </resources>

@@ -197,4 +197,9 @@
 
     <string name="dialogReplyNotLoggedInTitle">Not logged in</string>
     <string name="dialogReplyNotLoggedInContent">You are not logged in and won\'t be able to send a reply</string>
+
+    <plurals name="numReplies">
+        <item quantity="one">%d reply</item>
+        <item quantity="other">%d replies</item>
+    </plurals>
 </resources>
