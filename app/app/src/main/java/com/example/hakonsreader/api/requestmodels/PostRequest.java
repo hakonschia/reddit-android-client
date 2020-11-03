@@ -48,7 +48,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest {
     }
 
     /**
-     * Retrieve comments for the post
+     * Retrieve comments for the post. These comments are sorted by "best", see other functions for other sorts
      *
      * <p>OAuth scopes required:
      * <ol>
@@ -64,42 +64,87 @@ public class PostRequest implements VoteableRequest, ReplyableRequest {
      */
     @EverythingIsNonNull
     public void comments(OnResponse<List<RedditComment>> onResponse, OnResponse<RedditPost> onPostResponse, OnFailure onFailure) {
-        api.getComments(
-                postId,
-                RedditApi.RAW_JSON,
-                accessToken.generateHeaderString()
-        ).enqueue(new Callback<List<ListingResponse>>() {
-            @Override
-            public void onResponse(Call<List<ListingResponse>> call, Response<List<ListingResponse>> response) {
-                List<ListingResponse> body = null;
-                if (response.isSuccessful()) {
-                    body = response.body();
-                }
+        this.getComments("best", onResponse, onPostResponse, onFailure);
+    }
 
-                if (body != null) {
-                    // For comments the first listing object is the post itself and the second its comments
-                    RedditPost post = (RedditPost) body.get(0).getListings().get(0);
-                    List<RedditComment> topLevelComments = (List<RedditComment>) body.get(1).getListings();
+    /**
+     * Retrieve comments for the post sorted by "new"
+     *
+     * <p>OAuth scopes required:
+     * <ol>
+     *     <li>To retrieve posts customized for a logged in user (with vote status set etc.): {@code read}</li>
+     *     <li>To retrieve generic posts no OAuth scope is required</li>
+     * </ol>
+     * </p>
+     * <p>No specific OAuth scope is required</p>
+     *
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
+     * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
+     * @param onFailure The callback for failed requests
+     */
+    @EverythingIsNonNull
+    public void newComments(OnResponse<List<RedditComment>> onResponse, OnResponse<RedditPost> onPostResponse, OnFailure onFailure) {
+        this.getComments("new", onResponse, onPostResponse, onFailure);
+    }
 
-                    List<RedditComment> allComments = new ArrayList<>();
-                    topLevelComments.forEach(comment -> {
-                        // Add the comment itself and all its replies
-                        allComments.add(comment);
-                        allComments.addAll(comment.getReplies());
-                    });
+    /**
+     * Retrieve comments for the post sorted by "top"
+     *
+     * <p>OAuth scopes required:
+     * <ol>
+     *     <li>To retrieve posts customized for a logged in user (with vote status set etc.): {@code read}</li>
+     *     <li>To retrieve generic posts no OAuth scope is required</li>
+     * </ol>
+     * </p>
+     * <p>No specific OAuth scope is required</p>
+     *
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
+     * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
+     * @param onFailure The callback for failed requests
+     */
+    @EverythingIsNonNull
+    public void topComments(OnResponse<List<RedditComment>> onResponse, OnResponse<RedditPost> onPostResponse, OnFailure onFailure) {
+        this.getComments("top", onResponse, onPostResponse, onFailure);
+    }
 
-                    onPostResponse.onResponse(post);
-                    onResponse.onResponse(allComments);
-                } else {
-                    Util.handleHttpErrors(response, onFailure);
-                }
-            }
+    /**
+     * Retrieve comments for the post sorted by "controversial"
+     *
+     * <p>OAuth scopes required:
+     * <ol>
+     *     <li>To retrieve posts customized for a logged in user (with vote status set etc.): {@code read}</li>
+     *     <li>To retrieve generic posts no OAuth scope is required</li>
+     * </ol>
+     * </p>
+     * <p>No specific OAuth scope is required</p>
+     *
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
+     * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
+     * @param onFailure The callback for failed requests
+     */
+    @EverythingIsNonNull
+    public void controversialComments(OnResponse<List<RedditComment>> onResponse, OnResponse<RedditPost> onPostResponse, OnFailure onFailure) {
+        this.getComments("controversial", onResponse, onPostResponse, onFailure);
+    }
 
-            @Override
-            public void onFailure(Call<List<ListingResponse>> call, Throwable t) {
-                onFailure.onFailure(new GenericError(-1), t);
-            }
-        });
+    /**
+     * Retrieve comments for the post sorted by "old"
+     *
+     * <p>OAuth scopes required:
+     * <ol>
+     *     <li>To retrieve posts customized for a logged in user (with vote status set etc.): {@code read}</li>
+     *     <li>To retrieve generic posts no OAuth scope is required</li>
+     * </ol>
+     * </p>
+     * <p>No specific OAuth scope is required</p>
+     *
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
+     * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
+     * @param onFailure The callback for failed requests
+     */
+    @EverythingIsNonNull
+    public void oldComments(OnResponse<List<RedditComment>> onResponse, OnResponse<RedditPost> onPostResponse, OnFailure onFailure) {
+        this.getComments("old", onResponse, onPostResponse, onFailure);
     }
 
     /**
@@ -198,5 +243,53 @@ public class PostRequest implements VoteableRequest, ReplyableRequest {
     @Override
     public void reply(String comment, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
         replyRequest.postComment(Thing.POST, postId, comment, onResponse, onFailure);
+    }
+
+
+    /**
+     * Get comments for the post
+     *
+     * @param sort How to sort the comments (new, best, top, controversial)
+     * @param onResponse The response listener for the comments
+     * @param onPostResponse The response listener that holds the post information
+     * @param onFailure Failure handler
+     */
+    private void getComments(String sort, OnResponse<List<RedditComment>> onResponse, OnResponse<RedditPost> onPostResponse, OnFailure onFailure) {
+        api.getComments(
+                postId,
+                sort,
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<List<ListingResponse>>() {
+            @Override
+            public void onResponse(Call<List<ListingResponse>> call, Response<List<ListingResponse>> response) {
+                List<ListingResponse> body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    // For comments the first listing object is the post itself and the second its comments
+                    RedditPost post = (RedditPost) body.get(0).getListings().get(0);
+                    List<RedditComment> topLevelComments = (List<RedditComment>) body.get(1).getListings();
+
+                    List<RedditComment> allComments = new ArrayList<>();
+                    topLevelComments.forEach(comment -> {
+                        // Add the comment itself and all its replies
+                        allComments.add(comment);
+                        allComments.addAll(comment.getReplies());
+                    });
+
+                    onPostResponse.onResponse(post);
+                    onResponse.onResponse(allComments);
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<ListingResponse>> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
     }
 }

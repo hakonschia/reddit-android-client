@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.requestmodels;
 
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException;
@@ -81,7 +82,8 @@ public class SubredditRequest {
     }
 
     /**
-     * Asynchronously retrieves posts from the subreddit
+     * Retrieves posts from the subreddit. The posts here are sorted by "hot", see other functions
+     * for other sorting types
      *
      * <p>If an access token is set posts are customized for the user</p>
      *
@@ -94,43 +96,43 @@ public class SubredditRequest {
      */
     @EverythingIsNonNull
     public void posts(String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        // Not front page, add r/ prefix
-        String subreddit = subredditName;
-
-        if (!subreddit.isEmpty()) {
-            subreddit = "r/" + subreddit;
-        }
-
-        api.getPosts(
-                subreddit,
-                "hot",
-                after,
-                count,
-                RedditApi.RAW_JSON,
-                accessToken.generateHeaderString()
-        ).enqueue(new Callback<ListingResponse>() {
-            @Override
-            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
-                ListingResponse body = null;
-                if (response.isSuccessful()) {
-                    body = response.body();
-                }
-
-                if (body != null) {
-                    List<RedditPost> posts = (List<RedditPost>) body.getListings();
-                    onResponse.onResponse(posts);
-                } else {
-                    Util.handleHttpErrors(response, onFailure);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ListingResponse> call, Throwable t) {
-                onFailure.onFailure(new GenericError(-1), t);
-            }
-        });
+        this.getPosts("hot", null, after, count, onResponse, onFailure);
     }
 
+    /**
+     * Retrieves new posts from the subreddit
+     *
+     * <p>If an access token is set posts are customized for the user</p>
+     *
+     * <p>No specific OAuth scope is required</p>
+     *
+     * @param after The ID of the last post seen (or an empty string if first time loading)
+     * @param count The amount of posts already retrieved (0 if first time loading)
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
+     * @param onFailure The callback for failed requests
+     */
+    @EverythingIsNonNull
+    public void newPosts(String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
+        this.getPosts("new", null, after, count, onResponse, onFailure);
+    }
+
+    /**
+     * Retrieves top posts from the subreddit
+     *
+     * <p>If an access token is set posts are customized for the user</p>
+     *
+     * <p>No specific OAuth scope is required</p>
+     *
+     * @param after The ID of the last post seen (or an empty string if first time loading)
+     * @param timeSort The time sort for the posts (of all time, of hour etc.)
+     * @param count The amount of posts already retrieved (0 if first time loading)
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
+     * @param onFailure The callback for failed requests
+     */
+    @EverythingIsNonNull
+    public void top(PostTimeSort timeSort, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
+        this.getPosts("top", timeSort, after, count, onResponse, onFailure);
+    }
 
     /**
      * Favorite or un-favorite a subreddit
@@ -195,6 +197,60 @@ public class SubredditRequest {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
+    }
+
+
+    /**
+     * Retrieves posts from the subreddit
+     *
+     * <p>If an access token is set posts are customized for the user</p>
+     *
+     * <p>No specific OAuth scope is required</p>
+     *
+     * @param sort The sort for the posts (new, hot, top, or controversial)
+     * @param timeSort How the posts should be time sorted. This only has an affect on top and controversial,
+     *                 and can be set to null for new and hot
+     * @param after The ID of the last post seen (or an empty string if first time loading)
+     * @param count The amount of posts already retrieved (0 if first time loading)
+     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
+     * @param onFailure The callback for failed requests
+     */
+    private void getPosts(String sort, PostTimeSort timeSort, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
+        // Not front page, add r/ prefix
+        String subreddit = subredditName;
+
+        if (!subreddit.isEmpty()) {
+            subreddit = "r/" + subreddit;
+        }
+
+        api.getPosts(
+                subreddit,
+                sort,
+                after,
+                count,
+                RedditApi.RAW_JSON,
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<ListingResponse>() {
+            @Override
+            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+                ListingResponse body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    List<RedditPost> posts = (List<RedditPost>) body.getListings();
+                    onResponse.onResponse(posts);
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListingResponse> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });

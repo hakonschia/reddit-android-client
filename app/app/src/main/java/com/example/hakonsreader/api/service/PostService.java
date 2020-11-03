@@ -22,6 +22,7 @@ public interface PostService extends VoteService, ReplyService {
      * Retrieves comments for a post
      *
      * @param postID The ID of the post to retrieve comments for
+     * @param sort How to sort the comments (new, hot, top etc.)
      * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
      *                    to retrieve comments without a logged in user
      * @return A list of {@link ListingResponse}. The first item in this list is the post itself.
@@ -30,7 +31,7 @@ public interface PostService extends VoteService, ReplyService {
     @GET("comments/{postID}?raw_json=1")
     Call<List<ListingResponse>> getComments(
             @Path("postID") String postID,
-            @Query("raw_json") int rawJson,
+            @Query("sort") String sort,
 
             @Header("Authorization") String accessToken
     );

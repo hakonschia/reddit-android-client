@@ -50,9 +50,7 @@ public class CommentsViewModel extends ViewModel {
         App.get().getApi().post(postId).comments(newComments -> {
             comments.setValue(newComments);
             loadingChange.setValue(false);
-        }, newPost -> {
-            post.setValue(newPost);
-        }, ((code, t) -> {
+        }, post::setValue, ((code, t) -> {
             t.printStackTrace();
             loadingChange.setValue(false);
 
