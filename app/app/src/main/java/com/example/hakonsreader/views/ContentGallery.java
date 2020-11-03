@@ -2,7 +2,9 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,14 +18,20 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentGalleryBinding;
+import com.example.hakonsreader.interfaces.SlidrActivity;
+import com.r0adkll.slidr.Slidr;
 
 import java.util.List;
 import java.util.Locale;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
 
 /**
  * Class for gallery posts. A gallery post is simply a collection of multiple images
  */
 public class ContentGallery extends LinearLayout {
+    private static final String TAG = "ContentGallery";
+
     // This file and ContentImage is really coupled together, should be fixed to not be so terrible
 
 
@@ -86,6 +94,8 @@ public class ContentGallery extends LinearLayout {
             public void onPageSelected(int position) {
                 // Update the active text to show which image we are now on
                 setActiveImageText(position + 1);
+
+                lockSlidr(position != 0);
             }
 
             @Override
@@ -95,6 +105,22 @@ public class ContentGallery extends LinearLayout {
             @Override
             public void onPageScrollStateChanged(int state) {
                 // Not implemented
+            }
+
+            /**
+             * Lock or unlock a Slidr
+             *
+             * @param lock True to lock
+             */
+            private void lockSlidr(boolean lock) {
+                Context context = getContext();
+
+                // This might be bad? The "correct" way of doing it might be to add listeners
+                // and be notified that way, but I don't want to add 1000 functions to add the listener
+                // all the way up here from an activity
+                if (context instanceof SlidrActivity) {
+                    ((SlidrActivity)context).lock(lock);
+                }
             }
         });
         // Set initial state

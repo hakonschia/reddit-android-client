@@ -12,13 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
+import com.example.hakonsreader.interfaces.SlidrActivity;
 import com.example.hakonsreader.views.LoadingIcon;
 import com.r0adkll.slidr.Slidr;
+import com.r0adkll.slidr.model.SlidrConfig;
+import com.r0adkll.slidr.model.SlidrInterface;
 
 /**
  * Activity for a subreddit (used when a subreddit is clicked from a post)
  */
-public class SubredditActivity extends AppCompatActivity {
+public class SubredditActivity extends AppCompatActivity implements SlidrActivity {
     private static final String TAG = "SubredditActivity";
 
     /**
@@ -34,12 +37,13 @@ public class SubredditActivity extends AppCompatActivity {
 
     private LoadingIcon loadingIcon;
     private SubredditFragment fragment;
+    private SlidrInterface slidrInterface;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subreddit);
-        Slidr.attach(this);
+        slidrInterface = Slidr.attach(this);
 
         this.loadingIcon = findViewById(R.id.loadingIcon);
 
@@ -88,6 +92,14 @@ public class SubredditActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
+    @Override
+    public void lock(boolean lock) {
+        if (lock) {
+            slidrInterface.lock();
+        } else {
+            slidrInterface.unlock();
+        }
+    }
 
     /**
      * @return The name of the subreddit the activity is displaying
