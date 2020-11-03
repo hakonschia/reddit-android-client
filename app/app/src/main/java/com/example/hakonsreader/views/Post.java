@@ -47,7 +47,7 @@ public class Post extends RelativeLayout {
      */
     // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
     private static final List<String> KNOWN_VIDEO_DOMAINS = Collections.unmodifiableList(Arrays.asList(
-            "v.redd.it", "i.redd.it", "redgifs.com", "gfycat.com", "i.imgur.com"
+            "v.redd.it", "i.redd.it", "redgifs.com", "gfycat.com", "i.imgur.com", "media1.giphy.com"
     ));
 
     private final PostBinding binding;
