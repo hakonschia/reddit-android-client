@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.requestmodels;
 
+import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.OnFailure;
@@ -8,8 +9,19 @@ import com.example.hakonsreader.api.interfaces.ReplyableRequest;
 import com.example.hakonsreader.api.interfaces.VoteableRequest;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.responses.GenericError;
+import com.example.hakonsreader.api.responses.JsonResponse;
+import com.example.hakonsreader.api.responses.ListingResponse;
+import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.CommentService;
+import com.example.hakonsreader.api.utils.Util;
+import com.google.android.exoplayer2.C;
 
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
 /**
@@ -19,12 +31,16 @@ import retrofit2.internal.EverythingIsNonNull;
 public class CommentRequest implements VoteableRequest, ReplyableRequest {
 
     private final String commentId;
+    private final AccessToken accessToken;
+    private final CommentService api;
     private final VoteableRequestModel voteRequest;
     private final ReplyableRequestModel replyRequest;
 
     public CommentRequest(String commentId, AccessToken accessToken, CommentService api) {
         this.commentId = commentId;
 
+        this.accessToken = accessToken;
+        this.api = api;
         this.voteRequest = new VoteableRequestModel(accessToken, api);
         this.replyRequest = new ReplyableRequestModel(accessToken, api);
     }
@@ -47,6 +63,75 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest {
         replyRequest.postComment(Thing.COMMENT, commentId, comment, onResponse, onFailure);
     }
 
+
+    /**
+     * Edits the comment
+     *
+     * @param editedText The edited text
+     * @param onResponse Response handler for successful requests. Holds the updated comment
+     * @param onFailure Response handler for failed requests
+     */
+    public void edit(String editedText, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+        api.edit(
+                Util.createFullName(Thing.COMMENT, commentId),
+                editedText,
+                RedditApi.API_TYPE,
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<JsonResponse>() {
+            @Override
+            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                JsonResponse body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    if (!body.hasErrors()) {
+                        RedditComment comment = (RedditComment) body.getListings().get(0);
+                        onResponse.onResponse(comment);
+                    } else {
+                        Util.handleListingErrors(body.errors(), onFailure);
+                    }
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonResponse> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
+    }
+
+    /**
+     * Delete a comment. Note the comment being deleted must be posted by the user the access token represents.
+     *
+     * @param onResponse The response handler for successful request
+     *                   <p>NOTE: Even if the comment couldn't be deleted because it didn't belong to
+     *                   the user, this will be called as Reddit returns 200 OK for every request.
+     *                   Make sure this is only called for comments that actually can be deleted</p>
+     * @param onFailure Response handler for failed requests
+     */
+    public void delete(OnResponse<Void> onResponse, OnFailure onFailure) {
+        api.delete(
+                Util.createFullName(Thing.COMMENT, commentId),
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    onResponse.onResponse(null);
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
+    }
 
     /**
      * Cast a vote on the comment

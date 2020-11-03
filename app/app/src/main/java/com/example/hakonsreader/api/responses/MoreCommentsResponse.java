@@ -22,10 +22,6 @@ import java.util.List;
  */
 public class MoreCommentsResponse {
 
-    // Instead of an anonymous object the object is called "json"
-    // There is also an "errors" list, but I
-
-
     @SerializedName("json")
     private ListingResponse comments;
 
