@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/videoControlBackground"
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Thumbnail spanning across the entire view -->
@@ -36,7 +37,6 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
 
-        android:background="@drawable/rounded_square_black_bg"
         style="@style/ExoMediaButton.Play"
 
         app:layout_constraintTop_toTopOf="parent"
@@ -51,7 +51,6 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
 
-        android:background="@drawable/rounded_square_black_bg"
         style="@style/ExoMediaButton.Pause"
 
         app:layout_constraintTop_toTopOf="parent"
@@ -66,7 +65,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:background="#CC000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

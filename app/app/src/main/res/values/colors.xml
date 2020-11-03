@@ -49,4 +49,6 @@
     <color name="commentSideBar">#424242</color>
 
     <color name="ripplePressedColor">#AEAEAE</color>
+
+    <color name="videoControlBackground">#59000000</color>
 </resources>

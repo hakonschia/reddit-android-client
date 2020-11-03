@@ -1,5 +1,6 @@
 package com.example.hakonsreader.views;
 
+import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -144,10 +145,10 @@ public class ContentVideo extends PlayerView {
 
         // Equivalent to "android:animateLayoutChanges="true"", makes the controller fade in/out
         // TODO this creates some weird issues with the lists, see: https://stackoverflow.com/a/32692703/7750841
-       // LayoutTransition transition = new LayoutTransition();
-       // transition.setDuration(CONTROLLER_ANIMATION_DURATION);
-       // setLayoutTransition(transition);
-       // setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
+        //LayoutTransition transition = new LayoutTransition();
+        //transition.setDuration(CONTROLLER_ANIMATION_DURATION);
+        //setLayoutTransition(transition);
+        setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
 
         this.setupExoPlayer();
         setPlayer(exoPlayer);
@@ -310,6 +311,10 @@ public class ContentVideo extends PlayerView {
             // post.getThumbnail() returns an image which is very low quality, the source preview
             // has the same dimensions as the video itself
             Image image = post.getSourcePreview();
+
+            // Set the background color for the controls as a filter here since the thumbnail is shown
+            // over the controls
+            thumbnail.setColorFilter(ContextCompat.getColor(getContext(), R.color.videoControlBackground));
 
             // Show the thumbnail over the video before it is being played
             Picasso.get()

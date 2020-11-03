@@ -2,9 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,12 +17,10 @@ import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentGalleryBinding;
 import com.example.hakonsreader.interfaces.SlidrActivity;
-import com.r0adkll.slidr.Slidr;
 
 import java.util.List;
 import java.util.Locale;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
 
 /**
  * Class for gallery posts. A gallery post is simply a collection of multiple images
