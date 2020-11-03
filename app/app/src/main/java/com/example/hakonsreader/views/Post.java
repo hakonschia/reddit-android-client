@@ -22,13 +22,14 @@ import androidx.core.util.Pair;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.PostActivity;
-import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Post extends RelativeLayout {
@@ -39,6 +40,15 @@ public class Post extends RelativeLayout {
      */
     private static final int NO_MAX_HEIGHT = -1;
 
+    /**
+     * A list of domains that we know how to play videos for. Videos in this list can be used with
+     * {@link ContentVideo}, otherwise they should be provided as a {@link ContentLink} as they might
+     * (and probably wont) load. The domains in this list match the return from {@link RedditPost#getDomain()}
+     */
+    // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
+    private static final List<String> KNOWN_VIDEO_DOMAINS = Collections.unmodifiableList(Arrays.asList(
+            "v.redd.it", "i.redd.it", "redgifs.com", "gfycat.com", "i.imgur.com"
+    ));
 
     private final PostBinding binding;
     private RedditPost postData;
@@ -238,9 +248,17 @@ public class Post extends RelativeLayout {
             // TODO For rich video, create a function to check if it's on a domain that allows for direct videos
             //  otherwise just provide it as link content
             case RICH_VIDEO:
-                ContentVideo video = new ContentVideo(context);
-                video.setPost(post);
-                content = video;
+                // Ensure we know how to handle a video, otherwise it might not load
+                if (KNOWN_VIDEO_DOMAINS.contains(post.getDomain().toLowerCase())) {
+                    ContentVideo video = new ContentVideo(context);
+                    video.setPost(post);
+                    content = video;
+                } else {
+                    ContentLink link = new ContentLink(context);
+                    link.setPost(post);
+                    content = link;
+                }
+
                 break;
 
             case CROSSPOST:
