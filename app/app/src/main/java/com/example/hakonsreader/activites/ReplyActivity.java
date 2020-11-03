@@ -435,7 +435,9 @@ public class ReplyActivity extends AppCompatActivity {
         }
 
         // Already a quote, remove it (if text is empty we're guaranteed to not have a >)
-        if (!text.isEmpty() && text.charAt(startPos) == '>') {
+        // If startPos was incremented to the text length (we're at an empty line at the end of the text)
+        // look at the previous character as it would otherwise cause a crash
+        if (!text.isEmpty() && text.charAt(startPos == text.length() ? startPos - 1 : startPos) == '>') {
             // Remove ">"
             binding.replyText.getText().delete(startPos, startPos + 1);
         } else {
@@ -510,6 +512,7 @@ public class ReplyActivity extends AppCompatActivity {
 
         String startSyntax = "";
 
+        // TODO this should add the remaining newlines needed (ie. if one is already there only add one)
         // Ensure there are two newlines before the code block, unless we're at the beginning of the text
         // or we already have two newlines (one newline in markdown usually doesn't do anything, so we need two)
         if (!(start == 0 || (text.length() >= 2 && text.startsWith("\n\n", start - 2)))) {
