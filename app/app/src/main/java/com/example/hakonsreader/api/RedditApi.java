@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.Interceptor;
@@ -129,16 +130,21 @@ public class RedditApi {
     public static final String REDDIT_URL = "https://www.reddit.com/";
 
     /**
-     * The OAuth subdomain URL for Reddit.
+     * The OAuth sub domain URL for Reddit.
      *
      * <p>This is used to retrieve posts from reddit</p>
      */
     public static final String REDDIT_OUATH_URL = "https://oauth.reddit.com/";
 
     /**
-     * The list of standard subs
+     * The list of standard subs: front page (represented as an empty string), popular, all.
+     *
+     * <p>Note: that the elements in this list are case sensitive and in this list are all lower case.
+     * When using this list to check against a standard sub you should ensure the string is lower cased</p>
+     *
+     * <p>Note: This is an unmodifiable list. Attempting to change it will throw an exception</p>
      */
-    public static final List<String> STANDARD_SUBS = Arrays.asList("", "Popular", "All");
+    public static final List<String> STANDARD_SUBS = Collections.unmodifiableList(Arrays.asList("", "popular", "all"));
 
 
     /**
