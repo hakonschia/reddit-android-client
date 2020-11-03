@@ -13,6 +13,7 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
   <img src="/images/scrolling-in-posts.png" alt="Scrolling posts" width="275"/>
   <img src="/images/in-post.png" alt="In post" width="275"/>
   <img src="/images/profile.png" alt="User profile" width="275"/>
+  <img src="/images/replying.png" alt="User profile" width="275"/>
 </div>
 
 
