@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        sign {
+            storeFile file('C:\\Users\\hakon\\keystores\\key.jks')
+            storePassword 'eNNts[;Y[Fm6asUP'
+            keyAlias 'key0'
+            keyPassword ';)DtmafzZa3ng4`n'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
@@ -12,6 +20,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.sign
     }
 
     buildTypes {

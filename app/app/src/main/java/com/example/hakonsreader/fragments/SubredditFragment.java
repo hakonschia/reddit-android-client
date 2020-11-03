@@ -380,7 +380,7 @@ public class SubredditFragment extends Fragment {
             String subredditName = args.getString("subreddit", "");
             subreddit.set(new Subreddit(subredditName));
 
-            binding.setStandardSub(RedditApi.STANDARD_SUBS.contains(subredditName));
+            binding.setStandardSub(RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase()));
             binding.subscribe.setOnClickListener(this::subscribeOnClick);
 
             new Thread(() -> {
