@@ -32,8 +32,8 @@ class ReplyableRequestModel {
 
 
     /**
-     * Submit a new comment as a reply to another comment. Note: The depth of the new comment is not
-     * set and must be set manually with {@link RedditComment#setDepth(int)} (as the parents depth + 1)
+     * Submit a new comment as a reply to another comment. Note: The depth of the new comment for replies is not
+     * set (it is -1) and must be set manually with {@link RedditComment#setDepth(int)} (as the parents depth + 1)
      *
      * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
      *
@@ -76,8 +76,7 @@ class ReplyableRequestModel {
                     if (!body.hasErrors()) {
                         RedditComment newComment = body.getComments().get(0);
 
-                        // The comment is a top level comment, which has 0 depth
-                        newComment.setDepth(0);
+                        newComment.setDepth(thing == Thing.POST ? 0 : -1);
                         onResponse.onResponse(newComment);
                     } else {
                         Util.handleListingErrors(body.errors(), onFailure);

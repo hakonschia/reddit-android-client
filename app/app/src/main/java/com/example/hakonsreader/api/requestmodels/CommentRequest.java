@@ -31,16 +31,11 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest {
 
     /**
      * Submit a new comment as a reply to another comment. Note: The depth of the new comment is not
-     * set and must be set manually with {@link RedditComment#setDepth(int)} (as the parents depth + 1)
+     * set (it is -1) and must be set manually with {@link RedditComment#setDepth(int)} (as the parents depth + 1)
      *
      * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
      *
-     * <p>OAuth scopes required:
-     * <ol>
-     *     <li>For comments to post and replies: {@code submit}</li>
-     *     <li>For private messages: {@code privatemessage}</li>
-     * </ol>
-     * </p>
+     * <p>OAuth scope required: {@code submit} </p>
      *
      * @param comment The comment to submit, formatted as <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
      * @param onResponse Callback for successful responses. Holds the newly created comment

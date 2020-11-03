@@ -223,13 +223,19 @@ public class ReplyActivity extends AppCompatActivity {
 
         ReplyableRequest request = replyingTo instanceof RedditPost ? redditApi.post(id) : redditApi.comment(id);
         request.reply(text, comment -> {
-            Log.d(TAG, "sendReply: Comment posted");
+            Log.d(TAG, "sendReply: Comment posted ");
 
-            // TODO for replies to comments the depth has to be set manually
+            // No depth set means we're replying to a comment, set depth manually
+            if (comment.getDepth() == -1) {
+                comment.setDepth(((RedditComment)replyingTo).getDepth() + 1);
+            }
 
             // Pass the new comment back and finish
             Intent intent = getIntent().putExtra(PostActivity.LISTING_KEY, new Gson().toJson(comment));
 
+            // Kind of a bad way to do it, but if we call finish with text in the input a dialog is shown
+            // Other option is to create a flag (ie "replySent") and not show the dialog if true
+            binding.replyText.getText().clear();
             setResult(RESULT_OK, intent);
             finish();
         }, (error, t) -> {
@@ -301,6 +307,8 @@ public class ReplyActivity extends AppCompatActivity {
                 // Might be possible to implement onTextChanged and render only the markdown that changed
                 // and insert it into the text. This works for now
                 markwon.setMarkdown(binding.preview, s.toString());
+
+                binding.btnAddComment.setEnabled(!s.toString().isEmpty());
             }
 
             @Override

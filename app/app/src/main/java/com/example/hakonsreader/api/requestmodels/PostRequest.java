@@ -189,7 +189,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest {
      *
      * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
      *
-     * <p>OAuth scopes required: {@code submit}</p>
+     * <p>OAuth scope required: {@code submit}</p>
      *
      * @param comment The comment to submit, formatted as <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
      * @param onResponse Callback for successful responses. Holds the newly created comment
