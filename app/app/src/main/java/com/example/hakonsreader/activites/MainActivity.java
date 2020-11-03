@@ -175,6 +175,10 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         if (binding.bottomNav.getSelectedItemId() == R.id.navSubreddit && activeSubreddit != null) {
             activeSubreddit = null;
 
+            // If the fragment has been killed by the OS make a new one (after a while it might be killed)
+            if (selectSubredditFragment == null) {
+                selectSubredditFragment = new SelectSubredditFragment();
+            }
             // Since we are in a way going back in the same navbar item, use the close transition
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragmentContainer, selectSubredditFragment)
