@@ -59,6 +59,9 @@ public class Subreddit extends RedditListing {
     @SerializedName("subreddit_type")
     private String subredditType;
 
+    @SerializedName("comment_score_hide_mins")
+    private int hideScoreTime;
+
 
     /**
      * @return The name of the subreddit
@@ -163,6 +166,12 @@ public class Subreddit extends RedditListing {
         return subredditType;
     }
 
+    /**
+     * @return The amount of minutes scores should be hidden for in this subreddit
+     */
+    public int getHideScoreTime() {
+        return hideScoreTime;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -214,5 +223,9 @@ public class Subreddit extends RedditListing {
 
     public void setSubredditType(String subredditType) {
         this.subredditType = subredditType;
+    }
+
+    public void setHideScoreTime(int hideScoreTime) {
+        this.hideScoreTime = hideScoreTime;
     }
 }

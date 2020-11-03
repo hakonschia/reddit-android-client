@@ -83,6 +83,7 @@ public class SubredditFragment extends Fragment {
 
             updateIcon();
             binding.setSubreddit(value);
+            adapter.setHideScoreTime(value.getHideScoreTime());
         }
 
         /**

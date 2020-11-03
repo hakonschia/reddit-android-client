@@ -78,7 +78,6 @@ public class Post extends RelativeLayout {
         binding = PostBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
-
     /**
      * Sets the post data to use for this view
      *
@@ -97,6 +96,10 @@ public class Post extends RelativeLayout {
         });
 
         this.updateView();
+    }
+
+    public void setHideScore(boolean hideScore) {
+        binding.postFullBar.setHideScore(hideScore);
     }
 
     /**

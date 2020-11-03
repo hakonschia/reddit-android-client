@@ -29,6 +29,7 @@ public class VoteBar extends ConstraintLayout {
     private final RedditApi redditApi = App.get().getApi();
     private final VoteBarBinding binding;
     private RedditListing listing;
+    private boolean hideScore;
 
     public VoteBar(@NonNull Context context) {
         this(context, null, 0, 0);
@@ -62,6 +63,10 @@ public class VoteBar extends ConstraintLayout {
         // Make sure the initial status is up to date
 
         this.updateVoteStatus();
+    }
+
+    public void setHideScore(boolean hideScore) {
+        this.hideScore = hideScore;
     }
 
     /**
@@ -134,7 +139,7 @@ public class VoteBar extends ConstraintLayout {
 
         int scoreCount = listing.getScore();
 
-        if (listing.isScoreHidden()) {
+        if (listing.isScoreHidden() || hideScore) {
             binding.score.setText(getResources().getString(R.string.scoreHidden));
         } else {
             // For scores over 10000 show as "10.5k"

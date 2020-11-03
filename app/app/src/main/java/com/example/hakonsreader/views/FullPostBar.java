@@ -20,6 +20,7 @@ public class FullPostBar extends ConstraintLayout {
     private RedditPost post;
 
     private final FullPostBarBinding binding;
+    private int hideScoreTime;
 
     public FullPostBar(@NonNull Context context) {
         this(context, null, 0, 0);
@@ -46,6 +47,13 @@ public class FullPostBar extends ConstraintLayout {
         binding.voteBar.setListing(post);
 
         this.updateView();
+    }
+
+    /**
+     * Call this if the score should always be hidden. Must be called before {@link FullPostBar#setPost(RedditPost)}
+     */
+    public void setHideScore(boolean hideScore) {
+        binding.voteBar.setHideScore(hideScore);
     }
 
     /**

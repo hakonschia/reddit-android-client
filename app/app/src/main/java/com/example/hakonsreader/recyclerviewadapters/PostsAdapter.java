@@ -13,9 +13,12 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.ListDivider;
 import com.example.hakonsreader.views.Post;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +31,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private static final String TAG = "PostsAdapter";
     
     private final List<RedditPost> posts = new ArrayList<>();
+
+    /**
+     * The amount of minutes scores should be hidden (default to -1 means not specified)
+     */
+    private int hideScoreTime = -1;
 
 
     /**
@@ -58,6 +66,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         int previousSize = posts.size();
         posts.addAll(filtered);
         notifyItemRangeInserted(previousSize, posts.size() - 1);
+    }
+
+    /**
+     * @param hideScoreTime The amount of minutes scores should be hidden
+     */
+    public void setHideScoreTime(int hideScoreTime) {
+        this.hideScoreTime = hideScoreTime;
     }
 
     /**
@@ -92,7 +107,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // Don't show text posts here (only show when a post is opened)
         holder.post.setShowContent(post.getPostType() != PostType.TEXT);
 
+        // Disable ticker animation to avoid it updating when scrolling
         holder.post.enableTickerAnimation(false);
+
+        Instant created = Instant.ofEpochSecond(post.getCreatedAt());
+        Instant now = Instant.now();
+        Duration between = Duration.between(created, now);
+        holder.post.setHideScore(hideScoreTime > between.toMinutes());
+
         holder.post.setPostData(post);
         holder.post.enableTickerAnimation(true);
     }
