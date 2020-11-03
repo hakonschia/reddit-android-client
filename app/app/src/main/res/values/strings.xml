@@ -195,5 +195,6 @@
     <string name="cancel">Cancel</string>
     <string name="discard">Discard</string>
 
-
+    <string name="dialogReplyNotLoggedInTitle">Not logged in</string>
+    <string name="dialogReplyNotLoggedInContent">You are not logged in and won\'t be able to send a reply</string>
 </resources>

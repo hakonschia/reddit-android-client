@@ -116,4 +116,6 @@
     <string name="prefs_title_fullscreen_swipe_direction_right">Høyre</string>
     <string name="prefs_title_language">Språk</string>
     <string name="prefs_title_language_automatic">Automatisk</string>
+    <string name="dialogReplyNotLoggedInTitle">Ikke innlogget</string>
+    <string name="dialogReplyNotLoggedInContent">Du er ikke innlogget og vil ikke kunne sende et svar</string>
 </resources>

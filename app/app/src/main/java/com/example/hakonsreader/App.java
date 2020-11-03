@@ -217,6 +217,16 @@ public class App extends Application {
     }
 
     /**
+     * Checks if there currently is a user logged in
+     *
+     * @return True if there is a user logged in
+     */
+    public boolean isUserLoggedIn() {
+        // Only logged in users have a refresh token
+        return TokenManager.getToken().getRefreshToken() != null;
+    }
+
+    /**
      * Retrieve the {@link Markwon} object that is used to format markdown text
      *
      * <p>The object has various plugins set, such as support for tables</p>

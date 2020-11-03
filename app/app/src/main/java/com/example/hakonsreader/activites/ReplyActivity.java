@@ -1,5 +1,6 @@
 package com.example.hakonsreader.activites;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -140,6 +141,7 @@ public class ReplyActivity extends AppCompatActivity {
 
         this.setTextListeners();
         this.attachLongClickListenerToMarkdownButtons();
+        this.showNotLoggedInDialogIfNotLoggedIn();
     }
 
     @Override
@@ -651,6 +653,19 @@ public class ReplyActivity extends AppCompatActivity {
         cancel.setOnClickListener(v -> confirmDiscardDialog.dismiss());
 
         // TODO add button for "discard and save" that saves the text and whats being responded to so we can resume later
+    }
+
+    /**
+     * If there is no user logged in a dialog is shown to the user that
+     * they are not logged in and won't be able to send a reply
+     */
+    private void showNotLoggedInDialogIfNotLoggedIn() {
+        if (!App.get().isUserLoggedIn()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.dialogReplyNotLoggedInTitle))
+                    .setMessage(getString(R.string.dialogReplyNotLoggedInContent))
+                    .show();
+        }
     }
 
     /**
