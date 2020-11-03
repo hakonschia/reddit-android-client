@@ -65,14 +65,14 @@ public class UserRequests {
      * @param onFailure The callback for failed requests
      */
     public void info(OnResponse<User> onResponse, OnFailure onFailure) {
-        try {
-            Util.verifyLoggedInToken(accessToken);
-        } catch (InvalidAccessTokenException e) {
-            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
-            return;
-        }
-
         if (username == null) {
+            try {
+                Util.verifyLoggedInToken(accessToken);
+            } catch (InvalidAccessTokenException e) {
+                onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
+                return;
+            }
+
             api.getUserInfo(accessToken.generateHeaderString()).enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
