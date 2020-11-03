@@ -10,7 +10,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="@dimen/postLinkThumnailWidth"
         android:layout_height="@dimen/postLinkThumnailHeight"
-        app:cardCornerRadius="8dp">
+        app:cardCornerRadius="8dp"
+        app:cardBackgroundColor="@color/secondary_background">
 
         <ImageButton
             android:id="@+id/thumbnail"
