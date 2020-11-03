@@ -3,7 +3,7 @@
 
 An unofficial Reddit client for Android. The application allows for users to log in with their Reddit account and perform actions such as voting, commenting, and retrieving customized front page posts. There is currently no mod support.
 
-Includes an Android wrapper for the Reddit API that provides basic functionality, as well as basic persistence with [Room](https://developer.android.com/training/data-storage/room).
+Includes an Android wrapper for the Reddit API (for installed OAuth applications only) that provides basic functionality, as well as basic persistence with [Room](https://developer.android.com/training/data-storage/room).
 
 
 ## Screenshots
@@ -18,9 +18,9 @@ Includes an Android wrapper for the Reddit API that provides basic functionality
 
 ## Installation
 
-The downloadable [APK](apk/app-debug.apk) contains the application at commit `7f6436575137a358f5c785b7f9973adf24f8ca74`. To install the app via the APK download the APK and open it on your phone and follow the steps shown.
+The downloadable [APK](apk/app-release.apk) contains the application at commit `86c064be4b8bee94924df25231a97668de7094d9`. To install the app via the APK download the APK and open it on your phone and follow the steps shown.
 
-To retrieve the latest version clone the repository and install manually via Android Studio.
+To retrieve the latest version clone the repository and install manually via Android Studio (this will be a debug version).
 
 
 ## Thank you to these libraries
