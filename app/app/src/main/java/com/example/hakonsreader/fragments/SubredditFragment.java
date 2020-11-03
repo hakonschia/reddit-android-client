@@ -316,6 +316,7 @@ public class SubredditFragment extends Fragment {
      */
     private void handleErrors(GenericError error, Throwable throwable) {
         String errorReason = error.getReason();
+        throwable.printStackTrace();
 
         // TODO if SubredditNotFoundException do something with UI like "Subreddit doesn't exist, click here to create it" or something
 

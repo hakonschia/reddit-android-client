@@ -48,7 +48,8 @@ public class SubredditRequest {
      *                  subreddit (front page, popular, all) this will be called
      */
     public void info(OnResponse<Subreddit> onResponse, OnFailure onFailure) {
-        if (RedditApi.STANDARD_SUBS.contains(subredditName)) {
+        // Ensure the subreddit name is lowercased when matching against standard subs
+        if (RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())) {
             onFailure.onFailure(new GenericError(-1), new NoSubredditInfoException("The subreddits: " + RedditApi.STANDARD_SUBS.toString() + " do not have any info to retrieve"));
             return;
         }

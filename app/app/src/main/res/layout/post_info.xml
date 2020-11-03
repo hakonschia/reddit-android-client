@@ -90,7 +90,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/subreddit"
 
             app:layout_constraintEnd_toStartOf="@+id/stickied"
-            app:layout_constraintTop_toTopOf="@+id/commentAuthor"
             tools:visibility="visible" />
 
         <ImageView
@@ -147,7 +146,9 @@
 
             app:layout_constraintBottom_toBottomOf="@+id/author"
             app:layout_constraintStart_toEndOf="@+id/author"
-            app:layout_constraintTop_toTopOf="@+id/author" />
+            app:layout_constraintTop_toTopOf="@+id/author"
+            tools:layout_width="50dp"
+            tools:layout_height="0dp"/>
 
         <LinearLayout
             android:id="@+id/tags"
