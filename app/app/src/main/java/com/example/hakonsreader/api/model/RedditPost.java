@@ -174,6 +174,9 @@ public class RedditPost extends RedditListing {
     }
 
     /**
+     * Retrieve the thumbnail for the post. Note that the thumbnails are very low quality. For
+     * higher quality images see {@link RedditPost#getPreviewImages()} and {@link RedditPost#getSourcePreview()}
+     *
      * @return The URL to the thumbnail of the post
      */
     public String getThumbnail() {

@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.VideoActivity;
+import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditVideo;
 import com.example.hakonsreader.api.utils.LinkUtils;
@@ -306,9 +307,13 @@ public class ContentVideo extends PlayerView {
         if (post.isNsfw()) {
             thumbnail.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_200));
         } else {
+            // post.getThumbnail() returns an image which is very low quality, the source preview
+            // has the same dimensions as the video itself
+            Image image = post.getSourcePreview();
+
             // Show the thumbnail over the video before it is being played
             Picasso.get()
-                    .load(post.getThumbnail())
+                    .load(image.getUrl())
                     .resize(params.width, params.height)
                     .into(thumbnail);
         }
