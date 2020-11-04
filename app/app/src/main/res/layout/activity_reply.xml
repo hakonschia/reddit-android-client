@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="com.example.hakonsreader.views.util.ClickHandler" />
 
         <variable
             name="listing"
@@ -31,25 +32,11 @@
             android:textSize="20sp"
             app:layout_constrainedWidth="true"
 
-            app:layout_constraintEnd_toStartOf="@id/btnAddComment"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Replying to hakonschia" />
-
-        <Button
-            android:id="@+id/btnAddComment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:onClick="sendReply"
-            android:text="@string/btnAddComment"
-            android:textColor="@color/text_color"
-            android:textSize="12sp"
-            android:enabled="false"
-
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/summary"
@@ -81,7 +68,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
 
-            app:layout_constraintBottom_toTopOf="@id/previewHeader"
+            app:layout_constraintBottom_toTopOf="@id/btnAddComment"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/summary">
@@ -109,7 +96,6 @@
             android:id="@+id/previewHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_marginStart="8dp"
 
             android:text="@string/replyPreview"
@@ -117,9 +103,26 @@
             android:textSize="13sp"
 
             app:layout_constraintBottom_toTopOf="@id/preview"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+            app:layout_constraintVertical_bias="0.8" />
+
+        <!-- TODO the padding inside the button messes up the view, makes it look
+        like the button is a little bit above the preview header (thanks android?)-->
+        <ImageButton
+            android:id="@+id/btnAddComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+
+            android:contentDescription="@string/btnAddComment"
+            android:enabled="false"
+            android:onClick="sendReply"
+            android:onLongClick="@{(view) -> ClickHandler.showToastWithContentDescription(view)}"
+            android:src="@drawable/ic_baseline_send_24"
+
+            app:layout_constraintBottom_toTopOf="@id/preview"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
         <TextView
@@ -127,19 +130,19 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
+
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
 
+            android:fadeScrollbars="false"
+            android:scrollbars="vertical"
+
             android:textColor="@color/text_color"
             android:textSize="15sp"
-
-            android:scrollbars="vertical"
-            android:fadeScrollbars="false"
-
             app:layout_constraintBottom_toTopOf="@+id/markdownButtons"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/previewHeader"/>
+            app:layout_constraintTop_toBottomOf="@+id/btnAddComment" />
 
         <HorizontalScrollView
             android:id="@+id/markdownButtons"

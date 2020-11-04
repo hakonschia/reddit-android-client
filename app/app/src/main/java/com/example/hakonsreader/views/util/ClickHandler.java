@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.activites.ProfileActivity;
+import com.example.hakonsreader.activites.ReplyActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
 
 /**
@@ -119,4 +121,24 @@ public class ClickHandler {
     }
 
 
+    /**
+     * Function that can be used as onLongClick that displays a toast with the views
+     * {@code contentDescription}
+     *
+     * @param view The view to display the description for
+     * @return True (event consumed)
+     */
+    public static boolean showToastWithContentDescription(View view) {
+        CharSequence description = view.getContentDescription();
+
+        if (description != null) {
+            String desc = view.getContentDescription().toString();
+
+            if (!desc.isEmpty()) {
+                Toast.makeText(view.getContext(), description, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        return true;
+    }
 }
