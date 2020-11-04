@@ -123,4 +123,5 @@
         <item quantity="one">%d svar</item>
         <item quantity="other">%d svar</item>
     </plurals>
+    <string name="postAgeJustPostedShortened">Nå</string>
 </resources>

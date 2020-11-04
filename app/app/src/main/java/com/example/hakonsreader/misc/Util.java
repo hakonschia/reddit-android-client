@@ -193,7 +193,7 @@ public class Util {
         } else {
             t = time.toMinutes();
             if (t < 1) {
-                return resources.getString(R.string.postAgeJustPosted);
+                return resources.getString(R.string.postAgeJustPostedShortened);
             }
             format = resources.getString(R.string.postAgeMinutesShortened, (int) t);
         }

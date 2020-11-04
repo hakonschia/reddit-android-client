@@ -107,10 +107,10 @@
     </plurals>
 
     <!-- Shortened versions of the strings above to take less space-->
+    <string name="postAgeJustPostedShortened">Now</string>
     <string name="postAgeDaysShortened">%dd</string>
     <string name="postAgeHoursShortened">%dh</string>
     <string name="postAgeMinutesShortened">%dm</string>
-
 
     <!-- Error messages -->
     <string name="notLoggedInError">Please log in to do that</string>
