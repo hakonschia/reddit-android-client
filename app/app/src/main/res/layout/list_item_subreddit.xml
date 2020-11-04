@@ -8,15 +8,19 @@
     android:layout_marginBottom="8dp"
     android:background="?android:selectableItemBackground">
 
+    <!-- This image goes a bit above the text, since the TextView height will differ
+      a bit depending on which characters are in the view. We can offset a little bit
+      manually (and use includeFontPadding=false), but it's not a perfect solution as it will look a bit off depending
+      on the text -->
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/icon"
-        android:layout_width="@dimen/subredditIconSizeInList"
-        android:layout_height="@dimen/subredditIconSizeInList"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
 
-        app:layout_constraintBottom_toBottomOf="@+id/subredditDescription"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
+        app:layout_constraintVertical_bias="0.050000012"
         tools:src="@drawable/ic_baseline_emoji_emotions_24" />
 
     <TextView
@@ -30,6 +34,7 @@
         android:maxLines="1"
         android:textColor="@color/text_color"
         android:textSize="20sp"
+        android:includeFontPadding="false"
 
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@+id/favoriteSub"
@@ -39,19 +44,21 @@
 
         tools:text="GlobalOffensiveReallyReallyLongSubreddit" />
 
+    <!-- TODO Ellipsize isn't showing during runtime, something to do with Markwon -->
     <TextView
         android:id="@+id/subredditDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-
         android:layout_marginEnd="8dp"
-        android:ellipsize="end"
 
+        android:ellipsize="end"
         android:maxLines="3"
         android:text="@tools:sample/lorem/random"
         android:textColor="@color/secondary_text_color"
-
         android:textSize="12sp"
+        android:singleLine="false"
+
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/name"
         app:layout_constraintTop_toBottomOf="@+id/name" />

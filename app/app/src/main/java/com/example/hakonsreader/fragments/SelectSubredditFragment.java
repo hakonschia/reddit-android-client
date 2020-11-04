@@ -3,6 +3,8 @@ package com.example.hakonsreader.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,10 +32,19 @@ import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
 import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class SelectSubredditFragment extends Fragment {
     private static final String TAG = "SelectSubredditFragment";
     private static final String LIST_STATE_KEY = "listState";
+
+    /**
+     * The amount of milliseconds to wait to search for subreddits after text has been input
+     * to the search field
+     */
+    private static final int SUBREDDIT_SEARCH_DELAY = 500;
 
     private FragmentSelectSubredditBinding binding;
     private final RedditApi api = App.get().getApi();
@@ -44,6 +55,7 @@ public class SelectSubredditFragment extends Fragment {
     private LinearLayoutManager layoutManager;
     private SelectSubredditsViewModel viewModel;
     private OnSubredditSelected subredditSelected;
+    private TimerTask searchTimerTask;
 
 
     /**
@@ -102,6 +114,7 @@ public class SelectSubredditFragment extends Fragment {
         viewModel.loadSubreddits();
 
         binding.subredditSearch.setOnEditorActionListener(actionDoneListener);
+        binding.subredditSearch.addTextChangedListener(subredditAutomaticSearchListener);
 
         return binding.getRoot();
     }
@@ -144,6 +157,11 @@ public class SelectSubredditFragment extends Fragment {
                 }
 
                 subredditSelected.subredditSelected(subredditName);
+
+                // Ensure the task is canceled (this should never be null, but you never know)
+                if (searchTimerTask != null) {
+                    searchTimerTask.cancel();
+                }
             } else {
                 Snackbar.make(binding.getRoot(), getString(R.string.subredditMustBeBetweenLength), Snackbar.LENGTH_LONG).show();
             }
@@ -153,5 +171,45 @@ public class SelectSubredditFragment extends Fragment {
         // It makes sense to only return true if the subreddit is valid, but returning false hides
         // the keyboard which is annoying when you got an error and want to try again
         return true;
+    };
+
+    /**
+     * TextWatcher that schedules {@link SelectSubredditFragment#searchTimerTask} to run a task
+     * to search for subreddits. The task runs when no text has been input for
+     * {@link SelectSubredditFragment#SUBREDDIT_SEARCH_DELAY} milliseconds and is not canceled elsewhere.
+     */
+    private final TextWatcher subredditAutomaticSearchListener = new TextWatcher() {
+        @Override
+        public void afterTextChanged(Editable s) {
+            // After a delay of no text added, search for the subreddits in the field
+
+            // Cancel the previous task to avoid it running
+            if (searchTimerTask != null) {
+                searchTimerTask.cancel();
+            }
+
+            searchTimerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    // Call API to search for subreddits, update some sort of list with the results
+                    String searchQuery = s.toString();
+
+                    if (!searchQuery.trim().isEmpty()) {
+                        Log.d(TAG, "run: searching for '" + searchQuery + "'");
+                    }
+                }
+            };
+
+            new Timer().schedule(searchTimerTask, SUBREDDIT_SEARCH_DELAY);
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // Not implemented
+        }
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // Not implemented
+        }
     };
 }

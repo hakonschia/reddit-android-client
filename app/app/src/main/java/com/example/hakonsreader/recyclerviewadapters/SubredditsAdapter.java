@@ -1,10 +1,12 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -110,10 +112,14 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
         holder.name.setText(subreddit.getName());
         App.get().getMark().setMarkdown(holder.description, subreddit.getPublicDesription());
-
-        holder.updateFavorited(subreddit.isFavorited());
-
         ViewUtil.setSubredditIcon(holder.icon, subreddit);
+
+        if (subreddit.isSubscribed()) {
+            holder.favorite.setVisibility(View.VISIBLE);
+            holder.updateFavorited(subreddit.isFavorited());
+        } else {
+            holder.favorite.setVisibility(View.GONE);
+        }
     }
 
     @NonNull
@@ -156,6 +162,16 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
                 int pos = getAdapterPosition();
 
                 if (subredditSelected != null && pos != RecyclerView.NO_POSITION) {
+                    subredditSelected.subredditSelected(subreddits.get(pos).getName());
+                }
+            });
+            description.setOnClickListener(view -> {
+                int pos = getAdapterPosition();
+                TextView tv = (TextView) view;
+
+                // Not a hyperlink (even long clicking on the hyperlink would open it, so don't collapse as well)
+                if (tv.getSelectionStart() == -1 && tv.getSelectionEnd() == -1
+                        && subredditSelected != null && pos != RecyclerView.NO_POSITION) {
                     subredditSelected.subredditSelected(subreddits.get(pos).getName());
                 }
             });
