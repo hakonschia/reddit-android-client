@@ -117,7 +117,13 @@ public class App extends Application {
      * Unregisters any receivers that have been registered
      */
     public void unregisterReceivers() {
-        unregisterReceiver(wifiStateReceiver);
+        // The receiver might not have been registered, but since there isn't a way to check if
+        // a receiver has been registered this will do
+        try {
+            unregisterReceiver(wifiStateReceiver);
+        } catch (IllegalArgumentException ignored) {
+            // Ignored
+        }
     }
 
     /**

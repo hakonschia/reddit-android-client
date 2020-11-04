@@ -469,14 +469,12 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         private Fragment onNavBarProfile() {
             // If logged in, show profile, otherwise show log in page
             if (App.get().isUserLoggedIn()) {
-                Log.d(TAG, "onNavBarProfile: showing profile");
                 if (profileFragment == null) {
                     profileFragment = ProfileFragment.newInstance();
                 }
 
                 return profileFragment;
             } else {
-                Log.d(TAG, "onNavBarProfile: showing loging");
                 if (logInFragment == null) {
                     logInFragment = new LogInFragment();
                 }
