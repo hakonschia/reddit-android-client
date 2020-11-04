@@ -150,4 +150,37 @@ public class SubredditsRequest {
             this.defaultSubreddits(after, count, onResponse, onFailure);
         }
     }
+
+    /**
+     * Search for subreddits
+     *
+     * <p>OAuth scope required: {@code read}</p>
+     *
+     * @param searchQuery The query to search for
+     * @param onResponse The response handler for successful request. Holds the list of subreddits fetched.
+     * @param onFailure The response handler for failed requests
+     */
+    public void search(String searchQuery, OnResponse<List<Subreddit>> onResponse, OnFailure onFailure) {
+        api.searchForSubreddits(searchQuery, accessToken.generateHeaderString()).enqueue(new Callback<ListingResponse>() {
+            @Override
+            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+                ListingResponse body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    List<Subreddit> subreddits = (List<Subreddit>) body.getListings();
+                    onResponse.onResponse(subreddits);
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ListingResponse> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
+    }
 }

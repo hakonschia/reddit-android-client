@@ -48,4 +48,19 @@ public interface SubredditsService {
 
             @Header("Authorization") String accessToken
     );
+
+
+    /**
+     * Search for subreddits
+     *
+     * @param query
+     * @param accessToken
+     * @return
+     */
+    @GET("subreddits/search")
+    Call<ListingResponse> searchForSubreddits(
+            @Query("q") String query,
+
+            @Header("Authorization") String accessToken
+    );
 }
