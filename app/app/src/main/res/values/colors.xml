@@ -50,5 +50,5 @@
 
     <color name="ripplePressedColor">#AEAEAE</color>
 
-    <color name="videoControlBackground">#59000000</color>
+    <color name="videoControlBackground">#80000000</color>
 </resources>

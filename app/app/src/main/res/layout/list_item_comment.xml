@@ -8,6 +8,8 @@
         <import type="android.view.View" />
         <import type="android.graphics.Typeface" />
         <import type="com.example.hakonsreader.views.util.ClickHandler"/>
+        <import type="com.example.hakonsreader.App"/>
+        <import type="com.example.hakonsreader.api.model.User"/>
 
         <variable
             name="post"
@@ -65,6 +67,8 @@
                 android:id="@+id/commentAuthor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
 
                 android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, comment.author)}"
 
@@ -73,7 +77,7 @@
 
                 app:asAdmin="@{comment.admin}"
                 app:asMod="@{comment.mod}"
-                app:asPoster="@{post.author.equals(comment.author)}"
+                app:asPoster="@{comment.byPoster}"
 
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -158,6 +162,20 @@
                 app:layout_constraintTop_toBottomOf="@+id/commentAuthor"
 
                 tools:text="@tools:sample/lorem" />
+
+            <!-- TODO show the three dots here and based on if it's by the logged in user show
+             menu with "edit" "delete" etc. and otherwise "block user" etc.-->
+            <ImageView
+                android:id="@+id/text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+
+                android:src="@drawable/ic_baseline_more_horiz_24"
+                android:onClick="@{(view) -> ClickHandler.showPopupForCommentExtra(view, comment)}"
+
+                app:layout_constraintBottom_toBottomOf="@+id/reply"
+                app:layout_constraintEnd_toStartOf="@+id/reply" />
 
             <!-- We have to add commentHidden to the visibility here instead of adding reply to the
             moreComments group, since it would take precedence over post.locked/comment.locked and

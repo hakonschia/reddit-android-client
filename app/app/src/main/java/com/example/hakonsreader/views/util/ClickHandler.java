@@ -3,16 +3,21 @@ package com.example.hakonsreader.views.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.activites.ProfileActivity;
-import com.example.hakonsreader.activites.ReplyActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
+import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.misc.Util;
+import com.google.android.material.snackbar.Snackbar;
+
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 /**
  * Various click handlers that can be used as click listeners for data binding
@@ -140,5 +145,34 @@ public class ClickHandler {
         }
 
         return true;
+    }
+
+    public static void showPopupForCommentExtra(View view, RedditComment comment) {
+        if (App.getStoredUser().getName().equalsIgnoreCase(comment.getAuthor())) {
+            showPopupForCommentExtraForLoggerInUser(view, comment);
+        }
+    }
+
+    public static void showPopupForCommentExtraForLoggerInUser(View view, RedditComment comment) {
+        PopupMenu menu = new PopupMenu(view.getContext(), view);
+        menu.inflate(R.menu.comment_extra_by_user);
+
+        menu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.menuDeleteComment) {
+                Log.d(TAG, "showPopupForCommentExtraForLoggerInUser: Deleting comment");
+                // This won't actually return anything valid, so we just assume the comment was deleted
+                // This should update the adapter probably?
+                App.get().getApi().comment(comment.getId()).delete(response -> Snackbar.make(view, R.string.commentDeleted, LENGTH_SHORT).show(), ((error, t) -> {
+                    Util.handleGenericResponseErrors(view, error, t);
+                }));
+                return true;
+            }
+
+            return false;
+        });
+        
+        menu.show();
     }
 }

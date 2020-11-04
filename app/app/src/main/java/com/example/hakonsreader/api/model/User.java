@@ -49,22 +49,4 @@ public class User extends RedditListing {
     public String getProfilePictureUrl() {
         return profilePictureUrl;
     }
-
-
-    // TODO move this out of the API as this is android/application specific
-    /**
-     * @return Retrieves the user information stored in SharedPreferences
-     */
-    public static User getStoredUser() {
-        return SharedPreferencesManager.get(SharedPreferencesConstants.USER_INFO, User.class);
-    }
-
-    /**
-     * Stores information about a user in SharedPreferences
-     *
-     * @param user The object to store
-     */
-    public static void storeUserInfo(User user) {
-        SharedPreferencesManager.put(SharedPreferencesConstants.USER_INFO, user);
-    }
 }

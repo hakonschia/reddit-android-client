@@ -131,7 +131,7 @@ public class ProfileFragment extends Fragment {
 
         // No username given, load profile for logged in user
         if (username == null) {
-            user = User.getStoredUser();
+            user = App.getStoredUser();
         } else {
             binding.username.setText(username);
         }
@@ -201,7 +201,7 @@ public class ProfileFragment extends Fragment {
 
             // Store the updated user information if this profile is for the logged in user
             if (username == null) {
-                User.storeUserInfo(user);
+                App.storeUserInfo(user);
             }
 
             this.updateViews();

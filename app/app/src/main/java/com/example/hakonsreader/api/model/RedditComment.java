@@ -23,6 +23,9 @@ public class RedditComment extends RedditListing {
     @SerializedName("body_html")
     private String bodyHtml;
 
+    @SerializedName("is_submitter")
+    private boolean byPoster;
+
     /**
      * How far in the comment is in a comment chain
      */
@@ -86,6 +89,13 @@ public class RedditComment extends RedditListing {
      */
     public String getBodyHtml() {
         return bodyHtml;
+    }
+
+    /**
+     * @return True if the comment is posted by the user who posted the post
+     */
+    public boolean isByPoster() {
+        return byPoster;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
+import android.os.UserManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.databinding.ListItemCommentBinding;
 import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding;
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding;
@@ -76,7 +78,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<RedditComment> commentsHidden = new ArrayList<>();
 
 
-    private RedditPost post;
+    private final RedditPost post;
     private View parentLayout;
 
     private OnReplyListener replyListener;

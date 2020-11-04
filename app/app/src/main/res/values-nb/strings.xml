@@ -124,4 +124,6 @@
         <item quantity="other">%d svar</item>
     </plurals>
     <string name="postAgeJustPostedShortened">Nå</string>
+    <string name="menuDeleteComment">Slett kommentar</string>
+    <string name="commentDeleted">Kommentar slettet</string>
 </resources>

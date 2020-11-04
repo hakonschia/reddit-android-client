@@ -37,6 +37,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
 
             android:text='@{comment != null ? @string/author_prefixed(comment.author) : ""}'
             android:textColor="@color/link_color"
