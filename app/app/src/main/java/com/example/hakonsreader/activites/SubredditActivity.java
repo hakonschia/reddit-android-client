@@ -85,14 +85,6 @@ public class SubredditActivity extends AppCompatActivity implements SlidrActivit
     }
 
     @Override
-    public void finish() {
-        super.finish();
-
-        // Slide the activity out
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-    }
-
-    @Override
     public void lock(boolean lock) {
         if (lock) {
             slidrInterface.lock();

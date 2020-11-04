@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.interfaces.OnClickListener;
@@ -108,6 +109,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
         final Subreddit subreddit = subreddits.get(position);
 
         holder.name.setText(subreddit.getName());
+        App.get().getMark().setMarkdown(holder.description, subreddit.getPublicDesription());
 
         holder.updateFavorited(subreddit.isFavorited());
 
@@ -136,6 +138,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
         private ImageView icon;
         private TextView name;
+        private TextView description;
         private ImageButton favorite;
 
         public ViewHolder(@NonNull View itemView) {
@@ -144,6 +147,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
             icon = itemView.findViewById(R.id.icon);
             name = itemView.findViewById(R.id.name);
+            description = itemView.findViewById(R.id.subredditDescription);
             favorite = itemView.findViewById(R.id.favoriteSub);
 
             // TODO switching orientation somehow disables the listener? subredditSelected is probably null?

@@ -33,7 +33,13 @@ public class Subreddit extends RedditListing {
     private String description;
 
     @SerializedName("description_html")
-    private String descriptionHTML;
+    private String descriptionHtml;
+
+    @SerializedName("public_description")
+    private String publicDesription;
+
+    @SerializedName("public_description_html")
+    private String publicDesriptionHtml;
 
     @SerializedName("icon_img")
     private String iconImage;
@@ -85,7 +91,7 @@ public class Subreddit extends RedditListing {
     }
 
     /**
-     * For HTML see {@link Subreddit#getDescriptionHTML()}
+     * For HTML see {@link Subreddit#getDescriptionHtml()}
      *
      * @return The markdown text of the description of the subreddit
      */
@@ -98,8 +104,22 @@ public class Subreddit extends RedditListing {
      *
      * @return The HTML text of the description of the subreddit
      */
-    public String getDescriptionHTML() {
-        return descriptionHTML;
+    public String getDescriptionHtml() {
+        return descriptionHtml;
+    }
+
+    /**
+     * @return The public description (this is typically a shorter summary)
+     */
+    public String getPublicDesription() {
+        return publicDesription;
+    }
+
+    /**
+     * @return The public description in HTML (this is typically a shorter summary)
+     */
+    public String getPublicDesriptionHtml() {
+        return publicDesriptionHtml;
     }
 
     /**
@@ -189,8 +209,16 @@ public class Subreddit extends RedditListing {
         this.description = description;
     }
 
-    public void setDescriptionHTML(String descriptionHTML) {
-        this.descriptionHTML = descriptionHTML;
+    public void setDescriptionHtml(String descriptionHtml) {
+        this.descriptionHtml = descriptionHtml;
+    }
+
+    public void setPublicDesription(String publicDesription) {
+        this.publicDesription = publicDesription;
+    }
+
+    public void setPublicDesriptionHtml(String publicDesriptionHtml) {
+        this.publicDesriptionHtml = publicDesriptionHtml;
     }
 
     public void setIconImage(String iconImage) {

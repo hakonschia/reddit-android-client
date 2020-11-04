@@ -42,4 +42,6 @@
 
     <dimen name="markdownBtnWidth">60dp</dimen>
     <dimen name="markdownBtnHeight">45dp</dimen>
+
+    <dimen name="subredditIconSizeInList">50dp</dimen>
 </resources>

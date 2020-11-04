@@ -22,7 +22,7 @@ public class ViewUtil {
 
 
     /**
-     * Sets an ImageView to a subreddits icon. If no icon is found a default drawable is usde
+     * Sets an ImageView to a subreddits icon. If no icon is found a default drawable is used
      *
      * @param imageView The view to insert the image into
      * @param subreddit The subreddit to set the image for
@@ -31,6 +31,7 @@ public class ViewUtil {
     public static void setSubredditIcon(ImageView imageView, Subreddit subreddit) {
         String iconURL = subreddit.getIconImage();
         String communityURL = subreddit.getCommunityIcon();
+        int size = (int) imageView.getResources().getDimension(R.dimen.subredditIconSizeInList);
 
         // We use error and placeholder as the default icon. In case no internet it would override
         // the android:src in the layout, and the error isn't shown until the attempt to get the image has been made
@@ -39,12 +40,14 @@ public class ViewUtil {
                     .load(iconURL)
                     .placeholder(R.drawable.ic_baseline_emoji_emotions_24)
                     .error(R.drawable.ic_baseline_emoji_emotions_24)
+                    .resize(size, size)
                     .into(imageView);
         } else if(communityURL != null && !communityURL.isEmpty()) {
             Picasso.get()
                     .load(communityURL)
                     .placeholder(R.drawable.ic_baseline_emoji_emotions_24)
                     .error(R.drawable.ic_baseline_emoji_emotions_24)
+                    .resize(size, size)
                     .into(imageView);
         } else {
             imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_baseline_emoji_emotions_24));
