@@ -384,14 +384,17 @@ public class SubredditFragment extends Fragment {
             binding.setStandardSub(RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase()));
             binding.subscribe.setOnClickListener(this::subscribeOnClick);
 
-            new Thread(() -> {
-                Subreddit sub = database.subreddits().get(subredditName);
-                if (sub != null) {
-                    subreddit.set(sub);
-                }
-            }).start();
+            // Standard subs won't have information, so there is no point in attempting to get it
+            if (!RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())) {
+                new Thread(() -> {
+                    Subreddit sub = database.subreddits().get(subredditName);
+                    if (sub != null) {
+                        subreddit.set(sub);
+                    }
+                }).start();
 
-            this.retrieveSubredditInfo(subredditName);
+                this.retrieveSubredditInfo(subredditName);
+            }
         }
     }
 
