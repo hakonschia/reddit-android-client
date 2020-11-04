@@ -9,6 +9,9 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
 public class TokenManager {
     private static AccessToken token;
 
+    private TokenManager() {}
+
+
     /**
      * Retrieves the access token stored in the application
      *
@@ -37,9 +40,11 @@ public class TokenManager {
 
     /**
      * Clears the stored token
+     *
+     * <p>This call removes the token from SharedPreferences immediately</p>
      */
     public static void removeToken() {
         token = new AccessToken();
-        SharedPreferencesManager.remove(SharedPreferencesConstants.ACCESS_TOKEN);
+        SharedPreferencesManager.removeNow(SharedPreferencesConstants.ACCESS_TOKEN);
     }
 }

@@ -48,6 +48,14 @@ public class SharedPreferencesManager {
     }
 
 
+    /**
+     * Removes a key from the SharedPreferences
+     *
+     * <p>This call is done in the background with {@link SharedPreferences.Editor#apply()}, for immediate
+     * removal use {@link SharedPreferencesManager#removeNow(String)}</p>
+     *
+     * @param key The key to remove
+     */
     public static void remove(String key) {
         if (prefs == null) {
             throw new IllegalStateException(PREFERENCES_NOT_SET_ERROR_MESSAGE);
@@ -56,6 +64,21 @@ public class SharedPreferencesManager {
         prefs.edit()
                 .remove(key)
                 .apply();
+    }
+
+    /**
+     * Removes a key from the shared preferences immediately
+     *
+     * @param key The key to remove
+     */
+    public static void removeNow(String key) {
+        if (prefs == null) {
+            throw new IllegalStateException(PREFERENCES_NOT_SET_ERROR_MESSAGE);
+        }
+
+        prefs.edit()
+                .remove(key)
+                .commit();
     }
 
 }

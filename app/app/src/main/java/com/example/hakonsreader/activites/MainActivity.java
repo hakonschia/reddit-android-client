@@ -32,7 +32,7 @@ import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
-
+import com.jakewharton.processphoenix.ProcessPhoenix;
 
 
 public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         //startActivity(intent);
 
         if (savedInstanceState != null) {
+            Log.d(TAG, "onCreate: instance saved");
             this.restoreFragmentStates(savedInstanceState);
         } else {
             // Only setup the start fragment if we have no state to restore (as this is then a new activity)
@@ -299,10 +300,12 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             // Clear any user specific state from database records (such as vote status on posts)
             AppDatabase.getInstance(this).clearUserState();
 
-            // Restarting the app completely is probably the easiest way to do this.
-            // Although this has to be done after the API call is at the very least sent, SharedPreferences
-            // have been updated (can maybe use the apply()/commit() that instantly does it)
-           // ProcessPhoenix.triggerRebirth(this);
+            // Using a new intent here instead of calling recreate() is useful as that gives us a fresh activity
+            // without any state
+            runOnUiThread(() -> {
+                finish();
+                startActivity(new Intent(this, MainActivity.class));
+            });
         }).start();
     }
 
@@ -313,8 +316,8 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
      */
     private void clearUserInfo() {
         TokenManager.removeToken();
-        SharedPreferencesManager.remove(SharedPreferencesConstants.USER_INFO);
-        SharedPreferencesManager.remove(SelectSubredditsViewModel.SUBSCRIBED_SUBREDDITS_KEY);
+        SharedPreferencesManager.removeNow(SharedPreferencesConstants.USER_INFO);
+        SharedPreferencesManager.removeNow(SelectSubredditsViewModel.SUBSCRIBED_SUBREDDITS_KEY);
     }
 
 
@@ -464,19 +467,21 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
          * is shown so the user can log in
          */
         private Fragment onNavBarProfile() {
-            // If not logged in, show log in page
-            if (TokenManager.getToken().getRefreshToken() == null) {
-                if (logInFragment == null) {
-                    logInFragment = new LogInFragment();
-                }
-
-                return logInFragment;
-            } else {
+            // If logged in, show profile, otherwise show log in page
+            if (App.get().isUserLoggedIn()) {
+                Log.d(TAG, "onNavBarProfile: showing profile");
                 if (profileFragment == null) {
                     profileFragment = ProfileFragment.newInstance();
                 }
 
                 return profileFragment;
+            } else {
+                Log.d(TAG, "onNavBarProfile: showing loging");
+                if (logInFragment == null) {
+                    logInFragment = new LogInFragment();
+                }
+
+                return logInFragment;
             }
         }
     }
