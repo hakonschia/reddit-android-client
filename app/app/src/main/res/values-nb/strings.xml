@@ -24,7 +24,7 @@
     <string name="noInternetConnection">Ingen internett tilkobling</string>
     <string name="prefs_title_auto_play_videos_never">Aldri</string>
     <string name="prefs_title_loop_videos">Loop videoer</string>
-    <string name="btnLogOut">Logg ut</string>
+    <string name="logOut">Logg ut</string>
     <string name="btnLogIn">Logg inn</string>
     <string name="log_in">Logg inn</string>
     <string name="loggedIn">Logget inn</string>

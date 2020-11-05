@@ -44,4 +44,9 @@
     <dimen name="markdownBtnHeight">45dp</dimen>
 
     <dimen name="subredditIconSizeInList">40dp</dimen>
+
+    <!-- The values to use for the top layout (parent layouts) for subreddits and users
+     before and after they have been animated -->
+    <dimen name="userAndSubredditTopLayoutMarginPreAnim">80dp</dimen>
+    <dimen name="userAndSubredditTopLayoutMarginPostAnim">16dp</dimen>
 </resources>

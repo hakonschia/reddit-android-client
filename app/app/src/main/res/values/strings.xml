@@ -9,7 +9,7 @@
     <string name="navbarSettings">Settings</string>
 
     <string name="btnLogIn">Log in</string>
-    <string name="btnLogOut">Log out</string>
+    <string name="logOut">Log out</string>
 
     <string name="btnSubscribeSubscribe">+ Subscribe</string>
     <string name="btnSubscrubeUnsubscribe">- Unsubscribe</string>

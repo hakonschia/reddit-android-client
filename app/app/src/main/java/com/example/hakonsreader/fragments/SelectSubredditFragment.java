@@ -179,6 +179,8 @@ public class SelectSubredditFragment extends Fragment {
      * {@link SelectSubredditFragment#SUBREDDIT_SEARCH_DELAY} milliseconds and is not canceled elsewhere.
      */
     private final TextWatcher subredditAutomaticSearchListener = new TextWatcher() {
+        private final Timer timer = new Timer();
+
         @Override
         public void afterTextChanged(Editable s) {
             // After a delay of no text added, search for the subreddits in the field
@@ -200,7 +202,7 @@ public class SelectSubredditFragment extends Fragment {
                 }
             };
 
-            new Timer().schedule(searchTimerTask, SUBREDDIT_SEARCH_DELAY);
+            timer.schedule(searchTimerTask, SUBREDDIT_SEARCH_DELAY);
         }
 
         @Override

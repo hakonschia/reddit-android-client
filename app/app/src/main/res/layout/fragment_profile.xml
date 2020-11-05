@@ -16,18 +16,19 @@
             type="com.example.hakonsreader.api.model.User" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.motion.widget.MotionLayout
         android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/secondary_background">
+        android:background="@color/secondary_background"
+        app:layoutDescription="@xml/fragment_profile_xml_parentlayout_scene">
 
         <!-- This has a negative bottom margin to not get the rounded corners at the bottom -->
         <ImageView
             android:id="@+id/topLayout"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="@dimen/userAndSubredditTopLayoutMarginPreAnim"
             android:layout_marginBottom="-35dp"
             android:background="@drawable/rounded_square_main_bg_gradient"
 
@@ -36,30 +37,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/btnLogOut"
-            android:layout_width="88dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-
-            android:onClick="btnLogOutOnClick"
-            android:text="@string/btnLogOut"
-            android:visibility="@{loggedInUser ? View.VISIBLE : View.GONE}"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/topLayout" />
-
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profilePicture"
             android:layout_width="140dp"
             android:layout_height="140dp"
-            app:civ_circle_background_color="@color/background"
-
             android:onClick="@{view -> ClickHandler.openImageInFullscreen(view, user.profilePictureUrl)}"
 
             android:src="@drawable/ic_baseline_person_100"
+
             app:civ_border_color="@color/opposite_background"
             app:civ_border_width="2dp"
+            app:civ_circle_background_color="@color/background"
 
             app:layout_constraintBottom_toTopOf="@+id/topLayout"
             app:layout_constraintEnd_toEndOf="parent"
@@ -94,11 +82,13 @@
             android:layout_height="wrap_content"
 
             android:textColor="@color/text_color"
+            android:maxLines="1"
+            android:ellipsize="end"
 
             app:layout_constraintEnd_toEndOf="parent"
-
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/username"
+
             app:profileAge="@{user != null ? user.createdAt : -1}"
 
             tools:text="User since 12. August 1997" />
@@ -172,7 +162,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
 
-            android:visibility="gone"
-            tools:visibility="visible"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/menuProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+
+            android:onClick="@{(view) -> ClickHandler.showPopupForProfile(view, loggedInUser)}"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/topLayout"
+
+            app:srcCompat="@drawable/ic_baseline_more_vert_24" />
+    </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

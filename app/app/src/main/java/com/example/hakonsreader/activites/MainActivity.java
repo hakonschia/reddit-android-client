@@ -281,47 +281,6 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
 
     /**
-     * Click listener for the "Log out" button
-     * <p>Revokes the access/refresh token and clears any information stored locally</p>
-     *
-     * @param view Ignored
-     */
-    public void btnLogOutOnClick(View view) {
-        // Revoke token
-        redditApi.revokeRefreshToken(response -> {
-        }, (call, t) -> {
-            // If failed because of internet connection try to revoke later
-        });
-
-        // Clear shared preferences
-        this.clearUserInfo();
-
-        new Thread(() -> {
-            // Clear any user specific state from database records (such as vote status on posts)
-            AppDatabase.getInstance(this).clearUserState();
-
-            // Using a new intent here instead of calling recreate() is useful as that gives us a fresh activity
-            // without any state
-            runOnUiThread(() -> {
-                finish();
-                startActivity(new Intent(this, MainActivity.class));
-            });
-        }).start();
-    }
-
-    /**
-     * Clears any information stored locally about a logged in user from SharedPreferences.
-     *
-     * <p>The preferences the user have chosen from the settings screen are not changed</p>
-     */
-    private void clearUserInfo() {
-        TokenManager.removeToken();
-        SharedPreferencesManager.removeNow(SharedPreferencesConstants.USER_INFO);
-        SharedPreferencesManager.removeNow(SelectSubredditsViewModel.SUBSCRIBED_SUBREDDITS_KEY);
-    }
-
-
-    /**
      * Custom BottomNavigationView item selection listener
      */
     private class BottomNavigationViewListener implements BottomNavigationView.OnNavigationItemSelectedListener {

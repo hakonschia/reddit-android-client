@@ -149,11 +149,11 @@ public class ClickHandler {
 
     public static void showPopupForCommentExtra(View view, RedditComment comment) {
         if (App.getStoredUser().getName().equalsIgnoreCase(comment.getAuthor())) {
-            showPopupForCommentExtraForLoggerInUser(view, comment);
+            showPopupForCommentExtraForLoggedInUser(view, comment);
         }
     }
 
-    public static void showPopupForCommentExtraForLoggerInUser(View view, RedditComment comment) {
+    public static void showPopupForCommentExtraForLoggedInUser(View view, RedditComment comment) {
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.comment_extra_by_user);
 
@@ -174,5 +174,55 @@ public class ClickHandler {
         });
         
         menu.show();
+    }
+
+
+    /**
+     * Click handler for the profile "more" (kebab) button. Shows a popup menu customized
+     * based on if it should be shown for a logged in user or not
+     *
+     * @param view The view clicked (where the menu will be attached)
+     * @param loggedInUser True if the button is clicked for a logged in user
+     */
+    public static void showPopupForProfile(View view, boolean loggedInUser) {
+        Log.d(TAG, "showPopupForProfile: " + loggedInUser);
+        if (loggedInUser) {
+            showPopupForProfileForLoggedInUser(view);
+        } else {
+            showPopupForProfileForNonLoggedInUser(view);
+        }
+    }
+
+    /**
+     * Shows the popup menu for profiles for logged in users
+     *
+     * @param view The view clicked (where the menu will be attached)
+     */
+    public static void showPopupForProfileForLoggedInUser(View view) {
+        PopupMenu menu = new PopupMenu(view.getContext(), view);
+        menu.inflate(R.menu.profile_menu_logged_in_user);
+
+        menu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.menuLogOut) {
+                // log out etc etc
+                App.get().logOut();
+                return true;
+            }
+
+            return false;
+        });
+
+        menu.show();
+    }
+
+    /**
+     * Shows the popup menu for profiles for non-logged in users
+     *
+     * @param view The view clicked (where the menu will be attached)
+     */
+    public static void showPopupForProfileForNonLoggedInUser(View view) {
+
     }
 }

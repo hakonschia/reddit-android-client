@@ -1,5 +1,6 @@
 package com.example.hakonsreader;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
+import com.example.hakonsreader.activites.MainActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.persistence.AppDatabase;
@@ -30,6 +32,7 @@ import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
 import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
+import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
 import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
@@ -428,5 +431,36 @@ public class App extends Application {
      */
     public static void storeUserInfo(User user) {
         SharedPreferencesManager.put(SharedPreferencesConstants.USER_INFO, user);
+    }
+
+    public void logOut() {
+        Log.d(TAG, "logOut: logging out lul");
+        // Revoke token
+        redditApi.revokeRefreshToken(response -> {
+        }, (call, t) -> {
+            // If failed because of internet connection try to revoke later
+        });
+
+        // Clear shared preferences
+        this.clearUserInfo();
+
+        new Thread(() -> {
+            // Clear any user specific state from database records (such as vote status on posts)
+            AppDatabase.getInstance(this).clearUserState();
+
+            // Might be bad to just restart the app? Easiest way to ensure everything is reset though
+            ProcessPhoenix.triggerRebirth(this);
+        }).start();
+    }
+
+    /**
+     * Clears any information stored locally about a logged in user from SharedPreferences.
+     *
+     * <p>The preferences the user have chosen from the settings screen are not changed</p>
+     */
+    public void clearUserInfo() {
+        TokenManager.removeToken();
+        SharedPreferencesManager.removeNow(SharedPreferencesConstants.USER_INFO);
+        SharedPreferencesManager.removeNow(SelectSubredditsViewModel.SUBSCRIBED_SUBREDDITS_KEY);
     }
 }

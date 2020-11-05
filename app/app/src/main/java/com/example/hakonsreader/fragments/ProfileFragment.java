@@ -2,6 +2,7 @@ package com.example.hakonsreader.fragments;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,11 @@ public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
     private static final String POST_IDS_KEY = "post_ids";
     private static final String LAYOUT_STATE_KEY = "layout_state";
+    /**
+     * The key used to save the progress of the MotionLayout
+     */
+    private static final String LAYOUT_ANIMATION_PROGRESS_KEY = "layout_progress";
+
 
     private boolean firstLoad = true;
 
@@ -100,6 +106,10 @@ public class ProfileFragment extends Fragment {
             username = args.getString("username");
         }
 
+        if (savedInstanceState != null) {
+            binding.parentLayout.setProgress(savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
+        }
+
         adapter = new PostsAdapter();
         layoutManager = new LinearLayoutManager(getContext());
         postIds = new ArrayList<>();
@@ -147,11 +157,22 @@ public class ProfileFragment extends Fragment {
         }
 
         if (saveState != null) {
+            binding.parentLayout.setProgress(saveState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
             postIds = saveState.getStringArrayList(POST_IDS_KEY);
             postsViewModel.setPostIds(postIds);
         }
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // onSaveInstanceState is called for configuration changes (such as orientation)
+        // so we need to store the animation state here and in saveState (for when the fragment has
+        // been replaced but not destroyed)
+        outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
     }
 
     @Override
@@ -170,6 +191,7 @@ public class ProfileFragment extends Fragment {
             saveState = new Bundle();
         }
 
+        saveState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
         saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
         saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
     }

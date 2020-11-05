@@ -2,10 +2,13 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
 public class LoadingIcon extends ProgressBar {
+    private static final String TAG = "LoadingIcon";
+    
     private int itemsLoading;
 
     public LoadingIcon(Context context) {
@@ -25,7 +28,7 @@ public class LoadingIcon extends ProgressBar {
      * Increases the load counter. This will always enable the icon
      */
     private synchronized void increaseLoadCount() {
-        this.itemsLoading++;
+        itemsLoading++;
         setVisibility(View.VISIBLE);
     }
 
@@ -33,15 +36,15 @@ public class LoadingIcon extends ProgressBar {
      * Decreases the load counter. If the load counter is now 0 the icon is hidden
      */
     private synchronized void decreaseLoadCount() {
-        this.itemsLoading--;
-        if (this.itemsLoading == 0) {
+        itemsLoading--;
+        if (itemsLoading == 0) {
             setVisibility(View.GONE);
         }
     }
 
     public synchronized void setItemsLoading(int itemsLoading) {
         this.itemsLoading = itemsLoading;
-        if (this.itemsLoading == 0) {
+        if (itemsLoading == 0) {
             setVisibility(View.GONE);
         } else {
             setVisibility(VISIBLE);
