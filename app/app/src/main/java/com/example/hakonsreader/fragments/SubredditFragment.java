@@ -63,6 +63,11 @@ public class SubredditFragment extends Fragment {
      */
     private static final String LAYOUT_STATE_KEY = "layout_state";
 
+    /**
+     * The key used to save the progress of the MotionLayout
+     */
+    private static final String LAYOUT_ANIMATION_PROGRESS_KEY = "layout_progress";
+
 
     private final RedditApi api = App.get().getApi();
     private FragmentSubredditBinding binding;
@@ -107,7 +112,7 @@ public class SubredditFragment extends Fragment {
                             .load(communityURL)
                             .into(binding.subredditIcon);
                 } else {
-                    binding.subredditIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_emoji_emotions_24));
+                    binding.subredditIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_emoji_emotions_200));
                 }
             });
         }
@@ -344,6 +349,10 @@ public class SubredditFragment extends Fragment {
         Log.d(TAG, "onCreate " + getSubredditName());
         binding = FragmentSubredditBinding.inflate(getLayoutInflater());
 
+        if (savedInstanceState != null) {
+            binding.parentLayout.setProgress(savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
+        }
+
         lastLoadAttemptCount = 0;
         adapter = new PostsAdapter();
         layoutManager = new LinearLayoutManager(getContext());
@@ -414,6 +423,7 @@ public class SubredditFragment extends Fragment {
         this.setupPostsList();
 
         if (saveState != null) {
+            binding.parentLayout.setProgress(saveState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
             postIds = saveState.getStringArrayList(POST_IDS_KEY);
             postsViewModel.setPostIds(postIds);
         }
@@ -467,6 +477,11 @@ public class SubredditFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState " + getSubredditName());
+
+        // onSaveInstanceState is called for configuration changes (such as orientation)
+        // so we need to store the animation state here and in saveState (for when the fragment has
+        // been replaced but not destroyed)
+        outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
     }
 
     @Override
@@ -498,6 +513,7 @@ public class SubredditFragment extends Fragment {
             saveState = new Bundle();
         }
 
+        saveState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
         saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
         saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
     }

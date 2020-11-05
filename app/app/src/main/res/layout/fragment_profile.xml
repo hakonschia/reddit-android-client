@@ -39,8 +39,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profilePicture"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
+            android:layout_width="@dimen/userAndSubredditIconSizePreAnim"
+            android:layout_height="@dimen/userAndSubredditIconSizePreAnim"
             android:onClick="@{view -> ClickHandler.openImageInFullscreen(view, user.profilePictureUrl)}"
 
             android:src="@drawable/ic_baseline_person_100"
@@ -72,9 +72,9 @@
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profilePicture"
 
-            tools:text="Hakonschia" />
+            app:layout_constraintTop_toBottomOf="@+id/profilePicture"
+            tools:text="Hakonschiassssssssssssss" />
 
         <TextView
             android:id="@+id/profileAge"

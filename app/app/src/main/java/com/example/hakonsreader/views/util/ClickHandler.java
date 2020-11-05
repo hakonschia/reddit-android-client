@@ -28,6 +28,8 @@ public class ClickHandler {
     private ClickHandler() { }
 
 
+    public static void emptyClick() { };
+
     /**
      * Empty function to consume long click events. This can be used in XML to handle
      * a conditional {@code onLongClick} where one operand should be empty

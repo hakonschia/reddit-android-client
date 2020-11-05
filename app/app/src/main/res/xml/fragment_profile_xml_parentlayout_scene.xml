@@ -35,8 +35,8 @@
             android:layout_marginTop="@dimen/userAndSubredditTopLayoutMarginPostAnim" />
         <Constraint
             android:id="@+id/profilePicture"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
+            android:layout_width="@dimen/userAndSubredditIconSizePostAnim"
+            android:layout_height="@dimen/userAndSubredditIconSizePostAnim"
             motion:layout_constraintTop_toTopOf="@id/topLayout"
             motion:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="16dp"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             motion:layout_constraintTop_toTopOf="@+id/profilePicture"
             motion:layout_constraintEnd_toEndOf="parent"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:id="@+id/username"
             motion:layout_constraintStart_toEndOf="@+id/profilePicture"
             motion:layout_constraintHorizontal_bias="0.0"
@@ -97,5 +97,13 @@
             <PropertySet
                 motion:visibilityMode="ignore"/>
         </Constraint>
+        <Constraint
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            motion:layout_constraintTop_toTopOf="@+id/topLayout"
+            android:layout_marginTop="8dp"
+            android:id="@+id/menuProfile" />
     </ConstraintSet>
 </MotionScene>

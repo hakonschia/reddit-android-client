@@ -38,19 +38,19 @@ public class ViewUtil {
         if (iconURL != null && !iconURL.isEmpty()) {
             Picasso.get()
                     .load(iconURL)
-                    .placeholder(R.drawable.ic_baseline_emoji_emotions_24)
-                    .error(R.drawable.ic_baseline_emoji_emotions_24)
+                    .placeholder(R.drawable.ic_baseline_emoji_emotions_200)
+                    .error(R.drawable.ic_baseline_emoji_emotions_200)
                     .resize(size, size)
                     .into(imageView);
         } else if(communityURL != null && !communityURL.isEmpty()) {
             Picasso.get()
                     .load(communityURL)
-                    .placeholder(R.drawable.ic_baseline_emoji_emotions_24)
-                    .error(R.drawable.ic_baseline_emoji_emotions_24)
+                    .placeholder(R.drawable.ic_baseline_emoji_emotions_200)
+                    .error(R.drawable.ic_baseline_emoji_emotions_200)
                     .resize(size, size)
                     .into(imageView);
         } else {
-            imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_baseline_emoji_emotions_24));
+            imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_baseline_emoji_emotions_200));
         }
     }
 

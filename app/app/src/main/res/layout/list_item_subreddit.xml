@@ -21,7 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.050000012"
-        tools:src="@drawable/ic_baseline_emoji_emotions_24" />
+        tools:src="@drawable/ic_baseline_emoji_emotions_200" />
 
     <TextView
         android:id="@+id/name"
