@@ -13,8 +13,7 @@
 
         <variable
             name="noComments"
-            type="boolean"
-            />
+            type="boolean" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

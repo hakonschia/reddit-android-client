@@ -34,7 +34,13 @@
         <Constraint android:id="@+id/subscribe">
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
-        <Constraint android:id="@+id/subredditSubscribers">
+        <Constraint android:id="@+id/subredditSubscribers"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            motion:layout_constraintTop_toBottomOf="@+id/subredditName"
+            motion:layout_constraintEnd_toStartOf="@+id/subredditRefresh"
+            motion:layout_constraintStart_toEndOf="@+id/subscribe"
+            android:layout_marginStart="8dp">
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
 
@@ -55,14 +61,16 @@
             motion:layout_constraintHorizontal_bias="0.0"
             motion:layout_constraintStart_toEndOf="@+id/subredditIcon"
             motion:layout_constraintTop_toTopOf="@+id/subredditIcon"
-            android:layout_marginStart="16dp" />
+            android:layout_marginStart="8dp" />
         <Constraint
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             motion:layout_constraintTop_toBottomOf="@+id/subredditName"
             android:id="@+id/subredditSubscribers"
             motion:layout_constraintStart_toEndOf="@+id/subscribe"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            motion:layout_constraintEnd_toStartOf="@+id/subredditRefresh" />
         <Constraint
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"

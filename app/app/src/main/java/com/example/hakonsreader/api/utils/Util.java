@@ -10,6 +10,7 @@ import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.util.List;
@@ -78,9 +79,13 @@ public class Util {
 
         try {
             error = new Gson().fromJson(response.errorBody().string(), GenericError.class);
-        } catch (IOException e) {
+        } catch (IOException | JsonSyntaxException e) {
             // The code will always be present as the http status code of the response, but message and reason
-            //  are set by Reddit as the response body so response.message() will be empty
+            // are set by Reddit as the response body so response.message() will be empty
+
+            // In some cases, reddit might return a non-json body (it returns an html error page)
+            // which will make Gson throw an exception because it can't parse the response
+
             error = new GenericError(response.code());
         }
 
