@@ -324,6 +324,7 @@ public class Post extends RelativeLayout {
 
             Bundle extras = getExtras();
             intent.putExtra("extras", extras);
+            intent.putExtra(PostActivity.HIDE_SCORE_KEY, binding.postFullBar.getHideScore());
 
             this.pauseVideo();
 

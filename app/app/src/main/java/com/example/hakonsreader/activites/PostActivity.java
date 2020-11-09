@@ -47,6 +47,12 @@ public class PostActivity extends AppCompatActivity {
     public static final String KIND_KEY = "kind";
 
     /**
+     * The key used to tell if the post score should be hidden
+     */
+    public static final String HIDE_SCORE_KEY = "hideScore";
+
+
+    /**
      * The key used in intent extras for listings
      */
     public static final String LISTING_KEY = "listing";
@@ -92,6 +98,8 @@ public class PostActivity extends AppCompatActivity {
                 this.onPostLoaded();
             }
         });
+
+        binding.post.setHideScore(getIntent().getExtras().getBoolean(HIDE_SCORE_KEY));
 
         binding.post.setMaxContentHeight((int)getResources().getDimension(R.dimen.postContentMaxHeight));
         // Don't allow to open the post again when we are now in the post

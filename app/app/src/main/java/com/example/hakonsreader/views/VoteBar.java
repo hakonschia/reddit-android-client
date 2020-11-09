@@ -69,6 +69,10 @@ public class VoteBar extends ConstraintLayout {
         this.hideScore = hideScore;
     }
 
+    public boolean getHideScore() {
+        return hideScore;
+    }
+
     /**
      * Sends a request to vote on a given listing
      *

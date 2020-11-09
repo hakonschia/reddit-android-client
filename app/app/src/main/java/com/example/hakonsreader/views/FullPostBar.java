@@ -56,6 +56,10 @@ public class FullPostBar extends ConstraintLayout {
         binding.voteBar.setHideScore(hideScore);
     }
 
+    public boolean getHideScore() {
+        return binding.voteBar.getHideScore();
+    }
+
     /**
      * Updates the view based on the post set with {@link FullPostBar#post}
      */
