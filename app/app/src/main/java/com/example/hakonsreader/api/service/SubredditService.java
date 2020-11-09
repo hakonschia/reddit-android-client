@@ -44,10 +44,11 @@ public interface SubredditService {
      *                    to retrieve posts without a logged in user
      * @return A Call object ready to retrieve posts from a subreddit
      */
-    @GET("{subreddit}/{sort}?raw_json=1")
+    @GET("{subreddit}/{sort}?raw_json=1/")
     Call<ListingResponse> getPosts(
             @Path("subreddit") String subreddit,
             @Path("sort") String sort,
+            @Query("t") String timeSort,
             @Query("after") String after,
             @Query("count") int count,
             @Query("raw_json") int rawJson,

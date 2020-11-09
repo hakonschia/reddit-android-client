@@ -19,13 +19,10 @@ public enum PostTimeSort {
     }
 
     /**
-     * Retrieve the underlying string value of the thing
+     * Retrieve the underlying string value of the sorting method. This string value corresponds
+     * to how sorting is used with the Reddit API calls
      *
-     * <p>This value can be used in addition to the things ID to create the fullname of the thing</p>
-     *
-     * <p>When creating the fullname use a "_" between the thing value and the ID</p>
-     *
-     * @return The string identifier for the thing (eg. "t1")
+     * @return The string identifier for the thing (eg. "all")
      */
     public String getValue() {
         return value;

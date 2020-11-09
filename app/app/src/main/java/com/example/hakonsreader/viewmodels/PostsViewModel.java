@@ -9,7 +9,11 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.SortingMethods;
+import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.enums.Thing;
+import com.example.hakonsreader.api.interfaces.OnFailure;
+import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 
@@ -41,6 +45,21 @@ public class PostsViewModel extends ViewModel {
 
     private final String userOrSubreddit;
     private final boolean isUser;
+
+    private SortingMethods sort;
+    private PostTimeSort timeSort;
+
+    /**
+     * Handler for successful responses for getting posts
+     */
+    private final OnResponse<List<RedditPost>> onPostsResponse = this::onPostsRetrieved;
+    /**
+     * Handler for failed responses for getting posts
+     */
+    private final OnFailure onPostsFailure = (e, t) -> {
+        loadingChange.setValue(false);
+        error.setValue(new ErrorWrapper(e, t));
+    };
 
 
     /**
@@ -143,7 +162,9 @@ public class PostsViewModel extends ViewModel {
     }
 
     /**
-     * Starts posts from the start. This will automatically call {@link PostsViewModel#loadPosts()}
+     * Starts posts from the start. This will automatically call {@link PostsViewModel#loadPosts()}.
+     * If {@link PostsViewModel#restart(SortingMethods, PostTimeSort)} has been called previously, the same
+     * sorting is used this time
      */
     public void restart() {
         postsData.clear();
@@ -156,8 +177,25 @@ public class PostsViewModel extends ViewModel {
     }
 
     /**
+     * Starts posts from start and updates how to sort the posts
+     *
+     * @param sort How to sort the posts
+     * @param timeSort How to sort the posts based on time. Note this isn't applicable for all types
+     *                 of sorts. If not applicable this will be ignored (and can be null)
+     */
+    public void restart(SortingMethods sort, PostTimeSort timeSort) {
+        this.sort = sort;
+        this.timeSort = timeSort;
+
+        restart();
+    }
+
+    /**
      * Retrieve posts from the user or subreddit. Calling this automatically resumes from
-     * the previous posts loaded
+     * the previous posts loaded.
+     *
+     * <p>For users the default sort is {@link SortingMethods#NEW}, for subreddits the default is {@link SortingMethods#HOT}.
+     * Use {@link PostsViewModel#restart(SortingMethods, PostTimeSort)} to change the sorting method</p>
      */
     public void loadPosts() {
         // Usernames can be null (if logged in user), subreddits cannot be null (TODO treat null as front page?)
@@ -176,19 +214,57 @@ public class PostsViewModel extends ViewModel {
         loadingChange.setValue(true);
 
         if (isUser) {
-            api.user(userOrSubreddit).posts(this::onPostsRetrieved, (e, t) -> {
-                loadingChange.setValue(false);
-                t.printStackTrace();
-                error.setValue(new ErrorWrapper(e, t));
-            });
+            loadForUsers();
         } else {
-            api.subreddit(userOrSubreddit).posts(after, count, this::onPostsRetrieved, (e, t) -> {
-                loadingChange.setValue(false);
-                error.setValue(new ErrorWrapper(e, t));
-            });
+            loadForSubreddits(after, count);
         }
     }
 
+    /**
+     * Loads posts for users
+     */
+    private void loadForUsers() {
+        // TODO include after/count
+        // Default for users is "new"
+
+        if (sort == SortingMethods.HOT) {
+            api.user(userOrSubreddit).posts().hot(onPostsResponse, onPostsFailure);
+        } else if (sort == SortingMethods.TOP) {
+            api.user(userOrSubreddit).posts().top(timeSort, onPostsResponse, onPostsFailure);
+        } else if (sort == SortingMethods.CONTROVERSIAL) {
+            api.user(userOrSubreddit).posts().controversial(timeSort, onPostsResponse, onPostsFailure);
+        } else {
+            api.user(userOrSubreddit).posts(onPostsResponse, onPostsFailure);
+        }
+    }
+
+    /**
+     * Loads posts for subreddits
+     *
+     * @param after The ID of the last post loaded (where to load new posts from)
+     * @param count The amount of posts loaded
+     */
+    private void loadForSubreddits(String after, int count) {
+        // Default for users is "hot"
+        // Since the "else" is used for the default, this will ensure the default sort is always loaded
+
+        if (sort == SortingMethods.NEW) {
+            api.subreddit(userOrSubreddit).newPosts(after, count, onPostsResponse, onPostsFailure);
+        } else if (sort == SortingMethods.TOP) {
+            api.subreddit(userOrSubreddit).top(timeSort, after, count, onPostsResponse, onPostsFailure);
+        } else if (sort == SortingMethods.CONTROVERSIAL) {
+            //api.user(userOrSubreddit).posts().controversial(timeSort, onPostsResponse, onPostsFailure);
+        } else {
+            api.subreddit(userOrSubreddit).posts(after, count, onPostsResponse, onPostsFailure);
+        }
+    }
+
+    /**
+     * Function to deal with responses for new posts. The posts are inserted into the local database
+     * and are notified to the observers of the LiveData
+     *
+     * @param newPosts The new posts retrieved
+     */
     private void onPostsRetrieved(List<RedditPost> newPosts) {
         loadingChange.setValue(false);
 

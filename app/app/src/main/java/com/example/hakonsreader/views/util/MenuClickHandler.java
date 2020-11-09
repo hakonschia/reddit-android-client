@@ -140,6 +140,7 @@ public class MenuClickHandler {
         } else {
             return;
         }
+        // TODO the menu should show what is the currently selected sort (probably have to adjust the interface for a getter method)
 
         PopupMenu menu = new PopupMenu(context, view);
         menu.inflate(R.menu.sort_menu_with_time);

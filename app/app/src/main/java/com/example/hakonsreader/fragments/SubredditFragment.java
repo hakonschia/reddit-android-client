@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.SortingMethods;
 import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
 import com.example.hakonsreader.api.model.Subreddit;
@@ -452,21 +450,21 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
     @Override
     public void newSort() {
-        Log.d(TAG, "newSort: ");
+        postsViewModel.restart(SortingMethods.NEW, null);
     }
 
     @Override
     public void hot() {
-        Log.d(TAG, "hot: ");
+        postsViewModel.restart(SortingMethods.HOT, null);
     }
 
     @Override
     public void top(PostTimeSort timeSort) {
-        Log.d(TAG, "top: " + timeSort.getValue());
+        postsViewModel.restart(SortingMethods.TOP, timeSort);
     }
 
     @Override
     public void controversial(PostTimeSort timeSort) {
-        Log.d(TAG, "controversial: " + timeSort.getValue());
+        postsViewModel.restart(SortingMethods.CONTROVERSIAL, timeSort);
     }
 }

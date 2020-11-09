@@ -229,6 +229,7 @@ public class SubredditRequest {
         api.getPosts(
                 subreddit,
                 sort,
+                timeSort == null ? "" : timeSort.getValue(),
                 after,
                 count,
                 RedditApi.RAW_JSON,
