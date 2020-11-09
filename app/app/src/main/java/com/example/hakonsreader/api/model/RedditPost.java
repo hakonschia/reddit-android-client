@@ -371,7 +371,7 @@ public class RedditPost extends RedditListing {
             return preview.images.get(0).resolutions;
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     /**

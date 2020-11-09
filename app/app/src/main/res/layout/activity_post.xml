@@ -17,7 +17,6 @@
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-
         android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -150,9 +149,14 @@
 
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+
+            app:layout_anchor="@id/appBar"
+            app:layout_anchorGravity="bottom"
+            android:translationY="2dp"
+            android:indeterminateOnly="true"
+            style="?android:attr/progressBarStyleHorizontal"
 
             android:visibility="gone"
             tools:visibility="visible" />

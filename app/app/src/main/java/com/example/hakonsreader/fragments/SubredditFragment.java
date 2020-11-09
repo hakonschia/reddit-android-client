@@ -145,17 +145,6 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     }
 
     /**
-     * Called when the refresh button has been clicked
-     * <p>Clears the items in the list, scrolls to the top, and loads new posts</p>
-     *
-     * @param view Ignored
-     */
-    private void onRefreshPostsClicked(View view) {
-        // Kinda weird to clear the posts here but works I guess?
-        postsViewModel.restart();
-    }
-
-    /**
      * Sets up {@link FragmentSubredditBinding#posts}
      */
     private void setupPostsList() {
@@ -163,6 +152,43 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         binding.posts.setLayoutManager(layoutManager);
         binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> postsViewModel.loadPosts()));
     }
+
+    /**
+     * Sets up {@link SubredditFragment#postsViewModel}.
+     */
+    private void setupViewModel() {
+        postsViewModel = new ViewModelProvider(this, new PostsFactory(
+                getContext(),
+                getSubredditName(),
+                false
+        )).get(PostsViewModel.class);
+
+        postsViewModel.getPosts().observe(this, posts -> {
+            if (posts.isEmpty()) {
+                adapter.clearPosts();
+                return;
+            }
+
+            int size = adapter.getItemCount();
+            adapter.addPosts(posts);
+
+            // Possible state to restore
+            if (saveState != null && size == 0) {
+                Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);
+                if (state != null) {
+                    layoutManager.onRestoreInstanceState(saveState.getParcelable(LAYOUT_STATE_KEY));
+
+                    // Resume videos etc etc
+                    this.restoreViewHolderStates();
+                }
+            }
+        });
+        postsViewModel.onLoadingChange().observe(this, up -> {
+            binding.loadingIcon.onCountChange(up);
+        });
+        postsViewModel.getError().observe(this, error -> this.handleErrors(error.getError(), error.getThrowable()));
+    }
+
 
     /**
      * Restores the state of the visible ViewHolders based on {@link SubredditFragment#saveState}
@@ -305,37 +331,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             }
         }
 
-        postsViewModel = new ViewModelProvider(this, new PostsFactory(
-                getContext(),
-                getSubredditName(),
-                false
-        )).get(PostsViewModel.class);
-        postsViewModel.getPosts().observe(this, posts -> {
-            if (posts.isEmpty()) {
-                adapter.clearPosts();
-                return;
-            }
-
-            int size = adapter.getItemCount();
-            adapter.addPosts(posts);
-
-            // Possible state to restore
-            if (saveState != null && size == 0) {
-                Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);
-                if (state != null) {
-                    layoutManager.onRestoreInstanceState(saveState.getParcelable(LAYOUT_STATE_KEY));
-
-                    // Resume videos etc etc
-                    this.restoreViewHolderStates();
-                }
-            }
-        });
-        postsViewModel.onLoadingChange().observe(this, up -> {
-            binding.loadingIcon.onCountChange(up);
-        });
-        postsViewModel.getError().observe(this, error -> {
-            this.handleErrors(error.getError(), error.getThrowable());
-        });
+        this.setupViewModel();
     }
 
     @Nullable
@@ -344,7 +340,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         Log.d(TAG, "onCreateView " + getSubredditName());
 
         // Bind the refresh button in the toolbar
-        binding.subredditRefresh.setOnClickListener(this::onRefreshPostsClicked);
+        binding.subredditRefresh.setOnClickListener(view -> postsViewModel.restart());
 
         // Although only the numbers will actually change, we need to add alphabet characters as well
         //  for the initial animation when going from an empty string to "341 subscribers"

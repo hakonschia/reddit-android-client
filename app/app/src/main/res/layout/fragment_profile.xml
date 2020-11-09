@@ -156,12 +156,20 @@
 
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"
-            android:layout_width="wrap_content"
+
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
+
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:indeterminateOnly="true"
+            android:visibility="gone"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/profileNameDivider"
+            app:layout_constraintBottom_toBottomOf="@id/profileNameDivider"
 
             tools:visibility="visible" />
 

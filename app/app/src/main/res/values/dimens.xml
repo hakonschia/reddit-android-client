@@ -23,8 +23,8 @@
     <!-- The margin is from the start of the quote stripe to the start of the text -->
     <dimen name="quoteMargin">15dp</dimen>
 
-    <!-- The height -->
-    <dimen name="markdownThematicBreakHeight">2dp</dimen>
+    <!-- The height for lines in markdown -->
+    <dimen name="markdownThematicBreakHeight">0.5dp</dimen>
 
     <!-- The default time for TickerView animations -->
     <integer name="tickerAnimationDefault">750</integer>

@@ -28,7 +28,14 @@
 
     <ConstraintSet android:id="@+id/end">
         <!-- To control the visibility we need to tell the MotionLayout that we want control (in all ConstraintSets) -->
-        <Constraint android:id="@+id/loadingIcon">
+        <Constraint android:id="@+id/loadingIcon"
+            android:layout_marginEnd="2dp"
+            android:layout_height="wrap_content"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            motion:layout_constraintTop_toBottomOf="@+id/subredditIcon"
+            motion:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="2dp">
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
         <Constraint android:id="@+id/subscribe"
