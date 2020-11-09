@@ -187,6 +187,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
+     * Removes all comments from the list
+     */
+    public void clearComments() {
+        int size = comments.size();
+        comments.clear();
+        commentsHidden.clear();
+        notifyItemRangeRemoved(0, size);
+    }
+
+    /**
      * Find the next top level comment of the comment (hidden comments are ignored)
      *
      * @param currentPos The position to start looking at

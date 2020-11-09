@@ -21,7 +21,13 @@ public class CommentsViewModel extends ViewModel {
     private final MutableLiveData<RedditPost> post = new MutableLiveData<>();
     private final MutableLiveData<List<RedditComment>> comments = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();
+    private final MutableLiveData<ErrorWrapper> error = new MutableLiveData<>();
 
+    private String postId;
+
+    public void setPostId(String postId) {
+        this.postId = postId;
+    }
 
     public LiveData<RedditPost> getPost() {
         return post;
@@ -34,6 +40,10 @@ public class CommentsViewModel extends ViewModel {
         return comments;
     }
 
+    public LiveData<ErrorWrapper> getError() {
+        return error;
+    }
+
     /**
      * Retrieve the value used for listening to when something has started or finished loading
      *
@@ -44,18 +54,30 @@ public class CommentsViewModel extends ViewModel {
         return loadingChange;
     }
 
-    public void loadComments(View parentLayout, String postId) {
+    /**
+     * Loads comments
+     */
+    public void loadComments() {
         loadingChange.setValue(true);
 
         App.get().getApi().post(postId).comments(newComments -> {
             comments.setValue(newComments);
             loadingChange.setValue(false);
-        }, post::setValue, ((code, t) -> {
+        }, post::setValue, ((e, t) -> {
             t.printStackTrace();
             loadingChange.setValue(false);
-
-            Util.handleGenericResponseErrors(parentLayout, code, t);
+            error.setValue(new ErrorWrapper(e, t));
         }));
+    }
+
+    /**
+     * Loads comments from scratch. {@link CommentsViewModel#loadComments()} is automatically called
+     */
+    public void restart() {
+        commentsDataSet.clear();
+        comments.setValue(commentsDataSet);
+
+        loadComments();
     }
 
 }

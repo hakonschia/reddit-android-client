@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -18,6 +17,7 @@ import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
+import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.viewmodels.CommentsViewModel;
 import com.google.gson.Gson;
@@ -98,9 +98,9 @@ public class PostActivity extends AppCompatActivity {
                 this.onPostLoaded();
             }
         });
+        commentsViewModel.getError().observe(this, error -> Util.handleGenericResponseErrors(binding.parentLayout, error.getError(), error.getThrowable()));
 
         binding.post.setHideScore(getIntent().getExtras().getBoolean(HIDE_SCORE_KEY));
-
         binding.post.setMaxContentHeight((int)getResources().getDimension(R.dimen.postContentMaxHeight));
         // Don't allow to open the post again when we are now in the post
         binding.post.setAllowPostOpen(false);
@@ -114,6 +114,11 @@ public class PostActivity extends AppCompatActivity {
         // Previous is upwards, next is down
         binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment);
         binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment);
+
+        binding.commentsSwipeRefresh.setOnRefreshListener(() -> {
+            binding.commentsSwipeRefresh.setRefreshing(false);
+            commentsViewModel.restart();
+        });
     }
 
     @Override
@@ -202,7 +207,8 @@ public class PostActivity extends AppCompatActivity {
             postId = extras.getString(POST_ID_KEY);
         }
 
-        commentsViewModel.loadComments(binding.parentLayout, postId);
+        commentsViewModel.setPostId(postId);
+        commentsViewModel.loadComments();
     }
 
     /**
@@ -238,6 +244,12 @@ public class PostActivity extends AppCompatActivity {
         binding.comments.setLayoutManager(layoutManager);
 
         commentsViewModel.getComments().observe(this, comments -> {
+            // Check if there are any comments from before to avoid "No comments" not appearing when comments are reloaded
+            if (comments.isEmpty() && commentsAdapter.getItemCount() != 0) {
+                commentsAdapter.clearComments();
+                return;
+            }
+
             commentsAdapter.addComments(comments);
             binding.setNoComments(comments.isEmpty());
         });

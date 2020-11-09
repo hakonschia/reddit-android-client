@@ -48,22 +48,29 @@
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/comments"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/commentsSwipeRefresh"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:paddingBottom="75dp"
-            android:clipToPadding="false"
 
             android:background="@color/background"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
 
-            android:visibility="@{noComments ? View.GONE : View.VISIBLE}"
+            tools:visibility="gone" >
 
-            tools:visibility="gone"
-            tools:listitem="@layout/list_item_comment" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/comments"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:paddingBottom="75dp"
+                android:clipToPadding="false"
+
+                tools:listitem="@layout/list_item_comment" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
         <!-- TODO this can cause overlap with the post (if I can get rid of the
          toolbar layout and swap with a ConstraintLayout this wont be an issue)-->
