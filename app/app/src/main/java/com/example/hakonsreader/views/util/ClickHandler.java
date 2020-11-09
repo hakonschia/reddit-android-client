@@ -17,7 +17,9 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.activites.ProfileActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
+import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -237,12 +239,17 @@ public class ClickHandler {
      * Shows a popup menu to allow a list to change how it should be sorted. The menu shown here
      * includes time sorts for sorts such as top and controversial
      *
-     * @param view The view clicked
+     * @param view The view clicked. If this is not in a fragment implementing {@link SortableWithTime}
+     *             nothing is done
      */
     public static void showPopupSortWithTime(View view) {
         Fragment f = FragmentManager.findFragment(view);
-        Log.d(TAG, "showPopupSortWithTime: " + f);
 
+        if (!(f instanceof SortableWithTime)) {
+            return;
+        }
+
+        SortableWithTime sortable = (SortableWithTime) f;
         Context context = view.getContext();
 
         PopupMenu menu = new PopupMenu(context, view);
@@ -251,18 +258,65 @@ public class ClickHandler {
         menu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
 
-            // If top/controversial inflate new menu with sort_menu_of_time
             if (itemId == R.id.sortNew) {
+                sortable.newSort();
                 return true;
             } else if (itemId == R.id.sortHot) {
+                sortable.hot();
                 return true;
             } else if (itemId == R.id.sortTop) {
+                // If top/controversial inflate new menu with sort_menu_of_time
                 MenuItem subMenu = menu.getMenu().findItem(R.id.sortTop);
                 menu.getMenuInflater().inflate(R.menu.sort_times, subMenu.getSubMenu());
+
+                // TODO fix this listener so that we dont have to have almost the exact same code
+                //  with the only difference being calling top() or controversial()
+                menu.setOnMenuItemClickListener(subItem -> {
+                    int subItemId = subItem.getItemId();
+
+                    PostTimeSort timeSort;
+
+                    if (subItemId == R.id.sortToday) {
+                        // TODO find out what is correct of today/hour/now
+                        timeSort = PostTimeSort.HOUR;
+                    } else if (subItemId == R.id.sortWeek) {
+                        timeSort = PostTimeSort.WEEK;
+                    } else if(subItemId == R.id.sortMonth) {
+                        timeSort = PostTimeSort.MONTH;
+                    } else if (subItemId == R.id.sortYear) {
+                        timeSort = PostTimeSort.YEAR;
+                    }   else {
+                        timeSort = PostTimeSort.ALL_TIME;
+                    }
+
+                    sortable.top(timeSort);
+                    return true;
+                });
                 return true;
             } else if (itemId == R.id.sortControversial) {
                 MenuItem subMenu = menu.getMenu().findItem(R.id.sortControversial);
                 menu.getMenuInflater().inflate(R.menu.sort_times, subMenu.getSubMenu());
+                menu.setOnMenuItemClickListener(subItem -> {
+                    int subItemId = subItem.getItemId();
+
+                    PostTimeSort timeSort;
+
+                    if (subItemId == R.id.sortToday) {
+                        // TODO find out what is correct of today/hour/now
+                        timeSort = PostTimeSort.HOUR;
+                    } else if (subItemId == R.id.sortWeek) {
+                        timeSort = PostTimeSort.WEEK;
+                    } else if(subItemId == R.id.sortMonth) {
+                        timeSort = PostTimeSort.MONTH;
+                    } else if (subItemId == R.id.sortYear) {
+                        timeSort = PostTimeSort.YEAR;
+                    }   else {
+                        timeSort = PostTimeSort.ALL_TIME;
+                    }
+
+                    sortable.controversial(timeSort);
+                    return true;
+                });
                 return true;
             }
 

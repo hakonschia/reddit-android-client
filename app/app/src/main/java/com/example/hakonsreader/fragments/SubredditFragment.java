@@ -21,11 +21,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
+import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.misc.PostScrollListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
@@ -41,7 +43,7 @@ import java.util.List;
 /**
  * Fragment containing a subreddit
  */
-public class SubredditFragment extends Fragment {
+public class SubredditFragment extends Fragment implements SortableWithTime {
     private static final String TAG = "SubredditFragment";
 
     /**
@@ -443,5 +445,25 @@ public class SubredditFragment extends Fragment {
         saveState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
         saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
         saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
+    }
+
+    @Override
+    public void newSort() {
+        Log.d(TAG, "newSort: ");
+    }
+
+    @Override
+    public void hot() {
+        Log.d(TAG, "hot: ");
+    }
+
+    @Override
+    public void top(PostTimeSort timeSort) {
+        Log.d(TAG, "top: " + timeSort.getValue());
+    }
+
+    @Override
+    public void controversial(PostTimeSort timeSort) {
+        Log.d(TAG, "controversial: " + timeSort.getValue());
     }
 }
