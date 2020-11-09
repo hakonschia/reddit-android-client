@@ -82,13 +82,17 @@
             <!-- Note: the visibility of this is set to GONE if there is no authorFlair -->
             <FrameLayout
                 android:id="@+id/authorFlair"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
 
                 app:authorFlair="@{comment}"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintHorizontal_chainStyle="packed"
 
                 app:layout_constraintBottom_toBottomOf="@+id/commentAuthor"
+                app:layout_constraintEnd_toStartOf="@id/commentAge"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/commentAuthor"
                 app:layout_constraintTop_toTopOf="@+id/commentAuthor" />
 
