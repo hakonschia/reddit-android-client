@@ -336,10 +336,14 @@ public class RedditPost extends RedditListing {
      *
      * <p>See {@link RedditPost#getPreviewImages()} for a list of different resolutions of the image</p>
      *
-     * @return The source image for the post
+     * @return The source image for the post, or null if none is available
      */
     public Image getSourcePreview() {
-        return preview.images.get(0).source;
+        if (preview != null && preview.images != null) {
+            return preview.images.get(0).source;
+        }
+
+        return null;
     }
 
     /**
@@ -360,10 +364,14 @@ public class RedditPost extends RedditListing {
      *
      * <p>See {@link RedditPost#getSourcePreview()} for the source resolution</p>
      *
-     * @return A list of preview images
+     * @return A list of preview images, or null if none is available
      */
     public List<Image> getPreviewImages() {
-        return preview.images.get(0).resolutions;
+        if (preview != null && preview.images != null) {
+            return preview.images.get(0).resolutions;
+        }
+
+        return null;
     }
 
     /**

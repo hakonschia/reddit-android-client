@@ -316,11 +316,13 @@ public class ContentVideo extends PlayerView {
             // over the controls
             thumbnail.setColorFilter(ContextCompat.getColor(getContext(), R.color.videoControlBackground));
 
-            // Show the thumbnail over the video before it is being played
-            Picasso.get()
-                    .load(image.getUrl())
-                    .resize(params.width, params.height)
-                    .into(thumbnail);
+            if (image != null) {
+                // Show the thumbnail over the video before it is being played
+                Picasso.get()
+                        .load(image.getUrl())
+                        .resize(params.width, params.height)
+                        .into(thumbnail);
+            }
         }
 
         // When the thumbnail is shown, clicking it (ie. clicking on the video but not on the controls)
