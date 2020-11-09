@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,9 +14,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.constants.NetworkConstants;
-import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.databinding.ActivityMainBinding;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
@@ -26,13 +23,9 @@ import com.example.hakonsreader.fragments.SelectSubredditFragment;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
-import com.example.hakonsreader.misc.SharedPreferencesManager;
-import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
-import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.jakewharton.processphoenix.ProcessPhoenix;
 
 
 public class MainActivity extends AppCompatActivity implements OnSubredditSelected {

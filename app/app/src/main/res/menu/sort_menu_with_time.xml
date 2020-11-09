@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- This menu includes sorting with time included (for the relevant sorts) -->
+
+    <item
+        android:id="@+id/sortNew"
+        android:title="@string/sortNew" />
+    <item
+        android:id="@+id/sortHot"
+        android:title="@string/sortHot" />
+
+    <!-- The sub menus must be inflated programmatically based on sort_menu_of_time.xml -->
+    <item
+        android:id="@+id/sortTop"
+        android:title="@string/sortTop">
+        <menu />
+    </item>
+    <item
+        android:id="@+id/sortControversial"
+        android:title="@string/sortControversial" >
+        <menu />
+    </item>
+</menu>

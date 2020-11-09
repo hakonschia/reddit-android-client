@@ -204,6 +204,16 @@
     </plurals>
 
     <string name="menuDeleteComment">Delete comment</string>
-
     <string name="commentDeleted">Comment deleted</string>
+
+    <string name="sortNew">New</string>
+    <string name="sortHot">Hot</string>
+    <string name="sortTop">Top</string>
+    <string name="sortControversial">Controversial</string>
+    <string name="sortNow">Now</string>
+    <string name="sortToday">Today</string>
+    <string name="sortWeek">Week</string>
+    <string name="sortMonth">Month</string>
+    <string name="sortYear">Year</string>
+    <string name="sortAllTime">All time</string>
 </resources>

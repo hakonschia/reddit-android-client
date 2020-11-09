@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -226,5 +230,45 @@ public class ClickHandler {
      */
     public static void showPopupForProfileForNonLoggedInUser(View view) {
 
+    }
+
+
+    /**
+     * Shows a popup menu to allow a list to change how it should be sorted. The menu shown here
+     * includes time sorts for sorts such as top and controversial
+     *
+     * @param view The view clicked
+     */
+    public static void showPopupSortWithTime(View view) {
+        Fragment f = FragmentManager.findFragment(view);
+        Log.d(TAG, "showPopupSortWithTime: " + f);
+
+        Context context = view.getContext();
+
+        PopupMenu menu = new PopupMenu(context, view);
+        menu.inflate(R.menu.sort_menu_with_time);
+
+        menu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+            // If top/controversial inflate new menu with sort_menu_of_time
+            if (itemId == R.id.sortNew) {
+                return true;
+            } else if (itemId == R.id.sortHot) {
+                return true;
+            } else if (itemId == R.id.sortTop) {
+                MenuItem subMenu = menu.getMenu().findItem(R.id.sortTop);
+                menu.getMenuInflater().inflate(R.menu.sort_times, subMenu.getSubMenu());
+                return true;
+            } else if (itemId == R.id.sortControversial) {
+                MenuItem subMenu = menu.getMenu().findItem(R.id.sortControversial);
+                menu.getMenuInflater().inflate(R.menu.sort_times, subMenu.getSubMenu());
+                return true;
+            }
+
+            return false;
+        });
+
+        menu.show();
     }
 }

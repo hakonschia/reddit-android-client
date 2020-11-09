@@ -126,4 +126,14 @@
     <string name="postAgeJustPostedShortened">Nå</string>
     <string name="menuDeleteComment">Slett kommentar</string>
     <string name="commentDeleted">Kommentar slettet</string>
+    <string name="sortHot">Hot</string>
+    <string name="sortTop">Topp</string>
+    <string name="sortControversial">Kontroversiell</string>
+    <string name="sortNew">Nye</string>
+    <string name="sortNow">Nå</string>
+    <string name="sortToday">I dag</string>
+    <string name="sortWeek">Uke</string>
+    <string name="sortMonth">Måned</string>
+    <string name="sortYear">År</string>
+    <string name="sortAllTime">All tid</string>
 </resources>
