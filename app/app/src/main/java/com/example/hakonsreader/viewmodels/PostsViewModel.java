@@ -2,7 +2,6 @@ package com.example.hakonsreader.viewmodels;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -12,37 +11,45 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ViewModel holding reddit posts
+ */
 public class PostsViewModel extends ViewModel {
     private static final String TAG = "PostsViewModel";
 
+
+    // This is pretty weird I realise now, should probably just remove the database stuff if I bother at one point
 
     // The way this works is that the database holds all RedditPosts
     // We store the posts here as well, and have a function to get posts from the database by their ID
     // When our fragment/activity dies, we can get the posts back by storing the IDs
 
-    // TODO posts should be removed 1 day (or something) after they have been inserted, so not massive amounts of posts are
-    //  stored that wont ever be used
 
-    private AppDatabase database;
+    private final AppDatabase database;
     private final RedditApi api = App.get().getApi();
 
     private List<String> postIds = new ArrayList<>();
-    private List<RedditPost> postsData = new ArrayList<>();
+    private final List<RedditPost> postsData = new ArrayList<>();
     private final MutableLiveData<List<RedditPost>> posts = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();
     private final MutableLiveData<ErrorWrapper> error = new MutableLiveData<>();
 
+    private final String userOrSubreddit;
+    private final boolean isUser;
+
+
     /**
      * @param context The context to use to create the database for the posts
      */
-    public PostsViewModel(Context context) {
-        database = AppDatabase.getInstance(context);
+    public PostsViewModel(Context context, String userOrSubreddit, boolean isUser) {
+        this.database = AppDatabase.getInstance(context);
+        this.userOrSubreddit = userOrSubreddit;
+        this.isUser = isUser;
     }
 
 
@@ -126,14 +133,35 @@ public class PostsViewModel extends ViewModel {
         return loadingChange;
     }
 
+    /**
+     * Retrieve a LiveData object that will hold errors from the API
+     *
+     * @return An observable LiveData that will be updated when API calls return an error
+     */
     public LiveData<ErrorWrapper> getError() {
         return error;
     }
 
+    /**
+     * Starts posts from the start. This will automatically call {@link PostsViewModel#loadPosts()}
+     */
+    public void restart() {
+        postsData.clear();
+        postIds.clear();
 
-    public void loadPosts(String subreddit, boolean isUser) {
-        // Usernames can be null (if logged in user)
-        if (subreddit == null && !isUser) {
+        // Notify that the list is now empty
+        posts.setValue(postsData);
+
+        loadPosts();
+    }
+
+    /**
+     * Retrieve posts from the user or subreddit. Calling this automatically resumes from
+     * the previous posts loaded
+     */
+    public void loadPosts() {
+        // Usernames can be null (if logged in user), subreddits cannot be null (TODO treat null as front page?)
+        if (userOrSubreddit == null && !isUser) {
             return;
         }
 
@@ -148,13 +176,13 @@ public class PostsViewModel extends ViewModel {
         loadingChange.setValue(true);
 
         if (isUser) {
-            api.user(subreddit).posts(this::onPostsRetrieved, (e, t) -> {
+            api.user(userOrSubreddit).posts(this::onPostsRetrieved, (e, t) -> {
                 loadingChange.setValue(false);
                 t.printStackTrace();
                 error.setValue(new ErrorWrapper(e, t));
             });
         } else {
-            api.subreddit(subreddit).posts(after, count, this::onPostsRetrieved, (e, t) -> {
+            api.subreddit(userOrSubreddit).posts(after, count, this::onPostsRetrieved, (e, t) -> {
                 loadingChange.setValue(false);
                 error.setValue(new ErrorWrapper(e, t));
             });

@@ -69,6 +69,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     }
 
     /**
+     * Removes all posts from the list
+     */
+    public void clearPosts() {
+        int size = posts.size();
+        posts.clear();
+        notifyItemRangeRemoved(0, size);
+    }
+
+    /**
      * @param hideScoreTime The amount of minutes scores should be hidden
      */
     public void setHideScoreTime(int hideScoreTime) {

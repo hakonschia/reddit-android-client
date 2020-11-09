@@ -199,7 +199,7 @@ public class MenuClickHandler {
                         timeSort = PostTimeSort.MONTH;
                     } else if (subItemId == R.id.sortYear) {
                         timeSort = PostTimeSort.YEAR;
-                    }   else {
+                    } else {
                         timeSort = PostTimeSort.ALL_TIME;
                     }
 

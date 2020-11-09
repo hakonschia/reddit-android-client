@@ -107,6 +107,14 @@ public class ProfileFragment extends Fragment {
             username = args.getString("username");
         }
 
+        // No username given, load profile for logged in user
+        if (username == null) {
+            user = App.getStoredUser();
+            username = user.getName();
+        } else {
+            binding.username.setText(username);
+        }
+
         if (savedInstanceState != null) {
             binding.parentLayout.setProgress(savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
         }
@@ -116,7 +124,9 @@ public class ProfileFragment extends Fragment {
         postIds = new ArrayList<>();
 
         postsViewModel = new ViewModelProvider(this, new PostsFactory(
-                getContext()
+                getContext(),
+                username,
+                true
         )).get(PostsViewModel.class);
         postsViewModel.getPosts().observe(this, posts -> {
             adapter.addPosts(posts);
@@ -139,16 +149,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
-        binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> {
-            postsViewModel.loadPosts(username, true);
-        }));
-
-        // No username given, load profile for logged in user
-        if (username == null) {
-            user = App.getStoredUser();
-        } else {
-            binding.username.setText(username);
-        }
+        binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> postsViewModel.loadPosts()));
 
         // Retrieve user info if there is no user previously stored, or if it's the fragments first time
         // loading (to ensure the information is up-to-date)
@@ -184,7 +185,7 @@ public class ProfileFragment extends Fragment {
         super.onResume();
 
         if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
-            postsViewModel.loadPosts(username, true);
+            postsViewModel.loadPosts();
         }
     }
 
@@ -215,14 +216,17 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
-     * Retrieves user information about the currently logged in user
+     * Retrieves user information about the user the fragment is for
      */
     public void getUserInfo() {
         binding.loadingIcon.onCountChange(true);
         // user(null) gets information about the logged in user, so we can use username directly
         redditApi.user(username).info(user -> {
             // Load the posts for the user
-            postsViewModel.loadPosts(user.getName(), true);
+            // TODO update the name?
+            //postsViewModel.loadPosts(user.getName(), true);
+
+            postsViewModel.loadPosts();
             this.user = user;
 
             // Store the updated user information if this profile is for the logged in user

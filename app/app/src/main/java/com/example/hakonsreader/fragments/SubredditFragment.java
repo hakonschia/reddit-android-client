@@ -153,11 +153,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
      */
     private void onRefreshPostsClicked(View view) {
         // Kinda weird to clear the posts here but works I guess?
-        adapter.getPosts().clear();
-        binding.posts.scrollToPosition(0);
-
-        // TODO viewmodel load etc etc
-        //this.loadPosts();
+        postsViewModel.restart();
     }
 
     /**
@@ -166,7 +162,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     private void setupPostsList() {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
-        binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> postsViewModel.loadPosts(getSubredditName(), false)));
+        binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> postsViewModel.loadPosts()));
     }
 
     /**
@@ -289,31 +285,6 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
         database = AppDatabase.getInstance(getContext());
 
-        postsViewModel = new ViewModelProvider(this, new PostsFactory(
-                getContext()
-        )).get(PostsViewModel.class);
-        postsViewModel.getPosts().observe(this, posts -> {
-            int size = adapter.getItemCount();
-            adapter.addPosts(posts);
-
-            // Possible state to restore
-            if (saveState != null && size == 0) {
-                Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);
-                if (state != null) {
-                    layoutManager.onRestoreInstanceState(saveState.getParcelable(LAYOUT_STATE_KEY));
-
-                    // Resume videos etc etc
-                    this.restoreViewHolderStates();
-                }
-            }
-        });
-        postsViewModel.onLoadingChange().observe(this, up -> {
-            binding.loadingIcon.onCountChange(up);
-        });
-        postsViewModel.getError().observe(this, error -> {
-            this.handleErrors(error.getError(), error.getThrowable());
-        });
-
         Bundle args = getArguments();
         if (args != null) {
             String subredditName = args.getString("subreddit", "");
@@ -334,6 +305,38 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
                 this.retrieveSubredditInfo(subredditName);
             }
         }
+
+        postsViewModel = new ViewModelProvider(this, new PostsFactory(
+                getContext(),
+                getSubredditName(),
+                false
+        )).get(PostsViewModel.class);
+        postsViewModel.getPosts().observe(this, posts -> {
+            if (posts.isEmpty()) {
+                adapter.clearPosts();
+                return;
+            }
+
+            int size = adapter.getItemCount();
+            adapter.addPosts(posts);
+
+            // Possible state to restore
+            if (saveState != null && size == 0) {
+                Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);
+                if (state != null) {
+                    layoutManager.onRestoreInstanceState(saveState.getParcelable(LAYOUT_STATE_KEY));
+
+                    // Resume videos etc etc
+                    this.restoreViewHolderStates();
+                }
+            }
+        });
+        postsViewModel.onLoadingChange().observe(this, up -> {
+            binding.loadingIcon.onCountChange(up);
+        });
+        postsViewModel.getError().observe(this, error -> {
+            this.handleErrors(error.getError(), error.getThrowable());
+        });
     }
 
     @Nullable
@@ -396,7 +399,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
         // If the fragment is selected without any posts load posts automatically
         if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
-            postsViewModel.loadPosts(getSubredditName(), false);
+            postsViewModel.loadPosts();
         }
 
         this.restoreViewHolderStates();
