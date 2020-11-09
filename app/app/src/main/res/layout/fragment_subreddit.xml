@@ -21,7 +21,7 @@
     <!-- So using a MotionLayout here is kind of not what we want, since we don't want
      the subreddit info to be visible at all times (it should go fully away and when
      we scroll up in the post show the smaller view, then at the top show the full, like a toolbar)-->
-    <androidx.constraintlayout.motion.widget.MotionLayout
+    <com.example.hakonsreader.views.SwipeRefreshMotionLayout
         android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -164,5 +164,5 @@
 
             android:visibility="gone" />
 
-    </androidx.constraintlayout.motion.widget.MotionLayout>
+    </com.example.hakonsreader.views.SwipeRefreshMotionLayout>
 </layout>
