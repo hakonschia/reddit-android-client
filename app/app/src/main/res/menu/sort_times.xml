@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@string/sortNow"
+        android:id="@+id/sortNow"
         android:title="@string/sortNow" />
     <item
         android:id="@+id/sortToday"

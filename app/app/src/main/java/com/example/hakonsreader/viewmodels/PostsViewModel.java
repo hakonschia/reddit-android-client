@@ -249,11 +249,11 @@ public class PostsViewModel extends ViewModel {
         // Since the "else" is used for the default, this will ensure the default sort is always loaded
 
         if (sort == SortingMethods.NEW) {
-            api.subreddit(userOrSubreddit).newPosts(after, count, onPostsResponse, onPostsFailure);
+            api.subreddit(userOrSubreddit).posts().newPosts(after, count, onPostsResponse, onPostsFailure);
         } else if (sort == SortingMethods.TOP) {
-            api.subreddit(userOrSubreddit).top(timeSort, after, count, onPostsResponse, onPostsFailure);
+            api.subreddit(userOrSubreddit).posts().top(timeSort, after, count, onPostsResponse, onPostsFailure);
         } else if (sort == SortingMethods.CONTROVERSIAL) {
-            //api.user(userOrSubreddit).posts().controversial(timeSort, onPostsResponse, onPostsFailure);
+            api.subreddit(userOrSubreddit).posts().controversial(timeSort, after, count, onPostsResponse, onPostsFailure);
         } else {
             api.subreddit(userOrSubreddit).posts(after, count, onPostsResponse, onPostsFailure);
         }

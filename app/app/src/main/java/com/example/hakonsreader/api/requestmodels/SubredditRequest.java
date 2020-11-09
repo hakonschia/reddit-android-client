@@ -82,8 +82,8 @@ public class SubredditRequest {
     }
 
     /**
-     * Retrieves posts from the subreddit. The posts here are sorted by "hot", see other functions
-     * for other sorting types
+     * Retrieves posts from the subreddit. The posts here are sorted by "hot", if you want to retrieve posts with a
+     *      * different sort use {@link SubredditRequest#posts()}</p>
      *
      * <p>If an access token is set posts are customized for the user</p>
      *
@@ -100,38 +100,12 @@ public class SubredditRequest {
     }
 
     /**
-     * Retrieves new posts from the subreddit
+     * Retrieve an object to make API calls for posts in the subreddit
      *
-     * <p>If an access token is set posts are customized for the user</p>
-     *
-     * <p>No specific OAuth scope is required</p>
-     *
-     * @param after The ID of the last post seen (or an empty string if first time loading)
-     * @param count The amount of posts already retrieved (0 if first time loading)
-     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
-     * @param onFailure The callback for failed requests
+     * @return An object that can retrieve new, top, and controversial posts for the subreddit
      */
-    @EverythingIsNonNull
-    public void newPosts(String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        this.getPosts("new", null, after, count, onResponse, onFailure);
-    }
-
-    /**
-     * Retrieves top posts from the subreddit
-     *
-     * <p>If an access token is set posts are customized for the user</p>
-     *
-     * <p>No specific OAuth scope is required</p>
-     *
-     * @param after The ID of the last post seen (or an empty string if first time loading)
-     * @param timeSort The time sort for the posts (of all time, of hour etc.)
-     * @param count The amount of posts already retrieved (0 if first time loading)
-     * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
-     * @param onFailure The callback for failed requests
-     */
-    @EverythingIsNonNull
-    public void top(PostTimeSort timeSort, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        this.getPosts("top", timeSort, after, count, onResponse, onFailure);
+    public SubredditPostsRequets posts() {
+        return new SubredditPostsRequets();
     }
 
     /**
@@ -255,5 +229,63 @@ public class SubredditRequest {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
+    }
+
+
+    /**
+     * Class to retrieve posts from the subreddit. The functions declared here define how to sort the posts
+     * (new, hot etc.)
+     */
+    public class SubredditPostsRequets {
+
+        /**
+         * Get the "controversial" posts for the user
+         *
+         * <p>OAuth scope required: {@code history}</p>
+         *
+         * @param after The ID of the last post seen (or an empty string if first time loading)
+         * @param timeSort The time sort for the posts (of all time, of hour etc.)
+         * @param count The amount of posts already retrieved (0 if first time loading)
+         * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
+         * @param onFailure The callback for failed requests
+         */
+        public void controversial(PostTimeSort timeSort, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
+            getPosts("controversial", timeSort, after, count, onResponse, onFailure);
+        }
+
+        /**
+         * Retrieves new posts from the subreddit
+         *
+         * <p>If an access token is set posts are customized for the user</p>
+         *
+         * <p>No specific OAuth scope is required</p>
+         *
+         * @param after The ID of the last post seen (or an empty string if first time loading)
+         * @param count The amount of posts already retrieved (0 if first time loading)
+         * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
+         * @param onFailure The callback for failed requests
+         */
+        @EverythingIsNonNull
+        public void newPosts(String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
+            getPosts("new", null, after, count, onResponse, onFailure);
+        }
+
+        /**
+         * Retrieves top posts from the subreddit
+         *
+         * <p>If an access token is set posts are customized for the user</p>
+         *
+         * <p>No specific OAuth scope is required</p>
+         *
+         * @param after The ID of the last post seen (or an empty string if first time loading)
+         * @param timeSort The time sort for the posts (of all time, of hour etc.)
+         * @param count The amount of posts already retrieved (0 if first time loading)
+         * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
+         * @param onFailure The callback for failed requests
+         */
+        @EverythingIsNonNull
+        public void top(PostTimeSort timeSort, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
+            getPosts("top", timeSort, after, count, onResponse, onFailure);
+        }
     }
 }

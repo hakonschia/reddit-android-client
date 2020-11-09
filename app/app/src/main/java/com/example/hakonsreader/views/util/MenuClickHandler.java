@@ -6,6 +6,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 
+import androidx.annotation.IdRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -158,28 +159,9 @@ public class MenuClickHandler {
                 // If top/controversial inflate new menu with sort_menu_of_time
                 MenuItem subMenu = menu.getMenu().findItem(R.id.sortTop);
                 menu.getMenuInflater().inflate(R.menu.sort_times, subMenu.getSubMenu());
-
-                // TODO fix this listener so that we dont have to have almost the exact same code
-                //  with the only difference being calling top() or controversial()
                 menu.setOnMenuItemClickListener(subItem -> {
                     int subItemId = subItem.getItemId();
-
-                    PostTimeSort timeSort;
-
-                    if (subItemId == R.id.sortToday) {
-                        // TODO find out what is correct of today/hour/now
-                        timeSort = PostTimeSort.HOUR;
-                    } else if (subItemId == R.id.sortWeek) {
-                        timeSort = PostTimeSort.WEEK;
-                    } else if(subItemId == R.id.sortMonth) {
-                        timeSort = PostTimeSort.MONTH;
-                    } else if (subItemId == R.id.sortYear) {
-                        timeSort = PostTimeSort.YEAR;
-                    } else {
-                        timeSort = PostTimeSort.ALL_TIME;
-                    }
-
-                    sortable.top(timeSort);
+                    sortable.top(getTimeSortFromId(subItemId));
                     return true;
                 });
                 return true;
@@ -188,23 +170,7 @@ public class MenuClickHandler {
                 menu.getMenuInflater().inflate(R.menu.sort_times, subMenu.getSubMenu());
                 menu.setOnMenuItemClickListener(subItem -> {
                     int subItemId = subItem.getItemId();
-
-                    PostTimeSort timeSort;
-
-                    if (subItemId == R.id.sortToday) {
-                        // TODO find out what is correct of today/hour/now
-                        timeSort = PostTimeSort.HOUR;
-                    } else if (subItemId == R.id.sortWeek) {
-                        timeSort = PostTimeSort.WEEK;
-                    } else if(subItemId == R.id.sortMonth) {
-                        timeSort = PostTimeSort.MONTH;
-                    } else if (subItemId == R.id.sortYear) {
-                        timeSort = PostTimeSort.YEAR;
-                    } else {
-                        timeSort = PostTimeSort.ALL_TIME;
-                    }
-
-                    sortable.controversial(timeSort);
+                    sortable.controversial(getTimeSortFromId(subItemId));
                     return true;
                 });
                 return true;
@@ -214,5 +180,32 @@ public class MenuClickHandler {
         });
 
         menu.show();
+    }
+
+
+    /**
+     * Retrieves the correct {@link PostTimeSort} based on an ID res
+     *
+     * @param id The ID to retrieve a sort for (the IDs from {@code sort_times.xml}
+     * @return The corresponding {@link PostTimeSort}. Default if no match is {@link PostTimeSort#ALL_TIME}
+     */
+    private static PostTimeSort getTimeSortFromId(@IdRes int id) {
+        PostTimeSort timeSort;
+
+        if (id == R.id.sortNow) {
+            timeSort = PostTimeSort.HOUR;
+        } else if (id == R.id.sortToday) {
+            timeSort = PostTimeSort.DAY;
+        } else if (id == R.id.sortWeek) {
+            timeSort = PostTimeSort.WEEK;
+        } else if(id == R.id.sortMonth) {
+            timeSort = PostTimeSort.MONTH;
+        } else if (id == R.id.sortYear) {
+            timeSort = PostTimeSort.YEAR;
+        } else {
+            timeSort = PostTimeSort.ALL_TIME;
+        }
+
+        return timeSort;
     }
 }
