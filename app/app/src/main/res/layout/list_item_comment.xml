@@ -41,11 +41,6 @@
             android:layout_height="wrap_content"
 
             app:barrierDirection="right"
-
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-
             app:sideBars="@{comment.depth}" />
 
         <!-- Normal comment layout. Even if the layout visibility is set to GONE it might still render
