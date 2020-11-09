@@ -14,6 +14,7 @@ import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -357,6 +358,13 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             postIds = saveState.getStringArrayList(POST_IDS_KEY);
             postsViewModel.setPostIds(postIds);
         }
+
+        binding.postsRefreshLayout.setOnRefreshListener(() -> {
+            postsViewModel.restart();
+            // If we want to use the "native" refresher for the refresh layout we have to somehow
+            // differentiate it in the ViewModel (not important for now)
+            binding.postsRefreshLayout.setRefreshing(false);
+        });
 
         return binding.getRoot();
     }

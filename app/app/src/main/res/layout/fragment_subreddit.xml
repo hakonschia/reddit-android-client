@@ -130,8 +130,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/subredditSubscribers"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/posts"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/postsRefreshLayout"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
@@ -142,8 +142,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/subredditSubscribers"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:listitem="@layout/list_item_post" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/posts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                tools:listitem="@layout/list_item_post" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"
