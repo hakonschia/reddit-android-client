@@ -23,6 +23,7 @@ import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
+import com.example.hakonsreader.misc.PostScrollListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
@@ -118,36 +119,10 @@ public class SubredditFragment extends Fragment {
         }
     };
 
-    /**
-     * The amount of items in the list at the last attempt at loading more posts
-     */
-    private int lastLoadAttemptCount;
-    private final int screenHeight = App.get().getScreenHeight();
-
     private PostsViewModel postsViewModel;
     private PostsAdapter adapter;
     private LinearLayoutManager layoutManager;
 
-
-    /**
-     * Listener for scrolling in the posts list that automatically tries to load more posts
-     */
-    private final View.OnScrollChangeListener scrollListener = (view, scrollX, scrollY, oldX, oldY) -> {
-        // Find the positions of first and last visible items to find all visible items
-        int posFirstItem = layoutManager.findFirstVisibleItemPosition();
-        int posLastItem = layoutManager.findLastVisibleItemPosition();
-
-        int listSize = adapter.getItemCount();
-
-        // Load more posts before we reach the end to create an "infinite" list
-        // Only load posts if there hasn't been an attempt at loading more posts
-        if (posLastItem + NUM_REMAINING_POSTS_BEFORE_LOAD > listSize && lastLoadAttemptCount < listSize) {
-            lastLoadAttemptCount = adapter.getPosts().size();
-            postsViewModel.loadPosts(getSubredditName(), false);
-        }
-
-        this.checkSelectedPost(posFirstItem, posLastItem, oldY > 0);
-    };
 
     /**
      * Creates a new instance of the fragment
@@ -186,57 +161,7 @@ public class SubredditFragment extends Fragment {
     private void setupPostsList() {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
-        binding.posts.setOnScrollChangeListener(scrollListener);
-    }
-
-    /**
-     * Goes through the selected range of posts and calls {@link PostsAdapter.ViewHolder#onSelected()}
-     * and {@link PostsAdapter.ViewHolder#onUnSelected()} based on if a post has been "selected" (ie. is the main
-     * item on the screen) or "unselected" (ie. no longer the main item)
-     *
-     * @param startPost The index of the post to start at (from {@link PostsAdapter#getPosts()} or {@link SubredditFragment#layoutManager}
-     * @param endPost The index of the post to end at (from {@link PostsAdapter#getPosts()} or {@link SubredditFragment#layoutManager}
-     * @param scrollingUp Whether or not we are scrolling up or down in the list
-     */
-    private void checkSelectedPost(int startPost, int endPost, boolean scrollingUp) {
-        // The behavior is:
-        // When scrolling UP:
-        // 1. If the bottom of the content is under the screen, the view is UN SELECTED
-
-        // When scrolling DOWN:
-        // 1. If the top of the content is above the screen, the view is UN SELECTED
-        // 2. If the top of the content is above 3/4th of the screen, the view is SELECTED
-
-
-        // Go through all visible views and select/un select the view holder based on where on the screen they are
-        for (int i = startPost; i <= endPost; i++) {
-            PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
-
-            // If we have no view holder there isn't anything we can do later
-            if (viewHolder == null) {
-                continue;
-            }
-
-            // (0, 0) is top left
-            int y = viewHolder.getContentY();
-            int viewBottom = viewHolder.getContentBottomY();
-
-            if (scrollingUp) {
-                // TODO this might be a bit weird as scrolling up on the first item wont autplay
-                if (viewBottom > screenHeight) {
-                    viewHolder.onUnSelected();
-                }
-            } else {
-                // If the view is above the screen (< 0) it is "unselected"
-                // If the view is visible 3/4th the way up it is "selected"
-                if (y < 0) {
-                    viewHolder.onUnSelected();
-                } else if (y < screenHeight / 4f) {
-                    viewHolder.onSelected();
-                }
-            }
-
-        }
+        binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> postsViewModel.loadPosts(getSubredditName(), false)));
     }
 
     /**
@@ -353,7 +278,6 @@ public class SubredditFragment extends Fragment {
             binding.parentLayout.setProgress(savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
         }
 
-        lastLoadAttemptCount = 0;
         adapter = new PostsAdapter();
         layoutManager = new LinearLayoutManager(getContext());
         postIds = new ArrayList<>();

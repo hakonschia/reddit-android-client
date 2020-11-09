@@ -31,16 +31,23 @@
         <Constraint android:id="@+id/loadingIcon">
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
-        <Constraint android:id="@+id/subscribe">
+        <Constraint android:id="@+id/subscribe"
+            android:layout_height="wrap_content"
+            motion:layout_constraintBottom_toBottomOf="@+id/subredditIcon"
+            android:layout_width="wrap_content"
+            motion:layout_constraintTop_toBottomOf="@+id/subredditName"
+            motion:layout_constraintStart_toStartOf="@+id/subredditName">
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
         <Constraint android:id="@+id/subredditSubscribers"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            motion:layout_constraintTop_toBottomOf="@+id/subredditName"
             motion:layout_constraintEnd_toStartOf="@+id/subredditRefresh"
             motion:layout_constraintStart_toEndOf="@+id/subscribe"
-            android:layout_marginStart="8dp">
+            android:layout_marginStart="8dp"
+            motion:layout_constraintBottom_toBottomOf="@+id/subscribe"
+            motion:layout_constraintTop_toTopOf="@+id/subscribe"
+            motion:layout_constraintHorizontal_bias="0.0">
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
 
@@ -50,8 +57,8 @@
             android:layout_width="@dimen/userAndSubredditIconSizePostAnim"
             android:layout_height="@dimen/userAndSubredditIconSizePostAnim"
             android:id="@+id/subredditIcon"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp" />
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp" />
         <Constraint
             motion:layout_constraintEnd_toEndOf="parent"
             android:layout_width="wrap_content"
@@ -64,20 +71,21 @@
             android:layout_marginStart="8dp" />
         <Constraint
             android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            motion:layout_constraintTop_toBottomOf="@+id/subredditName"
+            android:layout_width="wrap_content"
             android:id="@+id/subredditSubscribers"
             motion:layout_constraintStart_toEndOf="@+id/subscribe"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            motion:layout_constraintEnd_toStartOf="@+id/subredditRefresh" />
+            motion:layout_constraintEnd_toStartOf="@+id/subredditRefresh"
+            motion:layout_constraintBottom_toBottomOf="@+id/subscribe"
+            motion:layout_constraintHorizontal_bias="0.0"
+            motion:layout_constraintTop_toTopOf="@+id/subscribe" />
         <Constraint
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             motion:layout_constraintTop_toBottomOf="@+id/subredditName"
             android:id="@+id/subscribe"
-            android:layout_marginTop="0dp"
-            motion:layout_constraintStart_toStartOf="@+id/subredditName" />
+            motion:layout_constraintStart_toStartOf="@+id/subredditName"
+            motion:layout_constraintBottom_toBottomOf="@+id/subredditIcon" />
         <Constraint
             android:layout_height="0dp"
             android:layout_width="0dp"

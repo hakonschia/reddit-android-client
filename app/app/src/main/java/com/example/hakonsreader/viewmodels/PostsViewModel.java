@@ -1,6 +1,7 @@
 package com.example.hakonsreader.viewmodels;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
@@ -131,7 +132,8 @@ public class PostsViewModel extends ViewModel {
 
 
     public void loadPosts(String subreddit, boolean isUser) {
-        if (subreddit == null) {
+        // Usernames can be null (if logged in user)
+        if (subreddit == null && !isUser) {
             return;
         }
 
@@ -148,6 +150,7 @@ public class PostsViewModel extends ViewModel {
         if (isUser) {
             api.user(subreddit).posts(this::onPostsRetrieved, (e, t) -> {
                 loadingChange.setValue(false);
+                t.printStackTrace();
                 error.setValue(new ErrorWrapper(e, t));
             });
         } else {

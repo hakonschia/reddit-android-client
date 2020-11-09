@@ -194,7 +194,7 @@ public class UserRequests {
                 username,
                 "submitted",
                 sort,
-                (timeSort == null ? "" : timeSort.getValue()),
+                timeSort == null ? "" : timeSort.getValue(),
                 accessToken.generateHeaderString()
         ).enqueue(new Callback<ListingResponse>() {
             @Override

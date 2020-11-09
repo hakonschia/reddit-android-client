@@ -21,6 +21,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.databinding.FragmentProfileBinding;
+import com.example.hakonsreader.misc.PostScrollListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
@@ -138,6 +139,9 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
+        binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> {
+            postsViewModel.loadPosts(username, true);
+        }));
 
         // No username given, load profile for logged in user
         if (username == null) {
