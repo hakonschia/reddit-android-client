@@ -6,6 +6,7 @@
 
     <data>
         <import type="android.view.View"/>
+        <import type="com.example.hakonsreader.views.util.ClickHandler" />
 
         <variable
             name="post"
@@ -16,56 +17,72 @@
             type="boolean" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <com.example.hakonsreader.views.SwipeRefreshMotionLayout
         android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/background"
+        app:layoutDescription="@xml/activity_post_xml_parentlayout_scene"
         tools:context=".activites.PostActivity">
 
-        <!-- Post info, content etc -->
-        <!-- Treat this as a toolbar so it can be hidden away when scrolled -->
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBar"
+        <!-- TODO if we can adjust the layout inside the post on transitions that would
+          be best as we could animate more than just the height of the post-->
+        <com.example.hakonsreader.views.Post
+            android:id="@+id/post"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background">
+            android:layout_marginStart="@dimen/postMargin"
+            android:layout_marginEnd="@dimen/postMargin"
 
-            <androidx.appcompat.widget.Toolbar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:contentInsetStart="0dp"
-                app:layout_scrollFlags="enterAlways|scroll">
+            android:transitionName="post"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
 
-                <com.example.hakonsreader.views.Post
-                    android:id="@+id/post"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+            tools:layout_height="150dp" />
 
-                    android:transitionName="post" />
+        <!-- A button to either expand or collapse the post, based on
+         what animation state it is in (already expanded or collapsed, it will reverse the animation)
+         It's a pretty poor solution to just constrain this to overlay the post, but I don't want to add
+         this to the the Post view, since this is specific for when posts are opened, not when they're in a list
+         It's a bad solution since if the Post view is updated later, this might actually overlay something in the view -->
+        <ImageButton
+            android:id="@+id/expandOrCollapsePost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_main_bg"
 
-            </androidx.appcompat.widget.Toolbar>
-        </com.google.android.material.appbar.AppBarLayout>
+            android:contentDescription="@string/content_description_expand_or_collapse_post"
+            android:onLongClick="@{(view) -> ClickHandler.showToastWithContentDescription(view)}"
+
+            android:src="@drawable/ic_baseline_arrow_down_24"
+            app:layout_constraintBottom_toBottomOf="@+id/post"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/commentsSwipeRefresh"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-
             android:background="@color/background"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
 
-            tools:visibility="gone" >
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post"
+
+            tools:visibility="gone">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/comments"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
 
-                android:paddingBottom="75dp"
                 android:clipToPadding="false"
+                android:paddingBottom="75dp"
 
                 tools:listitem="@layout/list_item_comment" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
@@ -73,22 +90,31 @@
 
         <!-- TODO this can cause overlap with the post (if I can get rid of the
          toolbar layout and swap with a ConstraintLayout this wont be an issue)-->
-        <include layout="@layout/no_comments_yet"
+        <include
+            android:id="@+id/noCommentsLayout"
+            layout="@layout/no_comments_yet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
 
-            bind:isVisible="@{noComments}"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post"
+
+            bind:isVisible="@{noComments}" />
 
         <!-- Reply, navigation buttons -->
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="wrap_content"
+
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-
-            android:layout_gravity="bottom|end" >
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <!-- The foreground clickable looks kinda weird since it ignores the rounded corners -->
             <ImageButton
@@ -96,15 +122,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:padding="10dp"
-
-                android:visibility="@{post.locked || post.archived ? View.GONE : View.VISIBLE}"
-
-                android:src="@drawable/ic_baseline_reply_24"
                 android:background="@drawable/ripple_rounded_square_secondary_bg"
-                android:onClick="replyToPost"
 
-                android:contentDescription="@string/content_description_reply_to_post"/>
+                android:contentDescription="@string/content_description_reply_to_post"
+
+                android:onClick="replyToPost"
+                android:padding="10dp"
+                android:src="@drawable/ic_baseline_reply_24"
+
+                android:visibility="@{post.locked || post.archived ? View.GONE : View.VISIBLE}" />
 
             <!-- Navigation buttons -->
             <LinearLayout
@@ -117,48 +143,48 @@
                     android:id="@+id/goToPreviousTopLevelComment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/ripple_rounded_square_secondary_bg"
+
+                    android:contentDescription="@string/content_description_previous_top_level_comment"
+                    android:onClick="goToPreviousTopLevelComment"
                     android:padding="10dp"
 
-                    android:src="@drawable/ic_baseline_arrow_up_24"
-                    android:background="@drawable/ripple_rounded_square_secondary_bg"
-                    android:onClick="goToPreviousTopLevelComment"
-
-                    android:contentDescription="@string/content_description_previous_top_level_comment"/>
+                    android:src="@drawable/ic_baseline_arrow_up_24" />
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="@color/divider"
-
                     android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp" />
+
+                    android:layout_marginBottom="5dp"
+                    android:background="@color/divider" />
 
                 <ImageButton
                     android:id="@+id/goToNextTopLevelComment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/ripple_rounded_square_secondary_bg"
+
+                    android:contentDescription="@string/content_description_next_top_level_comment"
+                    android:onClick="goToNextTopLevelComment"
                     android:padding="10dp"
 
-                    android:src="@drawable/ic_baseline_arrow_down_24"
-                    android:background="@drawable/ripple_rounded_square_secondary_bg"
-                    android:onClick="goToNextTopLevelComment"
-
-                    android:contentDescription="@string/content_description_next_top_level_comment"/>
+                    android:src="@drawable/ic_baseline_arrow_down_24" />
             </LinearLayout>
         </LinearLayout>
 
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            app:layout_anchor="@id/appBar"
-            app:layout_anchorGravity="bottom"
-            android:translationY="2dp"
-            android:indeterminateOnly="true"
             style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
 
+            android:layout_height="wrap_content"
+            android:indeterminateOnly="true"
             android:visibility="gone"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post"
             tools:visibility="visible" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </com.example.hakonsreader.views.SwipeRefreshMotionLayout>
 </layout>

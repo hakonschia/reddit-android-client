@@ -15,8 +15,6 @@
         android:id="@+id/postInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
 
         android:transitionName="@string/transition_post_info"/>
 
@@ -34,10 +32,7 @@
         android:id="@+id/postFullBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
         android:layout_below="@id/content"
 
         android:transitionName="@string/transition_post_full_bar"/>
-
  </RelativeLayout>

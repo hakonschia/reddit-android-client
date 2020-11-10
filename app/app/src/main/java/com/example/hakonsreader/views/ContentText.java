@@ -14,6 +14,11 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 
 
+/**
+ * View for text posts. This only shows the text of the post (with Markwon), but extends {@link ScrollView}
+ * instead of {@link TextView} so that the scrolling of the text has acceleration/drag that continues
+ * scrolling after the user has stopped scrolling (as this is expected behaviour when scrolling)
+ */
 public class ContentText extends ScrollView {
 
     private RedditPost post;
@@ -58,9 +63,6 @@ public class ContentText extends ScrollView {
             markdown = App.get().getAdjuster().adjust(markdown);
             App.get().getMark().setMarkdown(textView, markdown);
         }
-
-        int padding = (int) getResources().getDimension(R.dimen.defaultIndent);
-        setPadding(padding, 0, padding, 0);
     }
 
 }

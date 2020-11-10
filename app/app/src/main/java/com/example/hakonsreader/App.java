@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;

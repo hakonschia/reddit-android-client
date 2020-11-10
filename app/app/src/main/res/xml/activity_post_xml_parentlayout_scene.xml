@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:duration="500">
+       <KeyFrameSet>
+       </KeyFrameSet>
+
+        <OnSwipe motion:touchAnchorId="@+id/commentsSwipeRefresh" />
+        <OnClick motion:targetId="@+id/expandOrCollapsePost" motion:clickAction="toggle" />
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint
+            android:id="@+id/loadingIcon">
+            <PropertySet motion:visibilityMode="ignore"/>
+        </Constraint>
+        <Constraint
+            android:id="@+id/noCommentsLayout">
+            <PropertySet motion:visibilityMode="ignore"/>
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <!-- TODO Setting the constraint like this kinda works, but the larger the view the more screen space it will end up taking
+         and we want the height it takes to be consistent for all view heights (just showing the vote bar would be sufficient, but
+         I'm not sure if that's possible in a good way without knowing the height of the vote bar) -->
+        <Constraint
+            android:id="@+id/post"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/postMargin"
+            android:layout_marginStart="@dimen/postMargin"
+
+            motion:layout_constraintBottom_toTopOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintEnd_toStartOf="parent"
+            motion:layout_constraintStart_toStartOf="parent" />
+        <Constraint
+            android:id="@+id/expandOrCollapsePost"
+            motion:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_main_bg"
+            motion:layout_constraintBottom_toBottomOf="@+id/post"
+            motion:layout_constraintStart_toStartOf="parent"
+            android:rotation="180" />
+
+        <Constraint
+            android:id="@+id/loadingIcon">
+            <PropertySet motion:visibilityMode="ignore"/>
+        </Constraint>
+        <Constraint
+            android:id="@+id/noCommentsLayout">
+            <PropertySet motion:visibilityMode="ignore"/>
+        </Constraint>c
+    </ConstraintSet>
+</MotionScene>
