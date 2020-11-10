@@ -28,6 +28,7 @@ import com.example.hakonsreader.databinding.FragmentSelectSubredditBinding;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter;
+import com.example.hakonsreader.viewmodels.SearchForSubredditsViewModel;
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
 import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory;
 import com.google.android.material.snackbar.Snackbar;
@@ -38,7 +39,17 @@ import java.util.TimerTask;
 
 public class SelectSubredditFragment extends Fragment {
     private static final String TAG = "SelectSubredditFragment";
+
+    /**
+     * The key used to store the state of the subreddits list
+     */
     private static final String LIST_STATE_KEY = "listState";
+
+    /**
+     * The key used to store the state of the searched subreddits list
+     */
+    private static final String SEARCH_LIST_STATE_KEY = "searchListState";
+
 
     /**
      * The amount of milliseconds to wait to search for subreddits after text has been input
@@ -52,8 +63,11 @@ public class SelectSubredditFragment extends Fragment {
 
     private Bundle saveState;
     private SubredditsAdapter subredditsAdapter;
+    private SubredditsAdapter searchSubredditsAdapter;
     private LinearLayoutManager layoutManager;
+    private LinearLayoutManager searchLayoutManager;
     private SelectSubredditsViewModel viewModel;
+    private SearchForSubredditsViewModel searchViewModel;
     private OnSubredditSelected subredditSelected;
     private TimerTask searchTimerTask;
 
@@ -83,25 +97,10 @@ public class SelectSubredditFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = FragmentSelectSubredditBinding.inflate(getLayoutInflater());
-
-        database = AppDatabase.getInstance(getContext());
-
-        subredditsAdapter = new SubredditsAdapter();
-        subredditsAdapter.setSubredditSelected(subredditSelected);
-        subredditsAdapter.setFavoriteClicked(this::favoriteClicked);
-        layoutManager = new LinearLayoutManager(getContext());
-
-        binding.subreddits.setAdapter(subredditsAdapter);
-        binding.subreddits.setLayoutManager(layoutManager);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    /**
+     * Sets up {@link SelectSubredditFragment#viewModel}
+     */
+    private void setupViewModel() {
         viewModel = new ViewModelProvider(this, new SelectSubredditsFactory(
                 getContext()
         )).get(SelectSubredditsViewModel.class);
@@ -111,7 +110,67 @@ public class SelectSubredditFragment extends Fragment {
                 layoutManager.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY));
             }
         });
+    }
+
+    /**
+     * Sets up {@link SelectSubredditFragment#searchViewModel}
+     */
+    private void setupSearchViewModel() {
+        searchViewModel = new ViewModelProvider(this).get(SearchForSubredditsViewModel.class);
+        searchViewModel.getSearchResults().observe(getViewLifecycleOwner(), subreddits -> {
+            binding.setSearchedSubredditsCount(subreddits.size());
+            Log.d(TAG, "setupSearchViewModel: bruh");
+
+            // TODO make some sort of animation for this
+            if (subreddits.isEmpty()) {
+                searchSubredditsAdapter.clear();
+            } else {
+                searchSubredditsAdapter.setSubreddits(subreddits);
+            }
+            if (saveState != null) {
+                searchLayoutManager.onRestoreInstanceState(saveState.getParcelable(SEARCH_LIST_STATE_KEY));
+            }
+        });
+        searchViewModel.getOnCountChange().observe(getViewLifecycleOwner(), onCountChange -> {
+            binding.loadingIcon.onCountChange(onCountChange);
+        });
+        searchViewModel.getError().observe(getViewLifecycleOwner(), error -> {
+            Util.handleGenericResponseErrors(binding.parentLayout, error.getError(), error.getThrowable());
+        });
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = FragmentSelectSubredditBinding.inflate(getLayoutInflater());
+
+        database = AppDatabase.getInstance(getContext());
+
+        // Initialize the default list of subreddits
+        subredditsAdapter = new SubredditsAdapter();
+        subredditsAdapter.setSubredditSelected(subredditSelected);
+        subredditsAdapter.setFavoriteClicked(this::favoriteClicked);
+        layoutManager = new LinearLayoutManager(getContext());
+
+        binding.subreddits.setAdapter(subredditsAdapter);
+        binding.subreddits.setLayoutManager(layoutManager);
+
+        // Initalize the list for searched subreddits
+        searchSubredditsAdapter = new SubredditsAdapter();
+        searchSubredditsAdapter.setSubredditSelected(subredditSelected);
+        searchLayoutManager = new LinearLayoutManager(getContext());
+
+        binding.searchedSubreddits.setAdapter(searchSubredditsAdapter);
+        binding.searchedSubreddits.setLayoutManager(searchLayoutManager);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        this.setupViewModel();
         viewModel.loadSubreddits();
+
+        this.setupSearchViewModel();
 
         binding.subredditSearch.setOnEditorActionListener(actionDoneListener);
         binding.subredditSearch.addTextChangedListener(subredditAutomaticSearchListener);
@@ -128,6 +187,18 @@ public class SelectSubredditFragment extends Fragment {
         }
 
         saveState.putParcelable(LIST_STATE_KEY, layoutManager.onSaveInstanceState());
+        saveState.putParcelable(SEARCH_LIST_STATE_KEY, searchLayoutManager.onSaveInstanceState());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // If there's text in the input field, returning to the fragment should not trigger another search
+        // TODO restore the list as well
+        if (searchTimerTask != null) {
+            searchTimerTask.cancel();
+        }
     }
 
     @Override
@@ -193,11 +264,14 @@ public class SelectSubredditFragment extends Fragment {
             searchTimerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    // Call API to search for subreddits, update some sort of list with the results
+                    // Tell ViewModel to search for subreddits
                     String searchQuery = s.toString();
 
                     if (!searchQuery.trim().isEmpty()) {
-                        Log.d(TAG, "run: searching for '" + searchQuery + "'");
+                        searchViewModel.search(searchQuery);
+                    } else {
+                        // Remove search results when text is cleared
+                        searchViewModel.clear();
                     }
                 }
             };

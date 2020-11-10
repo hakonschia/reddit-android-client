@@ -217,4 +217,6 @@
     <string name="sortMonth">Month</string>
     <string name="sortYear">Year</string>
     <string name="sortAllTime">All time</string>
+
+    <string name="subredditsSearchResult">Search results</string>
 </resources>

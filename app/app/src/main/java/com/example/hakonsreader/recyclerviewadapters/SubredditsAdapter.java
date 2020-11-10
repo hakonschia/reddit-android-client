@@ -1,12 +1,10 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.Context;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,6 +47,15 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
         // Find differences between previous and this.subreddits to show animation with notifyItemInserted, notifyItemRemoved etc
 
         notifyDataSetChanged();
+    }
+
+    /**
+     * Removes all subreddits from the list
+     */
+    public void clear() {
+        int size = subreddits.size();
+        subreddits.clear();
+        notifyItemRangeRemoved(0, size);
     }
 
     /**

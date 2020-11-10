@@ -1,63 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View" />
 
-    android:id="@+id/parentLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background">
+        <variable
+            name="searchedSubredditsCount"
+            type="int" />
+    </data>
 
-    <ImageView
-        android:id="@+id/searchIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
 
-        android:contentDescription="@string/searchForSubredditHint"
+        android:id="@+id/parentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background">
 
-        android:src="@drawable/ic_baseline_search_40"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/subredditSearchLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+            app:constraint_referenced_ids="searchedSubreddits, searchResultsHeader"
+            android:visibility="@{searchedSubredditsCount == 0 ? View.GONE : View.VISIBLE}" />
 
-        app:layout_constraintBottom_toBottomOf="@+id/searchIcon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/searchIcon"
-        app:layout_constraintTop_toTopOf="@id/searchIcon">
+        <ImageView
+            android:id="@+id/searchIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/subredditSearch"
+            android:contentDescription="@string/searchForSubredditHint"
+
+            android:src="@drawable/ic_baseline_search_40"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/subredditSearchLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+
+            app:layout_constraintBottom_toBottomOf="@+id/searchIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/searchIcon"
+            app:layout_constraintTop_toTopOf="@id/searchIcon">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/subredditSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_"
+
+                android:hint="@string/searchForSubredditHint"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:singleLine="true"
+
+                android:textColor="@color/text_color"
+                android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/searchResultsHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="8dp"
+            android:textColor="@color/secondary_text_color"
+            android:textSize="15sp"
+            android:text="@string/subredditsSearchResult"
+
+            app:layout_constraintBottom_toTopOf="@id/searchedSubreddits"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/subredditSearchLayout"
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchedSubreddits"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
 
-            android:hint="@string/searchForSubredditHint"
-            android:imeOptions="actionDone"
-            android:inputType="text"
-            android:singleLine="true"
+            app:layout_constraintBottom_toTopOf="@id/subreddits"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchResultsHeader"
 
-            android:textColor="@color/text_color"
-            android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg" />
-    </com.google.android.material.textfield.TextInputLayout>
+            tools:layout_height="150dp"
+            tools:listitem="@layout/list_item_subreddit" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/subreddits"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subredditSearchLayout"
-        tools:listitem="@layout/list_item_subreddit" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/subreddits"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/searchedSubreddits"
+
+            tools:layout_height="150dp"
+            tools:listitem="@layout/list_item_subreddit" />
+
+        <com.example.hakonsreader.views.LoadingIcon
+            android:id="@+id/loadingIcon"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            android:indeterminateOnly="true"
+
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

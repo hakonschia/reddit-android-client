@@ -137,4 +137,5 @@
     <string name="sortYear">År</string>
     <string name="sortAllTime">All tid</string>
     <string name="content_description_expand_or_collapse_post">Utvid eller kollaps posten</string>
+    <string name="subredditsSearchResult">Søkeresultater</string>
 </resources>
