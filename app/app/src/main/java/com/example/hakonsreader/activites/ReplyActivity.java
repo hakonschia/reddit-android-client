@@ -592,6 +592,7 @@ public class ReplyActivity extends AppCompatActivity {
         add.setOnClickListener(v -> {
             String textToAdd = textTv.getText().toString();
             String linkToAdd = linkTv.getText().toString();
+            linkToAdd = linkToAdd.replace(" ", "%20");
 
             int start = binding.replyText.getSelectionStart();
             int end = binding.replyText.getSelectionEnd();
