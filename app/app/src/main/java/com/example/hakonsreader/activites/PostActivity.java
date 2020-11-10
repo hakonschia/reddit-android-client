@@ -8,6 +8,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -119,6 +120,7 @@ public class PostActivity extends AppCompatActivity {
             binding.commentsSwipeRefresh.setRefreshing(false);
             commentsViewModel.restart();
         });
+        binding.commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this, R.color.colorAccent));
     }
 
     @Override

@@ -361,6 +361,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             // differentiate it in the ViewModel (not important for now)
             binding.postsRefreshLayout.setRefreshing(false);
         });
+        // For some reason I can't change the background color from XML, so we have to do it in code
+        binding.postsRefreshLayout.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(requireContext(), R.color.colorAccent));
 
         return binding.getRoot();
     }

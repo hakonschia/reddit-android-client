@@ -235,7 +235,6 @@ public class Post extends RelativeLayout {
             c.setPost(post);
             return c;
         }
-        Log.d(TAG, "generatePostContent: " + post.getTitle());
 
         View content;
 
