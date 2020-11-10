@@ -14,7 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
  * Layout that fixes the issue of having a RecyclerView inside a SwipeRefreshLayout inside a
  * MotionLayout messing up the scrolling animation of the MotionLayout
  *
- * Taken from: https://stackoverflow.com/a/61249168/7750841
+ * Taken from (with some modifications): https://stackoverflow.com/a/61249168/7750841
  */
 public class SwipeRefreshMotionLayout extends MotionLayout {
     public SwipeRefreshMotionLayout(@NonNull Context context) {
@@ -43,14 +43,25 @@ public class SwipeRefreshMotionLayout extends MotionLayout {
             return;
         }
 
-        // Check that the child of the swipe layout is a RecyclerView
-        View recyclerView = ((SwipeRefreshLayout) target).getChildAt(0);
-        if (!(recyclerView instanceof RecyclerView)) {
+        SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) target;
+
+        // Check that the SwipeRefreshLayout has a RecyclerView child
+        View recyclerView = null;
+        for (int i = 0; i < swipeLayout.getChildCount(); i++) {
+            View child = swipeLayout.getChildAt(i);
+
+            if (child instanceof RecyclerView) {
+                recyclerView = child;
+                break;
+            }
+        }
+
+        if (recyclerView == null) {
             super.onNestedPreScroll(target, dx, dy, consumed, type);
             return;
         }
 
-        // Scrolling up (dy < 0) and we can still scroll up, do nothing
+        // Scrolling up (dy < 0) and we can still scroll up, don't play animation
         boolean canScrollVertically = recyclerView.canScrollVertically(-1);
         if (dy < 0 && canScrollVertically) {
             return;
