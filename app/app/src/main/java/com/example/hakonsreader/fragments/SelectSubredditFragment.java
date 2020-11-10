@@ -119,7 +119,6 @@ public class SelectSubredditFragment extends Fragment {
         searchViewModel = new ViewModelProvider(this).get(SearchForSubredditsViewModel.class);
         searchViewModel.getSearchResults().observe(getViewLifecycleOwner(), subreddits -> {
             binding.setSearchedSubredditsCount(subreddits.size());
-            Log.d(TAG, "setupSearchViewModel: bruh");
 
             // TODO make some sort of animation for this
             if (subreddits.isEmpty()) {
