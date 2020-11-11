@@ -10,7 +10,7 @@
        <KeyFrameSet>
        </KeyFrameSet>
 
-        <OnSwipe motion:touchAnchorId="@+id/commentsSwipeRefresh" />
+        <OnSwipe motion:onTouchUp="stop" motion:touchAnchorId="@+id/commentsSwipeRefresh" />
         <OnClick motion:targetId="@+id/expandOrCollapsePost" motion:clickAction="toggle" />
     </Transition>
 
