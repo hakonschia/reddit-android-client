@@ -223,4 +223,6 @@
     <string name="sortAllTime">All time</string>
 
     <string name="subredditsSearchResult">Search results</string>
+
+    <string name="scoreWithText">%d points</string>
 </resources>

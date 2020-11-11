@@ -139,4 +139,5 @@
     <string name="content_description_expand_or_collapse_post">Utvid eller kollaps posten</string>
     <string name="subredditsSearchResult">Søkeresultater</string>
     <string name="prefs_group_comments">Kommentarer</string>
+    <string name="scoreWithText">%d poeng</string>
 </resources>

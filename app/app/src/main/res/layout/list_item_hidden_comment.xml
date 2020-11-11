@@ -62,6 +62,22 @@
             tools:text="2h" />
 
         <TextView
+            android:id="@+id/commentScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+
+            android:textColor="@color/secondary_text_color"
+            android:textStyle="italic"
+            android:text="@{@string/scoreWithText(comment.score)}"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toEndOf="@id/commentAge"
+            app:layout_constraintTop_toTopOf="parent"
+
+            tools:text="@string/scoreWithText" />
+
+        <TextView
             android:id="@+id/hiddenCommentNumChildren"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
