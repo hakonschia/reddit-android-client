@@ -66,55 +66,76 @@ public class UserRequests {
      */
     public void info(OnResponse<User> onResponse, OnFailure onFailure) {
         if (username == null) {
-            try {
-                Util.verifyLoggedInToken(accessToken);
-            } catch (InvalidAccessTokenException e) {
-                onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
-                return;
+            this.getInfoForLoggedInUser(onResponse, onFailure);
+        } else {
+           this.getInfoByUsername(username, onResponse, onFailure);
+        }
+    }
+
+    /**
+     * Retrieves information about logged in users
+     *
+     * @param onResponse The callback for successful requests. Holds the {@link User} object representing the user
+     * @param onFailure The callback for failed requests
+     */
+    private void getInfoForLoggedInUser(OnResponse<User> onResponse, OnFailure onFailure) {
+        try {
+            Util.verifyLoggedInToken(accessToken);
+        } catch (InvalidAccessTokenException e) {
+            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
+            return;
+        }
+
+        api.getUserInfo(accessToken.generateHeaderString()).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                User body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    onResponse.onResponse(body);
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
             }
 
-            api.getUserInfo(accessToken.generateHeaderString()).enqueue(new Callback<User>() {
-                @Override
-                public void onResponse(Call<User> call, Response<User> response) {
-                    User body = null;
-                    if (response.isSuccessful()) {
-                        body = response.body();
-                    }
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
+    }
 
-                    if (body != null) {
-                        onResponse.onResponse(body);
-                    } else {
-                        Util.handleHttpErrors(response, onFailure);
-                    }
+    /**
+     * Retrieves information about a user by username
+     *
+     * @param username The username to retrieve information for
+     * @param onResponse The callback for successful requests. Holds the {@link User} object representing the user
+     * @param onFailure The callback for failed requests
+     */
+    private void getInfoByUsername(String username, OnResponse<User> onResponse, OnFailure onFailure) {
+        api.getUserInfoOtherUsers(username, accessToken.generateHeaderString()).enqueue(new Callback<RedditListing>() {
+            @Override
+            public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
+                RedditListing body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
                 }
 
-                @Override
-                public void onFailure(Call<User> call, Throwable t) {
-                    onFailure.onFailure(new GenericError(-1), t);
+                if (body != null) {
+                    onResponse.onResponse((User) body);
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
                 }
-            });
-        } else {
-            api.getUserInfoOtherUsers(username, accessToken.generateHeaderString()).enqueue(new Callback<RedditListing>() {
-                @Override
-                public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
-                    RedditListing body = null;
-                    if (response.isSuccessful()) {
-                        body = response.body();
-                    }
+            }
 
-                    if (body != null) {
-                        onResponse.onResponse((User) body);
-                    } else {
-                        Util.handleHttpErrors(response, onFailure);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<RedditListing> call, Throwable t) {
-                    onFailure.onFailure(new GenericError(-1), t);
-                }
-            });
-        }
+            @Override
+            public void onFailure(Call<RedditListing> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
     }
 
 
