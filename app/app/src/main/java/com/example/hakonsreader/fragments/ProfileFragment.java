@@ -95,13 +95,13 @@ public class ProfileFragment extends Fragment {
      * Create a new ProfileFragment for a user that is NOT the logged in user. For logged in users
      * user {@link ProfileFragment#newInstance()}
      *
-     * @param username The username to create the fragment for. If this is equal to "me", the fragment
-     *                 will be for the logged in user
+     * @param username The username to create the fragment for. If this is equal to "me" or the username
+     *                 stored in SharedPreferences, the fragment will be for the logged in user
      * @return A ProfileFragment for a user
      */
     public static ProfileFragment newInstance(String username) {
         // Hardcoding values like this is obviously bad, but this is the only case we're doing something special
-        if (username.equals("me")) {
+        if (username.equalsIgnoreCase("me") || username.equalsIgnoreCase(App.getStoredUser().getName())) {
             return ProfileFragment.newInstance();
         }
 
