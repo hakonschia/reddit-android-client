@@ -27,6 +27,9 @@
     <string name="scoreHidden" translatable="false">•</string>
     <string name="scoreThousands">%.1fK</string>
 
+    <string name="scoreWithText">%d points</string>
+    <string name="scoreHiddenText">Score hidden</string>
+
     <string name="subreddit_prefixed" translatable="false">r/%s</string>
     <string name="author_prefixed" translatable="false">u/%s</string>
     <string name="comment_by_poster" translatable="false">u/%s (OP)</string>
@@ -223,6 +226,4 @@
     <string name="sortAllTime">All time</string>
 
     <string name="subredditsSearchResult">Search results</string>
-
-    <string name="scoreWithText">%d points</string>
 </resources>

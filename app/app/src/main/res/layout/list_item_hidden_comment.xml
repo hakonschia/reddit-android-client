@@ -69,7 +69,7 @@
 
             android:textColor="@color/secondary_text_color"
             android:textStyle="italic"
-            android:text="@{@string/scoreWithText(comment.score)}"
+            android:text="@{comment.scoreHidden ? @string/scoreHiddenText : @string/scoreWithText(comment.score)}"
 
             app:layout_constrainedWidth="true"
             app:layout_constraintStart_toEndOf="@id/commentAge"

@@ -140,4 +140,6 @@
     <string name="subredditsSearchResult">Søkeresultater</string>
     <string name="prefs_group_comments">Kommentarer</string>
     <string name="scoreWithText">%d poeng</string>
+    <string name="prefs_title_hide_comments_threshold">Automatisk gjem kommentar med poengsum mindre enn</string>
+    <string name="scoreHiddenText">Poengsum gjemt</string>
 </resources>
