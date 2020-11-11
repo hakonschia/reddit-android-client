@@ -15,9 +15,11 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.misc.Util;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
@@ -136,6 +138,7 @@ public class MenuClickHandler {
             // Unsave
             api.comment(comment.getId()).unsave(response -> {
                 comment.setSaved(false);
+                Snackbar.make(view, R.string.commentUnsaved, LENGTH_SHORT).show();
             }, (e, t) -> {
                 Util.handleGenericResponseErrors(view, e, t);
             });
@@ -143,12 +146,121 @@ public class MenuClickHandler {
             // Save
             api.comment(comment.getId()).save(response -> {
                 comment.setSaved(true);
+                Snackbar.make(view, R.string.commentSaved, LENGTH_SHORT).show();
             }, (e, t) -> {
                 Util.handleGenericResponseErrors(view, e, t);
             });
         }
     }
 
+
+    /**
+     * Shows the extra popup for posts. Based on the user status, a different popup is shown
+     * (ie. if the logged in user is the post poster a different popup is shown)
+     *
+     * @param view The view clicked
+     * @param post The post the popup is for
+     */
+    public static void showPopupForPost(View view, RedditPost post) {
+        User user = App.getStoredUser();
+
+        if (user != null && user.getName().equalsIgnoreCase(post.getAuthor())) {
+            showPopupForPostExtraForLoggedInUser(view, post);
+        } else {
+            showPopupForPostExtraForNonLoggedInUser(view, post);
+        }
+    }
+
+    /**
+     * Shows the extra popup for posts for when the post is by the logged in user
+     *
+     * @param view The view clicked (where the popup will be attached)
+     * @param post The post the popup is for
+     */
+    public static void showPopupForPostExtraForLoggedInUser(View view, RedditPost post) {
+        PopupMenu menu = new PopupMenu(view.getContext(), view);
+        menu.inflate(R.menu.post_extra_by_user);
+        menu.inflate(R.menu.post_extra_generic_for_all_users);
+
+        // Default is "Save post", if post already is saved, change the text
+        if (post.isSaved()) {
+            MenuItem savedItem = menu.getMenu().findItem(R.id.saveOrUnsavePost);
+            savedItem.setTitle(view.getContext().getString(R.string.unsavePost));
+        }
+
+        menu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.saveOrUnsavePost) {
+                savePostOnClick(view, post);
+                return true;
+            }
+
+            return false;
+        });
+
+        menu.show();
+    }
+
+    /**
+     * Shows the extra popup for posts for when the post is NOT by the logged in user
+     *
+     * @param view The view clicked (where the popup will be attached)
+     * @param post The post the popup is for
+     */
+    public static void showPopupForPostExtraForNonLoggedInUser(View view, RedditPost post) {
+        PopupMenu menu = new PopupMenu(view.getContext(), view);
+        menu.inflate(R.menu.post_extra_generic_for_all_users);
+
+        // Default is "Save post", if post already is saved, change the text
+        if (post.isSaved()) {
+            MenuItem savedItem = menu.getMenu().findItem(R.id.saveOrUnsavePost);
+            savedItem.setTitle(view.getContext().getString(R.string.unsavePost));
+        }
+
+        menu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.saveOrUnsavePost) {
+                savePostOnClick(view, post);
+                return true;
+            }
+
+            return false;
+        });
+
+        menu.show();
+    }
+
+    /**
+     * Convenience method for when "Save post" or "Unsave post" has been clicked in a menu.
+     *
+     * <p>Makes an API request to save or unsave the comment based on the current save state</p>
+     *
+     * @param view The view clicked (used to attach the snackbar with potential error messages)
+     * @param post The post to save/unsave. This is updated if the request is successful
+     */
+    private static void savePostOnClick(View view, RedditPost post) {
+        RedditApi api = App.get().getApi();
+
+        if (post.isSaved()) {
+            // Unsave
+            api.post(post.getId()).unsave(response -> {
+                post.setSaved(false);
+                Snackbar.make(view, R.string.postUnsaved, LENGTH_SHORT).show();
+            }, (e, t) -> {
+                Util.handleGenericResponseErrors(view, e, t);
+            });
+        } else {
+            // Save
+            api.post(post.getId()).save(response -> {
+                post.setSaved(true);
+                Snackbar.make(view, R.string.postSaved, LENGTH_SHORT).show();
+            }, (e, t) -> {
+                Util.handleGenericResponseErrors(view, e, t);
+            });
+        }
+    }
 
     /**
      * Click handler for the profile "more" (kebab) button. Shows a popup menu customized

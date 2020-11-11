@@ -146,4 +146,12 @@
     <string name="unsaveComment">Glem kommentar</string>
     <string name="blockUser">Blokker bruker</string>
     <string name="badRequestError">Noe gikk galt</string>
+    <string name="savePost">Lagre post</string>
+    <string name="unsavePost">Glem post</string>
+    <string name="deletePost">Slett post</string>
+    <string name="postDeleted">Post slettet</string>
+    <string name="commentSaved">Kommentar lagret</string>
+    <string name="commentUnsaved">Kommentar glemt</string>
+    <string name="postSaved">Post lagret</string>
+    <string name="postUnsaved">Post glemt</string>
 </resources>

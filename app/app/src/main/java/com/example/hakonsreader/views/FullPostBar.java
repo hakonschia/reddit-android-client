@@ -45,6 +45,7 @@ public class FullPostBar extends ConstraintLayout {
         this.post = post;
 
         binding.voteBar.setListing(post);
+        binding.setPost(post);
 
         this.updateView();
     }

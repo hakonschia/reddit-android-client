@@ -1,44 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="com.example.hakonsreader.views.util.MenuClickHandler" />
 
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        <variable
+            name="post"
+            type="com.example.hakonsreader.api.model.RedditPost" />
+    </data>
 
-    <ImageView
-        android:id="@+id/postCommentsImg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        android:src="@drawable/ic_baseline_message_24"
-        android:scaleX="-1"
+        <ImageView
+            android:id="@+id/postCommentsImg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:src="@drawable/ic_baseline_message_24"
+            android:scaleX="-1"
 
-    <com.robinhood.ticker.TickerView
-        android:id="@+id/numComments"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginStart="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        android:textColor="@color/text_color"
+        <com.robinhood.ticker.TickerView
+            android:id="@+id/numComments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="4dp"
 
-        app:layout_constraintBottom_toBottomOf="@+id/postCommentsImg"
-        app:layout_constraintStart_toEndOf="@+id/postCommentsImg"
-        app:layout_constraintTop_toTopOf="@+id/postCommentsImg"
+            android:textColor="@color/text_color"
 
-        tools:text="123 comments" />
+            app:layout_constraintBottom_toBottomOf="@+id/postCommentsImg"
+            app:layout_constraintStart_toEndOf="@+id/postCommentsImg"
+            app:layout_constraintTop_toTopOf="@+id/postCommentsImg"
 
-    <com.example.hakonsreader.views.VoteBar
-        android:id="@+id/voteBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+            tools:text="123 comments" />
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageButton
+            android:id="@+id/postPopupMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:foreground="@drawable/ripple_main_bg"
+            android:background="@null"
+            android:src="@drawable/ic_baseline_more_horiz_24"
+
+            android:onClick="@{(view) -> MenuClickHandler.showPopupForPost(view, post)}"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/voteBar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <com.example.hakonsreader.views.VoteBar
+            android:id="@+id/voteBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

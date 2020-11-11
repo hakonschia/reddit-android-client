@@ -216,6 +216,15 @@
     <string name="commentDeleted">Comment deleted</string>
     <string name="saveComment">Save comment</string>
     <string name="unsaveComment">Unsave comment</string>
+    <string name="commentSaved">Comment saved</string>
+    <string name="commentUnsaved">Comment unsaved</string>
+
+    <string name="deletePost">Delete post</string>
+    <string name="postDeleted">Post deleted</string>
+    <string name="savePost">Save post</string>
+    <string name="unsavePost">Unsave post</string>
+    <string name="postSaved">Post saved</string>
+    <string name="postUnsaved">Post unsaved</string>
 
     <string name="blockUser">Block user</string>
 
