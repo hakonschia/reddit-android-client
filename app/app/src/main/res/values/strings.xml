@@ -8,6 +8,7 @@
     <string name="navbarProfile">Profile</string>
     <string name="navbarSettings">Settings</string>
 
+    <string name="logInDescription">When you press the button below to log in you will be redireceted to Reddit.com.\n\nYou will be shown a list of permissions this application needs, and if you authorize the application you will be redirected back. If you want to remove the applications access to your account, go to: <a href="https://www.reddit.com/prefs/apps">https://www.reddit.com/prefs/apps</a>\n\nYour password never leaves Reddit.com; this application will never know or store your password.</string>
     <string name="btnLogIn">Log in</string>
     <string name="logOut">Log out</string>
 
