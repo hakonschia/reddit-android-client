@@ -1,8 +1,6 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.responses.JsonResponse;
-import com.example.hakonsreader.api.responses.ListingResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -13,7 +11,7 @@ import retrofit2.http.POST;
 /**
  * Service interface towards a comment on Reddit
  */
-public interface CommentService extends VoteService, ReplyService {
+public interface CommentService extends VoteService, ReplyService, SaveService {
 
 
     /**

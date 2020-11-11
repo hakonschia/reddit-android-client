@@ -6,18 +6,14 @@ import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.interfaces.ReplyableRequest;
+import com.example.hakonsreader.api.interfaces.SaveableRequest;
 import com.example.hakonsreader.api.interfaces.VoteableRequest;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.JsonResponse;
-import com.example.hakonsreader.api.responses.ListingResponse;
-import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.CommentService;
 import com.example.hakonsreader.api.utils.Util;
-import com.google.android.exoplayer2.C;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,13 +24,14 @@ import retrofit2.internal.EverythingIsNonNull;
  * Class that provides an interface towards the Reddit API related to comments, such as
  * replying to the comment or voting on it
  */
-public class CommentRequest implements VoteableRequest, ReplyableRequest {
+public class CommentRequest implements VoteableRequest, ReplyableRequest, SaveableRequest {
 
     private final String commentId;
     private final AccessToken accessToken;
     private final CommentService api;
     private final VoteableRequestModel voteRequest;
     private final ReplyableRequestModel replyRequest;
+    private final SaveableRequestModel saveRequest;
 
     public CommentRequest(String commentId, AccessToken accessToken, CommentService api) {
         this.commentId = commentId;
@@ -43,6 +40,7 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest {
         this.api = api;
         this.voteRequest = new VoteableRequestModel(accessToken, api);
         this.replyRequest = new ReplyableRequestModel(accessToken, api);
+        this.saveRequest = new SaveableRequestModel(accessToken, api);
     }
 
     /**
@@ -63,6 +61,34 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest {
         replyRequest.postComment(Thing.COMMENT, commentId, comment, onResponse, onFailure);
     }
 
+
+    /**
+     * Save the comment
+     *
+     * <p>Requires OAuth scope: {@code save}</p>
+     *
+     * @param onResponse Callback for successful responses. This will never hold any information, but
+     *                   will be called when the request is successful
+     * @param onFailure Callback for failed requests
+     */
+    @Override
+    public void save(OnResponse<Void> onResponse, OnFailure onFailure) {
+        saveRequest.save(Thing.COMMENT, commentId, onResponse, onFailure);
+    }
+
+    /**
+     * Unsave the comment
+     *
+     * <p>Requires OAuth scope: {@code save}</p>
+     *
+     * @param onResponse Callback for successful responses. This will never hold any information, but
+     *                   will be called when the request is successful
+     * @param onFailure Callback for failed requests
+     */
+    @Override
+    public void unsave(OnResponse<Void> onResponse, OnFailure onFailure) {
+        saveRequest.unsave(Thing.COMMENT, commentId, onResponse, onFailure);
+    }
 
     /**
      * Edits the comment

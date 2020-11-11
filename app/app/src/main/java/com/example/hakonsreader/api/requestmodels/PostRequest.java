@@ -6,6 +6,7 @@ import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.interfaces.ReplyableRequest;
+import com.example.hakonsreader.api.interfaces.SaveableRequest;
 import com.example.hakonsreader.api.interfaces.VoteableRequest;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
@@ -29,7 +30,7 @@ import retrofit2.internal.EverythingIsNonNull;
  * Class that provides an interface towards the Reddit API related to post, such as retrieving
  * information about the post and commenting
  */
-public class PostRequest implements VoteableRequest, ReplyableRequest {
+public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableRequest {
 
     private final AccessToken accessToken;
     private final PostService api;
@@ -37,6 +38,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest {
 
     private final VoteableRequestModel voteRequest;
     private final ReplyableRequestModel replyRequest;
+    private final SaveableRequestModel saveRequest;
 
     public PostRequest(AccessToken accessToken, PostService api, String postId) {
         this.accessToken = accessToken;
@@ -45,6 +47,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest {
 
         this.voteRequest = new VoteableRequestModel(accessToken, api);
         this.replyRequest = new ReplyableRequestModel(accessToken, api);
+        this.saveRequest = new SaveableRequestModel(accessToken, api);
     }
 
     /**
@@ -243,6 +246,34 @@ public class PostRequest implements VoteableRequest, ReplyableRequest {
     @Override
     public void reply(String comment, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
         replyRequest.postComment(Thing.POST, postId, comment, onResponse, onFailure);
+    }
+
+    /**
+     * Save the comment
+     *
+     * <p>Requires OAuth scope: {@code save}</p>
+     *
+     * @param onResponse Callback for successful responses. This will never hold any information, but
+     *                   will be called when the request is successful
+     * @param onFailure Callback for failed requests
+     */
+    @Override
+    public void save(OnResponse<Void> onResponse, OnFailure onFailure) {
+        saveRequest.save(Thing.POST, postId, onResponse, onFailure);
+    }
+
+    /**
+     * Unsave the comment
+     *
+     * <p>Requires OAuth scope: {@code save}</p>
+     *
+     * @param onResponse Callback for successful responses. This will never hold any information, but
+     *                   will be called when the request is successful
+     * @param onFailure Callback for failed requests
+     */
+    @Override
+    public void unsave(OnResponse<Void> onResponse, OnFailure onFailure) {
+        saveRequest.unsave(Thing.POST, postId, onResponse, onFailure);
     }
 
 

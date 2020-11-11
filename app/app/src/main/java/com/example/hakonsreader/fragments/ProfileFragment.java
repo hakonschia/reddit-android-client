@@ -128,6 +128,8 @@ public class ProfileFragment extends Fragment {
         // No username given, load profile for logged in user
         if (isLoggedInUser) {
             user = App.getStoredUser();
+            // TODO this can be null since it is only set when we get user info here, should probably
+            //  get user info when we log in as well and set then
             username = user.getName();
         } else {
             binding.username.setText(username);

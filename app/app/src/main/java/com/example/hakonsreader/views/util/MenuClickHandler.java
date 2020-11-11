@@ -14,6 +14,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.snackbar.Snackbar;
@@ -37,8 +38,12 @@ public class MenuClickHandler {
      * @param comment The comment the popup is for
      */
     public static void showPopupForCommentExtra(View view, RedditComment comment) {
-        if (App.getStoredUser().getName().equalsIgnoreCase(comment.getAuthor())) {
+        User user = App.getStoredUser();
+
+        if (user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
             showPopupForCommentExtraForLoggedInUser(view, comment);
+        } else {
+            showPopupForCommentExtraForNonLoggedInUser(view, comment);
         }
     }
 
@@ -69,6 +74,15 @@ public class MenuClickHandler {
         });
 
         menu.show();
+    }
+    
+    public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment) {
+        Log.d(TAG, "showPopupForCommentExtraForNonLoggedInUser: :-d");
+        /*
+        App.get().getApi().comment(comment.getId()).unsave(response -> {}, (e, t) -> {
+            t.printStackTrace();
+        });
+         */
     }
 
 
