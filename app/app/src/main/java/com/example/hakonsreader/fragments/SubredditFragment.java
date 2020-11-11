@@ -293,6 +293,19 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         }
     }
 
+    /**
+     * Refreshes the posts in the fragment
+     *
+     * <p>To ensure that no list state is saved and restored, {@link SubredditFragment#saveState} is
+     * destroyed and set to a fresh bundle</p>
+     */
+    private void refreshPosts() {
+        // If the user had previously gone out of the fragment and gone back, refreshing would
+        // restore the list state that was saved at that point, making the list scroll to that point
+        saveState = new Bundle();
+        postsViewModel.restart();
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -340,7 +353,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         Log.d(TAG, "onCreateView " + getSubredditName());
 
         // Bind the refresh button in the toolbar
-        binding.subredditRefresh.setOnClickListener(view -> postsViewModel.restart());
+        binding.subredditRefresh.setOnClickListener(view -> this.refreshPosts());
 
         // Although only the numbers will actually change, we need to add alphabet characters as well
         //  for the initial animation when going from an empty string to "341 subscribers"
@@ -356,7 +369,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         }
 
         binding.postsRefreshLayout.setOnRefreshListener(() -> {
-            postsViewModel.restart();
+            this.refreshPosts();
+
             // If we want to use the "native" refresher for the refresh layout we have to somehow
             // differentiate it in the ViewModel (not important for now)
             binding.postsRefreshLayout.setRefreshing(false);
