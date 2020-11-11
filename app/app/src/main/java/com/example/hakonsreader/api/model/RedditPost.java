@@ -75,6 +75,9 @@ public class RedditPost extends RedditListing {
     @SerializedName("removed_by_category")
     private String removedByCategory;
 
+    @SerializedName("saved")
+    private boolean saved;
+
 
     @SerializedName("author_flair_background_color")
     private String authorFlairBackgroundColor;
@@ -240,6 +243,13 @@ public class RedditPost extends RedditListing {
      */
     public String getRemovedByCategory() {
         return removedByCategory;
+    }
+
+    /**
+     * @return True if the comment has been saved by the currently logged in user
+     */
+    public boolean isSaved() {
+        return saved;
     }
 
     /**
@@ -555,6 +565,10 @@ public class RedditPost extends RedditListing {
 
     public void setRemovedByCategory(String removedByCategory) {
         this.removedByCategory = removedByCategory;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
     }
 
     /**

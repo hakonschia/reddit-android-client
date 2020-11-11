@@ -68,6 +68,8 @@ public class RedditComment extends RedditListing {
     @SerializedName("author_flair_richtext")
     private List<RichtextFlair> authorRichtextFlairs;
 
+    @SerializedName("saved")
+    private boolean saved;
 
 
     /**
@@ -275,5 +277,12 @@ public class RedditComment extends RedditListing {
      */
     public List<RichtextFlair> getAuthorRichtextFlairs() {
         return authorRichtextFlairs;
+    }
+
+    /**
+     * @return True if the comment has been saved by the currently logged in user
+     */
+    public boolean isSaved() {
+        return saved;
     }
 }
