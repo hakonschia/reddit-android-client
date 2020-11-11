@@ -128,9 +128,9 @@ public class ProfileFragment extends Fragment {
         // No username given, load profile for logged in user
         if (isLoggedInUser) {
             user = App.getStoredUser();
-            // TODO this can be null since it is only set when we get user info here, should probably
-            //  get user info when we log in as well and set then
-            username = user.getName();
+            if (user != null) {
+                username = user.getName();
+            }
         } else {
             binding.username.setText(username);
         }
@@ -241,15 +241,19 @@ public class ProfileFragment extends Fragment {
     public void getUserInfo() {
         binding.loadingIcon.onCountChange(true);
         // user(null) gets information about the logged in user, so we can use username directly
-        redditApi.user(username).info(user -> {
-            // Load the posts for the user
-            postsViewModel.loadPosts();
-            this.user = user;
-
+        redditApi.user(username).info(newUser -> {
             // Store the updated user information if this profile is for the logged in user
             if (isLoggedInUser) {
-                App.storeUserInfo(user);
+                App.storeUserInfo(newUser);
+
+                // If this is the first time the user is on their profile, the username won't be set
+                // on the ViewModel, so set it
+                postsViewModel.setUserOrSubreddit(newUser.getName());
             }
+
+            // Load the posts for the user
+            postsViewModel.loadPosts();
+            this.user = newUser;
 
             this.updateViews();
             binding.loadingIcon.onCountChange(false);

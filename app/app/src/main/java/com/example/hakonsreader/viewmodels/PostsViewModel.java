@@ -43,7 +43,7 @@ public class PostsViewModel extends ViewModel {
     private final MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();
     private final MutableLiveData<ErrorWrapper> error = new MutableLiveData<>();
 
-    private final String userOrSubreddit;
+    private String userOrSubreddit;
     private final boolean isUser;
 
     private SortingMethods sort;
@@ -71,6 +71,17 @@ public class PostsViewModel extends ViewModel {
         this.isUser = isUser;
     }
 
+
+    /**
+     * Update which which subreddit or user this ViewModel is for. Use this with caution, ensure
+     * that if the ViewModel was for a user that the updated name is also a user and not a subreddit,
+     * and vice versa.
+     *
+     * @param userOrSubreddit THe new user or subreddit
+     */
+    public void setUserOrSubreddit(String userOrSubreddit) {
+        this.userOrSubreddit = userOrSubreddit;
+    }
 
     /**
      * @return The list of IDs the ViewModel is keeping track of
