@@ -144,4 +144,6 @@
     <string name="scoreHiddenText">Poengsum gjemt</string>
     <string name="saveComment">Lagre kommentar</string>
     <string name="unsaveComment">Glem kommentar</string>
+    <string name="blockUser">Blokker bruker</string>
+    <string name="badRequestError">Noe gikk galt</string>
 </resources>

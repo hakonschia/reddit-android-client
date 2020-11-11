@@ -51,12 +51,13 @@ public class MenuClickHandler {
     /**
      * Shows the popup for comments for when the comment is posted by the user currently logged in
      *
-     * @param view The view clicked
+     * @param view The view clicked (where the popup will be attached)
      * @param comment The comment the popup is for
      */
     public static void showPopupForCommentExtraForLoggedInUser(View view, RedditComment comment) {
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.comment_extra_by_user);
+        menu.inflate(R.menu.comment_extra_generic_for_all_users);
 
         // Default is "Save comment", if comment already is saved, change the text
         if (comment.isSaved()) {
@@ -78,65 +79,7 @@ public class MenuClickHandler {
                 }));
                 return true;
             } else if (itemId == R.id.menuSaveOrUnsaveComment) {
-                if (comment.isSaved()) {
-                    // Unsave
-                    api.comment(comment.getId()).unsave(response -> {
-                        comment.setSaved(false);
-                    }, (e, t) -> {
-                        Util.handleGenericResponseErrors(view, e, t);
-                    });
-                } else {
-                    // Save
-                    api.comment(comment.getId()).save(response -> {
-                        comment.setSaved(true);
-                    }, (e, t) -> {
-                        Util.handleGenericResponseErrors(view, e, t);
-                    });
-
-                    return true;
-                }
-            }
-
-            return false;
-        });
-
-        menu.show();
-    }
-    
-    public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment) {
-        Log.d(TAG, "showPopupForCommentExtraForNonLoggedInUser: :-d");
-        PopupMenu menu = new PopupMenu(view.getContext(), view);
-        menu.inflate(R.menu.comment_extra_not_by_user);
-
-        // Default is "Save comment", if comment already is saved, change the text
-        if (comment.isSaved()) {
-            MenuItem savedItem = menu.getMenu().findItem(R.id.menuSaveOrUnsaveComment);
-            savedItem.setTitle(view.getContext().getString(R.string.unsaveComment));
-        }
-
-        RedditApi api = App.get().getApi();
-
-        menu.setOnMenuItemClickListener(item -> {
-            int itemId = item.getItemId();
-
-            // TODO a lot of copy&paste code for this and showPopupForCommentExtraForLoggedInUser
-            if (itemId == R.id.menuSaveOrUnsaveComment) {
-                if (comment.isSaved()) {
-                    // Unsave
-                    api.comment(comment.getId()).unsave(response -> {
-                        comment.setSaved(false);
-                    }, (e, t) -> {
-                        Util.handleGenericResponseErrors(view, e, t);
-                    });
-                } else {
-                    // Save
-                    api.comment(comment.getId()).save(response -> {
-                        comment.setSaved(true);
-                    }, (e, t) -> {
-                        Util.handleGenericResponseErrors(view, e, t);
-                    });
-                }
-
+                saveCommentOnClick(view, comment);
                 return true;
             }
 
@@ -144,6 +87,66 @@ public class MenuClickHandler {
         });
 
         menu.show();
+    }
+
+    /**
+     * Shows the popup for comments for when the comment is NOT posted by the user currently logged in
+     *
+     * @param view The view clicked (where the popup will be attached)
+     * @param comment The comment the popup is for
+     */
+    public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment) {
+        PopupMenu menu = new PopupMenu(view.getContext(), view);
+        menu.inflate(R.menu.comment_extra_not_by_user);
+        menu.inflate(R.menu.comment_extra_generic_for_all_users);
+
+        // Default is "Save comment", if comment already is saved, change the text
+        if (comment.isSaved()) {
+            MenuItem savedItem = menu.getMenu().findItem(R.id.menuSaveOrUnsaveComment);
+            savedItem.setTitle(view.getContext().getString(R.string.unsaveComment));
+        }
+
+        menu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+            // TODO a lot of copy&paste code for this and showPopupForCommentExtraForLoggedInUser
+            if (itemId == R.id.menuSaveOrUnsaveComment) {
+                saveCommentOnClick(view, comment);
+                return true;
+            }
+
+            return false;
+        });
+
+        menu.show();
+    }
+
+    /**
+     * Convenience method for when "Save comment" or "Unsave comment" has been clicked in a menu.
+     *
+     * <p>Makes an API request to save or unsave the comment based on the current save state</p>
+     *
+     * @param view The view clicked (used to attach the snackbar with potential error messages)
+     * @param comment The comment to save/unsave. This is updated if the request is successful
+     */
+    private static void saveCommentOnClick(View view, RedditComment comment) {
+        RedditApi api = App.get().getApi();
+
+        if (comment.isSaved()) {
+            // Unsave
+            api.comment(comment.getId()).unsave(response -> {
+                comment.setSaved(false);
+            }, (e, t) -> {
+                Util.handleGenericResponseErrors(view, e, t);
+            });
+        } else {
+            // Save
+            api.comment(comment.getId()).save(response -> {
+                comment.setSaved(true);
+            }, (e, t) -> {
+                Util.handleGenericResponseErrors(view, e, t);
+            });
+        }
     }
 
 

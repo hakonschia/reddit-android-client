@@ -4,8 +4,4 @@
     <item
         android:id="@+id/menuDeleteComment"
         android:title="@string/menuDeleteComment" />
-
-    <item
-        android:id="@+id/menuSaveOrUnsaveComment"
-        android:title="@string/saveComment"/>
 </menu>

@@ -43,7 +43,11 @@ public class Util {
             Util.showNotLoggedInSnackbar(parent);
         } else if (t instanceof ThreadLockedException) {
             Util.showThreadLockedException(parent);
-        }  else if (code == 403) {
+        } else if (code == 400) {
+          // 400 requests are "Bad request" which means something went wrong (Reddit are generally pretty
+          // "secretive" with their error responses, they only give a code)
+          Util.showBadRequestSnackbar(parent);
+        } else if (code == 403) {
             Util.showForbiddenErrorSnackbar(parent);
         } else if (code == 429 || t instanceof RateLimitException) {
             // 429 = Too many requests. Reddit sometimes returns a 429, or 200 with a "RATELIMIT" error message
@@ -92,6 +96,15 @@ public class Util {
      */
     public static void showThreadLockedException(View parent) {
         Snackbar.make(parent, parent.getResources().getString(R.string.threadLockedError), LENGTH_SHORT).show();
+    }
+
+    /**
+     * Creates and shows a snackbar for errors caused by a 400 bad request error
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showBadRequestSnackbar(View parent) {
+        Snackbar.make(parent, parent.getResources().getString(R.string.badRequestError), LENGTH_SHORT).show();
     }
 
     /**
