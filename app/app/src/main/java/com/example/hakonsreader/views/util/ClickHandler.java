@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -96,7 +97,7 @@ public class ClickHandler {
 
 
     /**
-     * Opens an image in fullscreen
+     * Opens an image in fullscreen with a SharedElementTransition
      *
      * @param view The view itself is ignored, but this cannot be null as the context is needed
      * @param imageUrl The URL to the image
@@ -109,30 +110,9 @@ public class ClickHandler {
         Intent intent = new Intent(context, ImageActivity.class);
         intent.putExtra(ImageActivity.IMAGE_URL, imageUrl);
 
-        activity.startActivity(intent);
-
-        // Slide the activity in
-        activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image");
+        activity.startActivity(intent, options.toBundle());
     }
-    /**
-     * Opens an image in fullscreen
-     *
-     * @param context The context to start ImageActivity
-     * @param imageUrl The URL to the image
-     */
-    public static void openImageInFullscreen(Context context, String imageUrl) {
-        Activity activity = (Activity)context;
-
-        // Send some data like what sub it is etc etc so it knows what to load
-        Intent intent = new Intent(context, ImageActivity.class);
-        intent.putExtra(ImageActivity.IMAGE_URL, imageUrl);
-
-        activity.startActivity(intent);
-
-        // Slide the activity in
-        activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-    }
-
 
     /**
      * Function that can be used as onLongClick that displays a toast with the views

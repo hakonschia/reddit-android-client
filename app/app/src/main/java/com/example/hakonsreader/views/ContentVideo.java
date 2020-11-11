@@ -1,6 +1,5 @@
 package com.example.hakonsreader.views;
 
-import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
@@ -355,6 +355,13 @@ public class ContentVideo extends PlayerView {
 
                 context.startActivity(intent);
                 ((Activity)context).overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+                // TODO videos with SharedElementTransitions look very weird, unless I can manage a fix
+                //  so it looks smooth it's better to just use the normal fade (the video being stretched might
+                //  have something to do with the controller at the bottom being at the end of the screen, if
+                //  I fix that the animation might not be stretched at least)
+                //ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) context, this, "video");
+                //context.startActivity(intent, options.toBundle());
             });
         } else {
             // If we are in a video activity and press fullscreen, show an "Exit fullscreen" icon and exit the activity
