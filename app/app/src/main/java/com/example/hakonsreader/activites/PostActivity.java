@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditComment;
@@ -29,6 +30,13 @@ import com.r0adkll.slidr.Slidr;
  */
 public class PostActivity extends AppCompatActivity {
     private static final String TAG = "PostActivity";
+
+    /**
+     * The percentage of the screen height that the content should at maximum take (this is only the
+     * actual content of the post, and does not include the other post information)
+     */
+    private static final float MAX_CONTENT_HEIGHT_PERCENTAGE = 0.5f;
+
 
     /**
      * The key used for sending the post to this activity
@@ -102,7 +110,7 @@ public class PostActivity extends AppCompatActivity {
         commentsViewModel.getError().observe(this, error -> Util.handleGenericResponseErrors(binding.parentLayout, error.getError(), error.getThrowable()));
 
         binding.post.setHideScore(getIntent().getExtras().getBoolean(HIDE_SCORE_KEY));
-        binding.post.setMaxContentHeight((int)getResources().getDimension(R.dimen.postContentMaxHeight));
+        binding.post.setMaxContentHeight((int)(App.get().getScreenHeight() * MAX_CONTENT_HEIGHT_PERCENTAGE));
         // Don't allow to open the post again when we are now in the post
         binding.post.setAllowPostOpen(false);
 
@@ -121,6 +129,9 @@ public class PostActivity extends AppCompatActivity {
             commentsViewModel.restart();
         });
         binding.commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this, R.color.colorAccent));
+
+
+        // TODO when the animation is finished hiding the post videos should be paused
     }
 
     @Override
