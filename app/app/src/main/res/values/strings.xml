@@ -227,6 +227,7 @@
     <string name="postUnsaved">Post unsaved</string>
 
     <string name="blockUser">Block user</string>
+    <string name="userBlocked">User blocked</string>
 
     <string name="sortNew">New</string>
     <string name="sortHot">Hot</string>

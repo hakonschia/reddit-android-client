@@ -164,14 +164,14 @@
 
                 tools:text="@tools:sample/lorem" />
 
-            <!-- TODO show the three dots here and based on if it's by the logged in user show
-             menu with "edit" "delete" etc. and otherwise "block user" etc.-->
-            <ImageView
+            <ImageButton
                 android:id="@+id/popupMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
 
+                android:foreground="@drawable/ripple_main_bg"
+                android:background="@null"
                 android:onClick="@{(view) -> MenuClickHandler.showPopupForCommentExtra(view, comment)}"
                 android:src="@drawable/ic_baseline_more_horiz_24"
 

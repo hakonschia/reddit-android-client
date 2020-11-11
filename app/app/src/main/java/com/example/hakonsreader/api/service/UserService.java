@@ -5,8 +5,11 @@ import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.ListingResponse;
 
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -67,6 +70,22 @@ public interface UserService {
             @Path("what") String what,
             @Query("sort") String sort,
             @Query("t") String timeSort,
+
+            @Header("Authorization") String accessToken
+    );
+
+
+    /**
+     * Block a user
+     *
+     * @param username The username of the user to block
+     * @param accessToken The type of token + the actual token. Form: "type token"
+     * @return A Void call
+     */
+    @POST("api/block_user")
+    @FormUrlEncoded
+    Call<Void> blockUser(
+            @Field("name") String username,
 
             @Header("Authorization") String accessToken
     );

@@ -73,6 +73,43 @@ public class UserRequests {
     }
 
     /**
+     * Block a user
+     *
+     * @param onResponse The callback for successful requests. This will never hold any information
+     *                   but is called when the request is successful
+     * @param onFailure The callback for failed requests
+     */
+    public void block(OnResponse<Void> onResponse, OnFailure onFailure) {
+        try {
+            Util.verifyLoggedInToken(accessToken);
+        } catch (InvalidAccessTokenException e) {
+            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Blocking a user requires an access token for a logged in user", e));
+            return;
+        }
+
+        // Technically this API call returns some information, but it's barely any information, and it's
+        // not particularly interesting (it's only when the user has created their account, their profile image, and their name/fullname)
+        // If the user was blocked already, nothing is returned at all (but 200 OK is returned)
+
+        api.blockUser(username, accessToken.generateHeaderString()).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    onResponse.onResponse(null);
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
+
+    }
+
+    /**
      * Retrieves information about logged in users
      *
      * @param onResponse The callback for successful requests. Holds the {@link User} object representing the user

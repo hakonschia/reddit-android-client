@@ -53,6 +53,8 @@ public class MenuClickHandler {
     /**
      * Shows the popup for comments for when the comment is posted by the user currently logged in
      *
+     * <p>See also: {@link MenuClickHandler#showPopupForCommentExtra(View, RedditComment)}</p>
+     *
      * @param view The view clicked (where the popup will be attached)
      * @param comment The comment the popup is for
      */
@@ -94,13 +96,15 @@ public class MenuClickHandler {
     /**
      * Shows the popup for comments for when the comment is NOT posted by the user currently logged in
      *
+     * <p>See also: {@link MenuClickHandler#showPopupForCommentExtra(View, RedditComment)}</p>
+     *
      * @param view The view clicked (where the popup will be attached)
      * @param comment The comment the popup is for
      */
     public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment) {
         PopupMenu menu = new PopupMenu(view.getContext(), view);
-        menu.inflate(R.menu.comment_extra_not_by_user);
         menu.inflate(R.menu.comment_extra_generic_for_all_users);
+        menu.inflate(R.menu.comment_extra_not_by_user);
 
         // Default is "Save comment", if comment already is saved, change the text
         if (comment.isSaved()) {
@@ -108,11 +112,19 @@ public class MenuClickHandler {
             savedItem.setTitle(view.getContext().getString(R.string.unsaveComment));
         }
 
+        RedditApi api = App.get().getApi();
+
         menu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
 
             // TODO a lot of copy&paste code for this and showPopupForCommentExtraForLoggedInUser
-            if (itemId == R.id.menuSaveOrUnsaveComment) {
+            if (itemId == R.id.blockUser) {
+                api.user(comment.getAuthor()).block(ignored -> {
+                    Snackbar.make(view, R.string.userBlocked, LENGTH_SHORT).show();
+                }, (e, t) -> {
+                    Util.handleGenericResponseErrors(view, e, t);
+                });
+            } else if (itemId == R.id.menuSaveOrUnsaveComment) {
                 saveCommentOnClick(view, comment);
                 return true;
             }
@@ -136,7 +148,7 @@ public class MenuClickHandler {
 
         if (comment.isSaved()) {
             // Unsave
-            api.comment(comment.getId()).unsave(response -> {
+            api.comment(comment.getId()).unsave(ignored -> {
                 comment.setSaved(false);
                 Snackbar.make(view, R.string.commentUnsaved, LENGTH_SHORT).show();
             }, (e, t) -> {
@@ -144,7 +156,7 @@ public class MenuClickHandler {
             });
         } else {
             // Save
-            api.comment(comment.getId()).save(response -> {
+            api.comment(comment.getId()).save(ignored -> {
                 comment.setSaved(true);
                 Snackbar.make(view, R.string.commentSaved, LENGTH_SHORT).show();
             }, (e, t) -> {
@@ -174,13 +186,15 @@ public class MenuClickHandler {
     /**
      * Shows the extra popup for posts for when the post is by the logged in user
      *
+     * <p>See also: {@link MenuClickHandler#showPopupForPost(View, RedditPost)}</p>
+     *
      * @param view The view clicked (where the popup will be attached)
      * @param post The post the popup is for
      */
     public static void showPopupForPostExtraForLoggedInUser(View view, RedditPost post) {
         PopupMenu menu = new PopupMenu(view.getContext(), view);
-        menu.inflate(R.menu.post_extra_by_user);
         menu.inflate(R.menu.post_extra_generic_for_all_users);
+        menu.inflate(R.menu.post_extra_by_user);
 
         // Default is "Save post", if post already is saved, change the text
         if (post.isSaved()) {
@@ -205,12 +219,15 @@ public class MenuClickHandler {
     /**
      * Shows the extra popup for posts for when the post is NOT by the logged in user
      *
+     * <p>See also: {@link MenuClickHandler#showPopupForPost(View, RedditPost)}</p>
+     *
      * @param view The view clicked (where the popup will be attached)
      * @param post The post the popup is for
      */
     public static void showPopupForPostExtraForNonLoggedInUser(View view, RedditPost post) {
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.post_extra_generic_for_all_users);
+        menu.inflate(R.menu.post_extra_not_by_user);
 
         // Default is "Save post", if post already is saved, change the text
         if (post.isSaved()) {
@@ -218,10 +235,18 @@ public class MenuClickHandler {
             savedItem.setTitle(view.getContext().getString(R.string.unsavePost));
         }
 
+        RedditApi api = App.get().getApi();
+
         menu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
 
-            if (itemId == R.id.saveOrUnsavePost) {
+            if (itemId == R.id.blockUser) {
+                api.user(post.getAuthor()).block(ignored -> {
+                    Snackbar.make(view, R.string.userBlocked, LENGTH_SHORT).show();
+                }, (e, t) -> {
+                    Util.handleGenericResponseErrors(view, e, t);
+                });
+            } else if (itemId == R.id.saveOrUnsavePost) {
                 savePostOnClick(view, post);
                 return true;
             }
@@ -245,7 +270,7 @@ public class MenuClickHandler {
 
         if (post.isSaved()) {
             // Unsave
-            api.post(post.getId()).unsave(response -> {
+            api.post(post.getId()).unsave(ignored -> {
                 post.setSaved(false);
                 Snackbar.make(view, R.string.postUnsaved, LENGTH_SHORT).show();
             }, (e, t) -> {
@@ -253,7 +278,7 @@ public class MenuClickHandler {
             });
         } else {
             // Save
-            api.post(post.getId()).save(response -> {
+            api.post(post.getId()).save(ignored -> {
                 post.setSaved(true);
                 Snackbar.make(view, R.string.postSaved, LENGTH_SHORT).show();
             }, (e, t) -> {

@@ -154,4 +154,5 @@
     <string name="commentUnsaved">Kommentar glemt</string>
     <string name="postSaved">Post lagret</string>
     <string name="postUnsaved">Post glemt</string>
+    <string name="userBlocked">Bruker blokkert</string>
 </resources>
