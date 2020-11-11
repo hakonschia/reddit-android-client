@@ -1,24 +1,33 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/prefs_group_appearance">
+    <PreferenceCategory
+        app:title="@string/prefs_group_appearance"
+        app:iconSpaceReserved="false">
+
         <SwitchPreference
             app:key="@string/prefs_key_theme"
             app:title="@string/prefs_title_theme"
+            app:iconSpaceReserved="false"
             app:defaultValue="@bool/prefs_default_theme" />
 
         <ListPreference
             app:key="@string/prefs_key_language"
             app:title="@string/prefs_title_language"
+            app:iconSpaceReserved="false"
             app:entries="@array/language_entries"
             app:entryValues="@array/language_values"
             app:useSimpleSummaryProvider="true"
             app:defaultValue="@string/prefs_key_language_automatic" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/prefs_group_videos_images">
+    <PreferenceCategory
+        app:title="@string/prefs_group_videos_images"
+        app:iconSpaceReserved="false">
+
         <ListPreference
             app:key="@string/prefs_key_fullscreen_swipe_direction"
             app:title="@string/prefs_title_fullscreen_swipe_direction"
+            app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true"
             app:entries="@array/fullscreen_swipe_entries"
             app:entryValues="@array/fullscreen_swipe_values"
@@ -26,11 +35,13 @@
 
         <SwitchPreference
             app:key="@string/prefs_key_cache_nsfw"
+            app:iconSpaceReserved="false"
             app:title="@string/prefs_title_cache_nsfw"
             app:defaultValue="@bool/prefs_default_value_cache_nsfw" />
 
         <ListPreference
             app:key="@string/prefs_key_auto_play_videos"
+            app:iconSpaceReserved="false"
             app:title="@string/prefs_title_auto_play_videos"
             app:useSimpleSummaryProvider="true"
             app:defaultValue="@string/prefs_default_value_auto_play_videos"
@@ -38,18 +49,21 @@
             app:entryValues="@array/auto_play_values" />
 
         <SwitchPreference
-            app:defaultValue="@bool/prefs_default_play_muted_videos"
             app:key="@string/prefs_key_play_muted_videos"
-            app:title="@string/prefs_title_play_muted_videos" />
+            app:title="@string/prefs_title_play_muted_videos"
+            app:iconSpaceReserved="false"
+            app:defaultValue="@bool/prefs_default_play_muted_videos" />
 
         <SwitchPreference
             app:key="@string/prefs_key_play_muted_videos_fullscreen"
             app:title="@string/prefs_title_play_muted_videos_fullscreen"
+            app:iconSpaceReserved="false"
             app:defaultValue="@bool/prefs_default_play_muted_videos_fullscreen" />
 
         <SwitchPreference
             app:key="@string/prefs_key_loop_videos"
             app:title="@string/prefs_title_loop_videos"
+            app:iconSpaceReserved="false"
             app:defaultValue="@bool/prefs_default_loop_videos" />
     </PreferenceCategory>
 
