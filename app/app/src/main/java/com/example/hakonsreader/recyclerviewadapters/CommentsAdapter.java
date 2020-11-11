@@ -315,7 +315,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         // it's updated if the user has changed the value since the adapter was created
         int hideThreshold = App.get().getAutoHideScoreThreshold();
         comments.forEach(comment -> {
-            if (hideThreshold >= comment.getScore()) {
+            // If the score is hidden don't hide comments as we don't know the actual score (otherwise
+            // if the threshold is large enough all scores with hidden comments would be hidden)
+            if (!comment.isScoreHidden() && hideThreshold >= comment.getScore()) {
                 hideComments(comment);
             }
         });
