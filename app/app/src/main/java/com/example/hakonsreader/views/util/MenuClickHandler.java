@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.User;
@@ -57,6 +58,14 @@ public class MenuClickHandler {
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.comment_extra_by_user);
 
+        // Default is "Save comment", if comment already is saved, change the text
+        if (comment.isSaved()) {
+            MenuItem savedItem = menu.getMenu().findItem(R.id.menuSaveOrUnsaveComment);
+            savedItem.setTitle(view.getContext().getString(R.string.unsaveComment));
+        }
+
+        RedditApi api = App.get().getApi();
+
         menu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
 
@@ -64,10 +73,28 @@ public class MenuClickHandler {
                 Log.d(TAG, "showPopupForCommentExtraForLoggerInUser: Deleting comment");
                 // This won't actually return anything valid, so we just assume the comment was deleted
                 // This should update the adapter probably?
-                App.get().getApi().comment(comment.getId()).delete(response -> Snackbar.make(view, R.string.commentDeleted, LENGTH_SHORT).show(), ((error, t) -> {
+                api.comment(comment.getId()).delete(response -> Snackbar.make(view, R.string.commentDeleted, LENGTH_SHORT).show(), ((error, t) -> {
                     Util.handleGenericResponseErrors(view, error, t);
                 }));
                 return true;
+            } else if (itemId == R.id.menuSaveOrUnsaveComment) {
+                if (comment.isSaved()) {
+                    // Unsave
+                    api.comment(comment.getId()).unsave(response -> {
+                        comment.setSaved(false);
+                    }, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                } else {
+                    // Save
+                    api.comment(comment.getId()).save(response -> {
+                        comment.setSaved(true);
+                    }, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+
+                    return true;
+                }
             }
 
             return false;
@@ -78,11 +105,45 @@ public class MenuClickHandler {
     
     public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment) {
         Log.d(TAG, "showPopupForCommentExtraForNonLoggedInUser: :-d");
-        /*
-        App.get().getApi().comment(comment.getId()).unsave(response -> {}, (e, t) -> {
-            t.printStackTrace();
+        PopupMenu menu = new PopupMenu(view.getContext(), view);
+        menu.inflate(R.menu.comment_extra_not_by_user);
+
+        // Default is "Save comment", if comment already is saved, change the text
+        if (comment.isSaved()) {
+            MenuItem savedItem = menu.getMenu().findItem(R.id.menuSaveOrUnsaveComment);
+            savedItem.setTitle(view.getContext().getString(R.string.unsaveComment));
+        }
+
+        RedditApi api = App.get().getApi();
+
+        menu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+            // TODO a lot of copy&paste code for this and showPopupForCommentExtraForLoggedInUser
+            if (itemId == R.id.menuSaveOrUnsaveComment) {
+                if (comment.isSaved()) {
+                    // Unsave
+                    api.comment(comment.getId()).unsave(response -> {
+                        comment.setSaved(false);
+                    }, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                } else {
+                    // Save
+                    api.comment(comment.getId()).save(response -> {
+                        comment.setSaved(true);
+                    }, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                }
+
+                return true;
+            }
+
+            return false;
         });
-         */
+
+        menu.show();
     }
 
 

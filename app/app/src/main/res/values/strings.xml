@@ -213,6 +213,8 @@
 
     <string name="menuDeleteComment">Delete comment</string>
     <string name="commentDeleted">Comment deleted</string>
+    <string name="saveComment">Save comment</string>
+    <string name="unsaveComment">Unsave comment</string>
 
     <string name="sortNew">New</string>
     <string name="sortHot">Hot</string>

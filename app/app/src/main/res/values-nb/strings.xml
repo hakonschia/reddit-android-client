@@ -142,4 +142,6 @@
     <string name="scoreWithText">%d poeng</string>
     <string name="prefs_title_hide_comments_threshold">Automatisk gjem kommentar med poengsum mindre enn</string>
     <string name="scoreHiddenText">Poengsum gjemt</string>
+    <string name="saveComment">Lagre kommentar</string>
+    <string name="unsaveComment">Glem kommentar</string>
 </resources>

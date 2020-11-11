@@ -285,4 +285,14 @@ public class RedditComment extends RedditListing {
     public boolean isSaved() {
         return saved;
     }
+
+    /**
+     * Set if this comment is saved or not. This should only be used when a comment has been
+     * saved after the first retrieval of the comment
+     *
+     * @param saved True if saved, false if unsaved
+     */
+    public void setSaved(boolean saved) {
+        this.saved = saved;
+    }
 }
