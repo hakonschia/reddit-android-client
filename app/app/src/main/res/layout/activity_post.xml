@@ -41,25 +41,6 @@
 
             tools:layout_height="150dp" />
 
-        <!-- A button to either expand or collapse the post, based on
-         what animation state it is in (already expanded or collapsed, it will reverse the animation)
-         It's a pretty poor solution to just constrain this to overlay the post, but I don't want to add
-         this to the the Post view, since this is specific for when posts are opened, not when they're in a list
-         It's a bad solution since if the Post view is updated later, this might actually overlay something in the view -->
-        <ImageButton
-            android:id="@+id/expandOrCollapsePost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ripple_main_bg"
-
-            android:contentDescription="@string/content_description_expand_or_collapse_post"
-            android:onLongClick="@{(view) -> ClickHandler.showToastWithContentDescription(view)}"
-
-            android:src="@drawable/ic_baseline_arrow_down_24"
-            app:layout_constraintBottom_toBottomOf="@+id/post"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/commentsSwipeRefresh"
             android:layout_width="0dp"
@@ -74,7 +55,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/post"
 
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/comments"
@@ -87,9 +68,6 @@
                 tools:listitem="@layout/list_item_comment" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-
-        <!-- TODO this can cause overlap with the post (if I can get rid of the
-         toolbar layout and swap with a ConstraintLayout this wont be an issue)-->
         <include
             android:id="@+id/noCommentsLayout"
             layout="@layout/no_comments_yet"
@@ -186,5 +164,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/post"
             tools:visibility="visible" />
+
+        <!-- A button to either expand or collapse the post, based on
+         what animation state it is in (already expanded or collapsed, it will reverse the animation)
+         This is constrained to the bottom/center of the post, so it *might* overlap with something in the full_post_bar
+         In the end animation (when the post is hidden) this button is moved so it is still shown, so it cannot be part of
+         the Post view, so we have to ensure it never overlaps with something in the post (it's kind of bad, but not sure how
+         else this can be fixed) -->
+        <ImageButton
+            android:id="@+id/expandOrCollapsePost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_main_bg"
+
+            android:contentDescription="@string/content_description_expand_or_collapse_post"
+            android:onLongClick="@{(view) -> ClickHandler.showToastWithContentDescription(view)}"
+
+            android:src="@drawable/ic_baseline_arrow_up_24"
+            app:layout_constraintBottom_toBottomOf="@+id/post"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </com.example.hakonsreader.views.SwipeRefreshMotionLayout>
 </layout>

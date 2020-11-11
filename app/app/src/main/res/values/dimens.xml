@@ -13,7 +13,7 @@
     <dimen name="topLevelCommentTopPadding">7dp</dimen>
     <dimen name="hiddenCommentBottomPadding">12dp</dimen>
 
-    <dimen name="postContentMaxHeight">150dp</dimen>
+    <dimen name="postContentMaxHeight">350dp</dimen>
 
     <dimen name="tagTextSize">12sp</dimen>
     <dimen name="tagIconSize">14dp</dimen>

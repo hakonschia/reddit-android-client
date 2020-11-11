@@ -25,10 +25,10 @@
         </Constraint>
     </ConstraintSet>
 
+    <!-- Move the post all the way above the screen, and constrain the expand/collapse button
+     to the top of the parent so it doesn't move with the post. To make the comments not overlap with
+      the expand/collapse button constrain the comments top to the bottom of the button-->
     <ConstraintSet android:id="@+id/end">
-        <!-- TODO Setting the constraint like this kinda works, but the larger the view the more screen space it will end up taking
-         and we want the height it takes to be consistent for all view heights (just showing the vote bar would be sufficient, but
-         I'm not sure if that's possible in a good way without knowing the height of the vote bar) -->
         <Constraint
             android:id="@+id/post"
             android:layout_width="match_parent"
@@ -37,7 +37,6 @@
             android:layout_marginStart="@dimen/postMargin"
 
             motion:layout_constraintBottom_toTopOf="parent"
-            motion:layout_constraintTop_toTopOf="parent"
             motion:layout_constraintEnd_toStartOf="parent"
             motion:layout_constraintStart_toStartOf="parent" />
         <Constraint
@@ -46,10 +45,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ripple_main_bg"
-            motion:layout_constraintBottom_toBottomOf="@+id/post"
+            motion:layout_constraintTop_toTopOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
             android:rotation="180" />
 
+        <Constraint
+            android:id="@+id/commentsSwipeRefresh"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/background"
+
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@+id/expandOrCollapsePost"
+            />
         <Constraint
             android:id="@+id/loadingIcon">
             <PropertySet motion:visibilityMode="ignore"/>
