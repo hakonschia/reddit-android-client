@@ -47,9 +47,18 @@ public class ProfileFragment extends Fragment {
      */
     private static final String LAYOUT_ANIMATION_PROGRESS_KEY = "layout_progress";
 
+    /**
+     * The key set in the bundle with getArguments() that says the username the fragment is for
+     */
+    private static final String USERNAME_KEY = "username";
+    /**
+     * The key set in the bundle with getArguments() that says if the fragment is for the logged in user
+     */
+    private static final String IS_LOGGED_IN_USER_KEY = "isLoggedInUser";
+
 
     private boolean firstLoad = true;
-
+    private boolean isLoggedInUser;
     private final RedditApi redditApi = App.get().getApi();
     private FragmentProfileBinding binding;
     private User user;
@@ -67,12 +76,19 @@ public class ProfileFragment extends Fragment {
 
 
     /**
-     * Creates a new ProfileFragment for logged in users
+     * Creates a new ProfileFragment for logged in users. For fragments for users NOT the logged in user
+     * use {@link ProfileFragment#newInstance(String)}
      *
      * @return A new ProfileFragment for logged in users
      */
     public static ProfileFragment newInstance() {
-        return new ProfileFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(IS_LOGGED_IN_USER_KEY, true);
+
+        ProfileFragment fragment = new ProfileFragment();
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     /**
@@ -84,12 +100,13 @@ public class ProfileFragment extends Fragment {
      * @return A ProfileFragment for a user
      */
     public static ProfileFragment newInstance(String username) {
+        // Hardcoding values like this is obviously bad, but this is the only case we're doing something special
         if (username.equals("me")) {
             return ProfileFragment.newInstance();
         }
 
         Bundle args = new Bundle();
-        args.putString("username", username);
+        args.putString(USERNAME_KEY, username);
 
         ProfileFragment fragment = new ProfileFragment();
         fragment.setArguments(args);
@@ -104,11 +121,12 @@ public class ProfileFragment extends Fragment {
 
         Bundle args = getArguments();
         if (args != null) {
-            username = args.getString("username");
+            username = args.getString(USERNAME_KEY);
+            isLoggedInUser = args.getBoolean(IS_LOGGED_IN_USER_KEY);
         }
 
         // No username given, load profile for logged in user
-        if (username == null) {
+        if (isLoggedInUser) {
             user = App.getStoredUser();
             username = user.getName();
         } else {
@@ -212,7 +230,7 @@ public class ProfileFragment extends Fragment {
      */
     private void updateViews() {
         binding.setUser(user);
-        binding.setLoggedInUser(username == null);
+        binding.setLoggedInUser(isLoggedInUser);
     }
 
     /**
@@ -223,14 +241,11 @@ public class ProfileFragment extends Fragment {
         // user(null) gets information about the logged in user, so we can use username directly
         redditApi.user(username).info(user -> {
             // Load the posts for the user
-            // TODO update the name?
-            //postsViewModel.loadPosts(user.getName(), true);
-
             postsViewModel.loadPosts();
             this.user = user;
 
             // Store the updated user information if this profile is for the logged in user
-            if (username == null) {
+            if (isLoggedInUser) {
                 App.storeUserInfo(user);
             }
 

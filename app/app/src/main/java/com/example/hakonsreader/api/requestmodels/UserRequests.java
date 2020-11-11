@@ -180,7 +180,7 @@ public class UserRequests {
         /**
          * Get the "top" posts for the user
          *
-         * <p>OAuth scope required: history</p>
+         * <p>OAuth scope required: {@code history}</p>
          *
          * @param sort How to sort the posts
          */
