@@ -155,5 +155,5 @@
     <string name="postSaved">Post lagret</string>
     <string name="postUnsaved">Post glemt</string>
     <string name="userBlocked">Bruker blokkert</string>
-    <string name="logInDescription">Når du trykker på knappen under for å logge inn vil du bli videresendt til Reddit.com.\n\nDu vil bli vist en liste med tillatelser denne applikasjonen trenger, og hvis du autoriserer applikasjonen vil du bli videresendt tilbake.\nHvis du vil fjerne tilgangen til applikasjonen tilgang til kontoen din, gå til: <a href="https://www.reddit.com/prefs/apps">https://www.reddit.com/prefs/apps</a>\n\nPassordet ditt vil aldri forlate Reddit.com; denne applikasjonen vil aldri se eller lagre passordet ditt.\n\n</string>
+    <string name="logInDescription">Når du trykker på knappen under for å logge inn vil du bli videresendt til Reddit.com.\n\nDu vil bli vist en liste med tillatelser denne applikasjonen trenger, og hvis du autoriserer applikasjonen vil du bli videresendt tilbake.\nHvis du vil fjerne applikasjonens tilgang til kontoen din, gå til: <a href="https://www.reddit.com/prefs/apps">https://www.reddit.com/prefs/apps</a>\n\nPassordet ditt vil aldri forlate Reddit.com; denne applikasjonen vil aldri se eller lagre passordet ditt.\n\n</string>
 </resources>
