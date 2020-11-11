@@ -1,4 +1,5 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
         app:title="@string/prefs_group_appearance"
@@ -67,4 +68,18 @@
             app:defaultValue="@bool/prefs_default_loop_videos" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:title="@string/prefs_group_comments"
+        app:iconSpaceReserved="false">
+
+        <!-- This is only a number, but this cannot be set (anymore) with XML, so it is set in code -->
+        <EditTextPreference
+            app:key="@string/prefs_key_hide_comments_threshold"
+            app:title="@string/prefs_title_hide_comments_threshold"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="@integer/prefs_default_hide_comments_threshold"/>
+
+        <!-- TODO hide comments from users ("This will also remove their child comments") -->
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -329,7 +329,6 @@ public class App extends Application {
      * @return True if videos should be automatically played
      */
     public boolean autoPlayVideos() {
-        Context context = getApplicationContext();
         String value = settings.getString(
                 getString(R.string.prefs_key_auto_play_videos),
                 getString(R.string.prefs_default_value_auto_play_videos)
@@ -377,6 +376,23 @@ public class App extends Application {
                 getApplicationContext().getString(R.string.prefs_key_loop_videos),
                 getResources().getBoolean(R.bool.prefs_default_loop_videos)
         );
+    }
+
+    /**
+     * Retrieves the score threshold for comments to be automatically hidden
+     *
+     * @return An int with the score threshold
+     */
+    public int getAutoHideScoreThreshold() {
+        // The value is stored as a string, not an int, so we have to the default value
+
+        int defaultValue = getResources().getInteger(R.integer.prefs_default_hide_comments_threshold);
+        String value = settings.getString(
+                getString(R.string.prefs_key_hide_comments_threshold),
+                String.valueOf(defaultValue)
+        );
+
+        return Integer.parseInt(value);
     }
 
     /**
@@ -428,7 +444,6 @@ public class App extends Application {
     }
 
     public void logOut() {
-        Log.d(TAG, "logOut: logging out lul");
         // Revoke token
         redditApi.revokeRefreshToken(response -> {
         }, (call, t) -> {

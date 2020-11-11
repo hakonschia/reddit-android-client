@@ -48,6 +48,7 @@
     <!-- Preference groups -->
     <string name="prefs_group_appearance">Appearance</string>
     <string name="prefs_group_videos_images">Videos and images</string>
+    <string name="prefs_group_comments">Comments</string>
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark mode</string>
@@ -70,6 +71,8 @@
     <string name="prefs_title_language_automatic">Automatic</string>
     <string name="prefs_title_language_en" translatable="false">English</string>
     <string name="prefs_title_language_nb" translatable="false">Norsk (bokmål)</string>
+    <string name="prefs_title_hide_comments_threshold">Automatically hide comments with score less than</string>
+
 
     <!-- Preferences keys -->
     <string name="prefs_key_theme" translatable="false">theme</string>
@@ -89,6 +92,7 @@
     <string name="prefs_key_language_automatic" translatable="false">language_automatic</string>
     <string name="prefs_key_language_en" translatable="false">en</string>
     <string name="prefs_key_language_nb" translatable="false">nb</string>
+    <string name="prefs_key_hide_comments_threshold" translatable="false">auto_hide_comments_threshold</string>
 
 
     <!-- String for post ages that are "just posted", ie. < 1 minute -->

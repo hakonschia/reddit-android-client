@@ -114,13 +114,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * Adds a new top level comment
+     * Adds a new top level comment. The comment is added as the first element
      *
      * @param newComment The comment to add
      */
     public void addComment(RedditComment newComment) {
-        comments.add(newComment);
-        notifyItemInserted(comments.size() - 1);
+        comments.add(0, newComment);
+        notifyItemInserted(0);
     }
 
     /**
@@ -144,6 +144,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void addComments(List<RedditComment> newComments) {
         comments.addAll(newComments);
         notifyDataSetChanged();
+        checkForHiddenComments(newComments);
     }
 
     /**
@@ -155,6 +156,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void insertComments(List<RedditComment> newComments, int at) {
         comments.addAll(at, newComments);
         notifyItemRangeInserted(at, newComments.size());
+        checkForHiddenComments(newComments);
     }
 
     /**
@@ -171,6 +173,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void setComments(List<RedditComment> comments) {
         this.comments = comments;
         notifyDataSetChanged();
+        checkForHiddenComments(comments);
     }
 
     public void setCommentsHidden(List<RedditComment> commentsHidden) {
@@ -239,6 +242,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     public void hideComments(RedditComment start) {
         int startPos = comments.indexOf(start);
+        // Comment not found in the list, return to avoid weird stuff potentially happening
+        if (startPos == -1) {
+            return;
+        }
 
         // Update the comment selected to show that it is now a hidden comment chain
         commentsHidden.add(start);
@@ -297,6 +304,22 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return replies;
     }
 
+    /**
+     * Goes through a list of comments and hides comments that have a lower score than the
+     * threshold set in the preferences
+     *
+     * @param comments The comments to check
+     */
+    private void checkForHiddenComments(List<RedditComment> comments) {
+        // We could store this when the adapter is created, but if we retrieve the value now
+        // it's updated if the user has changed the value since the adapter was created
+        int hideThreshold = App.get().getAutoHideScoreThreshold();
+        comments.forEach(comment -> {
+            if (hideThreshold >= comment.getScore()) {
+                hideComments(comment);
+            }
+        });
+    }
 
     @NonNull
     @Override
