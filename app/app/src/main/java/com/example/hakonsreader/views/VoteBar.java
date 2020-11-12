@@ -1,6 +1,8 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 
@@ -105,6 +107,18 @@ public class VoteBar extends ConstraintLayout {
             updateVoteStatus();
             Util.handleGenericResponseErrors(this, code, t);
         });
+
+        // Disable both buttons, and enable them again after a short time delay
+        // This is to avoid spamming. It's still possible to get a 429 Too Many Requests, but it should
+        // reduce the amount of times that would happen (and it removes potenial missclicks right after a vote)
+        binding.upvote.setEnabled(false);
+        binding.downvote.setEnabled(false);
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(() -> {
+            binding.upvote.setEnabled(true);
+            binding.downvote.setEnabled(true);
+        }, 350);
     }
 
 
