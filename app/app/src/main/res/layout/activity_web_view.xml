@@ -21,12 +21,22 @@
             app:layout_scrollFlags="enterAlways|scroll">
 
             <ImageButton
+                android:id="@+id/webViewMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+
+                android:backgroundTint="#00000000"
+                android:tint="#222222"
+                android:src="@drawable/ic_baseline_more_vert_24" />
+
+            <ImageButton
                 android:id="@+id/webViewClose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_gravity="end"
 
+                android:tint="#222222"
                 android:backgroundTint="#00000000"
                 android:src="@drawable/ic_baseline_close_24" />
 
@@ -58,8 +68,8 @@
 
             <WebView
                 android:id="@+id/webView"
-                android:layout_height="match_parent"
-                android:layout_width="match_parent" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

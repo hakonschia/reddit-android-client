@@ -1,5 +1,6 @@
 package com.example.hakonsreader.activites;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -63,6 +65,8 @@ public class WebViewActivity extends AppCompatActivity {
         // Close the web view (ie. finish the activity) with the button in the toolbar
         binding.webViewClose.setOnClickListener(v -> finish());
 
+        binding.webViewMenu.setOnClickListener(v -> this.openMenu());
+
         binding.refreshWebView.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this, R.color.colorAccent));
         binding.refreshWebView.setOnRefreshListener(() -> {
             binding.webView.reload();
@@ -83,5 +87,32 @@ public class WebViewActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    /**
+     * Opens the more menu in the toolbar
+     */
+    private void openMenu() {
+        PopupMenu menu = new PopupMenu(this, binding.webViewMenu);
+        menu.inflate(R.menu.web_view_more);
+
+        menu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.webViewMenuRefresh) {
+                binding.webView.reload();
+                // Use the SwipeRefreshLayout refresher for this as well
+                binding.refreshWebView.setRefreshing(true);
+                return true;
+            } else if (itemId == R.id.webViewMenuOpenInBrowser) {
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(binding.webView.getUrl()));
+                startActivity(i);
+                return true;
+            }
+
+            return false;
+        });
+
+        menu.show();
     }
 }
