@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.UserManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -551,34 +552,31 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * Formats the author text based on whether or not it is posted by a mod, the poster.
+     * Formats the author text based on whether or not it is posted by a and admin or a mod.
+     * If no match is found, the default author color is used
      *
      * <p>If multiple values are true, the precedence is:
      * <ol>
      *     <li>Admin</li>
      *     <li>Mod</li>
-     *     <li>Poster</li>
+     *     <li>Poster (this sets the typeface to bold)</li>
      * </ol>
      * </p>
      *
-     * @param tv The TextView to format. Changes the text color and background drawable
-     * @param asMod True if posted (and distinguished) by a moderator
-     * @param asPoster True if posted by the poster of the post
-     * @param asAdmin True if posted by an admin of Reddit (ie. an employee of Reddit)
+     * @param tv The TextView to format
+     * @param comment The comment the text is for
      */
-    @BindingAdapter({"asMod", "asPoster", "asAdmin"})
-    public static void formatAuthor(TextView tv, boolean asMod, boolean asPoster, boolean asAdmin) {
-        if (asAdmin) {
-            tv.setBackground(ContextCompat.getDrawable(tv.getContext(), R.drawable.comment_by_admin));
-            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.text_color));
-        } else if (asMod) {
-            tv.setBackground(ContextCompat.getDrawable(tv.getContext(), R.drawable.comment_by_mod));
-            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.text_color));
-        } else if (asPoster) {
-            tv.setBackground(ContextCompat.getDrawable(tv.getContext(), R.drawable.comment_by_poster));
-            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.text_color));
+    @BindingAdapter("authorTextColorComment")
+    public static void formatAuthor(TextView tv, RedditComment comment) {
+        tv.setTypeface(Typeface.DEFAULT);
+        if (comment.isAdmin()) {
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.commentByAdminBackground));
+        } else if (comment.isMod()) {
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.commentByModBackground));
+        } else if (comment.isByPoster()) {
+            tv.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.opposite_background));
         } else {
-            tv.setBackground(null);
             tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.link_color));
         }
     }

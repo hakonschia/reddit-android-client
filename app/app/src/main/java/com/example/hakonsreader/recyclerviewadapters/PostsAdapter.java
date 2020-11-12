@@ -1,17 +1,21 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.databinding.BindingAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
+import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.ListDivider;
@@ -91,6 +95,31 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return posts;
     }
 
+    /**
+     * Formats the author text based on whether or not it is posted by a a mod or admin
+     * If no match is found, the default author color is used
+     *
+     * <p>If multiple values are true, the precedence is:
+     * <ol>
+     *     <li>Admin</li>
+     *     <li>Mod</li>
+     * </ol>
+     * </p>
+     *
+     * @param tv The TextView to format
+     * @param post The post the text is for
+     */
+    @BindingAdapter("authorTextColorPost")
+    public static void formatAuthor(TextView tv, RedditPost post) {
+        tv.setTypeface(Typeface.DEFAULT);
+        if (post.isAdmin()) {
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.commentByAdminBackground));
+        } else if (post.isMod()) {
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.commentByModBackground));
+        } else {
+            tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.link_color));
+        }
+    }
 
     @Override
     public int getItemCount() {

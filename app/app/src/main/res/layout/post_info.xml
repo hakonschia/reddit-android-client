@@ -128,11 +128,10 @@
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
 
-            android:background="@{post.mod ? @drawable/comment_by_mod : null}"
             android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, post.author)}"
             android:text='@{post != null ? @string/author_prefixed(post.author) : "" }'
-            android:textColor="@{post.mod ? @color/text_color : @color/link_color}"
             android:textSize="13sp"
+            app:authorTextColorPost="@{post}"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/subreddit"

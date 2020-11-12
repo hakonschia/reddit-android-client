@@ -70,11 +70,7 @@
                 android:onLongClick="@{view -> adapter.hideCommentsLongClick(view, comment)}"
 
                 android:text='@{comment != null ? @string/author_prefixed(comment.author) : "" }'
-                android:textColor="@color/link_color"
-
-                app:asAdmin="@{comment.admin}"
-                app:asMod="@{comment.mod}"
-                app:asPoster="@{comment.byPoster}"
+                app:authorTextColorComment="@{comment}"
 
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
