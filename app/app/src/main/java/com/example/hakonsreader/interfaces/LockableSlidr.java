@@ -3,7 +3,7 @@ package com.example.hakonsreader.interfaces;
 /**
  * Interface used for locking a Slidr
  */
-public interface SlidrActivity {
+public interface LockableSlidr {
 
     /**
      *

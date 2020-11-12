@@ -3,7 +3,6 @@ package com.example.hakonsreader.activites;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,17 +11,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.fragments.SubredditFragment;
-import com.example.hakonsreader.interfaces.ItemLoadingListener;
-import com.example.hakonsreader.interfaces.SlidrActivity;
+import com.example.hakonsreader.interfaces.LockableSlidr;
 import com.example.hakonsreader.views.LoadingIcon;
 import com.r0adkll.slidr.Slidr;
-import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrInterface;
 
 /**
  * Activity for a subreddit (used when a subreddit is clicked from a post)
  */
-public class SubredditActivity extends AppCompatActivity implements SlidrActivity {
+public class SubredditActivity extends AppCompatActivity implements LockableSlidr {
     private static final String TAG = "SubredditActivity";
 
     /**

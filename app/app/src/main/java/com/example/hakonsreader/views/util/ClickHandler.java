@@ -3,28 +3,15 @@ package com.example.hakonsreader.views.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.ImageActivity;
 import com.example.hakonsreader.activites.ProfileActivity;
 import com.example.hakonsreader.activites.SubredditActivity;
-import com.example.hakonsreader.api.enums.PostTimeSort;
-import com.example.hakonsreader.api.model.RedditComment;
-import com.example.hakonsreader.interfaces.SortableWithTime;
-import com.example.hakonsreader.misc.Util;
-import com.google.android.material.snackbar.Snackbar;
-
-import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 /**
  * Various click handlers that can be used as click listeners for data binding

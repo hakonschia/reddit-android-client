@@ -16,7 +16,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentGalleryBinding;
-import com.example.hakonsreader.interfaces.SlidrActivity;
+import com.example.hakonsreader.interfaces.LockableSlidr;
 
 import java.util.List;
 import java.util.Locale;
@@ -114,8 +114,8 @@ public class ContentGallery extends LinearLayout {
                 // This might be bad? The "correct" way of doing it might be to add listeners
                 // and be notified that way, but I don't want to add 1000 functions to add the listener
                 // all the way up here from an activity
-                if (context instanceof SlidrActivity) {
-                    ((SlidrActivity)context).lock(lock);
+                if (context instanceof LockableSlidr) {
+                    ((LockableSlidr)context).lock(lock);
                 }
             }
         });

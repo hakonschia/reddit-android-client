@@ -1,23 +1,15 @@
 package com.example.hakonsreader.misc;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.text.Layout;
 import android.text.method.LinkMovementMethod;
 import android.text.style.URLSpan;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.DispatcherActivity;
-import com.example.hakonsreader.activites.ImageActivity;
-import com.example.hakonsreader.activites.SubredditActivity;
-
-import java.util.List;
 
 /**
  * Set this on a textview and then you can potentially open links locally if applicable
