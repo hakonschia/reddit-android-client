@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -24,6 +25,7 @@ import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.viewmodels.CommentsViewModel;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
+import com.squareup.picasso.Callback;
 
 /**
  * Activity to show a Reddit post with its comments
@@ -200,7 +202,26 @@ public class PostActivity extends AppCompatActivity {
             post = new Gson().fromJson(p, RedditPost.class);
             postId = post.getId();
 
-            this.onPostLoaded();
+            // If we have an image ensure the image is fully loaded before we start the transition
+            // This is to avoid images showing the placeholder image during the transition. Even if
+            // Picasso is caching the image, it sometimes still needs to load the image from the cache
+            // which looks weird
+            // This won't produce a very noticeable delay, as it doesn't take a long time to load the image
+            if (post.getPostType() == PostType.IMAGE) {
+                postponeEnterTransition();
+
+                binding.post.setImageLoadedCallback(new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        startPostponedEnterTransition();
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        startPostponedEnterTransition();
+                    }
+                });
+            }
 
             // Since we have the post loaded we have a transition as well
             getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
@@ -217,6 +238,8 @@ public class PostActivity extends AppCompatActivity {
                     }
                 }
             });
+
+            this.onPostLoaded();
         } else {
             // If post is started with only the ID of the post
             postId = extras.getString(POST_ID_KEY);

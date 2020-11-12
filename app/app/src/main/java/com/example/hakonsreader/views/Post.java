@@ -26,6 +26,8 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +64,8 @@ public class Post extends RelativeLayout {
      */
     private boolean postOpened = false;
     private int maxContentHeight = NO_MAX_HEIGHT;
+
+    private Callback imageLoadedCallback;
 
 
     public Post(Context context) {
@@ -100,6 +104,17 @@ public class Post extends RelativeLayout {
 
     public void setHideScore(boolean hideScore) {
         binding.postFullBar.setHideScore(hideScore);
+    }
+
+    /**
+     * Sets the {@link Callback} to use for when the post is an image and the image has finished loading.
+     * 
+     * <p>This must be set before {@link Post#setPostData(RedditPost)}</p>
+     *
+     * @param imageLoadedCallback The callback for when images are finished loading
+     */
+    public void setImageLoadedCallback(Callback imageLoadedCallback) {
+        this.imageLoadedCallback = imageLoadedCallback;
     }
 
     /**
@@ -241,6 +256,7 @@ public class Post extends RelativeLayout {
         switch (post.getPostType()) {
             case IMAGE:
                 ContentImage image = new ContentImage(context);
+                image.setImageLoadedCallback(imageLoadedCallback);
                 image.setPost(postData);
                 content = image;
                 break;

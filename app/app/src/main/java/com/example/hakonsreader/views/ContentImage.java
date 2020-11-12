@@ -16,6 +16,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.misc.PhotoViewDoubleTapListener;
 import com.example.hakonsreader.views.util.ClickHandler;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -28,6 +29,7 @@ public class ContentImage extends PhotoView {
 
     private RedditPost post;
     private String imageUrl;
+    private Callback imageLoadedCallback;
 
     public ContentImage(Context context) {
         this(context, null, 0);
@@ -63,6 +65,17 @@ public class ContentImage extends PhotoView {
         this.post = post;
         this.imageUrl = imageUrl;
         this.updateView();
+    }
+
+    /**
+     * Sets the {@link Callback} to use for when the post is an image and the image has finished loading
+     *
+     * <p>This must be set before {@link Post#setPostData(RedditPost)}</p>
+     *
+     * @param imageLoadedCallback The callback for when images are finished loading
+     */
+    public void setImageLoadedCallback(Callback imageLoadedCallback) {
+        this.imageLoadedCallback = imageLoadedCallback;
     }
 
     /**
@@ -123,7 +136,9 @@ public class ContentImage extends PhotoView {
                 c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
             }
 
-            c.into(this);
+            Log.d(TAG, "updateView: " + imageLoadedCallback);
+
+            c.into(this, imageLoadedCallback);
         } catch (RuntimeException e) {
             e.printStackTrace();
             Log.d(TAG, "updateView:\n\n\n\n--------------------------- ERROR LOADING IMAGE" +
