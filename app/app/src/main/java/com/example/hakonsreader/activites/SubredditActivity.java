@@ -88,6 +88,9 @@ public class SubredditActivity extends AppCompatActivity implements LockableSlid
         getSupportFragmentManager().putFragment(outState, SAVED_SUBREDDIT, fragment);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void lock(boolean lock) {
         if (lock) {

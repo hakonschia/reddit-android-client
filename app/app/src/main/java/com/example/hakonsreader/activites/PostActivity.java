@@ -21,17 +21,19 @@ import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
+import com.example.hakonsreader.interfaces.LockableSlidr;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.viewmodels.CommentsViewModel;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
+import com.r0adkll.slidr.model.SlidrInterface;
 import com.squareup.picasso.Callback;
 
 /**
  * Activity to show a Reddit post with its comments
  */
-public class PostActivity extends AppCompatActivity {
+public class PostActivity extends AppCompatActivity implements LockableSlidr {
     private static final String TAG = "PostActivity";
 
     /**
@@ -84,11 +86,12 @@ public class PostActivity extends AppCompatActivity {
 
     private RedditPost post;
     private RedditListing replyingTo;
+    private SlidrInterface slidrInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Slidr.attach(this);
+        slidrInterface = Slidr.attach(this);
 
         binding = ActivityPostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -402,5 +405,17 @@ public class PostActivity extends AppCompatActivity {
      */
     public void replyToPost(View view) {
         this.replyTo(post);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void lock(boolean lock) {
+        if (lock) {
+            slidrInterface.lock();
+        } else {
+            slidrInterface.unlock();
+        }
     }
 }

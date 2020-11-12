@@ -49,6 +49,9 @@ public class ProfileActivity extends AppCompatActivity implements LockableSlidr 
         App.get().setActiveActivity(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void lock(boolean lock) {
         if (lock) {
