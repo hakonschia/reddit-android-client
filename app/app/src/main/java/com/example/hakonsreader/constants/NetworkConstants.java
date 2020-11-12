@@ -32,5 +32,5 @@ public class NetworkConstants {
     /**
      * A space separated string containing the OAuth scopes needed for the application
      */
-    public static final String SCOPE = "identity read vote submit mysubreddits subscribe history flair edit save account";
+    public static final String SCOPE = "identity read vote submit mysubreddits subscribe history flair edit save account modposts";
 }
