@@ -315,9 +315,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         // it's updated if the user has changed the value since the adapter was created
         int hideThreshold = App.get().getAutoHideScoreThreshold();
         comments.forEach(comment -> {
-            // If the score is hidden don't hide comments as we don't know the actual score (otherwise
-            // if the threshold is large enough all scores with hidden comments would be hidden)
-            if (!comment.isScoreHidden() && hideThreshold >= comment.getScore()) {
+            // Hide comments if the score is below the threshold
+            // Also hide comments if Reddit says they should be so (these are typically comments hidden because
+            // of downvotes, but can't be determined by a threshold since they have a hidden score)
+            if (comment.isCollapsed() || hideThreshold >= comment.getScore()) {
                 hideComments(comment);
             }
         });

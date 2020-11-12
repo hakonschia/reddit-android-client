@@ -71,6 +71,9 @@ public class RedditComment extends RedditListing {
     @SerializedName("saved")
     private boolean saved;
 
+    @SerializedName("collapsed")
+    private boolean collapsed;
+
 
     /**
      * Retrieves the markdown body. For HTML use {@link RedditComment#getBodyHtml()}
@@ -285,6 +288,17 @@ public class RedditComment extends RedditListing {
     public boolean isSaved() {
         return saved;
     }
+
+    /**
+     * Returns if the comment should be collapsed by default. Collapsed comments don't show their
+     * children, and should show graphically that they are collapsed
+     *
+     * @return True if the comment should be collapsed
+     */
+    public boolean isCollapsed() {
+        return collapsed;
+    }
+
 
     /**
      * Set if this comment is saved or not. This should only be used when a comment has been
