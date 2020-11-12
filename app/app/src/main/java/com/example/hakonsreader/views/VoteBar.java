@@ -110,7 +110,7 @@ public class VoteBar extends ConstraintLayout {
 
         // Disable both buttons, and enable them again after a short time delay
         // This is to avoid spamming. It's still possible to get a 429 Too Many Requests, but it should
-        // reduce the amount of times that would happen (and it removes potenial missclicks right after a vote)
+        // reduce the amount of times that would happen (and it removes potential missclicks right after a vote)
         binding.upvote.setEnabled(false);
         binding.downvote.setEnabled(false);
 

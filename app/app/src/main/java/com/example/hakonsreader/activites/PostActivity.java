@@ -9,6 +9,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -96,20 +97,7 @@ public class PostActivity extends AppCompatActivity {
         // have had a chance to load, so always assume there are comments (since there usually are)
         binding.setNoComments(false);
 
-        commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
-        commentsViewModel.onLoadingChange().observe(this, binding.loadingIcon::onCountChange);
-        commentsViewModel.getPost().observe(this, newPost -> {
-            boolean postPreviouslySet = post != null;
-            post = newPost;
-
-            // If we have a post already just update the info (the content gets reloaded which looks weird for videos)
-            if (postPreviouslySet) {
-                this.updatePostInfo();
-            } else {
-                this.onPostLoaded();
-            }
-        });
-        commentsViewModel.getError().observe(this, error -> Util.handleGenericResponseErrors(binding.parentLayout, error.getError(), error.getThrowable()));
+        this.setupCommentsViewModel();
 
         binding.post.setHideScore(getIntent().getExtras().getBoolean(HIDE_SCORE_KEY));
         binding.post.setMaxContentHeight((int)(App.get().getScreenHeight() * MAX_CONTENT_HEIGHT_PERCENTAGE));
@@ -132,7 +120,30 @@ public class PostActivity extends AppCompatActivity {
         });
         binding.commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this, R.color.colorAccent));
 
+        binding.parentLayout.addTransitionListener(new MotionLayout.TransitionListener() {
+            @Override
+            public void onTransitionCompleted(MotionLayout motionLayout, int currentId) {
+                // Pause video when the transition has finished to the end
+                // We could potentially pause it earlier, like when the transition is halfway done?
+                // We also can start it when we reach the start, not sure if that is good or bad
+                if (currentId == R.id.end) {
+                    binding.post.pauseVideo();
+                }
+            }
 
+            @Override
+            public void onTransitionStarted(MotionLayout motionLayout, int startId, int endId) {
+                // Not implemented
+            }
+            @Override
+            public void onTransitionChange(MotionLayout motionLayout, int startId, int endId, float progress) {
+                // Not implemented
+            }
+            @Override
+            public void onTransitionTrigger(MotionLayout motionLayout, int triggerId, boolean positive, float progress) {
+                // Not implemented
+            }
+        });
         // TODO when the animation is finished hiding the post videos should be paused
     }
 
@@ -186,6 +197,27 @@ public class PostActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * Sets up {@link PostActivity#commentsViewModel}
+     */
+    private void setupCommentsViewModel() {
+        commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
+        commentsViewModel.onLoadingChange().observe(this, binding.loadingIcon::onCountChange);
+        commentsViewModel.getPost().observe(this, newPost -> {
+            boolean postPreviouslySet = post != null;
+            post = newPost;
+
+            // If we have a post already just update the info (the content gets reloaded which looks weird for videos)
+            if (postPreviouslySet) {
+                this.updatePostInfo();
+            } else {
+                this.onPostLoaded();
+            }
+        });
+        commentsViewModel.getError().observe(this, error -> Util.handleGenericResponseErrors(binding.parentLayout, error.getError(), error.getThrowable()));
+    }
+
     /**
      * Gets the post ID from either the intent extras or the intent URI data if the activity was started
      * from a URI intent
@@ -215,7 +247,6 @@ public class PostActivity extends AppCompatActivity {
                     public void onSuccess() {
                         startPostponedEnterTransition();
                     }
-
                     @Override
                     public void onError(Exception e) {
                         startPostponedEnterTransition();
