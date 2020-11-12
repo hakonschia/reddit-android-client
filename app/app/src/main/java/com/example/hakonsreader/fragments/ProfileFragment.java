@@ -101,7 +101,8 @@ public class ProfileFragment extends Fragment {
      */
     public static ProfileFragment newInstance(String username) {
         // Hardcoding values like this is obviously bad, but this is the only case we're doing something special
-        if (username.equalsIgnoreCase("me") || username.equalsIgnoreCase(App.getStoredUser().getName())) {
+        User user = App.getStoredUser();
+        if (username.equalsIgnoreCase("me") || (user != null && username.equalsIgnoreCase(user.getName()))) {
             return ProfileFragment.newInstance();
         }
 
