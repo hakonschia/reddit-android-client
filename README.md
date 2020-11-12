@@ -1,7 +1,7 @@
 
 # ![logo](/images/logo.png) An unofficial Reddit client for Android
 
-An unofficial Reddit client for Android. The application allows for users to log in with their Reddit account and perform actions such as voting, commenting, and retrieving customized front page posts. There is currently no mod support.
+An unofficial Reddit client for Android. The application allows for users to log in with their Reddit account and perform actions such as voting, commenting, and retrieving customized front page posts. Mod support is limited.
 
 Includes an Android wrapper for the Reddit API (for installed OAuth applications only) that provides basic functionality, as well as basic persistence with [Room](https://developer.android.com/training/data-storage/room).
 
@@ -25,7 +25,12 @@ The downloadable [APK](apk/app-release.apk) contains the application at commit `
 To retrieve the latest version clone the repository and install manually via Android Studio (this will be a debug version).
 
 
-## Thank you to these libraries
+## Acknowledgements
+
+Thank you to Reddit for making this project possible by providing an open API.
+
+
+### Libraries used
 
 * [Retrofit](https://github.com/square/retrofit) - Used to create the wrapper for the Reddit API
   * [Gson](https://github.com/google/gson) - For API serialization and other JSON needs
@@ -38,4 +43,4 @@ To retrieve the latest version clone the repository and install manually via And
 * [Ticker](https://github.com/robinhood/ticker) - A ticker style TextView that smoothly animates changes (by sliding characters up/down)
 * [ProcessPhoenix](https://github.com/JakeWharton/ProcessPhoenix) - Used to restart the application
 
-As well as various code snippets acknowledged throughout the code, and Reddit for providing an open API to make this project possible.
+As well as various code snippets acknowledged throughout the code.
