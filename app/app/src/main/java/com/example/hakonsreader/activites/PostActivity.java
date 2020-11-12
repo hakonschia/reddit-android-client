@@ -146,6 +146,8 @@ public class PostActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        App.get().setActiveActivity(this);
+
         // Only resume if the video was actually playing when pausing
         if (videoPlayingWhenPaused) {
             binding.post.playVideo();

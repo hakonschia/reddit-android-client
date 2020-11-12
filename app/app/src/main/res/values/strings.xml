@@ -12,6 +12,9 @@
     <string name="btnLogIn">Log in</string>
     <string name="logOut">Log out</string>
 
+    <string name="applicationAccessRevokedHeader">Application access revoked</string>
+    <string name="applicationAccessRevokedContent">The applications access to your account has been revoked.\n\nYou will have to log in again.</string>
+
     <string name="btnSubscribeSubscribe">+ Subscribe</string>
     <string name="btnSubscrubeUnsubscribe">- Unsubscribe</string>
     <plurals name="amountOfSubscribers">

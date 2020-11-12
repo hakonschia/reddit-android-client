@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     @Override
     protected void onResume() {
         super.onResume();
+        App.get().setActiveActivity(this);
 
         Uri uri = getIntent().getData();
         if (uri == null) {

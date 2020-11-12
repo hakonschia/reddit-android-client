@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api;
 
 import com.example.hakonsreader.api.constants.OAuthConstants;
+import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.interceptors.UserAgentInterceptor;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
@@ -23,6 +24,7 @@ import com.example.hakonsreader.api.responses.GenericError;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
@@ -197,6 +199,11 @@ public class RedditApi {
      */
     private HttpLoggingInterceptor logger;
 
+    /**
+     * The callback for when the access token isn't valid
+     */
+    private OnFailure onInvalidToken;
+
 
     /* ----------------- Client specific variables ----------------- */
     /**
@@ -293,6 +300,7 @@ public class RedditApi {
         private HttpLoggingInterceptor logger;
         private String callbackUrl;
         private String deviceId;
+        private OnFailure onInvalidToken;
 
 
         /**
@@ -331,6 +339,7 @@ public class RedditApi {
          * <p>If the passed access token is null it is not added</p>
          *
          * @param accessToken The token to use
+         * @return This builder
          */
         public Builder accessToken(AccessToken accessToken) {
             if (accessToken != null) {
@@ -345,6 +354,7 @@ public class RedditApi {
          * This sets the listener for what to do when a new token is received by the API
          *
          * @param onNewToken The token listener. Holds an {@link AccessToken} object
+         * @return This builder
          */
         public Builder onNewToken(OnNewToken onNewToken) {
             this.onNewToken = onNewToken;
@@ -366,6 +376,7 @@ public class RedditApi {
          * <p>This must match the callback URL set in <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
          *
          * @param callbackUrl The URL to use for OAuth access tokens
+         * @return This builder
          */
         public Builder callbackUrl(String callbackUrl) {
             this.callbackUrl = callbackUrl;
@@ -380,9 +391,25 @@ public class RedditApi {
          *     Reddit OAuth documentation</a> for more information</p>
          *
          * @param deviceId The device ID to use
+         * @return This builder
          */
         public Builder deviceId(String deviceId) {
             this.deviceId = deviceId;
+            return this;
+        }
+
+        /**
+         * Sets a callback for when the API attempts to refresh an access token that is no longer valid.
+         *
+         * <p>This will be called if the access token set with {@link Builder#accessToken(AccessToken)}
+         * wasn't valid (ie. it can't be refreshed anymore), or if the user has revoked the applications
+         * access from <a href="https://reddit.com/prefs/apps">reddit.com/prefs/apps</a></p>
+         *
+         * @param onInvalidToken The callback for when tokens are now invalid
+         * @return This builder
+         */
+        public Builder onInvalidToken(OnFailure onInvalidToken) {
+            this.onInvalidToken = onInvalidToken;
             return this;
         }
 
@@ -406,6 +433,7 @@ public class RedditApi {
             api.logger = logger;
             api.callbackUrl = callbackUrl;
             api.deviceId = deviceId;
+            api.onInvalidToken = onInvalidToken;
 
             api.createServices();
 
@@ -618,12 +646,13 @@ public class RedditApi {
 
         @Override
         public Request authenticate(Route route, okhttp3.Response response) {
-            AccessToken newToken;
+            AccessToken newToken = null;
 
-            // If we have a previous access token with a refresh token
+            // If we have an access token with a refresh token the token is for a logged in user and can be refreshed
             if (accessToken.getRefreshToken() != null) {
                 newToken = refreshToken();
 
+                // Token refreshed
                 if (newToken != null) {
                     // The response does not send a new refresh token, so make sure the old one is saved
                     newToken.setRefreshToken(accessToken.getRefreshToken());
@@ -633,15 +662,16 @@ public class RedditApi {
                 newToken = newNonLoggedInToken();
             }
 
-            // No new token received
+            // New token received
             if (newToken != null) {
                 setTokenInternal(newToken);
 
                 return response.request().newBuilder()
-                        .header("Authorization", accessToken.generateHeaderString())
+                        .header("Authorization", newToken.generateHeaderString())
                         .build();
             } else {
-                return response.request();
+                // No new token received, we can't do anything so cancel the request
+                return null;
             }
         }
 
@@ -653,11 +683,29 @@ public class RedditApi {
         private AccessToken refreshToken() {
             AccessToken newToken = null;
             try {
-                newToken = oauthService.refreshToken(
+                Response<AccessToken> call =  oauthService.refreshToken(
                         basicAuthHeader,
                         accessToken.getRefreshToken(),
                         OAuthConstants.GRANT_TYPE_REFRESH
-                ).execute().body();
+                ).execute();
+
+                newToken = call.body();
+
+                // If we get a 400 Bad Request when attempting to refresh the token, the token has been
+                // invalidated outside of the control of the API (ie. the applications access from reddit.com/prefs/apps
+                // was revoked), or the access token set was never valid
+                // Call the listener registered when the API object was built to notify that the token isn't valid anymore
+                int code = call.code();
+                if (code == 400 && onInvalidToken != null) {
+                    onInvalidToken.onFailure(
+                            new GenericError(code),
+                            new InvalidAccessTokenException("The access token couldn't be refreshed. Either the access token set when building the API object" +
+                                    "was never valid, or the user has revoked the applications access to their account.")
+                    );
+
+                    // We can get a new token for non-logged in users here, not sure if it makes sense
+                    // that we handle that and automatically give the API users a new token
+                }
 
                 if (newToken != null) {
                     newToken.setRefreshToken(accessToken.getRefreshToken());
@@ -675,6 +723,7 @@ public class RedditApi {
      * a new token for non-logged in users is retrieved
      */
     private class NoTokenInterceptor implements Interceptor {
+        @NotNull
         @Override
         public okhttp3.Response intercept(Chain chain) throws IOException {
             Request original = chain.request();

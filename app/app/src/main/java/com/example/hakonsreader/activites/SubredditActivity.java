@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.ItemLoadingListener;
@@ -75,6 +76,12 @@ public class SubredditActivity extends AppCompatActivity implements SlidrActivit
             fragment = SubredditFragment.newInstance(subreddit);
             getSupportFragmentManager().beginTransaction().add(R.id.subredditActivityFragment, fragment, SAVED_SUBREDDIT).commit();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        App.get().setActiveActivity(this);
     }
 
     @Override

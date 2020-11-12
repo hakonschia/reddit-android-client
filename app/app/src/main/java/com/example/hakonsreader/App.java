@@ -1,5 +1,7 @@
 package com.example.hakonsreader;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,8 +10,11 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -17,6 +22,7 @@ import androidx.preference.PreferenceManager;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.persistence.AppDatabase;
+import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
@@ -33,6 +39,7 @@ import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
+import java.net.ProtocolException;
 import java.util.UUID;
 
 import io.noties.markwon.Markwon;
@@ -40,6 +47,8 @@ import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TablePlugin;
 import okhttp3.logging.HttpLoggingInterceptor;
+
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 
 
 /**
@@ -65,6 +74,8 @@ public class App extends Application {
 
     private Markwon markwon;
     private MarkdownAdjuster adjuster;
+
+    private Activity activeActivity;
 
     private static App app;
 
@@ -183,6 +194,7 @@ public class App extends Application {
                  .loggerLevel(HttpLoggingInterceptor.Level.BODY)
                  .callbackUrl(NetworkConstants.CALLBACK_URL)
                  .deviceId(UUID.randomUUID().toString())
+                 .onInvalidToken(this::onInvalidAccessToken)
                  .build();
     }
 
@@ -428,6 +440,18 @@ public class App extends Application {
         return new SlidrConfig.Builder().position(pos).distanceThreshold(0.15f);
     }
 
+
+    /**
+     * Sets the activity currently active. This is used to show a dialog on the rare occasion that
+     * the user has revoked the applications access and a dialog must be shown that they must log in again
+     *
+     * @param activeActivity The activity currently active
+     */
+    public void setActiveActivity(Activity activeActivity) {
+        this.activeActivity = activeActivity;
+    }
+
+
     /**
      * @return Retrieves the user information stored in SharedPreferences
      */
@@ -444,6 +468,34 @@ public class App extends Application {
         SharedPreferencesManager.put(SharedPreferencesConstants.USER_INFO, user);
     }
 
+    /**
+     * Handles when the API notifies that the access token is no longer valid, and the user should
+     * be logged out and prompted to log back in.
+     *
+     * @param error The GenericError received
+     * @param throwable The throwable received
+     */
+    private void onInvalidAccessToken(GenericError error, Throwable throwable) {
+        App.get().clearUserInfo();
+
+        // Setup the API again to remove the old token (it is not handled internally)
+        setupRedditApi();
+
+        // Should we also recreate the app? We could have posts for the user, be in the profile etc
+
+        // Storing an activity like this is probably very bad? What happens if we forget to use
+        // setActiveActivity()? I don't know how else to overlay a dialog from an Application class
+        activeActivity.runOnUiThread(() -> {
+            new AlertDialog.Builder(activeActivity)
+                    .setTitle(R.string.applicationAccessRevokedHeader)
+                    .setMessage(R.string.applicationAccessRevokedContent)
+                    .show();
+        });
+    }
+
+    /**
+     * Clears any user information stored, logging a user out. The application will be restarted
+     */
     public void logOut() {
         // Revoke token
         redditApi.revokeRefreshToken(response -> {

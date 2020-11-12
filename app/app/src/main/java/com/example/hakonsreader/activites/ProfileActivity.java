@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.fragments.ProfileFragment;
 import com.r0adkll.slidr.Slidr;
@@ -36,5 +37,11 @@ public class ProfileActivity extends AppCompatActivity {
                 .commit();
 
         Slidr.attach(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        App.get().setActiveActivity(this);
     }
 }

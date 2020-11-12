@@ -178,6 +178,12 @@ public class ReplyActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        App.get().setActiveActivity(this);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         binding = null;
