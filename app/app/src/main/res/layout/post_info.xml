@@ -142,15 +142,18 @@
             android:id="@+id/authorFlair"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="8dp"
 
             app:authorFlair="@{post}"
 
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="@+id/author"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/author"
             app:layout_constraintTop_toTopOf="@+id/author"
-            tools:layout_width="50dp"
-            tools:layout_height="0dp"/>
+            tools:layout_height="0dp"
+            tools:layout_width="50dp" />
 
         <LinearLayout
             android:id="@+id/tags"
