@@ -78,6 +78,9 @@ public class RedditPost extends RedditListing {
     @SerializedName("saved")
     private boolean saved;
 
+    @SerializedName("can_mod_post")
+    private boolean isUserMod;
+
 
     @SerializedName("author_flair_background_color")
     private String authorFlairBackgroundColor;
@@ -250,6 +253,13 @@ public class RedditPost extends RedditListing {
      */
     public boolean isSaved() {
         return saved;
+    }
+
+    /**
+     * @return True if the currently logged in user is a mod in the subreddit the post is in
+     */
+    public boolean isUserMod() {
+        return isUserMod;
     }
 
     /**
@@ -569,6 +579,10 @@ public class RedditPost extends RedditListing {
 
     public void setSaved(boolean saved) {
         this.saved = saved;
+    }
+
+    public void setUserMod(boolean userMod) {
+        isUserMod = userMod;
     }
 
     /**

@@ -32,6 +32,7 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest, Saveab
     private final VoteableRequestModel voteRequest;
     private final ReplyableRequestModel replyRequest;
     private final SaveableRequestModel saveRequest;
+    private final ModRequestModel modRequest;
 
     public CommentRequest(String commentId, AccessToken accessToken, CommentService api) {
         this.commentId = commentId;
@@ -41,6 +42,7 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest, Saveab
         this.voteRequest = new VoteableRequestModel(accessToken, api);
         this.replyRequest = new ReplyableRequestModel(accessToken, api);
         this.saveRequest = new SaveableRequestModel(accessToken, api);
+        this.modRequest = new ModRequestModel(accessToken, api);
     }
 
     /**
@@ -175,5 +177,63 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest, Saveab
     @EverythingIsNonNull
     public void vote(VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
         voteRequest.vote(Thing.COMMENT, commentId, type, onResponse, onFailure);
+    }
+
+
+    /**
+     * Distinguish the comment as a moderator. If the currently logged in user is not a moderator
+     * in the subreddit the post is in this will fail
+     *
+     * <p>OAuth scope required: {@code modposts}</p>
+     *
+     * @param onResponse The callback for successful requests. Holds the new comment data
+     * @param onFailure The callback for failed requests
+     */
+    public void distinguishAsMod(OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+        // We want to distinguish, but not sticky
+        modRequest.distinguishAsModComment(commentId, true, false, onResponse, onFailure);
+    }
+
+    /**
+     * Remove the distinguish as mod on the comment comment. This will also remove the sticky if
+     * the comment is stickied.
+     *
+     * <p>If the currently logged in user is not a moderator in the subreddit the post is in this will fail</p>
+     *
+     * <p>OAuth scope required: {@code modposts}</p>
+     *
+     * @param onResponse The callback for successful requests. Holds the new comment data
+     * @param onFailure The callback for failed requests
+     */
+    public void removeDistinguishAsMod(OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+        // We want to distinguish, but not sticky
+        modRequest.distinguishAsModComment(commentId, false, false, onResponse, onFailure);
+    }
+
+    /**
+     * Sticky the comment. This will also distinguish the comment as a moderator. This only works
+     * on top-level comments
+     *
+     * <p>OAuth scope required: {@code modposts}</p>
+     *
+     * @param onResponse The callback for successful requests. Holds the new comment data
+     * @param onFailure The callback for failed requests
+     */
+    public void sticky(OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+        modRequest.distinguishAsModComment(commentId, true, true, onResponse, onFailure);
+    }
+
+    /**
+     * Removes the sticky on the comment, keeps the distinguish. To remove both use {@link CommentRequest#removeDistinguishAsMod(OnResponse, OnFailure)}
+     *
+     * <p>If the currently logged in user is not a moderator in the subreddit the post is in this will fail</p>
+     *
+     * <p>OAuth scope required: {@code modposts}</p>
+     *
+     * @param onResponse The callback for successful requests. Holds the new comment data
+     * @param onFailure The callback for failed requests
+     */
+    public void removeSticky(OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+        modRequest.distinguishAsModComment(commentId, true, false, onResponse, onFailure);
     }
 }

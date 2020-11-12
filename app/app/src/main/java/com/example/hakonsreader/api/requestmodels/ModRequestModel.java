@@ -1,0 +1,67 @@
+package com.example.hakonsreader.api.requestmodels;
+
+import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.enums.Thing;
+import com.example.hakonsreader.api.interfaces.OnFailure;
+import com.example.hakonsreader.api.interfaces.OnResponse;
+import com.example.hakonsreader.api.model.AccessToken;
+import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.responses.GenericError;
+import com.example.hakonsreader.api.responses.JsonResponse;
+import com.example.hakonsreader.api.service.ModService;
+import com.example.hakonsreader.api.utils.Util;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ModRequestModel {
+
+    private final AccessToken accessToken;
+    private final ModService api;
+
+    public ModRequestModel(AccessToken accessToken, ModService api) {
+        this.accessToken = accessToken;
+        this.api = api;
+    }
+
+    /**
+     * Distinguish a comment as mod, and optionally sticky it
+     *
+     * @param id The ID of the comment to distinguish
+     * @param distinguish True to distinguish as mod, false to remove previous distinguish
+     * @param sticky True to also sticky the comment. This is only possible on top-level comments
+     * @param onResponse Callback for successful requests. Holds the updated comment info
+     * @param onFailure Callback for failed requests.
+     */
+    public void distinguishAsModComment(String id, boolean distinguish, boolean sticky, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+        api.distinguishAsMod(
+                Util.createFullName(Thing.COMMENT, id),
+                distinguish ? "yes" : "no",
+                sticky,
+                RedditApi.API_TYPE,
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<JsonResponse>() {
+            @Override
+            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                if (response.isSuccessful()) {
+                    JsonResponse body = response.body();
+
+                    if (body != null) {
+                        RedditComment comment = (RedditComment) body.getListings().get(0);
+                        onResponse.onResponse(comment);
+                    } else {
+                        Util.handleHttpErrors(response, onFailure);
+                    }
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonResponse> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
+    }
+}

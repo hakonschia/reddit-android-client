@@ -191,6 +191,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
+     * Notifies that a comment has been updated
+     *
+     * @param comment The comment updated
+     */
+    public void notifyItemChanged(RedditComment comment) {
+        int pos = comments.indexOf(comment);
+        if (pos != -1) {
+            notifyItemChanged(pos);
+        }
+    }
+
+    /**
      * Removes all comments from the list
      */
     public void clearComments() {

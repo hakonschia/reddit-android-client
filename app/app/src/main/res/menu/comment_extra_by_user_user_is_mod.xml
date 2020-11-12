@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- This menu is for when a comment is posted by the logged in user, and the user
+     is a mod in the subreddit the post of the comment is in. This allows the user to distinguish
+     the comment as a mod comment-->
     <item
-        android:id=""
+        android:id="@+id/menuDistinguishCommentAsMod"
+        android:title="@string/commentDistinguishAsMod" />
+
+    <item
+        android:id="@+id/menuStickyComment"
+        android:title="@string/commentSticky" />
 </menu>

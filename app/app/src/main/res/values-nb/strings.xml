@@ -160,4 +160,9 @@
     <string name="applicationAccessRevokedContent">Applikasjonens tilgang til brukeren din har blitt opphevet.\n\nDu må logge inn igjen.</string>
     <string name="webViewOpenInBrowser">Åpne i nettleser</string>
     <string name="webViewRefresh">Oppdater</string>
+    <string name="commentDistinguishAsMod">Vis som moderator</string>
+    <string name="commentSticky">Vis som moderator og fest</string>
+    <string name="lockComment">Lås</string>
+    <string name="commentRemoveModDistinguish">Ikke vis som moderator</string>
+    <string name="commentRemoveSticky">Fjern kommentarfeste</string>
 </resources>

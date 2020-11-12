@@ -74,6 +74,8 @@ public class RedditComment extends RedditListing {
     @SerializedName("collapsed")
     private boolean collapsed;
 
+    @SerializedName("can_mod_post")
+    private boolean isUserMod;
 
     /**
      * Retrieves the markdown body. For HTML use {@link RedditComment#getBodyHtml()}
@@ -299,6 +301,12 @@ public class RedditComment extends RedditListing {
         return collapsed;
     }
 
+    /**
+     * @return True if the currently logged in user is a mod of the subreddit the post of the comment is in
+     */
+    public boolean isUserMod() {
+        return isUserMod;
+    }
 
     /**
      * Set if this comment is saved or not. This should only be used when a comment has been

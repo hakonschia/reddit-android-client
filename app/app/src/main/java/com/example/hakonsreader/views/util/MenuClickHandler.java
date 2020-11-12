@@ -14,11 +14,13 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.PostTimeSort;
+import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.misc.Util;
+import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -39,12 +41,13 @@ public class MenuClickHandler {
      *
      * @param view The view clicked
      * @param comment The comment the popup is for
+     * @param adapter The RecyclerView adapter the comment is in
      */
-    public static void showPopupForCommentExtra(View view, RedditComment comment) {
+    public static void showPopupForCommentExtra(View view, RedditComment comment, CommentsAdapter adapter) {
         User user = App.getStoredUser();
 
         if (user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
-            showPopupForCommentExtraForLoggedInUser(view, comment);
+            showPopupForCommentExtraForLoggedInUser(view, comment, adapter);
         } else {
             showPopupForCommentExtraForNonLoggedInUser(view, comment);
         }
@@ -53,15 +56,36 @@ public class MenuClickHandler {
     /**
      * Shows the popup for comments for when the comment is posted by the user currently logged in
      *
-     * <p>See also: {@link MenuClickHandler#showPopupForCommentExtra(View, RedditComment)}</p>
+     * <p>See also: {@link MenuClickHandler#showPopupForCommentExtra(View, RedditComment, CommentsAdapter)}</p>
      *
      * @param view The view clicked (where the popup will be attached)
      * @param comment The comment the popup is for
      */
-    public static void showPopupForCommentExtraForLoggedInUser(View view, RedditComment comment) {
+    public static void showPopupForCommentExtraForLoggedInUser(View view, RedditComment comment, CommentsAdapter adapter) {
+        Log.d(TAG, "showPopupForCommentExtraForLoggedInUser: ");
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.comment_extra_by_user);
         menu.inflate(R.menu.comment_extra_generic_for_all_users);
+
+        // Add mod specific if user is a mod in the subreddit the post is in
+        // TODO only top-level comments can be stickied, but any comment can be distinguished
+        if (comment.isUserMod()) {
+            menu.inflate(R.menu.comment_extra_by_user_user_is_mod);
+
+            // Set text to "Undistinguish"
+            if (comment.isMod()) {
+                MenuItem modItem = menu.getMenu().findItem(R.id.menuDistinguishCommentAsMod);
+                modItem.setTitle(R.string.commentRemoveModDistinguish);
+            }
+
+            // Set text to "Remove sticky"
+            if (comment.isStickied()) {
+                MenuItem modItem = menu.getMenu().findItem(R.id.menuStickyComment);
+                modItem.setTitle(R.string.commentRemoveSticky);
+            }
+        } else {
+            Log.d(TAG, "showPopupForCommentExtraForLoggedInUser: not a mod");
+        }
 
         // Default is "Save comment", if comment already is saved, change the text
         if (comment.isSaved()) {
@@ -71,11 +95,17 @@ public class MenuClickHandler {
 
         RedditApi api = App.get().getApi();
 
+        // This response handler will work for any API call updating the distinguish/sticky status of a comment
+        OnResponse<RedditComment> distinguishAndStickyResponse = response -> {
+            comment.setDistinguished(response.getDistinguished());
+            comment.setStickied(response.isStickied());
+            adapter.notifyItemChanged(comment);
+        };
+
         menu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
 
             if (itemId == R.id.menuDeleteComment) {
-                Log.d(TAG, "showPopupForCommentExtraForLoggerInUser: Deleting comment");
                 // This won't actually return anything valid, so we just assume the comment was deleted
                 // This should update the adapter probably?
                 api.comment(comment.getId()).delete(response -> Snackbar.make(view, R.string.commentDeleted, LENGTH_SHORT).show(), ((error, t) -> {
@@ -85,6 +115,26 @@ public class MenuClickHandler {
             } else if (itemId == R.id.menuSaveOrUnsaveComment) {
                 saveCommentOnClick(view, comment);
                 return true;
+            } else if (itemId == R.id.menuDistinguishCommentAsMod) {
+                if (comment.isMod()) {
+                    api.comment(comment.getId()).removeDistinguishAsMod(distinguishAndStickyResponse, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                } else {
+                    api.comment(comment.getId()).distinguishAsMod(distinguishAndStickyResponse, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                }
+            } else if (itemId == R.id.menuStickyComment) {
+                if (comment.isStickied()) {
+                    api.comment(comment.getId()).removeSticky(distinguishAndStickyResponse, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                } else {
+                    api.comment(comment.getId()).sticky(distinguishAndStickyResponse, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                }
             }
 
             return false;
@@ -96,12 +146,13 @@ public class MenuClickHandler {
     /**
      * Shows the popup for comments for when the comment is NOT posted by the user currently logged in
      *
-     * <p>See also: {@link MenuClickHandler#showPopupForCommentExtra(View, RedditComment)}</p>
+     * <p>See also: {@link MenuClickHandler#showPopupForCommentExtra(View, RedditComment, CommentsAdapter)}</p>
      *
      * @param view The view clicked (where the popup will be attached)
      * @param comment The comment the popup is for
      */
     public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment) {
+        Log.d(TAG, "showPopupForCommentExtraForNonLoggedInUser: ");
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.comment_extra_generic_for_all_users);
         menu.inflate(R.menu.comment_extra_not_by_user);

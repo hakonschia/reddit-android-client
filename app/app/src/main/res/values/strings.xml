@@ -248,4 +248,11 @@
 
     <string name="webViewRefresh">Refresh</string>
     <string name="webViewOpenInBrowser">Open in browser</string>
+
+    <string name="commentDistinguishAsMod">Distinguish as mod</string>
+    <string name="commentSticky">Sticky</string>
+    <string name="commentRemoveModDistinguish">Remove mod distinguish</string>
+    <string name="commentRemoveSticky">Remove sticky</string>
+
+    <string name="lockComment">Lock</string>
 </resources>
