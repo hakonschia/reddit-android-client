@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <!-- This menu is for when a comment is posted by the logged in user, and the user
-     is a mod in the subreddit the post of the comment is in. -->
+     is a mod in the subreddit the post of the comment is in. Since stickying comments
+     is only possible on top level comments, it's not included here-->
     <item
         android:id="@+id/menuDistinguishCommentAsMod"
         android:title="@string/commentDistinguishAsMod" />
-
-    <item
-        android:id="@+id/menuStickyComment"
-        android:title="@string/commentSticky" />
 </menu>

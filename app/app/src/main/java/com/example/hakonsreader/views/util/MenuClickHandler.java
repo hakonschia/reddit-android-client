@@ -62,7 +62,6 @@ public class MenuClickHandler {
      * @param comment The comment the popup is for
      */
     public static void showPopupForCommentExtraForLoggedInUser(View view, RedditComment comment, CommentsAdapter adapter) {
-        Log.d(TAG, "showPopupForCommentExtraForLoggedInUser: ");
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.comment_extra_by_user);
         menu.inflate(R.menu.comment_extra_generic_for_all_users);
@@ -70,7 +69,11 @@ public class MenuClickHandler {
         // Add mod specific if user is a mod in the subreddit the post is in
         // TODO only top-level comments can be stickied, but any comment can be distinguished
         if (comment.isUserMod()) {
-            menu.inflate(R.menu.comment_extra_by_user_user_is_mod);
+            if (comment.getDepth() == 0) {
+                menu.inflate(R.menu.comment_extra_by_user_user_is_mod);
+            } else {
+                menu.inflate(R.menu.comment_extra_by_user_user_is_mod_no_sticky);
+            }
 
             // Set text to "Undistinguish"
             if (comment.isMod()) {
@@ -79,7 +82,7 @@ public class MenuClickHandler {
             }
 
             // Set text to "Remove sticky"
-            if (comment.isStickied()) {
+            if (comment.getDepth() == 0 && comment.isStickied()) {
                 MenuItem modItem = menu.getMenu().findItem(R.id.menuStickyComment);
                 modItem.setTitle(R.string.commentRemoveSticky);
             }
