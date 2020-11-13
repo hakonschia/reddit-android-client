@@ -562,13 +562,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     /**
      * Formats the author text based on whether or not it is posted by a and admin or a mod.
-     * If no match is found, the default author color is used
+     * If no match is found, the default author color is used.
+     *
+     * <p>If the comment is by the poster, the typeface will always be set to bold (as well as
+     * potential admin/mod)</p>
      *
      * <p>If multiple values are true, the precedence is:
      * <ol>
      *     <li>Admin</li>
      *     <li>Mod</li>
-     *     <li>Poster (this sets the typeface to bold)</li>
+     *     <li>Poster</li>
      * </ol>
      * </p>
      *
@@ -577,18 +580,72 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     @BindingAdapter("authorTextColorComment")
     public static void formatAuthor(TextView tv, RedditComment comment) {
-        tv.setTypeface(Typeface.DEFAULT);
+        formatAuthorInternal(tv, comment, false);
+    }
+
+    /**
+     * Formats the author text based on whether or not it is posted by a and admin or a mod.
+     * If no match is found, the default author color is used.
+     *
+     * <p>The text is always made italic</p>
+     *
+     * <p>If the comment is by the poster, the typeface will always be set to bold (as well as
+     * potential admin/mod)</p>
+     *
+     * <p>If multiple values are true, the precedence is:
+     * <ol>
+     *     <li>Admin</li>
+     *     <li>Mod</li>
+     *     <li>Poster</li>
+     * </ol>
+     * </p>
+     *
+     * @param tv The TextView to format
+     * @param comment The comment the text is for
+     */
+    @BindingAdapter("authorTextColorCommentWithItalic")
+    public static void formatAuthorWithItalic(TextView tv, RedditComment comment) {
+        formatAuthorInternal(tv, comment, true);
+    }
+
+    /**
+     * Formats the author text based on whether or not it is posted by a and admin or a mod.
+     * If no match is found, the default author color is used.
+     *
+     * <p>If the comment is by the poster, the typeface will always be set to bold (as well as
+     * potential admin/mod)</p>
+     *
+     * <p>If multiple values are true, the precedence is:
+     * <ol>
+     *     <li>Admin</li>
+     *     <li>Mod</li>
+     *     <li>Poster</li>
+     * </ol>
+     * </p>
+     *
+     * @param tv The TextView to format
+     * @param comment The comment the text is for
+     */
+    private static void formatAuthorInternal(TextView tv, RedditComment comment, boolean italic) {
+        Typeface typface;
+        if (comment.isByPoster()) {
+            typface = Typeface.defaultFromStyle(italic ? Typeface.BOLD_ITALIC : Typeface.BOLD);
+        } else {
+            typface = Typeface.defaultFromStyle(italic ? Typeface.ITALIC : Typeface.NORMAL);
+        }
+        tv.setTypeface(typface);
+
         if (comment.isAdmin()) {
             tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.commentByAdminBackground));
         } else if (comment.isMod()) {
             tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.commentByModBackground));
         } else if (comment.isByPoster()) {
-            tv.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.opposite_background));
         } else {
             tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.link_color));
         }
     }
+
 
     /**
      * OnClick listener for "2 more comments" comments.

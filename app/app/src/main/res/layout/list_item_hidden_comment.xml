@@ -37,7 +37,7 @@
 
             android:text='@{comment != null ? @string/author_prefixed(comment.author) : ""}'
             android:textStyle="italic"
-            app:authorTextColorComment="@{comment}"
+            app:authorTextColorCommentWithItalic="@{comment}"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/sideBarsBarrier"
