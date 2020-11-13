@@ -368,7 +368,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
      * @param onFailure The callback for failed requests
      */
     public void sticky(OnResponse<Void> onResponse, OnFailure onFailure) {
-        modRequest.stickyPost(Util.createFullName(Thing.POST, postId), true, onResponse, onFailure);
+        modRequest.stickyPost(postId, true, onResponse, onFailure);
     }
 
     /**
@@ -383,6 +383,6 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
      * @param onFailure The callback for failed requests
      */
     public void removeSticky(OnResponse<Void> onResponse, OnFailure onFailure) {
-        modRequest.stickyPost(Util.createFullName(Thing.POST, postId), false, onResponse, onFailure);
+        modRequest.stickyPost(postId, false, onResponse, onFailure);
     }
 }

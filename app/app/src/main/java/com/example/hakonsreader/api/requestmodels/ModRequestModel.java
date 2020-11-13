@@ -104,9 +104,19 @@ public class ModRequestModel {
         });
     }
 
-    public void stickyPost(String fullname, boolean sticky, OnResponse<Void> onResponse, OnFailure onFailure) {
+    /**
+     * Sticky or unsticky a post
+     *
+     * @param id The id of the post
+     * @param sticky True to sticky, false to unsticky. If the post is already stickied and this is true,
+     *               a 409 Conflict error will occur
+     * @param onResponse The callback for successful requests. Nothing is returned here, but the callback
+     *                   will be called when the request is successful
+     * @param onFailure The callback for failed requests
+     */
+    public void stickyPost(String id, boolean sticky, OnResponse<Void> onResponse, OnFailure onFailure) {
         api.stickyPost(
-                fullname,
+                Util.createFullName(Thing.POST, id),
                 sticky,
                 RedditApi.API_TYPE,
                 accessToken.generateHeaderString()
@@ -129,7 +139,7 @@ public class ModRequestModel {
 
             @Override
             public void onFailure(Call<JsonResponse> call, Throwable t) {
-
+                onFailure.onFailure(new GenericError(-1), t);
             }
         });
     }
