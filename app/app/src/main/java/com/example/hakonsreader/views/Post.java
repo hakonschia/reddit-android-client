@@ -27,18 +27,15 @@ import com.example.hakonsreader.databinding.PostBinding;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class Post extends RelativeLayout {
     private static final String TAG = "Post";
 
     /**
-     * Flag used for when the {@link Post#maxContentHeight} isn't set
+     * Flag used for when the {@link Post#maxHeight} isn't set
      */
     private static final int NO_MAX_HEIGHT = -1;
 
@@ -53,7 +50,7 @@ public class Post extends RelativeLayout {
      * If set to true the post has been opened in a new activity
      */
     private boolean postOpened = false;
-    private int maxContentHeight = NO_MAX_HEIGHT;
+    private int maxHeight = NO_MAX_HEIGHT;
 
     private Callback imageLoadedCallback;
 
@@ -139,12 +136,12 @@ public class Post extends RelativeLayout {
     }
 
     /**
-     * Sets the max height the content of the post can have.
+     * Sets the max height the post can have
      *
-     * @param maxContentHeight The height limit
+     * @param maxHeight The height limit
      */
-    public void setMaxContentHeight(int maxContentHeight) {
-        this.maxContentHeight = maxContentHeight;
+    public void setMaxHeight(int maxHeight) {
+        this.maxHeight = maxHeight;
     }
 
     /**
@@ -190,16 +187,17 @@ public class Post extends RelativeLayout {
         if (content != null) {
             binding.content.addView(content);
 
-            if (maxContentHeight != NO_MAX_HEIGHT) {
+            if (maxHeight != NO_MAX_HEIGHT) {
                 binding.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
                         int height = content.getMeasuredHeight();
+                        int totalHeight = binding.postsParentLayout.getMeasuredHeight();
 
                         // Content is too large, set new height
-                        if (height >= maxContentHeight) {
+                        if (totalHeight >= maxHeight) {
                             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) content.getLayoutParams();
-                            params.height = maxContentHeight;
+                            params.height = maxHeight - totalHeight + height;
                             content.setLayoutParams(params);
                         }
 

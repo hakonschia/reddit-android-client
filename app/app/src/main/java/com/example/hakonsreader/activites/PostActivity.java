@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -37,10 +36,9 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
     private static final String TAG = "PostActivity";
 
     /**
-     * The percentage of the screen height that the content should at maximum take (this is only the
-     * actual content of the post, and does not include the other post information)
+     * The percentage of the screen height that the post will at maximum take
      */
-    private static final float MAX_CONTENT_HEIGHT_PERCENTAGE = 0.5f;
+    private static final float MAX_POST_HEIGHT_PERCENTAGE = 0.65f;
 
 
     /**
@@ -103,7 +101,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         this.setupCommentsViewModel();
 
         binding.post.setHideScore(getIntent().getExtras().getBoolean(HIDE_SCORE_KEY));
-        binding.post.setMaxContentHeight((int)(App.get().getScreenHeight() * MAX_CONTENT_HEIGHT_PERCENTAGE));
+        binding.post.setMaxHeight((int)(App.get().getScreenHeight() * MAX_POST_HEIGHT_PERCENTAGE));
         // Don't allow to open the post again when we are now in the post
         binding.post.setAllowPostOpen(false);
 
