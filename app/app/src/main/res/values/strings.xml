@@ -250,9 +250,16 @@
     <string name="webViewOpenInBrowser">Open in browser</string>
 
     <string name="commentDistinguishAsMod">Distinguish as mod</string>
-    <string name="commentSticky">Sticky</string>
+    <string name="commentSticky">Sticky and distinguish as mod</string>
     <string name="commentRemoveModDistinguish">Remove mod distinguish</string>
     <string name="commentRemoveSticky">Remove sticky</string>
+
+    <!-- These strings are currently identical to the ones for comments, but just in case the will be different
+    in the future they are separated -->
+    <string name="postDistinguishAsMod">Distinguish as mod</string>
+    <string name="postSticky">Sticky</string>
+    <string name="postRemoveModDistinguish">Remove mod distinguish</string>
+    <string name="postRemoveSticky">Remove sticky</string>
 
     <string name="lockComment">Lock</string>
 </resources>

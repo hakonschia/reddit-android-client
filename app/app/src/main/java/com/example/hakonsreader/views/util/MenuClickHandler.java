@@ -21,7 +21,6 @@ import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
@@ -250,18 +249,69 @@ public class MenuClickHandler {
         menu.inflate(R.menu.post_extra_generic_for_all_users);
         menu.inflate(R.menu.post_extra_by_user);
 
+        if (post.isUserMod()) {
+            menu.inflate(R.menu.post_extra_user_is_mod);
+
+            // Set text to "Undistinguish"
+            if (post.isMod()) {
+                MenuItem modItem = menu.getMenu().findItem(R.id.menuDistinguishPostAsMod);
+                modItem.setTitle(R.string.postRemoveModDistinguish);
+            }
+            if (post.isStickied()) {
+                MenuItem modItem = menu.getMenu().findItem(R.id.menuStickyPost);
+                modItem.setTitle(R.string.postRemoveSticky);
+            }
+        }
+
         // Default is "Save post", if post already is saved, change the text
         if (post.isSaved()) {
             MenuItem savedItem = menu.getMenu().findItem(R.id.saveOrUnsavePost);
             savedItem.setTitle(view.getContext().getString(R.string.unsavePost));
         }
 
+        RedditApi api = App.get().getApi();
+
+        // This response handler will work for any API call updating the distinguish/sticky status of a post
+        // TODO the post this is in should be updated, this will either be a PostsAdapter or the post in PostActivity
+        OnResponse<RedditPost> distinguishAndStickyResponse = response -> {
+            post.setDistinguished(response.getDistinguished());
+            post.setStickied(response.isStickied());
+        };
+
+        // TODO these menu calls to the api that update the posts should probably update the local database as well
+
         menu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
+
+            // TODO add delete post
 
             if (itemId == R.id.saveOrUnsavePost) {
                 savePostOnClick(view, post);
                 return true;
+            } else if (itemId == R.id.menuDistinguishPostAsMod) {
+                if (post.isMod()) {
+                    api.post(post.getId()).removeDistinguishAsMod(distinguishAndStickyResponse, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                } else {
+                    api.post(post.getId()).distinguishAsMod(distinguishAndStickyResponse, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                }
+            } else if (itemId == R.id.menuStickyPost) {
+                if (post.isStickied()) {
+                    api.post(post.getId()).removeSticky(ignored -> {
+                        post.setStickied(false);
+                    }, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                } else {
+                    api.post(post.getId()).sticky(ignored -> {
+                        post.setStickied(true);
+                    }, (e, t) -> {
+                        Util.handleGenericResponseErrors(view, e, t);
+                    });
+                }
             }
 
             return false;

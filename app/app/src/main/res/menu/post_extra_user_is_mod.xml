@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- This menu is for the extras for posts when the logged in user is
+     a mod in the subreddit the post is in -->
+
+    <item
+        android:id="@+id/menuDistinguishPostAsMod"
+        android:title="@string/postDistinguishAsMod" />
+
+    <item
+        android:id="@+id/menuStickyPost"
+        android:title="@string/postSticky" />
+</menu>

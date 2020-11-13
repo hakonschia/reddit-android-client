@@ -161,8 +161,12 @@
     <string name="webViewOpenInBrowser">Åpne i nettleser</string>
     <string name="webViewRefresh">Oppdater</string>
     <string name="commentDistinguishAsMod">Vis som moderator</string>
-    <string name="commentSticky">Vis som moderator og fest</string>
+    <string name="commentSticky">Fest og vis som moderator</string>
     <string name="lockComment">Lås</string>
     <string name="commentRemoveModDistinguish">Ikke vis som moderator</string>
     <string name="commentRemoveSticky">Fjern kommentarfeste</string>
+    <string name="postDistinguishAsMod">Vis som moderator</string>
+    <string name="postSticky">Fest post</string>
+    <string name="postRemoveModDistinguish">Ikke vis som moderator</string>
+    <string name="postRemoveSticky">Fjern feste</string>
 </resources>

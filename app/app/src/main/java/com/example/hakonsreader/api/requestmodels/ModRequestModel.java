@@ -6,6 +6,7 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.JsonResponse;
 import com.example.hakonsreader.api.service.ModService;
@@ -35,7 +36,7 @@ public class ModRequestModel {
      * @param onFailure Callback for failed requests.
      */
     public void distinguishAsModComment(String id, boolean distinguish, boolean sticky, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
-        api.distinguishAsMod(
+        api.distinguishAsModComment(
                 Util.createFullName(Thing.COMMENT, id),
                 distinguish ? "yes" : "no",
                 sticky,
@@ -61,6 +62,74 @@ public class ModRequestModel {
             @Override
             public void onFailure(Call<JsonResponse> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
+    }
+
+    /**
+     * Distinguish a post as mod
+     *
+     * @param id The ID of the comment to distinguish
+     * @param distinguish True to distinguish as mod, false to remove previous distinguish
+     * @param onResponse Callback for successful requests. Holds the updated comment info
+     * @param onFailure Callback for failed requests.
+     */
+    public void distinguishAsModPost(String id, boolean distinguish, OnResponse<RedditPost> onResponse, OnFailure onFailure) {
+        api.distinguishAsModPost(
+                Util.createFullName(Thing.POST, id),
+                distinguish ? "yes" : "no",
+                RedditApi.API_TYPE,
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<JsonResponse>() {
+            @Override
+            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                if (response.isSuccessful()) {
+                    JsonResponse body = response.body();
+
+                    if (body != null) {
+                        RedditPost comment = (RedditPost) body.getListings().get(0);
+                        onResponse.onResponse(comment);
+                    } else {
+                        Util.handleHttpErrors(response, onFailure);
+                    }
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonResponse> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
+    }
+
+    public void stickyPost(String fullname, boolean sticky, OnResponse<Void> onResponse, OnFailure onFailure) {
+        api.stickyPost(
+                fullname,
+                sticky,
+                RedditApi.API_TYPE,
+                accessToken.generateHeaderString()
+        ).enqueue(new Callback<JsonResponse>() {
+            @Override
+            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                if (response.isSuccessful()) {
+                    JsonResponse body = response.body();
+
+                    if (body != null) {
+                        // There is no actual data in the response
+                        onResponse.onResponse(null);
+                    } else {
+                        Util.handleHttpErrors(response, onFailure);
+                    }
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonResponse> call, Throwable t) {
+
             }
         });
     }

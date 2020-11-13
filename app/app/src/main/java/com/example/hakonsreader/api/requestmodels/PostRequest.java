@@ -39,6 +39,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
     private final VoteableRequestModel voteRequest;
     private final ReplyableRequestModel replyRequest;
     private final SaveableRequestModel saveRequest;
+    private final ModRequestModel modRequest;
 
     public PostRequest(AccessToken accessToken, PostService api, String postId) {
         this.accessToken = accessToken;
@@ -48,6 +49,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
         this.voteRequest = new VoteableRequestModel(accessToken, api);
         this.replyRequest = new ReplyableRequestModel(accessToken, api);
         this.saveRequest = new SaveableRequestModel(accessToken, api);
+        this.modRequest = new ModRequestModel(accessToken, api);
     }
 
     /**
@@ -322,5 +324,65 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
+    }
+
+    /**
+     * Distinguish the post as a moderator. If the currently logged in user is not a moderator
+     * in the subreddit the post is in this will fail
+     *
+     * <p>OAuth scope required: {@code modposts}</p>
+     *
+     * @param onResponse The callback for successful requests. Holds the new post data
+     * @param onFailure The callback for failed requests
+     */
+    public void distinguishAsMod(OnResponse<RedditPost> onResponse, OnFailure onFailure) {
+        modRequest.distinguishAsModPost(postId, true, onResponse, onFailure);
+    }
+
+    /**
+     * Remove the distinguish as mod on the post.
+     *
+     * <p>If the currently logged in user is not a moderator in the subreddit the post is in this will fail</p>
+     *
+     * <p>OAuth scope required: {@code modposts}</p>
+     *
+     * @param onResponse The callback for successful requests. Holds the new post data
+     * @param onFailure The callback for failed requests
+     */
+    public void removeDistinguishAsMod(OnResponse<RedditPost> onResponse, OnFailure onFailure) {
+        // We want to distinguish, but not sticky
+        modRequest.distinguishAsModPost(postId, false, onResponse, onFailure);
+    }
+
+    /**
+     * Sticky the post
+     *
+     * <p>If the post is already stickied, this will give a 409 Conflict error</p>
+     *
+     * <p>If the currently logged in user is not a moderator in the subreddit the post is in this will fail</p>
+     *
+     * <p>OAuth scope required: {@code modposts}</p>
+     *
+     * @param onResponse The callback for successful requests. Nothing is returned here, but the callback
+     *                   will be called when the request is successful
+     * @param onFailure The callback for failed requests
+     */
+    public void sticky(OnResponse<Void> onResponse, OnFailure onFailure) {
+        modRequest.stickyPost(Util.createFullName(Thing.POST, postId), true, onResponse, onFailure);
+    }
+
+    /**
+     * Remove the sticky on the post
+     *
+     * <p>If the currently logged in user is not a moderator in the subreddit the post is in this will fail</p>
+     *
+     * <p>OAuth scope required: {@code modposts}</p>
+     *
+     * @param onResponse The callback for successful requests. Nothing is returned here, but the callback
+     *                   will be called when the request is successful
+     * @param onFailure The callback for failed requests
+     */
+    public void removeSticky(OnResponse<Void> onResponse, OnFailure onFailure) {
+        modRequest.stickyPost(Util.createFullName(Thing.POST, postId), false, onResponse, onFailure);
     }
 }
