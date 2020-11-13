@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.responses.JsonResponse;
 
 import retrofit2.Call;
@@ -12,13 +11,17 @@ import retrofit2.http.POST;
 public interface ModService {
 
     /**
+     * Distinguish a post or comment as a moderator
      *
-     * @param fullname
-     * @param how
-     * @param sticky
+     * <p>OAuth scope required: {@code modposts}</p>
+     *
+     * @param fullname The fullname of the post or comment
+     * @param how "yes" to distinguish as mod, "no" to remove the mod distinguish
+     * @param sticky True to also sticky the post or comment (comments will also be mod distinguished when stickied)
      * @param apiType The string "json"
-     * @param accessToken
-     * @return
+     * @param accessToken The type of token + the actual token. Form: "type token". This must be for
+     *                    a user that is a moderator in the respective subreddit
+     * @return A Call with a JsonResponse. The response will hold the updated post or comment
      */
     @POST("api/distinguish")
     @FormUrlEncoded

@@ -8,12 +8,12 @@ import java.util.List;
 /**
  * Handles responses in the form of:
  * <pre>
- *     "json": {
- *         "errors": [],
- *         "data:" {
+ * "json": {
+ *     "errors": [],
+ *     "data:" {
  *
- *         }
  *     }
+ * }
  * </pre>
  */
 public class JsonResponse {

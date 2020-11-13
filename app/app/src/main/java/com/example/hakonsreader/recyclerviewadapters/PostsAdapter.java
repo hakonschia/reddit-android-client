@@ -111,6 +111,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      */
     @BindingAdapter("authorTextColorPost")
     public static void formatAuthor(TextView tv, RedditPost post) {
+        if (post == null) {
+            return;
+        }
+
         tv.setTypeface(Typeface.DEFAULT);
         if (post.isAdmin()) {
             tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.commentByAdminBackground));

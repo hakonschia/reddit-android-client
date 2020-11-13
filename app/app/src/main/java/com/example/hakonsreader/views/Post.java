@@ -42,16 +42,6 @@ public class Post extends RelativeLayout {
      */
     private static final int NO_MAX_HEIGHT = -1;
 
-    /**
-     * A list of domains that we know how to play videos for. Videos in this list can be used with
-     * {@link ContentVideo}, otherwise they should be provided as a {@link ContentLink} as they might
-     * (and probably wont) load. The domains in this list match the return from {@link RedditPost#getDomain()}
-     */
-    // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
-    private static final List<String> KNOWN_VIDEO_DOMAINS = Collections.unmodifiableList(Arrays.asList(
-            "v.redd.it", "i.redd.it", "redgifs.com", "gfycat.com", "i.imgur.com", "media1.giphy.com"
-    ));
-
     private final PostBinding binding;
     private RedditPost postData;
     private boolean showContent = true;
@@ -268,7 +258,7 @@ public class Post extends RelativeLayout {
             //  otherwise just provide it as link content
             case RICH_VIDEO:
                 // Ensure we know how to handle a video, otherwise it might not load
-                if (KNOWN_VIDEO_DOMAINS.contains(post.getDomain().toLowerCase())) {
+                if (ContentVideo.KNOWN_VIDEO_DOMAINS.contains(post.getDomain().toLowerCase())) {
                     ContentVideo video = new ContentVideo(context);
                     video.setPost(post);
                     content = video;

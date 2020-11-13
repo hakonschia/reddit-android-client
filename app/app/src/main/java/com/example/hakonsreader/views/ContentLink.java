@@ -64,7 +64,7 @@ public class ContentLink extends ConstraintLayout {
     }
 
     /**
-     * Opens the link found in {@link ContentLink#post} in the browser
+     * Dispatches the link to {@link DispatcherActivity}
      */
     private void openLink() {
         Intent intent = new Intent(getContext(), DispatcherActivity.class);

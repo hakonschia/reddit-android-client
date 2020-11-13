@@ -5,6 +5,10 @@ package com.example.hakonsreader.api.exceptions;
  */
 public class InvalidAccessTokenException extends Exception {
 
+    public InvalidAccessTokenException() {
+
+    }
+
     public InvalidAccessTokenException(String message) {
         super(message);
     }
@@ -12,4 +16,13 @@ public class InvalidAccessTokenException extends Exception {
     public InvalidAccessTokenException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public InvalidAccessTokenException(Throwable cause) {
+        super(cause);
+    }
+
+    public InvalidAccessTokenException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
 }

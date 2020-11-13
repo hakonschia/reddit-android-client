@@ -1,4 +1,4 @@
-package com.example.hakonsreader.misc;
+package com.example.hakonsreader.views.util;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -17,6 +17,10 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+/**
+ * Utility class for views. Provides functions to create View tags (such as NSFW tags) and
+ * some binding adapters
+ */
 public class ViewUtil {
     private ViewUtil() { }
 

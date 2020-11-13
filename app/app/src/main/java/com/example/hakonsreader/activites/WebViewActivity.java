@@ -3,24 +3,26 @@ package com.example.hakonsreader.activites;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 import android.webkit.WebBackForwardList;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.PopupMenu;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.databinding.ActivityWebViewBinding;
 
+
+/**
+ * Activity that displays a WebView with a given URL. Use {@link WebViewActivity#URL_KEY} to send
+ * the URL to load
+ */
 public class WebViewActivity extends AppCompatActivity {
     private static final String TAG = "WebViewActivity";
 
@@ -64,13 +66,10 @@ public class WebViewActivity extends AppCompatActivity {
 
         // Close the web view (ie. finish the activity) with the button in the toolbar
         binding.webViewClose.setOnClickListener(v -> finish());
-
-        binding.webViewMenu.setOnClickListener(v -> this.openMenu());
+        binding.webViewMenu.setOnClickListener(this::openMenu);
 
         binding.refreshWebView.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this, R.color.colorAccent));
-        binding.refreshWebView.setOnRefreshListener(() -> {
-            binding.webView.reload();
-        });
+        binding.refreshWebView.setOnRefreshListener(binding.webView::reload);
     }
 
     @Override
@@ -91,9 +90,11 @@ public class WebViewActivity extends AppCompatActivity {
 
     /**
      * Opens the more menu in the toolbar
+     *
+     * @param view The view to attach the menu to
      */
-    private void openMenu() {
-        PopupMenu menu = new PopupMenu(this, binding.webViewMenu);
+    private void openMenu(View view) {
+        PopupMenu menu = new PopupMenu(this, view);
         menu.inflate(R.menu.web_view_more);
 
         menu.setOnMenuItemClickListener(item -> {

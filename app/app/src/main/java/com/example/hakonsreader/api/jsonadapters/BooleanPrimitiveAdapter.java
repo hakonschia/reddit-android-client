@@ -8,7 +8,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 
 /**
- * Adapter to allow primitive boolean types to be converted to Boolean for null values
+ * Adapter to allow primitive boolean types to be converted to {@link Boolean} for null values
  */
 public class BooleanPrimitiveAdapter extends TypeAdapter<Boolean> {
     @Override

@@ -5,6 +5,11 @@ package com.example.hakonsreader.api.constants;
  */
 public class OAuthConstants {
 
+    private OAuthConstants() { }
+
+    /**
+     *
+     */
     public static final String TOKEN_TYPE_REFRESH = "refresh_token";
 
     /**

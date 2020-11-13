@@ -184,17 +184,15 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_REPLY) {
-                if (data != null) {
-                    RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING_KEY), RedditComment.class);
+            if (requestCode == REQUEST_REPLY && data != null) {
+                RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING_KEY), RedditComment.class);
 
-                    // Adding a top-level comment
-                    if (replyingTo instanceof RedditPost) {
-                        commentsAdapter.addComment(newComment);
-                    } else {
-                        // Replying to a comment
-                        commentsAdapter.addComment(newComment, (RedditComment)replyingTo);
-                    }
+                // Adding a top-level comment
+                if (replyingTo instanceof RedditPost) {
+                    commentsAdapter.addComment(newComment);
+                } else {
+                    // Replying to a comment
+                    commentsAdapter.addComment(newComment, (RedditComment)replyingTo);
                 }
             }
         }

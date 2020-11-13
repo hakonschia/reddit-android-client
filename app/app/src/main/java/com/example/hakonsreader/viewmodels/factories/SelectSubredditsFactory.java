@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
 
 public class SelectSubredditsFactory implements ViewModelProvider.Factory {
-    private Context context;
+    private final Context context;
 
     public SelectSubredditsFactory(Context context) {
         this.context = context;

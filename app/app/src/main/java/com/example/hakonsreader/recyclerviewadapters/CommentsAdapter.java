@@ -2,8 +2,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.os.UserManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +23,13 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.databinding.ListItemCommentBinding;
 import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding;
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding;
 import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
-import com.example.hakonsreader.misc.ViewUtil;
+import com.example.hakonsreader.views.util.ViewUtil;
 import com.example.hakonsreader.views.Tag;
 
 import java.util.ArrayList;
@@ -598,6 +595,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      *
      * <p>Loads more comments and adds them to {@link CommentsAdapter#comments}</p>
      *
+     * @param view Ignored
      * @param comment The comment to load from. This comment has to be a "2 more comments" comment.
      *               When the comments have been loaded this will be removed from {@link CommentsAdapter#comments}
      */
@@ -641,6 +639,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
 
+    /**
+     * ViewHolder for comments that are "2 more comments" type comments, that will load the comments
+     * when clicked
+     */
     public static class MoreCommentsViewHolder extends RecyclerView.ViewHolder {
         private final ListItemMoreCommentBinding binding;
 
@@ -655,6 +657,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    /**
+     * ViewHolder for comments that are hidden (the comments explicitly selected to be hidden)
+     */
     public static class HiddenCommentViewHolder extends RecyclerView.ViewHolder {
         private final ListItemHiddenCommentBinding binding;
 
@@ -669,6 +674,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    /**
+     * ViewHolder for comments that are shown as the entire comment
+     */
     public static class NormalCommentViewHolder extends RecyclerView.ViewHolder {
         private final ListItemCommentBinding binding;
 
@@ -689,7 +697,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             // small, but noticeable delay, causing the old comment to still appear
             binding.executePendingBindings();
 
-            // TODO when the vote bar uses data binding this can probably be set through xml
+            // If the ticker has animation enabled it will animate from the previous comment to this one
+            // which is very weird behaviour, so disable the animation and enable it again when we have set the comment
             binding.commentVoteBar.enableTickerAnimation(false);
             binding.commentVoteBar.setListing(comment);
             binding.commentVoteBar.enableTickerAnimation(true);

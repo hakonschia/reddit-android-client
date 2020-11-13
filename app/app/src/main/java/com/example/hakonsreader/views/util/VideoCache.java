@@ -1,4 +1,4 @@
-package com.example.hakonsreader.misc;
+package com.example.hakonsreader.views.util;
 
 import android.content.Context;
 

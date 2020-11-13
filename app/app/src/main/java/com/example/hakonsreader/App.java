@@ -10,11 +10,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
@@ -29,7 +26,6 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.markwonplugins.LinkPlugin;
 import com.example.hakonsreader.markwonplugins.SuperscriptPlugin;
 import com.example.hakonsreader.markwonplugins.ThemePlugin;
-import com.example.hakonsreader.misc.OAuthStateGenerator;
 import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
 import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
@@ -39,7 +35,8 @@ import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
-import java.net.ProtocolException;
+import java.security.SecureRandom;
+import java.util.Random;
 import java.util.UUID;
 
 import io.noties.markwon.Markwon;
@@ -47,8 +44,6 @@ import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TablePlugin;
 import okhttp3.logging.HttpLoggingInterceptor;
-
-import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 
 
 /**
@@ -224,12 +219,30 @@ public class App extends Application {
     }
 
     /**
+     * Generates a random string to use for OAuth requests
+     *
+     * @return A new random string
+     */
+    private String generateOauthState() {
+        final String characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+        Random rnd = new SecureRandom();
+        StringBuilder state = new StringBuilder();
+
+        for (int i = 0; i < 35; i++) {
+            state.append(characters.charAt(rnd.nextInt(characters.length())));
+        }
+
+        return state.toString();
+    }
+
+    /**
      * Generates a new OAuth state that is used for validation
      *
      * @return A random string to use in the request for access
      */
     public String generateAndGetOAuthState() {
-        oauthState = OAuthStateGenerator.generate();
+        oauthState = generateOauthState();
         return oauthState;
     }
 
@@ -300,7 +313,7 @@ public class App extends Application {
      * Updates the theme (night mode) based on what is in the default SharedPreferences
      */
     public void updateTheme() {
-        if (settings.getBoolean(getApplicationContext().getString(R.string.prefs_key_theme), getResources().getBoolean(R.bool.prefs_default_theme))) {
+        if (settings.getBoolean(getString(R.string.prefs_key_theme), getResources().getBoolean(R.bool.prefs_default_theme))) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -397,7 +410,7 @@ public class App extends Application {
      * @return An int with the score threshold
      */
     public int getAutoHideScoreThreshold() {
-        // The value is stored as a string, not an int, so we have to the default value
+        // The value is stored as a string, not an int
 
         int defaultValue = getResources().getInteger(R.integer.prefs_default_hide_comments_threshold);
         String value = settings.getString(
@@ -413,7 +426,7 @@ public class App extends Application {
      * on the users setting. This also adjusts the threshold needed to perform a swipe. This builder can
      * be continued to set additional values
      *
-     * @return The SlidrConfig that should be used for videos and images
+     * @return A SlidrConfig builder that will build the SlidrConfig to be used for videos and images
      */
     public SlidrConfig.Builder getVideoAndImageSlidrConfig() {
         String direction = settings.getString(
@@ -497,11 +510,9 @@ public class App extends Application {
      * Clears any user information stored, logging a user out. The application will be restarted
      */
     public void logOut() {
-        // Revoke token
-        redditApi.revokeRefreshToken(response -> {
-        }, (call, t) -> {
-            // If failed because of internet connection try to revoke later
-        });
+        // Revoke token, the response to this never holds any data. If it fails we could potentially
+        // store that it failed and retry again later
+        redditApi.revokeRefreshToken(response -> { }, (call, t) -> { });
 
         // Clear shared preferences
         this.clearUserInfo();

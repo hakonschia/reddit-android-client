@@ -18,7 +18,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
-import com.example.hakonsreader.misc.ViewUtil;
+import com.example.hakonsreader.views.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.List;

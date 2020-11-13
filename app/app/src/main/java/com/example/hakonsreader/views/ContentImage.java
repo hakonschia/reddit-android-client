@@ -13,7 +13,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.misc.PhotoViewDoubleTapListener;
+import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener;
 import com.example.hakonsreader.views.util.ClickHandler;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.Callback;

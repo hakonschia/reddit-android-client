@@ -24,7 +24,6 @@ import com.example.hakonsreader.api.responses.GenericError;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.ProtocolException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
@@ -141,8 +140,9 @@ public class RedditApi {
     /**
      * The list of standard subs: front page (represented as an empty string), popular, all.
      *
-     * <p>Note: that the elements in this list are case sensitive and in this list are all lower case.
-     * When using this list to check against a standard sub you should ensure the string is lower cased</p>
+     * <p>Note: The elements in this list are case sensitive and in this list are all lower case.
+     * When using this list to check against a standard sub you should ensure the string is lower cased, or use
+     * {@link String#equalsIgnoreCase(String)}</p>
      *
      * <p>Note: This is an unmodifiable list. Attempting to change it will throw an exception</p>
      */
@@ -295,12 +295,13 @@ public class RedditApi {
         private final String userAgent;
         private final String clientId;
 
+        // The logger can be final as the logger object will never be changed, but its logging level will be
+        private final HttpLoggingInterceptor logger;
         private AccessToken accessToken;
         private OnNewToken onNewToken;
-        private HttpLoggingInterceptor logger;
+        private OnFailure onInvalidToken;
         private String callbackUrl;
         private String deviceId;
-        private OnFailure onInvalidToken;
 
 
         /**
@@ -362,6 +363,21 @@ public class RedditApi {
         }
 
         /**
+         * Sets a callback for when the API attempts to refresh an access token that is no longer valid.
+         *
+         * <p>This will be called if the access token set with {@link Builder#accessToken(AccessToken)}
+         * wasn't valid (ie. it can't be refreshed anymore), or if the user has revoked the applications
+         * access from <a href="https://reddit.com/prefs/apps">reddit.com/prefs/apps</a></p>
+         *
+         * @param onInvalidToken The callback for when tokens are now invalid
+         * @return This builder
+         */
+        public Builder onInvalidToken(OnFailure onInvalidToken) {
+            this.onInvalidToken = onInvalidToken;
+            return this;
+        }
+
+        /**
          * Sets the {@link HttpLoggingInterceptor.Level} to use for logging of the API calls.
          *
          * @param level The level to log
@@ -395,21 +411,6 @@ public class RedditApi {
          */
         public Builder deviceId(String deviceId) {
             this.deviceId = deviceId;
-            return this;
-        }
-
-        /**
-         * Sets a callback for when the API attempts to refresh an access token that is no longer valid.
-         *
-         * <p>This will be called if the access token set with {@link Builder#accessToken(AccessToken)}
-         * wasn't valid (ie. it can't be refreshed anymore), or if the user has revoked the applications
-         * access from <a href="https://reddit.com/prefs/apps">reddit.com/prefs/apps</a></p>
-         *
-         * @param onInvalidToken The callback for when tokens are now invalid
-         * @return This builder
-         */
-        public Builder onInvalidToken(OnFailure onInvalidToken) {
-            this.onInvalidToken = onInvalidToken;
             return this;
         }
 
@@ -700,7 +701,7 @@ public class RedditApi {
                     onInvalidToken.onFailure(
                             new GenericError(code),
                             new InvalidAccessTokenException("The access token couldn't be refreshed. Either the access token set when building the API object" +
-                                    "was never valid, or the user has revoked the applications access to their account.")
+                                    " was never valid, or the user has revoked the applications access to their account.")
                     );
 
                     // We can get a new token for non-logged in users here, not sure if it makes sense

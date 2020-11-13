@@ -14,7 +14,6 @@ import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -27,7 +26,7 @@ import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.interfaces.SortableWithTime;
-import com.example.hakonsreader.misc.PostScrollListener;
+import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;

@@ -1,7 +1,6 @@
 package com.example.hakonsreader.viewmodels;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -12,9 +11,7 @@ import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SelectSubredditsViewModel extends ViewModel {
 
@@ -80,7 +77,7 @@ public class SelectSubredditsViewModel extends ViewModel {
             new Thread(() -> database.subreddits().insertAll(subs)).start();
 
             SharedPreferencesManager.put(SUBSCRIBED_SUBREDDITS_KEY, ids);
-        }, (code, t) -> {
+        }, (e, t) -> {
             t.printStackTrace();
         });
     }

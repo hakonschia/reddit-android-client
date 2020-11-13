@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.interceptors;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -19,6 +21,7 @@ public class UserAgentInterceptor implements Interceptor {
         this.userAgent = userAgent;
     }
 
+    @NotNull
     @Override
     public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
         Request original = chain.request();

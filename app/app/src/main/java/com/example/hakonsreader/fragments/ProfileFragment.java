@@ -2,7 +2,6 @@ package com.example.hakonsreader.fragments;
 
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.databinding.FragmentProfileBinding;
-import com.example.hakonsreader.misc.PostScrollListener;
+import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;

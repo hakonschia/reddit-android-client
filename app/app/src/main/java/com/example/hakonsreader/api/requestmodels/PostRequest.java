@@ -59,7 +59,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
      *     <li>To retrieve generic posts no OAuth scope is required</li>
      * </ol>
      * </p>
-     * <p>No specific OAuth scope is required</p>
+     * <p>OAuth scope required: {@code read}</p>
      *
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
@@ -79,7 +79,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
      *     <li>To retrieve generic posts no OAuth scope is required</li>
      * </ol>
      * </p>
-     * <p>No specific OAuth scope is required</p>
+     * <p>OAuth scope required: {@code read}</p>
      *
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
@@ -99,7 +99,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
      *     <li>To retrieve generic posts no OAuth scope is required</li>
      * </ol>
      * </p>
-     * <p>No specific OAuth scope is required</p>
+     * <p>OAuth scope required: {@code read}</p>
      *
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
@@ -119,7 +119,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
      *     <li>To retrieve generic posts no OAuth scope is required</li>
      * </ol>
      * </p>
-     * <p>No specific OAuth scope is required</p>
+     * <p>OAuth scope required: {@code read}</p>
      *
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
@@ -139,7 +139,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
      *     <li>To retrieve generic posts no OAuth scope is required</li>
      * </ol>
      * </p>
-     * <p>No specific OAuth scope is required</p>
+     * <p>OAuth scope required: {@code read}</p>
      *
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditComment} objects
      * @param onPostResponse This callback is also for successful requests and holds the information about the post the comments are for
@@ -251,7 +251,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
     /**
      * Save the comment
      *
-     * <p>Requires OAuth scope: {@code save}</p>
+     * <p>OAuth scope required: {@code save}</p>
      *
      * @param onResponse Callback for successful responses. This will never hold any information, but
      *                   will be called when the request is successful
@@ -265,7 +265,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
     /**
      * Unsave the comment
      *
-     * <p>Requires OAuth scope: {@code save}</p>
+     * <p>OAuth scope required: {@code save}</p>
      *
      * @param onResponse Callback for successful responses. This will never hold any information, but
      *                   will be called when the request is successful

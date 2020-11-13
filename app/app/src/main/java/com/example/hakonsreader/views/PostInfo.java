@@ -14,7 +14,7 @@ import androidx.databinding.BindingAdapter;
 
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostInfoBinding;
-import com.example.hakonsreader.misc.ViewUtil;
+import com.example.hakonsreader.views.util.ViewUtil;
 
 
 /**

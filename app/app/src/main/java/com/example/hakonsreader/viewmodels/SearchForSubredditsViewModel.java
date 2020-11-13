@@ -61,9 +61,9 @@ public class SearchForSubredditsViewModel extends ViewModel {
     }
 
     /**
-     * Clears the list of subreddits
+     * Clears the list of subreddits searched for
      */
-    public void clear() {
+    public void clearSearchResults() {
         searchResults.postValue(new ArrayList<>());
     }
 }

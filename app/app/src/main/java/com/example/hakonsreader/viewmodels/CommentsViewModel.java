@@ -1,6 +1,5 @@
 package com.example.hakonsreader.viewmodels;
 
-import android.view.View;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -9,15 +8,17 @@ import androidx.lifecycle.ViewModel;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.misc.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * ViewModel for a list of comments on a Reddit post
+ */
 public class CommentsViewModel extends ViewModel {
 
     private final List<RedditComment> commentsDataSet = new ArrayList<>();
-
     private final MutableLiveData<RedditPost> post = new MutableLiveData<>();
     private final MutableLiveData<List<RedditComment>> comments = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();
@@ -25,10 +26,17 @@ public class CommentsViewModel extends ViewModel {
 
     private String postId;
 
+    /**
+     * @param postId The ID of the Reddit post to retrieve comments for
+     */
     public void setPostId(String postId) {
         this.postId = postId;
     }
 
+    /**
+     * @return A LiveData observable for the post. Retrieving comments also retrieves the updated
+     * post information, and will be sent here
+     */
     public LiveData<RedditPost> getPost() {
         return post;
     }
@@ -40,6 +48,9 @@ public class CommentsViewModel extends ViewModel {
         return comments;
     }
 
+    /**
+     * @return LiveData observable for potential errors from the API
+     */
     public LiveData<ErrorWrapper> getError() {
         return error;
     }

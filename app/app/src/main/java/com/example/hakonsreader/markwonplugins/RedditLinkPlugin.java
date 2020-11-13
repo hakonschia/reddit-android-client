@@ -30,7 +30,6 @@ import io.noties.markwon.AbstractMarkwonPlugin;
 public class RedditLinkPlugin extends AbstractMarkwonPlugin {
     private static final String TAG = "RedditLinkPlugin";
 
-    // TODO this should NOT match anything already in a markdown link (as people like to be funny with fake subreddit links)
     // Subreddits are alphanumericals, numbers, and underscores. Users are the same and dashes
     public static final Pattern RE = Pattern.compile(
             // Match whitespace, start of string, in a parenthesis, or not in a [] (ie. already a markdown link)

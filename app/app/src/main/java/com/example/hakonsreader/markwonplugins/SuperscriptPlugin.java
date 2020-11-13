@@ -4,7 +4,6 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;

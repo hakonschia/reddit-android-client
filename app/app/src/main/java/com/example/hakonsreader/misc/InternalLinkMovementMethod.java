@@ -46,7 +46,7 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
     }
 
 
-    private OnLinkClickedListener mOnLinkClickedListener;
+    private final OnLinkClickedListener mOnLinkClickedListener;
 
     public InternalLinkMovementMethod(OnLinkClickedListener onLinkClickedListener) {
         mOnLinkClickedListener = onLinkClickedListener;

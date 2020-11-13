@@ -12,7 +12,6 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.LockableSlidr;
-import com.example.hakonsreader.views.LoadingIcon;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrInterface;
 
@@ -32,8 +31,6 @@ public class SubredditActivity extends AppCompatActivity implements LockableSlid
      */
     public static final String SUBREDDIT_KEY = "subreddit";
 
-
-    private LoadingIcon loadingIcon;
     private SubredditFragment fragment;
     private SlidrInterface slidrInterface;
 
@@ -42,8 +39,6 @@ public class SubredditActivity extends AppCompatActivity implements LockableSlid
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subreddit);
         slidrInterface = Slidr.attach(this);
-
-        this.loadingIcon = findViewById(R.id.loadingIcon);
 
         // Restore the fragment if possible
         if (savedInstanceState != null) {
@@ -66,9 +61,6 @@ public class SubredditActivity extends AppCompatActivity implements LockableSlid
                     subreddit = data.getString(SUBREDDIT_KEY);
                 }
             }
-
-            // For testing purposes hardcode a subreddit
-            //subreddit = "sports";
 
             fragment = SubredditFragment.newInstance(subreddit);
             getSupportFragmentManager().beginTransaction().add(R.id.subredditActivityFragment, fragment, SAVED_SUBREDDIT).commit();

@@ -9,6 +9,10 @@ public enum Thing {
     POST("t3"),
     MESSAGE("t4"),
     SUBREDDIT("t5"),
+
+    /**
+     * Comments that are "2 more comments" type comments will be identified as MORE
+     */
     MORE("more");
 
 

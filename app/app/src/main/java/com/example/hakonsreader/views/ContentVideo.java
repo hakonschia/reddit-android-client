@@ -15,7 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
@@ -27,7 +26,7 @@ import com.example.hakonsreader.api.model.RedditVideo;
 import com.example.hakonsreader.api.utils.LinkUtils;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.misc.Util;
-import com.example.hakonsreader.misc.VideoCache;
+import com.example.hakonsreader.views.util.VideoCache;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.LoadControl;
@@ -46,12 +45,27 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
- * The view for video posts (no GIF support, although URLs that end in .gif/.gifv that are actually
- * .mp4 are supported)
+ * The view for video posts. This can only be used to display videos from certain domains. The list of known
+ * domains is found with {@link ContentVideo#KNOWN_VIDEO_DOMAINS}
  */
 public class ContentVideo extends PlayerView {
     private static final String TAG = "PostContentVideo";
+
+    /**
+     * A list of domains that we know how to play videos for. Videos in this list can be used with
+     * {@link ContentVideo}, otherwise they should be provided as a {@link ContentLink} as they might
+     * (and probably wont) load. The domains in this list match the return from {@link RedditPost#getDomain()}
+     * and are lowercased
+     */
+    // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
+    public static final List<String> KNOWN_VIDEO_DOMAINS = Collections.unmodifiableList(Arrays.asList(
+            "v.redd.it", "i.redd.it", "redgifs.com", "gfycat.com", "i.imgur.com", "media1.giphy.com"
+    ));
 
     /**
      * The key used for extra information about the timestamp of the video

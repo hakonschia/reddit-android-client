@@ -27,6 +27,8 @@ import com.example.hakonsreader.misc.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
+
 
 public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
     private static final String TAG = "MainActivity";
@@ -154,10 +156,8 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 postsFragment = null;
                 this.setupStartFragment();
 
-                Snackbar.make(binding.parentLayout, R.string.loggedIn, Snackbar.LENGTH_SHORT).show();
-            }, (c, t) -> {
-                Util.handleGenericResponseErrors(binding.parentLayout, c, t);
-            });
+                Snackbar.make(binding.parentLayout, R.string.loggedIn, LENGTH_SHORT).show();
+            }, (e, t) -> Util.handleGenericResponseErrors(binding.parentLayout, e, t));
         }
     }
 

@@ -1,4 +1,4 @@
-package com.example.hakonsreader.misc;
+package com.example.hakonsreader.recyclerviewadapters.listeners;
 
 import android.view.View;
 

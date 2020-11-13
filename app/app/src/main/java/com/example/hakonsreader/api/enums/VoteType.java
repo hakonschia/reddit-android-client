@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.enums;
 
 /**
- * What type of vote to cast on something
+ * What type of vote a post or comment has
  */
 public enum VoteType {
     UPVOTE(1),

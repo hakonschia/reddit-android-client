@@ -1,4 +1,4 @@
-package com.example.hakonsreader.misc;
+package com.example.hakonsreader.views.listeners;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
