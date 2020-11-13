@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,9 +18,10 @@ import com.example.hakonsreader.databinding.ContentLinkBinding;
 import com.squareup.picasso.Picasso;
 
 /**
- * Class for post contents that are a link
+ * Class for post contents that are a link. This extends ScrollView so that if the user
+ * selects a max size for posts that is very low this view can be scrolled to view it in its entirety
  */
-public class ContentLink extends ConstraintLayout {
+public class ContentLink extends ScrollView {
     private static final String TAG = "ContentLink";
 
     private final ContentLinkBinding binding;

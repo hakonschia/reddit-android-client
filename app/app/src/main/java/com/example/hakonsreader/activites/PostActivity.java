@@ -1,9 +1,11 @@
 package com.example.hakonsreader.activites;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -100,8 +102,13 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
 
         this.setupCommentsViewModel();
 
+        // If we're in landscape the "height" is the width of the screen
+        boolean portrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        int height = portrait ? App.get().getScreenHeight() : App.get().getScreenWidth();
+        int maxHeight = (int)(height * (App.get().getMaxPostSizePercentage() / 100f));
+
+        binding.post.setMaxHeight(maxHeight);
         binding.post.setHideScore(getIntent().getExtras().getBoolean(HIDE_SCORE_KEY));
-        binding.post.setMaxHeight((int)(App.get().getScreenHeight() * MAX_POST_HEIGHT_PERCENTAGE));
         // Don't allow to open the post again when we are now in the post
         binding.post.setAllowPostOpen(false);
 

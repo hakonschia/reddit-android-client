@@ -231,6 +231,7 @@ public class ProfileFragment extends Fragment {
      * Updates the views with the information found in {@link ProfileFragment#user}
      */
     private void updateViews() {
+        // TODO if you go to the profile page, then go out before it loads it will crash when it loads, since binding is now null
         binding.setUser(user);
         binding.setLoggedInUser(isLoggedInUser);
     }

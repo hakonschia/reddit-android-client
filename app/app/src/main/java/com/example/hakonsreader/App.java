@@ -453,6 +453,17 @@ public class App extends Application {
         return new SlidrConfig.Builder().position(pos).distanceThreshold(0.15f);
     }
 
+    /**
+     * Retrieve the percentage of the screen a post should at maximum take when opened
+     *
+     * @return The percentage of the screen to take (0-100)
+     */
+    public int getMaxPostSizePercentage() {
+        return settings.getInt(
+                getString(R.string.prefs_key_max_post_size_percentage),
+                getResources().getInteger(R.integer.prefs_default_max_post_size_percentage)
+        );
+    }
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that

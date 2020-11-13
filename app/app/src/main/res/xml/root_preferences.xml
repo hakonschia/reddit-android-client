@@ -22,8 +22,18 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="@string/prefs_group_videos_images"
+        android:title="@string/prefs_group_posts"
         app:iconSpaceReserved="false">
+
+        <!-- app:min but android:max, for some reason? -->
+        <SeekBarPreference
+            app:key="@string/prefs_key_max_post_size_percentage"
+            android:title="@string/prefs_title_max_post_size_percentage"
+            app:min="25"
+            android:max="80"
+            app:defaultValue="@integer/prefs_default_max_post_size_percentage"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
 
         <ListPreference
             app:key="@string/prefs_key_fullscreen_swipe_direction"
@@ -33,6 +43,26 @@
             app:entries="@array/fullscreen_swipe_entries"
             app:entryValues="@array/fullscreen_swipe_values"
             app:defaultValue="@string/prefs_default_fullscreen_swipe_direction"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/prefs_group_comments"
+        app:iconSpaceReserved="false">
+
+        <!-- This is only a (signed) number, but this cannot be set (anymore) with XML, so it is set in code -->
+        <EditTextPreference
+            app:key="@string/prefs_key_hide_comments_threshold"
+            app:title="@string/prefs_title_hide_comments_threshold"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="@integer/prefs_default_hide_comments_threshold"/>
+
+        <!-- TODO hide comments from users ("This will also remove their child comments") -->
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/prefs_group_videos_images"
+        app:iconSpaceReserved="false">
 
         <SwitchPreference
             app:key="@string/prefs_key_cache_nsfw"
@@ -66,20 +96,5 @@
             app:title="@string/prefs_title_loop_videos"
             app:iconSpaceReserved="false"
             app:defaultValue="@bool/prefs_default_loop_videos" />
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        app:title="@string/prefs_group_comments"
-        app:iconSpaceReserved="false">
-
-        <!-- This is only a number, but this cannot be set (anymore) with XML, so it is set in code -->
-        <EditTextPreference
-            app:key="@string/prefs_key_hide_comments_threshold"
-            app:title="@string/prefs_title_hide_comments_threshold"
-            app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true"
-            app:defaultValue="@integer/prefs_default_hide_comments_threshold"/>
-
-        <!-- TODO hide comments from users ("This will also remove their child comments") -->
     </PreferenceCategory>
 </PreferenceScreen>
