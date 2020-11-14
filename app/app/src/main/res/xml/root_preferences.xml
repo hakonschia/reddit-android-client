@@ -18,7 +18,7 @@
             app:entries="@array/language_entries"
             app:entryValues="@array/language_values"
             app:useSimpleSummaryProvider="true"
-            app:defaultValue="@string/prefs_key_language_automatic" />
+            app:defaultValue="@string/prefs_key_language_en" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -43,6 +43,12 @@
             app:entries="@array/fullscreen_swipe_entries"
             app:entryValues="@array/fullscreen_swipe_values"
             app:defaultValue="@string/prefs_default_fullscreen_swipe_direction"/>
+
+        <SwitchPreference
+            app:key="@string/prefs_key_cache_nsfw"
+            app:iconSpaceReserved="false"
+            app:title="@string/prefs_title_cache_nsfw"
+            app:defaultValue="@bool/prefs_default_value_cache_nsfw" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -61,14 +67,8 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="@string/prefs_group_videos_images"
+        app:title="@string/prefs_group_videos"
         app:iconSpaceReserved="false">
-
-        <SwitchPreference
-            app:key="@string/prefs_key_cache_nsfw"
-            app:iconSpaceReserved="false"
-            app:title="@string/prefs_title_cache_nsfw"
-            app:defaultValue="@bool/prefs_default_value_cache_nsfw" />
 
         <ListPreference
             app:key="@string/prefs_key_auto_play_videos"

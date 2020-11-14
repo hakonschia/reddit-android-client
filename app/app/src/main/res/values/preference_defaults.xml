@@ -7,7 +7,7 @@
     <bool name="prefs_default_play_muted_videos_fullscreen">true</bool>
     <bool name="prefs_default_loop_videos">false</bool>
     <string name="prefs_default_fullscreen_swipe_direction" translatable="false">@string/prefs_key_fullscreen_swipe_direction_up</string>
-    <string name="prefs_default_language" translatable="false">@string/prefs_key_language_automatic</string>
+    <string name="prefs_default_language" translatable="false">@string/prefs_key_language_en</string>
     <integer name="prefs_default_hide_comments_threshold">-5</integer>
     <integer name="prefs_default_max_post_size_percentage">65</integer>
 

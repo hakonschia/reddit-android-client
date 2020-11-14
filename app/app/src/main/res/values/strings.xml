@@ -55,7 +55,7 @@
     <!-- Preference groups -->
     <string name="prefs_group_appearance">Appearance</string>
     <string name="prefs_group_posts">Posts</string>
-    <string name="prefs_group_videos_images">Videos and images</string>
+    <string name="prefs_group_videos">Videos</string>
     <string name="prefs_group_comments">Comments</string>
 
     <!-- Preference titles/names -->
@@ -76,7 +76,6 @@
     <string name="prefs_title_language">Language</string>
     <!-- These are marked as non-translateable as they should always appear in the actual
      language they represent -->
-    <string name="prefs_title_language_automatic">Automatic</string>
     <string name="prefs_title_language_en" translatable="false">English</string>
     <string name="prefs_title_language_nb" translatable="false">Norsk (bokmål)</string>
     <string name="prefs_title_hide_comments_threshold">Automatically hide comments with score less than</string>
@@ -98,7 +97,6 @@
     <string name="prefs_key_fullscreen_swipe_direction_down" translatable="false">fullscreen_swipe_direction_down</string>
     <string name="prefs_key_fullscreen_swipe_direction_left" translatable="false">fullscreen_swipe_direction_left</string>
     <string name="prefs_key_language" translatable="false">language</string>
-    <string name="prefs_key_language_automatic" translatable="false">language_automatic</string>
     <string name="prefs_key_language_en" translatable="false">en</string>
     <string name="prefs_key_language_nb" translatable="false">nb</string>
     <string name="prefs_key_hide_comments_threshold" translatable="false">auto_hide_comments_threshold</string>

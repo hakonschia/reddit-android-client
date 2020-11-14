@@ -24,12 +24,10 @@
 
 
     <string-array name="language_entries">
-        <item>@string/prefs_title_language_automatic</item>
         <item>@string/prefs_title_language_en</item>
         <item>@string/prefs_title_language_nb</item>
     </string-array>
     <string-array name="language_values">
-        <item>@string/prefs_key_language_automatic</item>
         <item>@string/prefs_key_language_en</item>
         <item>@string/prefs_key_language_nb</item>
     </string-array>

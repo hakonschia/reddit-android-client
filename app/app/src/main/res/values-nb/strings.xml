@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Hakon\'s Reader</string>
     <string name="prefs_title_auto_play_videos_wifi_only">Kun Wi-Fi</string>
-    <string name="prefs_group_videos_images">Videor og bilder</string>
+    <string name="prefs_group_videos">Videor</string>
     <string name="profileAge">Bruker siden %s</string>
     <string name="btnSubscrubeUnsubscribe">- Avabonner</string>
     <string name="tooManyRequestsError">For mange forespørsler sent. Prøv igjen om et par sekunder</string>
@@ -114,8 +114,7 @@
     <string name="prefs_title_fullscreen_swipe_direction_down">Ned</string>
     <string name="prefs_title_fullscreen_swipe_direction_left">Venstre</string>
     <string name="prefs_title_fullscreen_swipe_direction_right">Høyre</string>
-    <string name="prefs_title_language">Språk</string>
-    <string name="prefs_title_language_automatic">Automatisk</string>
+    <string name="prefs_title_language">Språk (Language)</string>
     <string name="dialogReplyNotLoggedInTitle">Ikke innlogget</string>
     <string name="dialogReplyNotLoggedInContent">Du er ikke innlogget og vil ikke kunne sende et svar</string>
 
@@ -169,4 +168,6 @@
     <string name="postSticky">Fest post</string>
     <string name="postRemoveModDistinguish">Ikke vis som moderator</string>
     <string name="postRemoveSticky">Fjern feste</string>
+    <string name="prefs_group_posts">Poster</string>
+    <string name="prefs_title_max_post_size_percentage">Maks prosent av skjermhøyden poster vil ta</string>
 </resources>

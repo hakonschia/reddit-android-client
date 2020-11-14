@@ -1,6 +1,7 @@
 package com.example.hakonsreader.activites;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -26,11 +28,14 @@ import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.zeugmasolutions.localehelper.LocaleAwareCompatActivity;
+
+import java.util.Locale;
 
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 
-public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
+public class MainActivity extends LocaleAwareCompatActivity implements OnSubredditSelected {
     private static final String TAG = "MainActivity";
 
     private static final String POSTS_FRAGMENT = "postsFragment";
@@ -198,6 +203,20 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 .replace(R.id.fragmentContainer, activeSubreddit)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
+    }
+
+    /**
+     * Updates the language
+     *
+     * @param language The language to switch to. If this is {@code null} the language found in
+     *                 SharedPreferences will be used
+     */
+    public void updateLanguage(String language) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        if (language == null) {
+            language = settings.getString(getString(R.string.prefs_key_language), getString(R.string.prefs_default_language));
+        }
+        updateLocale(new Locale(language));
     }
 
     /**

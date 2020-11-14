@@ -74,7 +74,6 @@ public class App extends Application {
 
     private static App app;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -94,7 +93,6 @@ public class App extends Application {
 
         setupRedditApi();
         updateTheme();
-        updateLanguage();
 
         AppDatabase db = AppDatabase.getInstance(this);
 
@@ -317,23 +315,6 @@ public class App extends Application {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-    }
-
-    /**
-     * Updates the language based on what is set in the settings
-     */
-    public void updateLanguage() {
-        String language = settings.getString(getString(R.string.prefs_key_language), getString(R.string.prefs_default_language));
-
-        Log.d(TAG, "updateLanguage: " + language);
-
-        if (language.equals(getString(R.string.prefs_key_language_en))) {
-
-        } else if (language.equals(getString(R.string.prefs_key_language_nb))) {
-
-        } else {
-            // Automatic, set to default locale
         }
     }
 
