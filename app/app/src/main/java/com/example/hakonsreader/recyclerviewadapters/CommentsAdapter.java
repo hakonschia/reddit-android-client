@@ -750,15 +750,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void bind(RedditComment comment) {
             binding.setComment(comment);
 
-            // Execute all the bindings now, or else scrolling/changing to the dataset will have a
-            // small, but noticeable delay, causing the old comment to still appear
-            binding.executePendingBindings();
-
             // If the ticker has animation enabled it will animate from the previous comment to this one
             // which is very weird behaviour, so disable the animation and enable it again when we have set the comment
             binding.commentVoteBar.enableTickerAnimation(false);
             binding.commentVoteBar.setListing(comment);
             binding.commentVoteBar.enableTickerAnimation(true);
+
+            // Execute all the bindings now, or else scrolling/changes to the dataset will have a
+            // small, but noticeable delay, causing the old comment to still appear
+            binding.executePendingBindings();
         }
     }
 }

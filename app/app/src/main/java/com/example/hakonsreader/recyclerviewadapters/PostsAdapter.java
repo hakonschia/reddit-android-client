@@ -15,9 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
-import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.ListDivider;
 import com.example.hakonsreader.views.Post;
 
@@ -147,7 +145,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         final RedditPost post = posts.get(position);
 
         // Don't show text posts here (only show when a post is opened)
-        holder.post.setShowContent(post.getPostType() != PostType.TEXT);
+        holder.post.setShowTextContent(false);
 
         // Disable ticker animation to avoid it updating when scrolling
         holder.post.enableTickerAnimation(false);

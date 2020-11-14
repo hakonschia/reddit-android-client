@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -22,6 +23,7 @@ import androidx.core.util.Pair;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.PostActivity;
+import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 import com.google.gson.Gson;
@@ -41,7 +43,7 @@ public class Post extends RelativeLayout {
 
     private final PostBinding binding;
     private RedditPost postData;
-    private boolean showContent = true;
+    private boolean showTextContent = true;
     /**
      * If set to true the post can be opened in a new activity
      */
@@ -110,10 +112,10 @@ public class Post extends RelativeLayout {
      * <p>This only sets the flag to show the content or not. If content shouldn't be shown this must be set
      * before {@link Post#setPostData(RedditPost)} as the content is generated in that call</p>
      *
-     * @param showContent True if content should be set or not
+     * @param showTextContent True if content should be set or not
      */
-    public void setShowContent(boolean showContent) {
-        this.showContent = showContent;
+    public void setShowTextContent(boolean showTextContent) {
+        this.showTextContent = showTextContent;
     }
 
     /**
@@ -176,10 +178,10 @@ public class Post extends RelativeLayout {
     /**
      * Adds the post content
      *
-     * <p>If {@link Post#showContent} is {@code false}, nothing happens</p>
+     * <p>If {@link Post#showTextContent} is {@code false} and the post type is {@link PostType#TEXT} nothing happens</p>
      */
     private void addContent() {
-        if (!showContent) {
+        if (!showTextContent && postData.getPostType() == PostType.TEXT) {
             return;
         }
 
@@ -225,7 +227,7 @@ public class Post extends RelativeLayout {
 
 
     /**
-     * Generates content view for a post
+     * Generates the content view for a post
      *
      * @param post The post to generate for
      * @return A view with the content of the post
@@ -233,6 +235,9 @@ public class Post extends RelativeLayout {
     private View generatePostContent(RedditPost post, Context context) {
         // If the post has been removed don't try to render the content as it can cause a crash later
         // Just show that the post has been removed
+        // For instance, if the post is not uploaded to reddit the URL will still link to something (like an imgur gif)
+        // TODO maybe the only posts actually removed completely so they're not able ot be watched are videos? Even text/images uploaded
+        //  to reddit directly are still there
         if (post.getRemovedByCategory() != null) {
             ContentPostRemoved c = new ContentPostRemoved(context);
             c.setPost(post);
@@ -278,10 +283,18 @@ public class Post extends RelativeLayout {
                 } else {
                     // Otherwise the content is the entire parents info
                     Post c = new Post(context);
+
+                    // Propagate any information about the parent post to the crosspost, or else
+                    // it will act as a full post ignoring values it should have
+                    c.setAllowPostOpen(allowPostOpen);
+                    c.setMaxHeight(maxHeight);
+                    c.setImageLoadedCallback(imageLoadedCallback);
+                    c.setShowTextContent(showTextContent);
+                    c.setHideScore(binding.postFullBar.getHideScore());
                     c.setPostData(parent);
 
                     // Add a border around to show where the crosspost post is and where the actual post it
-                    c.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border));
+                    c.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border_crosspost));
                     content = c;
                 }
                 break;

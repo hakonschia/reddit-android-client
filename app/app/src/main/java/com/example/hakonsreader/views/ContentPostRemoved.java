@@ -48,7 +48,6 @@ public class ContentPostRemoved extends ConstraintLayout {
     public void setPost(RedditPost post) {
         this.post = post;
         binding.setPost(post);
-        Log.d(TAG, "setPost: bruh");
     }
 
 
@@ -63,6 +62,9 @@ public class ContentPostRemoved extends ConstraintLayout {
         String removedByCategory = post.getRemovedByCategory();
         Log.d(TAG, "removedBy: " + removedByCategory);
 
+        // TODO Other categories:
+        //  "author" for when the author removed it
+        //  "automod_filtered" for when it needs moderator approval
         if (removedByCategory.equals("moderator")) {
             tv.setText(tv.getResources().getString(R.string.postRemovedByMods, post.getSubreddit()));
         } else {

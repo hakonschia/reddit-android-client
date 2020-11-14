@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners
+        android:radius="5dp"/>
+
+    <!-- This padding is kinda weird, it looks fairly equal on left/right even if
+     left padding has a higher value. Might be some weird padding on Post or something -->
+    <padding
+        android:left="6dp"
+        android:right="2dp"
+        android:top="2dp"
+        android:bottom="2dp"/>
+
+    <stroke
+        android:width="1dp"
+        android:color="#515151"/>
+</shape>
