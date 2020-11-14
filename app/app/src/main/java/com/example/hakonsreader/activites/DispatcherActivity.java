@@ -31,6 +31,20 @@ public class DispatcherActivity extends AppCompatActivity {
      */
     public static final String URL_KEY = "url";
 
+    /**
+     * Matches variants of "reddit.com"
+     *
+     * <p>Matches:
+     * <ol>
+     *     <li>http</li>
+     *     <li>https</li>
+     *     <li>.com</li>
+     *     <li>.com/</li>
+     * </ol>
+     * </p>
+     */
+    public static final String REDDIT_HOME_PAGE_URL = "^http(s)?://(www.)?reddit\\.com(/)?$";
+
 
     private boolean fadeTransition = false;
 
@@ -90,8 +104,7 @@ public class DispatcherActivity extends AppCompatActivity {
             lastSegment = pathSegments.get(pathSegments.size() - 1);
         }
 
-        if (url.matches("https://(www.)?reddit\\.com")) {
-
+        if (url.matches(REDDIT_HOME_PAGE_URL)) {
             // When the app is started from a "reddit.com" intent we could load the front page as
             // its own subreddit activity, but it makes more sense that this actually loads the application
             // Since this activity is started without MainActivity being created we can just recreate the
@@ -122,8 +135,15 @@ public class DispatcherActivity extends AppCompatActivity {
 
             // TODO when the post is in a "user" subreddit it doesnt work
             //  eg: https://www.reddit.com/user/HyperBirchyBoy/comments/jbkw1f/moon_landing_with_benny_hill_and_sped_up/?utm_source=share&utm_medium=ios_app&utm_name=iossmf
-        } else if (url.matches("https://redd.it/.*")) {
-            // For shortened URLs the first (and only) path segment is the post ID
+        } else if (url.matches(LinkUtils.POST_REGEX_NO_SUBREDDIT)) {
+            // The URL will look like: reddit.com/comments/<postId>
+            String postId = pathSegments.get(1);
+
+            intent = new Intent(this, PostActivity.class);
+            intent.putExtra(PostActivity.POST_ID_KEY, postId);
+
+        } else if (url.matches(LinkUtils.POST_SHORTENED_URL_REGEX)) {
+            // The URL will look like: redd.it/<postId>
             String postId = pathSegments.get(0);
 
             intent = new Intent(this, PostActivity.class);
@@ -173,6 +193,8 @@ public class DispatcherActivity extends AppCompatActivity {
             if (!appActivityFound) {
                 intent = new Intent(this, WebViewActivity.class);
                 intent.putExtra(WebViewActivity.URL_KEY, url);
+            } else {
+                Log.d(TAG, "createIntent: no specific intent found");
             }
         }
 

@@ -45,9 +45,28 @@ public final class LinkUtils {
      * <p>Note that this doesn't check for the start of the string (^) so it can be used for
      * both stand-alone subreddit references (only r/...) and full URLs (reddit.com/r/...)</p>
      *
-     * <p>Example: r/GlobalOffensive/comments/55ter/FaZe_Wins_major</p>
+     * <p>Example: r/GlobalOffensive/comments/55ter</p>
+     * <p>Example: r/GlobalOffensive/comments/55ter/</p>
+     * <p>Example: /R/GlobalOffensive/comments/55ter/FaZe_Wins_major</p>
      */
-    public static final String POST_REGEX = ".*/?(r|R)/[A-Za-z0-9]+/comments/.+/.+/?$";
+    public static final String POST_REGEX = ".*/?(r|R)/[A-Za-z0-9]+/comments/.+/?$";
+
+    /**
+     * Matches a post URL with only {@code /comments/<postId>}
+     *
+     * <p>Example: comments/55ter/</p>
+     * <p>Example: comments/55ter/FaZe_wins_major</p>
+     */
+    public static final String POST_REGEX_NO_SUBREDDIT = ".*/comments/.+";
+
+    /**
+     * Matches a shortened URL for a post.
+     *
+     * <p>For these links the first (and only) path segment is the ID of the post</p>
+     *
+     * <p>Example: https://redd.it/jtpvml</p>
+     */
+    public static final String POST_SHORTENED_URL_REGEX = "http(s)?://redd.it/.*";
 
     /**
      * Regex matching imgur image URLs
@@ -63,7 +82,7 @@ public final class LinkUtils {
     /**
      * Regex for GIF URLs
      */
-    public static final String GIF_REGEX = "^.*(gif(v){0,1})$";
+    public static final String GIF_REGEX = "^.*(gif(v)?)$";
 
     private LinkUtils() {}
 

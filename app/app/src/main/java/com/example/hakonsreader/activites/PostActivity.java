@@ -102,6 +102,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
 
         this.setupCommentsViewModel();
 
+        // TODO When the post is opened from an intent outside the app (from intent-filter) this doesn't work
         // If we're in landscape the "height" is the width of the screen
         boolean portrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         int height = portrait ? App.get().getScreenHeight() : App.get().getScreenWidth();

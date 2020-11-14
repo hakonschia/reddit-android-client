@@ -66,83 +66,105 @@
             android:name=".activites.WebViewActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme"/>
 
+
         <activity
             android:name=".activites.DispatcherActivity"
             android:theme="@style/AppTheme.DispatcherTheme">
 
+            <!-- TODO it's kind of annoying to have to have a trailing slash on these. Since it's not a proper regex
+            matcher I can't do "/?" at the end. If I end up actually implementing all possible paths I can probably
+            match an intent filter for anything from reddit.com, but that's really bad to do if I can't handle all intents -->
+
+            <!-- Match reddit.com -->
+            <!-- Using testUrl="https://reddit.com" will fail, but when actually starting an intent with that URL it will pass -->
             <tools:validation testUrl="https://www.reddit.com/" />
             <tools:validation testUrl="https://reddit.com/" />
+            <tools:validation testUrl="https://old.reddit.com/" />
+            <tools:validation testUrl="https://np.reddit.com/" />
+            <tools:validation testUrl="https://redd.it/" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:scheme="https"
-                    android:host="www.reddit.com"
-                    android:path="/"/>
-                <data
-                    android:scheme="https"
-                    android:host="reddit.com"
-                    android:path="/"/>
+                <data android:scheme="https" android:host="*.reddit.com" android:path="/"/>
+                <data android:scheme="https" android:host="reddit.com" android:path="/"/>
+                <data android:scheme="http" android:host="*.reddit.com" android:path="/"/>
+                <data android:scheme="http" android:host="reddit.com" android:path="/"/>
+
+                <data android:scheme="https" android:host="redd.it" />
             </intent-filter>
 
-
-            <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive" />
-            <tools:validation testUrl="https://reddit.com/r/GlobalOffensive" />
+            <!-- Subreddits -->
+            <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/" />
+            <tools:validation testUrl="https://old.reddit.com/r/GlobalOffensive/" />
+            <tools:validation testUrl="http://reddit.com/r/GlobalOffensive/" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:scheme="https"
-                    android:host="www.reddit.com"
-                    android:pathPattern="/r/.*" />
-                <data
-                    android:scheme="https"
-                    android:host="reddit.com"
-                    android:pathPattern="/r/.*" />
+                <data android:scheme="https" android:host="*.reddit.com" android:pathPattern="/r/.*/" />
+                <data android:scheme="http" android:host="reddit.com" android:pathPattern="/r/" />
             </intent-filter>
 
+            <!-- Users -->
+            <!-- AFAIK nothing can come after users in the url, so we can safely omit the trailing slash here -->
+            <tools:validation testUrl="https://reddit.com/u/hakonschia/" />
+            <tools:validation testUrl="https://www.reddit.com/u/hakonschia/" />
+            <tools:validation testUrl="http://reddit.com/u/hakonschia/" />
+            <tools:validation testUrl="http://old.reddit.com/u/hakonschia/" />
+            <tools:validation testUrl="https://reddit.com/user/hakonschia/" />
+            <tools:validation testUrl="http://old.reddit.com/user/hakonschia" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" android:host="*.reddit.com" android:pathPattern="/u/.*"/>
+                <data android:scheme="http" android:host="reddit.com" android:pathPattern="/u/.*"/>
+
+                <data android:scheme="https" android:host="*.reddit.com" android:pathPattern="/user/.*"/>
+                <data android:scheme="http" android:host="reddit.com" android:pathPattern="/user/.*"/>
+            </intent-filter>
+
+            <!-- Posts -->
+            <tools:validation testUrl="https://old.reddit.com/r/GlobalOffensive/comments/j72qmj/furias_buy_against_triumph_at_iem_new_york/" />
             <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/comments/j72qmj/furias_buy_against_triumph_at_iem_new_york/" />
-            <tools:validation testUrl="https://reddit.com/r/GlobalOffensive/comments/j72qmj/furias_buy_against_triumph_at_iem_new_york/" />
+            <tools:validation testUrl="https://reddit.com/r/GlobalOffensive/comments/j72qmj/" />
+            <tools:validation testUrl="https://old.reddit.com/r/GlobalOffensive/comments/j72qmj/" />
+            <tools:validation testUrl="https://reddit.com/comments/j72qmj/" />
+            <tools:validation testUrl="https://old.reddit.com/comments/j72qmj/" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:scheme="https"
-                    android:host="www.reddit.com"
-                    android:pathPattern="/r/.*/comments/.*/.*" />
-                <data
-                    android:scheme="https"
-                    android:host="reddit.com"
-                    android:pathPattern="/r/.*/comments/.*/.*" />
+                <!-- With a summary of the title at the end -->
+                <data android:scheme="https" android:host="*.reddit.com" android:pathPattern="/r/.*/comments/.*/.*/" />
+                <data android:scheme="http" android:host="reddit.com" android:pathPattern="/r/.*/comments/.*/.*/" />
+
+                <!-- Without the summary of the title at the end (/r/<sub>/comments/<id>/ -->
+                <data android:scheme="http" android:host="reddit.com" android:pathPattern="/r/.*/comments/.*/" />
+
+                <!-- Without any knowledge of the subreddit (/comments/<id>/) -->
+                <data android:scheme="http" android:host="reddit.com" android:pathPattern="/comments/.*/" />
             </intent-filter>
 
+            <!-- Posts from shortened URLs-->
+            <!-- As with posts, I believe redd.it links will always only be for posts, so we can omit the trailing slash -->
+            <tools:validation testUrl="https://redd.it/je5l4g/"/>
             <tools:validation testUrl="https://redd.it/je5l4g"/>
-            <tools:validation testUrl="https://www.redd.it/je5l4g"/>
+            <tools:validation testUrl="http://redd.it/je5l4g/"/>
+            <tools:validation testUrl="http://redd.it/je5l4g"/>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:scheme="https"
-                    android:host="redd.it"
-                    android:pathPattern="/.*" />
-                <data
-                    android:scheme="https"
-                    android:host="www.redd.it"
-                    android:pathPattern="/.*" />
+                <data android:scheme="https" android:host="redd.it" android:pathPattern="/.*" />
+                <data android:scheme="http" android:host="redd.it" android:pathPattern="/.*" />
             </intent-filter>
-
         </activity>
     </application>
 
