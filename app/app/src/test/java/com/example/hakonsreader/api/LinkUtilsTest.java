@@ -257,6 +257,10 @@ public class LinkUtilsTest {
                 "https://reddit.com/r/hakon_schia/comments/jtyz0e/cool_image",
                 "https://reddit.com/r/hakon_schia/comments/jtyz0e/",
                 "https://reddit.com/r/hakon_schia/comments/jtyz0e",
+
+                // The full urls should also match a comment chain (the ID at the end links to a comment ID)
+                "https://reddit.com/r/hakon_schia/comments/jtyz0e/cool_image/gerger",
+                "https://reddit.com/r/hakon_schia/comments/jtyz0e/cool_image/gerger/",
         };
 
         Pattern p = Pattern.compile(LinkUtils.POST_REGEX);

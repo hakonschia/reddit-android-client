@@ -134,6 +134,9 @@
             <tools:validation testUrl="https://old.reddit.com/r/GlobalOffensive/comments/j72qmj/" />
             <tools:validation testUrl="https://reddit.com/comments/j72qmj/" />
             <tools:validation testUrl="https://old.reddit.com/comments/j72qmj/" />
+
+            <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/comments/ju3c1m/million_concurrent_players_again/gc9edc5" />
+            <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/comments/ju3c1m/million_concurrent_players_again/gc9edc5/" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -143,11 +146,15 @@
                 <data android:scheme="https" android:host="*.reddit.com" android:pathPattern="/r/.*/comments/.*/.*/" />
                 <data android:scheme="http" android:host="reddit.com" android:pathPattern="/r/.*/comments/.*/.*/" />
 
+                <!-- Linking to a specific comment thread -->
+                <data android:scheme="https" android:host="reddit.com" android:pathPattern="/r/.*/comments/.*/.*/.*" />
+
                 <!-- Without the summary of the title at the end (/r/<sub>/comments/<id>/ -->
                 <data android:scheme="http" android:host="reddit.com" android:pathPattern="/r/.*/comments/.*/" />
 
                 <!-- Without any knowledge of the subreddit (/comments/<id>/) -->
                 <data android:scheme="http" android:host="reddit.com" android:pathPattern="/comments/.*/" />
+
             </intent-filter>
 
             <!-- Posts from shortened URLs-->

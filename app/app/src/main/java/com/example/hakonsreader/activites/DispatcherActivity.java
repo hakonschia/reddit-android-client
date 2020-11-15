@@ -133,6 +133,12 @@ public class DispatcherActivity extends AppCompatActivity {
             intent = new Intent(this, PostActivity.class);
             intent.putExtra(PostActivity.POST_ID_KEY, postId);
 
+            // Link to a comment chain
+            // The URL will look like: reddit.com/r/<subreddit>/comments/<postId/<postTitle>/<commentId>
+            if (pathSegments.size() >= 6) {
+                intent.putExtra(PostActivity.COMMENT_ID_CHAIN, pathSegments.get(5));
+            }
+
             // TODO when the post is in a "user" subreddit it doesnt work
             //  eg: https://www.reddit.com/user/HyperBirchyBoy/comments/jbkw1f/moon_landing_with_benny_hill_and_sped_up/?utm_source=share&utm_medium=ios_app&utm_name=iossmf
         } else if (url.matches(LinkUtils.POST_REGEX_NO_SUBREDDIT)) {

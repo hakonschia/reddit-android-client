@@ -83,6 +83,7 @@ public final class LinkUtils {
      *     <li>r/GlobalOffensive/comments/55ter</li>
      *     <li>R/GlobalOffensive/comments/55ter/</li>
      *     <li>/R/GlobalOffensive/comments/55ter/FaZe_Wins_major</li>
+     *     <li>/R/GlobalOffensive/comments/55ter/FaZe_Wins_major</li>
      * </ol>
      * </p>
      */
