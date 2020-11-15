@@ -3,8 +3,6 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -13,9 +11,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener;
 import com.example.hakonsreader.views.util.ClickHandler;
-import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -23,9 +19,8 @@ import com.squareup.picasso.RequestCreator;
 
 import java.util.List;
 
-public class ContentImage extends PhotoView {
+public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
     private static final String TAG = "ContentImage";
-
 
     private RedditPost post;
     private String imageUrl;
@@ -100,8 +95,7 @@ public class ContentImage extends PhotoView {
             }
         }
 
-        // TODO create a preference for "Enable zooming of images while scrolling"
-        this.setOnDoubleTapListener(doubleTapListener);
+        setOnClickListener(v -> ClickHandler.openImageInFullscreen(this, imageUrl));
 
         // Dont show NSFW images until we are in fullscreen
         if (post.isNsfw()) {
@@ -146,30 +140,5 @@ public class ContentImage extends PhotoView {
         }
 
     }
-
-    /**
-     * Listener for double taps. For single taps the image is opened in a fullscreen activity, and double
-     * tap zooms (with the use of {@link PhotoViewDoubleTapListener}
-     */
-    private final GestureDetector.OnDoubleTapListener doubleTapListener = new GestureDetector.OnDoubleTapListener() {
-        private final PhotoViewDoubleTapListener photoViewDoubleTapListener = new PhotoViewDoubleTapListener(getAttacher());
-
-        // Open image in fullscreen on single tap
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
-            ClickHandler.openImageInFullscreen(ContentImage.this, imageUrl);
-            return true;
-        }
-
-        @Override
-        public boolean onDoubleTap(MotionEvent motionEvent) {
-            return photoViewDoubleTapListener.onDoubleTap(motionEvent);
-        }
-
-        @Override
-        public boolean onDoubleTapEvent(MotionEvent motionEvent) {
-            return false;
-        }
-    };
 }
 
