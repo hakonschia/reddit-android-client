@@ -7,6 +7,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -29,7 +30,7 @@ public class LinkPlugin extends AbstractMarkwonPlugin {
     private static final String TAG = "LinkPlugin";
 
     // Pattern taken from: https://stackoverflow.com/a/3809435/7750841
-    private static final Pattern RE = Pattern.compile("https://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)");
+    private static final Pattern RE = Pattern.compile("https://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=,]*)");
 
 
     private final Context context;
@@ -49,6 +50,7 @@ public class LinkPlugin extends AbstractMarkwonPlugin {
             final int e = matcher.end();
             final String link = matcher.group();
 
+            Log.d(TAG, "beforeSetText: " + link);
             final ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
