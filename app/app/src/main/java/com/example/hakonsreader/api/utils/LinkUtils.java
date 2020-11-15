@@ -7,23 +7,49 @@ package com.example.hakonsreader.api.utils;
  */
 public final class LinkUtils {
 
+
     /**
      * Regex for matching a subreddit URL. Matches either a full URL (only https, www optional) or only "r/...."
      *
      * <p>Examples:</p>
      * <ol>
-     * <li>r/GlobalOffensive</li>
-     * <li>/r/instant_karma</li>
-     * <li>R/GlobalOffensive</li>
-     * <li>/R/Hello</li>
      * <li>https://www.reddit.com/r/test</li>
      * <li>https://reddit.com/r/test</li>
      * </ol>
+     *
+     * @see LinkUtils#SUBREDDIT_REGEX_NO_HTTPS
+     * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
      */
-    // TODO this isn't 100 % as it will match "..reddit.comr/subreddit" since the first slash is optional
-    //  it has to be there for the full link, but if it's added to the actual link part that is optional, adding
-    //  as an optional to the rest will make it so you can match two (ie ".com//r/subreddit")
-    public static final String SUBREDDIT_REGEX = "(https://(www.)?reddit.com)?/?(r|R)/[A-Za-z0-9_]+/?";
+    // TODO instead of www. match anything (since it can be old.reddit.com etc.)
+    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "https://(www.)?reddit.com/(r|R)/[A-Za-z0-9_]+/?";
+
+    /**
+     * Regex for matching a subreddit string with only the "/r/..." part (no https://reddit.com).
+     * For a full URL matcher use {@link LinkUtils#SUBREDDIT_REGEX_WITH_HTTPS}.
+     *
+     * <p>The slashes at the beginning (/r..) and the end (r/globaloffensive/) are optional</p>
+     *
+     * <p>Examples:</p>
+     * <ol>
+     * <li>r/GlobalOffensive</li>
+     * <li>/r/instant_karma</li>
+     * <li>R/GlobalOffensive/</li>
+     * <li>/R/Hello</li>
+     * </ol>
+     *
+     * @see LinkUtils#SUBREDDIT_REGEX_WITH_HTTPS
+     * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
+     */
+    public static final String SUBREDDIT_REGEX_NO_HTTPS = "/?(r|R)/[A-Za-z0-9_]+/?";
+
+    /**
+     * Regex that matches either {@link LinkUtils#SUBREDDIT_REGEX_WITH_HTTPS} or {@link LinkUtils#SUBREDDIT_REGEX_NO_HTTPS}
+     *
+     * @see LinkUtils#SUBREDDIT_REGEX_WITH_HTTPS
+     * @see LinkUtils#SUBREDDIT_REGEX_NO_HTTPS
+     */
+    public static final String SUBREDDIT_REGEX_COMBINED = String.format("(%s)|(%s)", SUBREDDIT_REGEX_WITH_HTTPS, SUBREDDIT_REGEX_NO_HTTPS);
+
 
     /**
      * Regex for matching a URL to a user. Matches either a full URL (only https, www optional) or only "u/...."

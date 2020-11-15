@@ -112,7 +112,7 @@ public class DispatcherActivity extends AppCompatActivity {
             // Alternatively this could probably just resolve to MainActivity directly
             ProcessPhoenix.triggerRebirth(this);
             return null;
-        } else if (url.matches(LinkUtils.SUBREDDIT_REGEX)) {
+        } else if (url.matches(LinkUtils.SUBREDDIT_REGEX_COMBINED)) {
             // First is "r", second is the subreddit
             String subreddit = pathSegments.get(1);
 

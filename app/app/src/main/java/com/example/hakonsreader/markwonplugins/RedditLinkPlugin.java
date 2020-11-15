@@ -7,6 +7,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -35,7 +36,7 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
             // Match whitespace, start of string, in a parenthesis, or not in a [] (ie. already a markdown link)
             "(^|\\s|\\(|(?=\\[))" +
             // Match either subreddit or user regex
-            "(" + LinkUtils.SUBREDDIT_REGEX + ")" +
+            "(" + LinkUtils.SUBREDDIT_REGEX_NO_HTTPS + ")" +
             "|(" + LinkUtils.USER_REGEX + ")"
     );
 
@@ -65,6 +66,7 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
             String textToSpan = matcher.group();
             int s = matcher.start();
             int e = matcher.end();
+            Log.d(TAG, "applyLinkSpanRedditLinkPlugin: " + textToSpan);
 
             // The link is inside parenthesis such as a superscript, remove the parenthesis
             if (textToSpan.startsWith("(")) {
