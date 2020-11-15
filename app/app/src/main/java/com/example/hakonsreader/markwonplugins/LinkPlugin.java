@@ -50,7 +50,6 @@ public class LinkPlugin extends AbstractMarkwonPlugin {
             final int e = matcher.end();
             final String link = matcher.group();
 
-            Log.d(TAG, "beforeSetText: " + link);
             final ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
