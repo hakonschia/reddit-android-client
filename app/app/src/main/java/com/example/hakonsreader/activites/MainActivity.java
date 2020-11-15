@@ -28,14 +28,13 @@ import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.zeugmasolutions.localehelper.LocaleAwareCompatActivity;
 
 import java.util.Locale;
 
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 
-public class MainActivity extends LocaleAwareCompatActivity implements OnSubredditSelected {
+public class MainActivity extends AppCompatActivity implements OnSubredditSelected {
     private static final String TAG = "MainActivity";
 
     private static final String POSTS_FRAGMENT = "postsFragment";
@@ -72,7 +71,7 @@ public class MainActivity extends LocaleAwareCompatActivity implements OnSubredd
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
         intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/GlobalOffensive/comments/ju3c1m/million_concurrent_players_again/gc9edc5");
-        startActivity(intent);
+        //startActivity(intent);
 
         if (savedInstanceState != null) {
             Log.d(TAG, "onCreate: instance saved");
@@ -216,7 +215,8 @@ public class MainActivity extends LocaleAwareCompatActivity implements OnSubredd
         if (language == null) {
             language = settings.getString(getString(R.string.prefs_key_language), getString(R.string.prefs_default_language));
         }
-        updateLocale(new Locale(language));
+        // TODO this
+        //updateLocale(new Locale(language));
     }
 
     /**

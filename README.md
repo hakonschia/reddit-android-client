@@ -42,6 +42,5 @@ Thank you to Reddit for making this project possible by providing an open API.
 * [ExoPlayer](https://github.com/google/ExoPlayer) - Used for playing videos
 * [Ticker](https://github.com/robinhood/ticker) - A ticker style TextView that smoothly animates changes (by sliding characters up/down)
 * [ProcessPhoenix](https://github.com/JakeWharton/ProcessPhoenix) - Used to restart the application
-* [locale-helper-android](https://github.com/zeugma-solutions/locale-helper-android) - For changing the language of the application
 
 As well as various code snippets acknowledged throughout the code.

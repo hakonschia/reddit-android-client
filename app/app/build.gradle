@@ -12,10 +12,6 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
-    configurations {
-        implementation.exclude group: 'org.jetbrains', module: 'annotations'
-    }
-
     defaultConfig {
         applicationId "com.example.hakonsreader"
         minSdkVersion 26
@@ -85,7 +81,6 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.jakewharton:process-phoenix:2.0.0'
     implementation 'com.robinhood.ticker:ticker:2.0.2'
-    implementation 'com.zeugmasolutions.localehelper:locale-helper-android:1.1.2'
 
 
     testImplementation 'junit:junit:4.12'
