@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -64,6 +63,11 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      * The key used to tell if the post score should be hidden
      */
     public static final String HIDE_SCORE_KEY = "hideScore";
+
+    /**
+     * The key used to tell the ID of the comment chain to show
+     */
+    public static final String COMMENT_ID_CHAIN = "commentIdChain";
 
 
     /**
@@ -222,6 +226,16 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
                 this.onPostLoaded();
             }
         });
+        commentsViewModel.getComments().observe(this, comments -> {
+            // Check if there are any comments from before to avoid "No comments" not appearing when comments are reloaded
+            if (comments.isEmpty() && commentsAdapter.getItemCount() != 0) {
+                commentsAdapter.clearComments();
+                return;
+            }
+
+            commentsAdapter.addComments(comments);
+            binding.setNoComments(comments.isEmpty());
+        });
         commentsViewModel.getError().observe(this, error -> Util.handleGenericResponseErrors(binding.parentLayout, error.getError(), error.getThrowable()));
     }
 
@@ -313,22 +327,15 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         commentsAdapter = new CommentsAdapter(post);
         commentsAdapter.setParentLayout(binding.parentLayout);
         commentsAdapter.setOnReplyListener(this::replyTo);
+        commentsAdapter.setCommentIdChain(getIntent().getExtras().getString(COMMENT_ID_CHAIN, ""));
 
         layoutManager = new LinearLayoutManager(this);
 
+        // TODO this should be some sort of button above the list
+        binding.post.setOnClickListener(v -> commentsAdapter.setCommentIdChain(""));
+
         binding.comments.setAdapter(commentsAdapter);
         binding.comments.setLayoutManager(layoutManager);
-
-        commentsViewModel.getComments().observe(this, comments -> {
-            // Check if there are any comments from before to avoid "No comments" not appearing when comments are reloaded
-            if (comments.isEmpty() && commentsAdapter.getItemCount() != 0) {
-                commentsAdapter.clearComments();
-                return;
-            }
-
-            commentsAdapter.addComments(comments);
-            binding.setNoComments(comments.isEmpty());
-        });
     }
 
     /**

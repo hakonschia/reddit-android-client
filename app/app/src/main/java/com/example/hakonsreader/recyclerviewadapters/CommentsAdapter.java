@@ -2,6 +2,7 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +62,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private final RedditApi redditApi = App.get().getApi();
 
-
     /**
      * The list of comments that should be shown. This list might not include all comments for the post
      * as some might be hidden
@@ -75,10 +75,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     private List<RedditComment> commentsHidden = new ArrayList<>();
 
+    /**
+     * If {@link CommentsAdapter#commentIdChain} is set, this list will hold the chain of comments
+     * that should be shown
+     */
+    private List<RedditComment> chain = new ArrayList<>();
+
+    private List<RedditComment> commentsShownWhenChainSet;
+
 
     private final RedditPost post;
     private View parentLayout;
-
+    private String commentIdChain;
     private OnReplyListener replyListener;
 
 
@@ -141,6 +149,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     public void addComments(List<RedditComment> newComments) {
         comments.addAll(newComments);
+        setChain(newComments);
+
         notifyDataSetChanged();
         checkForHiddenComments(newComments);
     }
@@ -185,6 +195,62 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public List<RedditComment> getCommentsHidden() {
         return commentsHidden;
+    }
+
+    /**
+     * Sets {@link CommentsAdapter#chain} based on {@link CommentsAdapter#commentIdChain}.
+     * If the chain is found, the currently shown list is stored in {@link CommentsAdapter#commentsShownWhenChainSet}
+     *
+     * @param commentsToLookIn The comments to look in
+     */
+    private void setChain(List<RedditComment> commentsToLookIn) {
+        // TODO this (of course) causes isses with hiding comments. When all comments are shown again, the comments shown in the chain
+        //  wont be hidden if a parent is later hidden. Might have to find all comments manually instead of using comment.getReplies()
+
+        // TODO this is bugged when in a chain and going into a new chain
+
+        if (commentIdChain != null && !commentIdChain.isEmpty()) {
+            // We have to clear the list here. In case the comment isn't found every comment should be shown
+            int previousChainSize = chain.size();
+            chain.clear();
+
+            for (RedditComment comment : commentsToLookIn) {
+                if (comment.getId().equalsIgnoreCase(commentIdChain)) {
+                    chain = comment.getReplies();
+
+                    // The actual comment must also be added at the start
+                    chain.add(0, comment);
+
+                    // This list should take us back to all the comments, so if we're setting a chain
+                    // from within a chain, don't store the list
+                    if (previousChainSize == 0) {
+                        commentsShownWhenChainSet = comments;
+                    }
+                    comments = chain;
+                    break;
+                }
+            }
+        } else {
+            chain.clear();
+        }
+
+        if (chain.isEmpty() && commentsShownWhenChainSet != null) {
+            comments = commentsShownWhenChainSet;
+        }
+
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Sets what comment chain should be shown. If this is null or empty the entire list is shown.
+     *
+     * <p>This can be called before the comments are set, or after</p>
+     *
+     * @param commentIdChain The ID of the comment to show
+     */
+    public void setCommentIdChain(String commentIdChain) {
+        this.commentIdChain = commentIdChain;
+        setChain(comments);
     }
 
     /**
@@ -332,6 +398,14 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 hideComments(comment);
             }
         });
+    }
+
+    /**
+     * Returns the base depth for the current list shown. If a comment chain is shown, the value returned here
+     * will be the first comments depth, which should be used to calculate how many sidebars so show
+     */
+    public int getBaseDepth() {
+        return comments.get(0).getDepth();
     }
 
     @NonNull

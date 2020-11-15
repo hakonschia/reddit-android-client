@@ -170,4 +170,6 @@
     <string name="postRemoveSticky">Fjern feste</string>
     <string name="prefs_group_posts">Poster</string>
     <string name="prefs_title_max_post_size_percentage">Maks prosent av skjermhøyden poster vil ta</string>
+    <string name="commentShowChain">Vis kommentar tråd</string>
+    <string name="commentCopyLink">Kopier kommentar lenke</string>
 </resources>

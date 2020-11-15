@@ -368,13 +368,11 @@ public class Post extends RelativeLayout {
      * Copies the link to {@link Post#postData} to the clipboard and shows a toast that it has been copied
      */
     private void copyLinkToClipBoard() {
-        Activity activity = (Activity)getContext();
-
-        ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("reddit post", postData.getUrl());
         clipboard.setPrimaryClip(clip);
 
-        Toast.makeText(activity, R.string.linkCopied, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
 
         // DEBUG
         Log.d(TAG, "copyLinkToClipboard: " + new GsonBuilder().setPrettyPrinting().create().toJson(postData));

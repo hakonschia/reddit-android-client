@@ -1,10 +1,14 @@
 package com.example.hakonsreader.views.util;
 
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import androidx.annotation.IdRes;
 import androidx.fragment.app.Fragment;
@@ -48,7 +52,7 @@ public class MenuClickHandler {
         if (user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
             showPopupForCommentExtraForLoggedInUser(view, comment, adapter);
         } else {
-            showPopupForCommentExtraForNonLoggedInUser(view, comment);
+            showPopupForCommentExtraForNonLoggedInUser(view, comment, adapter);
         }
     }
 
@@ -59,6 +63,7 @@ public class MenuClickHandler {
      *
      * @param view The view clicked (where the popup will be attached)
      * @param comment The comment the popup is for
+     * @param adapter The RecyclerView adapter the comment is in
      */
     public static void showPopupForCommentExtraForLoggedInUser(View view, RedditComment comment, CommentsAdapter adapter) {
         PopupMenu menu = new PopupMenu(view.getContext(), view);
@@ -152,8 +157,9 @@ public class MenuClickHandler {
      *
      * @param view The view clicked (where the popup will be attached)
      * @param comment The comment the popup is for
+     * @param adapter The RecyclerView adapter the comment is in
      */
-    public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment) {
+    public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment, CommentsAdapter adapter) {
         Log.d(TAG, "showPopupForCommentExtraForNonLoggedInUser: ");
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.comment_extra_generic_for_all_users);
@@ -177,8 +183,22 @@ public class MenuClickHandler {
                 }, (e, t) -> {
                     Util.handleGenericResponseErrors(view, e, t);
                 });
+                return true;
             } else if (itemId == R.id.menuSaveOrUnsaveComment) {
                 saveCommentOnClick(view, comment);
+                return true;
+            } else if (itemId == R.id.menuShowCommentChain) {
+                adapter.setCommentIdChain(comment.getId());
+                return true;
+            } else if (itemId == R.id.menuCopyCommentLink) {
+                // The permalink is only the path
+                String url = "https://reddit.com" + comment.getPermalink();
+
+                ClipboardManager clipboard = (ClipboardManager) view.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("Reddit comment link", url);
+                clipboard.setPrimaryClip(clip);
+
+                Toast.makeText(view.getContext(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
                 return true;
             }
 

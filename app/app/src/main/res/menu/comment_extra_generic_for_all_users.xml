@@ -5,4 +5,12 @@
     <item
         android:id="@+id/menuSaveOrUnsaveComment"
         android:title="@string/saveComment"/>
+
+    <item
+        android:id="@+id/menuShowCommentChain"
+        android:title="@string/commentShowChain"/>
+
+    <item
+        android:id="@+id/menuCopyCommentLink"
+        android:title="@string/commentCopyLink"/>
 </menu>
