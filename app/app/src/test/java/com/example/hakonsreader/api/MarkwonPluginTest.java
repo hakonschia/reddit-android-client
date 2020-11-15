@@ -52,13 +52,4 @@ public class MarkwonPluginTest {
         m = pattern.matcher(text);
         assertEquals(2, totalMatches(m));
     }
-
-    @Test
-    public void superScriptPlugin() {
-        Pattern pattern = SuperscriptPlugin.RE_SENTENCES;
-
-        String text = "hello ^(how ^(are) you) :)";
-        Matcher m = pattern.matcher(text);
-
-    }
 }

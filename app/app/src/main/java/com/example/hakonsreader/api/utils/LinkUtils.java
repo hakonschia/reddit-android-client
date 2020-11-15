@@ -1,12 +1,19 @@
 package com.example.hakonsreader.api.utils;
 
 
+import com.example.hakonsreader.R;
+
 /**
  * Utility class that contains various regex matchers and functions to deal with common problems for
  * links from Reddit
  */
 public final class LinkUtils {
 
+    /**
+     * Basic subreddit regex that only matches "{@code < r/<allowed_subreddit_characters>}". This
+     * does not match a preceding or trailing slash
+     */
+    private static final String BASE_SUBREDDIT_REGEX = "(r|R)/[A-Za-z0-9_]";
 
     /**
      * Regex for matching a subreddit URL. Matches either a full URL (only https, www optional) or only "r/...."
@@ -21,7 +28,7 @@ public final class LinkUtils {
      * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
      */
     // TODO instead of www. match anything (since it can be old.reddit.com etc.)
-    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "https://(www.)?reddit.com/(r|R)/[A-Za-z0-9_]+/?";
+    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "(^|\\s)https://(www.)?reddit.com/" + BASE_SUBREDDIT_REGEX + "+/?(\\s|$)";
 
     /**
      * Regex for matching a subreddit string with only the "/r/..." part (no https://reddit.com).
@@ -40,7 +47,7 @@ public final class LinkUtils {
      * @see LinkUtils#SUBREDDIT_REGEX_WITH_HTTPS
      * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
      */
-    public static final String SUBREDDIT_REGEX_NO_HTTPS = "/?(r|R)/[A-Za-z0-9_]+/?";
+    public static final String SUBREDDIT_REGEX_NO_HTTPS = "(^|\\s)/?" + BASE_SUBREDDIT_REGEX + "+/?(\\s|$)";
 
     /**
      * Regex that matches either {@link LinkUtils#SUBREDDIT_REGEX_WITH_HTTPS} or {@link LinkUtils#SUBREDDIT_REGEX_NO_HTTPS}
@@ -63,7 +70,7 @@ public final class LinkUtils {
      * <li>/user/hakonschia-three</li>
      * </ol>
      */
-    public static final String USER_REGEX = "(https://(www.)?reddit.com)?/?u(ser)?/[A-Za-z0-9_-]+/?";
+    public static final String USER_REGEX = "(^|\\s)(https://(www.)?reddit.com)?/?u(ser)?/[A-Za-z0-9_-]+/?(\\s|$)";
 
     /**
      * Regex matching a post URL
@@ -71,17 +78,25 @@ public final class LinkUtils {
      * <p>Note that this doesn't check for the start of the string (^) so it can be used for
      * both stand-alone subreddit references (only r/...) and full URLs (reddit.com/r/...)</p>
      *
-     * <p>Example: r/GlobalOffensive/comments/55ter</p>
-     * <p>Example: r/GlobalOffensive/comments/55ter/</p>
-     * <p>Example: /R/GlobalOffensive/comments/55ter/FaZe_Wins_major</p>
+     * <p>Examples:
+     * <ol>
+     *     <li>r/GlobalOffensive/comments/55ter</li>
+     *     <li>R/GlobalOffensive/comments/55ter/</li>
+     *     <li>/R/GlobalOffensive/comments/55ter/FaZe_Wins_major</li>
+     * </ol>
+     * </p>
      */
-    public static final String POST_REGEX = ".*/?(r|R)/[A-Za-z0-9]+/comments/.+/?$";
+    public static final String POST_REGEX = ".*/?" + BASE_SUBREDDIT_REGEX + "+/comments/.+/?(\\s|$)";
 
     /**
      * Matches a post URL with only {@code /comments/<postId>}
      *
-     * <p>Example: comments/55ter/</p>
-     * <p>Example: comments/55ter/FaZe_wins_major</p>
+     * <p>Examples:
+     * <ol>
+     *     <li>comments/55ter</li>
+     *     <li>comments/55ter/FaZe_wins_major</li>
+     * </ol>
+     * </p>
      */
     public static final String POST_REGEX_NO_SUBREDDIT = ".*/comments/.+";
 
@@ -92,7 +107,7 @@ public final class LinkUtils {
      *
      * <p>Example: https://redd.it/jtpvml</p>
      */
-    public static final String POST_SHORTENED_URL_REGEX = "http(s)?://redd.it/.*";
+    public static final String POST_SHORTENED_URL_REGEX = "http(s)?://redd.it/.+";
 
     /**
      * Regex matching imgur image URLs
