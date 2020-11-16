@@ -47,8 +47,6 @@ public class ImgurRequest {
                 String[] paths = uri.getPath().split("/");
                 String albumHash = paths[paths.length - 1];
 
-                System.out.println("----------- Loading Imgur album " + albumHash + "---------------");
-
                 Response<ImgurAlbum> response = api.loadImgurAlbum(albumHash).execute();
                 ImgurAlbum album = response.body();
                 if (!response.isSuccessful() || album == null) {
@@ -58,36 +56,6 @@ public class ImgurRequest {
                 List<Image> images = album.getImages();
                 postWithImgurAlbum.setGallery(true);
                 postWithImgurAlbum.setGalleryImages(images);
-
-                for (Image image : images) {
-                    System.out.println("\tImageUrl=" + image.getUrl());
-                }
-
-                /*
-                api.loadImgurAlbum(albumHash).enqueue(new Callback<ImgurAlbum>() {
-                    @Override
-                    public void onResponse(Call<ImgurAlbum> call, Response<ImgurAlbum> response) {
-                        ImgurAlbum album = response.body();
-                        if (!response.isSuccessful() || album == null) {
-                            return;
-                        }
-
-                        List<Image> images = album.getImages();
-                        postWithImgurAlbum.setGallery(true);
-                        postWithImgurAlbum.setGalleryImages(images);
-
-                        for (Image image : images) {
-                            System.out.println("\tImageUrl=" + image.getUrl());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ImgurAlbum> call, Throwable t) {
-                        // This is an "optional" call, so if this fails we shouldn't invoke
-                        // onFailure.onFailure()
-                    }
-                });
-                 */
             } catch (URISyntaxException | IOException e) {
                 // This really should never happen but worst case is the album would be loaded as a link
                 e.printStackTrace();

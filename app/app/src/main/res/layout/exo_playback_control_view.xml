@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/videoControlBackground"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:background="@color/videoControlBackground">
 
     <!-- Thumbnail spanning across the entire view -->
-
     <ImageView
         android:id="@+id/thumbnail"
         android:layout_width="match_parent"
@@ -16,18 +16,14 @@
         android:contentDescription="@string/content_description_video_thumbnail"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.315" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/buffering"
         android:layout_width="25dp"
         android:layout_height="25dp"
 
-        android:layout_marginEnd="16dp"
         android:indeterminateTint="@color/colorAccent"
         android:visibility="gone"
 
@@ -82,8 +78,7 @@
             android:textStyle="bold"
             android:textColor="@android:color/white"
 
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
+            android:layout_marginStart="10dp"
             android:includeFontPadding="false"
 
             android:layout_gravity="center"
@@ -155,10 +150,9 @@
             android:id="@+id/volumeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
 
             android:paddingStart="10dp"
-            android:paddingEnd="25dp"
+            android:paddingEnd="10dp"
             android:background="@null"
             android:src="@drawable/ic_baseline_volume_up_24"
 

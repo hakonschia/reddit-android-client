@@ -51,5 +51,5 @@
     <dimen name="userAndSubredditIconSizePostAnim">45dp</dimen>
 
     <!-- The start/end margins of posts in lists/when opened -->
-    <dimen name="postMargin">12dp</dimen>
+    <dimen name="postMargin">8dp</dimen>
 </resources>

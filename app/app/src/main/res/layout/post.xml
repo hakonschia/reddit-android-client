@@ -15,13 +15,15 @@
         android:id="@+id/postInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/postMargin"
+        android:paddingEnd="@dimen/postMargin"
 
         android:transitionName="@string/transition_post_info"/>
 
     <!-- Content of the post (image, video etc.) -->
     <FrameLayout
         android:id="@+id/content"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
         android:layout_marginBottom="5dp"
@@ -33,6 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/content"
+        android:paddingStart="@dimen/postMargin"
+        android:paddingEnd="@dimen/postMargin"
 
         android:transitionName="@string/transition_post_full_bar"/>
  </RelativeLayout>

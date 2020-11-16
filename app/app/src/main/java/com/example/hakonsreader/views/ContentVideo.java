@@ -247,6 +247,8 @@ public class ContentVideo extends PlayerView {
 
             @Override
             public void onLoadingChanged(boolean isLoading) {
+                // TODO is this even visible? If the controller isn't visible this wont be visisble
+                //  it should be a part of the entire View, not just the controller view
                 if (loader == null) {
                     loader = findViewById(R.id.buffering);
                 }

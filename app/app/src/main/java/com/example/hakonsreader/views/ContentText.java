@@ -35,6 +35,12 @@ public class ContentText extends ScrollView {
 
         textView = new TextView(context);
         this.addView(textView);
+
+        MarginLayoutParams params = (MarginLayoutParams) textView.getLayoutParams();
+        int padding = (int) getResources().getDimension(R.dimen.postMargin);
+        params.setMarginStart(padding);
+        params.setMarginEnd(padding);
+        textView.setLayoutParams(params);
     }
 
     /**

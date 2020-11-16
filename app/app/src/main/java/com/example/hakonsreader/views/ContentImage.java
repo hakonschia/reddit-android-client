@@ -130,8 +130,6 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
                 c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
             }
 
-            Log.d(TAG, "updateView: " + imageLoadedCallback);
-
             c.into(this, imageLoadedCallback);
         } catch (RuntimeException e) {
             e.printStackTrace();
