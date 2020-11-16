@@ -43,7 +43,7 @@ public class DispatcherActivity extends AppCompatActivity {
      * </ol>
      * </p>
      */
-    public static final String REDDIT_HOME_PAGE_URL = "^http(s)?://(www.)?((reddit\\.com(/))|(redd.it)?)$";
+    public static final String REDDIT_HOME_PAGE_URL = "^http(s)?://(www.)?((reddit\\.com)|(redd.it))(/)?$";
 
 
     private boolean fadeTransition = false;
