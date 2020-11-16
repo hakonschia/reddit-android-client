@@ -278,6 +278,9 @@ public class LinkUtilsTest {
                 "r/hakonschia/comments",
                 "https://reddit.com/r/hakon_schia/comments/",
                 "https://reddit.com/r/hakon_schia/comments",
+
+                // TODO fix so it must be on reddit.com
+                "https://www.removeddit.com/r/DivinityOriginalSin/comments/jtx6t9/my_so_wanted_me_to_play_this_with_him_he_knew/gc8jjne"
         };
 
         for (String notMatchingTest : notMatchingTests) {

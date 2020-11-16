@@ -39,8 +39,22 @@ import java.util.List;
 import static android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION;
 
 
+/**
+ * Adapter for a RecyclerView populated with {@link RedditComment} objects. This adapter
+ * supports three different comment layouts:
+ * <ol>
+ *     <li>Normal comments</li>
+ *     <li>Hidden comments</li>
+ *     <li>"More" comments (eg. "2 more comments")</li>
+ * </ol>
+ */
 public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
+
+    // TODO this has become kind of messy and should be refactored to remove stuff that isn't used
+    //  and so I know what is actually going on here
+
+
     /**
      * The value returned from {@link CommentsAdapter#getItemViewType(int)} when the comment is
      * a "more comments" comment
@@ -204,9 +218,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param commentsToLookIn The comments to look in
      */
     private void setChain(List<RedditComment> commentsToLookIn) {
-        // TODO this (of course) causes isses with hiding comments. When all comments are shown again, the comments shown in the chain
-        //  wont be hidden if a parent is later hidden. Might have to find all comments manually instead of using comment.getReplies()
-
         // TODO this is bugged when in a chain and going into a new chain
 
         if (commentIdChain != null && !commentIdChain.isEmpty()) {
@@ -216,7 +227,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             for (RedditComment comment : commentsToLookIn) {
                 if (comment.getId().equalsIgnoreCase(commentIdChain)) {
-                    chain = comment.getReplies();
+                    chain = getShownReplies(comment);
 
                     // The actual comment must also be added at the start
                     chain.add(0, comment);
@@ -238,6 +249,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             comments = commentsShownWhenChainSet;
         }
 
+        // TODO animate the changes with "notifyItemRangeInserted" etc., it looks pretty bad now
         notifyDataSetChanged();
     }
 
@@ -249,6 +261,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param commentIdChain The ID of the comment to show
      */
     public void setCommentIdChain(String commentIdChain) {
+        // Don't do anything if the id is the same, because why would you
+        if (this.commentIdChain != null && this.commentIdChain.equalsIgnoreCase(commentIdChain)) {
+            return;
+        }
         this.commentIdChain = commentIdChain;
         setChain(comments);
     }
