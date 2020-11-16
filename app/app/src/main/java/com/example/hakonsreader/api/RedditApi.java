@@ -22,6 +22,7 @@ import com.example.hakonsreader.api.utils.Util;
 import com.example.hakonsreader.api.responses.GenericError;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -337,7 +338,7 @@ public class RedditApi {
          * <p>This only has to be set during the initial initialization. When new tokens are retrieved
          * the internal value is set automatically. To retrieve the new token use {@link RedditApi.Builder#onNewToken(OnNewToken)}</p>
          *
-         * <p>If the passed access token is null it is not added</p>
+         * <p>If the passed access token is {@code null} it is not added</p>
          *
          * @param accessToken The token to use
          * @return This builder
@@ -368,6 +369,10 @@ public class RedditApi {
          * <p>This will be called if the access token set with {@link Builder#accessToken(AccessToken)}
          * wasn't valid (ie. it can't be refreshed anymore), or if the user has revoked the applications
          * access from <a href="https://reddit.com/prefs/apps">reddit.com/prefs/apps</a></p>
+         *
+         * <p>When the API notices an invalid token an attempt to get a token for a non-logged in user
+         * is automatically attempted. If this also fails, an empty access token is set. This change
+         * is communicated through {@link Builder#onNewToken(OnNewToken)} as with other new tokens.</p>
          *
          * @param onInvalidToken The callback for when tokens are now invalid
          * @return This builder
@@ -445,16 +450,18 @@ public class RedditApi {
     /**
      * Convenience method to set the internal token. This calls the registered token listener
      *
-     * @param token The token to set, does nothing if null
+     * @param token The token to set. If this is set to null, a new empty access token is created
      */
     private void setTokenInternal(AccessToken token) {
-        if (token != null) {
-            accessToken = token;
+        if (token == null) {
+            token = new AccessToken();
+        }
 
-            // Call token listener if registered
-            if (onNewToken != null) {
-                onNewToken.newToken(token);
-            }
+        accessToken = token;
+
+        // Call token listener if registered
+        if (onNewToken != null) {
+            onNewToken.newToken(token);
         }
     }
 
@@ -617,8 +624,9 @@ public class RedditApi {
     /**
      * Retrieve a new access token valid for non-logged in users
      *
-     * @return A new access token only valid for non-logged in users
+     * @return A new access token only valid for non-logged in users, or null if an error occurred
      */
+    @Nullable
     private AccessToken newNonLoggedInToken() {
         AccessToken newToken = null;
         try {
@@ -658,8 +666,10 @@ public class RedditApi {
                     // The response does not send a new refresh token, so make sure the old one is saved
                     newToken.setRefreshToken(accessToken.getRefreshToken());
                 }
-            } else {
-                // No refresh token means we have a token for non-logged in users
+            }
+
+            // No new token yet, either no user is logged in or the refresh failed
+            if (newToken == null) {
                 newToken = newNonLoggedInToken();
             }
 
@@ -703,9 +713,6 @@ public class RedditApi {
                             new InvalidAccessTokenException("The access token couldn't be refreshed. Either the access token set when building the API object" +
                                     " was never valid, or the user has revoked the applications access to their account.")
                     );
-
-                    // We can get a new token for non-logged in users here, not sure if it makes sense
-                    // that we handle that and automatically give the API users a new token
                 }
 
                 if (newToken != null) {

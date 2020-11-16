@@ -3,8 +3,8 @@ package com.example.hakonsreader.interfaces;
 import com.example.hakonsreader.api.enums.PostTimeSort;
 
 /**
- * Interface for fragments/activites that have some sort of sorting (eg. posts that can be sorted
- * by new/hot/top etc.)
+ * Interface for fragments/activities that have some sort of sorting (eg. posts that can be sorted
+ * by new/hot/top etc.) that are also able to be sorted by time (eg. top of all time)
  */
 public interface SortableWithTime {
 

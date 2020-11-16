@@ -1,7 +1,7 @@
 package com.example.hakonsreader.interfaces;
 
 /**
- * Interface used for locking a Slidr
+ * Interface used for locking a Slidr from outside an activity/fragment
  */
 public interface LockableSlidr {
 

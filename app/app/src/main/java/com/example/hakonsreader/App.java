@@ -483,9 +483,6 @@ public class App extends Application {
     private void onInvalidAccessToken(GenericError error, Throwable throwable) {
         App.get().clearUserInfo();
 
-        // Setup the API again to remove the old token (it is not handled internally)
-        setupRedditApi();
-
         // Should we also recreate the app? We could have posts for the user, be in the profile etc
 
         // Storing an activity like this is probably very bad? What happens if we forget to use
