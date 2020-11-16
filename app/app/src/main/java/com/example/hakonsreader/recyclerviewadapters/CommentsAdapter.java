@@ -95,6 +95,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     private List<RedditComment> chain = new ArrayList<>();
 
+    /**
+     * The list of comments shown when a chain is shown. This will be used to go back to the comments
+     * previously shown when the user wants to get out of a chain
+     */
     private List<RedditComment> commentsShownWhenChainSet;
 
 
@@ -250,6 +254,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         // TODO animate the changes with "notifyItemRangeInserted" etc., it looks pretty bad now
+        //  also it should scroll to the top on chains (now it can end up in the middle of a chain)
         notifyDataSetChanged();
     }
 

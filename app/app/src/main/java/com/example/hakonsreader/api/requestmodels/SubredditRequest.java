@@ -13,9 +13,11 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.ListingResponse;
+import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.utils.Util;
 
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -31,12 +33,24 @@ public class SubredditRequest {
 
     private final AccessToken accessToken;
     private final SubredditService api;
+    private final ImgurRequest imgurRequest;
     private final String subredditName;
+    private final boolean loadImgurAlbumsAsRedditGalleries;
 
-    public SubredditRequest(AccessToken accessToken, SubredditService api, String subredditName) {
+    /**
+     *
+     * @param accessToken The access token to use for requests
+     * @param api The API service to use for requests
+     * @param subredditName The name of the subreddit to make requests towards
+     * @param imgurService The service to optionally use for loading Imgur albums directly. Set to
+     *                     {@code null} to not load albums.
+     */
+    public SubredditRequest(AccessToken accessToken, SubredditService api, String subredditName, ImgurService imgurService) {
         this.accessToken = accessToken;
         this.api = api;
         this.subredditName = subredditName;
+        this.imgurRequest = new ImgurRequest(imgurService);
+        this.loadImgurAlbumsAsRedditGalleries = imgurService != null;
     }
 
     /**
@@ -82,8 +96,10 @@ public class SubredditRequest {
     }
 
     /**
-     * Retrieves posts from the subreddit. The posts here are sorted by "hot", if you want to retrieve posts with a
-     *      * different sort use {@link SubredditRequest#posts()}</p>
+     * NOTE: the response for this request is sent on a background thread
+     *
+     * <p>Retrieves posts from the subreddit. The posts here are sorted by "hot", if you want to retrieve posts with a
+     * different sort use {@link SubredditRequest#posts()}</p>
      *
      * <p>If an access token is set posts are customized for the user</p>
      *
@@ -100,6 +116,8 @@ public class SubredditRequest {
     }
 
     /**
+     * <p>NOTE: the response for request is sent on a background thread</p>
+     *
      * Retrieve an object to make API calls for posts in the subreddit
      *
      * @return An object that can retrieve new, top, and controversial posts for the subreddit
@@ -178,6 +196,8 @@ public class SubredditRequest {
 
 
     /**
+     * <p>NOTE: the response for this request is sent on a background thread</p>
+     *
      * Retrieves posts from the subreddit
      *
      * <p>If an access token is set posts are customized for the user</p>
@@ -200,17 +220,24 @@ public class SubredditRequest {
             subreddit = "r/" + subreddit;
         }
 
-        api.getPosts(
-                subreddit,
-                sort,
-                timeSort == null ? "" : timeSort.getValue(),
-                after,
-                count,
-                RedditApi.RAW_JSON,
-                accessToken.generateHeaderString()
-        ).enqueue(new Callback<ListingResponse>() {
-            @Override
-            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+        String finalSubreddit = subreddit;
+
+        // Loading Imgur albums requires API calls inside the callback. If we use "enqueue" and operate
+        // on the current thread the RedditPost objects will be updated after the response is given with
+        // onResponse, which means the UI potentially wont be correct, so we have to run this entire thing on
+        // a background thread
+        new Thread(() -> {
+            try {
+                Response<ListingResponse> response = api.getPosts(
+                        finalSubreddit,
+                        sort,
+                        timeSort == null ? "" : timeSort.getValue(),
+                        after,
+                        count,
+                        RedditApi.RAW_JSON,
+                        accessToken.generateHeaderString()
+                ).execute();
+
                 ListingResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -218,17 +245,20 @@ public class SubredditRequest {
 
                 if (body != null) {
                     List<RedditPost> posts = (List<RedditPost>) body.getListings();
+
+                    if (loadImgurAlbumsAsRedditGalleries) {
+                        imgurRequest.loadAlbums(posts);
+                    }
+
+                    System.out.println("----------------------- Sending posts to onResponse -----------------------");
                     onResponse.onResponse(posts);
                 } else {
                     Util.handleHttpErrors(response, onFailure);
                 }
+            } catch (IOException e) {
+                onFailure.onFailure(new GenericError(-1), e);
             }
-
-            @Override
-            public void onFailure(Call<ListingResponse> call, Throwable t) {
-                onFailure.onFailure(new GenericError(-1), t);
-            }
-        });
+        }).start();
     }
 
 
@@ -239,7 +269,9 @@ public class SubredditRequest {
     public class SubredditPostsRequets {
 
         /**
-         * Get the "controversial" posts for the user
+         * NOTE: the response for this request is sent on a background thread
+         *
+         * <p>Get the "controversial" posts for the user</p>
          *
          * <p>OAuth scope required: {@code history}</p>
          *
@@ -254,7 +286,9 @@ public class SubredditRequest {
         }
 
         /**
-         * Retrieves new posts from the subreddit
+         * NOTE: the response for this request is sent on a background thread
+         *
+         * <p>Retrieves new posts from the subreddit</p>
          *
          * <p>If an access token is set posts are customized for the user</p>
          *
@@ -271,7 +305,9 @@ public class SubredditRequest {
         }
 
         /**
-         * Retrieves top posts from the subreddit
+         * NOTE: the response for this request is sent on a background thread
+         *
+         * <p>Retrieves top posts from the subreddit</p>
          *
          * <p>If an access token is set posts are customized for the user</p>
          *

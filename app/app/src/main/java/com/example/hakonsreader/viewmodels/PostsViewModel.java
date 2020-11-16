@@ -1,6 +1,8 @@
 package com.example.hakonsreader.viewmodels;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -57,8 +59,8 @@ public class PostsViewModel extends ViewModel {
      * Handler for failed responses for getting posts
      */
     private final OnFailure onPostsFailure = (e, t) -> {
-        loadingChange.setValue(false);
-        error.setValue(new ErrorWrapper(e, t));
+        loadingChange.postValue(false);
+        error.postValue(new ErrorWrapper(e, t));
     };
 
 
@@ -277,32 +279,31 @@ public class PostsViewModel extends ViewModel {
      * @param newPosts The new posts retrieved
      */
     private void onPostsRetrieved(List<RedditPost> newPosts) {
-        loadingChange.setValue(false);
+        // Posts are retrieved from a background thread, so we have to use postValue()
+        loadingChange.postValue(false);
 
         postsData.addAll(newPosts);
         posts.postValue(postsData);
 
         // Store (or update) the posts in the database
-        new Thread(() -> {
-            for (RedditPost post : newPosts) {
-                // Store which IDs this ViewModel is tracking
-                postIds.add(post.getId());
+        for (RedditPost post : newPosts) {
+            // Store which IDs this ViewModel is tracking
+            postIds.add(post.getId());
 
-                List<RedditPost> crossposts = post.getCrossposts();
-                if (crossposts != null && !crossposts.isEmpty()) {
-                    List<String> crosspostIds = new ArrayList<>();
+            List<RedditPost> crossposts = post.getCrossposts();
+            if (crossposts != null && !crossposts.isEmpty()) {
+                List<String> crosspostIds = new ArrayList<>();
 
-                    // Insert crossposts as their own database record
-                    for (RedditPost crosspost : crossposts) {
-                        database.posts().insert(crosspost);
-                        crosspostIds.add(crosspost.getId());
-                    }
-
-                    post.setCrosspostIds(crosspostIds);
+                // Insert crossposts as their own database record
+                for (RedditPost crosspost : crossposts) {
+                    database.posts().insert(crosspost);
+                    crosspostIds.add(crosspost.getId());
                 }
 
-                database.posts().insert(post);
+                post.setCrosspostIds(crosspostIds);
             }
-        }).start();
+
+            database.posts().insert(post);
+        }
     }
 }

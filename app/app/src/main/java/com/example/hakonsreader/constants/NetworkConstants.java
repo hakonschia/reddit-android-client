@@ -17,6 +17,11 @@ public class NetworkConstants {
      */
     public static final String CALLBACK_URL = "hakonreader://callback";
 
+    /**
+     * Client ID for Imgur OAuth application
+     */
+    public static final String IMGUR_CLIENT_ID = "d8c4185962cf694";
+
 
 
     /**

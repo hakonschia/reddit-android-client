@@ -128,18 +128,28 @@ public class RedditPost extends RedditListing {
     @SerializedName("media_metadata")
     private LinkedTreeMap<String, Object> mediaMetadata;
 
+    private List<Image> galleryImages = null;
+
+    /**
+     * Retrieves the list of images
+     * @return
+     */
     public List<Image> getGalleryImages() {
-        List<Image> images = new ArrayList<>(mediaMetadata.size());
-        Gson gson = new Gson();
+        // The gallery images can be set manually when loaded from an Imgur album
+        // mediaMetaData is for Reddit galleries, so in that case it will be null
+        if (mediaMetadata != null) {
+            galleryImages = new ArrayList<>(mediaMetadata.size());
+            Gson gson = new Gson();
 
-        mediaMetadata.forEach((s, obj) -> {
-            // The source is found in the "s" object, which can be converted to a PreviewImage
-            LinkedTreeMap<String, Object> converted = (LinkedTreeMap<String, Object>) obj;
-            String asJson = gson.toJson(converted.get("s"));
-            images.add(gson.fromJson(asJson, Image.class));
-        });
+            mediaMetadata.forEach((s, obj) -> {
+                // The source is found in the "s" object, which can be converted to a PreviewImage
+                LinkedTreeMap<String, Object> converted = (LinkedTreeMap<String, Object>) obj;
+                String asJson = gson.toJson(converted.get("s"));
+                galleryImages.add(gson.fromJson(asJson, Image.class));
+            });
+        }
 
-        return images;
+        return galleryImages;
     }
 
 
@@ -583,6 +593,10 @@ public class RedditPost extends RedditListing {
 
     public void setUserMod(boolean userMod) {
         isUserMod = userMod;
+    }
+
+    public void setGalleryImages(List<Image> galleryImages) {
+        this.galleryImages = galleryImages;
     }
 
     /**

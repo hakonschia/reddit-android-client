@@ -10,9 +10,11 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.User;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.ListingResponse;
+import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
 
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -27,14 +29,20 @@ public class UserRequests {
     private final AccessToken accessToken;
     private final UserService api;
     private final String username;
+    private final ImgurRequest imgurRequest;
+    private final boolean loadImgurAlbumsAsRedditGalleries;
 
     /**
      * @param api The API service to use for requests
      * @param accessToken The access token to use for requests
+     * @param imgurService The service to optionally use for loading Imgur albums directly. Set to
+     *                     {@code null} to not load albums.
      */
-    public UserRequests(UserService api, AccessToken accessToken) {
+    public UserRequests(UserService api, AccessToken accessToken, ImgurService imgurService) {
         this.api = api;
         this.accessToken = accessToken;
+        this.imgurRequest = new ImgurRequest(imgurService);
+        this.loadImgurAlbumsAsRedditGalleries = imgurService != null;
         this.username = null;
     }
 
@@ -42,11 +50,15 @@ public class UserRequests {
      * @param username The username to make requests towards
      * @param api The API service to use for requests
      * @param accessToken The access token to use for requests
+     * @param imgurService The service to optionally use for loading Imgur albums directly. Set to
+     *                     {@code null} to not load albums.
      */
-    public UserRequests(UserService api, AccessToken accessToken, String username) {
-        this.username = username;
+    public UserRequests(UserService api, AccessToken accessToken, String username, ImgurService imgurService) {
         this.accessToken = accessToken;
         this.api = api;
+        this.username = username;
+        this.imgurRequest = new ImgurRequest(imgurService);
+        this.loadImgurAlbumsAsRedditGalleries = imgurService != null;
     }
 
     /**
@@ -177,7 +189,9 @@ public class UserRequests {
 
 
     /**
-     * Get posts by a user
+     * NOTE: the response for this request is sent on a background thread
+     *
+     * <p>Get posts by a user</p>
      *
      * <p>The posts retrieved here are sorted by "new", if you want to retrieve posts with a
      * different sort use {@link UserRequests#posts()}</p>
@@ -206,7 +220,9 @@ public class UserRequests {
      */
     public class UserPostsRequets {
         /**
-         * Get the current "hot" posts for the user
+         * NOTE: the response for this request is sent on a background thread
+         *
+         * <p>Get the current "hot" posts for the user</p>
          *
          * <p>OAuth scope required: {@code history}</p>
          */
@@ -215,7 +231,9 @@ public class UserRequests {
         }
 
         /**
-         * Get the "top" posts for the user
+         * NOTE: the response for this request is sent on a background thread
+         *
+         * <p>Get the "top" posts for the user</p>
          *
          * <p>OAuth scope required: {@code history}</p>
          *
@@ -226,7 +244,9 @@ public class UserRequests {
         }
 
         /**
-         * Get the "controversial" posts for the user
+         * NOTE: the response for this request is sent on a background thread
+         *
+         * <p>Get the "controversial" posts for the user</p>
          *
          * <p>OAuth scope required: {@code history}</p>
          *
@@ -239,7 +259,9 @@ public class UserRequests {
 
 
     /**
-     * Convenience method that the other functions use internally
+     * NOTE: the response for this request is sent on a background thread
+     *
+     * <p>Convenience method that the other functions use internally</p>
      *
      * @param sort The sort for the posts (new, hot, top, or controversial)
      * @param timeSort How the posts should be time sorted. This only has an affect on top and controversial,
@@ -248,15 +270,20 @@ public class UserRequests {
      * @param onFailure The handler for failed responses
      */
     private void getPosts(String sort, PostTimeSort timeSort, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        api.getListingsFromUser(
-                username,
-                "submitted",
-                sort,
-                timeSort == null ? "" : timeSort.getValue(),
-                accessToken.generateHeaderString()
-        ).enqueue(new Callback<ListingResponse>() {
-            @Override
-            public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
+        // Loading Imgur albums requires API calls inside the callback. If we use "enqueue" and operate
+        // on the current thread the RedditPost objects will be updated after the response is given with
+        // onResponse, which means the UI potentially wont be correct, so we have to run this entire thing on
+        // a background thread
+        new Thread(() -> {
+            try {
+                Response<ListingResponse> response = api.getListingsFromUser(
+                        username,
+                        "submitted",
+                        sort,
+                        timeSort == null ? "" : timeSort.getValue(),
+                        accessToken.generateHeaderString()
+                ).execute();
+
                 ListingResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -264,16 +291,18 @@ public class UserRequests {
 
                 if (body != null) {
                     List<RedditPost> posts = (List<RedditPost>) body.getListings();
+
+                    if (loadImgurAlbumsAsRedditGalleries) {
+                        imgurRequest.loadAlbums(posts);
+                    }
+
                     onResponse.onResponse(posts);
                 } else {
                     Util.handleHttpErrors(response, onFailure);
                 }
+            } catch (IOException e) {
+                onFailure.onFailure(new GenericError(-1), e);
             }
-
-            @Override
-            public void onFailure(Call<ListingResponse> call, Throwable t) {
-                onFailure.onFailure(new GenericError(-1), t);
-            }
-        });
+        }).start();
     }
 }

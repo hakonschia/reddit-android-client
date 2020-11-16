@@ -131,9 +131,13 @@ public class ContentGallery extends LinearLayout {
      * @param activeImagePos The image position now active. Note this starts at 1, not 0
      */
     private void setActiveImageText(int activeImagePos) {
-        // TODO if imgur albums are treated as a gallery this should check if there is only one image, since
-        //  some imgur albums only contain one album, and it shouldn't show a text in that case
-        binding.activeImageText.setText(String.format(Locale.getDefault(), "%d / %d", activeImagePos, images.size()));
+        // Imgur albums are also handled as galleries, and they might only contain one image, so make it
+        // look like only one image by removing the text
+        if (images.size() == 1) {
+            binding.activeImageText.setVisibility(GONE);
+        } else {
+            binding.activeImageText.setText(String.format(Locale.getDefault(), "%d / %d", activeImagePos, images.size()));
+        }
     }
 
 

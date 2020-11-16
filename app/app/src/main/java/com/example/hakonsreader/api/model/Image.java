@@ -8,8 +8,9 @@ import com.google.gson.annotations.SerializedName;
  */
 public class Image {
     // Gallery images use u, x, y. Other images like preview images use full names
+    // Imgur images use width, height and "link" instead of "url"
 
-    @SerializedName(value = "url", alternate = "u")
+    @SerializedName(value = "url", alternate = {"u", "link"})
     private String url;
 
     @SerializedName(value = "width", alternate = "x")

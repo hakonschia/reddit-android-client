@@ -2,6 +2,7 @@ package com.example.hakonsreader.api.persistence;
 
 import androidx.room.TypeConverter;
 
+import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -62,5 +63,16 @@ public class PostConverter {
     @TypeConverter
     public static String fromPreview(RedditPost.Preview preview) {
         return gson.toJson(preview);
+    }
+
+
+    @TypeConverter
+    public static List<Image> galleryImagesFromString(String value) {
+        Type listType = new TypeToken<ArrayList<Image>>() {}.getType();
+        return gson.fromJson(value, listType);
+    }
+    @TypeConverter
+    public static String fromGalleryImages(List<Image> images) {
+        return gson.toJson(images);
     }
 }

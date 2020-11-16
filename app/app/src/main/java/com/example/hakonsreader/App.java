@@ -188,6 +188,7 @@ public class App extends Application {
                  .callbackUrl(NetworkConstants.CALLBACK_URL)
                  .deviceId(UUID.randomUUID().toString())
                  .onInvalidToken(this::onInvalidAccessToken)
+                 .loadImgurAlbumsAsRedditGalleries(NetworkConstants.IMGUR_CLIENT_ID)
                  .build();
     }
 

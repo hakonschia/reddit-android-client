@@ -1,18 +1,21 @@
 package com.example.hakonsreader.api;
 
 import com.example.hakonsreader.api.constants.OAuthConstants;
+import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.interceptors.UserAgentInterceptor;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.requestmodels.CommentRequest;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequest;
 import com.example.hakonsreader.api.requestmodels.UserRequests;
 import com.example.hakonsreader.api.service.CommentService;
+import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.PostService;
 import com.example.hakonsreader.api.service.OAuthService;
 import com.example.hakonsreader.api.service.SubredditService;
@@ -139,6 +142,11 @@ public class RedditApi {
     public static final String REDDIT_OUATH_URL = "https://oauth.reddit.com/";
 
     /**
+     * The URL to the Imgur API
+     */
+    public static final String IMGUR_API_URL = "https://api.imgur.com/";
+
+    /**
      * The list of standard subs: front page (represented as an empty string), popular, all.
      *
      * <p>Note: The elements in this list are case sensitive and in this list are all lower case.
@@ -181,6 +189,11 @@ public class RedditApi {
      */
     private OAuthService oauthService;
 
+    /**
+     * The service object used to communicate with the Imgur API
+     */
+    private ImgurService imgurService;
+
 
     /**
      * The access token to use for authorized API calls
@@ -204,6 +217,11 @@ public class RedditApi {
      * The callback for when the access token isn't valid
      */
     private OnFailure onInvalidToken;
+
+    /**
+     * The OAuth client ID for Imgur (for optionally loading Imgur albums as galleries)
+     */
+    private String imgurClientId;
 
 
     /* ----------------- Client specific variables ----------------- */
@@ -270,6 +288,29 @@ public class RedditApi {
         postApi = apiRetrofit.create(PostService.class);
         commentApi = apiRetrofit.create(CommentService.class);
 
+        // For Imgur we don't need any authentication, and adding it would cause issues
+        // as adding the access token for Reddit would break things for Imgur, so only add the logger
+
+        if (imgurClientId != null && !imgurClientId.isEmpty()) {
+            OkHttpClient imgurClient = new OkHttpClient.Builder()
+                    .addInterceptor(chain -> {
+                        Request original = chain.request();
+                        Request request = original.newBuilder()
+                                .header("Authorization", "Client-ID " + imgurClientId)
+                                .build();
+                        return chain.proceed(request);
+                    })
+                    .addInterceptor(logger)
+                    .build();
+
+            Retrofit imgurRetrofit = new Retrofit.Builder()
+                    .baseUrl(IMGUR_API_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(imgurClient)
+                    .build();
+            imgurService = imgurRetrofit.create(ImgurService.class);
+        }
+
         // The OAuth client does not need interceptors/authenticators for tokens as it doesn't
         // use the access tokens for authorization
         OkHttpClient oauthClient = new OkHttpClient.Builder()
@@ -303,6 +344,7 @@ public class RedditApi {
         private OnFailure onInvalidToken;
         private String callbackUrl;
         private String deviceId;
+        private String imgurClientId;
 
 
         /**
@@ -419,6 +461,31 @@ public class RedditApi {
             return this;
         }
 
+        /**
+         * If set this will make Imgur albums load as Reddit galleries.
+         *
+         * <p>Typically, an Imgur album will be represented as {@link PostType#LINK}. With this set to
+         * true the API will automatically call the Imgur API when posts are received and get the individual
+         * images and store them so they are accessible through {@link RedditPost#getGalleryImages()}
+         * in the same way as a normal Reddit gallery would. The post type will be {@link PostType#GALLERY}.
+         * While Imgur albums are typically for multiple images, these albums sometimes only contain one image.
+         * The API will still treat one image albums as a gallery</p>
+         *
+         * <p>Note that since this will call the Imgur API loading times for posts will increase when there are Imgur albums.
+         * No failure callback will be called if these API calls fail, and the post will be as a standard
+         * {@link PostType#LINK}.</p>
+         *
+         * <p>Using this option requires an Imgur OAuth client. Only public endpoints are used, so
+         * an OAuth client for anonymous use is sufficient.</p>
+         *
+         * @param imgurClientId The Client ID for your Imgur OAuth application. See
+         *                      <a href="https://api.imgur.com/oauth2/addclient">Imgur.com</a>
+         * @return This builder
+         */
+        public Builder loadImgurAlbumsAsRedditGalleries(String imgurClientId) {
+            this.imgurClientId = imgurClientId;
+            return this;
+        }
 
         /**
          * Builds the API
@@ -440,6 +507,7 @@ public class RedditApi {
             api.callbackUrl = callbackUrl;
             api.deviceId = deviceId;
             api.onInvalidToken = onInvalidToken;
+            api.imgurClientId = imgurClientId;
 
             api.createServices();
 
@@ -582,7 +650,7 @@ public class RedditApi {
      * @return An object that can perform various subreddit related API requests
      */
     public SubredditRequest subreddit(String subredditName) {
-        return new SubredditRequest(accessToken, subredditApi, subredditName);
+        return new SubredditRequest(accessToken, subredditApi, subredditName, imgurService);
     }
 
     /**
@@ -603,7 +671,7 @@ public class RedditApi {
      * @return An object that can perform various user related API requests
      */
     public UserRequests user() {
-        return new UserRequests(userApi, accessToken);
+        return new UserRequests(userApi, accessToken, imgurService);
     }
 
     /**
@@ -616,7 +684,7 @@ public class RedditApi {
      * @return An object that can perform various user related API requests for non-logged in users
      */
     public UserRequests user(String username) {
-        return new UserRequests(userApi, accessToken, username);
+        return new UserRequests(userApi, accessToken, username, imgurService);
     }
 
 
