@@ -204,7 +204,9 @@ public class ProfileFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
+        // If we have no username we can't get posts (we can't ask for posts for the logged in user without their username)
+        // The posts are retrieved automatically when the user information loads
+        if (adapter.getPosts().isEmpty() && postIds.isEmpty() && username != null) {
             postsViewModel.loadPosts();
         }
     }
