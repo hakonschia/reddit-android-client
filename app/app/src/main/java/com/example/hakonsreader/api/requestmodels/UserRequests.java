@@ -7,7 +7,7 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.service.ImgurService;
@@ -73,10 +73,10 @@ public class UserRequests {
      * </ol>
      * </p>
      *
-     * @param onResponse The callback for successful requests. Holds the {@link User} object representing the user
+     * @param onResponse The callback for successful requests. Holds the {@link RedditUser} object representing the user
      * @param onFailure The callback for failed requests
      */
-    public void info(OnResponse<User> onResponse, OnFailure onFailure) {
+    public void info(OnResponse<RedditUser> onResponse, OnFailure onFailure) {
         if (username == null) {
             this.getInfoForLoggedInUser(onResponse, onFailure);
         } else {
@@ -124,10 +124,10 @@ public class UserRequests {
     /**
      * Retrieves information about logged in users
      *
-     * @param onResponse The callback for successful requests. Holds the {@link User} object representing the user
+     * @param onResponse The callback for successful requests. Holds the {@link RedditUser} object representing the user
      * @param onFailure The callback for failed requests
      */
-    private void getInfoForLoggedInUser(OnResponse<User> onResponse, OnFailure onFailure) {
+    private void getInfoForLoggedInUser(OnResponse<RedditUser> onResponse, OnFailure onFailure) {
         try {
             Util.verifyLoggedInToken(accessToken);
         } catch (InvalidAccessTokenException e) {
@@ -135,10 +135,10 @@ public class UserRequests {
             return;
         }
 
-        api.getUserInfo(accessToken.generateHeaderString()).enqueue(new Callback<User>() {
+        api.getUserInfo(accessToken.generateHeaderString()).enqueue(new Callback<RedditUser>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                User body = null;
+            public void onResponse(Call<RedditUser> call, Response<RedditUser> response) {
+                RedditUser body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
@@ -151,7 +151,7 @@ public class UserRequests {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<RedditUser> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
@@ -161,10 +161,10 @@ public class UserRequests {
      * Retrieves information about a user by username
      *
      * @param username The username to retrieve information for
-     * @param onResponse The callback for successful requests. Holds the {@link User} object representing the user
+     * @param onResponse The callback for successful requests. Holds the {@link RedditUser} object representing the user
      * @param onFailure The callback for failed requests
      */
-    private void getInfoByUsername(String username, OnResponse<User> onResponse, OnFailure onFailure) {
+    private void getInfoByUsername(String username, OnResponse<RedditUser> onResponse, OnFailure onFailure) {
         api.getUserInfoOtherUsers(username, accessToken.generateHeaderString()).enqueue(new Callback<RedditListing>() {
             @Override
             public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
@@ -174,7 +174,7 @@ public class UserRequests {
                 }
 
                 if (body != null) {
-                    onResponse.onResponse((User) body);
+                    onResponse.onResponse((RedditUser) body);
                 } else {
                     Util.handleHttpErrors(response, onFailure);
                 }

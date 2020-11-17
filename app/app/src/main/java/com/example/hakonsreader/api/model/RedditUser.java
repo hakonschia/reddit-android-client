@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Class representing a Reddit user
  */
-public class User extends RedditListing {
+public class RedditUser extends RedditListing {
     @SerializedName("comment_karma")
     private int commentKarma;
 

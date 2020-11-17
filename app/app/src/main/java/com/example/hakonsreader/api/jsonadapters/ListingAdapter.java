@@ -4,8 +4,8 @@ import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.model.Subreddit;
-import com.example.hakonsreader.api.model.User;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -42,7 +42,7 @@ public class ListingAdapter implements JsonDeserializer<RedditListing> {
             // So far at least "more" kinds are only comments
             listing = context.deserialize(data, RedditComment.class);
         } else if (Thing.ACCOUNT.getValue().equals(kind)) {
-            listing = context.deserialize(data, User.class);
+            listing = context.deserialize(data, RedditUser.class);
         } else {
             listing = context.deserialize(data, Subreddit.class);
         }

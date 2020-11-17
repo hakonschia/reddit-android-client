@@ -14,7 +14,7 @@
 
         <variable
             name="user"
-            type="com.example.hakonsreader.api.model.User" />
+            type="com.example.hakonsreader.api.model.RedditUser" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout

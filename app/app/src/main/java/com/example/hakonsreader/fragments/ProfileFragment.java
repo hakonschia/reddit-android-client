@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.databinding.FragmentProfileBinding;
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener;
 import com.example.hakonsreader.misc.Util;
@@ -60,7 +60,7 @@ public class ProfileFragment extends Fragment {
     private boolean isLoggedInUser;
     private final RedditApi redditApi = App.get().getApi();
     private FragmentProfileBinding binding;
-    private User user;
+    private RedditUser user;
     /**
      * The username of the user to retrieve information for. If this is null, the fragment is
      * for logged in users
@@ -100,7 +100,7 @@ public class ProfileFragment extends Fragment {
      */
     public static ProfileFragment newInstance(String username) {
         // Hardcoding values like this is obviously bad, but this is the only case we're doing something special
-        User user = App.getStoredUser();
+        RedditUser user = App.getStoredUser();
         if (username.equalsIgnoreCase("me") || (user != null && username.equalsIgnoreCase(user.getName()))) {
             return ProfileFragment.newInstance();
         }

@@ -1,6 +1,5 @@
 package com.example.hakonsreader.views.util;
 
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -21,7 +20,7 @@ import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
@@ -47,7 +46,7 @@ public class MenuClickHandler {
      * @param adapter The RecyclerView adapter the comment is in
      */
     public static void showPopupForCommentExtra(View view, RedditComment comment, CommentsAdapter adapter) {
-        User user = App.getStoredUser();
+        RedditUser user = App.getStoredUser();
 
         if (user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
             showPopupForCommentExtraForLoggedInUser(view, comment, adapter);
@@ -247,7 +246,7 @@ public class MenuClickHandler {
      * @param post The post the popup is for
      */
     public static void showPopupForPost(View view, RedditPost post) {
-        User user = App.getStoredUser();
+        RedditUser user = App.getStoredUser();
 
         if (user != null && user.getName().equalsIgnoreCase(post.getAuthor())) {
             showPopupForPostExtraForLoggedInUser(view, post);

@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.service;
 
 import com.example.hakonsreader.api.model.RedditListing;
-import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.responses.ListingResponse;
 
 import retrofit2.Call;
@@ -25,17 +25,17 @@ public interface UserService {
      * <p>OAuth scope required: {@code identity}</p>
      *
      * @param accessToken The type of token + the actual token. Form: "type token"
-     * @return A Call with {@link User}
+     * @return A Call with {@link RedditUser}
      */
     @GET("api/v1/me?raw_json=1")
-    Call<User> getUserInfo(@Header("Authorization") String accessToken);
+    Call<RedditUser> getUserInfo(@Header("Authorization") String accessToken);
 
     /**
      * Retrieves information about a user. This can retrieve information about users that aren't
      * the logged in user
      *
      * @param accessToken The type of token + the actual token. Form: "type token"
-     * @return A Call with {@link User}
+     * @return A Call with {@link RedditUser}
      */
     @GET("u/{username}/about?raw_json=1")
     Call<RedditListing> getUserInfoOtherUsers(

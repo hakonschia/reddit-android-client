@@ -17,7 +17,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.model.User;
+import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
@@ -461,8 +461,8 @@ public class App extends Application {
     /**
      * @return Retrieves the user information stored in SharedPreferences
      */
-    public static User getStoredUser() {
-        return SharedPreferencesManager.get(SharedPreferencesConstants.USER_INFO, User.class);
+    public static RedditUser getStoredUser() {
+        return SharedPreferencesManager.get(SharedPreferencesConstants.USER_INFO, RedditUser.class);
     }
 
     /**
@@ -470,7 +470,7 @@ public class App extends Application {
      *
      * @param user The object to store
      */
-    public static void storeUserInfo(User user) {
+    public static void storeUserInfo(RedditUser user) {
         SharedPreferencesManager.put(SharedPreferencesConstants.USER_INFO, user);
     }
 

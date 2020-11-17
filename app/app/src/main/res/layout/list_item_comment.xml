@@ -10,7 +10,7 @@
         <import type="com.example.hakonsreader.views.util.ClickHandler"/>
         <import type="com.example.hakonsreader.views.util.MenuClickHandler"/>
         <import type="com.example.hakonsreader.App"/>
-        <import type="com.example.hakonsreader.api.model.User"/>
+        <import type="com.example.hakonsreader.api.model.RedditUser"/>
         <import type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
 
         <variable
