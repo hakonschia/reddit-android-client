@@ -155,6 +155,12 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             getIntent().setFlags(0);
 
             redditApi.getAccessToken(code, ignored -> {
+                // Get information about the user. If this fails it doesn't really matter, as it isn't
+                // strictly needed at this point
+                redditApi.user().info(App::storeUserInfo, (e, t) -> {
+                    // Ignored
+                });
+
                 // Re-create the start fragment as it now should load posts for the logged in user
                 // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
                 postsFragment = null;
