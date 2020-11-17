@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     private static final String TAG = "PostsAdapter";
     
-    private final List<RedditPost> posts = new ArrayList<>();
+    private List<RedditPost> posts = new ArrayList<>();
 
     /**
      * The amount of minutes scores should be hidden (default to -1 means not specified)
@@ -41,33 +42,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
 
     /**
-     * Adds a list of posts to the current list of posts
-     * <p>Duplicate posts are filtered out</p>
+     * Submits the list of posts to show in the RecyclerView
      *
-     * @param newPosts The posts to add
+     * @param newPosts The posts to show
      */
-    public void addPosts(List<RedditPost> newPosts) {
-        // The newly retrieved posts might include posts that have been "pushed down" by Reddit
-        // so filter out any posts that are already in the list
-        List<RedditPost> filtered = newPosts.stream()
-                .filter(post -> {
-                    for (RedditPost p : posts) {
-                        // Filter out the post on matching ID
-                        if (p.getId().equals(post.getId())) {
-                            return false;
-                        }
-                    }
+    public void submitList(List<RedditPost> newPosts) {
+        List<RedditPost> previous = posts;
 
-                    return true;
-                })
-                .collect(Collectors.toList());
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(
+                new PostsDiffCallback(previous, newPosts)
+        );
 
-        // If we use "notifyDataSetChanged" all the items get re-drawn, which means if a video is playing
-        // it will be restarted. By using notifyItemRangeInserted the items on screen currently wont
-        // be re-drawn
-        int previousSize = posts.size();
-        posts.addAll(filtered);
-        notifyItemRangeInserted(previousSize, posts.size() - 1);
+        posts = newPosts;
+        diffResult.dispatchUpdatesTo(this);
     }
 
     /**
@@ -253,6 +240,42 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         public void pause() {
             post.pauseVideo();
+        }
+    }
+
+
+    /**
+     * Callback class for DiffUtil
+     */
+    private static class PostsDiffCallback extends DiffUtil.Callback {
+
+        private final List<RedditPost> oldPosts;
+        private final List<RedditPost> newPosts;
+
+        public PostsDiffCallback(List<RedditPost> oldPosts, List<RedditPost> newPosts) {
+            this.oldPosts = oldPosts;
+            this.newPosts = newPosts;
+        }
+
+
+        @Override
+        public int getOldListSize() {
+            return oldPosts.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newPosts.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldPosts.get(oldItemPosition).getId().equals(newPosts.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return false;
         }
     }
 }

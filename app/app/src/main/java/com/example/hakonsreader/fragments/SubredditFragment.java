@@ -169,7 +169,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             }
 
             int size = adapter.getItemCount();
-            adapter.addPosts(posts);
+            adapter.submitList(posts);
 
             // Possible state to restore
             if (saveState != null && size == 0) {

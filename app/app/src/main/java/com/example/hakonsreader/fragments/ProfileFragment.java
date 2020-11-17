@@ -149,7 +149,7 @@ public class ProfileFragment extends Fragment {
                 true
         )).get(PostsViewModel.class);
         postsViewModel.getPosts().observe(this, posts -> {
-            adapter.addPosts(posts);
+            adapter.submitList(posts);
 
             if (saveState != null) {
                 Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);

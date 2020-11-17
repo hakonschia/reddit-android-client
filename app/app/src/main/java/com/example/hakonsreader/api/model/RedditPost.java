@@ -14,6 +14,7 @@ import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class representing a Reddit post
@@ -667,5 +668,49 @@ public class RedditPost extends RedditListing {
             default:
                 return null;
         }
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RedditPost)) return false;
+        RedditPost that = (RedditPost) o;
+        return amountOfComments == that.amountOfComments &&
+                spoiler == that.spoiler &&
+                isText == that.isText &&
+                isVideo == that.isVideo &&
+                isGallery == that.isGallery &&
+                isArchived == that.isArchived &&
+                saved == that.saved &&
+                isUserMod == that.isUserMod &&
+                title.equals(that.title) &&
+                subreddit.equals(that.subreddit) &&
+                Objects.equals(thumbnail, that.thumbnail) &&
+                Objects.equals(selftext, that.selftext) &&
+                Objects.equals(selftextHtml, that.selftextHtml) &&
+                Objects.equals(crosspostParentID, that.crosspostParentID) &&
+                Objects.equals(crossposts, that.crossposts) &&
+                Objects.equals(crosspostIds, that.crosspostIds) &&
+                Objects.equals(postHint, that.postHint) &&
+                Objects.equals(domain, that.domain) &&
+                Objects.equals(removedByCategory, that.removedByCategory) &&
+                Objects.equals(authorFlairBackgroundColor, that.authorFlairBackgroundColor) &&
+                Objects.equals(authorFlairTextColor, that.authorFlairTextColor) &&
+                Objects.equals(authorFlairText, that.authorFlairText) &&
+                Objects.equals(authorRichtextFlairs, that.authorRichtextFlairs) &&
+                Objects.equals(linkFlairBackgroundColor, that.linkFlairBackgroundColor) &&
+                Objects.equals(linkFlairTextColor, that.linkFlairTextColor) &&
+                Objects.equals(linkFlairText, that.linkFlairText) &&
+                Objects.equals(linkRichtextFlairs, that.linkRichtextFlairs) &&
+                Objects.equals(media, that.media) &&
+                Objects.equals(mediaMetadata, that.mediaMetadata) &&
+                Objects.equals(galleryImages, that.galleryImages) &&
+                Objects.equals(preview, that.preview);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, amountOfComments, subreddit, thumbnail, spoiler, selftext, selftextHtml, crosspostParentID, crossposts, crosspostIds, isText, isVideo, isGallery, isArchived, postHint, domain, removedByCategory, saved, isUserMod, authorFlairBackgroundColor, authorFlairTextColor, authorFlairText, authorRichtextFlairs, linkFlairBackgroundColor, linkFlairTextColor, linkFlairText, linkRichtextFlairs, media, mediaMetadata, galleryImages, preview);
     }
 }
