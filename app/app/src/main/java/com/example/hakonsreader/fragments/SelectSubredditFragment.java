@@ -80,6 +80,13 @@ public class SelectSubredditFragment extends Fragment {
         this.subredditSelected = subredditSelected;
     }
 
+    /**
+     * Callback for when "Favorite" in an item in the subreddit list has been clicked.
+     *
+     * <p>Updates the favorited status based on the current status</p>
+     *
+     * @param subreddit The subreddit clicked
+     */
     public void favoriteClicked(Subreddit subreddit) {
         api.subreddit(subreddit.getName()).favorite(!subreddit.isFavorited(), ignored -> {
             subreddit.setFavorited(!subreddit.isFavorited());
@@ -90,9 +97,9 @@ public class SelectSubredditFragment extends Fragment {
             if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
                 layoutManager.scrollToPosition(0);
             }
-        }, (code, t) -> {
+        }, (e, t) -> {
             t.printStackTrace();
-            Util.handleGenericResponseErrors(getView(), code, t);
+            Util.handleGenericResponseErrors(getView(), e, t);
         });
     }
 
@@ -104,10 +111,16 @@ public class SelectSubredditFragment extends Fragment {
                 getContext()
         )).get(SelectSubredditsViewModel.class);
         viewModel.getSubreddits().observe(getViewLifecycleOwner(), subreddits -> {
-            subredditsAdapter.setSubreddits(subreddits);
+            subredditsAdapter.submitList(subreddits);
             if (saveState != null) {
                 layoutManager.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY));
             }
+        });
+        viewModel.onCountChange().observe(getViewLifecycleOwner(), onCountChange -> {
+            binding.loadingIcon.onCountChange(onCountChange);
+        });
+        viewModel.getError().observe(getViewLifecycleOwner(), error -> {
+            Util.handleGenericResponseErrors(binding.parentLayout, error.getError(), error.getThrowable());
         });
     }
 
@@ -123,7 +136,7 @@ public class SelectSubredditFragment extends Fragment {
             if (subreddits.isEmpty()) {
                 searchSubredditsAdapter.clear();
             } else {
-                searchSubredditsAdapter.setSubreddits(subreddits);
+                searchSubredditsAdapter.submitList(subreddits);
             }
             if (saveState != null) {
                 searchLayoutManager.onRestoreInstanceState(saveState.getParcelable(SEARCH_LIST_STATE_KEY));

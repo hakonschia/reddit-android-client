@@ -3,6 +3,7 @@ package com.example.hakonsreader.recyclerviewadapters;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
@@ -21,32 +24,56 @@ import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.views.util.ViewUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Adapter for displaying a list of {@link Subreddit} items in a RecyclerView
+ */
 public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.ViewHolder> {
     private static final String TAG = "SubredditsAdapter";
-    
-    private OnSubredditSelected subredditSelected;
+
     private List<Subreddit> subreddits = new ArrayList<>();
+    private OnSubredditSelected subredditSelected;
     private OnClickListener<Subreddit> favoriteClicked;
 
+    /**
+     * Sets the listener for when a subreddit in the list has been clicked
+     *
+     * @param subredditSelected The callback to set
+     */
     public void setSubredditSelected(OnSubredditSelected subredditSelected) {
         this.subredditSelected = subredditSelected;
     }
 
+    /**
+     * Sets the listener for when the "Favorite" icon has been clicked on an item in the list
+     *
+     * @param favoriteClicked The callback to set
+     */
     public void setFavoriteClicked(OnClickListener<Subreddit> favoriteClicked) {
         this.favoriteClicked = favoriteClicked;
     }
 
-    public void setSubreddits(List<Subreddit> subreddits) {
+    /**
+     * Submit the list of subreddits to display
+     *
+     * @param newList The list of items to display
+     */
+    public void submitList(List<Subreddit> newList) {
         List<Subreddit> previous = this.subreddits;
-        this.subreddits = subreddits;
-        this.sortSubreddits();
+        List<Subreddit> newSorted = sortSubreddits(newList);
 
-        // Find differences between previous and this.subreddits to show animation with notifyItemInserted, notifyItemRemoved etc
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(
+                new SubredditItemDiffCallback(previous, newSorted),
+                true
+        );
 
-        notifyDataSetChanged();
+        this.subreddits = newSorted;
+        diffResult.dispatchUpdatesTo(this);
     }
 
     /**
@@ -59,7 +86,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
     }
 
     /**
-     * Sorts {@link SubredditsAdapter#subreddits}
+     * Sorts a list of subreddits
      *
      * <p>The order of the list will be, sorted alphabetically:
      * <ol>
@@ -68,9 +95,12 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
      *     <li>Users the user is following</li>
      * </ol>
      * </p>
+     *
+     * @param list The list so sort
+     * @return A new list that is sorted based on the subreddit type
      */
-    private void sortSubreddits() {
-        List<Subreddit> sorted = subreddits.stream()
+    private List<Subreddit> sortSubreddits(List<Subreddit> list) {
+        List<Subreddit> sorted = list.stream()
                 // Sort based on subreddit name
                 .sorted((first, second) -> first.getName().toLowerCase().compareTo(second.getName().toLowerCase()))
                 .collect(Collectors.toList());
@@ -92,7 +122,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
         combined.addAll(sorted);
         combined.addAll(users);
 
-        subreddits = combined;
+        return combined;
     }
 
     /**
@@ -104,12 +134,60 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
      * @param subreddit The subreddit favorited/un-favorited
      */
     public void onFavorite(Subreddit subreddit) {
-        // TODO find out where it actually should go
         int pos = subreddits.indexOf(subreddit);
         subreddits.remove(pos);
-        subreddits.add(0, subreddit);
 
-        notifyItemMoved(pos, 0);
+        int newPos = findPosForItem(subreddit);
+
+        subreddits.add(newPos, subreddit);
+
+        // itemMoved just moves the item, itemChanged updates the view
+        notifyItemMoved(pos, newPos);
+        notifyItemChanged(newPos);
+    }
+
+    /**
+     * Finds the position of where an item should be inserted in the list based on if it is favorited
+     * or not
+     *
+     * @param subreddit The subreddit to find the index for
+     * @return The index the item should be inserted
+     */
+    private int findPosForItem(Subreddit subreddit) {
+        int posFirstNonFavorite = 0;
+        for (int i = 0; i < subreddits.size(); i++) {
+            Subreddit s = subreddits.get(i);
+            if (!s.isFavorited()) {
+                posFirstNonFavorite = i;
+                break;
+            }
+        }
+
+        // Find a sublist of where the item should go (favorite or not)
+        List<Subreddit> list;
+        // Subreddit has been favorited, get the sublist of favorites
+        if (subreddit.isFavorited()) {
+            list = subreddits.subList(0, posFirstNonFavorite);
+        } else {
+            // Sublist of everything not favorited
+            list = subreddits.subList(posFirstNonFavorite, subreddits.size());
+        }
+
+        // binarySearch() returns the index of the item, or a negative representing where it would have been
+        // The list will always be sorted on the name
+        int newPos = Collections.binarySearch(list, subreddit, (s1, s2) -> s1.getName().toLowerCase().compareTo(s2.getName().toLowerCase()));
+
+        // Add one to the value and invert it to get the actual position
+        // ie. newPos = -5 means it would be in position 5 (index 4)
+        newPos++;
+        newPos *= -1;
+
+        // The pos is in the sublist, so if we're unfavoriting we need to add the favorites size
+        if (!subreddit.isFavorited()) {
+            newPos += posFirstNonFavorite;
+        }
+
+        return newPos;
     }
 
 
@@ -210,6 +288,42 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
             } else {
                 favorite.setColorFilter(ContextCompat.getColor(context, R.color.iconColor));
             }
+        }
+    }
+
+
+    /**
+     * Callback class for DiffUtil
+     */
+    private static class SubredditItemDiffCallback extends DiffUtil.Callback {
+
+        private final List<Subreddit> oldList;
+        private final List<Subreddit> newList;
+
+        public SubredditItemDiffCallback(List<Subreddit> oldList, List<Subreddit> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+
+        @Override
+        public int getOldListSize() {
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).getId().equals(newList.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
         }
     }
 }

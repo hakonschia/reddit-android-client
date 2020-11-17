@@ -4,6 +4,8 @@ import androidx.room.Entity;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
 
 /**
  * Class representing a subreddit
@@ -255,5 +257,34 @@ public class Subreddit extends RedditListing {
 
     public void setHideScoreTime(int hideScoreTime) {
         this.hideScoreTime = hideScoreTime;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Subreddit)) return false;
+        Subreddit subreddit = (Subreddit) o;
+        return subscribers == subreddit.subscribers &&
+                quarantine == subreddit.quarantine &&
+                favorited == subreddit.favorited &&
+                subscribed == subreddit.subscribed &&
+                hideScoreTime == subreddit.hideScoreTime &&
+                name.equals(subreddit.name) &&
+                title.equals(subreddit.title) &&
+                Objects.equals(description, subreddit.description) &&
+                Objects.equals(descriptionHtml, subreddit.descriptionHtml) &&
+                Objects.equals(publicDesription, subreddit.publicDesription) &&
+                Objects.equals(publicDesriptionHtml, subreddit.publicDesriptionHtml) &&
+                Objects.equals(iconImage, subreddit.iconImage) &&
+                Objects.equals(communityIcon, subreddit.communityIcon) &&
+                Objects.equals(headerImage, subreddit.headerImage) &&
+                Objects.equals(submitText, subreddit.submitText) &&
+                Objects.equals(subredditType, subreddit.subredditType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, title, subscribers, description, descriptionHtml, publicDesription, publicDesriptionHtml, iconImage, communityIcon, headerImage, quarantine, favorited, subscribed, submitText, subredditType, hideScoreTime);
     }
 }

@@ -22,6 +22,8 @@ public class SelectSubredditsViewModel extends ViewModel {
 
     private final AppDatabase database;
     private MutableLiveData<List<Subreddit>> subreddits;
+    private MutableLiveData<Boolean> onCountChange = new MutableLiveData<>();
+    private MutableLiveData<ErrorWrapper> errorWrapper = new MutableLiveData<>();
 
 
     /**
@@ -56,6 +58,20 @@ public class SelectSubredditsViewModel extends ViewModel {
     }
 
     /**
+     * Retrieve the value used for listening to when something has started or finished loading
+     *
+     * @return If something has started loading the value in this LiveData will be set to true, and when
+     * it has finished loading it will be set to false
+     */
+    public LiveData<Boolean> onCountChange() {
+        return onCountChange;
+    }
+
+    public LiveData<ErrorWrapper> getError() {
+        return errorWrapper;
+    }
+
+    /**
      * Load the subreddits. If a user is logged in their subscribed subreddits are loaded, otherwise
      * default subs are loaded.
      *
@@ -64,6 +80,7 @@ public class SelectSubredditsViewModel extends ViewModel {
      * <p>The IDs are stored in SharedPreferences with the key {@link SelectSubredditsViewModel#SUBSCRIBED_SUBREDDITS_KEY}</p>
      */
     public void loadSubreddits() {
+        onCountChange.setValue(true);
         App.get().getApi().subreddits().getSubreddits("", 0, subs -> {
             subreddits.setValue(subs);
 
@@ -77,8 +94,11 @@ public class SelectSubredditsViewModel extends ViewModel {
             new Thread(() -> database.subreddits().insertAll(subs)).start();
 
             SharedPreferencesManager.put(SUBSCRIBED_SUBREDDITS_KEY, ids);
+            onCountChange.setValue(false);
         }, (e, t) -> {
             t.printStackTrace();
+            errorWrapper.setValue(new ErrorWrapper(e, t));
+            onCountChange.setValue(false);
         });
     }
 }
