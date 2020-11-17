@@ -323,7 +323,15 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
 
         @Override
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+            Subreddit oldItem = oldList.get(oldItemPosition);
+            Subreddit newItem = newList.get(newItemPosition);
+
+            // We only have to compare what is actually shown in the list. If we used Subreddit.equals()
+            // it would most likely return false, since subscribers will very likely be changed, causing
+            // the list flash because this would return false and it would be redrawn
+            return oldItem.getName().equals(newItem.getName())
+                    && oldItem.isFavorited() == newItem.isFavorited()
+                    && oldItem.getPublicDesription().equals(newItem.getPublicDesription());
         }
     }
 }
