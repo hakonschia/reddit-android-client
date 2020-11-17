@@ -459,18 +459,21 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         RedditComment comment = comments.get(position);
 
+        // If we're in a chain and on the first element (the start of the chain) then highlight it
+        boolean highlight = position == 0 && !chain.isEmpty();
+
         switch (holder.getItemViewType()) {
             case MORE_COMMETS_TYPE:
                 ((MoreCommentsViewHolder)holder).bind(comment);
                 break;
 
             case HIDDEN_COMMENT_TYPE:
-                ((HiddenCommentViewHolder)holder).bind(comment);
+                ((HiddenCommentViewHolder)holder).bind(comment, highlight);
                 break;
 
             default:
             case NORMAL_COMMENT_TYPE:
-                ((NormalCommentViewHolder)holder).bind(comment);
+                ((NormalCommentViewHolder)holder).bind(comment, highlight);
                 break;
         }
 
@@ -820,8 +823,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.binding = binding;
         }
 
-        public void bind(RedditComment comment) {
+        public void bind(RedditComment comment, boolean highlight) {
             binding.setComment(comment);
+            binding.setHighlight(highlight);
             binding.executePendingBindings();
         }
     }
@@ -842,8 +846,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
          *
          * @param comment The comment to bind
          */
-        public void bind(RedditComment comment) {
+        public void bind(RedditComment comment, boolean highlight) {
             binding.setComment(comment);
+            binding.setHighlight(highlight);
 
             // If the ticker has animation enabled it will animate from the previous comment to this one
             // which is very weird behaviour, so disable the animation and enable it again when we have set the comment

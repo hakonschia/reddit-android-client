@@ -8,6 +8,11 @@
         <variable
             name="comment"
             type="com.example.hakonsreader.api.model.RedditComment" />
+
+        <variable
+            name="highlight"
+            type="boolean" />
+
         <variable
             name="adapter"
             type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
@@ -16,6 +21,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@{highlight ? @color/commentHighlightBackground : @color/background}"
         android:onClick="@{view -> adapter.showComments(comment)}"
         android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}">
 
