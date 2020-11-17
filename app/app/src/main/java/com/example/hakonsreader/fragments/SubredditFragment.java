@@ -21,6 +21,7 @@ import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.SortingMethods;
 import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException;
+import com.example.hakonsreader.api.exceptions.SubredditNotFoundException;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.responses.GenericError;
@@ -284,7 +285,10 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         } else {
             // NoSubredditInfoException is retrieved when trying to get info from front page, popular, or all
             // and we don't need to show anything of this to the user
-            if (!(throwable instanceof NoSubredditInfoException)) {
+            if (throwable instanceof NoSubredditInfoException) {
+                return;
+            } else if (throwable instanceof SubredditNotFoundException) {
+                Snackbar.make(binding.parentLayout, getString(R.string.subredditNotFound, getSubredditName()), Snackbar.LENGTH_LONG).show();
                 return;
             }
 

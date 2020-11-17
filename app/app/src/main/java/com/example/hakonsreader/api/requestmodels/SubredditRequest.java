@@ -245,11 +245,14 @@ public class SubredditRequest {
                 if (body != null) {
                     List<RedditPost> posts = (List<RedditPost>) body.getListings();
 
+                    // When searching for "herth" and AFTER the search result is done pressing enter
+                    // to go into the sub (that doesn't exist) this for some reason gives the search results here
+                    // which causes it to crash inside the imgur load albums because the list is of subreddits and not posts
+                    // ???????????
                     if (loadImgurAlbumsAsRedditGalleries) {
                         imgurRequest.loadAlbums(posts);
                     }
 
-                    System.out.println("----------------------- Sending posts to onResponse -----------------------");
                     onResponse.onResponse(posts);
                 } else {
                     Util.handleHttpErrors(response, onFailure);

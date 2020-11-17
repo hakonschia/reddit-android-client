@@ -172,4 +172,5 @@
     <string name="prefs_title_max_post_size_percentage">Maks prosent av skjermhøyden poster vil ta</string>
     <string name="commentShowChain">Vis kommentar tråd</string>
     <string name="commentCopyLink">Kopier kommentar lenke</string>
+    <string name="subredditNotFound">r/%s finnes ikke</string>
 </resources>

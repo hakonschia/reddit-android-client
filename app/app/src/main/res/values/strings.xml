@@ -171,6 +171,7 @@
 
     <string name="subredditBanned">r/%s has been banned</string>
     <string name="subredditPrivate">r/%s is private. You must be invited to access this subreddit</string>
+    <string name="subredditNotFound">r/%s doesn\'t exist</string>
 
     <string name="replyingTo">Replying to %s</string>
     <string name="replyHint">Say something nice</string>
