@@ -52,10 +52,6 @@ import static android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION;
 public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = "CommentsAdapter";
 
-    // TODO this has become kind of messy and should be refactored to remove stuff that isn't used
-    //  and so I know what is actually going on here
-
-
     /**
      * The value returned from {@link CommentsAdapter#getItemViewType(int)} when the comment is
      * a "more comments" comment
@@ -76,17 +72,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
     /**
-     * The list of comments that should be shown. This list might not include all comments for the post
-     * as some might be hidden
+     * The list of comments that should be shown, unless a comment chain is set to be shown.
+     * This list might not include all comments, as comments that are hidden
+     * ({@link RedditComment#isCollapsed()}) will not have its children in this list
      */
     private List<RedditComment> comments = new ArrayList<>();
-
-    /**
-     * The comments that have been selected to be hidden.
-     * These are only the comments that have been explicitly selected to be hidden, and not its children.
-     * These comments are still shown in a preview form to show that a comment chain is hidden.
-     */
-    private List<RedditComment> commentsHidden = new ArrayList<>();
 
     /**
      * If {@link CommentsAdapter#commentIdChain} is set, this list will hold the chain of comments
@@ -132,6 +122,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.replyListener = replyListener;
     }
 
+    /**
+     * @return The reply listener set on the adapter
+     */
     public OnReplyListener getReplyListener() {
         return replyListener;
     }
@@ -168,22 +161,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         List<RedditComment> previous = comments;
         comments = newComments;
 
-        List<RedditComment> commentsToRemoveChildrenFrom = new ArrayList<>();
-        int hideThreshold = App.get().getAutoHideScoreThreshold();
-        comments.forEach(comment -> {
-            if (hideThreshold >= comment.getScore()) {
-                comment.setCollapsed(true);
-                commentsToRemoveChildrenFrom.add(comment);
-            }
-        });
-
-        // We can't modify the comments list while looping over it, so we have to store the comments
-        // that should be hidden and remove them afterwards
-        commentsToRemoveChildrenFrom.forEach(comment -> {
-            // Remove all its replies
-            List<RedditComment> replies = getShownReplies(comment);
-            comments.removeAll(replies);
-        });
+        checkAndSetHiddenComments();
 
         if (commentIdChain != null && !commentIdChain.isEmpty()) {
             setChain(newComments);
@@ -194,37 +172,43 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             );
             diffResult.dispatchUpdatesTo(this);
         }
-
-        //checkForHiddenComments(newComments);
-    }
-
-    public void setComments(List<RedditComment> comments) {
-        this.comments = comments;
-        notifyDataSetChanged();
-        checkForHiddenComments(comments);
-    }
-
-    public void setCommentsHidden(List<RedditComment> commentsHidden) {
-        this.commentsHidden = commentsHidden;
-        notifyDataSetChanged();
-    }
-
-    public List<RedditComment> getComments() {
-        return comments;
-    }
-
-    public List<RedditComment> getCommentsHidden() {
-        return commentsHidden;
     }
 
     /**
+     * Goes through {@link CommentsAdapter#comments} and checks if a comments score is below
+     * the users threshold or if Reddit has specified that it should be hidden.
+     *
+     * <p>Comments hidden set {@link RedditComment#setCollapsed(boolean)} to true and all its
+     * children are removed from {@link CommentsAdapter#comments}</p>
+     */
+    private void checkAndSetHiddenComments() {
+        List<RedditComment> commentsToRemove = new ArrayList<>();
+        int hideThreshold = App.get().getAutoHideScoreThreshold();
+        comments.forEach(comment -> {
+            if (hideThreshold >= comment.getScore() || comment.isCollapsed()) {
+                // If we got here from the score threshold make sure collapsed is set to true
+                comment.setCollapsed(true);
+                commentsToRemove.addAll(getShownReplies(comment));
+            }
+        });
+
+        // We can't modify the comments list while looping over it, so we have to store the comments
+        // that should be removed and remove them afterwards
+        comments.removeAll(commentsToRemove);
+    }
+
+
+    /**
      * Sets {@link CommentsAdapter#chain} based on {@link CommentsAdapter#commentIdChain}.
-     * If the chain is found, the currently shown list is stored in {@link CommentsAdapter#commentsShownWhenChainSet}
+     * If the chain is found, the currently shown list is stored in {@link CommentsAdapter#commentsShownWhenChainSet}.
+     *
+     * <p>This function calls {@link RecyclerView.Adapter#notifyDataSetChanged()}</p>
      *
      * @param commentsToLookIn The comments to look in
      */
     private void setChain(List<RedditComment> commentsToLookIn) {
         // TODO this is bugged when in a chain and going into a new chain
+        // TODO the commentsShownWhenChainSet aren't updated with new comments loaded while in the chain
 
         if (commentIdChain != null && !commentIdChain.isEmpty()) {
             // We have to clear the list here. In case the comment isn't found every comment should be shown
@@ -294,7 +278,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void clearComments() {
         int size = comments.size();
         comments.clear();
-        commentsHidden.clear();
         notifyItemRangeRemoved(0, size);
     }
 
@@ -308,7 +291,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         for(int i = currentPos; i < comments.size(); i++) {
             RedditComment comment = comments.get(i);
 
-            if (comment.getDepth() == 0 && !commentsHidden.contains(comment)) {
+            if (comment.getDepth() == 0 && !comment.isCollapsed()) {
                 return i;
             }
         }
@@ -326,7 +309,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         for(int i = currentPos; i >= 0; i--) {
             RedditComment comment = comments.get(i);
 
-            if (comment.getDepth() == 0 && !commentsHidden.contains(comment)) {
+            if (comment.getDepth() == 0 && !comment.isCollapsed()) {
                 return i;
             }
         }
@@ -340,7 +323,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param start The comment to start at. This comment and any replies will be hidden
      */
     public void hideComments(RedditComment start) {
-        Log.d(TAG, "hideComments: HIDING COMMENT");
         int startPos = comments.indexOf(start);
         // Comment not found in the list, return to avoid weird stuff potentially happening
         if (startPos == -1) {
@@ -349,15 +331,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         start.setCollapsed(true);
 
-        // Update the comment selected to show that it is now a hidden comment chain
-        commentsHidden.add(start);
-        notifyItemChanged(startPos);
-
         // Remove all its replies
         List<RedditComment> replies = getShownReplies(start);
         comments.removeAll(replies);
 
         // The comment explicitly hidden isn't being removed, but its UI is updated
+        // Its children are removed from the list
+        notifyItemChanged(startPos);
         notifyItemRangeRemoved(startPos + 1, replies.size());
     }
 
@@ -396,7 +376,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 replies.add(reply);
 
                 // Reply isn't hidden which means it potentially has children to show
-                if (!commentsHidden.contains(reply)) {
+                if (!reply.isCollapsed()) {
                     replies.addAll(getShownReplies(reply));
                 }
             }
@@ -406,32 +386,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * Goes through a list of comments and hides comments that have a lower score than the
-     * threshold set in the preferences
-     *
-     * @param comments The comments to check
-     */
-    private void checkForHiddenComments(List<RedditComment> comments) {
-        // We could store this when the adapter is created, but if we retrieve the value now
-        // it's updated if the user has changed the value since the adapter was created
-        int hideThreshold = App.get().getAutoHideScoreThreshold();
-        comments.forEach(comment -> {
-            // Hide comments if the score is below the threshold
-            // Also hide comments if Reddit says they should be so (these are typically comments hidden because
-            // of downvotes, but can't be determined by a threshold since they have a hidden score)
-            if (comment.isCollapsed() || hideThreshold >= comment.getScore()) {
-                hideComments(comment);
-            }
-        });
-    }
-
-    /**
      * Returns the base depth for the current list shown. The value returned here
      * will be the first comments depth, which should be used to calculate how many sidebars so show
      */
     public int getBaseDepth() {
         return comments.get(0).getDepth();
     }
+
 
     @NonNull
     @Override
@@ -812,6 +773,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.binding = binding;
         }
 
+        /**
+         * Binds the ViewHolder to a comment
+         *
+         * @param comment The comment to bind
+         * @param highlight True if the comment should have a slight highlight around it
+         */
         public void bind(RedditComment comment, boolean highlight) {
             binding.setComment(comment);
             binding.setHighlight(highlight);
@@ -831,9 +798,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         /**
-         * Bind the ViewHolder to a comment
+         * Binds the ViewHolder to a comment
          *
          * @param comment The comment to bind
+         * @param highlight True if the comment should have a slight highlight around it
          */
         public void bind(RedditComment comment, boolean highlight) {
             binding.setComment(comment);
@@ -852,6 +820,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
 
+    /**
+     * DiffUtil callback for comments
+     */
     private static class CommentsDiffCallback extends DiffUtil.Callback {
 
         private final List<RedditComment> oldList;
