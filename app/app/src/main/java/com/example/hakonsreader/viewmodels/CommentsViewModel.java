@@ -6,8 +6,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.hakonsreader.App;
+import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.misc.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,8 @@ import java.util.List;
  */
 public class CommentsViewModel extends ViewModel {
 
-    private final List<RedditComment> commentsDataSet = new ArrayList<>();
+    private final RedditApi api = App.get().getApi();
+
     private final MutableLiveData<RedditPost> post = new MutableLiveData<>();
     private final MutableLiveData<List<RedditComment>> comments = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();
@@ -71,7 +74,7 @@ public class CommentsViewModel extends ViewModel {
     public void loadComments() {
         loadingChange.setValue(true);
 
-        App.get().getApi().post(postId).comments(newComments -> {
+        api.post(postId).comments(newComments -> {
             comments.setValue(newComments);
             loadingChange.setValue(false);
         }, post::setValue, ((e, t) -> {
@@ -82,13 +85,42 @@ public class CommentsViewModel extends ViewModel {
     }
 
     /**
+     * Loads more comments for the post
+     *
+     * @param comment The comment holding the child comments to load. {@link RedditComment#getKind()}
+     *                has to return {@link com.example.hakonsreader.api.enums.Thing#MORE} for this
+     *                to do anything
+     * @param parent The parent comment. The "2 more comments" comment is automatically removed
+     *               from the parent comment on successful requests
+     */
+    public void loadMoreComments(RedditComment comment, RedditComment parent) {
+        loadingChange.setValue(true);
+        api.post(postId).moreComments(comment.getChildren(), parent, newComments -> {
+            List<RedditComment> dataSet = new ArrayList<>(comments.getValue());
+
+            // Find the parent index to know where to insert the new comments
+            int commentPos = dataSet.indexOf(comment);
+
+            dataSet.remove(commentPos);
+            dataSet.addAll(commentPos, newComments);
+
+            if (parent != null) {
+                parent.removeReply(comment);
+            }
+
+            comments.setValue(dataSet);
+            loadingChange.setValue(false);
+        }, (e, t) -> {
+            error.setValue(new ErrorWrapper(e, t));
+            loadingChange.setValue(false);
+        });
+    }
+
+    /**
      * Loads comments from scratch. {@link CommentsViewModel#loadComments()} is automatically called
      */
     public void restart() {
-        commentsDataSet.clear();
-        comments.setValue(commentsDataSet);
-
+        comments.setValue(new ArrayList<>());
         loadComments();
     }
-
 }

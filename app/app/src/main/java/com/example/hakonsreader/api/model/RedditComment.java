@@ -317,4 +317,8 @@ public class RedditComment extends RedditListing {
     public void setSaved(boolean saved) {
         this.saved = saved;
     }
+
+    public void setCollapsed(boolean collapsed) {
+        this.collapsed = collapsed;
+    }
 }

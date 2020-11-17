@@ -230,6 +230,7 @@ public abstract class RedditListing {
     }
 
 
+
     /**
      * @return True if the listing is distinguished as posted by a moderator
      */

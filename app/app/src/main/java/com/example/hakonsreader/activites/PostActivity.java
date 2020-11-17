@@ -327,9 +327,9 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      */
     private void setupCommentsList() {
         commentsAdapter = new CommentsAdapter(post);
-        commentsAdapter.setParentLayout(binding.parentLayout);
         commentsAdapter.setOnReplyListener(this::replyTo);
         commentsAdapter.setCommentIdChain(getIntent().getExtras().getString(COMMENT_ID_CHAIN, ""));
+        commentsAdapter.setLoadMoreCommentsListener((c, p) -> commentsViewModel.loadMoreComments(c, p));
 
         layoutManager = new LinearLayoutManager(this);
 
@@ -430,5 +430,10 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         } else {
             slidrInterface.unlock();
         }
+    }
+
+
+    public interface LoadMoreComments {
+        void loadMoreComments(RedditComment comment, RedditComment parent);
     }
 }

@@ -16,11 +16,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -29,12 +30,12 @@ import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding;
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding;
 import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
-import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.util.ViewUtil;
 import com.example.hakonsreader.views.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION;
 
@@ -74,8 +75,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private static final int HIDDEN_COMMENT_TYPE = 2;
 
 
-    private final RedditApi redditApi = App.get().getApi();
-
     /**
      * The list of comments that should be shown. This list might not include all comments for the post
      * as some might be hidden
@@ -103,9 +102,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
     private final RedditPost post;
-    private View parentLayout;
     private String commentIdChain;
     private OnReplyListener replyListener;
+    private PostActivity.LoadMoreComments loadMoreCommentsListener;
 
 
     /**
@@ -116,12 +115,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * Sets the parent layout this adapter is in
+     * Sets the listener for when "2 more comments" comments in the list are clicked
      *
-     * @param parentLayout The parent layout of the adapter
+     * @param loadMoreCommentsListener The callback to set
      */
-    public void setParentLayout(View parentLayout) {
-        this.parentLayout = parentLayout;
+    public void setLoadMoreCommentsListener(PostActivity.LoadMoreComments loadMoreCommentsListener) {
+        this.loadMoreCommentsListener = loadMoreCommentsListener;
     }
 
     /**
@@ -166,34 +165,37 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param newComments The comments to add
      */
     public void addComments(List<RedditComment> newComments) {
-        comments.addAll(newComments);
-        setChain(newComments);
+        List<RedditComment> previous = comments;
+        comments = newComments;
 
-        notifyDataSetChanged();
-        checkForHiddenComments(newComments);
-    }
+        List<RedditComment> commentsToRemoveChildrenFrom = new ArrayList<>();
+        int hideThreshold = App.get().getAutoHideScoreThreshold();
+        comments.forEach(comment -> {
+            if (hideThreshold >= comment.getScore()) {
+                comment.setCollapsed(true);
+                commentsToRemoveChildrenFrom.add(comment);
+            }
+        });
 
-    /**
-     * Inserts a sublist of new comments into a given position
-     *
-     * @param newComments The comments to add
-     * @param at The position to insert the comments
-     */
-    public void insertComments(List<RedditComment> newComments, int at) {
-        comments.addAll(at, newComments);
-        notifyItemRangeInserted(at, newComments.size());
-        checkForHiddenComments(newComments);
-    }
+        // We can't modify the comments list while looping over it, so we have to store the comments
+        // that should be hidden and remove them afterwards
+        commentsToRemoveChildrenFrom.forEach(comment -> {
+            // Remove all its replies
+            List<RedditComment> replies = getShownReplies(comment);
+            comments.removeAll(replies);
+        });
 
-    /**
-     * Removes a comment from the comment list
-     *
-     * @param comment The comment to remove
-     */
-    public void removeComment(RedditComment comment) {
-        int pos = comments.indexOf(comment);
-        comments.remove(pos);
-        notifyItemRemoved(pos);
+        if (commentIdChain != null && !commentIdChain.isEmpty()) {
+            setChain(newComments);
+        } else {
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(
+                    new CommentsDiffCallback(previous, comments),
+                    false
+            );
+            diffResult.dispatchUpdatesTo(this);
+        }
+
+        //checkForHiddenComments(newComments);
     }
 
     public void setComments(List<RedditComment> comments) {
@@ -338,11 +340,14 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param start The comment to start at. This comment and any replies will be hidden
      */
     public void hideComments(RedditComment start) {
+        Log.d(TAG, "hideComments: HIDING COMMENT");
         int startPos = comments.indexOf(start);
         // Comment not found in the list, return to avoid weird stuff potentially happening
         if (startPos == -1) {
             return;
         }
+
+        start.setCollapsed(true);
 
         // Update the comment selected to show that it is now a hidden comment chain
         commentsHidden.add(start);
@@ -364,8 +369,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void showComments(RedditComment start) {
         int pos = comments.indexOf(start);
 
-        // This comment is no longer hidden
-        commentsHidden.remove(start);
+        start.setCollapsed(false);
         notifyItemChanged(pos);
 
         // Find the replies to the starting comment that are shown (not previously hidden)
@@ -422,7 +426,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * Returns the base depth for the current list shown. If a comment chain is shown, the value returned here
+     * Returns the base depth for the current list shown. The value returned here
      * will be the first comments depth, which should be used to calculate how many sidebars so show
      */
     public int getBaseDepth() {
@@ -485,7 +489,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (Thing.MORE.getValue().equals(comment.getKind())) {
             return MORE_COMMETS_TYPE;
-        } else if (commentsHidden.contains(comment)) {
+        } else if (comment.isCollapsed()) {
             return HIDDEN_COMMENT_TYPE;
         } else {
             return NORMAL_COMMENT_TYPE;
@@ -774,23 +778,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         }
 
-        // TODO move api call to ViewModel
-        final RedditComment finalParent = parent;
-        redditApi.post(post.getId()).moreComments(comment.getChildren(), finalParent, newComments -> {
-            // Find the parent index to know where to insert the new comments
-            int commentPos = comments.indexOf(comment);
-            this.insertComments(newComments, commentPos);
-
-            // Remove the previous comment (this is the "2 more comments" comment)
-            this.removeComment(comment);
-
-            if (finalParent != null) {
-                finalParent.removeReply(comment);
-            }
-        }, (code, t) -> {
-            t.printStackTrace();
-            Util.handleGenericResponseErrors(parentLayout, code, t);
-        });
+        // Could be null, but that's something we would want to discover when debugging
+        loadMoreCommentsListener.loadMoreComments(comment, parent);
     }
 
 
@@ -859,6 +848,50 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             // Execute all the bindings now, or else scrolling/changes to the dataset will have a
             // small, but noticeable delay, causing the old comment to still appear
             binding.executePendingBindings();
+        }
+    }
+
+
+    private static class CommentsDiffCallback extends DiffUtil.Callback {
+
+        private final List<RedditComment> oldList;
+        private final List<RedditComment> newList;
+
+        public CommentsDiffCallback(List<RedditComment> oldList, List<RedditComment> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            RedditComment oldItem = oldList.get(oldItemPosition);
+            RedditComment newItem = newList.get(newItemPosition);
+
+            // When new comments are loaded the first comment will have the same ID as the
+            // "more comments" comment, so we also have to check if the kind is the same
+            return oldItem.getId().equals(newItem.getId())
+                    && oldItem.getKind().equals(newItem.getKind());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            RedditComment oldItem = oldList.get(oldItemPosition);
+            RedditComment newItem = newList.get(newItemPosition);
+
+            // There can be a mismatch here with "2 more comments" and normal comments, and these values
+            // are null for "2 more comments" so use Objects.equals
+            return Objects.equals(oldItem.getAuthor(), newItem.getAuthor()) &&
+                    Objects.equals(oldItem.getBody(), newItem.getBody());
         }
     }
 }
