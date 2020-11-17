@@ -2,7 +2,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -31,12 +29,12 @@ import com.example.hakonsreader.databinding.ListItemMoreCommentBinding;
 import com.example.hakonsreader.interfaces.LoadMoreComments;
 import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
+import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback;
 import com.example.hakonsreader.views.util.ViewUtil;
 import com.example.hakonsreader.views.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static android.view.View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION;
 
@@ -807,53 +805,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             // Execute all the bindings now, or else scrolling/changes to the dataset will have a
             // small, but noticeable delay, causing the old comment to still appear
             binding.executePendingBindings();
-        }
-    }
-
-
-    /**
-     * DiffUtil callback for comments
-     */
-    private static class CommentsDiffCallback extends DiffUtil.Callback {
-
-        private final List<RedditComment> oldList;
-        private final List<RedditComment> newList;
-
-        public CommentsDiffCallback(List<RedditComment> oldList, List<RedditComment> newList) {
-            this.oldList = oldList;
-            this.newList = newList;
-        }
-
-        @Override
-        public int getOldListSize() {
-            return oldList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            return newList.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            RedditComment oldItem = oldList.get(oldItemPosition);
-            RedditComment newItem = newList.get(newItemPosition);
-
-            // When new comments are loaded the first comment will have the same ID as the
-            // "more comments" comment, so we also have to check if the kind is the same
-            return oldItem.getId().equals(newItem.getId())
-                    && oldItem.getKind().equals(newItem.getKind());
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            RedditComment oldItem = oldList.get(oldItemPosition);
-            RedditComment newItem = newList.get(newItemPosition);
-
-            // There can be a mismatch here with "2 more comments" and normal comments, and these values
-            // are null for "2 more comments" so use Objects.equals
-            return Objects.equals(oldItem.getAuthor(), newItem.getAuthor()) &&
-                    Objects.equals(oldItem.getBody(), newItem.getBody());
         }
     }
 }

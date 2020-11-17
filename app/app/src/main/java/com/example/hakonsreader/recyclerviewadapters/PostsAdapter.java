@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.recyclerviewadapters.diffutils.PostsDiffCallback;
 import com.example.hakonsreader.views.ListDivider;
 import com.example.hakonsreader.views.Post;
 
@@ -24,7 +24,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -240,42 +239,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         public void pause() {
             post.pauseVideo();
-        }
-    }
-
-
-    /**
-     * Callback class for DiffUtil
-     */
-    private static class PostsDiffCallback extends DiffUtil.Callback {
-
-        private final List<RedditPost> oldPosts;
-        private final List<RedditPost> newPosts;
-
-        public PostsDiffCallback(List<RedditPost> oldPosts, List<RedditPost> newPosts) {
-            this.oldPosts = oldPosts;
-            this.newPosts = newPosts;
-        }
-
-
-        @Override
-        public int getOldListSize() {
-            return oldPosts.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            return newPosts.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldPosts.get(oldItemPosition).getId().equals(newPosts.get(newItemPosition).getId());
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            return false;
         }
     }
 }

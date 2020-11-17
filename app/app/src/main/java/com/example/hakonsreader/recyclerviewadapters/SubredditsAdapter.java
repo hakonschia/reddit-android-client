@@ -3,7 +3,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
@@ -21,12 +19,11 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
+import com.example.hakonsreader.recyclerviewadapters.diffutils.SubredditsDiffCallback;
 import com.example.hakonsreader.views.util.ViewUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,7 +65,7 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
         List<Subreddit> newSorted = sortSubreddits(newList);
 
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(
-                new SubredditItemDiffCallback(previous, newSorted),
+                new SubredditsDiffCallback(previous, newSorted),
                 true
         );
 
@@ -288,50 +285,6 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
             } else {
                 favorite.setColorFilter(ContextCompat.getColor(context, R.color.iconColor));
             }
-        }
-    }
-
-
-    /**
-     * Callback class for DiffUtil
-     */
-    private static class SubredditItemDiffCallback extends DiffUtil.Callback {
-
-        private final List<Subreddit> oldList;
-        private final List<Subreddit> newList;
-
-        public SubredditItemDiffCallback(List<Subreddit> oldList, List<Subreddit> newList) {
-            this.oldList = oldList;
-            this.newList = newList;
-        }
-
-
-        @Override
-        public int getOldListSize() {
-            return oldList.size();
-        }
-
-        @Override
-        public int getNewListSize() {
-            return newList.size();
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList.get(oldItemPosition).getId().equals(newList.get(newItemPosition).getId());
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            Subreddit oldItem = oldList.get(oldItemPosition);
-            Subreddit newItem = newList.get(newItemPosition);
-
-            // We only have to compare what is actually shown in the list. If we used Subreddit.equals()
-            // it would most likely return false, since subscribers will very likely be changed, causing
-            // the list flash because this would return false and it would be redrawn
-            return oldItem.getName().equals(newItem.getName())
-                    && oldItem.isFavorited() == newItem.isFavorited()
-                    && oldItem.getPublicDesription().equals(newItem.getPublicDesription());
         }
     }
 }
