@@ -103,8 +103,7 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest, Saveab
         api.edit(
                 Util.createFullName(Thing.COMMENT, commentId),
                 editedText,
-                RedditApi.API_TYPE,
-                accessToken.generateHeaderString()
+                RedditApi.API_TYPE
         ).enqueue(new Callback<JsonResponse>() {
             @Override
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
@@ -143,8 +142,7 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest, Saveab
      */
     public void delete(OnResponse<Void> onResponse, OnFailure onFailure) {
         api.delete(
-                Util.createFullName(Thing.COMMENT, commentId),
-                accessToken.generateHeaderString()
+                Util.createFullName(Thing.COMMENT, commentId)
         ).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {

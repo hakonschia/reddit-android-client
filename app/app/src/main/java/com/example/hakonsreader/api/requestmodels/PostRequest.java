@@ -183,8 +183,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
                 childrenText,
                 postFullname,
                 RedditApi.API_TYPE,
-                RedditApi.RAW_JSON,
-                accessToken.generateHeaderString()
+                RedditApi.RAW_JSON
         ).enqueue(new Callback<JsonResponse>() {
             @Override
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
@@ -290,8 +289,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
     private void getComments(String sort, OnResponse<List<RedditComment>> onResponse, OnResponse<RedditPost> onPostResponse, OnFailure onFailure) {
         api.getComments(
                 postId,
-                sort,
-                accessToken.generateHeaderString()
+                sort
         ).enqueue(new Callback<List<ListingResponse>>() {
             @Override
             public void onResponse(Call<List<ListingResponse>> call, Response<List<ListingResponse>> response) {

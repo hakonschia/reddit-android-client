@@ -52,8 +52,7 @@ class VoteableRequestModel {
 
         api.vote(
                 Util.createFullName(thing, thingId),
-                type.getValue(),
-                accessToken.generateHeaderString()
+                type.getValue()
         ).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {

@@ -270,7 +270,7 @@ public class RedditApi {
                 // Add User-Agent header to every request
                 .addInterceptor(new UserAgentInterceptor(userAgent))
                 // Ensure that an access token is always set before sending a request
-                .addInterceptor(new NoTokenInterceptor())
+                .addInterceptor(new TokenInterceptor())
                 // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(logger)
                 .build();
@@ -795,10 +795,11 @@ public class RedditApi {
     }
 
     /**
-     * Interceptor that ensures that an access token is set. If no token is found
-     * a new token for non-logged in users is retrieved
+     * Interceptor that ensures that an access token is set and added as a request header.
+     *
+     * <p>If no token is found a new token for non-logged in users is retrieved</p>
      */
-    private class NoTokenInterceptor implements Interceptor {
+    private class TokenInterceptor implements Interceptor {
         @NotNull
         @Override
         public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -810,9 +811,10 @@ public class RedditApi {
 
                 if (token != null && onNewToken != null) {
                     setTokenInternal(token);
-                    request.header("Authorization", accessToken.generateHeaderString());
                 }
             }
+
+            request.header("Authorization", accessToken.generateHeaderString());
 
             return chain.proceed(request.build());
         }

@@ -103,7 +103,7 @@ public class UserRequests {
         // not particularly interesting (it's only when the user has created their account, their profile image, and their name/fullname)
         // If the user was blocked already, nothing is returned at all (but 200 OK is returned)
 
-        api.blockUser(username, accessToken.generateHeaderString()).enqueue(new Callback<Void>() {
+        api.blockUser(username).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -135,7 +135,7 @@ public class UserRequests {
             return;
         }
 
-        api.getUserInfo(accessToken.generateHeaderString()).enqueue(new Callback<RedditUser>() {
+        api.getUserInfo().enqueue(new Callback<RedditUser>() {
             @Override
             public void onResponse(Call<RedditUser> call, Response<RedditUser> response) {
                 RedditUser body = null;
@@ -165,7 +165,7 @@ public class UserRequests {
      * @param onFailure The callback for failed requests
      */
     private void getInfoByUsername(String username, OnResponse<RedditUser> onResponse, OnFailure onFailure) {
-        api.getUserInfoOtherUsers(username, accessToken.generateHeaderString()).enqueue(new Callback<RedditListing>() {
+        api.getUserInfoOtherUsers(username).enqueue(new Callback<RedditListing>() {
             @Override
             public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
                 RedditListing body = null;
@@ -280,8 +280,7 @@ public class UserRequests {
                         username,
                         "submitted",
                         sort,
-                        timeSort == null ? "" : timeSort.getValue(),
-                        accessToken.generateHeaderString()
+                        timeSort == null ? "" : timeSort.getValue()
                 ).execute();
 
                 ListingResponse body = null;

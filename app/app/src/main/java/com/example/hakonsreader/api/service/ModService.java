@@ -25,8 +25,6 @@ public interface ModService {
      * @param how "yes" to distinguish as mod, "no" to remove the mod distinguish
      * @param sticky True to also sticky the post or comment (comments will also be mod distinguished when stickied)
      * @param apiType The string "json"
-     * @param accessToken The type of token + the actual token. Form: "type token". This must be for
-     *                    a user that is a moderator in the respective subreddit
      * @return A Call with a JsonResponse. The response will hold the updated comment
      */
     @POST("api/distinguish")
@@ -35,9 +33,7 @@ public interface ModService {
             @Field("id") String fullname,
             @Field("how") String how,
             @Field("sticky") boolean sticky,
-            @Field("api_type") String apiType,
-
-            @Header("Authorization") String accessToken
+            @Field("api_type") String apiType
     );
 
     /**
@@ -48,8 +44,6 @@ public interface ModService {
      * @param fullname The fullname of the post
      * @param how "yes" to distinguish as mod, "no" to remove the mod distinguish
      * @param apiType The string "json"
-     * @param accessToken The type of token + the actual token. Form: "type token". This must be for
-     *                    a user that is a moderator in the respective subreddit
      * @return A Call with a JsonResponse. The response will hold the updated post
      */
     @POST("api/distinguish")
@@ -57,9 +51,7 @@ public interface ModService {
     Call<JsonResponse> distinguishAsModPost(
             @Field("id") String fullname,
             @Field("how") String how,
-            @Field("api_type") String apiType,
-
-            @Header("Authorization") String accessToken
+            @Field("api_type") String apiType
     );
 
 
@@ -70,8 +62,6 @@ public interface ModService {
      *                 If only the ID is passed, this will not throw any errors, but the post will not be updated
      * @param sticky True to sticky, false to remove the sticky
      * @param apiType The string "json"
-     * @param accessToken The type of token + the actual token. Form: "type token". This must be for
-     *                    a user that is a moderator in the respective subreddit
      * @return A Call with a JsonResponse. The JsonResponse will not hold any data on successful responses
      */
     @POST("api/set_subreddit_sticky")
@@ -79,8 +69,6 @@ public interface ModService {
     Call<JsonResponse> stickyPost(
             @Field("id") String fullname,
             @Field("state") boolean sticky,
-            @Field("api_type") String apiType,
-
-            @Header("Authorization") String accessToken
+            @Field("api_type") String apiType
     );
 }

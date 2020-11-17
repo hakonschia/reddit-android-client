@@ -62,8 +62,7 @@ class ReplyableRequestModel {
                 comment,
                 Util.createFullName(thing, thingId),
                 RedditApi.API_TYPE,
-                false,
-                accessToken.generateHeaderString()
+                false
         ).enqueue(new Callback<JsonResponse>() {
             @Override
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {

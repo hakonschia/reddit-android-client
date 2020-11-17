@@ -69,7 +69,7 @@ public class SubredditRequest {
             return;
         }
 
-        api.getSubredditInfo(subredditName, accessToken.generateHeaderString()).enqueue(new Callback<RedditListing>() {
+        api.getSubredditInfo(subredditName).enqueue(new Callback<RedditListing>() {
             @Override
             public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
                 RedditListing body = null;
@@ -142,7 +142,7 @@ public class SubredditRequest {
             return;
         }
 
-        api.favoriteSubreddit(subredditName, favorite, accessToken.generateHeaderString()).enqueue(new Callback<Void>() {
+        api.favoriteSubreddit(subredditName, favorite).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -177,7 +177,7 @@ public class SubredditRequest {
             return;
         }
 
-        api.subscribeToSubreddit(subscribe ? "sub" : "unsub", subredditName, accessToken.generateHeaderString()).enqueue(new Callback<Void>() {
+        api.subscribeToSubreddit(subscribe ? "sub" : "unsub", subredditName).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -234,8 +234,7 @@ public class SubredditRequest {
                         timeSort == null ? "" : timeSort.getValue(),
                         after,
                         count,
-                        RedditApi.RAW_JSON,
-                        accessToken.generateHeaderString()
+                        RedditApi.RAW_JSON
                 ).execute();
 
                 ListingResponse body = null;

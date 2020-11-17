@@ -20,7 +20,6 @@ public interface CommentService extends VoteService, ReplyService, SaveService, 
      * @param commentFullname The fullname of the comment to edit
      * @param text The updated text
      * @param apiType The string "json"
-     * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Call ready to execute the request
      */
     @POST("api/editusertext")
@@ -28,24 +27,17 @@ public interface CommentService extends VoteService, ReplyService, SaveService, 
     Call<JsonResponse> edit(
             @Field("thing_id") String commentFullname,
             @Field("text") String text,
-            @Field("api_type") String apiType,
-
-            @Header("Authorization") String accessToken
+            @Field("api_type") String apiType
     );
 
     /**
      * Delete a comment
      *
      * @param commentFullname The fullname of the comment to delete
-     * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Call ready to execute the request
      */
     @POST("api/del")
     @FormUrlEncoded
-    Call<Void> delete(
-            @Field("id") String commentFullname,
-
-            @Header("Authorization") String accessToken
-    );
+    Call<Void> delete(@Field("id") String commentFullname);
 
 }

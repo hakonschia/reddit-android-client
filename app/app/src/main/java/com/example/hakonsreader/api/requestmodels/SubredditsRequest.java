@@ -54,8 +54,7 @@ public class SubredditsRequest {
         api.getSubscribedSubreddits(
                 after,
                 count,
-                100,
-                accessToken.generateHeaderString()
+                100
         ).enqueue(new Callback<ListingResponse>() {
             @Override
             public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
@@ -98,8 +97,7 @@ public class SubredditsRequest {
         api.getDefaultSubreddits(
                 after,
                 count,
-                100,
-                accessToken.generateHeaderString()
+                100
         ).enqueue(new Callback<ListingResponse>() {
             @Override
             public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
@@ -161,7 +159,7 @@ public class SubredditsRequest {
      * @param onFailure The response handler for failed requests
      */
     public void search(String searchQuery, OnResponse<List<Subreddit>> onResponse, OnFailure onFailure) {
-        api.searchForSubreddits(searchQuery, accessToken.generateHeaderString()).enqueue(new Callback<ListingResponse>() {
+        api.searchForSubreddits(searchQuery).enqueue(new Callback<ListingResponse>() {
             @Override
             public void onResponse(Call<ListingResponse> call, Response<ListingResponse> response) {
                 ListingResponse body = null;

@@ -20,29 +20,23 @@ public interface UserService {
 
     /**
      * Retrieves information about the logged in user. For information about any user see
-     * {@link UserService#getUserInfoOtherUsers(String, String)}
+     * {@link UserService#getUserInfoOtherUsers(String)}
      *
      * <p>OAuth scope required: {@code identity}</p>
      *
-     * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Call with {@link RedditUser}
      */
     @GET("api/v1/me?raw_json=1")
-    Call<RedditUser> getUserInfo(@Header("Authorization") String accessToken);
+    Call<RedditUser> getUserInfo();
 
     /**
      * Retrieves information about a user. This can retrieve information about users that aren't
      * the logged in user
      *
-     * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Call with {@link RedditUser}
      */
     @GET("u/{username}/about?raw_json=1")
-    Call<RedditListing> getUserInfoOtherUsers(
-            @Path("username") String username,
-
-            @Header("Authorization") String accessToken
-    );
+    Call<RedditListing> getUserInfoOtherUsers(@Path("username") String username);
 
     /**
      * <p>OAauth scope required: {@code history}</p>
@@ -61,7 +55,6 @@ public interface UserService {
      * @param sort How to sort the listings (top, new, hot, or controversial)
      * @param timeSort For listings that can be sorted by time, how to sort the listings (use {@link com.example.hakonsreader.api.enums.PostTimeSort}
      *                 and getValue())
-     * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A ListingResponse call. The listings returned depend on the value of "what" (comments, post, etc.)
      */
     @GET("user/{username}/{what}?raw_json=1")
@@ -69,9 +62,7 @@ public interface UserService {
             @Path("username") String username,
             @Path("what") String what,
             @Query("sort") String sort,
-            @Query("t") String timeSort,
-
-            @Header("Authorization") String accessToken
+            @Query("t") String timeSort
     );
 
 
@@ -79,15 +70,10 @@ public interface UserService {
      * Block a user
      *
      * @param username The username of the user to block
-     * @param accessToken The type of token + the actual token. Form: "type token"
      * @return A Void call
      */
     @POST("api/block_user")
     @FormUrlEncoded
-    Call<Void> blockUser(
-            @Field("name") String username,
-
-            @Header("Authorization") String accessToken
-    );
+    Call<Void> blockUser(@Field("name") String username);
 
 }

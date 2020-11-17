@@ -42,10 +42,7 @@ public class SaveableRequestModel {
             return;
         }
 
-        api.save(
-                Util.createFullName(thing, id),
-                accessToken.generateHeaderString()
-        ).enqueue(new Callback<Void>() {
+        api.save(Util.createFullName(thing, id)).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
@@ -80,10 +77,7 @@ public class SaveableRequestModel {
             return;
         }
 
-        api.unsave(
-                Util.createFullName(thing, id),
-                accessToken.generateHeaderString()
-        ).enqueue(new Callback<Void>() {
+        api.unsave(Util.createFullName(thing, id)).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {

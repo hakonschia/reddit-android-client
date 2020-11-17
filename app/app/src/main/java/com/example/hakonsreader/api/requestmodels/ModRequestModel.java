@@ -40,8 +40,7 @@ public class ModRequestModel {
                 Util.createFullName(Thing.COMMENT, id),
                 distinguish ? "yes" : "no",
                 sticky,
-                RedditApi.API_TYPE,
-                accessToken.generateHeaderString()
+                RedditApi.API_TYPE
         ).enqueue(new Callback<JsonResponse>() {
             @Override
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
@@ -78,8 +77,7 @@ public class ModRequestModel {
         api.distinguishAsModPost(
                 Util.createFullName(Thing.POST, id),
                 distinguish ? "yes" : "no",
-                RedditApi.API_TYPE,
-                accessToken.generateHeaderString()
+                RedditApi.API_TYPE
         ).enqueue(new Callback<JsonResponse>() {
             @Override
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
@@ -118,8 +116,7 @@ public class ModRequestModel {
         api.stickyPost(
                 Util.createFullName(Thing.POST, id),
                 sticky,
-                RedditApi.API_TYPE,
-                accessToken.generateHeaderString()
+                RedditApi.API_TYPE
         ).enqueue(new Callback<JsonResponse>() {
             @Override
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {

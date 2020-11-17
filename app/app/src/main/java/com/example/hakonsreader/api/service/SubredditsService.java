@@ -19,16 +19,13 @@ public interface SubredditsService {
      * @param after
      * @param count
      * @param limit
-     * @param accessToken
      * @return
      */
     @GET("subreddits/mine/subscriber?raw_json=1")
     Call<ListingResponse> getSubscribedSubreddits(
             @Query("after") String after,
             @Query("count") int count,
-            @Query("limit") int limit,
-
-            @Header("Authorization") String accessToken
+            @Query("limit") int limit
     );
 
     /**
@@ -37,16 +34,13 @@ public interface SubredditsService {
      * @param after
      * @param count
      * @param limit
-     * @param accessToken
      * @return
      */
     @GET("subreddits/default?raw_json=1")
     Call<ListingResponse> getDefaultSubreddits(
             @Query("after") String after,
             @Query("count") int count,
-            @Query("limit") int limit,
-
-            @Header("Authorization") String accessToken
+            @Query("limit") int limit
     );
 
 
@@ -54,13 +48,8 @@ public interface SubredditsService {
      * Search for subreddits
      *
      * @param query
-     * @param accessToken
      * @return
      */
     @GET("subreddits/search")
-    Call<ListingResponse> searchForSubreddits(
-            @Query("q") String query,
-
-            @Header("Authorization") String accessToken
-    );
+    Call<ListingResponse> searchForSubreddits(@Query("q") String query);
 }

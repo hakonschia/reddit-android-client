@@ -23,17 +23,13 @@ public interface PostService extends VoteService, ReplyService, SaveService, Mod
      *
      * @param postID The ID of the post to retrieve comments for
      * @param sort How to sort the comments (new, hot, top etc.)
-     * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
-     *                    to retrieve comments without a logged in user
      * @return A list of {@link ListingResponse}. The first item in this list is the post itself.
      * The actual comments is found in the second element of the list
      */
     @GET("comments/{postID}?raw_json=1")
     Call<List<ListingResponse>> getComments(
             @Path("postID") String postID,
-            @Query("sort") String sort,
-
-            @Header("Authorization") String accessToken
+            @Query("sort") String sort
     );
 
     /**
@@ -43,8 +39,6 @@ public interface PostService extends VoteService, ReplyService, SaveService, Mod
      * @param linkId The fullname of the post the comments are in
      * @param apiType The string "json"
      * @param rawJson Set to 1 if the response should be raw JSON
-     * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
-     *                    to retrieve comments without a logged in user
      * @return A call with {@link JsonResponse}
      */
     @POST("api/morechildren")
@@ -53,8 +47,6 @@ public interface PostService extends VoteService, ReplyService, SaveService, Mod
             @Field("children") String children,
             @Field("link_id") String linkId,
             @Field("api_type") String apiType,
-            @Field("raw_json") int rawJson,
-
-            @Header("Authorization") String accessToken
+            @Field("raw_json") int rawJson
     );
 }
