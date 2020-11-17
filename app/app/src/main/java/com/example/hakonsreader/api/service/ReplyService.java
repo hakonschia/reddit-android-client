@@ -1,6 +1,6 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.responses.MoreCommentsResponse;
+import com.example.hakonsreader.api.responses.JsonResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -25,7 +25,7 @@ public interface ReplyService {
      */
     @POST("api/comment")
     @FormUrlEncoded
-    Call<MoreCommentsResponse> postComment(
+    Call<JsonResponse> postComment(
             @Field("text") String comment,
             @Field("thing_id") String parentId,
             @Field("api_type") String apiType,

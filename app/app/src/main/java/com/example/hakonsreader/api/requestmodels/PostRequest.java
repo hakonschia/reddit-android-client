@@ -12,8 +12,8 @@ import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.responses.GenericError;
+import com.example.hakonsreader.api.responses.JsonResponse;
 import com.example.hakonsreader.api.responses.ListingResponse;
-import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 import com.example.hakonsreader.api.service.PostService;
 import com.example.hakonsreader.api.utils.Util;
 
@@ -185,17 +185,17 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
                 RedditApi.API_TYPE,
                 RedditApi.RAW_JSON,
                 accessToken.generateHeaderString()
-        ).enqueue(new Callback<MoreCommentsResponse>() {
+        ).enqueue(new Callback<JsonResponse>() {
             @Override
-            public void onResponse(Call<MoreCommentsResponse> call, Response<MoreCommentsResponse> response) {
-                MoreCommentsResponse body = null;
+            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                JsonResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
 
                 if (body != null) {
                     if (!body.hasErrors()) {
-                        List<RedditComment> comments = body.getComments();
+                        List<RedditComment> comments = (List<RedditComment>) body.getListings();
 
                         if (parent != null) {
                             parent.addReplies(comments);
@@ -210,7 +210,7 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
             }
 
             @Override
-            public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
+            public void onFailure(Call<JsonResponse> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });

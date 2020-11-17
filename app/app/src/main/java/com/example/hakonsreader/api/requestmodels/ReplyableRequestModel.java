@@ -8,7 +8,7 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.responses.GenericError;
-import com.example.hakonsreader.api.responses.MoreCommentsResponse;
+import com.example.hakonsreader.api.responses.JsonResponse;
 import com.example.hakonsreader.api.service.ReplyService;
 import com.example.hakonsreader.api.utils.Util;
 
@@ -64,17 +64,17 @@ class ReplyableRequestModel {
                 RedditApi.API_TYPE,
                 false,
                 accessToken.generateHeaderString()
-        ).enqueue(new Callback<MoreCommentsResponse>() {
+        ).enqueue(new Callback<JsonResponse>() {
             @Override
-            public void onResponse(Call<MoreCommentsResponse> call, Response<MoreCommentsResponse> response) {
-                MoreCommentsResponse body = null;
+            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                JsonResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
 
                 if (body != null) {
                     if (!body.hasErrors()) {
-                        RedditComment newComment = body.getComments().get(0);
+                        RedditComment newComment = (RedditComment) body.getListings().get(0);
 
                         newComment.setDepth(thing == Thing.POST ? 0 : -1);
                         onResponse.onResponse(newComment);
@@ -87,7 +87,7 @@ class ReplyableRequestModel {
             }
 
             @Override
-            public void onFailure(Call<MoreCommentsResponse> call, Throwable t) {
+            public void onFailure(Call<JsonResponse> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });

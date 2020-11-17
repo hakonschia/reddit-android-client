@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.service;
 
+import com.example.hakonsreader.api.responses.JsonResponse;
 import com.example.hakonsreader.api.responses.ListingResponse;
-import com.example.hakonsreader.api.responses.MoreCommentsResponse;
 
 import java.util.List;
 
@@ -45,11 +45,11 @@ public interface PostService extends VoteService, ReplyService, SaveService, Mod
      * @param rawJson Set to 1 if the response should be raw JSON
      * @param accessToken The type of token + the actual token. Form: "type token". This can be omitted (an empty string)
      *                    to retrieve comments without a logged in user
-     * @return A call with {@link MoreCommentsResponse}
+     * @return A call with {@link JsonResponse}
      */
     @POST("api/morechildren")
     @FormUrlEncoded
-    Call<MoreCommentsResponse> getMoreComments(
+    Call<JsonResponse> getMoreComments(
             @Field("children") String children,
             @Field("link_id") String linkId,
             @Field("api_type") String apiType,

@@ -18,8 +18,6 @@ import java.util.List;
  */
 public class JsonResponse {
 
-    // TODO clean up this and "MoreCommentsResponse" as these are similar
-
     @SerializedName("json")
     private ListingResponse response;
 

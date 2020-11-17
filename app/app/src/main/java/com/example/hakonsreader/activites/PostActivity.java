@@ -102,6 +102,8 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
 
         // This is kinda hacky, but it looks weird if the "No comments yet" appears before the comments
         // have had a chance to load, so always assume there are comments (since there usually are)
+        // TODO this has to be updated when new comments are added (if there were no comments and a comment was
+        //  posted to the post, it's now obviously not empty anymore)
         binding.setNoComments(false);
 
         this.setupCommentsViewModel();
