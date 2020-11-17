@@ -92,6 +92,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
     private final RedditPost post;
+    private RecyclerView recyclerViewAttachedTo;
     private String commentIdChain;
     private OnReplyListener replyListener;
     private PostActivity.LoadMoreComments loadMoreCommentsListener;
@@ -239,9 +240,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             comments = commentsShownWhenChainSet;
         }
 
-        // TODO animate the changes with "notifyItemRangeInserted" etc., it looks pretty bad now
-        //  also it should scroll to the top on chains (now it can end up in the middle of a chain)
         notifyDataSetChanged();
+
+        if (recyclerViewAttachedTo != null) {
+            recyclerViewAttachedTo.getLayoutManager().scrollToPosition(0);
+        }
     }
 
     /**
@@ -462,6 +465,19 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return comments.size();
     }
 
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        recyclerViewAttachedTo = recyclerView;
+        Log.d(TAG, "onAttachedToRecyclerView: BRUH");
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        recyclerViewAttachedTo = null;
+        Log.d(TAG, "onDetachedFromRecyclerView: bruh:(");
+    }
 
     /**
      * Adds sidebars to the comment (to visually show the comment depth)

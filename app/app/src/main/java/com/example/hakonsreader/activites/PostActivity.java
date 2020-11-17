@@ -332,12 +332,11 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         commentsAdapter.setLoadMoreCommentsListener((c, p) -> commentsViewModel.loadMoreComments(c, p));
 
         layoutManager = new LinearLayoutManager(this);
+        binding.comments.setAdapter(commentsAdapter);
+        binding.comments.setLayoutManager(layoutManager);
 
         // TODO this should be some sort of button above the list
         binding.post.setOnClickListener(v -> commentsAdapter.setCommentIdChain(""));
-
-        binding.comments.setAdapter(commentsAdapter);
-        binding.comments.setLayoutManager(layoutManager);
     }
 
     /**
