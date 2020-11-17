@@ -1,6 +1,8 @@
 package com.example.hakonsreader.viewmodels;
 
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -69,7 +71,7 @@ public class CommentsViewModel extends ViewModel {
     }
 
     /**
-     * Loads comments
+     * Loads comments for the post. This will also fetch the post itself
      */
     public void loadComments() {
         loadingChange.setValue(true);
@@ -114,6 +116,26 @@ public class CommentsViewModel extends ViewModel {
             error.setValue(new ErrorWrapper(e, t));
             loadingChange.setValue(false);
         });
+    }
+
+    /**
+     * Inserts a comment. Top-level comments are inserted at the start of the list
+     *
+     * @param newComment The comment to insert
+     * @param parent The parent of the comment. If the comment is a top-level comment this should
+     *               be {@code null}
+     */
+    public void insertComment(@NonNull RedditComment newComment, @Nullable RedditComment parent) {
+        List<RedditComment> dataSet = new ArrayList<>(comments.getValue());
+
+        int posToInsert = 0;
+        if (parent != null) {
+            // Insert after the parent
+            posToInsert = dataSet.indexOf(parent) + 1;
+        }
+
+        dataSet.add(posToInsert, newComment);
+        comments.setValue(dataSet);
     }
 
     /**

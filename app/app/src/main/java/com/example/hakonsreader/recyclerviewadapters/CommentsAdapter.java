@@ -28,6 +28,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ListItemCommentBinding;
 import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding;
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding;
+import com.example.hakonsreader.interfaces.LoadMoreComments;
 import com.example.hakonsreader.interfaces.OnReplyListener;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.views.util.ViewUtil;
@@ -56,7 +57,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * The value returned from {@link CommentsAdapter#getItemViewType(int)} when the comment is
      * a "more comments" comment
      */
-    private static final int MORE_COMMETS_TYPE = 0;
+    private static final int MORE_COMMENTS_TYPE = 0;
 
     /**
      * The value returned from {@link CommentsAdapter#getItemViewType(int)} when the comment is
@@ -95,7 +96,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private RecyclerView recyclerViewAttachedTo;
     private String commentIdChain;
     private OnReplyListener replyListener;
-    private PostActivity.LoadMoreComments loadMoreCommentsListener;
+    private LoadMoreComments loadMoreCommentsListener;
 
 
     /**
@@ -110,7 +111,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      *
      * @param loadMoreCommentsListener The callback to set
      */
-    public void setLoadMoreCommentsListener(PostActivity.LoadMoreComments loadMoreCommentsListener) {
+    public void setLoadMoreCommentsListener(LoadMoreComments loadMoreCommentsListener) {
         this.loadMoreCommentsListener = loadMoreCommentsListener;
     }
 
@@ -131,29 +132,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * Adds a new top level comment. The comment is added as the first element
-     *
-     * @param newComment The comment to add
-     */
-    public void addComment(RedditComment newComment) {
-        comments.add(0, newComment);
-        notifyItemInserted(0);
-    }
-
-    /**
-     * Adds a new comment as a reply to {@code parent}
-     *
-     * @param newComment The comment to add
-     * @param parent The parent comment being replied to
-     */
-    public void addComment(RedditComment newComment, RedditComment parent) {
-        int pos = comments.indexOf(parent);
-
-        comments.add(pos + 1, newComment);
-        notifyItemInserted(pos + 1);
-    }
-
-    /**
      * Appends comments to the current list of comments
      *
      * @param newComments The comments to add
@@ -168,8 +146,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             setChain(newComments);
         } else {
             DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(
-                    new CommentsDiffCallback(previous, comments),
-                    false
+                    new CommentsDiffCallback(previous, comments)
             );
             diffResult.dispatchUpdatesTo(this);
         }
@@ -404,7 +381,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         // Create view holder based on which type of item we have
         switch (viewType) {
-            case MORE_COMMETS_TYPE:
+            case MORE_COMMENTS_TYPE:
                 ListItemMoreCommentBinding b = ListItemMoreCommentBinding.inflate(layoutInflater, parent, false);
                 b.setAdapter(this);
                 return new MoreCommentsViewHolder(b);
@@ -431,7 +408,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         boolean highlight = position == 0 && !chain.isEmpty();
 
         switch (holder.getItemViewType()) {
-            case MORE_COMMETS_TYPE:
+            case MORE_COMMENTS_TYPE:
                 ((MoreCommentsViewHolder)holder).bind(comment);
                 break;
 
@@ -452,7 +429,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         RedditComment comment = comments.get(position);
 
         if (Thing.MORE.getValue().equals(comment.getKind())) {
-            return MORE_COMMETS_TYPE;
+            return MORE_COMMENTS_TYPE;
         } else if (comment.isCollapsed()) {
             return HIDDEN_COMMENT_TYPE;
         } else {
@@ -469,14 +446,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         recyclerViewAttachedTo = recyclerView;
-        Log.d(TAG, "onAttachedToRecyclerView: BRUH");
     }
 
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         recyclerViewAttachedTo = null;
-        Log.d(TAG, "onDetachedFromRecyclerView: bruh:(");
     }
 
     /**

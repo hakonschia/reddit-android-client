@@ -102,23 +102,10 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         setContentView(binding.getRoot());
 
         // This is kinda hacky, but it looks weird if the "No comments yet" appears before the comments
-        // have had a chance to load, so always assume there are comments (since there usually are)
-        // TODO this has to be updated when new comments are added (if there were no comments and a comment was
-        //  posted to the post, it's now obviously not empty anymore)
         binding.setNoComments(false);
 
         this.setupCommentsViewModel();
-
-        // TODO When the post is opened from an intent outside the app (from intent-filter) this doesn't work
-        // If we're in landscape the "height" is the width of the screen
-        boolean portrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-        int height = portrait ? App.get().getScreenHeight() : App.get().getScreenWidth();
-        int maxHeight = (int)(height * (App.get().getMaxPostSizePercentage() / 100f));
-
-        binding.post.setMaxHeight(maxHeight);
-        binding.post.setHideScore(getIntent().getExtras().getBoolean(HIDE_SCORE_KEY));
-        // Don't allow to open the post again when we are now in the post
-        binding.post.setAllowPostOpen(false);
+        this.setupPost();
 
         if (savedInstanceState == null) {
             this.loadComments();
@@ -130,7 +117,6 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         //  back to the subreddit goes under the screen
 
         // Go to first/last comment on longclicks on navigation buttons
-        // Previous is upwards, next is down
         binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment);
         binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment);
 
@@ -139,32 +125,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
             commentsViewModel.restart();
         });
         binding.commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this, R.color.colorAccent));
-
-        binding.parentLayout.addTransitionListener(new MotionLayout.TransitionListener() {
-            @Override
-            public void onTransitionCompleted(MotionLayout motionLayout, int currentId) {
-                // Pause video when the transition has finished to the end
-                // We could potentially pause it earlier, like when the transition is halfway done?
-                // We also can start it when we reach the start, not sure if that is good or bad
-                if (currentId == R.id.end) {
-                    binding.post.pauseVideo();
-                }
-            }
-
-            @Override
-            public void onTransitionStarted(MotionLayout motionLayout, int startId, int endId) {
-                // Not implemented
-            }
-            @Override
-            public void onTransitionChange(MotionLayout motionLayout, int startId, int endId, float progress) {
-                // Not implemented
-            }
-            @Override
-            public void onTransitionTrigger(MotionLayout motionLayout, int triggerId, boolean positive, float progress) {
-                // Not implemented
-            }
-        });
-        // TODO when the animation is finished hiding the post videos should be paused
+        binding.parentLayout.addTransitionListener(transitionListener);
     }
 
     @Override
@@ -209,18 +170,28 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_REPLY && data != null) {
                 RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING_KEY), RedditComment.class);
+                RedditComment parent = replyingTo instanceof RedditComment ? (RedditComment) replyingTo : null;
 
-                // Adding a top-level comment
-                if (replyingTo instanceof RedditPost) {
-                    commentsAdapter.addComment(newComment);
-                } else {
-                    // Replying to a comment
-                    commentsAdapter.addComment(newComment, (RedditComment)replyingTo);
-                }
+                commentsViewModel.insertComment(newComment, parent);
             }
         }
     }
 
+    /**
+     * Sets up and calls various bindings on {@link ActivityPostBinding#post}
+     */
+    private void setupPost() {
+        // TODO When the post is opened from an intent outside the app (from intent-filter) this doesn't work
+        // If we're in landscape the "height" is the width of the screen
+        boolean portrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        int height = portrait ? App.get().getScreenHeight() : App.get().getScreenWidth();
+        int maxHeight = (int)(height * (App.get().getMaxPostSizePercentage() / 100f));
+
+        binding.post.setMaxHeight(maxHeight);
+        binding.post.setHideScore(getIntent().getExtras().getBoolean(HIDE_SCORE_KEY));
+        // Don't allow to open the post again when we are now in the post
+        binding.post.setAllowPostOpen(false);
+    }
 
     /**
      * Sets up {@link PostActivity#commentsViewModel}
@@ -273,6 +244,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
             // Picasso is caching the image, it sometimes still needs to load the image from the cache
             // which looks weird
             // This won't produce a very noticeable delay, as it doesn't take a long time to load the image
+            // TODO this doesn't really work as expected, plus it messes up the max height
             if (post.getPostType() == PostType.IMAGE) {
                 postponeEnterTransition();
 
@@ -288,7 +260,8 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
                 });
             }
 
-            // Since we have the post loaded we have a transition as well
+            // Since we have the post loaded already we have a transition as well (the activity is started
+            // from clicking on a list)
             getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
                 @Override
                 public void onTransitionEnd(Transition transition) {
@@ -442,8 +415,32 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         }
     }
 
+    /**
+     * Transition listener that automatically pauses the video content when the end of the transition
+     * has been reached
+     */
+    private MotionLayout.TransitionListener transitionListener = new MotionLayout.TransitionListener() {
+        @Override
+        public void onTransitionCompleted(MotionLayout motionLayout, int currentId) {
+            // Pause video when the transition has finished to the end
+            // We could potentially pause it earlier, like when the transition is halfway done?
+            // We also can start it when we reach the start, not sure if that is good or bad
+            if (currentId == R.id.end) {
+                binding.post.pauseVideo();
+            }
+        }
 
-    public interface LoadMoreComments {
-        void loadMoreComments(RedditComment comment, RedditComment parent);
-    }
+        @Override
+        public void onTransitionStarted(MotionLayout motionLayout, int startId, int endId) {
+            // Not implemented
+        }
+        @Override
+        public void onTransitionChange(MotionLayout motionLayout, int startId, int endId, float progress) {
+            // Not implemented
+        }
+        @Override
+        public void onTransitionTrigger(MotionLayout motionLayout, int triggerId, boolean positive, float progress) {
+            // Not implemented
+        }
+    };
 }
