@@ -5,8 +5,10 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
+import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.motion.widget.MotionLayout;
@@ -37,9 +39,9 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
     private static final String TAG = "PostActivity";
 
     /**
-     * The percentage of the screen height that the post will at maximum take
+     * The key used to store the stat of the post transition in saved instance states
      */
-    private static final float MAX_POST_HEIGHT_PERCENTAGE = 0.65f;
+    private static final String TRANSITION_STATE_KEY = "transitionState";
 
 
     /**
@@ -96,7 +98,6 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         slidrInterface = Slidr.attach(this);
-
         binding = ActivityPostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -119,7 +120,11 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         // Don't allow to open the post again when we are now in the post
         binding.post.setAllowPostOpen(false);
 
-        this.loadComments();
+        if (savedInstanceState == null) {
+            this.loadComments();
+        } else {
+            binding.parentLayout.setProgress(savedInstanceState.getFloat(TRANSITION_STATE_KEY));
+        }
 
         // TODO when going into a post and going to landscape and then back the animation of going
         //  back to the subreddit goes under the screen
@@ -160,6 +165,12 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
             }
         });
         // TODO when the animation is finished hiding the post videos should be paused
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putFloat(TRANSITION_STATE_KEY, binding.parentLayout.getProgress());
     }
 
     @Override
