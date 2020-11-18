@@ -37,6 +37,10 @@ public class PostsDiffCallback extends DiffUtil.Callback {
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        return false;
+        RedditPost oldPost = oldPosts.get(oldItemPosition);
+        RedditPost newPost = newPosts.get(newItemPosition);
+
+        return oldPost.getTitle().equals(newPost.getTitle())
+                && oldPost.getAuthor().equals(newPost.getAuthor());
     }
 }
