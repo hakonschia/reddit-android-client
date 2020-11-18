@@ -18,6 +18,7 @@ import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.utils.Util;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -210,7 +211,7 @@ public class SubredditRequest {
      * @param after The ID of the last post seen (or an empty string if first time loading)
      * @param count The amount of posts already retrieved (0 if first time loading)
      * @param onResponse The callback for successful requests. Holds a {@link List} of {@link RedditPost} objects
-     * @param onFailure The callback for failed requests
+     * @param onFailure The callback for failed requests. If the subreddit doesn't exist this will be called
      */
     private void getPosts(String sort, PostTimeSort timeSort, String after, int count, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
         // Not front page, add r/ prefix
@@ -237,6 +238,21 @@ public class SubredditRequest {
                         RedditApi.RAW_JSON
                 ).execute();
 
+                okhttp3.Response prior = response.raw().priorResponse();
+
+                // If the subreddit doesn't exist, Reddit wants to be helpful (or something) and redirects
+                // the response to a search request instead. This causes issues as the response being sent back
+                // now holds subreddits instead of posts, so if we have a prior request (which is the actual original request)
+                // then call the failure handler as the user of the API might want to know that the sub doesn't exist
+                // Additionaly, if the search request returned subreddits, body.getListings() will hold a List<Subreddit> which will cause issues
+                // This is also an "issue" for SubredditRequest.info(), but it will manage to convert that to a RedditListing
+                // and the check for getId() will return null, so it doesn't have to be handled directly
+                // We could disable redirects, but I'm afraid of what issues that would cause later
+                if (prior != null) {
+                    onFailure.onFailure(new GenericError(response.code()), new SubredditNotFoundException("No subreddit found with name: " + subredditName));
+                    return;
+                }
+
                 ListingResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -244,20 +260,6 @@ public class SubredditRequest {
 
                 if (body != null) {
                     List<RedditPost> posts = (List<RedditPost>) body.getListings();
-
-                    // For some reason I really can't explain, when searching for some subreddits ("herth", "nruh" are two examples)
-                    // that don't exist and then pressing enter to go into the subreddit the response from the
-                    // search (which is in SubredditsRequest.search()) is sent here AGAIN with Subreddit objects
-                    // in the list. I have actually no idea why this is happening and this is an absolutely terrible
-                    // way of "fixing" it, but it works
-                    // I tried taking out the threading and running this with api.enqueue() but that didn't matter
-                    // It might have something to do with interceptors and chain.proceed(), something to test
-                    try {
-                        RedditPost p = posts.get(0);
-                    } catch (ClassCastException | IndexOutOfBoundsException e) {
-                        e.printStackTrace();
-                        return;
-                    }
 
                     if (loadImgurAlbumsAsRedditGalleries) {
                         imgurRequest.loadAlbums(posts);
