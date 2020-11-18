@@ -52,6 +52,18 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/prefs_group_links"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="@string/prefs_key_opening_links_in_app"
+            android:title="@string/prefs_title_opening_links_in_app"
+            app:iconSpaceReserved="false"
+            app:defaultValue="@bool/prefs_default_opening_links_in_app" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         app:title="@string/prefs_group_comments"
         app:iconSpaceReserved="false">
 

@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.utils.LinkUtils;
 import com.jakewharton.processphoenix.ProcessPhoenix;
@@ -195,12 +196,10 @@ public class DispatcherActivity extends AppCompatActivity {
                 }
             }
 
-            // If no activity found, open in WebView (internal browser)
-            if (!appActivityFound) {
+            // If no activity found and user wants to open links in app, open in WebView (internal browser)
+            if (!appActivityFound && App.get().openLinksInApp()) {
                 intent = new Intent(this, WebViewActivity.class);
                 intent.putExtra(WebViewActivity.URL_KEY, url);
-            } else {
-                Log.d(TAG, "createIntent: no specific intent found");
             }
         }
 

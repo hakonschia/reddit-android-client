@@ -448,6 +448,19 @@ public class App extends Application {
     }
 
     /**
+     * Retrieve the setting for whether or not links should be opened in the app (WebView) or
+     * in the external browser
+     *
+     * @return True to open links in a WebView
+     */
+    public boolean openLinksInApp() {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_opening_links_in_app),
+                getResources().getBoolean(R.bool.prefs_default_opening_links_in_app)
+        );
+    }
+
+    /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that
      * the user has revoked the applications access and a dialog must be shown that they must log in again
      *

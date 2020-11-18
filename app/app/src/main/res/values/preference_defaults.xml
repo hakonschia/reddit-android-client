@@ -10,5 +10,6 @@
     <string name="prefs_default_language" translatable="false">@string/prefs_key_language_en</string>
     <integer name="prefs_default_hide_comments_threshold">-5</integer>
     <integer name="prefs_default_max_post_size_percentage">65</integer>
+    <bool name="prefs_default_opening_links_in_app">true</bool>
 
 </resources>

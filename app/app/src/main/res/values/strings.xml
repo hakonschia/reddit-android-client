@@ -57,6 +57,7 @@
     <string name="prefs_group_posts">Posts</string>
     <string name="prefs_group_videos">Videos</string>
     <string name="prefs_group_comments">Comments</string>
+    <string name="prefs_group_links">Links</string>
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark mode</string>
@@ -80,6 +81,7 @@
     <string name="prefs_title_language_nb" translatable="false">Norsk (bokmål)</string>
     <string name="prefs_title_hide_comments_threshold">Automatically hide comments with score less than</string>
     <string name="prefs_title_max_post_size_percentage">Max percentage of the screen height posts will take</string>
+    <string name="prefs_title_opening_links_in_app">Open links in internal browser</string>
 
 
     <!-- Preferences keys -->
@@ -101,6 +103,7 @@
     <string name="prefs_key_language_nb" translatable="false">nb</string>
     <string name="prefs_key_hide_comments_threshold" translatable="false">auto_hide_comments_threshold</string>
     <string name="prefs_key_max_post_size_percentage" translatable="false">max_post_size_percentage</string>
+    <string name="prefs_key_opening_links_in_app" translatable="false">open_links_in_app</string>
 
 
     <!-- String for post ages that are "just posted", ie. < 1 minute -->
