@@ -3,13 +3,16 @@ package com.example.hakonsreader.fragments;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
@@ -27,6 +30,9 @@ import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.databinding.FragmentSubredditBinding;
+import com.example.hakonsreader.databinding.SubredditBannedBinding;
+import com.example.hakonsreader.databinding.SubredditNotFoundBinding;
+import com.example.hakonsreader.databinding.SubredditPrivateBinding;
 import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener;
 import com.example.hakonsreader.misc.Util;
@@ -278,18 +284,36 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
         // TODO if SubredditNotFoundException do something with UI like "Subreddit doesn't exist, click here to create it" or something
 
-        // TODO update UI of the fragment instead of showing a snackbar
+        // Duplication of code here but idk how to generify the bindings?
+        // These should also be in the center of the bottom parent/appbar or have margin to the bottom of the appbar
+        // since now it might go over the appbar
         if (GenericError.SUBREDDIT_BANNED.equals(errorReason)) {
-            Snackbar.make(binding.parentLayout, getString(R.string.subredditBanned, getSubredditName()), Snackbar.LENGTH_LONG).show();
+            SubredditBannedBinding layout = SubredditBannedBinding.inflate(getLayoutInflater(), binding.parentLayout, true);
+            layout.setSubreddit(getSubredditName());
+
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getRoot().getLayoutParams();
+            params.gravity = Gravity.CENTER;
+            layout.getRoot().requestLayout();
         } else if (GenericError.SUBREDDIT_PRIVATE.equals(errorReason)) {
-            Snackbar.make(binding.parentLayout, getString(R.string.subredditPrivate, getSubredditName()), Snackbar.LENGTH_LONG).show();
+            SubredditPrivateBinding layout = SubredditPrivateBinding.inflate(getLayoutInflater(), binding.parentLayout, true);
+            layout.setSubreddit(getSubredditName());
+
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getRoot().getLayoutParams();
+            params.gravity = Gravity.CENTER;
+            layout.getRoot().requestLayout();
         } else {
             // NoSubredditInfoException is retrieved when trying to get info from front page, popular, or all
             // and we don't need to show anything of this to the user
             if (throwable instanceof NoSubredditInfoException) {
                 return;
             } else if (throwable instanceof SubredditNotFoundException) {
-                Snackbar.make(binding.parentLayout, getString(R.string.subredditNotFound, getSubredditName()), Snackbar.LENGTH_LONG).show();
+                // TODO could add a "Create community" button in this layout
+                SubredditNotFoundBinding layout = SubredditNotFoundBinding.inflate(getLayoutInflater(), binding.parentLayout, true);
+                layout.setSubreddit(getSubredditName());
+
+                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getRoot().getLayoutParams();
+                params.gravity = Gravity.CENTER;
+                layout.getRoot().requestLayout();
                 return;
             }
 

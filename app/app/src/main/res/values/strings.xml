@@ -57,7 +57,7 @@
     <string name="prefs_group_posts">Posts</string>
     <string name="prefs_group_videos">Videos</string>
     <string name="prefs_group_comments">Comments</string>
-    <string name="prefs_group_links">Links</string>
+    <string name="prefs_group_links" translatable="false">Links</string>
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark mode</string>
@@ -173,7 +173,8 @@
     <string name="noCommentsContent">Be the one to start the conversation!</string>
 
     <string name="subredditBanned">r/%s has been banned</string>
-    <string name="subredditPrivate">r/%s is private. You must be invited to access this subreddit</string>
+    <string name="subredditPrivate">r/%s is private</string>
+    <string name="subredditPrivateDescription">You must be invited to access this community</string>
     <string name="subredditNotFound">r/%s doesn\'t exist</string>
 
     <string name="replyingTo">Replying to %s</string>

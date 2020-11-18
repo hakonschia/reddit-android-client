@@ -76,7 +76,7 @@
     </plurals>
     <string name="postRemovedByMods">Posten har blitt fjernet av moderatorene av r/%s</string>
     <string name="postRemovedGeneric">Posten har blitt fjernet</string>
-    <string name="subredditPrivate">r/%s er privat. Du må bli invitert for å få tilgang til dette samfunnet</string>
+    <string name="subredditPrivate">r/%s er privat</string>
     <string name="subredditBanned">r/%s har blitt utestengt</string>
     <string name="noCommentsHeader">Ingen kommentar på denne posten enda</string>
     <string name="noCommentsContent">Vær den som starter samtalen!</string>
@@ -173,4 +173,6 @@
     <string name="commentShowChain">Vis kommentar tråd</string>
     <string name="commentCopyLink">Kopier kommentar lenke</string>
     <string name="subredditNotFound">r/%s finnes ikke</string>
+    <string name="prefs_title_opening_links_in_app">Åpne lenker i appen</string>
+    <string name="subredditPrivateDescription">Du må bli invitert for å få tilgang til dette samfunnet</string>
 </resources>
