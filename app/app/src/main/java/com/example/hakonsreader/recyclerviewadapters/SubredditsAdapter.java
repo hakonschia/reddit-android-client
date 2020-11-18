@@ -59,17 +59,25 @@ public class SubredditsAdapter extends RecyclerView.Adapter<SubredditsAdapter.Vi
      * Submit the list of subreddits to display
      *
      * @param newList The list of items to display
+     * @param sort If set to true the list will be sorted in the following order:
+     *          <ol>
+     *              <li>Favorites (for logged in users)</li>
+     *               <li>The rest of the subreddits</li>
+     *               <li>Users the user is following</li>
+     *          </ol>
      */
-    public void submitList(List<Subreddit> newList) {
+    public void submitList(List<Subreddit> newList, boolean sort) {
         List<Subreddit> previous = this.subreddits;
-        List<Subreddit> newSorted = sortSubreddits(newList);
+        if (sort) {
+            newList = sortSubreddits(newList);
+        }
 
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(
-                new SubredditsDiffCallback(previous, newSorted),
+                new SubredditsDiffCallback(previous, newList),
                 true
         );
 
-        this.subreddits = newSorted;
+        this.subreddits = newList;
         diffResult.dispatchUpdatesTo(this);
     }
 

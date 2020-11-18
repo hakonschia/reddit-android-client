@@ -111,7 +111,7 @@ public class SelectSubredditFragment extends Fragment {
                 getContext()
         )).get(SelectSubredditsViewModel.class);
         viewModel.getSubreddits().observe(getViewLifecycleOwner(), subreddits -> {
-            subredditsAdapter.submitList(subreddits);
+            subredditsAdapter.submitList(subreddits, true);
             if (saveState != null) {
                 layoutManager.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY));
             }
@@ -136,7 +136,8 @@ public class SelectSubredditFragment extends Fragment {
             if (subreddits.isEmpty()) {
                 searchSubredditsAdapter.clear();
             } else {
-                searchSubredditsAdapter.submitList(subreddits);
+                searchSubredditsAdapter.submitList(subreddits, false);
+                searchLayoutManager.scrollToPosition(0);
             }
             if (saveState != null) {
                 searchLayoutManager.onRestoreInstanceState(saveState.getParcelable(SEARCH_LIST_STATE_KEY));
