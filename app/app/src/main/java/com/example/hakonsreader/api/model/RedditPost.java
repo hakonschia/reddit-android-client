@@ -415,8 +415,7 @@ public class RedditPost extends RedditListing {
      */
     public List<Image> getObfuscatedPreviewImages() {
         try {
-            List<Image> images = preview.images.get(0).variants.obfuscated.resolutions;
-            return images;
+            return preview.images.get(0).variants.obfuscated.resolutions;
         } catch (NullPointerException e) {
             return null;
         }

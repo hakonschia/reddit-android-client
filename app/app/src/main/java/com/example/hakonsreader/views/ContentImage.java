@@ -83,11 +83,15 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
         if (imageUrl == null) {
             imageUrl = post.getUrl();
 
+            List<Image> images = post.getPreviewImages();
+
+
+
             // This should be improved and is a pretty poor way of doing it, but this will reduce some
             // unnecessary loading as it will get some lower resolution images (it will be scaled down to
             // the same size later by Picasso, so it won't give loss of image quality)
-            List<Image> images = post.getPreviewImages();
-            for (Image image : images) {
+            for (int i = 0; i < images.size(); i++) {
+                Image image = images.get(i);
                 if (image.getWidth() == screenWidth) {
                     imageUrl = image.getUrl();
                     break;
@@ -97,15 +101,21 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
 
         setOnClickListener(v -> ClickHandler.openImageInFullscreen(this, imageUrl));
 
-        // Dont show NSFW images until we are in fullscreen
+        // TODO this should probably be a setting:
+        //  NSFW images while scrolling:
+        //  dont load
+        //  load blurred
+        //  load image
+
+        String obfuscatedUrl = null;
         if (post.isNsfw()) {
-            this.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_200));
+            List<Image> obfuscatedPreviews = post.getObfuscatedPreviewImages();
 
-            // Set a border around to show what is clickable to open the window. Ideally the image would
-            // match the screen width, might have to adjust the drawable width somehow to do that
-            this.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border));
-
-            return;
+            if (obfuscatedPreviews != null && !obfuscatedPreviews.isEmpty()) {
+                // Obfuscated previews that are high res are still fairly showing sometimes, so
+                // get the lowest quality one as that will not be very easy to tell what it is
+                obfuscatedUrl = obfuscatedPreviews.get(0).getUrl();
+            }
         }
 
         // TODO this (I think) has caused crashes (at least on Samsung devices) because the canvas is trying
@@ -118,13 +128,16 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
 
         try {
             RequestCreator c = Picasso.get()
-                    .load(imageUrl)
+                    // If we have an obfuscated image, load that here instead
+                    .load(obfuscatedUrl != null ? obfuscatedUrl : imageUrl)
                     .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
                     .error(R.drawable.ic_baseline_wifi_tethering_150)
                     // Scale so the image fits the width of the screen
                     .resize(App.get().getScreenWidth(), 0);
 
             // Post is NSFW and user has chosen not to cache NSFW
+            // TODO this won't work as the actual image is only loaded in fullscreen, what is not cached here
+            //  is the obfuscated image, need to pass "dontCache" to ImageActivity
             if (post.isNsfw() && App.get().dontCacheNSFW()) {
                 // Don't store in cache and don't look in cache as this image will never be there
                 c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);

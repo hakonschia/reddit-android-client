@@ -66,9 +66,9 @@ public class ContentLink extends ScrollView {
 
         List<Image> previews = post.getPreviewImages();
         if (post.isNsfw()) {
-            List<Image> obfusactedPreviews = post.getObfuscatedPreviewImages();
-            if (obfusactedPreviews != null && !obfusactedPreviews.isEmpty()) {
-                previews = obfusactedPreviews;
+            List<Image> obfuscatedPreviews = post.getObfuscatedPreviewImages();
+            if (obfuscatedPreviews != null && !obfuscatedPreviews.isEmpty()) {
+                previews = obfuscatedPreviews;
             }
         }
 
