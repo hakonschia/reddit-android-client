@@ -80,18 +80,21 @@ public class ContentGallery extends LinearLayout {
         float widthScale = screenWidth / (float)maxWidth;
         setLayoutParams(new ViewGroup.LayoutParams(screenWidth, (int) (maxHeight * widthScale)));
 
+        int imagesSize = images.size();
+
         ImageAdapter adapter = new ImageAdapter(getContext(), images);
         binding.galleryImages.setAdapter(adapter);
 
         // Keep all images alive to not have to reload them
-        binding.galleryImages.setOffscreenPageLimit(images.size());
+        binding.galleryImages.setOffscreenPageLimit(imagesSize);
 
         // The ViewPager will be an infinite scroller. The adapter returns a size 3 times images.size()
         // so set the current item to the middle
         //      Here
         //        |
         // 0 1    0 1    0 1
-        binding.galleryImages.setCurrentItem(images.size());
+        // Since imgur albums are loaded here, and they can be only 1 image, don't add scrolling functionality to it
+        binding.galleryImages.setCurrentItem(imagesSize == 1 ? 0 : images.size());
 
         // Add listener to change the text saying which item we're on
         binding.galleryImages.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -181,7 +184,7 @@ public class ContentGallery extends LinearLayout {
 
         @Override
         public int getCount() {
-            return images.size() * 3;
+            return images.size() == 1 ? 1 : images.size() * 3;
         }
 
         @Override
