@@ -106,8 +106,6 @@ public class ContentGallery extends LinearLayout {
 
                 // Update the active text to show which image we are now on
                 setActiveImageText(position % images.size());
-
-                lockSlidr(position != 0);
             }
 
             @Override
@@ -131,25 +129,13 @@ public class ContentGallery extends LinearLayout {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 // Not implemented
             }
-
-            /**
-             * Lock or unlock a Slidr
-             *
-             * @param lock True to lock
-             */
-            private void lockSlidr(boolean lock) {
-                Context context = getContext();
-
-                // This might be bad? The "correct" way of doing it might be to add listeners
-                // and be notified that way, but I don't want to add 1000 functions to add the listener
-                // all the way up here from an activity
-                if (context instanceof LockableSlidr) {
-                    ((LockableSlidr)context).lock(lock);
-                }
-            }
         });
         // Set initial state
         setActiveImageText(0);
+
+        // If the context of the gallery is attached to a Slidr make sure it's locked so
+        // swipes in the gallery won't slide the activity/fragment away
+        lockSlidr(true);
 
         // TODO get extras with which image is currently viewed for when post is opened
     }
@@ -166,6 +152,22 @@ public class ContentGallery extends LinearLayout {
             binding.activeImageText.setVisibility(GONE);
         } else {
             binding.activeImageText.setText(String.format(Locale.getDefault(), "%d / %d", activeImagePos + 1, images.size()));
+        }
+    }
+
+    /**
+     * Lock or unlock a Slidr.
+     *
+     * @param lock True to lock, false to unlock
+     */
+    private void lockSlidr(boolean lock) {
+        Context context = getContext();
+
+        // This might be bad? The "correct" way of doing it might be to add listeners
+        // and be notified that way, but I don't want to add 1000 functions to add the listener
+        // all the way up here from an activity
+        if (context instanceof LockableSlidr) {
+            ((LockableSlidr)context).lock(lock);
         }
     }
 
