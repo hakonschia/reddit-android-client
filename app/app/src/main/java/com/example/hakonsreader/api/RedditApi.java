@@ -275,6 +275,7 @@ public class RedditApi {
                 .addInterceptor(new TokenInterceptor())
                 // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(logger)
+                .addNetworkInterceptor(new StethoInterceptor())
                 .build();
 
         // Create the API service used to make calls towards oauth.reddit.com
@@ -319,12 +320,13 @@ public class RedditApi {
                 // Add User-Agent header to every request
                 .addInterceptor(new UserAgentInterceptor(userAgent))
                 .addInterceptor(logger)
+                .addNetworkInterceptor(new StethoInterceptor())
                 .build();
 
         // Create the API service used to make API calls towards www.reddit.com
         Retrofit oauthRetrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(REDDIT_URL)
+                .addConverterFactory(GsonConverterFactory.create())
                 .client(oauthClient)
                 .build();
         oauthService = oauthRetrofit.create(OAuthService.class);
