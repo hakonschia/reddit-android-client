@@ -379,7 +379,8 @@ public class RedditPost extends RedditListing {
 
     /**
      * Retrieves the list of preview images the post has. This list will usually hold a number
-     * of images with different resolutions.
+     * of images with different resolutions. Note that this can be empty as it's not guarnateed that
+     * a post has preview images
      *
      * <p>The resolutions found here typically follow the widths below (in order), with the height matching
      * the aspect ratio:
@@ -396,6 +397,7 @@ public class RedditPost extends RedditListing {
      * <p>See {@link RedditPost#getSourcePreview()} for the source resolution</p>
      *
      * @return A list of preview images, or null if none is available
+     * @see RedditPost#getSourcePreview()
      */
     public List<Image> getPreviewImages() {
         if (preview != null && preview.images != null) {

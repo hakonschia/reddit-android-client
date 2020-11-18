@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.example.hakonsreader.activites.DispatcherActivity;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentLinkBinding;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -62,12 +64,23 @@ public class ContentLink extends ScrollView {
         // TODO although this will use more data, so it might be reasonable to add a data saving setting where
         //  this image quality is reduced
         List<Image> previews = post.getPreviewImages();
-        Image preview = previews.get(previews.size() - 1);
+        if (!previews.isEmpty()) {
+            Image preview = previews.get(previews.size() - 1);
 
-        if (!preview.getUrl().isEmpty()) {
-            Picasso.get()
-                    .load(preview.getUrl())
-                    .into(binding.thumbnail);
+            // If the image was deleted the response for getting the image will return a 404
+            // We could add a callback and reduce the image height in onError, but it looks kind of weird
+            // since it has to do the request which causes it suddenly jump, so if the image has been deleted
+            // we just let the size be as it is
+            if (!preview.getUrl().isEmpty()) {
+                Picasso.get()
+                        .load(preview.getUrl())
+                        .into(binding.thumbnail);
+            }
+        } else {
+            // No thumbnail, reduce the height so it doesn't take up too much unnecessary space
+            ViewGroup.LayoutParams params = binding.thumbnail.getLayoutParams();
+            params.height = (int) getResources().getDimension(R.dimen.contentLinkNoThumbnailSize);
+            binding.thumbnail.setLayoutParams(params);
         }
 
         binding.link.setText(post.getUrl());

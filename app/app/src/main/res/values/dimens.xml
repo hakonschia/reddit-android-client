@@ -49,4 +49,7 @@
 
     <!-- The start/end margins of posts in lists/when opened -->
     <dimen name="postMargin">8dp</dimen>
+
+    <dimen name="contentLinkThumbnailSize">175dp</dimen>
+    <dimen name="contentLinkNoThumbnailSize">75dp</dimen>
 </resources>
