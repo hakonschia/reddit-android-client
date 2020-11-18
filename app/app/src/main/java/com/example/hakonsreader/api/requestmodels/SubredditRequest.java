@@ -245,10 +245,20 @@ public class SubredditRequest {
                 if (body != null) {
                     List<RedditPost> posts = (List<RedditPost>) body.getListings();
 
-                    // When searching for "herth" and AFTER the search result is done pressing enter
-                    // to go into the sub (that doesn't exist) this for some reason gives the search results here
-                    // which causes it to crash inside the imgur load albums because the list is of subreddits and not posts
-                    // ???????????
+                    // For some reason I really can't explain, when searching for some subreddits ("herth", "nruh" are two examples)
+                    // that don't exist and then pressing enter to go into the subreddit the response from the
+                    // search (which is in SubredditsRequest.search()) is sent here AGAIN with Subreddit objects
+                    // in the list. I have actually no idea why this is happening and this is an absolutely terrible
+                    // way of "fixing" it, but it works
+                    // I tried taking out the threading and running this with api.enqueue() but that didn't matter
+                    // It might have something to do with interceptors and chain.proceed(), something to test
+                    try {
+                        RedditPost p = posts.get(0);
+                    } catch (ClassCastException | IndexOutOfBoundsException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
                     if (loadImgurAlbumsAsRedditGalleries) {
                         imgurRequest.loadAlbums(posts);
                     }
