@@ -13,9 +13,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.DispatcherActivity;
+import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentLinkBinding;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 /**
  * Class for post contents that are a link. This extends ScrollView so that if the user
@@ -55,10 +58,15 @@ public class ContentLink extends ScrollView {
     }
 
     private void updateView() {
-        if (!post.getThumbnail().isEmpty()) {
+        // The previews will (I believe) never be above 1080p, and that should be fine for most devices
+        // TODO although this will use more data, so it might be reasonable to add a data saving setting where
+        //  this image quality is reduced
+        List<Image> previews = post.getPreviewImages();
+        Image preview = previews.get(previews.size() - 1);
+
+        if (!preview.getUrl().isEmpty()) {
             Picasso.get()
-                    .load(post.getThumbnail())
-                    .resize((int)getResources().getDimension(R.dimen.postLinkThumnailWidth), (int)getResources().getDimension(R.dimen.postLinkThumnailHeight))
+                    .load(preview.getUrl())
                     .into(binding.thumbnail);
         }
 

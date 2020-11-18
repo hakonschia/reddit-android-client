@@ -3,9 +3,6 @@
     <dimen name="textMargin">16dp</dimen>
     <dimen name="upvoteDownvoteButtonsSize">25dp</dimen>
 
-    <dimen name="postLinkThumnailHeight">60dp</dimen>
-    <dimen name="postLinkThumnailWidth">80dp</dimen>
-
     <dimen name="defaultIndent">8dp</dimen>
 
     <dimen name="commentDepthIndent">12dp</dimen>
