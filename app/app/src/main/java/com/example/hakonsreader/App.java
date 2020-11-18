@@ -31,6 +31,7 @@ import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
+import com.facebook.stetho.Stetho;
 import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
@@ -95,6 +96,10 @@ public class App extends Application {
         updateTheme();
 
         AppDatabase db = AppDatabase.getInstance(this);
+
+        if (BuildConfig.DEBUG) {
+            Stetho.initializeWithDefaults(this);
+        }
 
         // Remove records that are older than 12 hours, as they likely won't be used again
         new Thread(() -> {

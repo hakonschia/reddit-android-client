@@ -23,6 +23,8 @@ import com.example.hakonsreader.api.service.SubredditsService;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
 import com.example.hakonsreader.api.responses.GenericError;
+import com.facebook.stetho.Stetho;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
