@@ -2,6 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentGalleryBinding;
 import com.example.hakonsreader.interfaces.LockableSlidr;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -84,22 +86,46 @@ public class ContentGallery extends LinearLayout {
         // Keep all images alive to not have to reload them
         binding.galleryImages.setOffscreenPageLimit(images.size());
 
+        // The ViewPager will be an infinite scroller. The adapter returns a size 3 times images.size()
+        // so set the current item to the middle
+        //      Here
+        //        |
+        // 0 1    0 1    0 1
+        binding.galleryImages.setCurrentItem(images.size());
+
         // Add listener to change the text saying which item we're on
         binding.galleryImages.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            int currentPos;
+
             @Override
             public void onPageSelected(int position) {
+                currentPos = position;
+
                 // Update the active text to show which image we are now on
-                setActiveImageText(position + 1);
+                setActiveImageText(position % images.size());
 
                 lockSlidr(position != 0);
             }
 
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                // Not implemented
-            }
-            @Override
             public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
+                    // Here       Go here    Or here
+                    //   |          |          |
+                    // 0 1        0 1        0 1
+                    if (currentPos == images.size() - 1 || currentPos == adapter.getCount() - 1) {
+                        binding.galleryImages.setCurrentItem(images.size() * 2 - 1, false);
+                    } else if (currentPos == images.size() * 2 || currentPos == 0) {
+                        // Or here  Go here    Here
+                        // |          |          |
+                        // 0 1        0 1        0 1
+                        binding.galleryImages.setCurrentItem(images.size(), false);
+                    }
+                }
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 // Not implemented
             }
 
@@ -120,7 +146,7 @@ public class ContentGallery extends LinearLayout {
             }
         });
         // Set initial state
-        setActiveImageText(1);
+        setActiveImageText(0);
 
         // TODO get extras with which image is currently viewed for when post is opened
     }
@@ -128,7 +154,7 @@ public class ContentGallery extends LinearLayout {
     /**
      * Updates the text in {@link ContentGalleryBinding#activeImageText}
      *
-     * @param activeImagePos The image position now active. Note this starts at 1, not 0
+     * @param activeImagePos The image position now active.
      */
     private void setActiveImageText(int activeImagePos) {
         // Imgur albums are also handled as galleries, and they might only contain one image, so make it
@@ -136,7 +162,7 @@ public class ContentGallery extends LinearLayout {
         if (images.size() == 1) {
             binding.activeImageText.setVisibility(GONE);
         } else {
-            binding.activeImageText.setText(String.format(Locale.getDefault(), "%d / %d", activeImagePos, images.size()));
+            binding.activeImageText.setText(String.format(Locale.getDefault(), "%d / %d", activeImagePos + 1, images.size()));
         }
     }
 
@@ -144,7 +170,7 @@ public class ContentGallery extends LinearLayout {
     /**
      * The pager adapter responsible for handling the images in the post
      */
-    private class ImageAdapter extends PagerAdapter {
+    public class ImageAdapter extends PagerAdapter {
         Context context;
         List<Image> images;
 
@@ -155,25 +181,27 @@ public class ContentGallery extends LinearLayout {
 
         @Override
         public int getCount() {
-            return images.size();
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
+            return images.size() * 3;
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, final int position) {
-            Image image = images.get(position);
+            Image image = images.get(position % images.size());
 
             // Use ContentImage as that already has listeners, NSFW caching etc already
             ContentImage contentImage = new ContentImage(context);
             contentImage.setWithImageUrl(post, image.getUrl());
 
+            // TODO imgur albums might be gifs
+
             container.addView(contentImage);
 
             return contentImage;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
         }
 
         @Override
