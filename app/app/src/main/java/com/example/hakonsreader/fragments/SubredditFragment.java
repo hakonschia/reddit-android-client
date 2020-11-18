@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
@@ -317,7 +318,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         binding = FragmentSubredditBinding.inflate(getLayoutInflater());
 
         if (savedInstanceState != null) {
-            binding.parentLayout.setProgress(savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
+            //binding.parentLayout.setProgress(savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
         }
 
         adapter = new PostsAdapter();
@@ -366,7 +367,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         this.setupPostsList();
 
         if (saveState != null) {
-            binding.parentLayout.setProgress(saveState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
+        //    binding.parentLayout.setProgress(saveState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
             postIds = saveState.getStringArrayList(POST_IDS_KEY);
             postsViewModel.setPostIds(postIds);
         }
@@ -380,6 +381,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         });
         // For some reason I can't change the background color from XML, so we have to do it in code
         binding.postsRefreshLayout.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(requireContext(), R.color.colorAccent));
+
+       // ((AppCompatActivity)getActivity()).setSupportActionBar(binding.subredditToolbar);
 
         return binding.getRoot();
     }
@@ -434,7 +437,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         // onSaveInstanceState is called for configuration changes (such as orientation)
         // so we need to store the animation state here and in saveState (for when the fragment has
         // been replaced but not destroyed)
-        outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
+      //  outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
     }
 
     @Override
@@ -466,7 +469,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             saveState = new Bundle();
         }
 
-        saveState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
+      //  saveState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
         saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
         saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
     }

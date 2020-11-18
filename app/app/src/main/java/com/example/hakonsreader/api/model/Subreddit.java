@@ -52,6 +52,9 @@ public class Subreddit extends RedditListing {
     @SerializedName("header_img")
     private String headerImage;
 
+    @SerializedName("banner_background_image")
+    private String bannerImage;
+
     @SerializedName("quarantine")
     private boolean quarantine;
 
@@ -151,6 +154,13 @@ public class Subreddit extends RedditListing {
      */
     public String getHeaderImage() {
         return headerImage;
+    }
+
+    /**
+     * @return The URL to the subreddits banner background image
+     */
+    public String getBannerImage() {
+        return bannerImage;
     }
 
     /**
@@ -259,6 +269,9 @@ public class Subreddit extends RedditListing {
         this.hideScoreTime = hideScoreTime;
     }
 
+    public void setBannerImage(String bannerImage) {
+        this.bannerImage = bannerImage;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -28,12 +28,11 @@
         <ImageView
             android:id="@+id/topLayout"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_marginTop="@dimen/userAndSubredditTopLayoutMarginPreAnim"
-            android:layout_marginBottom="-35dp"
             android:background="@drawable/rounded_square_main_bg_gradient"
 
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/profileNameDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -144,10 +143,10 @@
             android:id="@+id/posts"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:background="@color/background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-
             app:layout_constraintTop_toBottomOf="@+id/profileNameDivider"
             tools:listitem="@layout/post" />
 

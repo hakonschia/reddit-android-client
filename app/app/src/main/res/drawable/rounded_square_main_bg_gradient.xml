@@ -1,4 +1,5 @@
 <!-- https://stackoverflow.com/a/47347625/7750841 -->
+<!-- https://stackoverflow.com/a/8931327/7750841 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item>
@@ -9,7 +10,12 @@
                 android:endColor="@color/opposite_background"
                 android:startColor="@color/background" />
 
-            <corners android:radius="24dp"/>
+            <corners
+                android:radius="1dp"
+                android:topLeftRadius="24dp"
+                android:topRightRadius="24dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
         </shape>
     </item>
 
@@ -22,7 +28,12 @@
         <shape android:shape="rectangle" >
             <!-- fill the inside in the color you want (could also be a gradient again if you want to, just change solid to gradient and enter angle, start, maybe center, and end color) -->
             <solid android:color="@color/background" />
-            <corners android:radius="24dp"/>
+            <corners
+                android:radius="1dp"
+                android:topLeftRadius="24dp"
+                android:topRightRadius="24dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp" />
 
         </shape>
     </item>
