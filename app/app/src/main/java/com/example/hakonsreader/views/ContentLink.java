@@ -63,7 +63,15 @@ public class ContentLink extends ScrollView {
         // The previews will (I believe) never be above 1080p, and that should be fine for most devices
         // TODO although this will use more data, so it might be reasonable to add a data saving setting where
         //  this image quality is reduced
+
         List<Image> previews = post.getPreviewImages();
+        if (post.isNsfw()) {
+            List<Image> obfusactedPreviews = post.getObfuscatedPreviewImages();
+            if (obfusactedPreviews != null && !obfusactedPreviews.isEmpty()) {
+                previews = obfusactedPreviews;
+            }
+        }
+
         if (!previews.isEmpty()) {
             Image preview = previews.get(previews.size() - 1);
 

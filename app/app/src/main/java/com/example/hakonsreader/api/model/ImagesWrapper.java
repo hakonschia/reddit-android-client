@@ -27,5 +27,8 @@ class ImagesWrapper {
 
         @SerializedName("mp4")
         ImagesWrapper mp4;
+
+        @SerializedName("obfuscated")
+        ImagesWrapper obfuscated;
     }
 }

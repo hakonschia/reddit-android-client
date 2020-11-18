@@ -398,6 +398,7 @@ public class RedditPost extends RedditListing {
      *
      * @return A list of preview images, or null if none is available
      * @see RedditPost#getSourcePreview()
+     * @see RedditPost#getObfuscatedPreviewImages()
      */
     public List<Image> getPreviewImages() {
         if (preview != null && preview.images != null) {
@@ -406,6 +407,21 @@ public class RedditPost extends RedditListing {
 
         return new ArrayList<>();
     }
+
+    /**
+     * Returns a list of preview images that have been obfuscated (for NSFW posts)
+     *
+     * @return A list of preview images, or null if none is available
+     */
+    public List<Image> getObfuscatedPreviewImages() {
+        try {
+            List<Image> images = preview.images.get(0).variants.obfuscated.resolutions;
+            return images;
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
 
     /**
      * Retrieves the video for GIF posts from sources such as Gfycat
