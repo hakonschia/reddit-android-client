@@ -3,6 +3,7 @@ package com.example.hakonsreader.fragments;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,31 +40,19 @@ public class LogInFragment extends Fragment {
         // Generate a new state to validate when we get a response back
         String state = App.get().generateAndGetOAuthState();
 
-        String url = String.format(
-                "%s?client_id=%s&response_type=%s&state=%s&redirect_uri=%s&scope=%s&duration=%s",
-                "https://www.reddit.com/api/v1/authorize/",
-                NetworkConstants.CLIENT_ID,
-                NetworkConstants.RESPONSE_TYPE,
-                state,
-                NetworkConstants.CALLBACK_URL,
-                NetworkConstants.SCOPE,
-                NetworkConstants.DURATION
-        );
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .authority("reddit.com")
+                .path("api/v1/authorize")
+                .appendQueryParameter("response_type", NetworkConstants.RESPONSE_TYPE)
+                .appendQueryParameter("duration", NetworkConstants.DURATION)
+                .appendQueryParameter("redirect_uri" ,NetworkConstants.CALLBACK_URL)
+                .appendQueryParameter("client_id", NetworkConstants.CLIENT_ID)
+                .appendQueryParameter("scope", NetworkConstants.SCOPE)
+                .appendQueryParameter("state", state)
+                .build();
 
-        /*
-        this.oauthWebView.loadUrl(url);
-
-        this.oauthWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                Log.d(TAG, "onPageFinished: View finished: " + url);
-
-                super.onPageFinished(view, url);
-            }
-        });
-*/
-        // Maybe WebView is better so it doesnt open a million web pages?
-        Intent oauthIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        Intent oauthIntent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(oauthIntent);
     }
 }
