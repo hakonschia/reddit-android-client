@@ -454,76 +454,95 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * Adds sidebars to the comment (to visually show the comment depth)
+     * Adds sidebars to the a (to visually show the comment depth) in a ConstraintLayout
      *
      * @param barrier The layout to add the sidebars to
      * @param depth The depth of the comment
      */
-    @BindingAdapter("sideBars")
-    public static void addSideBars(Barrier barrier, int depth) {
-        final String childDescription = "sidebar";
+    @BindingAdapter("sidebars")
+    public static void addSidebars(Barrier barrier, int depth) {
         final ConstraintLayout parent = (ConstraintLayout) barrier.getParent();
+        // The contentDescription for the sidebars, this is used to find the sidebars again later
+        final String contentDescription = "sidebar";
 
-        Resources res = barrier.getResources();
+        final Resources res = barrier.getResources();
         final int barWidth = (int)res.getDimension(R.dimen.commentSideBarWidth);
         final int indent = (int)res.getDimension(R.dimen.commentDepthIndent);
 
-        // Find the previous sidebars
-        ArrayList<View> previousSideBars = new ArrayList<>();
-        parent.findViewsWithText(previousSideBars, childDescription, FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
-
-        int previousSideBarsSize = previousSideBars.size();
+        // Find the previous sidebars added to the ConstraintLayout
+        // By doing this we can reuse views by removing only the overflow amount/only adding the extra
+        // needed. When scrolling through a lot of comments this will save 100s of views from being created
+        ArrayList<View> previousSidebars = new ArrayList<>();
+        parent.findViewsWithText(previousSidebars, contentDescription, FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
+        int previousSidebarsSize = previousSidebars.size();
         
         // Top level comments don't have sidebars, remove all previous
         if (depth == 0) {
-            previousSideBars.forEach(parent::removeView);
-            Log.d(TAG, "addSideBars: Removing all sidebars");
+            previousSidebars.forEach(parent::removeView);
             return;
-        } else if (previousSideBarsSize == depth) {
-
-            Log.d(TAG, "addSideBars: Correct amount of sidebars already added (" + depth + ")");
-            // The depth is the same, we can keep the previous sidebars
+        } else if (previousSidebarsSize == depth) {
+            // The depth is the same, we can keep the previous sidebars (do nothing)
             return;
-        } else {
-            Log.d(TAG, "addSideBars: previous=" + previousSideBarsSize + ", depth=" + depth);
-
+        } else if (previousSidebarsSize > depth) {
             // Too many sidebars, remove the overflow
-            if (previousSideBarsSize > depth) {
-                Log.d(TAG, "addSideBars: Removing overflow, previous="+previousSideBarsSize + ", depth=" + depth);
-                removeSideBarsOverflow(previousSideBars, parent, barrier, previousSideBarsSize - depth, indent);
-                return;
-            } else {
-                // For now, remove all and the correct amount will be added below
-                previousSideBars.forEach(parent::removeView);
-                Log.d(TAG, "addSideBars: Adding new sidebars, previous="+previousSideBarsSize + ", depth=" + depth);
-            }
-
+            removeSidebarsOverflow(previousSidebars, parent, barrier, previousSidebarsSize - depth, indent);
+            return;
         }
 
+        // If we get here we need to add sidebars as the
+
+        // ConstraintSet for the constraints of the sidebars
+        ConstraintSet constraintSet = new ConstraintSet();
+
+        // The previous sidebar
         View previous = null;
+
+        // Remove the constraint of the last sidebar as that is constrained to the barrier
+        // Get the last side bar kept and constrain it to the barrie
+        // The last sidebar is constrained "end_toEndOf=barrier", that has to be removed as this
+        // sidebar should now be constrained "end_toStartOf=nextSideBar"
+        if (previousSidebarsSize > 0) {
+            View lastSidebar = previousSidebars.get(previousSidebars.size() - 1);
+
+            // Set constraints
+            constraintSet.clone(parent);
+            constraintSet.clear(lastSidebar.getId(), ConstraintSet.END);
+
+            previous = lastSidebar;
+        }
+
         // The reference IDs the barrier will use
         int[] referenceIds = new int[depth];
 
+        // Copy the IDs
+        for (int i = 0; i < previousSidebars.size(); i++) {
+            referenceIds[i] = previousSidebars.get(i).getId();
+        }
+
+        // The downside to keeping the same views is that since the comments can be different type of
+        // layouts (normal comment, hidden comment, more comment) ConstraintSet will give out warnings
+        // that an id is unknown when the sidebars were previously in a different layout
+        // ("id unknown sideBarsBarrier", "id unknown normalComment") since those IDs aren't found
+        // in this layout (the sidebars are constrained to the parent/barrier from the previous layout
+        // which are different views).
+        // It doesn't seem to cause any issues, but the logcat gets spammed with the warnings
+
         // Every comment is only responsible for the lines to its side, so each line will match up
         // with the line for the comment above and below to create a long line throughout the entire list
-        for (int i = 0; i < depth; i++) {
+        for (int i = previousSidebarsSize; i < depth; i++) {
             int id = View.generateViewId();
             referenceIds[i] = id;
 
             View view = new View(barrier.getContext());
 
             view.setBackgroundColor(ContextCompat.getColor(barrier.getContext(), R.color.commentSideBar));
-            view.setContentDescription(childDescription);
+            view.setContentDescription(contentDescription);
             view.setId(id);
-
-            // Set constraints
-            ConstraintSet constraintSet = new ConstraintSet();
-            constraintSet.clone(parent);
 
             // The width of the view is set with this
             constraintSet.constrainWidth(id, barWidth);
 
-            // With the sidebar constrained to top/bottom of parent, MATCH_CONSTRAINT height will match the parent height
+            // With the sidebar is constrained to top/bottom of parent, MATCH_CONSTRAINT height will match the parent height
             // bottom_toBottomOf=parent
             constraintSet.connect(id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
             // top_toTopOf=parent
@@ -538,17 +557,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 constraintSet.connect(id, ConstraintSet.START, previous.getId(), ConstraintSet.END, indent);
             }
 
-            // Last sidebar, connect the end to the end of the barrier to create a margin
+            // Last sidebar, connect the end to the end of the barrier to create a margin from the last sidebar
+            // to the comment itself
             if (i == depth - 1) {
                 constraintSet.connect(id, ConstraintSet.END, barrier.getId(), ConstraintSet.END, indent);
             }
 
-            // The view has to be added to the layout BEFORE the constraints are set, otherwise they wont work
             parent.addView(view);
             previous = view;
-
-            constraintSet.applyTo(parent);
         }
+
+        // Apply all the constraints
+        constraintSet.applyTo(parent);
 
         // The barrier will move to however long out it has to, so we don't have to adjust anything
         // with the layout itself
@@ -565,7 +585,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param sideBarsToRemove The amount of side bars to remove
      * @param indent The indent to use for the side bars
      */
-    private static void removeSideBarsOverflow(List<View> sideBars, ConstraintLayout parent, Barrier barrier, int sideBarsToRemove, int indent) {
+    private static void removeSidebarsOverflow(List<View> sideBars, ConstraintLayout parent, Barrier barrier, int sideBarsToRemove, int indent) {
         int size = sideBars.size();
         for (int i = size; i > size - sideBarsToRemove; i--) {
             View sideBar = sideBars.remove(i - 1);

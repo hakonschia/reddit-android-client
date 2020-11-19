@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
 
             app:barrierDirection="end"
-            app:sideBars="@{comment.depth}" />
+            app:sidebars="@{comment.depth - adapter.baseDepth}" />
 
         <!-- Normal comment layout. Even if the layout visibility is set to GONE it might still render
          the view, which is probably inefficient (function calls are still called). Might be better for
