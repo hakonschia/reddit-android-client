@@ -1,11 +1,11 @@
 package com.example.hakonsreader.activites;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -22,6 +22,7 @@ import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.databinding.ActivityPostBinding;
 import com.example.hakonsreader.interfaces.LockableSlidr;
 import com.example.hakonsreader.misc.Util;
@@ -217,7 +218,18 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
                 return;
             }
 
-            commentsAdapter.addComments(comments);
+            // Get the last time the post was opened (last time comments were retrieved)
+            String lastTimeOpenedKey = post.getId() + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP;
+            SharedPreferences sharedPreferences = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
+            long lastTimePostOpened = sharedPreferences.getLong(lastTimeOpenedKey, -1);
+            // Update the value
+            // TODO these values should probably be deleted at some point? Can check at startup if any of the values are
+            //  over a few days old or something and delete those that are
+            sharedPreferences.edit().putLong(lastTimeOpenedKey, System.currentTimeMillis() / 1000L).apply();
+
+            commentsAdapter.setLastTimePostOpened(lastTimePostOpened);
+            commentsAdapter.setComments(comments);
+
             binding.setNoComments(comments.isEmpty());
         });
         commentsViewModel.getError().observe(this, error -> Util.handleGenericResponseErrors(binding.parentLayout, error.getError(), error.getThrowable()));

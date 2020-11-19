@@ -92,6 +92,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
     private final RedditPost post;
+    /**
+     * The timestamp in milliseconds of when the post was opened last
+     */
+    private long lastTimePostOpened;
+    /**
+     * The Unix timestamp in milliseconds of when the comments were set
+     */
     private RecyclerView recyclerViewAttachedTo;
     private String commentIdChain;
     private OnReplyListener replyListener;
@@ -131,11 +138,21 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * Appends comments to the current list of comments
+     * Sets the Unix timestamp of when the post was previously opened. This will be used
+     * to highlight new comments
+     *
+     * @param lastTimePostOpened A Unix timestamp
+     */
+    public void setLastTimePostOpened(long lastTimePostOpened) {
+        this.lastTimePostOpened = lastTimePostOpened;
+    }
+
+    /**
+     * Sets the comments to use in the list
      *
      * @param newComments The comments to add
      */
-    public void addComments(List<RedditComment> newComments) {
+    public void setComments(List<RedditComment> newComments) {
         List<RedditComment> previous = comments;
         comments = newComments;
 
@@ -404,7 +421,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         RedditComment comment = comments.get(position);
 
         // If we're in a chain and on the first element (the start of the chain) then highlight it
-        boolean highlight = position == 0 && !chain.isEmpty();
+        // Or if the comment has been added since the previous time the post was opened
+        boolean highlight = (position == 0 && !chain.isEmpty())
+                || (lastTimePostOpened > 0 && (comment.getCreatedAt() > lastTimePostOpened));
 
         switch (holder.getItemViewType()) {
             case MORE_COMMENTS_TYPE:

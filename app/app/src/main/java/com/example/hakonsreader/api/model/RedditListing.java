@@ -116,7 +116,7 @@ public abstract class RedditListing {
     }
 
     /**
-     * @return The unix timestamp in milliseconds when the listing was created
+     * @return The unix timestamp in seconds when the listing was created
      */
     public long getCreatedAt() {
         return (long)createdAt;
