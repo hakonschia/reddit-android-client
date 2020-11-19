@@ -20,7 +20,7 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 
 ## Installation
 
-The downloadable [APK](apk/app-release.apk) contains the application at commit `86c064be4b8bee94924df25231a97668de7094d9`. To install the app via the APK download the APK and open it on your phone and follow the steps shown.
+The downloadable [APK](apk/app-release.apk) contains the application at commit `6f67ae52d8f747a1ec6c8d3ec6a76254e9172353` (#826). To install the app via the APK download the APK and open it on your phone and follow the steps shown.
 
 To retrieve the latest version clone the repository and install manually via Android Studio (this will be a debug version).
 
