@@ -42,5 +42,6 @@ Thank you to Reddit for making this project possible by providing an open API.
 * [ExoPlayer](https://github.com/google/ExoPlayer) - Used for playing videos
 * [Ticker](https://github.com/robinhood/ticker) - A ticker style TextView that smoothly animates changes (by sliding characters up/down)
 * [ProcessPhoenix](https://github.com/JakeWharton/ProcessPhoenix) - Used to restart the application
+* [Stetho](https://github.com/facebook/stetho) - For debugging
 
 As well as various code snippets acknowledged throughout the code.
