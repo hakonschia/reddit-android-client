@@ -464,6 +464,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         final String childDescription = "sidebar";
         final ConstraintLayout parent = (ConstraintLayout) barrier.getParent();
 
+        Resources res = barrier.getResources();
+        final int barWidth = (int)res.getDimension(R.dimen.commentSideBarWidth);
+        final int indent = (int)res.getDimension(R.dimen.commentDepthIndent);
+
         // Find the previous sidebars
         ArrayList<View> previousSideBars = new ArrayList<>();
         parent.findViewsWithText(previousSideBars, childDescription, FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
@@ -483,14 +487,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else {
             Log.d(TAG, "addSideBars: previous=" + previousSideBarsSize + ", depth=" + depth);
 
-            // TODO if too many sidebars, remove the overflow, if too little, add the missing
-            // For now, remove all sidebars and recreate the correct amount needed to it's correct
-            previousSideBars.forEach(parent::removeView);
-        }
+            // Too many sidebars, remove the overflow
+            if (previousSideBarsSize > depth) {
+                Log.d(TAG, "addSideBars: Removing overflow, previous="+previousSideBarsSize + ", depth=" + depth);
+                removeSideBarsOverflow(previousSideBars, parent, barrier, previousSideBarsSize - depth, indent);
+                return;
+            } else {
+                // For now, remove all and the correct amount will be added below
+                previousSideBars.forEach(parent::removeView);
+                Log.d(TAG, "addSideBars: Adding new sidebars, previous="+previousSideBarsSize + ", depth=" + depth);
+            }
 
-        Resources res = barrier.getResources();
-        int barWidth = (int)res.getDimension(R.dimen.commentSideBarWidth);
-        int indent = (int)res.getDimension(R.dimen.commentDepthIndent);
+        }
 
         View previous = null;
         // The reference IDs the barrier will use
@@ -545,6 +553,33 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         // The barrier will move to however long out it has to, so we don't have to adjust anything
         // with the layout itself
         barrier.setReferencedIds(referenceIds);
+    }
+
+
+    /**
+     * Removes overflow side bars from a ConstraintLayout
+     *
+     * @param sideBars The list of the side bars. The side bars are removed from this list
+     * @param parent The parent layout where the side bars are added. The side bars are removed from the layout
+     * @param barrier The barrier the side bars are referenced/constrained to
+     * @param sideBarsToRemove The amount of side bars to remove
+     * @param indent The indent to use for the side bars
+     */
+    private static void removeSideBarsOverflow(List<View> sideBars, ConstraintLayout parent, Barrier barrier, int sideBarsToRemove, int indent) {
+        int size = sideBars.size();
+        for (int i = size; i > size - sideBarsToRemove; i--) {
+            View sideBar = sideBars.remove(i - 1);
+            parent.removeView(sideBar);
+        }
+
+        // Get the last side bar kept and constrain it to the barrier
+        View lastSideBar = sideBars.get(sideBars.size() - 1);
+
+        // Set constraints
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(parent);
+        constraintSet.connect(lastSideBar.getId(), ConstraintSet.END, barrier.getId(), ConstraintSet.END, indent);
+        constraintSet.applyTo(parent);
     }
 
     /**
