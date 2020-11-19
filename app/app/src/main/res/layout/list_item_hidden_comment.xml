@@ -30,22 +30,14 @@
           to be able to get an ellipsize on it. We therefore need to have an empty view
           so the barrier has something to barrier against (this is only an issue for
           top level comments where there are no views added to the barrier) -->
-        <View
-            android:id="@+id/emptyView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/sideBarsBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            app:constraint_referenced_ids="emptyView"
-            app:barrierDirection="right"
-            app:sideBars="@{comment.depth - adapter.baseDepth}" />
+            app:barrierDirection="end"
+            app:sideBars="@{comment.depth}" />
 
         <TextView
             android:id="@+id/commentAuthor"

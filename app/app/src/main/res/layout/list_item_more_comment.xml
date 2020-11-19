@@ -25,8 +25,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            app:barrierDirection="right"
-            app:sideBars="@{comment.depth - adapter.baseDepth}" />
+            app:barrierDirection="end"
+            app:sideBars="@{comment.depth}" />
 
         <TextView
             android:id="@+id/moreComments"

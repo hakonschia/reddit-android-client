@@ -2,6 +2,7 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -463,14 +464,28 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         final String childDescription = "sidebar";
         final ConstraintLayout parent = (ConstraintLayout) barrier.getParent();
 
-        // Find the previous sidebars and remove them
-        ArrayList<View> outputViews = new ArrayList<>();
-        parent.findViewsWithText(outputViews, childDescription, FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
-        outputViews.forEach(parent::removeView);
+        // Find the previous sidebars
+        ArrayList<View> previousSideBars = new ArrayList<>();
+        parent.findViewsWithText(previousSideBars, childDescription, FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
 
-        // Top level comments don't have sidebars
+        int previousSideBarsSize = previousSideBars.size();
+        
+        // Top level comments don't have sidebars, remove all previous
         if (depth == 0) {
+            previousSideBars.forEach(parent::removeView);
+            Log.d(TAG, "addSideBars: Removing all sidebars");
             return;
+        } else if (previousSideBarsSize == depth) {
+
+            Log.d(TAG, "addSideBars: Correct amount of sidebars already added (" + depth + ")");
+            // The depth is the same, we can keep the previous sidebars
+            return;
+        } else {
+            Log.d(TAG, "addSideBars: previous=" + previousSideBarsSize + ", depth=" + depth);
+
+            // TODO if too many sidebars, remove the overflow, if too little, add the missing
+            // For now, remove all sidebars and recreate the correct amount needed to it's correct
+            previousSideBars.forEach(parent::removeView);
         }
 
         Resources res = barrier.getResources();
