@@ -419,7 +419,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      * Transition listener that automatically pauses the video content when the end of the transition
      * has been reached
      */
-    private MotionLayout.TransitionListener transitionListener = new MotionLayout.TransitionListener() {
+    private final MotionLayout.TransitionListener transitionListener = new MotionLayout.TransitionListener() {
         @Override
         public void onTransitionCompleted(MotionLayout motionLayout, int currentId) {
             // Pause video when the transition has finished to the end

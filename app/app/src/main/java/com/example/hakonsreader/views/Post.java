@@ -244,7 +244,7 @@ public class Post extends RelativeLayout {
             return c;
         }
 
-        View content;
+        View content = null;
 
         switch (post.getPostType()) {
             case IMAGE:
@@ -306,9 +306,13 @@ public class Post extends RelativeLayout {
                 break;
 
             case TEXT:
-                ContentText contentText = new ContentText(context);
-                contentText.setPost(post);
-                content = contentText;
+                // If there is no text on the post there is no point in creating a view for it
+                String selfText = post.getSelftext();
+                if (selfText != null && !selfText.isEmpty()) {
+                    ContentText contentText = new ContentText(context);
+                    contentText.setPost(post);
+                    content = contentText;
+                }
                 break;
 
             case GALLERY:
