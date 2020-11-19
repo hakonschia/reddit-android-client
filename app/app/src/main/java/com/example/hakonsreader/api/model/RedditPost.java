@@ -93,7 +93,6 @@ public class RedditPost extends RedditListing {
     private String authorFlairText;
 
     @SerializedName("author_flair_richtext")
-    @Ignore
     private List<RichtextFlair> authorRichtextFlairs;
 
     @SerializedName("link_flair_background_color")
@@ -106,7 +105,6 @@ public class RedditPost extends RedditListing {
     private String linkFlairText;
 
     @SerializedName("link_flair_richtext")
-    @Ignore
     private List<RichtextFlair> linkRichtextFlairs;
 
 

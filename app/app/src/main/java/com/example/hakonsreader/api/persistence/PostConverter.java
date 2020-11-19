@@ -4,6 +4,7 @@ import androidx.room.TypeConverter;
 
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
@@ -73,6 +74,17 @@ public class PostConverter {
     }
     @TypeConverter
     public static String fromGalleryImages(List<Image> images) {
+        return gson.toJson(images);
+    }
+
+
+    @TypeConverter
+    public static List<RichtextFlair> rickTextFlairListFromString(String value) {
+        Type listType = new TypeToken<ArrayList<RichtextFlair>>() {}.getType();
+        return gson.fromJson(value, listType);
+    }
+    @TypeConverter
+    public static String fromRichTextFlairList(List<RichtextFlair> images) {
         return gson.toJson(images);
     }
 }
