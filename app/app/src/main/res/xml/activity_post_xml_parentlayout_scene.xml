@@ -33,9 +33,6 @@
             android:id="@+id/post"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/postMargin"
-            android:layout_marginStart="@dimen/postMargin"
-
             motion:layout_constraintBottom_toTopOf="parent"
             motion:layout_constraintEnd_toStartOf="parent"
             motion:layout_constraintStart_toStartOf="parent" />
