@@ -1,14 +1,21 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
 import androidx.databinding.BindingAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.interfaces.OnClickListener;
 import com.example.hakonsreader.recyclerviewadapters.diffutils.PostsDiffCallback;
 import com.example.hakonsreader.views.ListDivider;
 import com.example.hakonsreader.views.Post;
@@ -33,12 +41,22 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private static final String TAG = "PostsAdapter";
     
     private List<RedditPost> posts = new ArrayList<>();
+    private OnClickListener<Post> postOnClickListener;
 
     /**
      * The amount of minutes scores should be hidden (default to -1 means not specified)
      */
     private int hideScoreTime = -1;
 
+    /**
+     * Sets the listener for when an item in the list has been clicked. Note that the listener will
+     * hold a {@link Post} view, not a {@link RedditPost}
+     *
+     * @param postOnClickListener The listener for clicks
+     */
+    public void setPostOnClickListener(OnClickListener<Post> postOnClickListener) {
+        this.postOnClickListener = postOnClickListener;
+    }
 
     /**
      * Submits the list of posts to show in the RecyclerView
@@ -161,13 +179,27 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     /**
      * The view for the items in the list
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private final Post post;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             post = itemView.findViewById(R.id.post);
+
+            itemView.setOnClickListener(v -> {
+                if (postOnClickListener != null) {
+                    postOnClickListener.onClick(post);
+                }
+            });
+            itemView.setOnLongClickListener(v -> {
+                ClipboardManager clipboard = (ClipboardManager) post.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("reddit post", post.getRedditPost().getUrl());
+                clipboard.setPrimaryClip(clip);
+
+                Toast.makeText(post.getContext(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
+                return true;
+            });
         }
 
         /**
@@ -238,6 +270,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         public void pause() {
             post.viewUnselected();
+        }
+
+        /**
+         * Checks if the ViewHolder's current post ID is equal to another post ID
+         *
+         * @param post The {@link Post} to check
+         * @return True if the {@link Post} this ViewHolder is displaying is equal to the one passed
+         */
+        public boolean isViewHolderForPost(@Nullable Post post) {
+            if (post == null) {
+                return false;
+            }
+            return this.post.getRedditPost().getId().equals(post.getRedditPost().getId());
         }
     }
 }

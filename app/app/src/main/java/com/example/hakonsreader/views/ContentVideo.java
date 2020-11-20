@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
@@ -71,21 +72,29 @@ public class ContentVideo extends Content {
 
     /**
      * The key used for extra information about the timestamp of the video
+     *
+     * <p>The value stored with this key will be a {@code long}</p>
      */
     public static final String EXTRA_TIMESTAMP = "videoTimestamp";
 
     /**
      * The key used for extra information about the playback state of a video
+     *
+     * <p>The value stored with this key will be a {@code boolean}</p>
      */
     public static final String EXTRA_IS_PLAYING = "isPlaying";
 
     /**
      * The key used for extra information about the playback state of a video
+     *
+     * <p>The value stored with this key will be a {@code boolean}</p>
      */
     public static final String EXTRA_SHOW_CONTROLS = "showControls";
 
     /**
      * The key used for extra information about the volume of the video
+     *
+     * <p>The value stored with this key will be a {@code boolean}</p>
      */
     public static final String EXTRA_VOLUME = "volume";
 
@@ -252,7 +261,6 @@ public class ContentVideo extends Content {
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 // If the player is trying to play and hasn't yet prepared the video, prepare it
-                Log.d(TAG, "onPlayerStateChanged: " + playWhenReady);
                 if (playWhenReady && !isPrepared) {
                     prepare();
                 }
@@ -583,6 +591,7 @@ public class ContentVideo extends Content {
      * @return A bundle that might include state variables
      */
     @Override
+    @NonNull
     public Bundle getExtras() {
         Bundle extras = new Bundle();
 
@@ -607,7 +616,7 @@ public class ContentVideo extends Content {
      *               {@link ContentVideo#getExtras()}
      */
     @Override
-    public void setExtras(Bundle extras) {
+    public void setExtras(@NonNull Bundle extras) {
         long timestamp = extras.getLong(EXTRA_TIMESTAMP);
         boolean isPlaying = extras.getBoolean(EXTRA_IS_PLAYING);
         boolean showController = extras.getBoolean(EXTRA_SHOW_CONTROLS);

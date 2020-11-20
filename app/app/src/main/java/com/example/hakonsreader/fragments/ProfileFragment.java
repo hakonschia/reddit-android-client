@@ -1,7 +1,10 @@
 package com.example.hakonsreader.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.databinding.BindingAdapter;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.databinding.FragmentProfileBinding;
@@ -25,6 +30,9 @@ import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
+import com.example.hakonsreader.views.Content;
+import com.example.hakonsreader.views.Post;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -54,6 +62,7 @@ public class ProfileFragment extends Fragment {
      * The key set in the bundle with getArguments() that says if the fragment is for the logged in user
      */
     private static final String IS_LOGGED_IN_USER_KEY = "isLoggedInUser";
+    private static final int REQUEST_CODE_POST_RESULT = 1;
 
 
     private boolean firstLoad = true;
@@ -66,6 +75,11 @@ public class ProfileFragment extends Fragment {
      * for logged in users
      */
     private String username;
+
+    /**
+     * The post that has been opened by a list click, or null if no post is opened
+     */
+    private Post postOpened;
 
     private Bundle saveState;
     private List<String> postIds;
@@ -140,6 +154,7 @@ public class ProfileFragment extends Fragment {
         }
 
         adapter = new PostsAdapter();
+        adapter.setPostOnClickListener(this::openPost);
         layoutManager = new LinearLayoutManager(getContext());
         postIds = new ArrayList<>();
 
@@ -210,6 +225,26 @@ public class ProfileFragment extends Fragment {
             postsViewModel.loadPosts();
         }
     }
+    /**
+     * Handles results to the fragment
+     *
+     * @param requestCode The request code. If the request code is {@link ProfileFragment#REQUEST_CODE_POST_RESULT}
+     *                    then the bundle of extras is sent to the active subreddit fragment
+     * @param resultCode The result code
+     * @param data The intent data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.d(TAG, "onActivityResult: ");
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            // Resumed from PostActivity, get the bundle of post extras and send to the active fragment
+            if (requestCode == REQUEST_CODE_POST_RESULT && data != null) {
+                Bundle extras = data.getExtras().getBundle(Content.EXTRAS);
+                postOpened.setExtras(extras);
+            }
+        }
+    }
 
     @Override
     public void onDestroyView() {
@@ -265,6 +300,24 @@ public class ProfileFragment extends Fragment {
             Util.handleGenericResponseErrors(binding.parentLayout, code, t);
             binding.loadingIcon.onCountChange(false);
         });
+    }
+    /**
+     * Opens a post in a new activity
+     *
+     * @param post The post to open
+     */
+    private void openPost(Post post) {
+        postOpened = post;
+
+        Intent intent = new Intent(getContext(), PostActivity.class);
+        intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(post.getRedditPost()));
+        intent.putExtra(Content.EXTRAS, post.getExtras());
+
+        // Only really applicable for videos, as they should be paused
+        post.viewUnselected();
+
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), post.getTransitionViews());
+        startActivityForResult(intent, REQUEST_CODE_POST_RESULT, options.toBundle());
     }
 
 

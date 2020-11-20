@@ -1,5 +1,7 @@
 package com.example.hakonsreader.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -7,12 +9,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
@@ -21,6 +22,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.MainActivity;
+import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.SortingMethods;
 import com.example.hakonsreader.api.enums.PostTimeSort;
@@ -39,7 +42,11 @@ import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.hakonsreader.views.Content;
+import com.example.hakonsreader.views.ContentVideo;
+import com.example.hakonsreader.views.Post;
+import com.example.hakonsreader.views.util.ClickHandler;
+import com.google.gson.Gson;
 import com.robinhood.ticker.TickerUtils;
 import com.squareup.picasso.Picasso;
 
@@ -69,6 +76,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
      * The key used to store the state of {@link SubredditFragment#layoutManager}
      */
     private static final String LAYOUT_STATE_KEY = "layout_state";
+    private static final int REQUEST_CODE_POST_RESULT = 1;
 
 
     private final RedditApi api = App.get().getApi();
@@ -77,6 +85,10 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     private AppDatabase database;
     private Bundle saveState;
     private List<String> postIds;
+    /**
+     * The post that has been opened by a list click, or null if no post is opened
+     */
+    private Post postOpened;
 
     /**
      * Observable that automatically updates the UI when the internal object
@@ -198,10 +210,14 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             for (int i = firstVisible; i <= lastVisible; i++) {
                 PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
 
-                // If the view has been destroyed the ViewHolders havent been created yet
-                Bundle extras = saveState.getBundle(VIEW_STATE_STORED_KEY + i);
-                if (extras != null && viewHolder != null) {
-                    viewHolder.setExtras(extras);
+                // If the ViewHolder is for the post that was opened don't restore the state as it will be
+                // restored in onActivityResult with an updated state (which is called first, so this would override it)
+                if (viewHolder != null && !viewHolder.isViewHolderForPost(postOpened)) {
+                    // If the view has been destroyed the ViewHolders havent been created yet
+                    Bundle extras = saveState.getBundle(VIEW_STATE_STORED_KEY + i);
+                    if (extras != null) {
+                        viewHolder.setExtras(extras);
+                    }
                 }
             }
         }
@@ -328,11 +344,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         Log.d(TAG, "onCreate " + getSubredditName());
         binding = FragmentSubredditBinding.inflate(getLayoutInflater());
 
-        if (savedInstanceState != null) {
-            //binding.parentLayout.setProgress(savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
-        }
-
         adapter = new PostsAdapter();
+        adapter.setPostOnClickListener(this::openPost);
         layoutManager = new LinearLayoutManager(getContext());
         postIds = new ArrayList<>();
 
@@ -437,6 +450,27 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         this.restoreViewHolderStates();
     }
 
+    /**
+     * Handles results to the fragment
+     *
+     * @param requestCode The request code. If the request code is {@link SubredditFragment#REQUEST_CODE_POST_RESULT}
+     *                    then the bundle of extras is sent to the active subreddit fragment
+     * @param resultCode The result code
+     * @param data The intent data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.d(TAG, "onActivityResult: ");
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            // Resumed from PostActivity, get the bundle of post extras and send to the active fragment
+            if (requestCode == REQUEST_CODE_POST_RESULT && data != null) {
+                Bundle extras = data.getExtras().getBundle(Content.EXTRAS);
+                postOpened.setExtras(extras);
+            }
+        }
+    }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -494,5 +528,24 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     @Override
     public void controversial(PostTimeSort timeSort) {
         postsViewModel.restart(SortingMethods.CONTROVERSIAL, timeSort);
+    }
+
+    /**
+     * Opens a post in a new activity
+     *
+     * @param post The post to open
+     */
+    private void openPost(Post post) {
+        postOpened = post;
+
+        Intent intent = new Intent(getContext(), PostActivity.class);
+        intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(post.getRedditPost()));
+        intent.putExtra(Content.EXTRAS, post.getExtras());
+
+        // Only really applicable for videos, as they should be paused
+        post.viewUnselected();
+
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), post.getTransitionViews());
+        startActivityForResult(intent, REQUEST_CODE_POST_RESULT, options.toBundle());
     }
 }

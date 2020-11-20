@@ -129,13 +129,6 @@ public class Post extends Content {
      */
     @Override
     protected void updateView() {
-        // Open post when clicked, copy link to clipboard on long clicks
-        super.setOnClickListener(v -> this.openPost());
-        super.setOnLongClickListener(v -> {
-            this.copyLinkToClipBoard();
-            return true;
-        });
-
         // Ensure view is fresh if used in a RecyclerView
         this.cleanUpContent();
 
@@ -317,8 +310,6 @@ public class Post extends Content {
 
         if (content != null) {
             content.setTransitionName(context.getString(R.string.transition_post_content));
-        } else {
-            Log.d(TAG, "generatePostContent: bruh");
         }
         return content;
     }
@@ -336,15 +327,16 @@ public class Post extends Content {
             intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(redditPost));
 
             Bundle extras = getExtras();
-            intent.putExtra("extras", extras);
+            intent.putExtra(Content.EXTRAS, extras);
             intent.putExtra(PostActivity.HIDE_SCORE_KEY, binding.postFullBar.getHideScore());
 
+            // Only really applicable for videos, as they should be paused
             this.viewUnselected();
 
             Activity activity = (Activity)getContext();
 
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, getTransitionViews());
-            activity.startActivity(intent, options.toBundle());
+            activity.startActivityForResult(intent,2, options.toBundle());
 
             // Set it back to un-opened after a short amount of time so the user can open the post again after exiting
             // The sleep time just has to be long enough to avoid double clicks, the sleep time is fairly arbitrary
@@ -358,20 +350,6 @@ public class Post extends Content {
                 postOpened = false;
             }).start();
         }
-    }
-
-    /**
-     * Copies the link to {@link Post#redditPost} to the clipboard and shows a toast that it has been copied
-     */
-    private void copyLinkToClipBoard() {
-        ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("reddit post", redditPost.getUrl());
-        clipboard.setPrimaryClip(clip);
-
-        Toast.makeText(getContext(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
-
-        // DEBUG
-        Log.d(TAG, "copyLinkToClipboard: " + new GsonBuilder().setPrettyPrinting().create().toJson(redditPost));
     }
 
     /**

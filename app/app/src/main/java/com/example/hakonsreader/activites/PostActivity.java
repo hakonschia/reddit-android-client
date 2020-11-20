@@ -162,6 +162,15 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
     }
 
     @Override
+    public void finish() {
+        // Send back the current extras so that the post can be updated again
+        Intent intent = new Intent();
+        intent.putExtra(Content.EXTRAS, binding.post.getExtras());
+        setResult(RESULT_OK, intent);
+        super.finish();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -320,7 +329,10 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         binding.setPost(post);
         binding.post.setRedditPost(post);
         this.setupCommentsList();
-        binding.post.setExtras(extras);
+
+        if (extras != null) {
+            binding.post.setExtras(extras);
+        }
     }
 
     /**
@@ -330,7 +342,6 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         binding.setPost(post);
         binding.post.updatePostInfo(post);
     }
-
 
     /**
      * Sets up {@link ActivityPostBinding#comments}
