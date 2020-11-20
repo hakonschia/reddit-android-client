@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -25,6 +26,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditVideo;
 import com.example.hakonsreader.api.utils.LinkUtils;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.databinding.ContentVideoBinding;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.util.VideoCache;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -53,7 +55,7 @@ import java.util.List;
  * The view for video posts. This can only be used to display videos from certain domains. The list of known
  * domains is found with {@link ContentVideo#KNOWN_VIDEO_DOMAINS}
  */
-public class ContentVideo extends PlayerView {
+public class ContentVideo extends Content {
     private static final String TAG = "PostContentVideo";
 
     /**
@@ -115,12 +117,13 @@ public class ContentVideo extends PlayerView {
     private static final int CONTROLLER_ANIMATION_DURATION = 200;
 
 
-    private RedditPost post;
     private RedditVideo redditVideo;
 
     private ImageView thumbnail;
     private ExoPlayer exoPlayer;
     private MediaSource mediaSource;
+    private final ContentVideoBinding binding;
+    private final PlayerView player;
     
     /**
      * True if {@link ContentVideo#exoPlayer} has been prepared
@@ -136,24 +139,15 @@ public class ContentVideo extends PlayerView {
     }
     public ContentVideo(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-    }
-
-    /**
-     * Sets the post and updates the view
-     *
-     * <p>If the post is NSFW no thumbnail is shown</p>
-     *
-     * @param post The post to set
-     */
-    public void setPost(RedditPost post) {
-        this.post = post;
-        this.updateView();
+        binding = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true);
+        player = binding.getRoot();
     }
 
     /**
      * Creates the exo player and updates the view
      */
-    private void updateView() {
+    @Override
+    protected void updateView() {
         this.setVideo();
         this.setSize();
 
@@ -162,10 +156,10 @@ public class ContentVideo extends PlayerView {
         //LayoutTransition transition = new LayoutTransition();
         //transition.setDuration(CONTROLLER_ANIMATION_DURATION);
         //setLayoutTransition(transition);
-        setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
+        player.setControllerShowTimeoutMs(CONTROLLER_TIMEOUT);
 
         this.setupExoPlayer();
-        setPlayer(exoPlayer);
+        player.setPlayer(exoPlayer);
 
         this.loadThumbnail();
         this.setFullscreenListener();
@@ -190,9 +184,9 @@ public class ContentVideo extends PlayerView {
     private void setVideo() {
         TextView duration = findViewById(R.id.duration);
 
-        redditVideo = post.getVideo();
+        redditVideo = redditPost.getVideo();
         if (redditVideo == null) {
-            redditVideo = post.getVideoGif();
+            redditVideo = redditPost.getVideoGif();
         }
         // Not all GIFs are returned as a RedditVideo, but if it is we can set the duration now
         if (redditVideo != null) {
@@ -207,7 +201,7 @@ public class ContentVideo extends PlayerView {
 
     /**
      * Sets up {@link ContentVideo#exoPlayer} and {@link ContentVideo#mediaSource}.
-     * Use this before calling {@link ContentVideo#setPlayer(Player)}
+     * Use this before calling {@link PlayerView#setPlayer(Player)} on {@link ContentVideo#player}
      */
     private void setupExoPlayer() {
         Context context = getContext();
@@ -241,7 +235,7 @@ public class ContentVideo extends PlayerView {
                     thumbnail.setVisibility(GONE);
 
                     // Hide the controller instantly when the state changes
-                    hideController();
+                    player.hideController();
                 }
             }
 
@@ -258,6 +252,7 @@ public class ContentVideo extends PlayerView {
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                 // If the player is trying to play and hasn't yet prepared the video, prepare it
+                Log.d(TAG, "onPlayerStateChanged: " + playWhenReady);
                 if (playWhenReady && !isPrepared) {
                     prepare();
                 }
@@ -278,7 +273,7 @@ public class ContentVideo extends PlayerView {
         // Data source is constant for all media sources
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
         // Convert the data source into a cache source if the user has selected to cache NSFW videos
-        if (!(post.isNsfw() && App.get().dontCacheNSFW())) {
+        if (!(redditPost.isNsfw() && App.get().dontCacheNSFW())) {
             dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
         }
 
@@ -289,16 +284,15 @@ public class ContentVideo extends PlayerView {
             media = new DashMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(redditVideo.getDashUrl()));
         } else {
-            String url = post.getUrl();
+            String url = redditPost.getUrl();
 
             // Gif uploaded to reddit directly
             if (url.matches("^https://i.redd.it/.*")) {
-                url = post.getMp4Source().getUrl();
+                url = redditPost.getMp4Source().getUrl();
             } else {
                 url = LinkUtils.convertToDirectUrl(url);
             }
 
-            Log.d(TAG, "createMediaSource: " + url);
             media = new ProgressiveMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(url));
 
@@ -321,12 +315,12 @@ public class ContentVideo extends PlayerView {
         // Don't show thumbnail for NSFW posts
         // TODO maybe show thumbnail is autoplayed is enabled? It will load anyways so
         //  maybe setting to autoload NSFW
-        if (post.isNsfw()) {
+        if (redditPost.isNsfw()) {
             thumbnail.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_200));
         } else {
             // post.getThumbnail() returns an image which is very low quality, the source preview
             // has the same dimensions as the video itself
-            Image image = post.getSourcePreview();
+            Image image = redditPost.getSourcePreview();
 
             // Set the background color for the controls as a filter here since the thumbnail is shown
             // over the controls
@@ -363,8 +357,8 @@ public class ContentVideo extends PlayerView {
                 // TODO resume at the same point where we ended (for fullscreen and in posts)
 
                 Intent intent = new Intent(context, VideoActivity.class);
-                intent.putExtra(VideoActivity.POST, new Gson().toJson(post));
-                intent.putExtra("extras", getExtras());
+                intent.putExtra(VideoActivity.POST, new Gson().toJson(redditPost));
+                intent.putExtra(Content.EXTRAS, getExtras());
 
                 // Pause the video here so it doesn't play both places
                 setPlayback(false);
@@ -454,7 +448,7 @@ public class ContentVideo extends PlayerView {
      * @return True if the controller is visible
      */
     public boolean isControllerShown() {
-        return isControllerVisible();
+        return player.isControllerVisible();
     }
 
     /**
@@ -500,9 +494,9 @@ public class ContentVideo extends PlayerView {
      */
     public void setControllerVisible(boolean visible) {
         if (visible) {
-            showController();
+            player.showController();
         } else {
-            hideController();
+            player.hideController();
         }
     }
 
@@ -524,8 +518,8 @@ public class ContentVideo extends PlayerView {
             // Get width and height from the preview thing
 
             // If the gif is uploaded to reddit directly the width/height is found in the source preview image
-            videoWidth = post.getSourcePreview().getWidth();
-            videoHeight = post.getSourcePreview().getHeight();
+            videoWidth = redditPost.getSourcePreview().getWidth();
+            videoHeight = redditPost.getSourcePreview().getHeight();
         }
 
         // Ensure the video size to screen ratio isn't too large or too small
@@ -566,12 +560,29 @@ public class ContentVideo extends PlayerView {
         setLayoutParams(params);
     }
 
+    /**
+     * Called when the video has been selected. If the user has enabled autoplay the video will start playing
+     */
+    @Override
+    public void viewSelected() {
+        // Not sure if this should be used directly here, creates high coupling between ContentVideo and App
+        if (App.get().autoPlayVideos()) {
+            setPlayback(true);
+        }
+    }
+
+    @Override
+    public void viewUnselected() {
+        Log.d(TAG, "viewSelected: Video unselected, pausing video");
+        setPlayback(false);
+    }
 
     /**
      * Retrieve a bundle of information that can be useful for saving the state of the post
      *
      * @return A bundle that might include state variables
      */
+    @Override
     public Bundle getExtras() {
         Bundle extras = new Bundle();
 
@@ -595,6 +606,7 @@ public class ContentVideo extends PlayerView {
      * @param extras The bundle of data to use. This should be the same bundle as retrieved with
      *               {@link ContentVideo#getExtras()}
      */
+    @Override
     public void setExtras(Bundle extras) {
         long timestamp = extras.getLong(EXTRA_TIMESTAMP);
         boolean isPlaying = extras.getBoolean(EXTRA_IS_PLAYING);

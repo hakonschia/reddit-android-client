@@ -104,7 +104,6 @@ public class ViewUtil {
     public static Tag createFlair(List<RichtextFlair> flairs, String flairText, String flairColor, String backgroundColor, Context context) {
         // No richtext flair items, or a standard flair text, return as there won't be anything to add
         if (!((flairs != null && !flairs.isEmpty()) && (flairText != null && !flairText.isEmpty()))) {
-            Log.d(TAG, "createFlair: no tag found");
             return null;
         }
 

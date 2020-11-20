@@ -52,7 +52,7 @@ public class PostScrollListener implements View.OnScrollChangeListener {
      *     </li>
      *     <li>
      *         Automatically calls {@link PostsAdapter.ViewHolder#onSelected()} and
-     *         {@link PostsAdapter.ViewHolder#onUnSelected()} based on if a post has been "selected" (ie. is the main
+     *         {@link PostsAdapter.ViewHolder#onUnselected()} based on if a post has been "selected" (ie. is the main
      *         item on the screen) or "unselected" (ie. no longer the main item)
      *     </li>
      *</ol>
@@ -111,7 +111,7 @@ public class PostScrollListener implements View.OnScrollChangeListener {
 
     /**
      * Goes through the selected range of posts and calls {@link PostsAdapter.ViewHolder#onSelected()}
-     * and {@link PostsAdapter.ViewHolder#onUnSelected()} based on if a post has been "selected" (ie. is the main
+     * and {@link PostsAdapter.ViewHolder#onUnselected()} based on if a post has been "selected" (ie. is the main
      * item on the screen) or "unselected" (ie. no longer the main item)
      *
      * @param startPost The index of the post to start at (from {@link PostsAdapter#getPosts()} or {@link PostScrollListener#layoutManager}
@@ -144,13 +144,13 @@ public class PostScrollListener implements View.OnScrollChangeListener {
             if (scrollingUp) {
                 // TODO this might be a bit weird as scrolling up on the first item wont autplay
                 if (viewBottom > SCREEN_HEIGHT) {
-                    viewHolder.onUnSelected();
+                    viewHolder.onUnselected();
                 }
             } else {
                 // If the view is above the screen (< 0) it is "unselected"
                 // If the view is below 35% of the screen height it is "selected" (kind of backwards since 0 is at the top)
                 if (y < 0) {
-                    viewHolder.onUnSelected();
+                    viewHolder.onUnselected();
                 } else if (y < SCREEN_HEIGHT * 0.35f) {
                     viewHolder.onSelected();
                 }

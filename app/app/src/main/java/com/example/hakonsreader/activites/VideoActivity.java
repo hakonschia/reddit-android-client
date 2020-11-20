@@ -61,7 +61,7 @@ public class VideoActivity extends AppCompatActivity {
             }
 
             content = new ContentVideo(this);
-            content.setPost(redditPost);
+            content.setRedditPost(redditPost);
             content.setExtras(extras);
             content.fitScreen();
 

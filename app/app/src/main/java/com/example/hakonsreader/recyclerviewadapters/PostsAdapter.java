@@ -2,7 +2,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -147,7 +146,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         Duration between = Duration.between(created, now);
         holder.post.setHideScore(hideScoreTime > between.toMinutes());
 
-        holder.post.setPostData(post);
+        holder.post.setRedditPost(post);
         holder.post.enableTickerAnimation(true);
     }
 
@@ -173,22 +172,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         /**
          * Call when the view holder has been selected (ie. it is now the main visible view holder)
-         *
-         * <p>Plays a video if auto play is selected</p>
          */
         public void onSelected() {
-            if (App.get().autoPlayVideos()) {
-                post.playVideo();
-            }
+            post.viewSelected();
         }
 
         /**
          * Call when the view holder has been unselected (ie. not the main visible view holder anymore)
-         *
-         * <p>If the view holder holds video content it is paused</p>
          */
-        public void onUnSelected() {
-            post.pauseVideo();
+        public void onUnselected() {
+            post.viewUnselected();
         }
 
         /**
@@ -244,7 +237,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          * Call when the view holding the ViewHolder has been paused. Any videos will be paused
          */
         public void pause() {
-            post.pauseVideo();
+            post.viewUnselected();
         }
     }
 }

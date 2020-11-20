@@ -1,6 +1,7 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,14 +28,19 @@ import java.util.Locale;
 /**
  * Class for gallery posts. A gallery post is simply a collection of multiple images
  */
-public class ContentGallery extends LinearLayout {
+public class ContentGallery extends Content {
     private static final String TAG = "ContentGallery";
+
+
+    /**
+     * The key for extras in {@link ContentGallery#getExtras()} that tells which image is currently active.
+     */
+    public static final String EXTRAS_ACTIVE_IMAGE = "activeImage";
 
     // This file and ContentImage is really coupled together, should be fixed to not be so terrible
 
 
     private final ContentGalleryBinding binding;
-    private RedditPost post;
     private List<Image> images;
 
     public ContentGallery(Context context) {
@@ -51,13 +57,10 @@ public class ContentGallery extends LinearLayout {
         binding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
-    public void setPost(RedditPost post) {
-        this.post = post;
-        this.updateView();
-    }
 
-    private void updateView() {
-        images = post.getGalleryImages();
+    @Override
+    protected void updateView() {
+        images = redditPost.getGalleryImages();
 
         // Find the largest height and width and set the layout to that
         int maxHeight = 0;
@@ -171,6 +174,21 @@ public class ContentGallery extends LinearLayout {
         }
     }
 
+    @Override
+    public Bundle getExtras() {
+        Bundle extras = super.getExtras();
+        extras.putInt(EXTRAS_ACTIVE_IMAGE, binding.galleryImages.getCurrentItem());
+        return extras;
+    }
+
+    @Override
+    public void setExtras(Bundle extras) {
+        super.setExtras(extras);
+
+        int activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, images.size());
+        Log.d(TAG, "setExtras: activeImage="+activeImage);
+        binding.galleryImages.setCurrentItem(activeImage, false);
+    }
 
     /**
      * The pager adapter responsible for handling the images in the post
@@ -195,7 +213,7 @@ public class ContentGallery extends LinearLayout {
 
             // Use ContentImage as that already has listeners, NSFW caching etc already
             ContentImage contentImage = new ContentImage(context);
-            contentImage.setWithImageUrl(post, image.getUrl());
+            contentImage.setWithImageUrl(redditPost, image.getUrl());
 
             // TODO imgur albums might be gifs
 
@@ -211,7 +229,7 @@ public class ContentGallery extends LinearLayout {
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((ImageView) object);
+            container.removeView((ContentImage) object);
         }
     }
 }

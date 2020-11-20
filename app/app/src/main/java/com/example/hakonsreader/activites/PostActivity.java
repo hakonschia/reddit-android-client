@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,9 @@ import com.example.hakonsreader.interfaces.LockableSlidr;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.viewmodels.CommentsViewModel;
+import com.example.hakonsreader.views.Content;
+import com.example.hakonsreader.views.ContentGallery;
+import com.example.hakonsreader.views.ContentVideo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrInterface;
@@ -139,8 +143,10 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
     protected void onPause() {
         super.onPause();
 
-        videoPlayingWhenPaused = binding.post.isVideoPlaying();
-        binding.post.pauseVideo();
+        Bundle data = binding.post.getExtras();
+
+        videoPlayingWhenPaused = data.getBoolean(ContentVideo.EXTRA_IS_PLAYING);
+        binding.post.viewUnselected();
     }
 
     @Override
@@ -151,7 +157,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
 
         // Only resume if the video was actually playing when pausing
         if (videoPlayingWhenPaused) {
-            binding.post.playVideo();
+            binding.post.viewSelected();
         }
     }
 
@@ -208,7 +214,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
             if (postPreviouslySet) {
                 this.updatePostInfo();
             } else {
-                this.onPostLoaded();
+                this.onPostLoaded(null);
             }
         });
         commentsViewModel.getComments().observe(this, comments -> {
@@ -272,24 +278,28 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
                 });
             }
 
-            // Since we have the post loaded already we have a transition as well (the activity is started
-            // from clicking on a list)
-            getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
-                @Override
-                public void onTransitionEnd(Transition transition) {
-                    super.onTransitionEnd(transition);
+            Bundle postExtras = null;
 
-                    // Start videos again when the transition is finished, as playing videos during the transition
-                    // can make the view weird.
-                    // TODO the thumbnail is shown the entire time, make it so the frame the video
-                    //  ended at is shown instead
-                    if (post.getPostType() == PostType.VIDEO) {
-                        binding.post.setExtras(getIntent().getExtras().getBundle("extras"));
+            // For videos we don't want to set the extras right away. If a video is playing during the
+            // animation the animation looks very choppy, so it should only be played at the end
+            if (post.getPostType() == PostType.VIDEO) {
+                // Since we have the post loaded already we have a transition as well (the activity is started
+                // from clicking on a list)
+                getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
+                    @Override
+                    public void onTransitionEnd(Transition transition) {
+                        super.onTransitionEnd(transition);
+
+                        // TODO the thumbnail is shown the entire time, make it so the frame the video
+                        //  ended at is shown instead
+                        binding.post.setExtras(getIntent().getExtras().getBundle(Content.EXTRAS));
                     }
-                }
-            });
+                });
+            } else {
+                postExtras = getIntent().getExtras().getBundle(Content.EXTRAS);
+            }
 
-            this.onPostLoaded();
+            this.onPostLoaded(postExtras);
         } else {
             // If post is started with only the ID of the post
             postId = extras.getString(POST_ID_KEY);
@@ -301,12 +311,16 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
 
     /**
      * Called when {@link PostActivity#post} has been set.
+     *
      * <p>Notifies the view about the new post data and calls {@link PostActivity#setupCommentsList()}</p>
+     *
+     * @param extras The extras to set after the post has been created. This can be {@code null}
      */
-    private void onPostLoaded() {
+    private void onPostLoaded(@Nullable Bundle extras) {
         binding.setPost(post);
-        binding.post.setPostData(post);
+        binding.post.setRedditPost(post);
         this.setupCommentsList();
+        binding.post.setExtras(extras);
     }
 
     /**
@@ -438,7 +452,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
             // We could potentially pause it earlier, like when the transition is halfway done?
             // We also can start it when we reach the start, not sure if that is good or bad
             if (currentId == R.id.end) {
-                binding.post.pauseVideo();
+                binding.post.viewUnselected();
             }
         }
 

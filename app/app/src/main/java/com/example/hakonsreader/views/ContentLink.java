@@ -26,11 +26,10 @@ import java.util.List;
  * Class for post contents that are a link. This extends ScrollView so that if the user
  * selects a max size for posts that is very low this view can be scrolled to view it in its entirety
  */
-public class ContentLink extends ScrollView {
+public class ContentLink extends Content {
     private static final String TAG = "ContentLink";
 
     private final ContentLinkBinding binding;
-    private RedditPost post;
 
     public ContentLink(@NonNull Context context) {
         this(context, null, 0, 0);
@@ -49,24 +48,15 @@ public class ContentLink extends ScrollView {
         binding.link.setOnClickListener(v -> this.openLink());
     }
 
-    /**
-     * Sets the post this content is for and updates the view
-     *
-     * @param post The post
-     */
-    public void setPost(RedditPost post) {
-        this.post = post;
-        this.updateView();
-    }
-
-    private void updateView() {
+    @Override
+    protected void updateView() {
         // The previews will (I believe) never be above 1080p, and that should be fine for most devices
         // TODO although this will use more data, so it might be reasonable to add a data saving setting where
         //  this image quality is reduced
 
-        List<Image> previews = post.getPreviewImages();
-        if (post.isNsfw()) {
-            List<Image> obfuscatedPreviews = post.getObfuscatedPreviewImages();
+        List<Image> previews = redditPost.getPreviewImages();
+        if (redditPost.isNsfw()) {
+            List<Image> obfuscatedPreviews = redditPost.getObfuscatedPreviewImages();
             if (obfuscatedPreviews != null && !obfuscatedPreviews.isEmpty()) {
                 previews = obfuscatedPreviews;
             }
@@ -91,7 +81,7 @@ public class ContentLink extends ScrollView {
             binding.thumbnail.setLayoutParams(params);
         }
 
-        binding.link.setText(post.getUrl());
+        binding.link.setText(redditPost.getUrl());
     }
 
     /**
@@ -99,7 +89,7 @@ public class ContentLink extends ScrollView {
      */
     private void openLink() {
         Intent intent = new Intent(getContext(), DispatcherActivity.class);
-        intent.putExtra(DispatcherActivity.URL_KEY, post.getUrl());
+        intent.putExtra(DispatcherActivity.URL_KEY, redditPost.getUrl());
         getContext().startActivity(intent);
     }
 }

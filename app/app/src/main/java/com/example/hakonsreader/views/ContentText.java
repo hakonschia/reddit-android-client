@@ -2,6 +2,7 @@ package com.example.hakonsreader.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -11,6 +12,7 @@ import androidx.core.content.ContextCompat;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.databinding.ContentTextBinding;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 
 
@@ -19,10 +21,9 @@ import com.example.hakonsreader.misc.InternalLinkMovementMethod;
  * instead of {@link TextView} so that the scrolling of the text has acceleration/drag that continues
  * scrolling after the user has stopped scrolling (as this is expected behaviour when scrolling)
  */
-public class ContentText extends ScrollView {
+public class ContentText extends Content {
 
-    private RedditPost post;
-    private final TextView textView;
+    private final ContentTextBinding binding;
 
     public ContentText(Context context) {
         this(context, null, 0);
@@ -33,42 +34,22 @@ public class ContentText extends ScrollView {
     public ContentText(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        textView = new TextView(context);
-        this.addView(textView);
-
-        MarginLayoutParams params = (MarginLayoutParams) textView.getLayoutParams();
-        int padding = (int) getResources().getDimension(R.dimen.postMargin);
-        params.setMarginStart(padding);
-        params.setMarginEnd(padding);
-        textView.setLayoutParams(params);
+        binding = ContentTextBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
-    /**
-     * Sets the post this content is for and updates the view
-     *
-     * @param post The post
-     */
-    public void setPost(RedditPost post) {
-        this.post = post;
-        this.updateView();
-    }
-
-    private void updateView() {
-        textView.setTextColor(getContext().getColor(R.color.textColorTextPosts));
-
-        String markdown = post.getSelftext();
+    @Override
+    protected void updateView() {
+        String markdown = redditPost.getSelftext();
 
         // Self text posts with only a title won't have a body
         if (markdown != null) {
             // Note the movement method must be set before applying the markdown
-            textView.setMovementMethod(InternalLinkMovementMethod.getInstance(getContext()));
-            textView.setLinkTextColor(ContextCompat.getColor(getContext(), R.color.link_color));
+            binding.content.setMovementMethod(InternalLinkMovementMethod.getInstance(getContext()));
 
             // TODO this crashes the app with some tables, such as https://www.reddit.com/r/test/comments/j7px9a/sadasd/
             //  not sure what happens here as the same text can be rendered fine in a stand-alone app
             markdown = App.get().getAdjuster().adjust(markdown);
-            App.get().getMark().setMarkdown(textView, markdown);
+            App.get().getMark().setMarkdown(binding.content, markdown);
         }
     }
-
 }

@@ -3,14 +3,15 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.databinding.ContentImageBinding;
 import com.example.hakonsreader.views.util.ClickHandler;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -19,12 +20,16 @@ import com.squareup.picasso.RequestCreator;
 
 import java.util.List;
 
-public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
+/**
+ * Content view for Reddit images posts
+ */
+public class ContentImage extends Content {
     private static final String TAG = "ContentImage";
 
-    private RedditPost post;
+    private final ContentImageBinding binding;
     private String imageUrl;
     private Callback imageLoadedCallback;
+
 
     public ContentImage(Context context) {
         this(context, null, 0);
@@ -34,20 +39,9 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
     }
     public ContentImage(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        binding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
-
-    /**
-     * Sets the post the content is for and updates the view
-     *
-     * <p>If the image is NSFW it is not shown (but a drawable to indicate the post is NSFW is)</p>
-     *
-     * @param post The post to set
-     */
-    public void setPost(RedditPost post) {
-        this.post = post;
-        this.updateView();
-    }
 
     /**
      * Sets the post with a different image URL than the one retrieved with {@link RedditPost#getUrl()}.
@@ -57,15 +51,14 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
      * @param imageUrl The image URL to set
      */
     public void setWithImageUrl(RedditPost post, String imageUrl) {
-        this.post = post;
         this.imageUrl = imageUrl;
-        this.updateView();
+        super.setRedditPost(post);
     }
 
     /**
      * Sets the {@link Callback} to use for when the post is an image and the image has finished loading
      *
-     * <p>This must be set before {@link Post#setPostData(RedditPost)}</p>
+     * <p>This must be set before {@link Post#setRedditPost(RedditPost)}</p>
      *
      * @param imageLoadedCallback The callback for when images are finished loading
      */
@@ -76,16 +69,15 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
     /**
      * Updates the view with the url from {@link ContentImage#post}
      */
-    private void updateView() {
+    @Override
+    protected void updateView() {
         int screenWidth = App.get().getScreenWidth();
 
         // Set with setPost() not setWithImageUrl()
         if (imageUrl == null) {
-            imageUrl = post.getUrl();
+            imageUrl = redditPost.getUrl();
 
-            List<Image> images = post.getPreviewImages();
-
-
+            List<Image> images = redditPost.getPreviewImages();
 
             // This should be improved and is a pretty poor way of doing it, but this will reduce some
             // unnecessary loading as it will get some lower resolution images (it will be scaled down to
@@ -99,7 +91,7 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
             }
         }
 
-        setOnClickListener(v -> ClickHandler.openImageInFullscreen(this, imageUrl));
+        setOnClickListener(v -> ClickHandler.openImageInFullscreen(binding.image, imageUrl));
 
         // TODO this should probably be a setting:
         //  NSFW images while scrolling:
@@ -108,8 +100,8 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
         //  load image
 
         String obfuscatedUrl = null;
-        if (post.isNsfw()) {
-            List<Image> obfuscatedPreviews = post.getObfuscatedPreviewImages();
+        if (redditPost.isNsfw()) {
+            List<Image> obfuscatedPreviews = redditPost.getObfuscatedPreviewImages();
 
             if (obfuscatedPreviews != null && !obfuscatedPreviews.isEmpty()) {
                 // Obfuscated previews that are high res are still fairly showing sometimes, so
@@ -138,16 +130,16 @@ public class ContentImage extends androidx.appcompat.widget.AppCompatImageView {
             // Post is NSFW and user has chosen not to cache NSFW
             // TODO this won't work as the actual image is only loaded in fullscreen, what is not cached here
             //  is the obfuscated image, need to pass "dontCache" to ImageActivity
-            if (post.isNsfw() && App.get().dontCacheNSFW()) {
+            if (redditPost.isNsfw() && App.get().dontCacheNSFW()) {
                 // Don't store in cache and don't look in cache as this image will never be there
                 c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
             }
 
-            c.into(this, imageLoadedCallback);
+            c.into(binding.image, imageLoadedCallback);
         } catch (RuntimeException e) {
             e.printStackTrace();
             Log.d(TAG, "updateView:\n\n\n\n--------------------------- ERROR LOADING IMAGE" +
-                    "\n\n " + post.getSubreddit() + ", " + post.getTitle() + " ---------------------------\n\n\n\n");
+                    "\n\n " + redditPost.getSubreddit() + ", " + redditPost.getTitle() + " ---------------------------\n\n\n\n");
         }
 
     }

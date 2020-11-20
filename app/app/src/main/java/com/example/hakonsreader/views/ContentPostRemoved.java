@@ -19,10 +19,9 @@ import com.example.hakonsreader.databinding.ContentPostRemovedBinding;
 /**
  * View for posts that have been removed
  */
-public class ContentPostRemoved extends ConstraintLayout {
+public class ContentPostRemoved extends Content {
     private static final String TAG = "ContentPostRemoved";
     private final ContentPostRemovedBinding binding;
-    private RedditPost post;
 
 
     public ContentPostRemoved(Context context) {
@@ -39,17 +38,10 @@ public class ContentPostRemoved extends ConstraintLayout {
         binding = ContentPostRemovedBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
-
-    /**
-     * Sets the post to use for this view
-     *
-     * @param post The post to set
-     */
-    public void setPost(RedditPost post) {
-        this.post = post;
-        binding.setPost(post);
+    @Override
+    protected void updateView() {
+        binding.setPost(redditPost);
     }
-
 
     /**
      * Sets the text saying which category (ie. moderator, admin etc.) removed the post

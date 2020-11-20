@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -33,7 +32,7 @@ import com.squareup.picasso.Callback;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Post extends RelativeLayout {
+public class Post extends Content {
     private static final String TAG = "Post";
 
     /**
@@ -42,7 +41,6 @@ public class Post extends RelativeLayout {
     private static final int NO_MAX_HEIGHT = -1;
 
     private final PostBinding binding;
-    private RedditPost postData;
     private boolean showTextContent = true;
     /**
      * If set to true the post can be opened in a new activity
@@ -71,26 +69,6 @@ public class Post extends RelativeLayout {
         binding = PostBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
-    /**
-     * Sets the post data to use for this view
-     *
-     * <p>The view is updated automatically. If this is used in a RecyclerView the view is also
-     * recycled</p>
-     *
-     * @param post The post to use
-     */
-    public void setPostData(RedditPost post) {
-        postData = post;
-
-        super.setOnClickListener(v -> this.openPost());
-        super.setOnLongClickListener(v -> {
-            this.copyLinkToClipBoard();
-            return true;
-        });
-
-        this.updateView();
-    }
-
     public void setHideScore(boolean hideScore) {
         binding.postFullBar.setHideScore(hideScore);
     }
@@ -98,7 +76,7 @@ public class Post extends RelativeLayout {
     /**
      * Sets the {@link Callback} to use for when the post is an image and the image has finished loading.
      * 
-     * <p>This must be set before {@link Post#setPostData(RedditPost)}</p>
+     * <p>This must be set before {@link Post#setRedditPost(RedditPost)}</p>
      *
      * @param imageLoadedCallback The callback for when images are finished loading
      */
@@ -110,7 +88,7 @@ public class Post extends RelativeLayout {
      * Sets if the content should be shown or not. Default to true
      *
      * <p>This only sets the flag to show the content or not. If content shouldn't be shown this must be set
-     * before {@link Post#setPostData(RedditPost)} as the content is generated in that call</p>
+     * before {@link Post#setRedditPost(RedditPost)} as the content is generated in that call</p>
      *
      * @param showTextContent True if content should be set or not
      */
@@ -149,16 +127,30 @@ public class Post extends RelativeLayout {
     /**
      * Updates the view
      */
-    private void updateView() {
+    @Override
+    protected void updateView() {
+        // Open post when clicked, copy link to clipboard on long clicks
+        super.setOnClickListener(v -> this.openPost());
+        super.setOnLongClickListener(v -> {
+            this.copyLinkToClipBoard();
+            return true;
+        });
+
         // Ensure view is fresh if used in a RecyclerView
         this.cleanUpContent();
 
-        binding.postInfo.setPost(postData);
+        binding.postInfo.setPost(redditPost);
         this.addContent();
-        binding.postFullBar.setPost(postData);
+        binding.postFullBar.setPost(redditPost);
     }
 
+    /**
+     * Updates the information in the post without re-creating the content
+     *
+     * @param post The post with updated information
+     */
     public void updatePostInfo(RedditPost post) {
+        redditPost = post;
         binding.postInfo.setPost(post);
         binding.postFullBar.setPost(post);
     }
@@ -181,11 +173,11 @@ public class Post extends RelativeLayout {
      * <p>If {@link Post#showTextContent} is {@code false} and the post type is {@link PostType#TEXT} nothing happens</p>
      */
     private void addContent() {
-        if (!showTextContent && postData.getPostType() == PostType.TEXT) {
+        if (!showTextContent && redditPost.getPostType() == PostType.TEXT) {
             return;
         }
 
-        View content = generatePostContent(postData, getContext());
+        View content = generatePostContent(redditPost, getContext());
         if (content != null) {
             binding.content.addView(content);
 
@@ -232,7 +224,7 @@ public class Post extends RelativeLayout {
      * @param post The post to generate for
      * @return A view with the content of the post
      */
-    private View generatePostContent(RedditPost post, Context context) {
+    private Content generatePostContent(RedditPost post, Context context) {
         // If the post has been removed don't try to render the content as it can cause a crash later
         // Just show that the post has been removed
         // For instance, if the post is not uploaded to reddit the URL will still link to something (like an imgur gif)
@@ -240,41 +232,39 @@ public class Post extends RelativeLayout {
         //  to reddit directly are still there
         if (post.getRemovedByCategory() != null) {
             ContentPostRemoved c = new ContentPostRemoved(context);
-            c.setPost(post);
+            c.setRedditPost(post);
             return c;
         }
 
-        View content = null;
+        Content content = null;
 
         switch (post.getPostType()) {
             case IMAGE:
                 ContentImage image = new ContentImage(context);
                 image.setImageLoadedCallback(imageLoadedCallback);
-                image.setPost(postData);
+                image.setRedditPost(redditPost);
                 content = image;
                 break;
 
             case VIDEO:
             case GIF:
             // Links such as youtube, gfycat etc are rich video posts
-            // TODO For rich video, create a function to check if it's on a domain that allows for direct videos
-            //  otherwise just provide it as link content
             case RICH_VIDEO:
                 // Ensure we know how to handle a video, otherwise it might not load
                 if (ContentVideo.KNOWN_VIDEO_DOMAINS.contains(post.getDomain().toLowerCase())) {
                     ContentVideo video = new ContentVideo(context);
-                    video.setPost(post);
+                    video.setRedditPost(post);
                     content = video;
                 } else {
                     ContentLink link = new ContentLink(context);
-                    link.setPost(post);
+                    link.setRedditPost(post);
                     content = link;
                 }
 
                 break;
 
             case CROSSPOST:
-                RedditPost parent = postData.getCrossposts().get(0);
+                RedditPost parent = post.getCrossposts().get(0);
 
                 // If we are in a post only care about the actual post content, as it's not enough space
                 // to show the entire parent post info
@@ -291,7 +281,7 @@ public class Post extends RelativeLayout {
                     c.setImageLoadedCallback(imageLoadedCallback);
                     c.setShowTextContent(showTextContent);
                     c.setHideScore(binding.postFullBar.getHideScore());
-                    c.setPostData(parent);
+                    c.setRedditPost(parent);
 
                     // Add a border around to show where the crosspost post is and where the actual post it
                     c.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border_crosspost));
@@ -301,7 +291,7 @@ public class Post extends RelativeLayout {
 
             case LINK:
                 ContentLink contentLink = new ContentLink(context);
-                contentLink.setPost(post);
+                contentLink.setRedditPost(post);
                 content = contentLink;
                 break;
 
@@ -310,14 +300,14 @@ public class Post extends RelativeLayout {
                 String selfText = post.getSelftext();
                 if (selfText != null && !selfText.isEmpty()) {
                     ContentText contentText = new ContentText(context);
-                    contentText.setPost(post);
+                    contentText.setRedditPost(post);
                     content = contentText;
                 }
                 break;
 
             case GALLERY:
                 ContentGallery contentGallery = new ContentGallery(context);
-                contentGallery.setPost(postData);
+                contentGallery.setRedditPost(post);
                 content = contentGallery;
                 break;
 
@@ -327,12 +317,14 @@ public class Post extends RelativeLayout {
 
         if (content != null) {
             content.setTransitionName(context.getString(R.string.transition_post_content));
+        } else {
+            Log.d(TAG, "generatePostContent: bruh");
         }
         return content;
     }
 
     /**
-     * Opens {@link Post#postData} in a new activity
+     * Opens {@link Post#redditPost} in a new activity
      */
     private void openPost() {
         // If the post has already been opened don't open it again
@@ -341,13 +333,13 @@ public class Post extends RelativeLayout {
         // view will be missing
         if (allowPostOpen && !postOpened) {
             Intent intent = new Intent(getContext(), PostActivity.class);
-            intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(postData));
+            intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(redditPost));
 
             Bundle extras = getExtras();
             intent.putExtra("extras", extras);
             intent.putExtra(PostActivity.HIDE_SCORE_KEY, binding.postFullBar.getHideScore());
 
-            this.pauseVideo();
+            this.viewUnselected();
 
             Activity activity = (Activity)getContext();
 
@@ -369,17 +361,17 @@ public class Post extends RelativeLayout {
     }
 
     /**
-     * Copies the link to {@link Post#postData} to the clipboard and shows a toast that it has been copied
+     * Copies the link to {@link Post#redditPost} to the clipboard and shows a toast that it has been copied
      */
     private void copyLinkToClipBoard() {
         ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("reddit post", postData.getUrl());
+        ClipData clip = ClipData.newPlainText("reddit post", redditPost.getUrl());
         clipboard.setPrimaryClip(clip);
 
         Toast.makeText(getContext(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
 
         // DEBUG
-        Log.d(TAG, "copyLinkToClipboard: " + new GsonBuilder().setPrettyPrinting().create().toJson(postData));
+        Log.d(TAG, "copyLinkToClipboard: " + new GsonBuilder().setPrettyPrinting().create().toJson(redditPost));
     }
 
     /**
@@ -409,17 +401,10 @@ public class Post extends RelativeLayout {
      *
      * @return A bundle that might include state variables
      */
+    @Override
     public Bundle getExtras() {
-        Bundle extras = new Bundle();
-
-        View c = binding.content.getChildAt(0);
-
-        if (c instanceof ContentVideo) {
-            ContentVideo video = (ContentVideo)c;
-            extras = video.getExtras();
-        }
-
-        return extras;
+        Content c = (Content) binding.content.getChildAt(0);
+        return c != null ? c.getExtras() : new Bundle();
     }
 
     /**
@@ -429,14 +414,14 @@ public class Post extends RelativeLayout {
      *
      * @param data The data to use for restoring the state
      */
+    @Override
     public void setExtras(Bundle data) {
-        View c = binding.content.getChildAt(0);
+        Content c = (Content) binding.content.getChildAt(0);
 
-        if (c instanceof ContentVideo) {
-            ContentVideo video = (ContentVideo)c;
-            video.setExtras(data); }
+        if (c != null) {
+            c.setExtras(data);
+        }
     }
-
 
     /**
      * Retrieve the list of views mapped to the corresponding transition name
@@ -458,51 +443,19 @@ public class Post extends RelativeLayout {
         return pairs.toArray(new Pair[0]);
     }
 
-
-    /**
-     * @return Returns if the video content is currently playing. Always returns false if the content
-     * isn't video content
-     */
-    public boolean isVideoPlaying() {
-        View content = binding.content.getChildAt(0);
-        if (content instanceof ContentVideo) {
-            return ((ContentVideo)content).isPlaying();
-        } else if (content instanceof Post) {
-            // If the content is a crosspost pause the video in the crosspost post
-            return ((Post)content).isVideoPlaying();
-        }
-
-        // I suppose if the post isn't a video it's also not playing?
-        return false;
-    }
-
-    /**
-     * Pauses the video content
-     *
-     * <p>If the content isn't a video nothing is done</p>
-     */
-    public void pauseVideo() {
-        View content = binding.content.getChildAt(0);
-        if (content instanceof ContentVideo) {
-            ((ContentVideo)content).setPlayback(false);
-        } else if (content instanceof Post) {
-            // If the content is a crosspost pause the video in the crosspost post
-            ((Post)content).pauseVideo();
+    @Override
+    public void viewSelected() {
+        Content content = (Content) binding.content.getChildAt(0);
+        if (content != null) {
+            content.viewSelected();
         }
     }
 
-    /**
-     * Plays the video content
-     *
-     * <p>If the content isn't a video nothing is done</p>
-     */
-    public void playVideo() {
-        View content = binding.content.getChildAt(0);
-        if (content instanceof ContentVideo) {
-            ((ContentVideo)content).setPlayback(true);
-        } else if (content instanceof Post) {
-            // If the content is a crosspost play the video in the crosspost post
-            ((Post)content).playVideo();
+    @Override
+    public void viewUnselected() {
+        Content content = (Content) binding.content.getChildAt(0);
+        if (content != null) {
+            content.viewUnselected();
         }
     }
 
