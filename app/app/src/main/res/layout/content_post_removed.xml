@@ -10,31 +10,64 @@
             type="com.example.hakonsreader.api.model.RedditPost" />
     </data>
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/secondary_background"
+        app:cardCornerRadius="8dp"
 
-        <androidx.cardview.widget.CardView
+        android:layout_marginStart="@dimen/postMargin"
+        android:layout_marginEnd="@dimen/postMargin">
+
+        <!-- This layout is so copied from Reddit, but it looks good so :) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="wrap_content">
 
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            <View
+                android:id="@+id/view"
+                android:layout_width="5dp"
+                android:layout_height="0dp"
+                android:background="#FF3939"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            app:cardBackgroundColor="@color/secondary_background"
-            app:cardCornerRadius="8dp">
+            <TextView
+                android:id="@+id/postRemovedTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+
+                android:text="@string/postRemovedTitle"
+                android:textColor="@color/text_color"
+                android:textSize="15sp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/view"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/removeByReason"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:textColor="@color/text_color"
-                android:textSize="15sp"
-                app:removedBy="@{post}"
+                android:layout_marginBottom="4dp"
 
-                tools:text="@string/postRemovedGeneric" />
-        </androidx.cardview.widget.CardView>
-    </LinearLayout>
+                android:textColor="@color/secondary_text_color"
+                android:textSize="12sp"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/postRemovedTitle"
+                app:layout_constraintTop_toBottomOf="@id/postRemovedTitle"
+                app:removedBy="@{post}"
+                tools:text="@string/postRemovedByAuthor" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 </layout>

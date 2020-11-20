@@ -177,4 +177,5 @@
     <string name="subredditPrivateDescription">Du må bli invitert for å få tilgang til dette samfunnet</string>
     <string name="postRemovedByAutoMod">Posten har blitt midlertidig fjernet  mens den aventer moderator godkjenning</string>
     <string name="postRemovedByAuthor">Posten har blitt fjernet av posteren</string>
+    <string name="postRemovedTitle">Posten har blitt fjernet</string>
 </resources>
