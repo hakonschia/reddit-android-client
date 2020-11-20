@@ -4,7 +4,8 @@ package com.example.hakonsreader.api.model.flairs;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Class representing a richtext flair
+ * A richtext flair is a flair combined of multiple types of items, such as images and text.
+ * This class represents one of the items in a richtext flair
  */
 public class RichtextFlair {
     @SerializedName("e")
