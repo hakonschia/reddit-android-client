@@ -295,16 +295,12 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             if (throwable instanceof NoSubredditInfoException) {
                 return;
             } else if (throwable instanceof SubredditNotFoundException) {
-                // This seems to sometimes happen, so if it does don't show "r/ doesn't exist" (for frontpage)
-                // as that doesn't make any sense
-                if (!RedditApi.STANDARD_SUBS.contains(getSubredditName().toLowerCase())) {
-                    SubredditNotFoundBinding layout = SubredditNotFoundBinding.inflate(getLayoutInflater(), binding.parentLayout, true);
-                    layout.setSubreddit(getSubredditName());
+                SubredditNotFoundBinding layout = SubredditNotFoundBinding.inflate(getLayoutInflater(), binding.parentLayout, true);
+                layout.setSubreddit(getSubredditName());
 
-                    CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getRoot().getLayoutParams();
-                    params.gravity = Gravity.CENTER;
-                    layout.getRoot().requestLayout();
-                }
+                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getRoot().getLayoutParams();
+                params.gravity = Gravity.CENTER;
+                layout.getRoot().requestLayout();
                 return;
             }
 

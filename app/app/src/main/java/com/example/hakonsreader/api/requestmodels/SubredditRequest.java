@@ -244,15 +244,19 @@ public class SubredditRequest {
                 // the response to a search request instead. This causes issues as the response being sent back
                 // now holds subreddits instead of posts, so if we have a prior request (which is the actual original request)
                 // then call the failure handler as the user of the API might want to know that the sub doesn't exist
-                // Additionaly, if the search request returned subreddits, body.getListings() will hold a List<Subreddit> which will cause issues
+                // Additionally, if the search request returned subreddits, body.getListings() will hold a List<Subreddit> which will cause issues
                 // This is also an "issue" for SubredditRequest.info(), but it will manage to convert that to a RedditListing
                 // and the check for getId() will return null, so it doesn't have to be handled directly
                 // We could disable redirects, but I'm afraid of what issues that would cause later
                 if (prior != null) {
-                    // TODO when new access tokens are retrieved automatically, the prior response is also set which means
-                    //  the posts aren't returned
-                    onFailure.onFailure(new GenericError(response.code()), new SubredditNotFoundException("No subreddit found with name: " + subredditName));
-                    return;
+                    // If the prior response was a redirect then we exit. "prior" can be a 401 Unauthorized because the
+                    // access token was invalid and automatically refreshed, so if that happens we don't want to exit
+                    // as the new response will hold the posts and be correct
+                    int code = prior.code();
+                    if (code >= 300 && code < 400) {
+                        onFailure.onFailure(new GenericError(response.code()), new SubredditNotFoundException("No subreddit found with name: " + subredditName));
+                        return;
+                    }
                 }
 
                 ListingResponse body = null;
