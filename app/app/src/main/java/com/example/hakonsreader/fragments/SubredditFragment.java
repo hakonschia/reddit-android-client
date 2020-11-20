@@ -460,7 +460,6 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        Log.d(TAG, "onActivityResult: ");
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             // Resumed from PostActivity, get the bundle of post extras and send to the active fragment

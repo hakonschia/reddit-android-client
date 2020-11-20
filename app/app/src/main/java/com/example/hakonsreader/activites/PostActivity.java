@@ -118,9 +118,6 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
             binding.parentLayout.setProgress(savedInstanceState.getFloat(TRANSITION_STATE_KEY));
         }
 
-        // TODO when going into a post and going to landscape and then back the animation of going
-        //  back to the subreddit goes under the screen
-
         // Go to first/last comment on longclicks on navigation buttons
         binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment);
         binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment);

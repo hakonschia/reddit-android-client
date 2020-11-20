@@ -100,7 +100,7 @@ public class ContentImage extends Content {
         //  load image
 
         String obfuscatedUrl = null;
-        if (redditPost.isNsfw()) {
+        if (redditPost.isNsfw() || redditPost.isSpoiler()) {
             List<Image> obfuscatedPreviews = redditPost.getObfuscatedPreviewImages();
 
             if (obfuscatedPreviews != null && !obfuscatedPreviews.isEmpty()) {
