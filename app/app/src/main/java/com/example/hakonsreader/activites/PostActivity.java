@@ -442,6 +442,8 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      */
     @Override
     public void lock(boolean lock) {
+        // TODO since galleries are now infinite scrollable this will also be locked when a gallery is
+        //  present. Should probably override some onTouch or something and lock based on that
         if (lock) {
             slidrInterface.lock();
         } else {
