@@ -498,6 +498,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         // Top level comments don't have sidebars, remove all previous
         if (depth == 0) {
             previousSidebars.forEach(parent::removeView);
+            // If the barrier doesn't have any views referenced to it hidden comments will
+            // expand out from the right side, so ensure it has something referenced
+            barrier.setReferencedIds(new int[]{R.id.emptyView});
             return;
         } else if (previousSidebarsSize == depth) {
             // The depth is the same, we can keep the previous sidebars (do nothing)

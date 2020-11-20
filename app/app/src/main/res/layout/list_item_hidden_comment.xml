@@ -28,14 +28,23 @@
         <!-- So if the barrier has no views referenced, it jumps to the middle
          if commentScore is constrained to hiddenCommentNumChildren, which it has to be
           to be able to get an ellipsize on it. We therefore need to have an empty view
-          so the barrier has something to barrier against (this is only an issue for
-          top level comments where there are no views added to the barrier) -->
+          so the barrier has something to barrier against, the barrier is added in
+          the binding adapter (this is only an issue for top level comments where there
+          are no views added to the barrier) -->
+        <View
+            android:id="@+id/emptyView"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/sideBarsBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
+            app:constraint_referenced_ids="emptyView"
             app:barrierDirection="end"
             app:sidebars="@{comment.depth - adapter.baseDepth}" />
 
