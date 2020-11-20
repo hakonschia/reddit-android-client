@@ -1,19 +1,15 @@
 package com.example.hakonsreader.views;
 
 import android.app.Activity;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
@@ -26,7 +22,6 @@ import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Callback;
 
 import java.util.ArrayList;
@@ -245,13 +240,11 @@ public class Post extends Content {
             case RICH_VIDEO:
                 // Ensure we know how to handle a video, otherwise it might not load
                 if (ContentVideo.KNOWN_VIDEO_DOMAINS.contains(post.getDomain().toLowerCase())) {
-                    ContentVideo video = new ContentVideo(context);
-                    video.setRedditPost(post);
-                    content = video;
+                    content = new ContentVideo(context);
+                    content.setRedditPost(post);
                 } else {
-                    ContentLink link = new ContentLink(context);
-                    link.setRedditPost(post);
-                    content = link;
+                    content = new ContentLink(context);
+                    content.setRedditPost(post);
                 }
 
                 break;
@@ -283,25 +276,22 @@ public class Post extends Content {
                 break;
 
             case LINK:
-                ContentLink contentLink = new ContentLink(context);
-                contentLink.setRedditPost(post);
-                content = contentLink;
+                content = new ContentLink(context);
+                content.setRedditPost(post);
                 break;
 
             case TEXT:
                 // If there is no text on the post there is no point in creating a view for it
                 String selfText = post.getSelftext();
                 if (selfText != null && !selfText.isEmpty()) {
-                    ContentText contentText = new ContentText(context);
-                    contentText.setRedditPost(post);
-                    content = contentText;
+                    content = new ContentText(context);
+                    content.setRedditPost(post);
                 }
                 break;
 
             case GALLERY:
-                ContentGallery contentGallery = new ContentGallery(context);
-                contentGallery.setRedditPost(post);
-                content = contentGallery;
+                content = new ContentGallery(context);
+                content.setRedditPost(post);
                 break;
 
             default:

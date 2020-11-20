@@ -31,8 +31,6 @@ public class SwipeRefreshMotionLayout extends MotionLayout {
 
     @Override
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed, int type) {
-        // TODO if you switch from the fragment and go back this doesn't work anymore (it will expand again)
-
         if (!isInteractionEnabled()) {
             return;
         }

@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey;
 
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.jsonadapters.BooleanPrimitiveAdapter;
+import com.example.hakonsreader.api.jsonadapters.FloatToLongDeserializer;
 import com.example.hakonsreader.api.jsonadapters.ListingAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
@@ -49,7 +50,8 @@ public abstract class RedditListing {
     protected String fullname;
 
     @SerializedName("created_utc")
-    protected float createdAt;
+    @JsonAdapter(FloatToLongDeserializer.class)
+    protected long createdAt;
 
     // Posts use over_18, subreddits use over18. ¯\_(ツ)_/¯
     @SerializedName(value = "over_18", alternate = "over18")
@@ -119,7 +121,7 @@ public abstract class RedditListing {
      * @return The unix timestamp in seconds when the listing was created
      */
     public long getCreatedAt() {
-        return (long)createdAt;
+        return createdAt;
     }
 
     /**
@@ -193,7 +195,7 @@ public abstract class RedditListing {
         this.fullname = fullname;
     }
 
-    public void setCreatedAt(float createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 
