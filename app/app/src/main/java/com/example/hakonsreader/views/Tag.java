@@ -58,12 +58,6 @@ public class Tag extends LinearLayout {
     public void add(View view) {
         view.setPadding(5, 0, 5, 1);
         binding.tags.addView(view);
-
-        // Constrain top to top of parent, bottom to bottom of parent
-        // Constrain start to end of previous (to start of parent if first)
-        // Constrain end to end of parent
-
-        // Constrain the start of the previous (if not first) to end of this view
     }
 
     /**
@@ -103,7 +97,21 @@ public class Tag extends LinearLayout {
         if (text.isEmpty()) {
             return;
         }
-        // TODO check if previous with added was a textview, if so we can probably just add the text to that instead (with a space)
+
+        // If the last item in the tags is a TextView, add the text to that view instead
+        // of creating a new view
+        int tagsAdded = binding.tags.getChildCount();
+        if (tagsAdded > 0) {
+            View last = binding.tags.getChildAt(tagsAdded - 1);
+
+            if (last instanceof TextView) {
+                TextView asTextView = (TextView) last;
+                asTextView.append(" " + text);
+
+                return;
+            }
+        }
+
         TextView tv = new TextView(getContext());
 
         tv.setText(text);
