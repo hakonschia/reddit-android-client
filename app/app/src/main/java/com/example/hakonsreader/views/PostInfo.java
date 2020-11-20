@@ -50,22 +50,31 @@ public class PostInfo extends ConstraintLayout {
 
     /**
      * Creates and adds the tags for the post
+     *
+     * @param viewGroup The {@link ViewGroup} to add the tags to. If no tags are added the visiblity
+     *                  of this ViewGroup is set to {@link View#GONE}
+     * @param isSpoiler If set to true a spoiler tag is added
+     * @param isNsfw If set to true a NSFW tag is added
+     * @param post The post to adds tags for link flairs for, if it has any
      */
     @BindingAdapter({"spoiler", "nsfw", "linkFlair"})
-    public static void addTags(ViewGroup view, boolean isSpoiler, boolean isNsfw, RedditPost post) {
-        Context context = view.getContext();
+    public static void addTags(ViewGroup viewGroup, boolean isSpoiler, boolean isNsfw, RedditPost post) {
+        Context context = viewGroup.getContext();
 
         // If this view has been used in a RecyclerView it might still have old views
-        view.removeAllViews();
+        viewGroup.removeAllViews();
 
         if (isSpoiler) {
-            ViewUtil.addTagWithSpace(view, ViewUtil.createSpoilerTag(context));
+            ViewUtil.addTagWithSpace(viewGroup, ViewUtil.createSpoilerTag(context));
         }
         if (isNsfw) {
-            ViewUtil.addTagWithSpace(view, ViewUtil.createNsfwTag(context));
+            ViewUtil.addTagWithSpace(viewGroup, ViewUtil.createNsfwTag(context));
         }
 
-        addLinkFlair(view, post);
+        addLinkFlair(viewGroup, post);
+
+        // If no tags were added remove the visibility to not take up extra space
+        viewGroup.setVisibility(viewGroup.getChildCount() > 0 ? VISIBLE : GONE);
     }
 
     /**

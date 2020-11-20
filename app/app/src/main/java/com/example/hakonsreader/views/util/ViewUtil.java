@@ -3,6 +3,7 @@ package com.example.hakonsreader.views.util;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Space;
@@ -145,7 +146,7 @@ public class ViewUtil {
 
 
     /**
-     * Adds a tag to the layout, with extra space after it
+     * Adds a tag to a ViewGroup, with extra space after it
      *
      * @param layout The layout to add the tag to
      * @param tag The tag to add
