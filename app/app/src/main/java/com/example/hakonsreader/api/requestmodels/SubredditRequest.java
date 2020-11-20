@@ -249,6 +249,8 @@ public class SubredditRequest {
                 // and the check for getId() will return null, so it doesn't have to be handled directly
                 // We could disable redirects, but I'm afraid of what issues that would cause later
                 if (prior != null) {
+                    // TODO when new access tokens are retrieved automatically, the prior response is also set which means
+                    //  the posts aren't returned
                     onFailure.onFailure(new GenericError(response.code()), new SubredditNotFoundException("No subreddit found with name: " + subredditName));
                     return;
                 }

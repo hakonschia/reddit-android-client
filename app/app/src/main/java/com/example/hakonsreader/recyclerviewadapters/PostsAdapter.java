@@ -2,6 +2,7 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,23 +47,28 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      * @param newPosts The posts to show
      */
     public void submitList(List<RedditPost> newPosts) {
-        List<RedditPost> previous = posts;
+        // If there are no posts we don't have to diff the posts as they will all be gone
+        // TODO when new posts are retrieved it doesn't update until the list is scrolled
+        if (newPosts.isEmpty()) {
+            clearPosts();
+        } else {
+            List<RedditPost> previous = posts;
 
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(
-                new PostsDiffCallback(previous, newPosts)
-        );
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(
+                    new PostsDiffCallback(previous, newPosts)
+            );
 
-        posts = newPosts;
-        diffResult.dispatchUpdatesTo(this);
+            posts = newPosts;
+            diffResult.dispatchUpdatesTo(this);
+        }
     }
 
     /**
      * Removes all posts from the list
      */
     public void clearPosts() {
-        int size = posts.size();
         posts.clear();
-        notifyItemRangeRemoved(0, size);
+        notifyDataSetChanged();
     }
 
     /**
