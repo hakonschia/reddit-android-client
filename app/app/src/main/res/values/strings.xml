@@ -168,6 +168,8 @@
 
     <string name="postRemovedGeneric">The post has been removed</string>
     <string name="postRemovedByMods">The post has been removed by the moderators of r/%s</string>
+    <string name="postRemovedByAutoMod">The post has been temporarily removed while awaiting mod approval</string>
+    <string name="postRemovedByAuthor">The post has been removed by the author</string>
 
     <string name="noCommentsHeader">No comments on this post yet</string>
     <string name="noCommentsContent">Be the one to start the conversation!</string>

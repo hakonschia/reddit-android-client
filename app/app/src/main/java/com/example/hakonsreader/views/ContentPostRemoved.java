@@ -52,15 +52,23 @@ public class ContentPostRemoved extends Content {
     @BindingAdapter("removedBy")
     public static void removedBy(TextView tv, RedditPost post) {
         String removedByCategory = post.getRemovedByCategory();
-        Log.d(TAG, "removedBy: " + removedByCategory);
 
-        // TODO Other categories:
-        //  "author" for when the author removed it
-        //  "automod_filtered" for when it needs moderator approval
-        if (removedByCategory.equals("moderator")) {
-            tv.setText(tv.getResources().getString(R.string.postRemovedByMods, post.getSubreddit()));
-        } else {
-            tv.setText(tv.getResources().getString(R.string.postRemovedGeneric));
+        switch (removedByCategory) {
+            case "moderator":
+                tv.setText(tv.getResources().getString(R.string.postRemovedByMods, post.getSubreddit()));
+                break;
+
+            case "automod_filtered":
+                tv.setText(tv.getResources().getString(R.string.postRemovedByAutoMod));
+                break;
+
+            case "author":
+                tv.setText(tv.getResources().getString(R.string.postRemovedByAuthor));
+                break;
+
+            default:
+                tv.setText(tv.getResources().getString(R.string.postRemovedGeneric));
+                break;
         }
     }
 }
