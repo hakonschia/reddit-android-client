@@ -48,7 +48,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      */
     public void submitList(List<RedditPost> newPosts) {
         // If there are no posts we don't have to diff the posts as they will all be gone
-        // TODO when new posts are retrieved it doesn't update until the list is scrolled
         if (newPosts.isEmpty()) {
             clearPosts();
         } else {
@@ -67,8 +66,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      * Removes all posts from the list
      */
     public void clearPosts() {
+        int size = posts.size();
         posts.clear();
-        notifyDataSetChanged();
+        notifyItemRangeRemoved(0, size);
     }
 
     /**

@@ -41,7 +41,6 @@ public class PostsViewModel extends ViewModel {
     private final RedditApi api = App.get().getApi();
 
     private List<String> postIds = new ArrayList<>();
-    private final List<RedditPost> postsData = new ArrayList<>();
     private final MutableLiveData<List<RedditPost>> posts = new MutableLiveData<>();
     private final MutableLiveData<Boolean> loadingChange = new MutableLiveData<>();
     private final MutableLiveData<ErrorWrapper> error = new MutableLiveData<>();
@@ -113,21 +112,22 @@ public class PostsViewModel extends ViewModel {
             // in several ViewModels in a different order)
             List<RedditPost> postsFromDb = database.posts().getPostsById(postIds);
 
+            List<RedditPost> postsSorted = new ArrayList<>();
+
             for (String id : postIds) {
                 RedditPost post = find(postsFromDb, id);
 
                 if (post != null) {
-
                     // If the post had crosspost posts, restore them
                     List<String> crosspostIds = post.getCrosspostIds();
                     if (crosspostIds != null && !crosspostIds.isEmpty()) {
                         post.setCrossposts(database.posts().getPostsById(crosspostIds));
                     }
-                    postsData.add(post);
+                    postsSorted.add(post);
                 }
             }
 
-            posts.postValue(postsData);
+            posts.postValue(postsSorted);
         }).start();
     }
 
@@ -186,11 +186,10 @@ public class PostsViewModel extends ViewModel {
      * sorting is used this time
      */
     public void restart() {
-        postsData.clear();
         postIds.clear();
 
         // Notify that the list is now empty
-        posts.setValue(postsData);
+        posts.setValue(new ArrayList<>());
 
         loadPosts();
     }
@@ -304,6 +303,12 @@ public class PostsViewModel extends ViewModel {
                     }
                 })
                 .collect(Collectors.toList());
+
+        List<RedditPost> postsData = posts.getValue();
+
+        if (postsData == null) {
+            postsData = new ArrayList<>();
+        }
 
         postsData.addAll(newPostsFiltered);
         posts.postValue(postsData);
