@@ -240,7 +240,11 @@ public class ProfileFragment extends Fragment {
             // Resumed from PostActivity, get the bundle of post extras and send to the active fragment
             if (requestCode == REQUEST_CODE_POST_RESULT && data != null) {
                 Bundle extras = data.getExtras().getBundle(Content.EXTRAS);
-                postOpened.setExtras(extras);
+
+                // TODO on orientation changes this will be nulled
+                if (postOpened != null) {
+                    postOpened.setExtras(extras);
+                }
             }
         }
     }
