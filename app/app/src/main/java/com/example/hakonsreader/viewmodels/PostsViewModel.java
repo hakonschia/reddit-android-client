@@ -21,6 +21,7 @@ import com.example.hakonsreader.api.persistence.AppDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * ViewModel holding reddit posts
@@ -66,6 +67,8 @@ public class PostsViewModel extends ViewModel {
 
     /**
      * @param context The context to use to create the database for the posts
+     * @param userOrSubreddit The name of the user or subreddit to get posts for
+     * @param isUser True if the ViewModel is getting posts for users, false for posts from subreddits
      */
     public PostsViewModel(Context context, String userOrSubreddit, boolean isUser) {
         this.database = AppDatabase.getInstance(context);
@@ -146,6 +149,9 @@ public class PostsViewModel extends ViewModel {
     }
 
     /**
+     * Retrieves an observable for the posts this ViewModel is tracking. The list in the observable
+     * will not include duplicate posts
+     *
      * @return The observable for the posts
      */
     public LiveData<List<RedditPost>> getPosts() {
@@ -282,14 +288,29 @@ public class PostsViewModel extends ViewModel {
         // Posts are retrieved from a background thread, so we have to use postValue()
         loadingChange.postValue(false);
 
-        postsData.addAll(newPosts);
+        // When we retrieve new posts the previous posts might have been "pushed down" by Reddit, so remove
+        // posts that are already in the list from being shown again
+        List<RedditPost> newPostsFiltered = newPosts.stream()
+                .filter(post -> {
+                    // If the post ID isn't in the list of IDs, add the post ID and keep the post
+                    // in the filtered list
+                    String id = post.getId();
+                    if (!postIds.contains(id)) {
+                        postIds.add(id);
+                        return true;
+                    } else {
+                        // Otherwise remove the post from the list
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        postsData.addAll(newPostsFiltered);
         posts.postValue(postsData);
 
         // Store (or update) the posts in the database
+        // We use all the posts here as duplicates will just be updated, which is fine
         for (RedditPost post : newPosts) {
-            // Store which IDs this ViewModel is tracking
-            postIds.add(post.getId());
-
             List<RedditPost> crossposts = post.getCrossposts();
             if (crossposts != null && !crossposts.isEmpty()) {
                 List<String> crosspostIds = new ArrayList<>();
