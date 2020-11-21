@@ -283,6 +283,7 @@
 
     <string name="commentShowChain">Show comment chain</string>
     <string name="commentCopyLink">Copy comment link</string>
+    <string name="showAllComments">Show all comments</string>
 
     <!-- These strings are currently identical to the ones for comments, but just in case the will be different
     in the future they are separated -->

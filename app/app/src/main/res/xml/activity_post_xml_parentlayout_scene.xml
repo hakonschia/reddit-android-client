@@ -23,6 +23,10 @@
             android:id="@+id/noCommentsLayout">
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
+        <Constraint
+            android:id="@+id/showAllComments">
+            <PropertySet motion:visibilityMode="ignore"/>
+        </Constraint>
     </ConstraintSet>
 
     <!-- Move the post all the way above the screen, and constrain the expand/collapse button
@@ -58,7 +62,7 @@
             motion:layout_constraintBottom_toBottomOf="parent"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
-            motion:layout_constraintTop_toBottomOf="@+id/expandOrCollapsePost"
+            motion:layout_constraintTop_toBottomOf="@+id/showAllComments"
             />
         <Constraint
             android:id="@+id/loadingIcon">
@@ -67,6 +71,10 @@
         <Constraint
             android:id="@+id/noCommentsLayout">
             <PropertySet motion:visibilityMode="ignore"/>
-        </Constraint>c
+        </Constraint>
+        <Constraint
+            android:id="@+id/showAllComments">
+            <PropertySet motion:visibilityMode="ignore"/>
+        </Constraint>
     </ConstraintSet>
 </MotionScene>

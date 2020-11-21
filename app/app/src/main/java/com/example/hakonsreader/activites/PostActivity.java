@@ -108,6 +108,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
 
         // This is kinda hacky, but it looks weird if the "No comments yet" appears before the comments
         binding.setNoComments(false);
+        binding.setCommentChainShown(false);
 
         this.setupCommentsViewModel();
         this.setupPost();
@@ -353,8 +354,13 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         binding.comments.setAdapter(commentsAdapter);
         binding.comments.setLayoutManager(layoutManager);
 
-        // TODO this should be some sort of button above the list
-        binding.post.setOnClickListener(v -> commentsAdapter.setCommentIdChain(""));
+
+        commentsAdapter.setOnChainShown(() -> binding.setCommentChainShown(true));
+        binding.showAllComments.setOnClickListener(v -> {
+            commentsAdapter.setCommentIdChain("");
+            binding.setCommentChainShown(false);
+        });
+
     }
 
     /**

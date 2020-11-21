@@ -104,6 +104,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private OnReplyListener replyListener;
     private LoadMoreComments loadMoreCommentsListener;
 
+    private Runnable onChainShown;
+
 
     /**
      * @param post The post the comment is for
@@ -145,6 +147,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     public void setLastTimePostOpened(long lastTimePostOpened) {
         this.lastTimePostOpened = lastTimePostOpened;
+    }
+
+    /**
+     * Sets the runnable to run when a comment chain has been shown
+     *
+     * @param onChainShown The runnable
+     */
+    public void setOnChainShown(Runnable onChainShown) {
+        this.onChainShown = onChainShown;
     }
 
     /**
@@ -222,6 +233,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         commentsShownWhenChainSet = comments;
                     }
                     comments = chain;
+                    onChainShown.run();
                     break;
                 }
             }

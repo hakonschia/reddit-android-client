@@ -15,6 +15,10 @@
         <variable
             name="noComments"
             type="boolean" />
+
+        <variable
+            name="commentChainShown"
+            type="boolean" />
     </data>
 
     <com.example.hakonsreader.views.SwipeRefreshMotionLayout
@@ -39,6 +43,22 @@
 
             tools:layout_height="150dp" />
 
+        <Button
+            android:id="@+id/showAllComments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+
+            android:text="@string/showAllComments"
+            android:textColor="@color/text_color"
+
+            android:visibility="@{commentChainShown ? View.VISIBLE : View.GONE, default=gone}"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/post" />
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/commentsSwipeRefresh"
             android:layout_width="0dp"
@@ -51,7 +71,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/post"
+            app:layout_constraintTop_toBottomOf="@+id/showAllComments"
 
             tools:visibility="visible">
 
