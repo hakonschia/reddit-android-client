@@ -6,12 +6,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentImageBinding;
+import com.example.hakonsreader.enums.ShowNsfwPreview;
 import com.example.hakonsreader.views.util.ClickHandler;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -21,7 +23,9 @@ import com.squareup.picasso.RequestCreator;
 import java.util.List;
 
 /**
- * Content view for Reddit images posts
+ * Content view for Reddit images posts.
+ *
+ * <p>Images for NSFW posts are automatically blurred or not shown according to the setting from {@link App#showNsfwPreview()}</p>
  */
 public class ContentImage extends Content {
     private static final String TAG = "ContentImage";
@@ -93,20 +97,35 @@ public class ContentImage extends Content {
 
         setOnClickListener(v -> ClickHandler.openImageInFullscreen(binding.image, imageUrl));
 
-        // TODO this should probably be a setting:
-        //  NSFW images while scrolling:
-        //  dont load
-        //  load blurred
-        //  load image
-
         String obfuscatedUrl = null;
-        if (redditPost.isNsfw() || redditPost.isSpoiler()) {
-            List<Image> obfuscatedPreviews = redditPost.getObfuscatedPreviewImages();
+        int noImageId = -1;
+        if (redditPost.isNsfw() ) {
+            ShowNsfwPreview show = App.get().showNsfwPreview();
 
-            if (obfuscatedPreviews != null && !obfuscatedPreviews.isEmpty()) {
-                // Obfuscated previews that are high res are still fairly showing sometimes, so
-                // get the lowest quality one as that will not be very easy to tell what it is
-                obfuscatedUrl = obfuscatedPreviews.get(0).getUrl();
+            switch (show) {
+                case NORMAL:
+                    // Do nothing, load imageUrl as is
+                    break;
+
+                case BLURRED:
+                    obfuscatedUrl = getObfuscatedUrl();
+                    // If we don't have a URL to show then show the NSFW drawable instead as a fallback
+                    if (obfuscatedUrl == null) {
+                        noImageId = R.drawable.ic_baseline_image_nsfw_200;
+                    }
+                    break;
+
+                case NO_IMAGE:
+                    noImageId = R.drawable.ic_baseline_image_nsfw_200;
+                    break;
+            }
+        } else if (redditPost.isSpoiler()) {
+            // Always blur spoilers (if possible)
+
+            obfuscatedUrl = getObfuscatedUrl();
+            // If we don't have a URL to show then show the NSFW drawable instead as a fallback
+            if (obfuscatedUrl == null) {
+                noImageId = R.drawable.ic_baseline_image_nsfw_200;
             }
         }
 
@@ -119,29 +138,50 @@ public class ContentImage extends Content {
         //  The issue at least happens with extremely large images (although it didn't happen with large images the first time)
 
         try {
-            RequestCreator c = Picasso.get()
-                    // If we have an obfuscated image, load that here instead
-                    .load(obfuscatedUrl != null ? obfuscatedUrl : imageUrl)
-                    .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
-                    .error(R.drawable.ic_baseline_wifi_tethering_150)
-                    // Scale so the image fits the width of the screen
-                    .resize(App.get().getScreenWidth(), 0);
+            RequestCreator creator;
+            // No image to load, set image drawable directly
+            if (noImageId != -1) {
+                binding.image.setImageDrawable(ContextCompat.getDrawable(getContext(), noImageId));
+            } else {
+                // If we have an obfuscated image, load that here instead
+                creator = Picasso.get().load(obfuscatedUrl != null ? obfuscatedUrl : imageUrl)
+                        .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
+                        .error(R.drawable.ic_baseline_wifi_tethering_150)
+                        // Scale so the image fits the width of the screen
+                        .resize(App.get().getScreenWidth(), 0);
 
-            // Post is NSFW and user has chosen not to cache NSFW
-            // TODO this won't work as the actual image is only loaded in fullscreen, what is not cached here
-            //  is the obfuscated image, need to pass "dontCache" to ImageActivity
-            if (redditPost.isNsfw() && App.get().dontCacheNSFW()) {
-                // Don't store in cache and don't look in cache as this image will never be there
-                c = c.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
+                // Post is NSFW and user has chosen not to cache NSFW
+                // TODO this won't work as the actual image is only loaded in fullscreen, what is not cached here
+                //  is the obfuscated image, need to pass "dontCache" to ImageActivity
+                if (redditPost.isNsfw() && App.get().dontCacheNSFW()) {
+                    // Don't store in cache and don't look in cache as this image will never be there
+                    creator = creator.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
+                }
+                creator.into(binding.image, imageLoadedCallback);
             }
-
-            c.into(binding.image, imageLoadedCallback);
         } catch (RuntimeException e) {
             e.printStackTrace();
             Log.d(TAG, "updateView:\n\n\n\n--------------------------- ERROR LOADING IMAGE" +
                     "\n\n " + redditPost.getSubreddit() + ", " + redditPost.getTitle() + " ---------------------------\n\n\n\n");
         }
+    }
 
+
+    /**
+     * Retrieves the obfuscated image URL to use
+     *
+     * @return An URL pointing to an image, or {@code null} of no obfuscated images were found
+     */
+    private String getObfuscatedUrl() {
+        List<Image> obfuscatedPreviews = redditPost.getObfuscatedPreviewImages();
+
+        if (obfuscatedPreviews != null && !obfuscatedPreviews.isEmpty()) {
+            // Obfuscated previews that are high res are still fairly showing sometimes, so
+            // get the lowest quality one as that will not be very easy to tell what it is
+            return obfuscatedPreviews.get(0).getUrl();
+        }
+
+        return null;
     }
 }
 

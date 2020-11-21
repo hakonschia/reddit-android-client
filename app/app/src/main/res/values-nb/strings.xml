@@ -184,4 +184,8 @@
     <string name="prefs_title_data_saving_always">Alltid</string>
     <string name="prefs_title_data_saving_never">Aldri</string>
     <string name="prefs_title_auto_play_nsfw_videos">Start NSFW videoer automatisk</string>
+    <string name="prefs_title_show_nsfw_preview">Vis NSFW (video miniatyrbilder, bilder under skrolling)</string>
+    <string name="prefs_title_show_nsfw_preview_normal">Normal</string>
+    <string name="prefs_title_show_nsfw_preview_blur">Uklart</string>
+    <string name="prefs_title_show_nsfw_preview_no_image">Ingen bilde</string>
 </resources>

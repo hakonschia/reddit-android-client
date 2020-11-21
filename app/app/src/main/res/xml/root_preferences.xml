@@ -66,6 +66,15 @@
             app:iconSpaceReserved="false"
             app:title="@string/prefs_title_cache_nsfw"
             app:defaultValue="@bool/prefs_default_value_cache_nsfw" />
+
+        <ListPreference
+            app:key="@string/prefs_key_show_nsfw_preview"
+            android:title="@string/prefs_title_show_nsfw_preview"
+            android:entries="@array/show_nsfw_entries"
+            app:entryValues="@array/show_nsfw_values"
+            app:defaultValue="@string/prefs_default_show_nsfw"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
 

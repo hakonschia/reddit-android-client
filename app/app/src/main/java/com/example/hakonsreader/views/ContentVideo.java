@@ -28,6 +28,7 @@ import com.example.hakonsreader.api.model.RedditVideo;
 import com.example.hakonsreader.api.utils.LinkUtils;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.ContentVideoBinding;
+import com.example.hakonsreader.enums.ShowNsfwPreview;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.util.VideoCache;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -320,25 +321,57 @@ public class ContentVideo extends Content {
 
         thumbnail = findViewById(R.id.thumbnail);
 
+        // Loading the blurred/no image etc. is very copied from ContentImage and should be
+        // generified so it's not duplicated, but cba to fix that right now
+
+        // post.getThumbnail() returns an image which is very low quality, the source preview
+        // has the same dimensions as the video itself
+        Image image = redditPost.getSourcePreview();
+        String imageUrl = image != null ? image.getUrl() : null;
+
         // Don't show thumbnail for NSFW posts
+        String obfuscatedUrl = null;
+        int noImageId = -1;
         if (redditPost.isNsfw()) {
-            thumbnail.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_200));
-        } else {
-            // post.getThumbnail() returns an image which is very low quality, the source preview
-            // has the same dimensions as the video itself
-            Image image = redditPost.getSourcePreview();
+            ShowNsfwPreview show = App.get().showNsfwPreview();
 
-            // Set the background color for the controls as a filter here since the thumbnail is shown
-            // over the controls
-            thumbnail.setColorFilter(ContextCompat.getColor(getContext(), R.color.videoControlBackground));
+            switch (show) {
+                case NORMAL:
+                    // Do nothing, load imageUrl as is
+                    break;
 
-            if (image != null) {
-                // Show the thumbnail over the video before it is being played
-                Picasso.get()
-                        .load(image.getUrl())
-                        .resize(params.width, params.height)
-                        .into(thumbnail);
+                case BLURRED:
+                    obfuscatedUrl = getObfuscatedUrl();
+                    // If we don't have a URL to show then show the NSFW drawable instead as a fallback
+                    if (obfuscatedUrl == null) {
+                        noImageId = R.drawable.ic_baseline_image_nsfw_200;
+                    }
+                    break;
+
+                case NO_IMAGE:
+                    noImageId = R.drawable.ic_baseline_image_nsfw_200;
+                    break;
             }
+        } else if (redditPost.isSpoiler()) {
+            obfuscatedUrl = getObfuscatedUrl();
+            // If we don't have a URL to show then show the NSFW drawable instead as a fallback
+            if (obfuscatedUrl == null) {
+                noImageId = R.drawable.ic_baseline_image_nsfw_200;
+            }
+        }
+
+        // Set the background color for the controls as a filter here since the thumbnail is shown
+        // over the controls
+        thumbnail.setColorFilter(ContextCompat.getColor(getContext(), R.color.videoControlBackground));
+
+        if (noImageId != -1) {
+            thumbnail.setImageDrawable(ContextCompat.getDrawable(getContext(), noImageId));
+        } else {
+            // Show the thumbnail over the video before it is being played
+            Picasso.get()
+                    .load(obfuscatedUrl != null ? obfuscatedUrl : imageUrl)
+                    .resize(params.width, params.height)
+                    .into(thumbnail);
         }
 
         // When the thumbnail is shown, clicking it (ie. clicking on the video but not on the controls)
@@ -633,5 +666,22 @@ public class ContentVideo extends Content {
         setPlayback(isPlaying);
         setControllerVisible(showController);
         toggleVolume(volumeOn);
+    }
+
+    /**
+     * Retrieves the obfuscated image URL to use
+     *
+     * @return An URL pointing to an image, or {@code null} of no obfuscated images were found
+     */
+    private String getObfuscatedUrl() {
+        List<Image> obfuscatedPreviews = redditPost.getObfuscatedPreviewImages();
+
+        if (obfuscatedPreviews != null && !obfuscatedPreviews.isEmpty()) {
+            // Obfuscated previews that are high res are still fairly showing sometimes, so
+            // get the lowest quality one as that will not be very easy to tell what it is
+            return obfuscatedPreviews.get(0).getUrl();
+        }
+
+        return null;
     }
 }

@@ -43,4 +43,16 @@
         <item>@string/prefs_key_language_en</item>
         <item>@string/prefs_key_language_nb</item>
     </string-array>
+
+
+    <string-array name="show_nsfw_entries">
+        <item>@string/prefs_title_show_nsfw_preview_normal</item>
+        <item>@string/prefs_title_show_nsfw_preview_blur</item>
+        <item>@string/prefs_title_show_nsfw_preview_no_image</item>
+    </string-array>
+    <string-array name="show_nsfw_values">
+        <item>@string/prefs_key_show_nsfw_preview_normal</item>
+        <item>@string/prefs_key_show_nsfw_preview_blur</item>
+        <item>@string/prefs_key_show_nsfw_preview_no_image</item>
+    </string-array>
 </resources>

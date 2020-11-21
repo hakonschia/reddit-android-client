@@ -23,6 +23,7 @@ import com.example.hakonsreader.api.responses.GenericError;
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
+import com.example.hakonsreader.enums.ShowNsfwPreview;
 import com.example.hakonsreader.markwonplugins.LinkPlugin;
 import com.example.hakonsreader.markwonplugins.SuperscriptPlugin;
 import com.example.hakonsreader.markwonplugins.ThemePlugin;
@@ -494,6 +495,23 @@ public class App extends Application {
 
         // If we get here we are on Mobile Data only, return false if Wi-Fi is connected, else true
         return !wifiConnected;
+    }
+
+    /**
+     * Retrieves how NSFW images/thumbnails should be filtered
+     *
+     * @return An enum representing how to filter the images/thumbnails
+     */
+    public ShowNsfwPreview showNsfwPreview() {
+        String value = settings.getString(getString(R.string.prefs_key_show_nsfw_preview), getString(R.string.prefs_default_show_nsfw));
+
+        if (value.equals(getString(R.string.prefs_key_show_nsfw_preview_normal))) {
+            return ShowNsfwPreview.NORMAL;
+        } else if (value.equals(getString(R.string.prefs_key_show_nsfw_preview_blur))) {
+            return ShowNsfwPreview.BLURRED;
+        } else {
+            return ShowNsfwPreview.NO_IMAGE;
+        }
     }
 
 
