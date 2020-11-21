@@ -183,4 +183,5 @@
     <string name="prefs_title_data_saving_mobile_only">Kun på mobildata</string>
     <string name="prefs_title_data_saving_always">Alltid</string>
     <string name="prefs_title_data_saving_never">Aldri</string>
+    <string name="prefs_title_auto_play_nsfw_videos">Start NSFW videoer automatisk</string>
 </resources>

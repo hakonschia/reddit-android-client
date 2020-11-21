@@ -321,8 +321,6 @@ public class ContentVideo extends Content {
         thumbnail = findViewById(R.id.thumbnail);
 
         // Don't show thumbnail for NSFW posts
-        // TODO maybe show thumbnail is autoplayed is enabled? It will load anyways so
-        //  maybe setting to autoload NSFW
         if (redditPost.isNsfw()) {
             thumbnail.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_image_nsfw_200));
         } else {
@@ -569,19 +567,24 @@ public class ContentVideo extends Content {
     }
 
     /**
-     * Called when the video has been selected. If the user has enabled autoplay the video will start playing
+     * Called when the video has been selected. If the user has enabled auto play the video will start playing
      */
     @Override
     public void viewSelected() {
-        // Not sure if this should be used directly here, creates high coupling between ContentVideo and App
-        if (App.get().autoPlayVideos()) {
+        if (redditPost.isNsfw()) {
+            if (App.get().autoPlayNsfwVideos()) {
+                setPlayback(true);
+            }
+        } else if (App.get().autoPlayVideos()) {
             setPlayback(true);
         }
     }
 
+    /**
+     * Pauses the video playback
+     */
     @Override
     public void viewUnselected() {
-        Log.d(TAG, "viewSelected: Video unselected, pausing video");
         setPlayback(false);
     }
 

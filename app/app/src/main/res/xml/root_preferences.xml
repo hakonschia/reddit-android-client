@@ -103,12 +103,18 @@
 
         <ListPreference
             app:key="@string/prefs_key_auto_play_videos"
-            app:iconSpaceReserved="false"
             app:title="@string/prefs_title_auto_play_videos"
+            app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true"
             app:defaultValue="@string/prefs_default_value_auto_play_videos"
             app:entries="@array/auto_play_entries"
             app:entryValues="@array/auto_play_values" />
+
+        <SwitchPreference
+            app:key="@string/prefs_key_auto_play_nsfw_videos"
+            app:title="@string/prefs_title_auto_play_nsfw_videos"
+            app:defaultValue="@bool/prefs_default_autoplay_nsfw_videos"
+            app:iconSpaceReserved="false" />
 
         <SwitchPreference
             app:key="@string/prefs_key_play_muted_videos"

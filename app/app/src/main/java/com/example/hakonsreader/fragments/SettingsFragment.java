@@ -4,12 +4,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.widget.Switch;
 
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -33,6 +35,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         ListPreference language = findPreference(getString(R.string.prefs_key_language));
         language.setOnPreferenceChangeListener(languageChangeListener);
+
+        ListPreference autoPlayVideos = findPreference(getString(R.string.prefs_key_auto_play_videos));
+        autoPlayVideos.setOnPreferenceChangeListener(autoPlayVideosChangeListener);
+
+        // The enabled state isn't stored, so if never auto playing videos is set then disable the nsfw auto play
+        // (this is the same functionality as is done in autoPlayVideosChangeListener)
+        SwitchPreference autoPlayNsfwVideos = findPreference(getString(R.string.prefs_key_auto_play_nsfw_videos));
+        boolean neverAutoPlayVideos = settings.getString(getString(R.string.prefs_key_auto_play_videos), getString(R.string.prefs_default_value_auto_play_videos))
+                .equals(getString(R.string.prefs_key_auto_play_videos_never));
+        autoPlayNsfwVideos.setEnabled(!neverAutoPlayVideos);
     }
 
     @Override
@@ -87,4 +99,29 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         activity.updateLanguage(newValue.toString());
         return true;
     };
+
+    /**
+     * Listener for when auto playing videos changes. This will change the auto play NSFW videos preference
+     * as it should be dependant on the normal auto play.
+     *
+     * <p>If normal auto play is set to "Never", NSFW auto play should be disabled as well</p>
+     */
+    private final Preference.OnPreferenceChangeListener autoPlayVideosChangeListener = (preference, newValue) -> {
+        String asString = (String) newValue;
+        SwitchPreference autoPlayNsfw = findPreference(getString(R.string.prefs_key_auto_play_nsfw_videos));
+
+        // TODO this isnt updated when going into the settings, only when changing. Have to enable this in onCreatePreferences as well
+        if (asString.equals(getString(R.string.prefs_key_auto_play_videos_never))) {
+            // Ideally I wouldn't have to manually call setChecked(false) as it would be ideal if the actual value
+            // would be saved, but when retrieving the value and the preference is disabled it would always return false
+            // But this works fine enough
+            autoPlayNsfw.setEnabled(false);
+            autoPlayNsfw.setChecked(false);
+        } else {
+            autoPlayNsfw.setEnabled(true);
+        }
+
+        return true;
+    };
+
 }
