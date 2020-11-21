@@ -11,5 +11,6 @@
     <integer name="prefs_default_hide_comments_threshold">-5</integer>
     <integer name="prefs_default_max_post_size_percentage">65</integer>
     <bool name="prefs_default_opening_links_in_app">true</bool>
+    <string name="prefs_default_data_saving" translatable="false">@string/prefs_key_data_saving_never</string>
 
 </resources>

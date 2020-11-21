@@ -1,13 +1,25 @@
 <resources>
+    <string-array name="data_saving_entries">
+        <item>@string/prefs_title_data_saving_mobile_only</item>
+        <item>@string/prefs_title_data_saving_always</item>
+        <item>@string/prefs_title_data_saving_never</item>
+    </string-array>
+    <string-array name="data_saving_values">
+        <item>@string/prefs_key_data_saving_mobile_only</item>
+        <item>@string/prefs_key_data_saving_always</item>
+        <item>@string/prefs_key_data_saving_never</item>
+    </string-array>
+
+
     <string-array name="auto_play_entries">
+        <item>@string/prefs_title_auto_play_videos_wifi_only</item>
         <item>@string/prefs_title_auto_play_videos_always</item>
         <item>@string/prefs_title_auto_play_videos_never</item>
-        <item>@string/prefs_title_auto_play_videos_wifi_only</item>
     </string-array>
     <string-array name="auto_play_values">
+        <item>@string/prefs_key_auto_play_videos_wifi_only</item>
         <item>@string/prefs_key_auto_play_videos_always</item>
         <item>@string/prefs_key_auto_play_videos_never</item>
-        <item>@string/prefs_key_auto_play_videos_wifi_only</item>
     </string-array>
 
 

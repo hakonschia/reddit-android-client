@@ -466,6 +466,29 @@ public class App extends Application {
     }
 
     /**
+     * Checks if data saving is enabled, based on a combination of the users setting and current
+     * Wi-Fi connection
+     *
+     * @return True if data saving is enabled
+     */
+    public boolean dataSavingEnabled() {
+        String value = settings.getString(
+                getString(R.string.prefs_key_data_saving),
+                getString(R.string.prefs_default_data_saving)
+        );
+
+        if (value.equals(getString(R.string.prefs_key_data_saving_always))) {
+            return true;
+        } else if (value.equals(getString(R.string.prefs_key_data_saving_never))) {
+            return false;
+        }
+
+        // If we get here we are on Mobile Data only, return false if Wi-Fi is connected, else true
+        return !wifiConnected;
+    }
+
+
+    /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that
      * the user has revoked the applications access and a dialog must be shown that they must log in again
      *

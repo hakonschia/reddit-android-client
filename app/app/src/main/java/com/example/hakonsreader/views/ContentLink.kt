@@ -38,11 +38,10 @@ class ContentLink : Content {
      * data saving setting
      */
     private fun getCorrectBinding() : ViewBinding {
-        // TODO create and get the actual data saving setting
-        return if (App.get().dontCacheNSFW()) {
-            ContentLinkBinding.inflate(LayoutInflater.from(context), this, true)
-        } else {
+        return if (App.get().dataSavingEnabled()) {
             ContentLinkSimpleBinding.inflate(LayoutInflater.from(context), this, true)
+        } else {
+            ContentLinkBinding.inflate(LayoutInflater.from(context), this, true)
         }
     }
 

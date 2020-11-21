@@ -18,8 +18,25 @@
             app:entries="@array/language_entries"
             app:entryValues="@array/language_values"
             app:useSimpleSummaryProvider="true"
-            app:defaultValue="@string/prefs_key_language_en" />
+            app:defaultValue="@string/prefs_default_language" />
     </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="@string/prefs_group_misc"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            android:title="@string/prefs_title_data_saving"
+            app:key="@string/prefs_key_data_saving"
+            app:entries="@array/data_saving_entries"
+            app:entryValues="@array/data_saving_values"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="@string/prefs_default_data_saving" />
+
+    </PreferenceCategory>
+
 
     <PreferenceCategory
         android:title="@string/prefs_group_posts"
@@ -51,6 +68,7 @@
             app:defaultValue="@bool/prefs_default_value_cache_nsfw" />
     </PreferenceCategory>
 
+
     <PreferenceCategory
         android:title="@string/prefs_group_links"
         app:iconSpaceReserved="false">
@@ -77,6 +95,7 @@
 
         <!-- TODO hide comments from users ("This will also remove their child comments") -->
     </PreferenceCategory>
+
 
     <PreferenceCategory
         app:title="@string/prefs_group_videos"

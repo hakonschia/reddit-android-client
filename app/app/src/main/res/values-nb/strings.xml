@@ -178,4 +178,9 @@
     <string name="postRemovedByAutoMod">Posten har blitt midlertidig fjernet  mens den aventer moderator godkjenning</string>
     <string name="postRemovedByAuthor">Posten har blitt fjernet av posteren</string>
     <string name="postRemovedTitle">Posten har blitt fjernet</string>
+    <string name="prefs_group_misc">Diverse</string>
+    <string name="prefs_title_data_saving">Data sparing</string>
+    <string name="prefs_title_data_saving_mobile_only">Kun på mobildata</string>
+    <string name="prefs_title_data_saving_always">Alltid</string>
+    <string name="prefs_title_data_saving_never">Aldri</string>
 </resources>
