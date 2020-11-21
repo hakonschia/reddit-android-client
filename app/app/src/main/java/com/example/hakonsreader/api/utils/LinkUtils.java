@@ -1,8 +1,6 @@
 package com.example.hakonsreader.api.utils;
 
 
-import com.example.hakonsreader.R;
-
 /**
  * Utility class that contains various regex matchers and functions to deal with common problems for
  * links from Reddit
@@ -11,9 +9,9 @@ public final class LinkUtils {
 
     /**
      * Basic subreddit regex that only matches "{@code < r/<allowed_subreddit_characters>}". This
-     * does not match a preceding or trailing slash
+     * does not match a trailing slash
      */
-    private static final String BASE_SUBREDDIT_REGEX = "(r|R)/[A-Za-z0-9_]";
+    public static final String BASE_SUBREDDIT_REGEX = "/?(r|R)/[A-Za-z0-9_]+";
 
     /**
      * Regex for matching a subreddit URL. Matches either a full URL (only https, www optional) or only "r/...."
@@ -57,6 +55,11 @@ public final class LinkUtils {
      */
     public static final String SUBREDDIT_REGEX_COMBINED = String.format("(%s)|(%s)", SUBREDDIT_REGEX_WITH_HTTPS, SUBREDDIT_REGEX_NO_HTTPS);
 
+    /**
+     * Basic subreddit regex that only matches "{@code < u(ser)/<allowed_subreddit_characters>}". This
+     * does not match a trailing slash
+     */
+    public static final String BASE_USER_REGEX = "/?u(ser)?/[A-Za-z0-9_-]+";
 
     /**
      * Regex for matching a URL to a user. Matches either a full URL (only https, www optional) or only "u/...."

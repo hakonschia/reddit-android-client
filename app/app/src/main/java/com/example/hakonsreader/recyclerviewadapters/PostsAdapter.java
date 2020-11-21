@@ -188,6 +188,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             post = itemView.findViewById(R.id.post);
 
             itemView.setOnClickListener(v -> {
+                // TODO if the post is a crosspost we need to open the crosspost post, not this post which always takes you to the
+                //  post in the subreddit that is not the original
                 if (postOnClickListener != null) {
                     postOnClickListener.onClick(post);
                 }
