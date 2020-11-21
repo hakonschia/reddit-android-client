@@ -52,4 +52,6 @@
 
     <dimen name="contentLinkThumbnailSize">175dp</dimen>
     <dimen name="contentLinkNoThumbnailSize">75dp</dimen>
+    <dimen name="contentLinkSimpleThumbnailWidth">80dp</dimen>
+    <dimen name="contentLinkSimpleThumbnailHeight">60dp</dimen>
 </resources>
