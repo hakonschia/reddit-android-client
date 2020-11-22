@@ -297,11 +297,15 @@ public class ProfileFragment extends Fragment {
             this.user = newUser;
 
             this.updateViews();
-            binding.loadingIcon.onCountChange(false);
-        }, (code, t) -> {
-            t.printStackTrace();
-            Util.handleGenericResponseErrors(binding.parentLayout, code, t);
-            binding.loadingIcon.onCountChange(false);
+            if (binding != null) {
+                binding.loadingIcon.onCountChange(false);
+            }
+        }, (error, t) -> {
+            // If you get to this point and the user has left the fragment it will cause a NPE
+            if (binding != null) {
+                Util.handleGenericResponseErrors(binding.parentLayout, error, t);
+                binding.loadingIcon.onCountChange(false);
+            }
         });
     }
     /**

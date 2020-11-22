@@ -13,6 +13,7 @@ import com.example.hakonsreader.api.requestmodels.CommentRequest;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequest;
+import com.example.hakonsreader.api.requestmodels.SubredditsRequestKt;
 import com.example.hakonsreader.api.requestmodels.UserRequests;
 import com.example.hakonsreader.api.service.CommentService;
 import com.example.hakonsreader.api.service.ImgurService;
@@ -20,10 +21,10 @@ import com.example.hakonsreader.api.service.PostService;
 import com.example.hakonsreader.api.service.OAuthService;
 import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.service.SubredditsService;
+import com.example.hakonsreader.api.service.SubredditsServiceKt;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
 import com.example.hakonsreader.api.responses.GenericError;
-import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import org.jetbrains.annotations.NotNull;
@@ -175,6 +176,8 @@ public class RedditApi {
      */
     private SubredditsService subredditsApi;
 
+    private SubredditsServiceKt subredditsApiK;
+
     /**
      * The service object used to communicate with the Reddit API about post related calls
      */
@@ -288,6 +291,7 @@ public class RedditApi {
         userApi = apiRetrofit.create(UserService.class);
         subredditApi = apiRetrofit.create(SubredditService.class);
         subredditsApi = apiRetrofit.create(SubredditsService.class);
+        subredditsApiK = apiRetrofit.create(SubredditsServiceKt.class);
         postApi = apiRetrofit.create(PostService.class);
         commentApi = apiRetrofit.create(CommentService.class);
 
@@ -662,10 +666,20 @@ public class RedditApi {
      * This differs from {@link RedditApi#subreddit(String)} as this is for multiple subreddits (like
      * getting subreddits a user is subscribed to), not one specific subreddit
      *
-     * @return An object that can perform various subreddit related API requests
+     * @return An object that can perform various subreddits related API requests
      */
     public SubredditsRequest subreddits() {
         return new SubredditsRequest(accessToken, subredditsApi);
+    }
+
+    /**
+     * Retrieve a Kotlin based object to make API calls towards subreddits. This class is functionality
+     * identical to {@link SubredditsRequest}, but leverages Kotlin coroutines to avoid callbacks
+     *
+     * @return An object that can perform various subreddits related API requests
+     */
+    public SubredditsRequestKt subredittsKt() {
+        return new SubredditsRequestKt(accessToken, subredditsApiK);
     }
 
     /**

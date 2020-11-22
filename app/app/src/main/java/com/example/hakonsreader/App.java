@@ -45,7 +45,6 @@ import io.noties.markwon.Markwon;
 import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.ext.tables.TablePlugin;
-import okhttp3.logging.HttpLoggingInterceptor;
 
 
 /**
