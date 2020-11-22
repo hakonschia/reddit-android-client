@@ -52,6 +52,8 @@ class ContentLink : Content {
         } else {
             this.updateViewSimple()
         }
+
+        setOnClickListener { openLink() }
     }
 
     /**
