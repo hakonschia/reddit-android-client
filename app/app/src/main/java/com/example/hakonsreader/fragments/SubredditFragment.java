@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.MainActivity;
 import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.SortingMethods;
@@ -43,9 +42,7 @@ import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
 import com.example.hakonsreader.views.Content;
-import com.example.hakonsreader.views.ContentVideo;
 import com.example.hakonsreader.views.Post;
-import com.example.hakonsreader.views.util.ClickHandler;
 import com.google.gson.Gson;
 import com.robinhood.ticker.TickerUtils;
 import com.squareup.picasso.Picasso;

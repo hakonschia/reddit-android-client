@@ -18,7 +18,6 @@ import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.utils.Util;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;

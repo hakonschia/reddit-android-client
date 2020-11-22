@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName;
 
 
 /**
- * Represents a generic error returned by Reddit. These errors are given in cases such as
+ * Represents an error returned by Reddit. These errors are given in cases such as
  * a subreddit has been banned or is private.
  *
- * <p>The class contains three fields: code, message, and reason. {@code code} will always be
+ * <p>The class contains three fields: {@code code}, {@code message}, and {@code reason}. {@code code} will always be
  * present, but {@code message} and {@code reason} might not be.</p>
  */
 public class GenericError {
@@ -33,7 +33,6 @@ public class GenericError {
 
     @SerializedName("reason")
     private String reason;
-
 
 
     public GenericError(int code) {
