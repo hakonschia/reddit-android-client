@@ -21,15 +21,13 @@ import com.example.hakonsreader.databinding.ActivityMainBinding;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
-import com.example.hakonsreader.fragments.SelectSubredditFragment;
+import com.example.hakonsreader.fragments.SelectSubredditFragmentK;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
-
-import java.util.Locale;
 
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
@@ -48,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     // The fragments to show in the nav bar
     private PostsContainerFragment postsFragment;
     private SubredditFragment activeSubreddit;
-    private SelectSubredditFragment selectSubredditFragment;
+    private SelectSubredditFragmentK selectSubredditFragment;
     private ProfileFragment profileFragment;
     private LogInFragment logInFragment;
     private SettingsFragment settingsFragment;
@@ -182,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
             // If the fragment has been killed by the OS make a new one (after a while it might be killed)
             if (selectSubredditFragment == null) {
-                selectSubredditFragment = new SelectSubredditFragment();
+                selectSubredditFragment = new SelectSubredditFragmentK();
             }
             // Since we are in a way going back in the same navbar item, use the close transition
             getSupportFragmentManager().beginTransaction()
@@ -195,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     }
 
     /**
-     * Called when a subreddit has been selected from a {@link SelectSubredditFragment} fragment
+     * Called when a subreddit has been selected from a {@link SelectSubredditFragmentK} fragment
      * <p>A new instance of {@link SubredditFragment} is created and shown</p>
      *
      * @param subredditName The subreddit selected
@@ -233,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private void restoreFragmentStates(@NonNull Bundle restoredState) {
         postsFragment = (PostsContainerFragment) getSupportFragmentManager().getFragment(restoredState, POSTS_FRAGMENT);
         activeSubreddit = (SubredditFragment) getSupportFragmentManager().getFragment(restoredState, ACTIVE_SUBREDDIT_FRAGMENT);
-        selectSubredditFragment = (SelectSubredditFragment) getSupportFragmentManager().getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT);
+        selectSubredditFragment = (SelectSubredditFragmentK) getSupportFragmentManager().getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT);
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(restoredState, PROFILE_FRAGMENT);
     }
 
@@ -269,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 activeSubreddit = null;
 
                 if (selectSubredditFragment == null) {
-                    selectSubredditFragment = new SelectSubredditFragment();
+                    selectSubredditFragment = new SelectSubredditFragmentK();
                     selectSubredditFragment.setSubredditSelected(this);
                 }
 
@@ -428,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             // No subreddit created (first time here), or we in a subreddit looking to get back
             if (activeSubreddit == null) {
                 if (selectSubredditFragment == null) {
-                    selectSubredditFragment = new SelectSubredditFragment();
+                    selectSubredditFragment = new SelectSubredditFragmentK();
                     selectSubredditFragment.setSubredditSelected(MainActivity.this);
                 }
                 return selectSubredditFragment;
