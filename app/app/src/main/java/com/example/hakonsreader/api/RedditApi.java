@@ -675,7 +675,7 @@ public class RedditApi {
     }
 
     public SubredditRequestKt subredditKt(String subredditName) {
-        return new SubredditRequestKt(accessToken, subredditApiKt);
+        return new SubredditRequestKt(subredditName, accessToken, subredditApiKt, imgurService);
     }
 
 

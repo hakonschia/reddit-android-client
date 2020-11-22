@@ -40,7 +40,9 @@ import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListene
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
+import com.example.hakonsreader.viewmodels.PostsViewModelKt;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
+import com.example.hakonsreader.viewmodels.factories.PostsKtFactory;
 import com.example.hakonsreader.views.Content;
 import com.example.hakonsreader.views.Post;
 import com.google.gson.Gson;
@@ -129,7 +131,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         }
     };
 
-    private PostsViewModel postsViewModel;
+    private PostsViewModelKt postsViewModel;
     private PostsAdapter adapter;
     private LinearLayoutManager layoutManager;
 
@@ -163,11 +165,11 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
      * Sets up {@link SubredditFragment#postsViewModel}.
      */
     private void setupViewModel() {
-        postsViewModel = new ViewModelProvider(this, new PostsFactory(
+        postsViewModel = new ViewModelProvider(this, new PostsKtFactory(
                 getContext(),
                 getSubredditName(),
                 false
-        )).get(PostsViewModel.class);
+        )).get(PostsViewModelKt.class);
 
         postsViewModel.getPosts().observe(this, posts -> {
             if (posts.isEmpty()) {
@@ -189,7 +191,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
                 }
             }
         });
-        postsViewModel.onLoadingChange().observe(this, up -> {
+        postsViewModel.onLoadingCountChange().observe(this, up -> {
             binding.loadingIcon.onCountChange(up);
         });
         postsViewModel.getError().observe(this, error -> this.handleErrors(error.getError(), error.getThrowable()));

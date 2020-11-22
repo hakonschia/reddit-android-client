@@ -104,7 +104,7 @@ class SubredditRequestKt(
 
             val posts = resp.body()?.getListings()
 
-            if (!posts.isNullOrEmpty()) {
+            if (posts != null) {
                 if (loadImgurAlbumsAsRedditGalleries) {
                     imgurRequest.loadAlbums(posts)
                 }

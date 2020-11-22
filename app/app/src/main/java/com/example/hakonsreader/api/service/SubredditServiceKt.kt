@@ -30,7 +30,7 @@ interface SubredditServiceKt {
      * @param rawJson Set to 1 if the response should be raw JSON
      * @return A Call object ready to retrieve posts from a subreddit
      */
-    @GET("{subreddit}/{sort}?raw_json=1/")
+    @GET("{subreddit}/{sort}?raw_json=1")
     suspend fun getPosts(
             @Path("subreddit") subreddit: String,
             @Path("sort") sort: String,
