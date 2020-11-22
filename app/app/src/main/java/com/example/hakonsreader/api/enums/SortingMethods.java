@@ -7,21 +7,35 @@ public enum SortingMethods {
     /**
      * For sorting by new
      */
-    NEW,
+    NEW("new"),
+
     /**
      * For sorting by hot (typically the standard sort)
      */
-    HOT,
+    HOT("hot"),
+
     /**
      * For sorting by top
      *
      * @see PostTimeSort
      */
-    TOP,
+    TOP("top"),
+
     /**
      * For sorting by controversial
      *
      * @see PostTimeSort
      */
-    CONTROVERSIAL
+
+    CONTROVERSIAL("controversial");
+
+    private final String value;
+
+    SortingMethods(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

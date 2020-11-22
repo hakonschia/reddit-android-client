@@ -2,6 +2,7 @@ package com.example.hakonsreader.api.requestmodels
 
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
+import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
@@ -48,88 +49,21 @@ class SubredditRequestKt(
             ApiResponse.Error(GenericError(-1), e)
         }
     }
-    /**
-     *
-     * Retrieves posts from the subreddit. The subreddits sorted here are by *hot*
-     *
-     * If an access token for a user is set posts are customized for the user
-     *
-     * No specific OAuth scope is required
-     *
-     * @param after The ID of the last post seen. Default value is an empty string (ie. no post seen)
-     * @param count The amount of posts already retrieved. Default value is *0* (ie. no posts seen)
-     *
-     * @see posts
-     */
-    suspend fun posts(after: String = "", count: Int = 0) : ApiResponse<List<RedditPost>> {
-        return getPosts("hot", after = after, count = count)
-    }
-
-    /**
-     * Retrieve an object that can retrieve posts by different sorts
-     */
-    fun posts() : SubredditPostsRequest = SubredditPostsRequest()
-
-    inner class SubredditPostsRequest {
-        /**
-         * Retrieves *controversial* posts from the subreddit
-         *
-         * If an access token for a user is set posts are customized for the user
-         *
-         * No specific OAuth scope is required
-         *
-         * @param timeSort The time sort for the posts to retireve
-         * @param after The ID of the last post seen. Default value is an empty string (ie. no post seen)
-         * @param count The amount of posts already retrieved. Default value is *0* (ie. no posts seen)
-         */
-        suspend fun controversial(timeSort: PostTimeSort, after: String = "", count: Int = 0) : ApiResponse<List<RedditPost>> {
-            return getPosts("controversial", timeSort, after, count)
-        }
-
-        /**
-         * Retrieves *top* posts from the subreddit
-         *
-         * If an access token for a user is set posts are customized for the user
-         *
-         * No specific OAuth scope is required
-         *
-         * @param timeSort The time sort for the posts to retireve
-         * @param after The ID of the last post seen. Default value is an empty string (ie. no post seen)
-         * @param count The amount of posts already retrieved. Default value is *0* (ie. no posts seen)
-         */
-        suspend fun top(timeSort: PostTimeSort, after: String, count: Int) : ApiResponse<List<RedditPost>> {
-            return getPosts("top", timeSort, after, count)
-        }
-
-        /**
-         * Retrieves *new* posts from the subreddit
-         *
-         * If an access token for a user is set posts are customized for the user
-         *
-         * No specific OAuth scope is required
-         *
-         * @param after The ID of the last post seen. Default value is an empty string (ie. no post seen)
-         * @param count The amount of posts already retrieved. Default value is *0* (ie. no posts seen)
-         */
-        suspend fun newPosts(after: String = "", count: Int = 0) : ApiResponse<List<RedditPost>> {
-            return getPosts("new", after = after, count = count)
-        }
-    }
 
     /**
      * Retrieves posts from the subreddit
      *
      * If an access token for a user is set posts are customized for the user
      *
-     * No specific OAuth scope is required
+     * OAuth scope required: *read*
      *
-     * @param sort The sort for the posts (new, hot, top, or controversial)
-     * @param timeSort How the posts should be time sorted. This only has an affect on top and controversial,
-     *                 and can be set to null for new and hot
-     * @param after The ID of the last post seen (or an empty string if first time loading)
-     * @param count The amount of posts already retrieved (0 if first time loading)
+     * @param postSort sort for the posts (new, hot, top, or controversial). Default is [SortingMethods.HOT]
+     * @param timeSort How the posts should be time sorted. This only has an affect on top and controversial.
+     * Default is [PostTimeSort.DAY]
+     * @param after The ID of the last post seen. Default is an empty string (ie. no last post)
+     * @param count The amount of posts already retrieved. Default is *0* (ie. no posts already)
      */
-    private suspend fun getPosts(sort: String = "hot", timeSort: PostTimeSort? = null, after: String = "", count: Int = 0) : ApiResponse<List<RedditPost>> {
+    suspend fun posts(postSort: SortingMethods = SortingMethods.HOT, timeSort: PostTimeSort = PostTimeSort.DAY, after: String = "", count: Int = 0) : ApiResponse<List<RedditPost>> {
         // If not blank (ie. front page) add "r/" at the start
         val sub = if (subredditName.isBlank()) {
             ""
@@ -140,11 +74,13 @@ class SubredditRequestKt(
         return try {
             val resp = api.getPosts(
                     sub,
-                    sort,
-                    if (timeSort == null) "" else timeSort.value,
+                    postSort.value,
+                    timeSort.value,
                     after,
                     count
             )
+
+            // TODO is this an actual issue for the Kotlin version since getPost() will return a ListingResponseKt with RedditPost?
 
             // If the subreddit doesn't exist, Reddit wants to be helpful (or something) and redirects
             // the response to a search request instead. This causes issues as the response being sent back
