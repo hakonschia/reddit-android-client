@@ -31,7 +31,7 @@ import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
 import com.example.hakonsreader.markwonplugins.RedditSpoilerPlugin;
 import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
-import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
+import com.example.hakonsreader.viewmodels.SelectSubredditsViewModelK;
 import com.facebook.stetho.Stetho;
 import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.r0adkll.slidr.model.SlidrConfig;
@@ -592,6 +592,6 @@ public class App extends Application {
     public void clearUserInfo() {
         TokenManager.removeToken();
         SharedPreferencesManager.removeNow(SharedPreferencesConstants.USER_INFO);
-        SharedPreferencesManager.removeNow(SelectSubredditsViewModel.SUBSCRIBED_SUBREDDITS_KEY);
+        SharedPreferencesManager.removeNow(SelectSubredditsViewModelK.SUBSCRIBED_SUBREDDITS_KEY);
     }
 }

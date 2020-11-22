@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel;
+import com.example.hakonsreader.viewmodels.SelectSubredditsViewModelK;
 
 public class SelectSubredditsFactory implements ViewModelProvider.Factory {
     private final Context context;
@@ -16,6 +16,6 @@ public class SelectSubredditsFactory implements ViewModelProvider.Factory {
 
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new SelectSubredditsViewModel(context);
+        return (T) new SelectSubredditsViewModelK(context);
     }
 }

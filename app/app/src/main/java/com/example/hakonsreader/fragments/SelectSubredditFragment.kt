@@ -23,7 +23,7 @@ import com.example.hakonsreader.interfaces.OnSubredditSelected
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.viewmodels.SearchForSubredditsViewModel
-import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
+import com.example.hakonsreader.viewmodels.SelectSubredditsViewModelK
 import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +65,7 @@ class SelectSubredditFragmentK : Fragment() {
 
     private var subredditsAdapter: SubredditsAdapter? = null
     private var subredditsLayoutManager: LinearLayoutManager? = null
-    private var subredditsViewModel: SelectSubredditsViewModel? = null
+    private var subredditsViewModel: SelectSubredditsViewModelK? = null
 
     private var searchSubredditsAdapter: SubredditsAdapter? = null
     private var searchSubredditsLayoutManager: LinearLayoutManager? = null
@@ -110,18 +110,18 @@ class SelectSubredditFragmentK : Fragment() {
      */
     private fun setupSubredditsViewModel() {
         subredditsViewModel = ViewModelProvider(this, SelectSubredditsFactory(context))
-                .get(SelectSubredditsViewModel::class.java)
+                .get(SelectSubredditsViewModelK::class.java)
 
-        subredditsViewModel!!.subreddits.observe(viewLifecycleOwner, { subreddits ->
-            subredditsAdapter?.submitList(subreddits, true)
+        subredditsViewModel!!.getSubreddits().observe(viewLifecycleOwner, { subreddits ->
+            subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
             subredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY))
         })
 
-        subredditsViewModel!!.onCountChange().observe(viewLifecycleOwner, { onCountChange ->
+        subredditsViewModel!!.getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
             binding?.loadingIcon?.onCountChange(onCountChange)
         })
 
-        subredditsViewModel!!.error.observe(viewLifecycleOwner, { error ->
+        subredditsViewModel!!.getError().observe(viewLifecycleOwner, { error ->
             Util.handleGenericResponseErrors(view, error.error, error.throwable)
         })
     }
