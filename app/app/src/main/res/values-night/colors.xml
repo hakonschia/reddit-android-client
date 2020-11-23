@@ -10,6 +10,7 @@
     <color name="secondary_background">#121212</color>
     <color name="opposite_background">#FFFFFF</color>
     <color name="opposite_secondaryBackground">#EAEAEA</color>
+    <color name="background_with_alpha">#FF000000</color>
 
     <color name="text_color">#FFFFFF</color>
     <color name="textColorTextPosts">#DFDFDF</color>

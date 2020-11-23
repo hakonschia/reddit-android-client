@@ -186,6 +186,7 @@ class PostsViewModel(
                     crosspostIds.add(crosspost.id)
                 }
 
+                // TODO probably this that causes the ConcurrentModificationException
                 it.crosspostIds = crosspostIds
             }
         }

@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
@@ -26,6 +27,8 @@ public class Tag extends LinearLayout {
     private String text;
     private int textColor;
     private int fillColor;
+
+    private boolean textColorOverriden = false;
 
     public Tag(Context context) {
         this(context, null, 0);
@@ -63,27 +66,46 @@ public class Tag extends LinearLayout {
     /**
      * Sets the fill/background color of the tag
      *
-     * @param color The color resource ID
+     * @param color The color resource ID. If this is fully transparent (ie. alpha = 255) then the text color
+     *              of the tag is overridden to be the themes text color
      */
     public void setFillColor(int color) {
+        int alpha = (color >> 8 * 3) & 0xFF;
+        if (alpha == 255) {
+            textColor = ContextCompat.getColor(getContext(), R.color.text_color);
+            textColorOverriden = true;
+            // The elevation shadow will still be visible on light backgrounds
+            binding.cardView.setCardElevation(0f);
+        }
+
         binding.cardView.setCardBackgroundColor(color);
     }
 
     /**
      * Sets the fill/background color of the tag
      *
-     * @param hexColor A hex string representing a color
+     * @param hexColor A hex string representing a color. Note: If this is set to "transparent"
+     *                 then the text color will be overridden and always be set to the current themes
+     *                 text color
      */
     public void setFillColor(String hexColor) {
         if (hexColor.equals("transparent")) {
-            hexColor = "#80000000";
+            setFillColor(ContextCompat.getColor(getContext(), R.color.background_with_alpha));
+        } else {
+            setFillColor(Color.parseColor(hexColor));
         }
-
-        binding.cardView.setCardBackgroundColor(Color.parseColor(hexColor));
     }
 
+    /**
+     * Sets the text color for the tag. If {@link Tag#setFillColor(String)} is set with "transparent"
+     * then this will override the text color with the themes text color
+     *
+     * @param textColor The color to set for the text
+     */
     public void setTextColor(int textColor) {
-        this.textColor = textColor;
+        if (!textColorOverriden) {
+            this.textColor = textColor;
+        }
     }
 
     /**
