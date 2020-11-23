@@ -14,7 +14,7 @@ import com.example.hakonsreader.api.responses.ApiResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import java.util.ArrayList
+import java.util.*
 
 /**
  * ViewModel for retrieving Reddit posts from a user or subreddit
@@ -170,9 +170,10 @@ class PostsViewModel(
 
         // Store (or update) the posts in the database
         // We use all the posts here as duplicates will just be updated, which is fine
-        // TODO this causes ConcurrentModificationException sometimes when loading profiles
+        database.posts().insertAll(newPosts)
+
+        // Store the crossposts
         newPosts.forEach {
-            database.posts().insert(it)
             val crossposts = it.crossposts
 
             if (!crossposts.isNullOrEmpty()) {
@@ -186,7 +187,6 @@ class PostsViewModel(
                     crosspostIds.add(crosspost.id)
                 }
 
-                // TODO probably this that causes the ConcurrentModificationException
                 it.crosspostIds = crosspostIds
             }
         }
