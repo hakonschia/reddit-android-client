@@ -213,7 +213,6 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
         val binding: ListItemSubredditBinding = b
 
         init {
-            // TODO switching orientation somehow disables the listener? subredditSelected is probably null?
             // The listener must be set on both the root view and the description since the description
             // has movement method and we have to check if the description is clicked on a link
             binding.root.setOnClickListener {

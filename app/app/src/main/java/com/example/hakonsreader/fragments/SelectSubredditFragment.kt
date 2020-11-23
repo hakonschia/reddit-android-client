@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -77,6 +78,13 @@ class SelectSubredditFragmentK : Fragment() {
      * The listener for when a subreddit has been clicked
      */
     var subredditSelected: OnSubredditSelected? = null
+        set(value) {
+            field = value
+            // When the device orientation changes and the fragment is recreated, the setter for this
+            // will be called after the fragment has gone through onCreate/onCreateView, so the
+            // value set on subredditsAdapter will be null
+            subredditsAdapter?.subredditSelected = value
+        }
 
     /**
      * Updates the favorite for a subreddit. Calls the Reddit API and based on the response

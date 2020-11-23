@@ -233,6 +233,10 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         activeSubreddit = (SubredditFragment) getSupportFragmentManager().getFragment(restoredState, ACTIVE_SUBREDDIT_FRAGMENT);
         selectSubredditFragment = (SelectSubredditFragmentK) getSupportFragmentManager().getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT);
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(restoredState, PROFILE_FRAGMENT);
+
+        if (selectSubredditFragment != null) {
+            selectSubredditFragment.setSubredditSelected(this);
+        }
     }
 
     /**
