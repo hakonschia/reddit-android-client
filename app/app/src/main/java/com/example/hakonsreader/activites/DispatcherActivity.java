@@ -161,10 +161,6 @@ public class DispatcherActivity extends AppCompatActivity {
             intent.putExtra(ImageActivity.IMAGE_URL, url);
 
             fadeTransition = true;
-
-            // TODO check if URL is an imgur image and add .png
-
-
         } else if (url.matches(LinkUtils.GIF_REGEX)) {
             intent = new Intent(this, VideoActivity.class);
             // TODO for this to work I need to rewrite ContentVideo so there is an additional class

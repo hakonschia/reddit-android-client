@@ -91,6 +91,11 @@ public class VoteBar extends ConstraintLayout {
      * @param voteType The vote type to cast
      */
     private void vote(VoteType voteType) {
+        // In a case that the post doesn't load, clicking on the vote buttons would cause a NPE
+        if (listing == null) {
+            return;
+        }
+
         VoteType current = listing.getVoteType();
 
         // Ie. if upvote is clicked when the listing is already upvoted, unvote the listing
