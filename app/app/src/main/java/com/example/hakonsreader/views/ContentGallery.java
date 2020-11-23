@@ -91,6 +91,27 @@ public class ContentGallery extends Content {
         // Keep all images alive to not have to reload them
         binding.galleryImages.setOffscreenPageLimit(imagesSize);
 
+        binding.galleryImages.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                setActiveImageText(position);
+                lockSlidr(position != 0);
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                // Not implemented
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                // Not implemented
+            }
+        });
+
+        // If I can manage to lock the slidr only when the gallery is touched, and unlocked when not touched
+        // then I can add back the infinite paging. If I can't manage that then having a gallery will lock
+        // the slidr completely
+        /*
         // The ViewPager will be an infinite scroller. The adapter returns a size 3 times images.size()
         // so set the current item to the middle
         //      Here
@@ -133,14 +154,15 @@ public class ContentGallery extends Content {
                 // Not implemented
             }
         });
-        // Set initial state
-        setActiveImageText(0);
+
 
         // If the context of the gallery is attached to a Slidr make sure it's locked so
         // swipes in the gallery won't slide the activity/fragment away
         lockSlidr(true);
+         */
 
-        // TODO get extras with which image is currently viewed for when post is opened
+        // Set initial state
+        setActiveImageText(0);
     }
 
     /**
@@ -186,7 +208,6 @@ public class ContentGallery extends Content {
         super.setExtras(extras);
 
         int activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, images.size());
-        Log.d(TAG, "setExtras: activeImage="+activeImage);
         binding.galleryImages.setCurrentItem(activeImage, false);
     }
 
@@ -204,12 +225,14 @@ public class ContentGallery extends Content {
 
         @Override
         public int getCount() {
-            return images.size() == 1 ? 1 : images.size() * 3;
+           // return images.size() == 1 ? 1 : images.size() * 3;
+            return images.size();
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, final int position) {
-            Image image = images.get(position % images.size());
+            //Image image = images.get(position % images.size());
+            Image image = images.get(position);
 
             // Use ContentImage as that already has listeners, NSFW caching etc already
             ContentImage contentImage = new ContentImage(context);
