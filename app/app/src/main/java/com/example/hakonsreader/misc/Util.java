@@ -1,12 +1,14 @@
 package com.example.hakonsreader.misc;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.LogInActivity;
 import com.example.hakonsreader.activites.MainActivity;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.RateLimitException;
@@ -81,9 +83,10 @@ public class Util {
             // If getContext instance of MainAcitivty we can set the navbar item to profile and, otherwise create activity for logging in
             if (context instanceof MainActivity) {
                 ((MainActivity)context).selectProfileNavBar();
+            } else {
+                // Otherwise we can open an activity showing a login fragment
+                context.startActivity(new Intent(context, LogInActivity.class));
             }
-
-            // TODO if we're not in MainActivity we need to open a LogInActivity or something
         });
         snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
         snackbar.show();

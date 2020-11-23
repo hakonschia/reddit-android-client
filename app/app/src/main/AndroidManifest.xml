@@ -65,6 +65,9 @@
             android:name=".activites.WebViewActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme"/>
 
+        <activity
+            android:name=".activites.LogInActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme"/>
 
         <activity
             android:name=".activites.DispatcherActivity"
