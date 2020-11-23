@@ -67,10 +67,20 @@ public class VoteBar extends ConstraintLayout {
         this.updateVoteStatus();
     }
 
+    /**
+     * Sets if the score should always be hidden
+     *
+     * @param hideScore True to always hide the score
+     */
     public void setHideScore(boolean hideScore) {
         this.hideScore = hideScore;
     }
 
+    /**
+     * Gets if the score is set to always be hidden
+     *
+     * @return True if the score is always hidden
+     */
     public boolean getHideScore() {
         return hideScore;
     }

@@ -64,8 +64,20 @@ public class Post extends Content {
         binding = PostBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
+    /**
+     * Call this if the score should always be hidden. Must be called before {@link Post#setRedditPost(RedditPost)}
+     */
     public void setHideScore(boolean hideScore) {
         binding.postFullBar.setHideScore(hideScore);
+    }
+
+    /**
+     * Gets if the score is set to always be hidden
+     *
+     * @return True if the score is always hidden
+     */
+    public boolean getHideScore() {
+        return binding.postFullBar.getHideScore();
     }
 
     /**

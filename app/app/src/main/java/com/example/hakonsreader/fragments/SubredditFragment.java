@@ -537,6 +537,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         Intent intent = new Intent(getContext(), PostActivity.class);
         intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(post.getRedditPost()));
         intent.putExtra(Content.EXTRAS, post.getExtras());
+        intent.putExtra(PostActivity.HIDE_SCORE_KEY, post.getHideScore());
 
         // Only really applicable for videos, as they should be paused
         post.viewUnselected();

@@ -57,6 +57,11 @@ public class FullPostBar extends ConstraintLayout {
         binding.voteBar.setHideScore(hideScore);
     }
 
+    /**
+     * Gets if the score is set to always be hidden
+     *
+     * @return True if the score is always hidden
+     */
     public boolean getHideScore() {
         return binding.voteBar.getHideScore();
     }

@@ -263,6 +263,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         if (p != null) {
             post = new Gson().fromJson(p, RedditPost.class);
             postId = post.getId();
+            binding.post.setHideScore(extras.getBoolean(PostActivity.HIDE_SCORE_KEY));
 
             // If we have an image ensure the image is fully loaded before we start the transition
             // This is to avoid images showing the placeholder image during the transition. Even if
