@@ -56,7 +56,7 @@ public class RedditPost extends RedditListing {
 
 
     @SerializedName("is_self")
-    private boolean isText;
+    private boolean isSelf;
 
     @SerializedName("is_video")
     private boolean isVideo;
@@ -462,8 +462,10 @@ public class RedditPost extends RedditListing {
         return selftextHtml;
     }
 
-    public boolean isText() {
-        return isText;
+    public boolean isSelf() {
+        // If it's a crosspost the domain will be "self.<subreddit the original is in>" which is counted
+        // as a crosspost
+        return isSelf || domain.matches("self.*");
     }
 
     public boolean isVideo() {
@@ -531,8 +533,8 @@ public class RedditPost extends RedditListing {
         this.crosspostIds = crosspostIds;
     }
 
-    public void setText(boolean text) {
-        isText = text;
+    public void setSelf(boolean self) {
+        isSelf = self;
     }
 
     public void setVideo(boolean video) {
@@ -622,7 +624,7 @@ public class RedditPost extends RedditListing {
         // TODO make this less bad
         if (isVideo) {
             return PostType.VIDEO;
-        } else if (isText) {
+        } else if (isSelf) {
             return PostType.TEXT;
         } else if (isGallery) {
             return PostType.GALLERY;
@@ -693,7 +695,7 @@ public class RedditPost extends RedditListing {
         RedditPost that = (RedditPost) o;
         return amountOfComments == that.amountOfComments &&
                 spoiler == that.spoiler &&
-                isText == that.isText &&
+                isSelf == that.isSelf &&
                 isVideo == that.isVideo &&
                 isGallery == that.isGallery &&
                 isArchived == that.isArchived &&
@@ -726,6 +728,6 @@ public class RedditPost extends RedditListing {
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, amountOfComments, subreddit, thumbnail, spoiler, selftext, selftextHtml, crosspostParentID, crossposts, crosspostIds, isText, isVideo, isGallery, isArchived, postHint, domain, removedByCategory, saved, isUserMod, authorFlairBackgroundColor, authorFlairTextColor, authorFlairText, authorRichtextFlairs, linkFlairBackgroundColor, linkFlairTextColor, linkFlairText, linkRichtextFlairs, media, mediaMetadata, galleryImages, preview);
+        return Objects.hash(title, amountOfComments, subreddit, thumbnail, spoiler, selftext, selftextHtml, crosspostParentID, crossposts, crosspostIds, isSelf, isVideo, isGallery, isArchived, postHint, domain, removedByCategory, saved, isUserMod, authorFlairBackgroundColor, authorFlairTextColor, authorFlairText, authorRichtextFlairs, linkFlairBackgroundColor, linkFlairTextColor, linkFlairText, linkRichtextFlairs, media, mediaMetadata, galleryImages, preview);
     }
 }

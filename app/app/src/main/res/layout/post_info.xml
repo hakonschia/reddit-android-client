@@ -40,10 +40,10 @@
 
             android:ellipsize="end"
             android:maxLines="1"
-            android:text='@{post != null &amp;&amp; !post.text ? post.domain : ""}'
+            android:text='@{post != null &amp;&amp; !post.self ? post.domain : ""}'
             android:textColor="@color/secondary_text_color"
             android:textSize="13sp"
-            android:visibility='@{post != null &amp;&amp; !post.text ? View.VISIBLE : View.GONE}'
+            android:visibility="@{post != null &amp;&amp; !post.self ? View.VISIBLE : View.GONE}"
 
             app:layout_constrainedWidth="true"
             app:layout_constraintHorizontal_bias="0.0"
