@@ -170,6 +170,7 @@ class PostsViewModel(
 
         // Store (or update) the posts in the database
         // We use all the posts here as duplicates will just be updated, which is fine
+        // TODO this causes ConcurrentModificationException sometimes when loading profiles
         newPosts.forEach {
             database.posts().insert(it)
             val crossposts = it.crossposts

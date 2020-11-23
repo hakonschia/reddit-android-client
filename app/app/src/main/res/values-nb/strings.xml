@@ -189,4 +189,6 @@
     <string name="prefs_title_show_nsfw_preview_blur">Uklart</string>
     <string name="prefs_title_show_nsfw_preview_no_image">Ingen bilde</string>
     <string name="showAllComments">Vis alle kommentarer</string>
+    <string name="imageLoadFailedDialogTitle">Feil ved innlasting av bildet</string>
+    <string name="imageLoadFailedDialogContent">En feil skjedde ved innlastingen av bildet.\nBildet har muligens blitt slettet</string>
 </resources>

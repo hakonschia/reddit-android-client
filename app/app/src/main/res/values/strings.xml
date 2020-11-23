@@ -293,4 +293,7 @@
     <string name="postRemoveSticky">Remove sticky</string>
 
     <string name="lockComment">Lock</string>
+
+    <string name="imageLoadFailedDialogTitle">Error loading image</string>
+    <string name="imageLoadFailedDialogContent">There was an error loading the image.\nThe image might have been deleted</string>
 </resources>

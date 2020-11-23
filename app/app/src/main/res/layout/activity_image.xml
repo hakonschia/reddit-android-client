@@ -2,6 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/imageVideoActivityBackground">
 
     <com.github.chrisbanes.photoview.PhotoView
@@ -11,4 +13,18 @@
 
         android:transitionName="image"/>
 
+    <com.example.hakonsreader.views.LoadingIcon
+        android:id="@+id/loadingIcon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:indeterminateOnly="true"
+        android:visibility="gone"
+        style="?android:attr/progressBarStyleHorizontal"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

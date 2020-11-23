@@ -1,5 +1,6 @@
 package com.example.hakonsreader.activites;
 
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowInsets;
@@ -7,17 +8,20 @@ import android.view.WindowInsetsController;
 import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.utils.LinkUtils;
+import com.example.hakonsreader.databinding.ActivityImageBinding;
 import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.github.chrisbanes.photoview.PhotoViewAttacher;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrInterface;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -32,12 +36,14 @@ public class ImageActivity extends AppCompatActivity {
     public static final String IMAGE_URL = "imageUrl";
 
     private SlidrInterface slidrInterface;
+    private ActivityImageBinding binding;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image);
+        binding = ActivityImageBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // The color retrieved is "0x<alpha><red><green><blue>" (each one byte, 8 bits)
         int color = getColor(R.color.imageVideoActivityBackground);
@@ -71,25 +77,34 @@ public class ImageActivity extends AppCompatActivity {
 
             String imageUrl = data.getString(IMAGE_URL);
 
-            PhotoView image = findViewById(R.id.image);
-            PhotoViewAttacher attacher = image.getAttacher();
+            PhotoViewAttacher attacher = binding.image.getAttacher();
             attacher.setMaximumScale(7f);
 
-            image.setOnDoubleTapListener(new PhotoViewDoubleTapListener(attacher, slidrInterface));
+            binding.image.setOnDoubleTapListener(new PhotoViewDoubleTapListener(attacher, slidrInterface));
 
             imageUrl = LinkUtils.convertToDirectUrl(imageUrl);
 
-            // This needs to be resized or else we will get "Canvas: Trying to draw too large bitmap"
-            // TODO since we're resizing we can probably try to get a closer match in images from the
-            //  preview images (also for ContentImage)
-
-            // TODO add callback for if the image fails and show something, since now it just shows
-            //  an overview with nothing if the image fails
+            binding.loadingIcon.onCountChange(true);
             Picasso
                     .get()
                     .load(imageUrl)
                     .resize(App.get().getScreenWidth(), 0)
-                    .into(image);
+                    .into(binding.image, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            binding.loadingIcon.onCountChange(false);
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            binding.loadingIcon.onCountChange(false);
+                            e.printStackTrace();
+                            new AlertDialog.Builder(ImageActivity.this)
+                                    .setTitle(R.string.imageLoadFailedDialogTitle)
+                                    .setMessage(R.string.imageLoadFailedDialogContent)
+                                    .setOnDismissListener(dialog -> finish())
+                                    .show();
+                        }
+                    });
         } else {
             finish();
         }
