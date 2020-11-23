@@ -21,8 +21,8 @@ class SubredditRequestKt(
         private val subredditName: String,
         private val accessToken: AccessToken,
         private val api: SubredditServiceKt,
-        private val imgurApi: ImgurService?
-        ) {
+        imgurApi: ImgurService?
+) {
 
     private val imgurRequest: ImgurRequest = ImgurRequest(imgurApi)
     private val loadImgurAlbumsAsRedditGalleries: Boolean = imgurApi != null

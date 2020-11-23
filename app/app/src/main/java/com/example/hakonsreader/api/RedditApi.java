@@ -16,6 +16,7 @@ import com.example.hakonsreader.api.requestmodels.SubredditRequestKt;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequestKt;
 import com.example.hakonsreader.api.requestmodels.UserRequests;
+import com.example.hakonsreader.api.requestmodels.UserRequestsKt;
 import com.example.hakonsreader.api.service.CommentService;
 import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.PostService;
@@ -24,6 +25,7 @@ import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.service.SubredditServiceKt;
 import com.example.hakonsreader.api.service.SubredditsService;
 import com.example.hakonsreader.api.service.SubredditsServiceKt;
+import com.example.hakonsreader.api.service.UserServiceKt;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
 import com.example.hakonsreader.api.responses.GenericError;
@@ -169,6 +171,12 @@ public class RedditApi {
     private UserService userApi;
 
     /**
+     * The service object used to communicate with the Reddit API about user related calls
+     * for Kotlin
+     */
+    private UserServiceKt userApiKt;
+
+    /**
      * The service object used to communicate with the Reddit API about subreddit related calls
      */
     private SubredditService subredditApi;
@@ -301,6 +309,7 @@ public class RedditApi {
                 .build();
 
         userApi = apiRetrofit.create(UserService.class);
+        userApiKt = apiRetrofit.create(UserServiceKt.class);
         subredditApi = apiRetrofit.create(SubredditService.class);
         subredditApiKt = apiRetrofit.create(SubredditServiceKt.class);
         subredditsApi = apiRetrofit.create(SubredditsService.class);
@@ -721,6 +730,10 @@ public class RedditApi {
      */
     public UserRequests user(String username) {
         return new UserRequests(userApi, accessToken, username, imgurService);
+    }
+
+    public UserRequestsKt userKt(String username) {
+        return new UserRequestsKt(username, accessToken, userApiKt, imgurService);
     }
 
 
