@@ -36,9 +36,8 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
             // Match whitespace, start of string, in a parenthesis, or not in a [] (ie. already a markdown link)
             "(^|\\s|\\(|(?=\\[))" +
             // Match either subreddit or user regex
-                    // TODO i messed these regexes up so they dont match /r/.. only r/...
-            "(" + LinkUtils.BASE_SUBREDDIT_REGEX + ")" +
-            "|(" + LinkUtils.BASE_USER_REGEX + ")"
+            "(/?" + LinkUtils.BASE_SUBREDDIT_REGEX + ")" +
+            "|(/?" + LinkUtils.BASE_USER_REGEX + ")"
     );
 
 

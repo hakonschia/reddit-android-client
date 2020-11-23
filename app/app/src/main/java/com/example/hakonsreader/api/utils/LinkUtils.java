@@ -9,9 +9,9 @@ public final class LinkUtils {
 
     /**
      * Basic subreddit regex that only matches "{@code < r/<allowed_subreddit_characters>}". This
-     * does not match a trailing slash
+     * does not match a preceding or trailing slash
      */
-    public static final String BASE_SUBREDDIT_REGEX = "/?(r|R)/[A-Za-z0-9_]+";
+    public static final String BASE_SUBREDDIT_REGEX = "(r|R)/[A-Za-z0-9_]+";
 
     /**
      * Regex for matching a subreddit URL. Matches either a full URL (only https, www optional) or only "r/...."
@@ -57,9 +57,9 @@ public final class LinkUtils {
 
     /**
      * Basic subreddit regex that only matches "{@code < u(ser)/<allowed_subreddit_characters>}". This
-     * does not match a trailing slash
+     * does not match a preceding or trailing slash
      */
-    public static final String BASE_USER_REGEX = "/?u(ser)?/[A-Za-z0-9_-]+";
+    public static final String BASE_USER_REGEX = "u(ser)?/[A-Za-z0-9_-]+";
 
     /**
      * Regex for matching a URL to a user. Matches either a full URL (only https, www optional) or only "u/...."
@@ -73,13 +73,10 @@ public final class LinkUtils {
      * <li>/user/hakonschia-three</li>
      * </ol>
      */
-    public static final String USER_REGEX = "(^|\\s)(https://(www.)?reddit.com)?/?u(ser)?/[A-Za-z0-9_-]+/?(\\s|$)";
+    public static final String USER_REGEX = "(^|\\s)(https://(.*)?reddit.com)?/?u(ser)?/[A-Za-z0-9_-]+/?(\\s|$)";
 
     /**
      * Regex matching a post URL
-     *
-     * <p>Note that this doesn't check for the start of the string (^) so it can be used for
-     * both stand-alone subreddit references (only r/...) and full URLs (reddit.com/r/...)</p>
      *
      * <p>Examples:
      * <ol>
@@ -90,7 +87,7 @@ public final class LinkUtils {
      * </ol>
      * </p>
      */
-    public static final String POST_REGEX = ".*/?" + BASE_SUBREDDIT_REGEX + "+/comments/.+/?(\\s|$)";
+    public static final String POST_REGEX = "http(s)://(.*)?reddit.com/" + BASE_SUBREDDIT_REGEX + "+/comments/.+/?(\\s|$)";
 
     /**
      * Matches a post URL with only {@code /comments/<postId>}

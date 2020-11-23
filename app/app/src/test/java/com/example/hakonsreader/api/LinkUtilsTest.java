@@ -1,7 +1,5 @@
 package com.example.hakonsreader.api;
 
-import android.util.Log;
-
 import com.example.hakonsreader.api.utils.LinkUtils;
 
 import org.junit.Test;
@@ -15,6 +13,52 @@ import static org.junit.Assert.*;
  * Class testing {@link com.example.hakonsreader.api.utils.LinkUtils}
  */
 public class LinkUtilsTest {
+
+    @Test
+    public void testBaseSubredditRegex() {
+        // Test cases that should match
+        String[] matchingTests = {
+                // Standard
+                "r/GlobalOffensive/",
+                // No trailing slash
+                "/r/GlobalOffensive",
+                // No preceding slash
+                "r/GlobalOffensive/",
+                // No preceding or trailing slash
+                "r/GlobalOffensive",
+                // Capitalized R
+                "/R/GlobalOffensive/",
+                // Allowed characters: A-Za-z, 0-9, "_"
+                "/r/aAbB03_439ger",
+        };
+
+        Pattern p = Pattern.compile(LinkUtils.BASE_SUBREDDIT_REGEX);
+        for (String matchingTest : matchingTests) {
+            Matcher matcher = p.matcher(matchingTest);
+            if (!matcher.find()) {
+                fail(String.format("'%s' doesn't match", matchingTest));
+            }
+        }
+
+        // Test cases that should NOT match
+        String[] notMatchingTests = {
+                // Duplicate r
+                "rr/GlobalOffensive/",
+                // Duplicate preceding slash
+                "//r/GlobalOffensive",
+                // Duplicate preceding slash
+                "r/GlobalOffensive//",
+                // Illegal characters
+                "/r/global---fre€€offensive"
+        };
+
+        for (String notMatchingTest : notMatchingTests) {
+            Matcher matcher = p.matcher(notMatchingTest);
+            if (matcher.find()) {
+                fail(String.format("'%s' matches", notMatchingTest));
+            }
+        }
+    }
 
     /**
      * Tests that {@link LinkUtils#SUBREDDIT_REGEX_WITH_HTTPS} matches what it should and does not
@@ -190,11 +234,11 @@ public class LinkUtilsTest {
 
 
     /**
-     * Tests {@link LinkUtils#USER_REGEX}. This should match links like "u/hakonschia"
+     * Tests {@link LinkUtils#BASE_USER_REGEX}. This should match links like "u/hakonschia"
      * that link to reddit user profiles
      */
     @Test
-    public void testUserRegex() {
+    public void testBaseUserRegex() {
         // Test cases that should match
         String[] matchingTests = {
                 "/u/hakonschia/",
@@ -205,7 +249,7 @@ public class LinkUtilsTest {
                 "/u/hanko_schia-s5",
         };
 
-        Pattern p = Pattern.compile(LinkUtils.USER_REGEX);
+        Pattern p = Pattern.compile(LinkUtils.BASE_USER_REGEX);
         for (String matchingTest : matchingTests) {
             Matcher matcher = p.matcher(matchingTest);
             if (!matcher.find()) {
