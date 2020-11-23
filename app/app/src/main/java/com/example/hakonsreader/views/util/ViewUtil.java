@@ -109,20 +109,17 @@ public class ViewUtil {
 
         Tag tag = new Tag(context);
 
-        int textColor;
         if (flairColor.equals("dark")) {
-            textColor = ContextCompat.getColor(context, R.color.flairTextDark);
+            tag.setTextColor(ContextCompat.getColor(context, R.color.flairTextDark));
             tag.setFillColor(ContextCompat.getColor(context, R.color.flairBackgroundDark));
         } else {
-            textColor = ContextCompat.getColor(context, R.color.flairTextLight);
+            tag.setTextColor(ContextCompat.getColor(context, R.color.flairTextLight));
             tag.setFillColor(ContextCompat.getColor(context, R.color.flairBackgroundLight));
         }
 
         if (backgroundColor != null && !backgroundColor.isEmpty()) {
             tag.setFillColor(backgroundColor);
         }
-
-        tag.setTextColor(textColor);
 
         // If no richtext flairs, try to see if there is a text flair
         // Apparently some subs set both text and richtext flairs *cough* GlobalOffensive *cough*

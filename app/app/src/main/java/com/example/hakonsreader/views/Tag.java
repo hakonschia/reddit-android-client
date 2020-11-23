@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,18 +67,9 @@ public class Tag extends LinearLayout {
     /**
      * Sets the fill/background color of the tag
      *
-     * @param color The color resource ID. If this is fully transparent (ie. alpha = 255) then the text color
-     *              of the tag is overridden to be the themes text color
+     * @param color The color resource ID
      */
     public void setFillColor(int color) {
-        int alpha = (color >> 8 * 3) & 0xFF;
-        if (alpha == 255) {
-            textColor = ContextCompat.getColor(getContext(), R.color.text_color);
-            textColorOverriden = true;
-            // The elevation shadow will still be visible on light backgrounds
-            binding.cardView.setCardElevation(0f);
-        }
-
         binding.cardView.setCardBackgroundColor(color);
     }
 
@@ -90,7 +82,13 @@ public class Tag extends LinearLayout {
      */
     public void setFillColor(String hexColor) {
         if (hexColor.equals("transparent")) {
+            // Getting the transparent value out of a color is apparently harder (if there is no transparent
+            // it still returns 255? so set it here only, not in setFillColor(int))
             setFillColor(ContextCompat.getColor(getContext(), R.color.background_with_alpha));
+            textColor = ContextCompat.getColor(getContext(), R.color.text_color);
+            textColorOverriden = true;
+            // The elevation shadow will still be visible on light backgrounds
+            binding.cardView.setCardElevation(0f);
         } else {
             setFillColor(Color.parseColor(hexColor));
         }
