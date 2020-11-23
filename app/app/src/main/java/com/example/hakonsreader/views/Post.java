@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -251,13 +252,13 @@ public class Post extends Content {
             // Links such as youtube, gfycat etc are rich video posts
             case RICH_VIDEO:
                 // Ensure we know how to handle a video, otherwise it might not load
+                Log.d(TAG, "generatePostContent: " + post.getDomain());
                 if (ContentVideo.KNOWN_VIDEO_DOMAINS.contains(post.getDomain().toLowerCase())) {
                     content = new ContentVideo(context);
-                    content.setRedditPost(post);
                 } else {
                     content = new ContentLink(context);
-                    content.setRedditPost(post);
                 }
+                content.setRedditPost(post);
 
                 break;
 

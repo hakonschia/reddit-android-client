@@ -659,7 +659,7 @@ public class RedditPost extends RedditListing {
             // but that shouldn't really matter
             if (url.matches(".+(.png|.jpeg|.jpg)$")) {
                 return PostType.IMAGE;
-            } else if (url.endsWith(".gifv")) {
+            } else if (url.endsWith(".gifv") || domain.matches("giphy.com")) {
                 return PostType.GIF;
             }
 

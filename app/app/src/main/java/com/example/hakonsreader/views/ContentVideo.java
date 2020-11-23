@@ -68,7 +68,7 @@ public class ContentVideo extends Content {
      */
     // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
     public static final List<String> KNOWN_VIDEO_DOMAINS = Collections.unmodifiableList(Arrays.asList(
-            "v.redd.it", "i.redd.it", "redgifs.com", "gfycat.com", "i.imgur.com", "media1.giphy.com", "media2.giphy.com"
+            "v.redd.it", "i.redd.it", "redgifs.com", "gfycat.com", "i.imgur.com", "giphy.com", "media1.giphy.com", "media2.giphy.com"
     ));
 
     /**
@@ -293,14 +293,8 @@ public class ContentVideo extends Content {
             media = new DashMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(redditVideo.getDashUrl()));
         } else {
-            String url = redditPost.getUrl();
-
-            // Gif uploaded to reddit directly
-            if (url.matches("^https://i.redd.it/.*")) {
-                url = redditPost.getMp4Source().getUrl();
-            } else {
-                url = LinkUtils.convertToDirectUrl(url);
-            }
+            // Reddit creates copies kept on their own servers of gifs from other places (like imgur, giphy etc.)
+            String url = redditPost.getMp4Source().getUrl();
 
             media = new ProgressiveMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(url));
