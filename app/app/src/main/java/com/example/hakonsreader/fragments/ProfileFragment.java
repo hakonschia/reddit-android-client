@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -174,7 +173,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        postsViewModel.onLoadingChange().observe(this, up -> {
+        postsViewModel.onLoadingCountChange().observe(this, up -> {
             binding.loadingIcon.onCountChange(up);
         });
     }
@@ -289,7 +288,7 @@ public class ProfileFragment extends Fragment {
 
                 // If this is the first time the user is on their profile, the username won't be set
                 // on the ViewModel, so set it
-                postsViewModel.setUserOrSubreddit(newUser.getName());
+                postsViewModel.setUserOrSubredditName(newUser.getName());
             }
 
             // Load the posts for the user

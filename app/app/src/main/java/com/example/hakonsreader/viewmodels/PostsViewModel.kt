@@ -16,7 +16,16 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import java.util.ArrayList
 
-class PostsViewModelKt(
+/**
+ * ViewModel for retrieving Reddit posts from a user or subreddit
+ *
+ * @param context An Android context used to create the local database if needed
+ * @param userOrSubredditName The name of the user or subreddit to retrieve posts from. This is
+ * mutable, but be aware that if changed it has to match the previous user or subreddit type (ie.
+ * it shouldn't go from a user to a subreddit)
+ * @param isUser True if the ViewModel is loading posts for a user, false for a subreddit
+ */
+class PostsViewModel(
         val context: Context,
         var userOrSubredditName: String,
         private val isUser: Boolean
@@ -110,21 +119,23 @@ class PostsViewModelKt(
             ""
         }
 
+        load(after, count)
+    }
+
+    /**
+     * Loads posts for the user/subreddit
+     *
+     * @param after The ID of the last post seen
+     * @param count The amount of posts already seen
+     */
+    private fun load(after: String, count: Int) {
         loadingChange.value = true
-        if (isUser) {
-            loadForUsers(after, count)
-        } else {
-            loadForSubreddits(after, count)
-        }
-    }
-
-    private fun loadForUsers(after: String, count: Int) {
-
-    }
-
-    private fun loadForSubreddits(after: String, count: Int) {
         CoroutineScope(IO).launch {
-            val resp = api.subredditKt(userOrSubredditName).posts(sort, timeSort, after, count)
+            val resp = if (isUser) {
+                api.userKt(userOrSubredditName).posts(sort, timeSort, after, count)
+            } else {
+                api.subredditKt(userOrSubredditName).posts(sort, timeSort, after, count)
+            }
             loadingChange.postValue(false)
 
             when (resp) {

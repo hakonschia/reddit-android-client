@@ -82,6 +82,9 @@ public class ImageActivity extends AppCompatActivity {
             // This needs to be resized or else we will get "Canvas: Trying to draw too large bitmap"
             // TODO since we're resizing we can probably try to get a closer match in images from the
             //  preview images (also for ContentImage)
+
+            // TODO add callback for if the image fails and show something, since now it just shows
+            //  an overview with nothing if the image fails
             Picasso
                     .get()
                     .load(imageUrl)

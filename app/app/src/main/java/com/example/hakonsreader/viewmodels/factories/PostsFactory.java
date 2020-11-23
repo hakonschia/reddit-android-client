@@ -7,9 +7,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 
-/**
- * Factory for PostsViewModel's
- */
 public class PostsFactory implements ViewModelProvider.Factory {
     private final Context context;
     private final String userOrSubreddit;

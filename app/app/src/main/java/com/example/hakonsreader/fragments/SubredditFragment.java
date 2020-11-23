@@ -40,9 +40,7 @@ import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListene
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
-import com.example.hakonsreader.viewmodels.PostsViewModelKt;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
-import com.example.hakonsreader.viewmodels.factories.PostsKtFactory;
 import com.example.hakonsreader.views.Content;
 import com.example.hakonsreader.views.Post;
 import com.google.gson.Gson;
@@ -131,7 +129,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         }
     };
 
-    private PostsViewModelKt postsViewModel;
+    private PostsViewModel postsViewModel;
     private PostsAdapter adapter;
     private LinearLayoutManager layoutManager;
 
@@ -165,11 +163,11 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
      * Sets up {@link SubredditFragment#postsViewModel}.
      */
     private void setupViewModel() {
-        postsViewModel = new ViewModelProvider(this, new PostsKtFactory(
+        postsViewModel = new ViewModelProvider(this, new PostsFactory(
                 getContext(),
                 getSubredditName(),
                 false
-        )).get(PostsViewModelKt.class);
+        )).get(PostsViewModel.class);
 
         postsViewModel.getPosts().observe(this, posts -> {
             if (posts.isEmpty()) {
