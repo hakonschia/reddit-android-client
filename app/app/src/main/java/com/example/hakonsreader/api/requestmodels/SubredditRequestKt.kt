@@ -62,8 +62,9 @@ class SubredditRequestKt(
      * Default is [PostTimeSort.DAY]
      * @param after The ID of the last post seen. Default is an empty string (ie. no last post)
      * @param count The amount of posts already retrieved. Default is *0* (ie. no posts already)
+     * @param limit The amount of posts to retrieve. Default is *25*
      */
-    suspend fun posts(postSort: SortingMethods = SortingMethods.HOT, timeSort: PostTimeSort = PostTimeSort.DAY, after: String = "", count: Int = 0) : ApiResponse<List<RedditPost>> {
+    suspend fun posts(postSort: SortingMethods = SortingMethods.HOT, timeSort: PostTimeSort = PostTimeSort.DAY, after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditPost>> {
         // If not blank (ie. front page) add "r/" at the start
         val sub = if (subredditName.isBlank()) {
             ""
@@ -77,10 +78,9 @@ class SubredditRequestKt(
                     postSort.value,
                     timeSort.value,
                     after,
-                    count
+                    count,
+                    limit
             )
-
-            // TODO is this an actual issue for the Kotlin version since getPost() will return a ListingResponseKt with RedditPost?
 
             // If the subreddit doesn't exist, Reddit wants to be helpful (or something) and redirects
             // the response to a search request instead. This causes issues as the response being sent back

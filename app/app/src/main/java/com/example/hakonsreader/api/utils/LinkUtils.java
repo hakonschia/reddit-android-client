@@ -149,8 +149,6 @@ public final class LinkUtils {
             return u;
         }
 
-        // TODO gfycat
-
         return url;
     }
 }

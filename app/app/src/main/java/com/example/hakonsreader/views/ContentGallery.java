@@ -95,6 +95,9 @@ public class ContentGallery extends Content {
             @Override
             public void onPageSelected(int position) {
                 setActiveImageText(position);
+
+                // TODO this is still not a great solution. If the user scrolls and doesn't go back
+                //  to the first image then the entire fragment/activity will be locked afterwards
                 lockSlidr(position != 0);
             }
 

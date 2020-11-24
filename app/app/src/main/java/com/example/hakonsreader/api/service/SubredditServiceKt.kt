@@ -2,8 +2,9 @@ package com.example.hakonsreader.api.service
 
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.responses.ListingResponse
 import com.example.hakonsreader.api.responses.ListingResponseKt
+import com.example.hakonsreader.api.enums.PostTimeSort
+import com.example.hakonsreader.api.enums.SortingMethods
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -24,11 +25,15 @@ interface SubredditServiceKt {
     /**
      * Retrieves posts from a subreddit
      *
-     * @param subreddit The subreddit to get posts in. Must prefix with "r/" unless posts are from front page
-     *                  (then just use an empty string)
-     * @param sort How to sort the post (new, best etc.)
-     * @param rawJson Set to 1 if the response should be raw JSON
-     * @return A Call object ready to retrieve posts from a subreddit
+     * @param subreddit The subreddit to get posts in. Must prefix with "r/" unless posts are
+     * from front page (then just use an empty string)
+     * @param sort How to sort the post (new, best etc.). This should use [SortingMethods] and its
+     * corresponding value
+     * @param timeSort How to sort the posts. This should use [PostTimeSort] and its corresponding value
+     * @param after The fullname of the last post retrieved
+     * @param count The amount of items already fetched
+     * @param limit The amount of posts to retrieve
+     * @return A Response object which will hold the posts
      */
     @GET("{subreddit}/{sort}?raw_json=1")
     suspend fun getPosts(
@@ -36,7 +41,8 @@ interface SubredditServiceKt {
             @Path("sort") sort: String,
             @Query("t") timeSort: String,
             @Query("after") after: String,
-            @Query("count") count: Int
+            @Query("count") count: Int,
+            @Query("limit") limit: Int
     ) : Response<ListingResponseKt<RedditPost>>
 
     /**

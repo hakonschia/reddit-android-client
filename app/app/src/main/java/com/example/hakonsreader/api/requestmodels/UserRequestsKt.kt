@@ -105,8 +105,9 @@ class UserRequestsKt(
      * Default is [PostTimeSort.DAY]
      * @param after The ID of the last post seen. Default is an empty string (ie. no last post)
      * @param count The amount of posts already retrieved. Default is *0* (ie. no posts already)
+     * @param limit The amount of posts to retrieve
      */
-    suspend fun posts(postSort: SortingMethods = SortingMethods.HOT, timeSort: PostTimeSort = PostTimeSort.DAY, after: String = "", count: Int = 0) : ApiResponse<List<RedditPost>> {
+    suspend fun posts(postSort: SortingMethods = SortingMethods.HOT, timeSort: PostTimeSort = PostTimeSort.DAY, after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditPost>> {
         if (username == null) {
             return ApiResponse.Error(GenericError(-1), IllegalStateException("Cannot get posts without a username"))
         }
@@ -115,10 +116,11 @@ class UserRequestsKt(
             val resp = api.getListingsFromUser<RedditPost>(
                     username,
                     "submitted",
-                    after,
-                    count,
                     postSort.value,
                     timeSort.value,
+                    after,
+                    count,
+                    limit
             )
 
             val posts = resp.body()?.getListings()
