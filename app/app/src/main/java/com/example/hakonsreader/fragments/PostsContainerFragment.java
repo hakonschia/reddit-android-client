@@ -17,13 +17,20 @@ import com.example.hakonsreader.misc.SectionsPageAdapter;
 
 
 /**
- * Fragment that contains the subreddit fragments
+ * Fragment that contains the standard subreddit fragments: Front page, Popular, All
  */
 public class PostsContainerFragment extends Fragment  {
     private static final String TAG = "PostsContainerFragment";
 
+    /**
+     * The key used to store the subreddit currently visible on the screen
+     */
+    private static final String ACTIVE_SUBREDDIT_KEY = "active_subreddit_posts_container";
+
+
+    private ViewPager viewPager;
     private SubredditFragment[] fragments;
-    private ItemLoadingListener loadingListener;
+    private Bundle saveState;
 
     /**
      * Creates and initializes the fragments needed. Sets {@link PostsContainerFragment#fragments}
@@ -37,6 +44,10 @@ public class PostsContainerFragment extends Fragment  {
                     SubredditFragment.newInstance("Popular"),
                     SubredditFragment.newInstance("All")
             };
+
+            for (SubredditFragment fragment : fragments) {
+                fragment.restoreState(saveState);
+            }
         }
     }
 
@@ -56,6 +67,38 @@ public class PostsContainerFragment extends Fragment  {
 
         // Always keep all fragments alive
         viewPager.setOffscreenPageLimit(3);
+
+        if (saveState != null) {
+            viewPager.setCurrentItem(saveState.getInt(ACTIVE_SUBREDDIT_KEY), false);
+        }
+    }
+
+    /**
+     * Saves the state of the fragments to a bundle. Restore the state with {@link PostsContainerFragment#restoreState(Bundle)}
+     *
+     * @param saveState The bundle to store the state to
+     */
+    public void saveState(Bundle saveState) {
+        for (SubredditFragment fragment : fragments) {
+            // I don't believe this will happen, but in case the fragment has been killed by the OS don't cause a NPE
+            if (fragment != null) {
+                fragment.saveState(saveState);
+            }
+        }
+
+        saveState.putInt(ACTIVE_SUBREDDIT_KEY, viewPager.getCurrentItem());
+    }
+
+    /**
+     * Restores the state stored for when the activity holding the fragment has been recreated in a
+     * way that doesn't permit the fragment to store its own state
+     *
+     * @param state The bundle holding the stored state
+     */
+    public void restoreState(Bundle state) {
+        if (state != null) {
+            saveState = state;
+        }
     }
 
 
@@ -66,7 +109,7 @@ public class PostsContainerFragment extends Fragment  {
 
         this.setupFragments();
 
-        ViewPager viewPager = view.findViewById(R.id.postsContainer);
+        viewPager = view.findViewById(R.id.postsContainer);
         this.setupViewPager(viewPager);
 
         return view;

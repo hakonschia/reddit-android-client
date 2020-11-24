@@ -113,8 +113,12 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
         // If fragments aren't null, save them
         // Save which fragment is the active one as well
-        if (postsFragment != null && postsFragment.isAdded()) {
-            getSupportFragmentManager().putFragment(outState, POSTS_FRAGMENT, postsFragment);
+        if (postsFragment != null) {
+            postsFragment.saveState(outState);
+
+            if (postsFragment.isAdded()) {
+                getSupportFragmentManager().putFragment(outState, POSTS_FRAGMENT, postsFragment);
+            }
         }
         if (activeSubreddit != null) {
             // If there is an active subreddit it won't be null, store the state of it even if it isn't
@@ -255,16 +259,23 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         selectSubredditFragment = (SelectSubredditFragmentK) getSupportFragmentManager().getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT);
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(restoredState, PROFILE_FRAGMENT);
 
-        if (selectSubredditFragment != null) {
-            selectSubredditFragment.setSubredditSelected(this);
+        if (postsFragment == null) {
+            postsFragment = new PostsContainerFragment();
+            postsFragment.restoreState(restoredState);
         }
 
         // Active subreddit not restored directly, check if it should be restored manually
         if (activeSubreddit == null) {
             String activeSubredditName = restoredState.getString("active_subreddit_name");
             if (activeSubredditName != null) {
+                // The state of the fragment itself is restored when it is accessed again
                 activeSubreddit = SubredditFragment.newInstance(activeSubredditName);
             }
+        }
+
+        // Restore the listener as it won't be set automatically
+        if (selectSubredditFragment != null) {
+            selectSubredditFragment.setSubredditSelected(this);
         }
     }
 
