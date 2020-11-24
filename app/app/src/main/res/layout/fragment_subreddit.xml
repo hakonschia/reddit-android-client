@@ -158,8 +158,6 @@
             android:id="@+id/postsRefreshLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -170,21 +168,17 @@
                 tools:listitem="@layout/list_item_post" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+        <!-- TODO figure out a way to remove the padding in this, it looks like it's below the top of the screen -->
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"
-            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_anchor="@id/postsRefreshLayout"
 
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
+            app:layout_anchor="@id/postsRefreshLayout"
+            style="?android:attr/progressBarStyleHorizontal"
+
             android:indeterminateOnly="true"
             android:visibility="gone"
-
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subredditRefresh"
 
             tools:visibility="visible" />
 
