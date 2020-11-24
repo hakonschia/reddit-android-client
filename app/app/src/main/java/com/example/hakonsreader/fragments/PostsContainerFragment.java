@@ -79,14 +79,18 @@ public class PostsContainerFragment extends Fragment  {
      * @param saveState The bundle to store the state to
      */
     public void saveState(Bundle saveState) {
-        for (SubredditFragment fragment : fragments) {
-            // I don't believe this will happen, but in case the fragment has been killed by the OS don't cause a NPE
-            if (fragment != null) {
-                fragment.saveState(saveState);
+        // If the fragments haven't been recreated yet, ie. in a subreddit from the navbar and they were destroyed
+        // but haven't yet been accessed again
+        if (fragments != null) {
+            for (SubredditFragment fragment : fragments) {
+                // I don't believe this will happen, but in case the fragment has been killed by the OS don't cause a NPE
+                if (fragment != null) {
+                    fragment.saveState(saveState);
+                }
             }
-        }
 
-        saveState.putInt(ACTIVE_SUBREDDIT_KEY, viewPager.getCurrentItem());
+            saveState.putInt(ACTIVE_SUBREDDIT_KEY, viewPager.getCurrentItem());
+        }
     }
 
     /**

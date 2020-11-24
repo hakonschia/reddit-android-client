@@ -331,8 +331,12 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
      * @param saveState The bundle to store the state to
      */
     public void saveState(@NonNull Bundle saveState) {
-        saveState.putStringArrayList(saveKey(POST_IDS_KEY), (ArrayList<String>) postsViewModel.getPostIds());
-        saveState.putParcelable(saveKey(LAYOUT_STATE_KEY), layoutManager.onSaveInstanceState());
+        if (postsViewModel != null) {
+            saveState.putStringArrayList(saveKey(POST_IDS_KEY), (ArrayList<String>) postsViewModel.getPostIds());
+        }
+        if (layoutManager != null) {
+            saveState.putParcelable(saveKey(LAYOUT_STATE_KEY), layoutManager.onSaveInstanceState());
+        }
     }
 
     /**
@@ -411,9 +415,12 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         // Setup the RecyclerView posts list
         this.setupPostsList();
 
+        // TODO if you go to settings, rotate and change theme, then the IDs wont be saved. The subreddit will be notified about
+        //  the first change, save the state, but the state isn't restored again for the second save so there's nothing to restore then
         if (saveState != null) {
-            postIds = saveState.getStringArrayList(POST_IDS_KEY + "_" + getSubredditName());
-            if (postIds != null) {
+            ArrayList<String> ids = saveState.getStringArrayList(POST_IDS_KEY + "_" + getSubredditName());
+            if (ids != null) {
+                postIds = ids;
                 postsViewModel.setPostIds(postIds);
             }
         }
