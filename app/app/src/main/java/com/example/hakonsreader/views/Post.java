@@ -267,7 +267,6 @@ public class Post extends Content {
                 break;
 
             case CROSSPOST:
-                /*
                 RedditPost parent = post.getCrossposts().get(0);
 
                 // If we are in a post only care about the actual post content, as it's not enough space
@@ -291,7 +290,6 @@ public class Post extends Content {
                     c.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border_crosspost));
                     content = c;
                 }
-                 */
                 break;
 
             case LINK:

@@ -111,6 +111,9 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState");
 
+        // TODO when rotating the state isn't saved like when changing theme (for instance the active subreddit is only saved when inside the subreddit
+        //  when in front page etc. the active subreddit wont be saved)
+
         // If fragments aren't null, save them
         // Save which fragment is the active one as well
         if (postsFragment != null) {

@@ -170,10 +170,6 @@ class PostsViewModel(
 
         posts.postValue(postsData)
 
-        // Store (or update) the posts in the database
-        // We use all the posts here as duplicates will just be updated, which is fine
-        database.posts().insertAll(newPosts)
-
         // Store the crossposts
         newPosts.forEach {
             val crossposts = it.crossposts
@@ -192,5 +188,10 @@ class PostsViewModel(
                 it.crosspostIds = crosspostIds
             }
         }
+
+        // Store (or update) the posts in the database
+        // We use all the posts here as duplicates will just be updated, which is fine
+        // This must be called after the crossposts are set or else the IDs wont be stored
+        database.posts().insertAll(newPosts)
     }
 }
