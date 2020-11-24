@@ -160,15 +160,6 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
     }
 
     @Override
-    public void finish() {
-        // Send back the current extras so that the post can be updated again
-        Intent intent = new Intent();
-        intent.putExtra(Content.EXTRAS, binding.post.getExtras());
-        setResult(RESULT_OK, intent);
-        super.finish();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
 

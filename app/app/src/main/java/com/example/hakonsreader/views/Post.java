@@ -1,6 +1,8 @@
 package com.example.hakonsreader.views;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
@@ -143,6 +146,9 @@ public class Post extends Content {
         binding.postInfo.setPost(redditPost);
         this.addContent();
         binding.postFullBar.setPost(redditPost);
+
+        setOnClickListener(v -> openPost());
+        setOnLongClickListener(v -> copyLinkToClipboard());
     }
 
     /**
@@ -352,6 +358,20 @@ public class Post extends Content {
                 postOpened = false;
             }).start();
         }
+    }
+
+    /**
+     * Copies the link of the post to the clipboard
+     *
+     * @return True (ie. event handled in a long click)
+     */
+    public boolean copyLinkToClipboard() {
+        ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("reddit post", getRedditPost().getUrl());
+        clipboard.setPrimaryClip(clip);
+
+        Toast.makeText(getContext(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
+        return true;
     }
 
     /**

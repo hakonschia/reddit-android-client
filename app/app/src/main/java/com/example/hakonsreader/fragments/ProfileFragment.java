@@ -153,7 +153,6 @@ public class ProfileFragment extends Fragment {
         }
 
         adapter = new PostsAdapter();
-        adapter.setPostOnClickListener(this::openPost);
         layoutManager = new LinearLayoutManager(getContext());
         postIds = new ArrayList<>();
 

@@ -41,22 +41,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private static final String TAG = "PostsAdapter";
     
     private List<RedditPost> posts = new ArrayList<>();
-    private OnClickListener<Post> postOnClickListener;
 
     /**
      * The amount of minutes scores should be hidden (default to -1 means not specified)
      */
     private int hideScoreTime = -1;
 
-    /**
-     * Sets the listener for when an item in the list has been clicked. Note that the listener will
-     * hold a {@link Post} view, not a {@link RedditPost}
-     *
-     * @param postOnClickListener The listener for clicks
-     */
-    public void setPostOnClickListener(OnClickListener<Post> postOnClickListener) {
-        this.postOnClickListener = postOnClickListener;
-    }
 
     /**
      * Submits the list of posts to show in the RecyclerView
@@ -179,29 +169,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     /**
      * The view for the items in the list
      */
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private final Post post;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             post = itemView.findViewById(R.id.post);
-
-            itemView.setOnClickListener(v -> {
-                // TODO if the post is a crosspost we need to open the crosspost post, not this post which always takes you to the
-                //  post in the subreddit that is not the original
-                if (postOnClickListener != null) {
-                    postOnClickListener.onClick(post);
-                }
-            });
-            itemView.setOnLongClickListener(v -> {
-                ClipboardManager clipboard = (ClipboardManager) post.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("reddit post", post.getRedditPost().getUrl());
-                clipboard.setPrimaryClip(clip);
-
-                Toast.makeText(post.getContext(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
-                return true;
-            });
         }
 
         /**

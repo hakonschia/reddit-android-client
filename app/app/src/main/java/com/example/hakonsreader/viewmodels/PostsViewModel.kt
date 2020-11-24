@@ -134,7 +134,7 @@ class PostsViewModel(
             val resp = if (isUser) {
                 api.userKt(userOrSubredditName).posts(sort, timeSort, after, count)
             } else {
-                api.subredditKt(userOrSubredditName).posts(sort, timeSort, after, count, 5)
+                api.subredditKt(userOrSubredditName).posts(sort, timeSort, after, count)
             }
             loadingChange.postValue(false)
 

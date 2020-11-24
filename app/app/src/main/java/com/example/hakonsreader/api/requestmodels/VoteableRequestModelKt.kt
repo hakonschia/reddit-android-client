@@ -16,7 +16,7 @@ import java.lang.Exception
  * Request class to cast a vote. This is a convenience class that other request classes that allow
  * for voting can use, and is not exposed outside the API package
  */
-private class VoteableRequestModelKt(
+internal class VoteableRequestModelKt(
         private val accessToken: AccessToken,
         private val api: VoteServiceKt
 ) {

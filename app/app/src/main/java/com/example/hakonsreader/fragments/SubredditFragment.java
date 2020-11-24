@@ -82,10 +82,6 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     private AppDatabase database;
     private Bundle saveState;
     private List<String> postIds;
-    /**
-     * The post that has been opened by a list click, or null if no post is opened
-     */
-    private Post postOpened;
 
     /**
      * Observable that automatically updates the UI when the internal object
@@ -207,9 +203,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             for (int i = firstVisible; i <= lastVisible; i++) {
                 PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)binding.posts.findViewHolderForLayoutPosition(i);
 
-                // If the ViewHolder is for the post that was opened don't restore the state as it will be
-                // restored in onActivityResult with an updated state (which is called first, so this would override it)
-                if (viewHolder != null && !viewHolder.isViewHolderForPost(postOpened)) {
+                if (viewHolder != null) {
                     // If the view has been destroyed the ViewHolders havent been created yet
                     Bundle extras = saveState.getBundle(VIEW_STATE_STORED_KEY + i);
                     if (extras != null) {
@@ -342,7 +336,6 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         binding = FragmentSubredditBinding.inflate(getLayoutInflater());
 
         adapter = new PostsAdapter();
-        adapter.setPostOnClickListener(this::openPost);
         layoutManager = new LinearLayoutManager(getContext());
         postIds = new ArrayList<>();
 
@@ -447,26 +440,6 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         this.restoreViewHolderStates();
     }
 
-    /**
-     * Handles results to the fragment
-     *
-     * @param requestCode The request code. If the request code is {@link SubredditFragment#REQUEST_CODE_POST_RESULT}
-     *                    then the bundle of extras is sent to the active subreddit fragment
-     * @param resultCode The result code
-     * @param data The intent data
-     */
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            // Resumed from PostActivity, get the bundle of post extras and send to the active fragment
-            if (requestCode == REQUEST_CODE_POST_RESULT && data != null) {
-                Bundle extras = data.getExtras().getBundle(Content.EXTRAS);
-                postOpened.setExtras(extras);
-            }
-        }
-    }
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -524,25 +497,5 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     @Override
     public void controversial(PostTimeSort timeSort) {
         postsViewModel.restart(SortingMethods.CONTROVERSIAL, timeSort);
-    }
-
-    /**
-     * Opens a post in a new activity
-     *
-     * @param post The post to open
-     */
-    private void openPost(Post post) {
-        postOpened = post;
-
-        Intent intent = new Intent(getContext(), PostActivity.class);
-        intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(post.getRedditPost()));
-        intent.putExtra(Content.EXTRAS, post.getExtras());
-        intent.putExtra(PostActivity.HIDE_SCORE_KEY, post.getHideScore());
-
-        // Only really applicable for videos, as they should be paused
-        post.viewUnselected();
-
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), post.getTransitionViews());
-        startActivityForResult(intent, REQUEST_CODE_POST_RESULT, options.toBundle());
     }
 }
