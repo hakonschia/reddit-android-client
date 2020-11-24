@@ -86,31 +86,77 @@ class SelectSubredditFragmentK : Fragment() {
             subredditsAdapter?.subredditSelected = value
         }
 
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        this.setupBinding(container)
+
+        this.setupSubredditsList()
+        this.setupSearchSubredditsList()
+
+        this.setupSearchViewModel()
+        this.setupSubredditsViewModel()
+
+        // TODO this probably shouldn't be called every time, since it's not necessary to load subreddits
+        //  every time the user opens to the fragment. Can load every 5 hours or something
+        subredditsViewModel?.loadSubreddits()
+
+        return binding?.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // If there's text in the input field, returning to the fragment should not trigger another search
+        // TODO restore the list as well
+        searchTimerTask?.cancel()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        saveState.putParcelable(LIST_STATE_KEY, subredditsLayoutManager?.onSaveInstanceState())
+        saveState.putParcelable(SEARCH_LIST_STATE_KEY, searchSubredditsLayoutManager?.onSaveInstanceState())
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
+
     /**
-     * Updates the favorite for a subreddit. Calls the Reddit API and based on the response
-     * updates the favorite status and list accordingly
+     * Infaltes and sets up [binding]
      */
-    private fun favoriteClicked(subreddit: Subreddit) {
-        val favorite = !subreddit.isFavorited
-        api.subreddit(subreddit.name).favorite(favorite, {
-            run {
-                subreddit.isFavorited = favorite
-                subredditsAdapter?.onFavorite(subreddit)
+    private fun setupBinding(container: ViewGroup?) {
+        binding = FragmentSelectSubredditBinding.inflate(layoutInflater, container, false)
 
-                // If the top is visible make sure the top is also visible after the item has moved
-                if (subredditsLayoutManager?.findFirstCompletelyVisibleItemPosition() == 0) {
-                    subredditsLayoutManager?.scrollToPosition(0)
-                }
+        binding?.subredditSearch?.setOnEditorActionListener(actionDoneListener)
+        binding?.subredditSearch?.addTextChangedListener(automaticSearchListener)
+    }
 
-                CoroutineScope(IO).launch {
-                    database.subreddits().update(subreddit)
-                }
-            }
-        }, { error, throwable ->
-            run {
-                Util.handleGenericResponseErrors(view, error, throwable)
-            }
-        })
+    /**
+     * Sets up the list of subreddits (the "default" list shown with subscribed/default subreddits)
+     */
+    private fun setupSubredditsList() {
+        subredditsAdapter = SubredditsAdapter()
+        subredditsAdapter?.subredditSelected = subredditSelected
+        subredditsAdapter?.favoriteClicked = OnClickListener { subreddit -> favoriteClicked(subreddit) }
+        subredditsLayoutManager = LinearLayoutManager(context)
+
+        binding?.subreddits?.adapter = subredditsAdapter
+        binding?.subreddits?.layoutManager = subredditsLayoutManager
+    }
+
+    /**
+     * Sets up the list of subreddits from search results
+     */
+    private fun setupSearchSubredditsList() {
+        searchSubredditsAdapter = SubredditsAdapter()
+        searchSubredditsAdapter?.subredditSelected = subredditSelected
+        searchSubredditsLayoutManager = LinearLayoutManager(context)
+
+        binding?.searchedSubreddits?.adapter = searchSubredditsAdapter
+        binding?.searchedSubreddits?.layoutManager = searchSubredditsLayoutManager
     }
 
     /**
@@ -164,61 +210,31 @@ class SelectSubredditFragmentK : Fragment() {
     }
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = FragmentSelectSubredditBinding.inflate(layoutInflater)
+    /**
+     * Updates the favorite for a subreddit. Calls the Reddit API and based on the response
+     * updates the favorite status and list accordingly
+     */
+    private fun favoriteClicked(subreddit: Subreddit) {
+        val favorite = !subreddit.isFavorited
+        api.subreddit(subreddit.name).favorite(favorite, {
+            run {
+                subreddit.isFavorited = favorite
+                subredditsAdapter?.onFavorite(subreddit)
 
-        // Initialize the list of subreddits
-        subredditsAdapter = SubredditsAdapter()
-        subredditsAdapter?.subredditSelected = subredditSelected
-        subredditsAdapter?.favoriteClicked = OnClickListener { subreddit -> favoriteClicked(subreddit) }
-        subredditsLayoutManager = LinearLayoutManager(context)
+                // If the top is visible make sure the top is also visible after the item has moved
+                if (subredditsLayoutManager?.findFirstCompletelyVisibleItemPosition() == 0) {
+                    subredditsLayoutManager?.scrollToPosition(0)
+                }
 
-        binding?.subreddits?.adapter = subredditsAdapter
-        binding?.subreddits?.layoutManager = subredditsLayoutManager
-
-        // Initialize the list for searched subreddits
-        searchSubredditsAdapter = SubredditsAdapter()
-        searchSubredditsAdapter?.subredditSelected = subredditSelected
-        searchSubredditsLayoutManager = LinearLayoutManager(context)
-
-        binding?.searchedSubreddits?.adapter = searchSubredditsAdapter
-        binding?.searchedSubreddits?.layoutManager = searchSubredditsLayoutManager
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        this.setupSearchViewModel()
-        this.setupSubredditsViewModel()
-
-        // TODO this probably shouldn't be called every time, since it's not necessary to load subreddits
-        //  every time the user opens to the fragment. Can load every 5 hours or something
-        subredditsViewModel?.loadSubreddits()
-
-        binding?.subredditSearch?.setOnEditorActionListener(actionDoneListener)
-        binding?.subredditSearch?.addTextChangedListener(automaticSearchListener)
-
-        return binding?.root
-    }
-
-
-    override fun onPause() {
-        super.onPause()
-
-        saveState.putParcelable(LIST_STATE_KEY, subredditsLayoutManager?.onSaveInstanceState())
-        saveState.putParcelable(SEARCH_LIST_STATE_KEY, searchSubredditsLayoutManager?.onSaveInstanceState())
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        // If there's text in the input field, returning to the fragment should not trigger another search
-        // TODO restore the list as well
-        searchTimerTask?.cancel()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
+                CoroutineScope(IO).launch {
+                    database.subreddits().update(subreddit)
+                }
+            }
+        }, { error, throwable ->
+            run {
+                Util.handleGenericResponseErrors(view, error, throwable)
+            }
+        })
     }
 
 
