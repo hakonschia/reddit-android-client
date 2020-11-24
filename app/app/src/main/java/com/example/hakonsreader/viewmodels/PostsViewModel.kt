@@ -55,6 +55,8 @@ class PostsViewModel(
                 val sorted = ArrayList<RedditPost>()
 
                 value.forEach {
+                    // TODO crossposts aren't stored/retrieved correctly and they will cause a crash
+                    //  when attempting to create content
                     val post = findPost(postsFromDb, it)
                     if (post != null) {
                         sorted.add(post)

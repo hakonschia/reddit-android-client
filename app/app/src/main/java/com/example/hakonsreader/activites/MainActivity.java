@@ -29,6 +29,8 @@ import com.example.hakonsreader.misc.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
+
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 
@@ -41,7 +43,19 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private static final String PROFILE_FRAGMENT = "profileFragment";
     private static final String ACTIVE_NAV_ITEM = "activeNavItem";
 
+    /**
+     * The key used to store the name of the subreddit represented in {@link MainActivity#activeSubreddit}
+     *
+     * <p>When this key holds a value it does not necessarily mean the subreddit was active (shown on screen)
+     * at the time the instance was saved, but means that when clicking on the subreddit navbar, this should
+     * be shown again instead of the list of subreddits</p>
+     */
+    private static final String ACTIVE_SUBREDDIT_NAME = "active_subreddit_name";
+
+
     private ActivityMainBinding binding;
+
+    private Bundle savedState;
 
     // The fragments to show in the nav bar
     private PostsContainerFragment postsFragment;
@@ -69,10 +83,10 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
         intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/GlobalOffensive/comments/jznuc5/just_finished_the_m4a4_cybershark_a_new_skin_from/");
-        startActivity(intent);
+        //startActivity(intent);
 
         if (savedInstanceState != null) {
-            Log.d(TAG, "onCreate: instance saved");
+            savedState = savedInstanceState;
             this.restoreFragmentStates(savedInstanceState);
         } else {
             // Only setup the start fragment if we have no state to restore (as this is then a new activity)
@@ -102,8 +116,15 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         if (postsFragment != null && postsFragment.isAdded()) {
             getSupportFragmentManager().putFragment(outState, POSTS_FRAGMENT, postsFragment);
         }
-        if (activeSubreddit != null && activeSubreddit.isAdded()) {
-            getSupportFragmentManager().putFragment(outState, ACTIVE_SUBREDDIT_FRAGMENT, activeSubreddit);
+        if (activeSubreddit != null) {
+            // If there is an active subreddit it won't be null, store the state of it even if it isn't
+            // currently added (shown on screen)
+            outState.putString(ACTIVE_SUBREDDIT_NAME, activeSubreddit.getSubredditName());
+            activeSubreddit.saveState(outState);
+
+            if (activeSubreddit.isAdded()) {
+                getSupportFragmentManager().putFragment(outState, ACTIVE_SUBREDDIT_FRAGMENT, activeSubreddit);
+            }
         }
         if (selectSubredditFragment != null && selectSubredditFragment.isAdded()) {
             getSupportFragmentManager().putFragment(outState, SELECT_SUBREDDIT_FRAGMENT, selectSubredditFragment);
@@ -236,6 +257,14 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
         if (selectSubredditFragment != null) {
             selectSubredditFragment.setSubredditSelected(this);
+        }
+
+        // Active subreddit not restored directly, check if it should be restored manually
+        if (activeSubreddit == null) {
+            String activeSubredditName = restoredState.getString("active_subreddit_name");
+            if (activeSubredditName != null) {
+                activeSubreddit = SubredditFragment.newInstance(activeSubredditName);
+            }
         }
     }
 
@@ -436,6 +465,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 return selectSubredditFragment;
             } else {
                 // There is an active subreddit selected, show that instead of the list to return to the subreddit
+                activeSubreddit.restoreState(savedState);
                 return activeSubreddit;
             }
         }

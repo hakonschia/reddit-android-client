@@ -1,7 +1,5 @@
 package com.example.hakonsreader.fragments;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -13,7 +11,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
@@ -22,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.SortingMethods;
 import com.example.hakonsreader.api.enums.PostTimeSort;
@@ -41,9 +37,6 @@ import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
-import com.example.hakonsreader.views.Content;
-import com.example.hakonsreader.views.Post;
-import com.google.gson.Gson;
 import com.robinhood.ticker.TickerUtils;
 import com.squareup.picasso.Picasso;
 
@@ -73,7 +66,6 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
      * The key used to store the state of {@link SubredditFragment#layoutManager}
      */
     private static final String LAYOUT_STATE_KEY = "layout_state";
-    private static final int REQUEST_CODE_POST_RESULT = 1;
 
 
     private final RedditApi api = App.get().getApi();
@@ -176,9 +168,14 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
             // Possible state to restore
             if (saveState != null && size == 0) {
-                Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);
+                Parcelable state = saveState.getParcelable(saveKey(LAYOUT_STATE_KEY));
                 if (state != null) {
-                    layoutManager.onRestoreInstanceState(saveState.getParcelable(LAYOUT_STATE_KEY));
+                    layoutManager.onRestoreInstanceState(state);
+
+                    // If we're at this point we probably don't want the toolbar expanded
+                    // We get here when the fragment/activity holding the fragment has been restarted
+                    // so it usually looks odd if the toolbar now shows
+                    binding.subredditAppBarLayout.setExpanded(false, false);
 
                     // Resume videos etc etc
                     this.restoreViewHolderStates();
@@ -328,11 +325,45 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         postsViewModel.restart();
     }
 
+    /**
+     * Saves the state of the fragment to a bundle. Restore the state with {@link SubredditFragment#restoreState(Bundle)}
+     *
+     * @param saveState The bundle to store the state to
+     */
+    public void saveState(@NonNull Bundle saveState) {
+        saveState.putStringArrayList(saveKey(POST_IDS_KEY), (ArrayList<String>) postsViewModel.getPostIds());
+        saveState.putParcelable(saveKey(LAYOUT_STATE_KEY), layoutManager.onSaveInstanceState());
+    }
+
+    /**
+     * Restores the state stored for when the activity holding the fragment has been recreated in a
+     * way that doesn't permit the fragment to store its own state
+     *
+     * @param state The bundle holding the stored state
+     */
+    public void restoreState(@Nullable Bundle state) {
+        if (state != null) {
+            // Might be asking for trouble by doing overriding saveState like this? This function
+            // is meant to only be called when there is no saved state by the fragment
+            saveState = state;
+        }
+    }
+
+    /**
+     * Converts a base key into a unique key for this subreddit, so that the subreddit state can be
+     * stored in a global bundle holding states for multiple subreddits
+     *
+     * @param baseKey The base key to use
+     * @return A key unique to this subreddit
+     */
+    private String saveKey(String baseKey) {
+        return baseKey + "_" + getSubredditName();
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate " + getSubredditName());
         binding = FragmentSubredditBinding.inflate(getLayoutInflater());
 
         adapter = new PostsAdapter();
@@ -381,8 +412,10 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         this.setupPostsList();
 
         if (saveState != null) {
-            postIds = saveState.getStringArrayList(POST_IDS_KEY);
-            postsViewModel.setPostIds(postIds);
+            postIds = saveState.getStringArrayList(POST_IDS_KEY + "_" + getSubredditName());
+            if (postIds != null) {
+                postsViewModel.setPostIds(postIds);
+            }
         }
 
         binding.postsRefreshLayout.setOnRefreshListener(() -> {
@@ -441,12 +474,6 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState " + getSubredditName());
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy " + getSubredditName());
@@ -475,8 +502,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             saveState = new Bundle();
         }
 
-        saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
-        saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
+        saveState.putParcelable(saveKey(LAYOUT_STATE_KEY), layoutManager.onSaveInstanceState());
+        saveState.putStringArrayList(saveKey(POST_IDS_KEY), (ArrayList<String>) postsViewModel.getPostIds());
     }
 
     @Override
