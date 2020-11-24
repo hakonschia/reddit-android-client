@@ -11,10 +11,13 @@ import android.widget.Space;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.views.Tag;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -59,6 +62,46 @@ public class ViewUtil {
                     .into(imageView);
         } else {
             imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_baseline_emoji_emotions_200));
+        }
+    }
+
+    /**
+     * Sets an ImageView to a subreddits banner background. If no image is found the visibility of the view
+     * is set to GONE.
+     *
+     * <p>If data saving is enabled the image will only be loaded if the image is found in the local cache</p>
+     *
+     * @param imageView The ImageView to load the banner into
+     * @param subreddit The subreddit to load the banner for
+     */
+    @BindingAdapter("subredditBanner")
+    public static void setSubredditBannerImage(ImageView imageView, Subreddit subreddit) {
+        String bannerURL = subreddit.getBannerImage();
+        if (bannerURL != null && !bannerURL.isEmpty()) {
+            // Data saving on, only load if the image is already cached
+            if (App.get().dataSavingEnabled()) {
+                Picasso.get()
+                        .load(bannerURL)
+                        .networkPolicy(NetworkPolicy.OFFLINE)
+                        .into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                imageView.setVisibility(View.VISIBLE);
+
+                            }
+                            @Override
+                            public void onError(Exception e) {
+                                imageView.setVisibility(View.GONE);
+                            }
+                        });
+            } else {
+                imageView.setVisibility(View.VISIBLE);
+                Picasso.get()
+                        .load(bannerURL)
+                        .into(imageView);
+            }
+        } else {
+            imageView.setVisibility(View.GONE);
         }
     }
 

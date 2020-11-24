@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     protected void onDestroy() {
         super.onDestroy();
         App.get().unregisterReceivers();
+        binding = null;
     }
 
     /**

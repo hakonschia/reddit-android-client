@@ -783,13 +783,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param comment The comment the text is for
      */
     private static void formatAuthorInternal(TextView tv, RedditComment comment, boolean italic) {
-        Typeface typface;
+        Typeface typeface;
         if (comment.isByPoster()) {
-            typface = Typeface.defaultFromStyle(italic ? Typeface.BOLD_ITALIC : Typeface.BOLD);
+            typeface = Typeface.defaultFromStyle(italic ? Typeface.BOLD_ITALIC : Typeface.BOLD);
         } else {
-            typface = Typeface.defaultFromStyle(italic ? Typeface.ITALIC : Typeface.NORMAL);
+            typeface = Typeface.defaultFromStyle(italic ? Typeface.ITALIC : Typeface.NORMAL);
         }
-        tv.setTypeface(typface);
+        tv.setTypeface(typeface);
 
         if (comment.isAdmin()) {
             tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.commentByAdminBackground));
