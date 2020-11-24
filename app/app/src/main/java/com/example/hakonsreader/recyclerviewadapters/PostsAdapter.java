@@ -240,25 +240,5 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public void destroy() {
             post.cleanUpContent();
         }
-
-        /**
-         * Call when the view holding the ViewHolder has been paused. Any videos will be paused
-         */
-        public void pause() {
-            post.viewUnselected();
-        }
-
-        /**
-         * Checks if the ViewHolder's current post ID is equal to another post ID
-         *
-         * @param post The {@link Post} to check
-         * @return True if the {@link Post} this ViewHolder is displaying is equal to the one passed
-         */
-        public boolean isViewHolderForPost(@Nullable Post post) {
-            if (post == null) {
-                return false;
-            }
-            return this.post.getRedditPost().getId().equals(post.getRedditPost().getId());
-        }
     }
 }
