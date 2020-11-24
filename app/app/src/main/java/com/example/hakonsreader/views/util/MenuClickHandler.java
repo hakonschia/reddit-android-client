@@ -46,6 +46,10 @@ public class MenuClickHandler {
      * @param adapter The RecyclerView adapter the comment is in
      */
     public static void showPopupForCommentExtra(View view, RedditComment comment, CommentsAdapter adapter) {
+        // If the menu is clicked before the comment loads, it will be passed as null
+        if (comment == null) {
+            return;
+        }
         RedditUser user = App.getStoredUser();
 
         if (user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
@@ -159,7 +163,6 @@ public class MenuClickHandler {
      * @param adapter The RecyclerView adapter the comment is in
      */
     public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment, CommentsAdapter adapter) {
-        Log.d(TAG, "showPopupForCommentExtraForNonLoggedInUser: ");
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.comment_extra_generic_for_all_users);
         menu.inflate(R.menu.comment_extra_not_by_user);
@@ -246,6 +249,10 @@ public class MenuClickHandler {
      * @param post The post the popup is for
      */
     public static void showPopupForPost(View view, RedditPost post) {
+        // If the menu is clicked before the post loads, it will be passed as null
+        if (post == null) {
+            return;
+        }
         RedditUser user = App.getStoredUser();
 
         if (user != null && user.getName().equalsIgnoreCase(post.getAuthor())) {
