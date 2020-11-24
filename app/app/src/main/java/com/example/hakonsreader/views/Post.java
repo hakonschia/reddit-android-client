@@ -191,24 +191,21 @@ public class Post extends Content {
             binding.content.addView(content);
 
             if (maxHeight != NO_MAX_HEIGHT) {
-                binding.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        // Get height of the content and the total height of the entire post so we can resize the content correctly
-                        int height = content.getMeasuredHeight();
-                        int totalHeight = binding.postsParentLayout.getMeasuredHeight();
+                binding.content.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                    // Get height of the content and the total height of the entire post so we can resize the content correctly
+                    int height = content.getMeasuredHeight();
+                    int totalHeight = binding.postsParentLayout.getMeasuredHeight();
 
-                        // When loading from intent filter the total height is smaller than what it really is. hmm
+                    // When loading from intent filter the total height is smaller than what it really is. hmm
 
-                        // Entire post is too large, set new content height
-                        if (totalHeight > maxHeight) {
-                            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) content.getLayoutParams();
-                            params.height = maxHeight - totalHeight + height;
-                            content.setLayoutParams(params);
-                        }
-
-                        // TODO if video post maybe resume video after this is done as animation might look better
+                    // Entire post is too large, set new content height
+                    if (totalHeight > maxHeight) {
+                        LayoutParams params = (LayoutParams) content.getLayoutParams();
+                        params.height = maxHeight - totalHeight + height;
+                        content.setLayoutParams(params);
                     }
+
+                    // TODO if video post maybe resume video after this is done as animation might look better
                 });
             }
         }
