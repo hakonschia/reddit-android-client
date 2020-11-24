@@ -1,7 +1,5 @@
 package com.example.hakonsreader.fragments;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
@@ -12,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.databinding.BindingAdapter;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.databinding.FragmentProfileBinding;
@@ -29,9 +25,6 @@ import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.viewmodels.PostsViewModel;
 import com.example.hakonsreader.viewmodels.factories.PostsFactory;
-import com.example.hakonsreader.views.Content;
-import com.example.hakonsreader.views.Post;
-import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -46,8 +39,8 @@ import java.util.Locale;
  */
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
-    private static final String POST_IDS_KEY = "post_ids";
-    private static final String LAYOUT_STATE_KEY = "layout_state";
+    private static final String POST_IDS_KEY = "post_ids_profile";
+    private static final String LAYOUT_STATE_KEY = "layout_state_profile";
     /**
      * The key used to save the progress of the MotionLayout
      */
@@ -61,24 +54,32 @@ public class ProfileFragment extends Fragment {
      * The key set in the bundle with getArguments() that says if the fragment is for the logged in user
      */
     private static final String IS_LOGGED_IN_USER_KEY = "isLoggedInUser";
-    private static final int REQUEST_CODE_POST_RESULT = 1;
 
 
-    private boolean firstLoad = true;
-    private boolean isLoggedInUser;
+
     private final RedditApi redditApi = App.get().getApi();
     private FragmentProfileBinding binding;
-    private RedditUser user;
+
     /**
-     * The username of the user to retrieve information for. If this is null, the fragment is
+     * The object representing the Reddit user the fragment is for
+     */
+    private RedditUser user;
+
+    /**
+     * Flag to check if the fragment has loaded user information
+     */
+    private boolean firstLoad = true;
+
+    /**
+     * Flag to set if the fragment is for the logged in user or not
+     */
+    private boolean isLoggedInUser = false;
+
+    /**
+     * The username of the user to retrieve information for. If this is null, the fragment will be
      * for logged in users
      */
     private String username;
-
-    /**
-     * The post that has been opened by a list click, or null if no post is opened
-     */
-    private Post postOpened;
 
     private Bundle saveState;
     private List<String> postIds;
@@ -130,7 +131,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = FragmentProfileBinding.inflate(getLayoutInflater());
 
         Bundle args = getArguments();
         if (args != null) {
@@ -144,49 +144,26 @@ public class ProfileFragment extends Fragment {
             if (user != null) {
                 username = user.getName();
             }
-        } else {
-            binding.username.setText(username);
         }
-
-        if (savedInstanceState != null) {
-            binding.parentLayout.setProgress(savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
-        }
-
-        adapter = new PostsAdapter();
-        layoutManager = new LinearLayoutManager(getContext());
-        postIds = new ArrayList<>();
-
-        postsViewModel = new ViewModelProvider(this, new PostsFactory(
-                getContext(),
-                username,
-                true
-        )).get(PostsViewModel.class);
-        postsViewModel.getPosts().observe(this, posts -> {
-            adapter.submitList(posts);
-
-            if (saveState != null) {
-                Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);
-                if (state != null) {
-                    layoutManager.onRestoreInstanceState(saveState.getParcelable(LAYOUT_STATE_KEY));
-                }
-            }
-        });
-
-        postsViewModel.onLoadingCountChange().observe(this, up -> {
-            binding.loadingIcon.onCountChange(up);
-        });
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding.posts.setAdapter(adapter);
-        binding.posts.setLayoutManager(layoutManager);
-        binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> postsViewModel.loadPosts()));
+        this.setupBinding(container);
+        this.setupPostsList();
+        this.setupViewModel();
+
+        if (savedInstanceState != null) {
+            binding.parentLayout.setProgress(savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
+        }
+
+        postIds = new ArrayList<>();
 
         // Retrieve user info if there is no user previously stored, or if it's the fragments first time
         // loading (to ensure the information is up-to-date)
-        if (user == null || firstLoad) {
+        // If it's the fragments first time loading retrieve new user info to ensure it is up-to-date
+        if (firstLoad) {
             // Retrieve user info and then update
             this.getUserInfo();
             firstLoad = false;
@@ -204,6 +181,17 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        // If we have no username we can't get posts (we can't ask for posts for the logged in user without their username)
+        // The posts are retrieved automatically when the user information loads
+        if (adapter.getPosts().isEmpty() && postIds.isEmpty() && username != null) {
+            postsViewModel.loadPosts();
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
@@ -214,42 +202,9 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        // If we have no username we can't get posts (we can't ask for posts for the logged in user without their username)
-        // The posts are retrieved automatically when the user information loads
-        if (adapter.getPosts().isEmpty() && postIds.isEmpty() && username != null) {
-            postsViewModel.loadPosts();
-        }
-    }
-    /**
-     * Handles results to the fragment
-     *
-     * @param requestCode The request code. If the request code is {@link ProfileFragment#REQUEST_CODE_POST_RESULT}
-     *                    then the bundle of extras is sent to the active subreddit fragment
-     * @param resultCode The result code
-     * @param data The intent data
-     */
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            // Resumed from PostActivity, get the bundle of post extras and send to the active fragment
-            if (requestCode == REQUEST_CODE_POST_RESULT && data != null) {
-                Bundle extras = data.getExtras().getBundle(Content.EXTRAS);
-
-                // TODO on orientation changes this will be nulled
-                if (postOpened != null) {
-                    postOpened.setExtras(extras);
-                }
-            }
-        }
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
+
         if (saveState == null) {
             saveState = new Bundle();
         }
@@ -257,30 +212,86 @@ public class ProfileFragment extends Fragment {
         saveState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.getProgress());
         saveState.putParcelable(LAYOUT_STATE_KEY, layoutManager.onSaveInstanceState());
         saveState.putStringArrayList(POST_IDS_KEY, (ArrayList<String>) postsViewModel.getPostIds());
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
         binding = null;
     }
 
+
     /**
-     * Updates the views with the information found in {@link ProfileFragment#user}
+     * Inflates and sets up {@link ProfileFragment#binding}
+     *
+     * @param container The ViewGroup container for the fragment
      */
-    private void updateViews() {
-        // TODO if you go to the profile page, then go out before it loads it will crash when it loads, since binding is now null
-        binding.setUser(user);
+    private void setupBinding(ViewGroup container) {
+        binding = FragmentProfileBinding.inflate(getLayoutInflater(), container, false);
+
+        // We might not have a username at this point (first time loading for logged in user)
+        if (username != null) {
+            binding.username.setText(username);
+        }
+
         binding.setLoggedInUser(isLoggedInUser);
     }
 
     /**
-     * Retrieves user information about the user the fragment is for
+     * Sets up {@link ProfileFragment#postsViewModel}
+     */
+    private void setupViewModel() {
+        postsViewModel = new ViewModelProvider(this, new PostsFactory(
+                getContext(),
+                username,
+                true
+        )).get(PostsViewModel.class);
+
+        postsViewModel.getPosts().observe(getViewLifecycleOwner(), posts -> {
+            adapter.submitList(posts);
+
+            if (saveState != null) {
+                Parcelable state = saveState.getParcelable(LAYOUT_STATE_KEY);
+                if (state != null) {
+                    layoutManager.onRestoreInstanceState(saveState.getParcelable(LAYOUT_STATE_KEY));
+                }
+            }
+        });
+        postsViewModel.getError().observe(getViewLifecycleOwner(), e -> Util.handleGenericResponseErrors(requireView(), e.getError(), e.getThrowable()));
+        postsViewModel.onLoadingCountChange().observe(getViewLifecycleOwner(), up -> {
+            binding.loadingIcon.onCountChange(up);
+        });
+    }
+
+    /**
+     * Sets up {@link FragmentProfileBinding#posts}
+     */
+    private void setupPostsList() {
+        adapter = new PostsAdapter();
+        layoutManager = new LinearLayoutManager(getContext());
+
+        binding.posts.setAdapter(adapter);
+        binding.posts.setLayoutManager(layoutManager);
+        binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> postsViewModel.loadPosts()));
+    }
+
+
+    /**
+     * Updates {@link ProfileFragment#binding} with new user information if {@link ProfileFragment#user} isn't {@code null}
+     */
+    private void updateViews() {
+        if (user != null) {
+            binding.setUser(user);
+        }
+    }
+
+    /**
+     * Retrieves user information about the user the fragment is for. When information is retrieved
+     * posts are automatically loaded
      */
     public void getUserInfo() {
         binding.loadingIcon.onCountChange(true);
         // user(null) gets information about the logged in user, so we can use username directly
         redditApi.user(username).info(newUser -> {
+            user = newUser;
+            username = user.getName();
+
             // Store the updated user information if this profile is for the logged in user
             if (isLoggedInUser) {
                 App.storeUserInfo(newUser);
@@ -292,37 +303,19 @@ public class ProfileFragment extends Fragment {
 
             // Load the posts for the user
             postsViewModel.loadPosts();
-            this.user = newUser;
 
-            this.updateViews();
+            // If the view has been destroyed by the time the response comes back, binding will be nulled
             if (binding != null) {
+                this.updateViews();
                 binding.loadingIcon.onCountChange(false);
             }
-        }, (error, t) -> {
+        }, (e, t) -> {
             // If you get to this point and the user has left the fragment it will cause a NPE
             if (binding != null) {
-                Util.handleGenericResponseErrors(binding.parentLayout, error, t);
+                Util.handleGenericResponseErrors(binding.parentLayout, e, t);
                 binding.loadingIcon.onCountChange(false);
             }
         });
-    }
-    /**
-     * Opens a post in a new activity
-     *
-     * @param post The post to open
-     */
-    private void openPost(Post post) {
-        postOpened = post;
-
-        Intent intent = new Intent(getContext(), PostActivity.class);
-        intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(post.getRedditPost()));
-        intent.putExtra(Content.EXTRAS, post.getExtras());
-
-        // Only really applicable for videos, as they should be paused
-        post.viewUnselected();
-
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), post.getTransitionViews());
-        startActivityForResult(intent, REQUEST_CODE_POST_RESULT, options.toBundle());
     }
 
 

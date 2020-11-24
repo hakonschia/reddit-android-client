@@ -286,6 +286,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
     /**
      * Inflates and sets up {@link SubredditFragment#binding}
+     *
+     * @param container The ViewGroup container for the fragment
      */
     private void setupBinding(ViewGroup container) {
         binding = FragmentSubredditBinding.inflate(getLayoutInflater(), container, false);
