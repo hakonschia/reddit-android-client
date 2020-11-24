@@ -168,6 +168,13 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         binding = null;
     }
 
+    /**
+     * Handles results for when a reply has been sent
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -326,7 +333,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
     }
 
     /**
-     * Update the information about the post in the UI
+     * Update the information about the post in the UI, but does not make the content update
      */
     private void updatePostInfo() {
         binding.setPost(post);
@@ -346,13 +353,11 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         binding.comments.setAdapter(commentsAdapter);
         binding.comments.setLayoutManager(layoutManager);
 
-
         commentsAdapter.setOnChainShown(() -> binding.setCommentChainShown(true));
         binding.showAllComments.setOnClickListener(v -> {
             commentsAdapter.setCommentIdChain("");
             binding.setCommentChainShown(false);
         });
-
     }
 
     /**
@@ -440,8 +445,6 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      */
     @Override
     public void lock(boolean lock) {
-        // TODO since galleries are now infinite scrollable this will also be locked when a gallery is
-        //  present. Should probably override some onTouch or something and lock based on that
         if (lock) {
             slidrInterface.lock();
         } else {
