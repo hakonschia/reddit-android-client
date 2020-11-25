@@ -172,6 +172,11 @@ class PostsViewModel(
 
         posts.postValue(postsData)
 
+        // Inserting posts sometimes causes ConcurrentModificationException, so only insert posts
+        // at the end instead of in the loop and at the end to try and fix it
+        val postsToInsertIntoDb = ArrayList<RedditPost>()
+        postsToInsertIntoDb.addAll(newPosts)
+
         // Store the crossposts
         newPosts.forEach {
             val crossposts = it.crossposts
@@ -184,6 +189,7 @@ class PostsViewModel(
                 // when there are RedditPost objects inside a RedditPost (or I just don't know how to)
                 crossposts.forEach { crosspost ->
                     database.posts().insert(crosspost)
+                    postsToInsertIntoDb.add(crosspost)
                     crosspostIds.add(crosspost.id)
                 }
 
@@ -194,6 +200,6 @@ class PostsViewModel(
         // Store (or update) the posts in the database
         // We use all the posts here as duplicates will just be updated, which is fine
         // This must be called after the crossposts are set or else the IDs wont be stored
-        database.posts().insertAll(newPosts)
+        database.posts().insertAll(postsToInsertIntoDb)
     }
 }
