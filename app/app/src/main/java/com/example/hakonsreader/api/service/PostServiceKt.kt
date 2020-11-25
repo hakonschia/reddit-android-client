@@ -5,10 +5,7 @@ import com.example.hakonsreader.api.model.RedditListing
 import com.example.hakonsreader.api.responses.JsonResponseKt
 import com.example.hakonsreader.api.responses.ListingResponseKt
 import retrofit2.Response
-import retrofit2.http.Field
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 /**
  * Service interface to make post related API calls towards Reddit
@@ -39,6 +36,8 @@ interface PostServiceKt : VoteServiceKt, ReplyServiceKt, SaveServiceKt, ModServi
      * @param rawJson Set to 1 if the response should be raw JSON
      * @return A Response with a [JsonResponseKt] holding the new comments
      */
+    @POST("api/morechildren")
+    @FormUrlEncoded
     suspend fun getMoreComments(
             @Field("children") children: String,
             @Field("link_id") linkId: String,

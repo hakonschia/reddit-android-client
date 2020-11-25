@@ -11,6 +11,7 @@ import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.requestmodels.CommentRequest;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
+import com.example.hakonsreader.api.requestmodels.PostRequestKt;
 import com.example.hakonsreader.api.requestmodels.SubredditRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditRequestKt;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequest;
@@ -21,6 +22,7 @@ import com.example.hakonsreader.api.service.CommentService;
 import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.PostService;
 import com.example.hakonsreader.api.service.OAuthService;
+import com.example.hakonsreader.api.service.PostServiceKt;
 import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.service.SubredditServiceKt;
 import com.example.hakonsreader.api.service.SubredditsService;
@@ -203,6 +205,8 @@ public class RedditApi {
      */
     private PostService postApi;
 
+    private PostServiceKt postApiKt;
+
     /**
      * The service object used to communicate with the Reddit API about comment related calls
      */
@@ -315,6 +319,7 @@ public class RedditApi {
         subredditsApi = apiRetrofit.create(SubredditsService.class);
         subredditsApiKt = apiRetrofit.create(SubredditsServiceKt.class);
         postApi = apiRetrofit.create(PostService.class);
+        postApiKt = apiRetrofit.create(PostServiceKt.class);
         commentApi = apiRetrofit.create(CommentService.class);
 
         // For Imgur we don't need any authentication, and adding it would cause issues
@@ -661,6 +666,10 @@ public class RedditApi {
      */
     public PostRequest post(String postId) {
         return new PostRequest(accessToken, postApi, postId);
+    }
+
+    public PostRequestKt postKt(String postId) {
+        return new PostRequestKt(accessToken, postApiKt, postId);
     }
 
     /**

@@ -76,7 +76,7 @@ class PostRequestKt(
      * Note that this is the parent of the new comments, not the comment holding the list children
      * retrieved with [RedditComment.getChildren].
      */
-    suspend fun moreComments(children: List<String>, parent: RedditComment?) : ApiResponse<List<RedditComment>> {
+    suspend fun moreComments(children: List<String>, parent: RedditComment? = null) : ApiResponse<List<RedditComment>> {
         // If no children are given, just return an empty list as it's not strictly an error but it will cause an API error later on
         if (children.isEmpty()) {
             return ApiResponse.Success(ArrayList())

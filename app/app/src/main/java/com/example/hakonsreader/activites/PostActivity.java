@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionListenerAdapter;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -30,7 +29,6 @@ import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.example.hakonsreader.viewmodels.CommentsViewModel;
 import com.example.hakonsreader.views.Content;
-import com.example.hakonsreader.views.ContentGallery;
 import com.example.hakonsreader.views.ContentVideo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
@@ -210,7 +208,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      */
     private void setupCommentsViewModel() {
         commentsViewModel = new ViewModelProvider(this).get(CommentsViewModel.class);
-        commentsViewModel.onLoadingChange().observe(this, binding.loadingIcon::onCountChange);
+        commentsViewModel.onLoadingCountChange().observe(this, binding.loadingIcon::onCountChange);
         commentsViewModel.getPost().observe(this, newPost -> {
             boolean postPreviouslySet = post != null;
             post = newPost;
