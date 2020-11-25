@@ -74,6 +74,13 @@ class SelectSubredditFragmentK : Fragment() {
     private var searchTimerTask: TimerTask? = null
 
     /**
+     * Flag to check if subreddits have already been loaded, and shouldn't be loaded again when
+     * the fragment view is recreated
+     */
+    private var subredditsLoaded = false
+
+
+    /**
      * The listener for when a subreddit has been clicked
      */
     var subredditSelected: OnSubredditSelected? = null
@@ -95,9 +102,9 @@ class SelectSubredditFragmentK : Fragment() {
         this.setupSearchViewModel()
         this.setupSubredditsViewModel()
 
-        // TODO this probably shouldn't be called every time, since it's not necessary to load subreddits
-        //  every time the user opens to the fragment. Can load every 5 hours or something
-        subredditsViewModel?.loadSubreddits()
+        if (!subredditsLoaded) {
+            subredditsViewModel?.loadSubreddits()
+        }
 
         return binding?.root
     }
@@ -166,6 +173,7 @@ class SelectSubredditFragmentK : Fragment() {
                 .get(SelectSubredditsViewModelK::class.java)
 
         subredditsViewModel!!.getSubreddits().observe(viewLifecycleOwner, { subreddits ->
+            subredditsLoaded = true
             subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
             subredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY))
         })
