@@ -24,6 +24,6 @@ interface VoteServiceKt {
     suspend fun vote(
             @Field("id") fullname: String,
             @Field("dir") dir: Int
-    ) : Response<Nothing>
+    ) : Response<Any>
 
 }
