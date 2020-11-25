@@ -133,7 +133,7 @@ class PostRequestKt(
 
 
     /**
-     * Save the comment
+     * Save the post
      *
      * OAuth scope required: *save*
      *
@@ -145,7 +145,7 @@ class PostRequestKt(
     }
 
     /**
-     * Unsave the comment
+     * Unsave the post
      *
      * OAuth scope required: *save*
      *

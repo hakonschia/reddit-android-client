@@ -87,8 +87,7 @@ class VoteBarKt : FrameLayout {
                 val resp = if (listing is RedditPost) {
                     api.postKt(id)
                 } else {
-                    // TODO change to comment when comment request has kotlin version
-                    api.postKt(id)
+                    api.commentKt(id)
                 }.vote(actualVote)
 
                 when (resp) {

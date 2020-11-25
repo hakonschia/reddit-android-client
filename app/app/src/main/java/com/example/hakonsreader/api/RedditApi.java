@@ -10,6 +10,7 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.requestmodels.CommentRequest;
+import com.example.hakonsreader.api.requestmodels.CommentRequestKt;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
 import com.example.hakonsreader.api.requestmodels.PostRequestKt;
 import com.example.hakonsreader.api.requestmodels.SubredditRequest;
@@ -19,6 +20,7 @@ import com.example.hakonsreader.api.requestmodels.SubredditsRequestKt;
 import com.example.hakonsreader.api.requestmodels.UserRequests;
 import com.example.hakonsreader.api.requestmodels.UserRequestsKt;
 import com.example.hakonsreader.api.service.CommentService;
+import com.example.hakonsreader.api.service.CommentServiceKt;
 import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.PostService;
 import com.example.hakonsreader.api.service.OAuthService;
@@ -212,6 +214,8 @@ public class RedditApi {
      */
     private CommentService commentApi;
 
+    private CommentServiceKt commentApiKt;
+
     /**
      * The service object used to communicate only with the part of the Reddit API
      * that deals with OAuth access tokens
@@ -321,6 +325,7 @@ public class RedditApi {
         postApi = apiRetrofit.create(PostService.class);
         postApiKt = apiRetrofit.create(PostServiceKt.class);
         commentApi = apiRetrofit.create(CommentService.class);
+        commentApiKt = apiRetrofit.create(CommentServiceKt.class);
 
         // For Imgur we don't need any authentication, and adding it would cause issues
         // as adding the access token for Reddit would break things for Imgur, so only add the logger
@@ -680,6 +685,10 @@ public class RedditApi {
      */
     public CommentRequest comment(String commentId) {
         return new CommentRequest(commentId, accessToken, commentApi);
+    }
+
+    public CommentRequestKt commentKt(String commentId) {
+        return new CommentRequestKt(accessToken, commentApiKt, commentId);
     }
 
     /**
