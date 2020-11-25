@@ -7,12 +7,14 @@ import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.views.Content;
 import com.example.hakonsreader.views.ContentVideo;
 import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
@@ -54,7 +56,14 @@ public class VideoActivity extends AppCompatActivity {
             Gson gson = new Gson();
             RedditPost redditPost = gson.fromJson(getIntent().getExtras().getString(POST), RedditPost.class);
 
-            Bundle extras = getIntent().getExtras().getBundle("extras");
+            Bundle extras;
+
+            // Restore from the saved state if possible
+            if (savedInstanceState != null) {
+                extras = savedInstanceState.getBundle(Content.EXTRAS);
+            } else {
+                extras = data.getBundle(Content.EXTRAS);
+            }
 
             if (!App.get().muteVideoByDefaultInFullscreen()) {
                 extras.putBoolean(ContentVideo.EXTRA_VOLUME, true);
@@ -84,6 +93,20 @@ public class VideoActivity extends AppCompatActivity {
                 .build();
 
         Slidr.attach(this, config);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Store the new extras so that we use that to update the video progress instead of
+        // the one passed when the activity was started
+        outState.putBundle(Content.EXTRAS, content.getExtras());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        content.release();
     }
 
     @Override
