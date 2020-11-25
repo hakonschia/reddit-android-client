@@ -151,6 +151,8 @@ class PostsViewModel(
         val filtered = newPosts.filter {
             val id = it.id
             // If the ID isn't in the list, add it and keep it in the filtered list
+            // TODO this has crashed from ArrayIndexOutOfBoundsException with length=19, index= 26
+            //  which makes no sense?
             if (!postIds.contains(id)) {
                 postIds.add(id)
                 true

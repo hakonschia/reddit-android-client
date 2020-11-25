@@ -21,7 +21,7 @@
             type="boolean" />
     </data>
 
-    <androidx.constraintlayout.motion.widget.MotionLayout
+    <com.example.hakonsreader.views.SwipeRefreshMotionLayout
         android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -204,5 +204,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/post"
             tools:visibility="visible" />
-    </androidx.constraintlayout.motion.widget.MotionLayout>
+    </com.example.hakonsreader.views.SwipeRefreshMotionLayout>
 </layout>
