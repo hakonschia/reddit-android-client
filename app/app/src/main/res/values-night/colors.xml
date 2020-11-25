@@ -16,6 +16,7 @@
     <color name="textColorTextPosts">#DFDFDF</color>
     <color name="secondary_text_color">#BDBDBD</color>
     <color name="link_color">#03A9F4</color>
+    <color name="linkColorPressedBackground">#0A2733</color>
     <color name="modTextColor">#00C130</color>
 
     <!-- Upvote/downvote button colors-->

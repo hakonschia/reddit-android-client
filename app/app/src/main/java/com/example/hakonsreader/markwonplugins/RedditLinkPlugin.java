@@ -6,6 +6,8 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
@@ -82,26 +84,13 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
             }
 
             final String link = textToSpan;
-            final ClickableSpan clickableSpan = new ClickableSpan() {
-                @Override
-                public void onClick(@NonNull View widget) {
-                    Intent intent = new Intent(context, DispatcherActivity.class);
-                    intent.putExtra(DispatcherActivity.URL_KEY, link.trim());
 
-                    // The plugin is created from App, which is not an activity
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
-                }
-
-                @Override
-                public void updateDrawState(@NonNull TextPaint ds) {
-                    ds.linkColor = ContextCompat.getColor(context, R.color.link_color);
-                    ds.setColor(ds.linkColor);
-                }
-            };
-
-            spannable.setSpan(clickableSpan, s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             spannable.setSpan(new UnderlineSpan(), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.link_color)), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            // By setting a URL span as well we can handle the link in InternalLinkMovementMethod which looks for
+            // URLSpans, so we can get the highlight when touched
+            spannable.setSpan(new URLSpan(link.trim()), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 
