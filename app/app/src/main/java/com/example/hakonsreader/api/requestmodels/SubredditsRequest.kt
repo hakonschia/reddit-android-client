@@ -5,17 +5,25 @@ import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.SubredditsServiceKt
+import com.example.hakonsreader.api.service.SubredditsService
 import com.example.hakonsreader.api.utils.apiError
 import com.example.hakonsreader.api.utils.Util
 import java.lang.Exception
 
-class SubredditsRequestKt(private val accessToken: AccessToken, private val api: SubredditsServiceKt) {
+class SubredditsRequest(
+        private val accessToken: AccessToken,
+        private val api: SubredditsService
+) {
 
     /**
      * Retrieves a list of subreddits
+     *
      * The subreddits retrieved here are either the logged in users subscribed subreddits, or the
      * default subreddits if no user is logged in
+     *
+     * OAuth scopes required:
+     * 1. For default subreddits: *read*
+     * 2. For subscribed subreddits: *mysubreddits*
      *
      * @param after For loading more subreddits, this is the ID of the last subreddit loaded. The new
      * subreddits will be loaded after this. Default to an empty string
@@ -35,6 +43,8 @@ class SubredditsRequestKt(private val accessToken: AccessToken, private val api:
 
     /**
      * Retrieves a list of subreddits that a logged in user is subscribed to
+     *
+     * OAuth scope required: *mysubreddits*
      *
      * @param after For loading more subreddits, this is the ID of the last subreddit loaded. The new
      * subreddits will be loaded after this. Default to an empty string
@@ -65,9 +75,9 @@ class SubredditsRequestKt(private val accessToken: AccessToken, private val api:
     }
 
     /**
-     * Retrieves a list of subreddits
-     * The subreddits retrieved here are either the logged in users subscribed subreddits, or the
-     * default subreddits if no user is logged in
+     * Retrieves the list of default subreddits
+     *
+     * OAauth scope required: *read*
      *
      * @param after For loading more subreddits, this is the ID of the last subreddit loaded. The new
      * subreddits will be loaded after this. Default to an empty string
@@ -83,6 +93,29 @@ class SubredditsRequestKt(private val accessToken: AccessToken, private val api:
 
             if (!list.isNullOrEmpty()) {
                 ApiResponse.Success(list)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Search for subreddits
+     *
+     * OAuth scope required: *read*
+     *
+     * @param query The search query
+     * @return
+     */
+    suspend fun search(query: String) : ApiResponse<List<Subreddit>> {
+        return try {
+            val resp = api.search(query)
+            val subreddits = resp.body()?.getListings()
+
+            if (!subreddits.isNullOrEmpty()) {
+                ApiResponse.Success(subreddits)
             } else {
                 apiError(resp)
             }

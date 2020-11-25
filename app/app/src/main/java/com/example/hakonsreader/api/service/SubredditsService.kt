@@ -7,7 +7,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface SubredditsServiceKt {
+interface SubredditsService {
 
     /**
      * Retrieve a list of the users subscribed subreddits
@@ -39,4 +39,14 @@ interface SubredditsServiceKt {
             @Query("count") count: Int,
             @Query("limit") limit: Int
     ) : Response<ListingResponseKt<Subreddit>>
+
+
+    /**
+     * Search for subreddits
+     *
+     * @param query The search query
+     * @return A Response holding a list of subreddits
+     */
+    @GET("subreddits/search")
+    suspend fun search(@Query("q") query: String) : Response<ListingResponseKt<Subreddit>>
 }

@@ -61,7 +61,7 @@ class SelectSubredditsViewModelK(context: Context) : ViewModel() {
         onCountChange.value = true
 
         CoroutineScope(IO).launch {
-            val response = api.subredittsKt().getSubreddits()
+            val response = api.subreditts().getSubreddits()
             onCountChange.postValue(false)
 
             when (response) {

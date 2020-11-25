@@ -16,7 +16,6 @@ import com.example.hakonsreader.api.requestmodels.PostRequestKt;
 import com.example.hakonsreader.api.requestmodels.SubredditRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditRequestKt;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequest;
-import com.example.hakonsreader.api.requestmodels.SubredditsRequestKt;
 import com.example.hakonsreader.api.requestmodels.UserRequests;
 import com.example.hakonsreader.api.requestmodels.UserRequestsKt;
 import com.example.hakonsreader.api.service.CommentService;
@@ -28,7 +27,6 @@ import com.example.hakonsreader.api.service.PostServiceKt;
 import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.service.SubredditServiceKt;
 import com.example.hakonsreader.api.service.SubredditsService;
-import com.example.hakonsreader.api.service.SubredditsServiceKt;
 import com.example.hakonsreader.api.service.UserServiceKt;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
@@ -197,12 +195,6 @@ public class RedditApi {
     private SubredditsService subredditsApi;
 
     /**
-     * The service object used to communicate with the Reddit API about multiple subreddits related calls
-     * for Kotlin
-     */
-    private SubredditsServiceKt subredditsApiKt;
-
-    /**
      * The service object used to communicate with the Reddit API about post related calls
      */
     private PostService postApi;
@@ -321,7 +313,6 @@ public class RedditApi {
         subredditApi = apiRetrofit.create(SubredditService.class);
         subredditApiKt = apiRetrofit.create(SubredditServiceKt.class);
         subredditsApi = apiRetrofit.create(SubredditsService.class);
-        subredditsApiKt = apiRetrofit.create(SubredditsServiceKt.class);
         postApi = apiRetrofit.create(PostService.class);
         postApiKt = apiRetrofit.create(PostServiceKt.class);
         commentApi = apiRetrofit.create(CommentService.class);
@@ -705,7 +696,6 @@ public class RedditApi {
         return new SubredditRequestKt(subredditName, accessToken, subredditApiKt, imgurService);
     }
 
-
     /**
      * Retrieve a {@link SubredditsRequest} object that can be used to make API calls towards subreddits.
      * This differs from {@link RedditApi#subreddit(String)} as this is for multiple subreddits (like
@@ -713,18 +703,8 @@ public class RedditApi {
      *
      * @return An object that can perform various subreddits related API requests
      */
-    public SubredditsRequest subreddits() {
+    public SubredditsRequest subreditts() {
         return new SubredditsRequest(accessToken, subredditsApi);
-    }
-
-    /**
-     * Retrieve a Kotlin based object to make API calls towards subreddits. This class is functionality
-     * identical to {@link SubredditsRequest}, but leverages Kotlin coroutines to avoid callbacks
-     *
-     * @return An object that can perform various subreddits related API requests
-     */
-    public SubredditsRequestKt subredittsKt() {
-        return new SubredditsRequestKt(accessToken, subredditsApiKt);
     }
 
     /**

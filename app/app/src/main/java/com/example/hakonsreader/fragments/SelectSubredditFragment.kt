@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -186,25 +185,25 @@ class SelectSubredditFragmentK : Fragment() {
     private fun setupSearchViewModel() {
         searchSubredditsViewModel = ViewModelProvider(this).get(SearchForSubredditsViewModel::class.java)
 
-        searchSubredditsViewModel!!.searchResults.observe(viewLifecycleOwner, { subreddits ->
+        searchSubredditsViewModel!!.getSearchResults().observe(viewLifecycleOwner, { subreddits ->
             binding?.searchedSubredditsCount = subreddits.size
 
             // TODO make some sort of animation for this
             if (subreddits.isEmpty()) {
                 searchSubredditsAdapter?.clear()
             } else {
-                searchSubredditsAdapter?.submitList(subreddits, false)
+                searchSubredditsAdapter?.submitList(subreddits.toMutableList(), false)
                 searchSubredditsLayoutManager?.scrollToPosition(0)
             }
 
             searchSubredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(SEARCH_LIST_STATE_KEY))
         })
 
-        searchSubredditsViewModel!!.onCountChange.observe(viewLifecycleOwner, { onCountChange ->
+        searchSubredditsViewModel!!.getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
             binding?.loadingIcon?.onCountChange(onCountChange)
         })
 
-        searchSubredditsViewModel!!.error.observe(viewLifecycleOwner, { error ->
+        searchSubredditsViewModel!!.getError().observe(viewLifecycleOwner, { error ->
             Util.handleGenericResponseErrors(view, error.error, error.throwable)
         })
     }
