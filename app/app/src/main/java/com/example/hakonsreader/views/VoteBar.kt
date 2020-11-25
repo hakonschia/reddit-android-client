@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.example.hakonsreader.App
@@ -22,9 +21,8 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
-import kotlin.concurrent.schedule
 
-class VoteBarKt : FrameLayout {
+class VoteBar : FrameLayout {
     private var api = App.get().api
     private lateinit var binding: VoteBarBinding
     var hideScore = false
@@ -98,7 +96,7 @@ class VoteBarKt : FrameLayout {
                         withContext(Main) {
                             updateVoteStatus()
                             resp.throwable.printStackTrace()
-                            Util.handleGenericResponseErrors(this@VoteBarKt, resp.error, resp.throwable)
+                            Util.handleGenericResponseErrors(this@VoteBar, resp.error, resp.throwable)
                         }
                     }
                 }
