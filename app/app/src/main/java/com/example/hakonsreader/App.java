@@ -629,5 +629,6 @@ public class App extends Application {
         TokenManager.removeToken();
         SharedPreferencesManager.removeNow(SharedPreferencesConstants.USER_INFO);
         SharedPreferencesManager.removeNow(SelectSubredditsViewModelK.SUBSCRIBED_SUBREDDITS_KEY);
+        settings.edit().remove(PRIVATELY_BROWSING_KEY).commit();
     }
 }
