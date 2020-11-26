@@ -55,6 +55,12 @@ public class App extends Application {
     private static final String TAG = "App";
 
     /**
+     * The key used in SharedPreferences to store if the API should be in private browsing from startup
+     */
+    private static final String PRIVATELY_BROWSING_KEY = "privatelyBrowsing";
+
+
+    /**
      * The width of the screen of the current device
      */
     private int screenWidth;
@@ -185,6 +191,9 @@ public class App extends Application {
 
     /**
      * Sets up {@link App#redditApi}
+     *
+     * <p>{@link RedditApi#enablePrivateBrowsing(boolean)} is called based on the value
+     * stored in SharedPreferences with the key {@link App#PRIVATELY_BROWSING_KEY}</p>
      */
     private void setupRedditApi() {
          redditApi = new RedditApi.Builder(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID)
@@ -196,6 +205,9 @@ public class App extends Application {
                  .onInvalidToken(this::onInvalidAccessToken)
                  .loadImgurAlbumsAsRedditGalleries(NetworkConstants.IMGUR_CLIENT_ID)
                  .build();
+
+         boolean privatelyBrowsing = settings.getBoolean(PRIVATELY_BROWSING_KEY, false);
+         redditApi.enablePrivateBrowsing(privatelyBrowsing);
     }
 
     /**
@@ -278,8 +290,8 @@ public class App extends Application {
      * @param enable True to enable private browsing, false to disable
      */
     public void enablePrivateBrowsing(boolean enable) {
-        // TODO store in sharedprefs that we are privately browsing so we can automatically set it on app startup
         redditApi.enablePrivateBrowsing(enable);
+        settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, enable).apply();
     }
 
     /**

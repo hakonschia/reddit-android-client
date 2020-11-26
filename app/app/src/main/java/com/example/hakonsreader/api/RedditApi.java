@@ -42,6 +42,8 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -226,7 +228,8 @@ public class RedditApi {
      * <p>Note: never set this to {@code null}, use {@code new AccessToken()} instead. To update the
      * value use {@link RedditApi#setTokenInternal(AccessToken)} instead of updating it directly</p>
      */
-    private AccessToken accessToken;
+    @NotNull
+    private AccessToken accessToken = new AccessToken();
 
     /**
      * The saved access token stored when the API is in a private browsing context. This will reference
@@ -235,6 +238,7 @@ public class RedditApi {
      *
      * <p>This should be set to {@code null} when private browsing is disabled</p>
      */
+    @Nullable
     private AccessToken savedToken = null;
 
     /**
@@ -908,7 +912,7 @@ public class RedditApi {
             if (accessToken.getAccessToken() == null) {
                 AccessToken token = newNonLoggedInToken();
 
-                if (token != null && onNewToken != null) {
+                if (token != null) {
                     setTokenInternal(token);
                 }
             }
