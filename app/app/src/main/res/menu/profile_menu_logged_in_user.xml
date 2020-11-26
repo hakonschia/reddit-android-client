@@ -4,4 +4,8 @@
     <item
         android:id="@+id/menuLogOut"
         android:title="@string/logOut" />
+
+    <item
+        android:id="@+id/menuBrowsePrivately"
+        android:title="@string/menuPrivateBrowsingEnable" />
 </menu>

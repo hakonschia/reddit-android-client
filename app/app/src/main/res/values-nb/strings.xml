@@ -191,4 +191,6 @@
     <string name="showAllComments">Vis alle kommentarer</string>
     <string name="imageLoadFailedDialogTitle">Feil ved innlasting av bildet</string>
     <string name="imageLoadFailedDialogContent">En feil skjedde ved innlastingen av bildet.\nBildet har muligens blitt slettet</string>
+    <string name="menuPrivateBrowsingEnable">Aktiver privat surfing</string>
+    <string name="menuPrivateBrowsingDisable">Deaktiver privat surfing</string>
 </resources>

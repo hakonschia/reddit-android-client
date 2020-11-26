@@ -52,7 +52,7 @@ public class MenuClickHandler {
         }
         RedditUser user = App.getStoredUser();
 
-        if (user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
+        if (App.get().isUserLoggedInNotPrivatelyBrowsing() && user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
             showPopupForCommentExtraForLoggedInUser(view, comment, adapter);
         } else {
             showPopupForCommentExtraForNonLoggedInUser(view, comment, adapter);
@@ -93,8 +93,6 @@ public class MenuClickHandler {
                 MenuItem modItem = menu.getMenu().findItem(R.id.menuStickyComment);
                 modItem.setTitle(R.string.commentRemoveSticky);
             }
-        } else {
-            Log.d(TAG, "showPopupForCommentExtraForLoggedInUser: not a mod");
         }
 
         // Default is "Save comment", if comment already is saved, change the text
@@ -255,7 +253,7 @@ public class MenuClickHandler {
         }
         RedditUser user = App.getStoredUser();
 
-        if (user != null && user.getName().equalsIgnoreCase(post.getAuthor())) {
+        if (App.get().isUserLoggedInNotPrivatelyBrowsing() && user != null && user.getName().equalsIgnoreCase(post.getAuthor())) {
             showPopupForPostExtraForLoggedInUser(view, post);
         } else {
             showPopupForPostExtraForNonLoggedInUser(view, post);
@@ -441,12 +439,21 @@ public class MenuClickHandler {
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.profile_menu_logged_in_user);
 
+        boolean isPrivatelyBrowsing = App.get().getApi().isPrivatelyBrowsing();
+        if (isPrivatelyBrowsing) {
+            MenuItem savedItem = menu.getMenu().findItem(R.id.menuBrowsePrivately);
+            savedItem.setTitle(view.getContext().getString(R.string.menuPrivateBrowsingDisable));
+        }
+
         menu.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
 
             if (itemId == R.id.menuLogOut) {
                 // log out etc etc
                 App.get().logOut();
+                return true;
+            } else if (itemId == R.id.menuBrowsePrivately) {
+                App.get().getApi().enablePrivateBrowsing(!isPrivatelyBrowsing);
                 return true;
             }
 

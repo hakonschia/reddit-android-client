@@ -255,10 +255,21 @@ public class App extends Application {
      * Checks if there currently is a user logged in
      *
      * @return True if there is a user logged in
+     * @see App#isUserLoggedInNotPrivatelyBrowsing()
      */
     public boolean isUserLoggedIn() {
         // Only logged in users have a refresh token
         return TokenManager.getToken().getRefreshToken() != null;
+    }
+
+    /**
+     * Checks if there currently is a user logged in that is not privately browsing
+     *
+     * @return True if there is a user logged in and private browsing is not enabled
+     * @see App#isUserLoggedIn()
+     */
+    public boolean isUserLoggedInNotPrivatelyBrowsing() {
+        return isUserLoggedIn() && !redditApi.isPrivatelyBrowsing();
     }
 
     /**

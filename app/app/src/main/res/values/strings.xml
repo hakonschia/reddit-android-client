@@ -296,4 +296,7 @@
 
     <string name="imageLoadFailedDialogTitle">Error loading image</string>
     <string name="imageLoadFailedDialogContent">There was an error loading the image.\nThe image might have been deleted</string>
+
+    <string name="menuPrivateBrowsingEnable">Enable private browsing</string>
+    <string name="menuPrivateBrowsingDisable">Disable private browsing</string>
 </resources>
