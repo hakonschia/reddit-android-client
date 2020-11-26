@@ -48,5 +48,8 @@ interface SubredditsService {
      * @return A Response holding a list of subreddits
      */
     @GET("subreddits/search")
-    suspend fun search(@Query("q") query: String) : Response<ListingResponseKt<Subreddit>>
+    suspend fun search(
+            @Query("q") query: String,
+            @Query("include_over_18") includeNsfw: Boolean
+    ) : Response<ListingResponseKt<Subreddit>>
 }

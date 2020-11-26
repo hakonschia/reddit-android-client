@@ -107,11 +107,12 @@ class SubredditsRequest(
      * OAuth scope required: *read*
      *
      * @param query The search query
+     * @param includeNsfw If set to *true* NSFW search results will be included. Default value is *true*
      * @return
      */
-    suspend fun search(query: String) : ApiResponse<List<Subreddit>> {
+    suspend fun search(query: String, includeNsfw: Boolean = true) : ApiResponse<List<Subreddit>> {
         return try {
-            val resp = api.search(query)
+            val resp = api.search(query, includeNsfw)
             val subreddits = resp.body()?.getListings()
 
             if (!subreddits.isNullOrEmpty()) {
