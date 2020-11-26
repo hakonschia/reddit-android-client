@@ -66,7 +66,7 @@ class ContentLink : Content {
         var previews: List<Image> = redditPost.previewImages
 
         if (redditPost.isNsfw) {
-            val obfuscatedPreviews: List<Image> = redditPost.obfuscatedPreviewImages
+            val obfuscatedPreviews: List<Image>? = redditPost.obfuscatedPreviewImages
             if (!obfuscatedPreviews.isNullOrEmpty()) {
                 previews = obfuscatedPreviews
             }
