@@ -229,6 +229,15 @@ public class RedditApi {
     private AccessToken accessToken;
 
     /**
+     * The saved access token stored when the API is in a private browsing context. This will reference
+     * what {@link RedditApi#accessToken} was at the point when private browsing was set, and should
+     * be used to set the token again when private browsing is disabled
+     *
+     * <p>This should be set to {@code null} when private browsing is disabled</p>
+     */
+    private AccessToken savedToken = null;
+
+    /**
      * The listener for when the authenticator retrieves a new token automatically
      */
     private OnNewToken onNewToken;
@@ -551,7 +560,7 @@ public class RedditApi {
      *
      * @param token The token to set. If this is set to null, a new empty access token is created
      */
-    private void setTokenInternal(AccessToken token) {
+    private void setTokenInternal(@Nullable AccessToken token) {
         if (token == null) {
             token = new AccessToken();
         }
@@ -559,9 +568,52 @@ public class RedditApi {
         accessToken = token;
 
         // Call token listener if registered
-        if (onNewToken != null) {
+        // If we are currently in a private browsing context, don't notify the listener as the
+        // tokens retrieved at this point shouldn't be forwarded to the API users
+        if (onNewToken != null && !isPrivatelyBrowsing()) {
             onNewToken.newToken(token);
         }
+    }
+
+    /**
+     * Enable or disable private browsing. Enabling private browsing will temporarily set an anonymous
+     * access token to be used for API calls
+     *
+     * <p>When non-logged in access tokens are retrieved, the listener set with
+     * {@link Builder#onNewToken(OnNewToken)} will NOT be notified</p>
+     *
+     * <p>This operation is idempotent</p>
+     *
+     * @param enable True to enable private browsing, false to disable it
+     * @see RedditApi#isPrivatelyBrowsing()
+     */
+    public void enablePrivateBrowsing(boolean enable) {
+        if (enable) {
+            // If we're in a private browsing context already, calling this again would override the stored token
+            if (savedToken != null) {
+                return;
+            }
+            savedToken = accessToken;
+            setTokenInternal(new AccessToken());
+        } else {
+            // Ie. if we weren't in a private browsing context, this shouldn't do anything
+            if (savedToken == null) {
+                return;
+            }
+            setTokenInternal(savedToken);
+            savedToken = null;
+        }
+    }
+
+    /**
+     * Checks if the API is currently in a private browsing context, meaning that there is a user
+     * logged in, but the API calls should currently not be made on behalf of that user
+     *
+     * @return True if private browsing is enabled
+     * @see RedditApi#enablePrivateBrowsing(boolean)
+     */
+    public boolean isPrivatelyBrowsing() {
+        return savedToken != null;
     }
 
     /* --------------- Access token calls --------------- */
