@@ -3,6 +3,7 @@ package com.example.hakonsreader.api.requestmodels
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
+import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.RedditUser

@@ -1,6 +1,6 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.model.RedditListingKt;
+import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.responses.ListingResponse;
 
@@ -8,6 +8,7 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -35,7 +36,7 @@ public interface UserService {
      * @return A Call with {@link RedditUser}
      */
     @GET("u/{username}/about?raw_json=1")
-    Call<RedditListingKt> getUserInfoOtherUsers(@Path("username") String username);
+    Call<RedditListing> getUserInfoOtherUsers(@Path("username") String username);
 
     /**
      * <p>OAauth scope required: {@code history}</p>

@@ -93,7 +93,6 @@ public class Util {
         snackbar.setAction(context.getString(R.string.disable), v -> {
             App.get().enablePrivateBrowsing(false);
             // If we're in the ProfileFragment notify it as well to update the UI
-            // TODO this can cause a crash if we're not in a fragment (IllegalStateException)
             Fragment f = FragmentManager.findFragment(parent);
             if (f instanceof ProfileFragment) {
                 ((ProfileFragment)f).enablePrivateBrowsing(false);

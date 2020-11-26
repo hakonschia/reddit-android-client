@@ -34,6 +34,7 @@ import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModelK;
 import com.facebook.stetho.Stetho;
+import com.google.gson.Gson;
 import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
