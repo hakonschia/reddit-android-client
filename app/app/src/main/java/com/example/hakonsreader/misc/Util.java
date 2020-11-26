@@ -6,7 +6,10 @@ import android.content.res.Resources;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.LogInActivity;
 import com.example.hakonsreader.activites.MainActivity;
@@ -14,6 +17,7 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.RateLimitException;
 import com.example.hakonsreader.api.exceptions.ThreadLockedException;
 import com.example.hakonsreader.api.responses.GenericError;
+import com.example.hakonsreader.fragments.ProfileFragment;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -42,7 +46,11 @@ public class Util {
         if (t instanceof IOException) {
             Util.showNoInternetSnackbar(parent);
         } else if (t instanceof InvalidAccessTokenException) {
-            Util.showNotLoggedInSnackbar(parent);
+            if (App.get().isUserLoggedInPrivatelyBrowsing()) {
+                Util.showPrivatelyBrowsingSnackbar(parent);
+            } else {
+                Util.showNotLoggedInSnackbar(parent);
+            }
         } else if (t instanceof ThreadLockedException) {
             Util.showThreadLockedException(parent);
         } else if (code == 400) {
@@ -68,6 +76,30 @@ public class Util {
      */
     public static void showNoInternetSnackbar(View parent) {
         Snackbar.make(parent, parent.getResources().getString(R.string.noInternetConnection), LENGTH_SHORT).show();
+    }
+
+    /**
+     * Creates and shows a snackbar for when an action was attempted that requires a logged in user,
+     * but private browsing is currently enabled.
+     *
+     * <p>The snackbar includes a button to disable private browsing</p>
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showPrivatelyBrowsingSnackbar(View parent) {
+        Snackbar snackbar = Snackbar.make(parent, parent.getResources().getString(R.string.privatelyBrowsingError), LENGTH_LONG);
+        Context context = parent.getContext();
+
+        snackbar.setAction(context.getString(R.string.disable), v -> {
+            App.get().enablePrivateBrowsing(false);
+            // If we're in the ProfileFragment notify it as well to update the UI
+            Fragment f = FragmentManager.findFragment(parent);
+            if (f instanceof ProfileFragment) {
+                ((ProfileFragment)f).enablePrivateBrowsing(false);
+            }
+        });
+        snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+        snackbar.show();
     }
 
     /**

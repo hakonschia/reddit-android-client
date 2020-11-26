@@ -3,7 +3,6 @@ package com.example.hakonsreader.views.util;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -53,7 +52,7 @@ public class MenuClickHandler {
         }
         RedditUser user = App.getStoredUser();
 
-        if (App.get().isUserLoggedInNotPrivatelyBrowsing() && user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
+        if (!App.get().isUserLoggedInPrivatelyBrowsing() && user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
             showPopupForCommentExtraForLoggedInUser(view, comment, adapter);
         } else {
             showPopupForCommentExtraForNonLoggedInUser(view, comment, adapter);
@@ -254,7 +253,7 @@ public class MenuClickHandler {
         }
         RedditUser user = App.getStoredUser();
 
-        if (App.get().isUserLoggedInNotPrivatelyBrowsing() && user != null && user.getName().equalsIgnoreCase(post.getAuthor())) {
+        if (!App.get().isUserLoggedInPrivatelyBrowsing() && user != null && user.getName().equalsIgnoreCase(post.getAuthor())) {
             showPopupForPostExtraForLoggedInUser(view, post);
         } else {
             showPopupForPostExtraForNonLoggedInUser(view, post);
@@ -454,7 +453,7 @@ public class MenuClickHandler {
                 App.get().logOut();
                 return true;
             } else if (itemId == R.id.menuBrowsePrivately) {
-                App.get().getApi().enablePrivateBrowsing(!isPrivatelyBrowsing);
+                App.get().enablePrivateBrowsing(!isPrivatelyBrowsing);
 
                 Fragment f = FragmentManager.findFragment(view);
                 if (f instanceof ProfileFragment) {

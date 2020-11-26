@@ -173,7 +173,7 @@ public class ProfileFragment extends Fragment {
         }
 
         if (isLoggedInUser) {
-            enablePrivateBrowsing(!App.get().isUserLoggedInNotPrivatelyBrowsing());
+            enablePrivateBrowsing(App.get().isUserLoggedInPrivatelyBrowsing());
         }
 
         if (saveState != null) {

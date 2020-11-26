@@ -193,4 +193,6 @@
     <string name="imageLoadFailedDialogContent">En feil skjedde ved innlastingen av bildet.\nBildet har muligens blitt slettet</string>
     <string name="menuPrivateBrowsingEnable">Aktiver privat surfing</string>
     <string name="menuPrivateBrowsingDisable">Deaktiver privat surfing</string>
+    <string name="privatelyBrowsingError">Du surfer privat</string>
+    <string name="disable">Deaktiver</string>
 </resources>

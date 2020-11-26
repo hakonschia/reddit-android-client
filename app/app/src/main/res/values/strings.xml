@@ -147,6 +147,7 @@
 
     <!-- Error messages -->
     <string name="notLoggedInError">Please log in to do that</string>
+    <string name="privatelyBrowsingError">You are currently browsing privately</string>
     <string name="genericServerError">Can\'t connect to Reddit servers</string>
     <string name="tooManyRequestsError">Too many request sent. Try again in a few seconds</string>
     <string name="errorLoggingIn">Error logging in</string>
@@ -299,4 +300,6 @@
 
     <string name="menuPrivateBrowsingEnable">Enable private browsing</string>
     <string name="menuPrivateBrowsingDisable">Disable private browsing</string>
+
+    <string name="disable">Disable</string>
 </resources>

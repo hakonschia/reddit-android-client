@@ -255,7 +255,7 @@ public class App extends Application {
      * Checks if there currently is a user logged in
      *
      * @return True if there is a user logged in
-     * @see App#isUserLoggedInNotPrivatelyBrowsing()
+     * @see App#isUserLoggedInPrivatelyBrowsing()
      */
     public boolean isUserLoggedIn() {
         // Only logged in users have a refresh token
@@ -263,13 +263,23 @@ public class App extends Application {
     }
 
     /**
-     * Checks if there currently is a user logged in that is not privately browsing
+     * Checks if there currently is a user logged in that is privately browsing
      *
-     * @return True if there is a user logged in and private browsing is not enabled
+     * @return True if there is a user logged in and private browsing is enabled
      * @see App#isUserLoggedIn()
      */
-    public boolean isUserLoggedInNotPrivatelyBrowsing() {
-        return isUserLoggedIn() && !redditApi.isPrivatelyBrowsing();
+    public boolean isUserLoggedInPrivatelyBrowsing() {
+        return isUserLoggedIn() && redditApi.isPrivatelyBrowsing();
+    }
+
+    /**
+     * Toggles the API to private browsing and stores locally that private browsing is enabled/disabled
+     *
+     * @param enable True to enable private browsing, false to disable
+     */
+    public void enablePrivateBrowsing(boolean enable) {
+        // TODO store in sharedprefs that we are privately browsing so we can automatically set it on app startup
+        redditApi.enablePrivateBrowsing(enable);
     }
 
     /**
