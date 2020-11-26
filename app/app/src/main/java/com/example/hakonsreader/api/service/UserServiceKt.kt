@@ -3,8 +3,8 @@ package com.example.hakonsreader.api.service
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditListing
-import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ListingResponseKt
 import retrofit2.Response
 import retrofit2.http.*
@@ -13,7 +13,7 @@ interface UserServiceKt {
 
     /**
      * Retrieves information about the logged in user. For information about any user see
-     * [userInfoOtherUsers]
+     * [getUserInfoOtherUsers]
      *
      * OAuth scope required: *identity*
      *

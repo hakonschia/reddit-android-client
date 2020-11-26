@@ -320,6 +320,7 @@ public class ProfileFragment extends Fragment {
                 Util.handleGenericResponseErrors(binding.parentLayout, e, t);
                 binding.loadingIcon.onCountChange(false);
             }
+            t.printStackTrace();
         });
     }
 
