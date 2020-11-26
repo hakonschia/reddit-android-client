@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.persistence.AppDatabase;
 import com.example.hakonsreader.api.responses.GenericError;
@@ -33,6 +34,7 @@ import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModelK;
 import com.facebook.stetho.Stetho;
+import com.google.gson.Gson;
 import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
@@ -270,8 +272,9 @@ public class App extends Application {
      * @see App#isUserLoggedInPrivatelyBrowsing()
      */
     public boolean isUserLoggedIn() {
+        AccessToken accessToken = TokenManager.getToken();
         // Only logged in users have a refresh token
-        return TokenManager.getToken().getRefreshToken() != null;
+        return accessToken != null && accessToken.getRefreshToken() != null;
     }
 
     /**

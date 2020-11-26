@@ -3,6 +3,8 @@ package com.example.hakonsreader.misc;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Class for managing the access token for the logged in user
  */
@@ -17,6 +19,7 @@ public class TokenManager {
      *
      * @return The stored access token. If no token is stored (ie. no user logged in) null is returned
      */
+    @Nullable
     public static AccessToken getToken() {
         // If null, try to get from shared preferences
         if (token == null) {
