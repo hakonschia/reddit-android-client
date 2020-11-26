@@ -54,4 +54,6 @@
     <color name="ripplePressedColor">#AEAEAE</color>
 
     <color name="videoControlBackground">#80000000</color>
+
+    <color name="privatelyBrowsing">#FF9800</color>
 </resources>

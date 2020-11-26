@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -171,6 +172,10 @@ public class ProfileFragment extends Fragment {
             this.updateViews();
         }
 
+        if (isLoggedInUser) {
+            enablePrivateBrowsing(!App.get().isUserLoggedInNotPrivatelyBrowsing());
+        }
+
         if (saveState != null) {
             binding.parentLayout.setProgress(saveState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY));
             postIds = saveState.getStringArrayList(POST_IDS_KEY);
@@ -316,6 +321,15 @@ public class ProfileFragment extends Fragment {
                 binding.loadingIcon.onCountChange(false);
             }
         });
+    }
+
+    public void enablePrivateBrowsing(boolean enable) {
+        binding.setPrivatelyBrowsing(enable);
+        // Setting the conditional in xml causes an error because of color/int mismatch
+        binding.profilePicture.setBorderColor(
+                ContextCompat.getColor(requireContext(),
+                enable ? R.color.privatelyBrowsing : R.color.opposite_background)
+        );
     }
 
 

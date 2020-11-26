@@ -21,6 +21,7 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditUser;
+import com.example.hakonsreader.fragments.ProfileFragment;
 import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
@@ -454,6 +455,12 @@ public class MenuClickHandler {
                 return true;
             } else if (itemId == R.id.menuBrowsePrivately) {
                 App.get().getApi().enablePrivateBrowsing(!isPrivatelyBrowsing);
+
+                Fragment f = FragmentManager.findFragment(view);
+                if (f instanceof ProfileFragment) {
+                    ((ProfileFragment)f).enablePrivateBrowsing(!isPrivatelyBrowsing);
+                }
+
                 return true;
             }
 
