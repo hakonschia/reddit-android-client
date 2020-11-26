@@ -56,12 +56,19 @@ class SelectSubredditsViewModelK(context: Context) : ViewModel() {
      * The list returned is not sorted
      *
      * The IDs are stored in SharedPreferences with the key [SUBSCRIBED_SUBREDDITS_KEY]
+     *
+     * @param loadDefaultSubs Set to *true* to load default subs, *false* to load subs for a logged in user.
+     * Default is *true* (load default subs)
      */
-    fun loadSubreddits() {
+    fun loadSubreddits(loadDefaultSubs: Boolean = true) {
         onCountChange.value = true
 
         CoroutineScope(IO).launch {
-            val response = api.subreditts().getSubreddits()
+            val response = if (loadDefaultSubs) {
+                api.subreditts().defaultSubreddits()
+            } else {
+                api.subreditts().subscribedSubreddits()
+            }
             onCountChange.postValue(false)
 
             when (response) {

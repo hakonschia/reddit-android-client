@@ -103,7 +103,13 @@ class SelectSubredditFragmentK : Fragment() {
         this.setupSubredditsViewModel()
 
         if (!subredditsLoaded) {
-            subredditsViewModel?.loadSubreddits()
+            val loadDefault = if (App.get().isUserLoggedIn) {
+                // If the user is logged in we want to load default subs if they're privately browsing
+                App.get().isUserLoggedInPrivatelyBrowsing
+            } else {
+                true
+            }
+            subredditsViewModel?.loadSubreddits(loadDefault)
         }
 
         return binding?.root
