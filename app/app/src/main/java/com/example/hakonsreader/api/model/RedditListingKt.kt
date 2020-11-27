@@ -23,7 +23,7 @@ abstract class RedditListingKt {
      */
     @PrimaryKey
     @SerializedName("id")
-    var id: String = ""
+    var id = ""
 
     /**
      * The type of listing this is (eg. *t3* for posts)
@@ -31,18 +31,16 @@ abstract class RedditListingKt {
      * The types of listings available are represented in [Thing]
      */
     @SerializedName("kind")
-    var kind: String = ""
+    var kind = ""
 
     /**
      * The name of the listing.
      *
      * This is typically what is referred to as a *fullname* by Reddit. A fullname if the listings
      * [kind] combined with its [id], eg. *t3_rerrg* for a post.
-     *
-     * For users this will represent the users username instead of the fullname
      */
     @SerializedName("name")
-    var name: String = ""
+    open var fullname = ""
 
     /**
      * The URL pointing to the listing
