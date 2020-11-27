@@ -8,11 +8,6 @@
         <variable
             name="subredditName"
             type="String" />
-
-        <variable
-            name="subreddit"
-            type="com.example.hakonsreader.api.model.Subreddit" />
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -51,7 +46,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
 
-            android:text="@{subreddit.submitText}"
             android:textColor="@color/secondary_text_color"
 
             app:layout_constraintEnd_toEndOf="parent"

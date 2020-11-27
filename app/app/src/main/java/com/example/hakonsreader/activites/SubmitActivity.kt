@@ -19,6 +19,7 @@ import com.example.hakonsreader.databinding.ActivitySubmitBinding
 import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
 import com.example.hakonsreader.databinding.SubmissionLinkBinding
 import com.example.hakonsreader.databinding.SubmissionTextBinding
+import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -85,13 +86,21 @@ class SubmitActivity : AppCompatActivity() {
             if (sub != null) {
                 subreddit = sub
                 withContext(Main) {
-                    binding.subreddit = subreddit
+                    updateViews()
                     checkSubmissionTypes(subreddit)
                 }
             }  else {
                 // Get from API
             }
         }
+    }
+
+    /**
+     * Updates the views in the activity based on [subreddit]
+     */
+    private fun updateViews() {
+        binding.subredditSubmitText.movementMethod = InternalLinkMovementMethod.getInstance(this)
+        App.get().mark.setMarkdown(binding.subredditSubmitText, subreddit.submitText)
     }
 
     private fun setupTabs() {
