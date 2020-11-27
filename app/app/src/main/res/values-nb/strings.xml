@@ -80,7 +80,7 @@
     <string name="subredditBanned">r/%s har blitt utestengt</string>
     <string name="noCommentsHeader">Ingen kommentar på denne posten enda</string>
     <string name="noCommentsContent">Vær den som starter samtalen!</string>
-    <string name="replyingTo">Svarer %s</string>
+    <string name="replyingTo">Svarer <b>%s</b></string>
     <string name="replyHint">Si noe hyggelig</string>
     <string name="replyPreview">Forhåndsvisning</string>
     <string name="replyAddLinkDialogHeader">Legg til lenke</string>
@@ -195,4 +195,13 @@
     <string name="menuPrivateBrowsingDisable">Deaktiver privat surfing</string>
     <string name="privatelyBrowsingError">Du surfer privat</string>
     <string name="disable">Deaktiver</string>
+    <string name="prefs_group_links">Lenker</string>
+    <string name="submittingTo">Sender inn til <b>r/%s</b></string>
+    <string name="submittingTitleHint">Tittel</string>
+    <string name="submittingTextHint">Tekst</string>
+    <string name="submittingLinkHint">Lenke</string>
+    <string name="submittingCrosspostHint">IDen til posten å krossposte</string>
+    <string name="submittingCrosspostTitle">Krosspost</string>
+    <string name="submittingSpoiler">Spoiler</string>
+    <string name="submittingReceiveNotifications">Motta notifikasjonedr</string>
 </resources>

@@ -17,7 +17,6 @@ import com.example.hakonsreader.api.service.ImgurService
 import com.example.hakonsreader.api.service.SubredditServiceKt
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
-import java.lang.Exception
 
 class SubredditRequestKt(
         private val subredditName: String,
@@ -197,6 +196,7 @@ class SubredditRequestKt(
      * @param text The text of the post. Can be omitted for title-only posts
      * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
      *
      * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
@@ -205,7 +205,8 @@ class SubredditRequestKt(
             text: String = "",
 
             nsfw: Boolean = false,
-            spoiler: Boolean = false
+            spoiler: Boolean = false,
+            receiveNotifications: Boolean = true
     ) : ApiResponse<Submission> {
         val submissionError = verifyGenericSubmission(title)
         if (submissionError != null) {
@@ -213,7 +214,7 @@ class SubredditRequestKt(
         }
 
         return try {
-            val resp = api.submit(subredditName, kind = "self", title = title, text = text, nsfw = nsfw, spoiler = spoiler)
+            val resp = api.submit(subredditName, kind = "self", title = title, text = text, nsfw = nsfw, spoiler = spoiler, sendNotifications = receiveNotifications)
             val body = resp.body()?.response?.getListings()?.get(0)
 
             if (body != null) {
@@ -233,9 +234,10 @@ class SubredditRequestKt(
      *
      * @param title The title of the post. Max characters is 300
      * @param link The link the post is referencing. This should be a valid URL, verification is not done
-     * by the API
+     * by the API. Spaces in the link will be converted to *%20*
      * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
      *
      * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
@@ -244,15 +246,18 @@ class SubredditRequestKt(
             link: String,
 
             nsfw: Boolean = false,
-            spoiler: Boolean = false
+            spoiler: Boolean = false,
+            receiveNotifications: Boolean = true
     ) : ApiResponse<Submission> {
         val submissionError = verifyGenericSubmission(title)
         if (submissionError != null) {
             return submissionError
         }
 
+        val linkSpaceConverted = link.replace(" ", "%20")
+
         return try {
-            val resp = api.submit(subredditName, kind = "link", title = title, link = link, nsfw = nsfw, spoiler = spoiler)
+            val resp = api.submit(subredditName, kind = "link", title = title, link = linkSpaceConverted, nsfw = nsfw, spoiler = spoiler, sendNotifications = receiveNotifications)
             val body = resp.body()?.response?.getListings()?.get(0)
 
             if (body != null) {
@@ -274,6 +279,7 @@ class SubredditRequestKt(
      * @param crosspostId The ID of the post this post is crossposting
      * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
      *
      * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
@@ -282,7 +288,8 @@ class SubredditRequestKt(
             crosspostId: String,
 
             nsfw: Boolean = false,
-            spoiler: Boolean = false
+            spoiler: Boolean = false,
+            receiveNotifications: Boolean = true
     ) : ApiResponse<Submission> {
         val submissionError = verifyGenericSubmission(title)
         if (submissionError != null) {
@@ -297,7 +304,7 @@ class SubredditRequestKt(
         val fullname = Util.createFullName(Thing.POST, crosspostId)
 
         return try {
-            val resp = api.submit(subredditName, kind = "crosspost", title = title, crosspostFullname = fullname, nsfw = nsfw, spoiler = spoiler)
+            val resp = api.submit(subredditName, kind = "crosspost", title = title, crosspostFullname = fullname, nsfw = nsfw, spoiler = spoiler, sendNotifications = receiveNotifications)
             val body = resp.body()?.response?.getListings()?.get(0)
 
             if (body != null) {
@@ -308,7 +315,7 @@ class SubredditRequestKt(
         } catch (e: Exception) {
             ApiResponse.Error(GenericError(-1), e)
         }
-        
+
         // TODO possible error:
         //  {"json": {"errors": [["INVALID_CROSSPOST_THING", "that isn't a valid crosspost url", "crosspost_thing"]]}}
     }

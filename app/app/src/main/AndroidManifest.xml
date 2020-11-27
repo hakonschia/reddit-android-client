@@ -46,8 +46,7 @@
         <activity
             android:name=".activites.VideoActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
-        <!--
- In the ReplyActivity we need to make sure the buttons for markdown input is visible
+        <!--In the ReplyActivity we need to make sure the buttons for markdown input is visible
          when the keyboard is
         -->
         <activity
@@ -63,8 +62,8 @@
 
         <activity
             android:name=".activites.SubmitActivity"
-            android:theme="@style/AppTheme.SlidrActivityTheme" />
-
+            android:theme="@style/AppTheme.SlidrActivityTheme"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".activites.DispatcherActivity"

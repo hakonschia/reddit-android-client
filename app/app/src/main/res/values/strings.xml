@@ -58,7 +58,7 @@
     <string name="prefs_group_posts">Posts</string>
     <string name="prefs_group_videos">Videos</string>
     <string name="prefs_group_comments">Comments</string>
-    <string name="prefs_group_links" translatable="false">Links</string>
+    <string name="prefs_group_links">Links</string>
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark mode</string>
@@ -199,7 +199,7 @@
     <string name="subredditPrivateDescription">You must be invited to access this community</string>
     <string name="subredditNotFound">r/%s doesn\'t exist</string>
 
-    <string name="replyingTo">Replying to %s</string>
+    <string name="replyingTo">Replying to <b>%s</b></string>
     <string name="replyHint">Say something nice</string>
     <string name="replyPreview">Preview</string>
 
@@ -209,6 +209,19 @@
 
     <string name="replyConfirmBackPressDialogHeader">You have unsent text</string>
     <string name="replyConfirmBackPressDialogContent">There is currently text in the input field. Are you sure you want to discard it?</string>
+
+    <string name="submittingTo">Submitting to <b>r/%s</b></string>
+    <string name="submittingTitleHint">Title</string>
+    <string name="submittingTextHint">Text</string>
+    <string name="submittingLinkHint">Link</string>
+
+    <string name="submittingCrosspostTitle">Crosspost</string>
+    <string name="submittingCrosspostHint">ID of post to crosspost</string>
+
+    <string name="submittingNSFW" translatable="false">NSFW</string>
+    <string name="submittingSpoiler">Spoiler</string>
+    <string name="submittingReceiveNotifications">Receive notifications</string>
+
 
     <!-- The text inside the markdown buttons (these aren't language specific so marked as untranslatable) -->
     <string name="markdownBtnBold" translatable="false"><b>B</b></string>
@@ -295,11 +308,11 @@
 
     <string name="lockComment">Lock</string>
 
-    <string name="imageLoadFailedDialogTitle">Error loading image</string>
     <string name="imageLoadFailedDialogContent">There was an error loading the image.\nThe image might have been deleted</string>
 
     <string name="menuPrivateBrowsingEnable">Enable private browsing</string>
     <string name="menuPrivateBrowsingDisable">Disable private browsing</string>
 
     <string name="disable">Disable</string>
+    <string name="imageLoadFailedDialogTitle">Image failed to load</string>
 </resources>
