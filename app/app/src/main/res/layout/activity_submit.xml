@@ -4,6 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SubmitActivity">
+    tools:context=".activites.SubmitActivity">
+
+    <Button
+        android:id="@+id/submitPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Submit post"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/postSubmittedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/submitPost"
+        app:layout_constraintStart_toStartOf="@+id/submitPost"
+        app:layout_constraintTop_toBottomOf="@+id/submitPost" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

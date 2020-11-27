@@ -3,11 +3,13 @@ package com.example.hakonsreader.api.requestmodels
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
+import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.model.Submission
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -179,29 +181,159 @@ class SubredditRequestKt(
         }
     }
 
+
+    // TODO possible submit errors:
+    //  {"json": {"errors": [["BAD_SR_NAME", "det navnet kommer ikke til \u00e5 virke", "sr"]]}}
+
+    // TODO submit response: {"json": {"errors": [], "data": {"url": "https://www.reddit.com/r/hakonschia/comments/k1yj0s/hello_reddit/", "drafts_count": 0, "id": "k1yj0s", "name": "t3_k1yj0s"}}}
+    //  can probably just return the ID of the post
+
     /**
-     * Submit a post to the subreddit
+     * Submit a text post to the subreddit
      *
      * OAuth scope required: *submit*
      *
-     * @param kind One of: *link*, *self*, *image*, *video*, *videogif*
-     * @param title The title of the post (max 300 characters)
-     * @param text The Markdown text of the post. Default to an empty string (can be omitted if not a selfpost)
-     * @param url The URL of the post used when *kind* is *link*. Default to an empty string (can be omitted if not a link post)
-     * @param nsfw True if the post should should be marked as NSFW. Default to *false*
+     * @param title The title of the post. Max characters is 300
+     * @param text The text of the post. Can be omitted for title-only posts
+     * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     *
+     * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
-    suspend fun submit(
-            kind: String,
+    suspend fun submitTextPost(
             title: String,
             text: String = "",
-            url: String = "",
 
             nsfw: Boolean = false,
             spoiler: Boolean = false
-    ) {
+    ) : ApiResponse<Submission> {
+        val submissionError = verifyGenericSubmission(title)
+        if (submissionError != null) {
+            return submissionError
+        }
 
-        api.submit(kind, title, text, url, nsfw, spoiler)
+        return try {
+            val resp = api.submit(subredditName, kind = "self", title = title, text = text, nsfw = nsfw, spoiler = spoiler)
+            val body = resp.body()?.response?.getListings()?.get(0)
 
+            if (body != null) {
+                ApiResponse.Success(body)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Submit a link post to the subreddit
+     *
+     * OAuth scope required: *submit*
+     *
+     * @param title The title of the post. Max characters is 300
+     * @param link The link the post is referencing. This should be a valid URL, verification is not done
+     * by the API
+     * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
+     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     *
+     * @return An [ApiResponse] holding a [Submission] of the newly created post
+     */
+    suspend fun submitLinkPost(
+            title: String,
+            link: String,
+
+            nsfw: Boolean = false,
+            spoiler: Boolean = false
+    ) : ApiResponse<Submission> {
+        val submissionError = verifyGenericSubmission(title)
+        if (submissionError != null) {
+            return submissionError
+        }
+
+        return try {
+            val resp = api.submit(subredditName, kind = "link", title = title, link = link, nsfw = nsfw, spoiler = spoiler)
+            val body = resp.body()?.response?.getListings()?.get(0)
+
+            if (body != null) {
+                ApiResponse.Success(body)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Submit a text post to the subreddit
+     *
+     * OAuth scope required: *submit*
+     *
+     * @param title The title of the post. Max characters is 300
+     * @param crosspostId The ID of the post this post is crossposting
+     * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
+     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     *
+     * @return An [ApiResponse] holding a [Submission] of the newly created post
+     */
+    suspend fun submitCrosspost(
+            title: String,
+            crosspostId: String,
+
+            nsfw: Boolean = false,
+            spoiler: Boolean = false
+    ) : ApiResponse<Submission> {
+        val submissionError = verifyGenericSubmission(title)
+        if (submissionError != null) {
+            return submissionError
+        }
+
+        // TODO optionally take in a RedditPost and copy everything from that (should maybe be its own
+        //  function instead)
+
+        // kind = crosspost
+        // "crosspost_fullname"
+        val fullname = Util.createFullName(Thing.POST, crosspostId)
+
+        return try {
+            val resp = api.submit(subredditName, kind = "crosspost", title = title, crosspostFullname = fullname, nsfw = nsfw, spoiler = spoiler)
+            val body = resp.body()?.response?.getListings()?.get(0)
+
+            if (body != null) {
+                ApiResponse.Success(body)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+        
+        // TODO possible error:
+        //  {"json": {"errors": [["INVALID_CROSSPOST_THING", "that isn't a valid crosspost url", "crosspost_thing"]]}}
+    }
+
+
+    /**
+     * Verifies that a submission is valid on a generic level.
+     *
+     * This verifies that the title is within the allowed character size and that an access token is valid
+     *
+     * @return An [ApiResponse.Error]. If this is null then the submission is verified
+     */
+    private fun verifyGenericSubmission(title: String) : ApiResponse.Error? {
+        try {
+            Util.verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Submitting a post requires a valid access token for a logged in user", e))
+        }
+
+        if (title.length > 300) {
+            return ApiResponse.Error(GenericError(-1), IllegalStateException("Post titles cannot be longer than 300 characters"))
+        } else if (title.isBlank()) {
+            return ApiResponse.Error(GenericError(-1), IllegalStateException("Post titles cannot be empty"))
+        }
+
+        return null
     }
 }

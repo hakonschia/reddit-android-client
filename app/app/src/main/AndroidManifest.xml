@@ -13,7 +13,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Launcher">
-        <activity android:name=".SubmitActivity"></activity>
         <activity android:name=".activites.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,6 +60,12 @@
         <activity
             android:name=".activites.LogInActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
+
+        <activity
+            android:name=".activites.SubmitActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
+
+
         <activity
             android:name=".activites.DispatcherActivity"
             android:theme="@style/AppTheme.DispatcherTheme">
