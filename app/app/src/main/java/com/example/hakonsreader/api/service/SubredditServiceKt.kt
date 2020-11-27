@@ -70,4 +70,35 @@ interface SubredditServiceKt {
             @Field("make_favorite") favorite: Boolean,
             @Field("sr_name") subredditName: String,
     ) : Response<Nothing>
+
+
+    /**
+     * Submit a post to a subreddit
+     *
+     * OAuth scope required: *submit*
+     *
+     * @param kind One of: *link*, *self*, *image*, *video*, *videogif*
+     * @param title The title of the post (max 300 characters)
+     * @param text The Markdown text of the post. Default to an empty string (can be omitted if not a selfpost)
+     * @param url The URL of the post used when *kind* is *link*. Default to an empty string (can be omitted if not a link post)
+     * @param nsfw True if the post should should be marked as NSFW. Default to *false*
+     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     *
+     * @param apiType The string *json*
+     * @param rawJson The value *1*
+     */
+    @POST("api/submit")
+    @FormUrlEncoded
+    suspend fun submit(
+            @Field("kind") kind: String,
+            @Field("title") title: String,
+            @Field("text") text: String = "",
+            @Field("url") url: String = "",
+
+            @Field("nsfw") nsfw: Boolean = false,
+            @Field("spoiler") spoiler: Boolean = false,
+
+            @Field("api_type") apiType: String = "json",
+            @Field("raw_json") rawJson: Int = 1
+    )
 }

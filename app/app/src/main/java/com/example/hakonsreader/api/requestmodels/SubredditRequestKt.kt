@@ -178,4 +178,30 @@ class SubredditRequestKt(
             ApiResponse.Error(GenericError(-1), e)
         }
     }
+
+    /**
+     * Submit a post to the subreddit
+     *
+     * OAuth scope required: *submit*
+     *
+     * @param kind One of: *link*, *self*, *image*, *video*, *videogif*
+     * @param title The title of the post (max 300 characters)
+     * @param text The Markdown text of the post. Default to an empty string (can be omitted if not a selfpost)
+     * @param url The URL of the post used when *kind* is *link*. Default to an empty string (can be omitted if not a link post)
+     * @param nsfw True if the post should should be marked as NSFW. Default to *false*
+     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     */
+    suspend fun submit(
+            kind: String,
+            title: String,
+            text: String = "",
+            url: String = "",
+
+            nsfw: Boolean = false,
+            spoiler: Boolean = false
+    ) {
+
+        api.submit(kind, title, text, url, nsfw, spoiler)
+
+    }
 }
