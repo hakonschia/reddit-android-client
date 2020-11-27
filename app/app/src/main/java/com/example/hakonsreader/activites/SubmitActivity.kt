@@ -1,7 +1,8 @@
 package com.example.hakonsreader.activites
 
 import android.os.Bundle
-import android.util.Log
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import com.example.hakonsreader.databinding.ActivitySubmitBinding
 import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
 import com.example.hakonsreader.databinding.SubmissionLinkBinding
 import com.example.hakonsreader.databinding.SubmissionTextBinding
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -57,6 +59,14 @@ class SubmitActivity : AppCompatActivity() {
         binding.subredditName = subredditName
 
         // Set text change listener on binding.title, disable submitPost if not in range 0..300
+
+        binding.title.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                binding.submitPost.isEnabled = s.length in 1..300
+            }
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+        })
 
         binding.submitPost.setOnClickListener {
             // Check which page is active, submit based on that
@@ -100,6 +110,9 @@ class SubmitActivity : AppCompatActivity() {
      * Submits the post based on what is in text tab
      */
     private fun submitText(fragment: SubmissionTextFragment) {
+        // TODO the text is markdown, so the code with buttons etc from ReplyActivity should be extracted
+        //  to its own class/fragment/whatever so it can be used here and in ReplyActivity
+
         val title = binding.title.text.toString()
         val nsfw = binding.nsfw.isChecked
         val spoiler = binding.spoiler.isChecked
@@ -134,6 +147,7 @@ class SubmitActivity : AppCompatActivity() {
         val link = fragment.getLink()
 
         if (link.isBlank()) {
+            Snackbar.make(binding.root, R.string.submittingLinkNoLink, Snackbar.LENGTH_SHORT).show()
             return
         }
 
@@ -152,7 +166,7 @@ class SubmitActivity : AppCompatActivity() {
     /**
      * Submits the post based on what is in the crosspost tab
      */
-    private fun submitCrosspost( fragment: SubmissionCrosspostFragment) {
+    private fun submitCrosspost(fragment: SubmissionCrosspostFragment) {
         val title = binding.title.text.toString()
         val nsfw = binding.nsfw.isChecked
         val spoiler = binding.spoiler.isChecked
@@ -161,6 +175,7 @@ class SubmitActivity : AppCompatActivity() {
         val id = fragment.getCrosspostId()
 
         if (id.isBlank()) {
+            Snackbar.make(binding.root, R.string.submittingCrosspostNoId, Snackbar.LENGTH_SHORT).show()
             return
         }
 

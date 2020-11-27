@@ -1,5 +1,6 @@
 package com.example.hakonsreader.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -16,9 +17,11 @@ import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.SubmitActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.SortingMethods;
 import com.example.hakonsreader.api.enums.PostTimeSort;
@@ -122,6 +125,9 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
         // Set the subreddit based on the argument based to newInstance()
         this.setSubredditObservable();
+
+        // Setup the FAB for submitting a new post to the subreddit
+        this.setupSubmitPostFab();
 
         // Set the ViewModel now that we have a subreddit name to create it with
         this.setupViewModel();
@@ -368,6 +374,32 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
         binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> postsViewModel.loadPosts()));
+    }
+
+    /**
+     * Sets up {@link FragmentSubredditBinding#submitPostFab}
+     */
+    private void setupSubmitPostFab() {
+        // Not a default sub, add listener to show/hide submit post FAB
+        if (!RedditApi.STANDARD_SUBS.contains(getSubredditName().toLowerCase())) {
+            binding.posts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (dy > 0) {
+                        binding.submitPostFab.hide();
+                    } else {
+                        binding.submitPostFab.show();
+                    }
+                }
+            });
+
+            binding.submitPostFab.setOnClickListener(v -> {
+                Intent i = new Intent(getContext(), SubmitActivity.class);
+                i.putExtra(SubmitActivity.SUBREDDIT_KEY, getSubredditName());
+                startActivity(i);
+            });
+        }
     }
 
     /**

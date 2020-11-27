@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
 
             android:ellipsize="end"
@@ -120,6 +120,8 @@
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
 
+        <!-- TODO when there is text being edited this should scroll to the top or something
+         so the text input fields are actually visible-->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
             android:layout_width="0dp"
@@ -154,7 +156,9 @@
 
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="Submit post"
+            android:text="@string/submitPostBtn"
+            android:enabled="false"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

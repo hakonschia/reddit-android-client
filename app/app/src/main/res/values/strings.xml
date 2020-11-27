@@ -214,6 +214,7 @@
     <string name="submittingTitleHint">Title</string>
     <string name="submittingTextHint">Text</string>
     <string name="submittingLinkHint">Link</string>
+    <string name="submitPostBtn">Submit post</string>
 
     <string name="submittingCrosspostTitle">Crosspost</string>
     <string name="submittingCrosspostHint">ID of post to crosspost</string>
@@ -221,6 +222,9 @@
     <string name="submittingNSFW" translatable="false">NSFW</string>
     <string name="submittingSpoiler">Spoiler</string>
     <string name="submittingReceiveNotifications">Receive notifications</string>
+
+    <string name="submittingLinkNoLink">Please enter a link to submit</string>
+    <string name="submittingCrosspostNoId">Please enter a post ID to submit</string>
 
 
     <!-- The text inside the markdown buttons (these aren't language specific so marked as untranslatable) -->

@@ -182,6 +182,19 @@
                 tools:listitem="@layout/list_item_post" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/submitPostFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_gravity="bottom|end"
+            android:src="@drawable/ic_baseline_add_24"
+
+            android:visibility="@{standardSub ? View.GONE : View.VISIBLE, default=gone}"
+            tools:visibility="visible" />
+
         <!-- TODO figure out a way to remove the padding in this, it looks like it's below the top of the screen -->
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"
