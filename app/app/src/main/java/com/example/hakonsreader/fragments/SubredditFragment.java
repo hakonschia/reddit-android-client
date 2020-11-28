@@ -305,6 +305,12 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     private void setupBinding(ViewGroup container) {
         binding = FragmentSubredditBinding.inflate(getLayoutInflater(), container, false);
 
+        binding.setPrivatelyBrowsing(App.get().isUserLoggedInPrivatelyBrowsing());
+        // Setting the conditional in xml causes an error because of color/int mismatch
+        binding.subredditIcon.setBorderColor(
+                ContextCompat.getColor(requireContext(),
+                        App.get().isUserLoggedInPrivatelyBrowsing() ? R.color.privatelyBrowsing : R.color.opposite_background)
+        );
         binding.subredditRefresh.setOnClickListener(view -> this.refreshPosts());
         binding.subscribe.setOnClickListener(this::subscribeOnClick);
 
