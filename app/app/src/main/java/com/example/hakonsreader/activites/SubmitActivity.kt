@@ -64,6 +64,8 @@ class SubmitActivity : AppCompatActivity() {
         binding.title.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
                 binding.submitPost.isEnabled = s.length in 1..300
+                binding.titleCharacterLength.text = "${s.length} / 300"
+                // TODO if above 300 show some red outline on the input field
             }
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
