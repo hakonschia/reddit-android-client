@@ -111,18 +111,21 @@
 
                     <com.robinhood.ticker.TickerView
                         android:id="@+id/subredditSubscribers"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
 
                         android:text="@{@plurals/amountOfSubscribers(subreddit.subscribers, subreddit.subscribers)}"
                         android:textColor="@color/secondary_text_color"
+                        android:gravity="center"
+
                         android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
 
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/subredditRefresh"
+                        app:layout_constraintStart_toEndOf="@+id/subscribe"
                         app:layout_constraintTop_toBottomOf="@id/subredditName"
                         app:ticker_animationDuration="@integer/tickerAnimationDefault"
-
                         tools:text="523 123 subscribers" />
 
                     <TextView
@@ -200,6 +203,7 @@
             android:id="@+id/loadingIcon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="4dp"
 
             app:layout_anchor="@id/postsRefreshLayout"
             style="?android:attr/progressBarStyleHorizontal"

@@ -84,8 +84,15 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     private final ObservableField<Subreddit> subreddit = new ObservableField<Subreddit>() {
         @Override
         public void set(Subreddit value) {
-            super.set(value);
+            // If there is no subscribers previously the ticker animation looks very weird
+            // so disable it if it would like weird
+            Subreddit old = subreddit.get();
+            boolean enableTickerAnimation = old != null && old.getSubscribers() != 0;
+
+            binding.subredditSubscribers.setAnimationDuration(enableTickerAnimation ? getResources().getInteger(R.integer.tickerAnimationDefault) : 0);
+
             // Probably not how ObservableField is supposed to be used? Works though
+            super.set(value);
 
             ViewUtil.setSubredditIcon(binding.subredditIcon, value);
             binding.setSubreddit(value);
@@ -303,7 +310,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
         // Although only the numbers will actually change, we need to add alphabet characters as well
         // for the initial animation when going from an empty string to "341 subscribers"
-        binding.subredditSubscribers.setCharacterLists(TickerUtils.provideAlphabeticalList(), TickerUtils.provideAlphabeticalList());
+        binding.subredditSubscribers.setCharacterLists(TickerUtils.provideNumberList());
 
         // Set listener for when the swipe refresh layout is refreshed, and the color of the icon
         binding.postsRefreshLayout.setOnRefreshListener(() -> {
