@@ -231,7 +231,7 @@ class SubmitActivity : AppCompatActivity() {
         }
 
         fun getText() : String {
-            return binding?.textSubmission?.text.toString()
+            return binding?.markdownInput?.inputText ?: ""
         }
     }
 

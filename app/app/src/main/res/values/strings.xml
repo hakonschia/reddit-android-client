@@ -201,7 +201,7 @@
 
     <string name="replyingTo">Replying to <b>%s</b></string>
     <string name="replyHint">Say something nice</string>
-    <string name="replyPreview">Preview</string>
+    <string name="preview">Preview</string>
 
     <string name="replyAddLinkDialogHeader">Add link</string>
     <string name="replyAddLinkDialogLinkTextHint">Text</string>
