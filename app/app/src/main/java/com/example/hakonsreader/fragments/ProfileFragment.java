@@ -235,6 +235,9 @@ public class ProfileFragment extends Fragment {
             binding.username.setText(username);
         }
 
+        // Kinda weird to do this here, but even if we are privately browsing and on another users profile
+        // it should indicate that we're privately browsing (as with your own profile and subreddits)
+        enablePrivateBrowsing(App.get().isUserLoggedInPrivatelyBrowsing());
         binding.setLoggedInUser(isLoggedInUser);
     }
 
