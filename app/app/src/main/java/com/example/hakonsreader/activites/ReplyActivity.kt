@@ -133,6 +133,21 @@ class ReplyActivity : AppCompatActivity() {
         binding = null
     }
 
+    /**
+     * If there is text a dialog is shown to warn the user that they are leaving text behind
+     * and makes the user confirm they want to discard the text
+     */
+    override fun finish() {
+        if (binding?.markdownInput?.inputText.isNullOrBlank()) {
+            super.finish()
+        } else {
+            showConfirmDialog()
+        }
+
+        // Might not actually finish, but it shouldn't matter
+        overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
+    }
+
 
     /**
      * Restores a saved instance state
@@ -201,6 +216,7 @@ class ReplyActivity : AppCompatActivity() {
             confirmDiscardDialog = Dialog(this)
             confirmDiscardDialog!!.setContentView(R.layout.dialog_reply_confirm_back_press)
         }
+        // TODO causes a leak when discard is clicked
         confirmDiscardDialog!!.show()
 
         // Because using match_parent in the layout file doesn't actually match the parent (screen width)
@@ -208,7 +224,7 @@ class ReplyActivity : AppCompatActivity() {
         confirmDiscardDialog!!.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         val discard = confirmDiscardDialog!!.findViewById<Button>(R.id.btnDiscard)
         val cancel = confirmDiscardDialog!!.findViewById<Button>(R.id.btnCancel)
-        discard.setOnClickListener { finish() }
+        discard.setOnClickListener { super.finish() }
         cancel.setOnClickListener { confirmDiscardDialog!!.dismiss() }
 
         // TODO add button for "discard and save" that saves the text and whats being responded to so we can resume later
