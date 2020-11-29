@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.responses
 
+import com.example.hakonsreader.api.jsonadapters.ListingKtListAdapter
 import com.example.hakonsreader.api.jsonadapters.ListingListAdapter
 import com.example.hakonsreader.api.model.RedditListing
 import com.google.gson.annotations.JsonAdapter
@@ -19,7 +20,7 @@ class ListingResponseKt<T> {
     inner class Data {
         // For "more comments" kind of responses the array is called "things" instead of "children"
         @SerializedName(value = "children", alternate = ["things"])
-        @JsonAdapter(ListingListAdapter::class)
+        @JsonAdapter(ListingKtListAdapter::class)
         var listings: List<T>? = null
     }
 

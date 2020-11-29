@@ -9,6 +9,7 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditListing;
+import com.example.hakonsreader.api.model.RedditListingKt;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.responses.GenericError;
@@ -69,10 +70,10 @@ public class SubredditRequest {
             return;
         }
 
-        api.getSubredditInfo(subredditName).enqueue(new Callback<RedditListing>() {
+        api.getSubredditInfo(subredditName).enqueue(new Callback<RedditListingKt>() {
             @Override
-            public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
-                RedditListing body = null;
+            public void onResponse(Call<RedditListingKt> call, Response<RedditListingKt> response) {
+                RedditListingKt body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
@@ -89,7 +90,7 @@ public class SubredditRequest {
             }
 
             @Override
-            public void onFailure(Call<RedditListing> call, Throwable t) {
+            public void onFailure(Call<RedditListingKt> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });

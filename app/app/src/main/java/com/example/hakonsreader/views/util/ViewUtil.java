@@ -2,7 +2,6 @@ package com.example.hakonsreader.views.util;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,7 +39,7 @@ public class ViewUtil {
      */
     @BindingAdapter("subredditIcon")
     public static void setSubredditIcon(ImageView imageView, Subreddit subreddit) {
-        String iconURL = subreddit.getIconImage();
+        String iconURL = subreddit.getIcon();
         String communityURL = subreddit.getCommunityIcon();
         int size = (int) imageView.getResources().getDimension(R.dimen.subredditIconSizeInList);
 
@@ -76,7 +75,7 @@ public class ViewUtil {
      */
     @BindingAdapter("subredditBanner")
     public static void setSubredditBannerImage(ImageView imageView, Subreddit subreddit) {
-        String bannerURL = subreddit.getBannerImage();
+        String bannerURL = subreddit.getBannerBackgroundImage();
         if (bannerURL != null && !bannerURL.isEmpty()) {
             // Data saving on, only load if the image is already cached
             if (App.get().dataSavingEnabled()) {

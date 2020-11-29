@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName
  * This class has local database support with Room
  */
 @Entity(tableName = "subreddits")
-class SubredditKt : RedditListingKt() {
+class Subreddit(name: String) : RedditListingKt() {
 
     /**
      * The name of the Subreddit
@@ -136,20 +136,20 @@ class SubredditKt : RedditListingKt() {
      * True if the currently logged in user has subscribed to the subreddit
      */
     @SerializedName("user_is_subscriber")
-    var userHasSubscribed = false
+    var isSubscribed = false
 
     /**
      * True if the currently logged in user has favorited the Subreddit. This being true
-     * implies that [userHasSubscribed] is also true
+     * implies that [isSubscribed] is also true
      */
     @SerializedName("user_has_favorited")
-    var userHasFavorited = false
+    var isFavorited = false
 
     /**
      * True if the currently logged in user is a moderator of the Subreddit
      */
     @SerializedName("user_is_moderator")
-    var userIsModerator = false
+    var isModerator = false
 
 
     /**
@@ -174,4 +174,10 @@ class SubredditKt : RedditListingKt() {
      */
     @SerializedName("subreddit_type")
     var subredditType = ""
+
+    /**
+     * The amount of minutes posts should have their score hidden on this subreddit
+     */
+    @SerializedName("comment_score_hide_mins")
+    var hideScoreTime = 0
 }

@@ -12,12 +12,14 @@ import com.example.hakonsreader.api.model.Subreddit;
 /**
  * The global database for the application, holds {@link RedditPost} and {@link Subreddit} entities
  */
-@Database(entities = {RedditPost.class, Subreddit.class}, version = 25)
+@Database(entities = {RedditPost.class}, version = 27)
 public abstract class AppDatabase extends RoomDatabase {
+
+    // TODO fix subreddits
 
     private static AppDatabase instance;
     public abstract RedditPostsDao posts();
-    public abstract RedditSubredditsDao subreddits();
+  //  public abstract RedditSubredditsDao subreddits();
 
 
     /**
@@ -43,6 +45,6 @@ public abstract class AppDatabase extends RoomDatabase {
      */
     public void clearUserState() {
         posts().clearUserState();
-        subreddits().clearUserState();
+     //   subreddits().clearUserState();
     }
 }

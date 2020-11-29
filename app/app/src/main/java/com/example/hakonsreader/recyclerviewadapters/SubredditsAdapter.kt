@@ -162,7 +162,7 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
         var newPos = Collections.binarySearch(
                 sublist,
                 subreddit,
-                { s1, s2 -> s1.name.toLowerCase().compareTo(s2.name.toLowerCase())}
+                { s1: Subreddit, s2: Subreddit -> s1.name.toLowerCase().compareTo(s2.name.toLowerCase())}
         )
 
         // Add one to the value and invert it to get the actual position
@@ -184,7 +184,7 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
         val sub = subreddits[position]
 
         holder.binding.name.text = sub.name
-        App.get().mark.setMarkdown(holder.binding.subredditDescription, sub.publicDesription)
+        App.get().mark.setMarkdown(holder.binding.subredditDescription, sub.publicDescription)
         ViewUtil.setSubredditIcon(holder.binding.icon, sub)
 
         // You can only favorite subs you are subscribed to

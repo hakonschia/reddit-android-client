@@ -331,6 +331,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         // Standard subs won't have information, so there is no point in attempting to get it
         if (!RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())) {
 
+            // TODO fix subreddits database
+           /*
             // Check the local database to see if there is previous information stored
             String finalSubredditName = subredditName;
             new Thread(() -> {
@@ -341,7 +343,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
                     });
                 }
             }).start();
-
+             */
             this.retrieveSubredditInfo(subredditName);
         }
     }
@@ -448,7 +450,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         final boolean subscribed = sub.isSubscribed();
 
         api.subreddit(sub.getName()).subscribe(!subscribed, voidValue -> {
-            sub.setSubscribed(!subscribed);
+            sub.setFavorited(!subscribed);
             subreddit.set(sub);
         }, (e, t) -> {
             t.printStackTrace();
@@ -470,7 +472,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
                 // Lets assume the user doesn't want to store NSFW. We could use the setting for caching
                 // images/videos but it's somewhat going beyond the intent of the setting
                 if (!sub.isNsfw()) {
-                    database.subreddits().insert(sub);
+                    // TODO fix subreddits database
+               //     database.subreddits().insert(sub);
                 }
             }).start();
 

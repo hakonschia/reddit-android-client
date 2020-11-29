@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.service;
 
 import com.example.hakonsreader.api.model.RedditListing;
+import com.example.hakonsreader.api.model.RedditListingKt;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.responses.ListingResponse;
 
@@ -8,7 +9,6 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -25,7 +25,7 @@ public interface SubredditService {
      * @return A call with a {@link RedditListing} that can be converted to a {@link Subreddit}
      */
     @GET("r/{subreddit}/about?raw_json=1")
-    Call<RedditListing> getSubredditInfo(@Path("subreddit") String subreddit);
+    Call<RedditListingKt> getSubredditInfo(@Path("subreddit") String subreddit);
 
 
     /**

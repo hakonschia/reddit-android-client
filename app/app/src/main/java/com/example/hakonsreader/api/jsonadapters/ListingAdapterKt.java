@@ -1,7 +1,9 @@
 package com.example.hakonsreader.api.jsonadapters;
 
+import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditListingKt;
 import com.example.hakonsreader.api.model.RedditUser;
+import com.example.hakonsreader.api.model.Subreddit;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -27,7 +29,11 @@ public class ListingAdapterKt implements JsonDeserializer<RedditListingKt> {
         data.addProperty("kind", kind);
 
         RedditListingKt listing;
-        listing = context.deserialize(data, RedditUser.class);
+        if (Thing.ACCOUNT.getValue().equals(kind)) {
+            listing = context.deserialize(data, RedditUser.class);
+        } else {
+            listing = context.deserialize(data, Subreddit.class);
+        }
 
         /*
         // So far we only support posts, comments, and subreddits

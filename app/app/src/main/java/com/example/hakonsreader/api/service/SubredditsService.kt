@@ -1,7 +1,6 @@
 package com.example.hakonsreader.api.service
 
 import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.responses.ListingResponse
 import com.example.hakonsreader.api.responses.ListingResponseKt
 import retrofit2.Response
 import retrofit2.http.GET

@@ -36,7 +36,9 @@ class SelectSubredditsViewModelK(context: Context) : ViewModel() {
             val ids = SharedPreferencesManager.get(SUBSCRIBED_SUBREDDITS_KEY, Array<String>::class.java)
             if (!ids.isNullOrEmpty()) {
                 CoroutineScope(IO).launch {
-                    subreddits.postValue(database.subreddits().getSubsById(ids))
+                    // TODO fix subreddits database
+
+                    //subreddits.postValue(database.subreddits().getSubsById(ids))
                 }
             }
         }
@@ -84,9 +86,11 @@ class SelectSubredditsViewModelK(context: Context) : ViewModel() {
 
                     // Although NSFW subs might be inserted with this, it's fine as if the user
                     // has subscribed to them it's fine (for non-logged in users, default subs don't include NSFW)
-                    database.subreddits().insertAll(subs)
+                    // TODO fix subreddits database
+                    // database.subreddits().insertAll(subs)
                 }
                 is ApiResponse.Error -> {
+                    response.throwable.printStackTrace()
                     error.postValue(ErrorWrapper(response.error, response.throwable))
                 }
             }

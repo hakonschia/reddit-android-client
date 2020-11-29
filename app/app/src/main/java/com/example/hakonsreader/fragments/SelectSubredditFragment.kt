@@ -240,7 +240,7 @@ class SelectSubredditFragmentK : Fragment() {
                 }
 
                 CoroutineScope(IO).launch {
-                    database.subreddits().update(subreddit)
+                 //   database.subreddits().update(subreddit)
                 }
             }
         }, { error, throwable ->

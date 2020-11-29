@@ -8,12 +8,14 @@ import androidx.room.Update;
 
 import com.example.hakonsreader.api.model.Subreddit;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 /**
  * Interface to store subreddits in a persistent Room database
  */
-@Dao
+//@Dao
 public interface RedditSubredditsDao {
 
     /**
@@ -22,7 +24,7 @@ public interface RedditSubredditsDao {
      * @param subreddit The subreddit to insert
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Subreddit subreddit);
+    void insert(@Nullable Subreddit subreddit);
 
     /**
      * Inserts a list of subreddits into the database. If there is a conflict the subreddit is updated
@@ -71,6 +73,6 @@ public interface RedditSubredditsDao {
      * Clears user specific information from all posts. Sets to the values that the Reddit API
      * would return for non-logged in users
      */
-    @Query("UPDATE subreddits SET subscribed=0")
+    @Query("UPDATE subreddits SET isSubscribed=0")
     void clearUserState();
 }
