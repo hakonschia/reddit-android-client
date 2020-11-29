@@ -7,10 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -236,7 +234,7 @@ public class Post extends Content {
         // For instance, if the post is not uploaded to reddit the URL will still link to something (like an imgur gif)
         // TODO maybe the only posts actually removed completely so they're not able ot be watched are videos? Even text/images uploaded
         //  to reddit directly are still there
-        if (post.getRemovedByCategory() != null) {
+        if (!post.getRemovedByCategory().isEmpty()) {
             ContentPostRemoved c = new ContentPostRemoved(context);
             c.setRedditPost(post);
             return c;

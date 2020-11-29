@@ -30,14 +30,13 @@ import retrofit2.internal.EverythingIsNonNull;
  * Class that provides an interface towards the Reddit API related to post, such as retrieving
  * information about the post and commenting
  */
-public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableRequest {
+public class PostRequest implements VoteableRequest, SaveableRequest {
 
     private final AccessToken accessToken;
     private final PostService api;
     private final String postId;
 
     private final VoteableRequestModel voteRequest;
-    private final ReplyableRequestModel replyRequest;
     private final SaveableRequestModel saveRequest;
     private final ModRequestModel modRequest;
 
@@ -47,7 +46,6 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
         this.postId = postId;
 
         this.voteRequest = new VoteableRequestModel(accessToken, api);
-        this.replyRequest = new ReplyableRequestModel(accessToken, api);
         this.saveRequest = new SaveableRequestModel(accessToken, api);
         this.modRequest = new ModRequestModel(accessToken, api);
     }
@@ -233,21 +231,6 @@ public class PostRequest implements VoteableRequest, ReplyableRequest, SaveableR
         voteRequest.vote(Thing.POST, postId, type, onResponse, onFailure);
     }
 
-    /**
-     * Submit a new comment as a reply to the post. For replies to other comments use {@link CommentRequest#reply(String, OnResponse, OnFailure)}
-     *
-     * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
-     *
-     * <p>OAuth scope required: {@code submit}</p>
-     *
-     * @param comment The comment to submit, formatted as <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
-     * @param onResponse Callback for successful responses. Holds the newly created comment
-     * @param onFailure Callback for failed requests
-     */
-    @Override
-    public void reply(String comment, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
-        replyRequest.postComment(Thing.POST, postId, comment, onResponse, onFailure);
-    }
 
     /**
      * Save the comment

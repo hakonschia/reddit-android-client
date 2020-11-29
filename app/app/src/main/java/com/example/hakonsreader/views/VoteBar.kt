@@ -9,7 +9,7 @@ import android.widget.FrameLayout
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.VoteType
-import com.example.hakonsreader.api.model.RedditListing
+import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.VoteBarBinding
@@ -26,7 +26,7 @@ class VoteBar : FrameLayout {
     private var api = App.get().api
     private lateinit var binding: VoteBarBinding
     var hideScore = false
-    var listing: RedditListing? = null
+    var listing: VoteableListing? = null
         set(value) {
             field = value
             updateVoteStatus()
@@ -66,7 +66,7 @@ class VoteBar : FrameLayout {
             return
         }
         listing?.let {
-            val currentVote = it.voteType
+            val currentVote = it.getVoteType()
             val actualVote = if (currentVote == voteType) {
                 // Ie. if upvote is clicked when the listing is already upvoted, unvote the listing
                 VoteType.NO_VOTE
@@ -76,7 +76,7 @@ class VoteBar : FrameLayout {
 
             // Assume it's successful as it feels like the buttons aren't pressed when you have to wait
             // until the colors are updated
-            it.voteType = actualVote
+            it.setVoteType(actualVote)
             updateVoteStatus()
 
             val id = it.id
@@ -92,7 +92,7 @@ class VoteBar : FrameLayout {
                     is ApiResponse.Success -> {}
                     is ApiResponse.Error -> {
                         // Request failed, set back to default
-                        it.voteType = currentVote
+                        it.setVoteType(currentVote)
                         withContext(Main) {
                             updateVoteStatus()
                             resp.throwable.printStackTrace()
@@ -130,7 +130,7 @@ class VoteBar : FrameLayout {
         binding.downvote.setColorFilter(context.getColor(R.color.noVote))
 
         listing?.let {
-            binding.score.textColor = when (it.voteType) {
+            binding.score.textColor = when (it.getVoteType()) {
                 VoteType.UPVOTE -> {
                     binding.upvote.setColorFilter(context.getColor(R.color.upvoted))
                     context.getColor(R.color.upvoted)

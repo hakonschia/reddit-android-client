@@ -1,7 +1,6 @@
 package com.example.hakonsreader.api.service;
 
 import com.example.hakonsreader.api.model.RedditListing;
-import com.example.hakonsreader.api.model.RedditListingKt;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.responses.ListingResponse;
 
@@ -25,7 +24,7 @@ public interface SubredditService {
      * @return A call with a {@link RedditListing} that can be converted to a {@link Subreddit}
      */
     @GET("r/{subreddit}/about?raw_json=1")
-    Call<RedditListingKt> getSubredditInfo(@Path("subreddit") String subreddit);
+    Call<RedditListing> getSubredditInfo(@Path("subreddit") String subreddit);
 
 
     /**

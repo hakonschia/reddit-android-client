@@ -12,13 +12,13 @@ import com.example.hakonsreader.api.model.Subreddit;
 /**
  * The global database for the application, holds {@link RedditPost} and {@link Subreddit} entities
  */
-@Database(entities = {RedditPost.class}, version = 27)
+//@Database(entities = {RedditPost.class}, version = 28)
 public abstract class AppDatabase extends RoomDatabase {
 
-    // TODO fix subreddits
+    // TODO fix this
 
     private static AppDatabase instance;
-    public abstract RedditPostsDao posts();
+  //  public abstract RedditPostsDao posts();
   //  public abstract RedditSubredditsDao subreddits();
 
 
@@ -28,12 +28,15 @@ public abstract class AppDatabase extends RoomDatabase {
      * @return The instance of the database
      */
     public static synchronized AppDatabase getInstance(Context context) {
+        /*
         if (instance == null) {
             instance = Room.databaseBuilder(
                     context.getApplicationContext(),
                     AppDatabase.class, "app_database"
             ).fallbackToDestructiveMigration().build();
         }
+
+         */
         return instance;
     }
 
@@ -44,7 +47,7 @@ public abstract class AppDatabase extends RoomDatabase {
      * For example, all posts will convert {@link RedditPost#getVoteType()} to {@link com.example.hakonsreader.api.enums.VoteType#NO_VOTE}</p>
      */
     public void clearUserState() {
-        posts().clearUserState();
+   //     posts().clearUserState();
      //   subreddits().clearUserState();
     }
 }

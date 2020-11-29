@@ -50,6 +50,8 @@ class PostsViewModel(
         set(value) {
             field = value
 
+            // TODO this
+            /*
             CoroutineScope(IO).launch {
                 val postsFromDb = database.posts().getPostsById(value)
                 val sorted = ArrayList<RedditPost>()
@@ -62,13 +64,14 @@ class PostsViewModel(
                         sorted.add(post)
                         val crosspostIds = post.crosspostIds
                         if (crosspostIds?.isNotEmpty() == true) {
-                            post.crossposts = database.posts().getPostsById(crosspostIds)
+                           /post.crossposts = database.posts().getPostsById(crosspostIds)
                         }
                     }
                 }
 
                 posts.postValue(sorted)
             }
+             */
         }
 
     private fun findPost(list: List<RedditPost>, id: String) : RedditPost? {
@@ -177,6 +180,8 @@ class PostsViewModel(
         val postsToInsertIntoDb = ArrayList<RedditPost>()
         postsToInsertIntoDb.addAll(newPosts)
 
+        // TODO this
+        /*
         // Store the crossposts
         newPosts.forEach {
             val crossposts = it.crossposts
@@ -201,5 +206,6 @@ class PostsViewModel(
         // We use all the posts here as duplicates will just be updated, which is fine
         // This must be called after the crossposts are set or else the IDs wont be stored
         database.posts().insertAll(postsToInsertIntoDb)
+         */
     }
 }

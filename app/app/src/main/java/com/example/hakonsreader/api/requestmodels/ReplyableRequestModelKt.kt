@@ -49,11 +49,13 @@ class ReplyableRequestModelKt(
 
             val comment = resp.body()?.response?.getListings()?.get(0)
             if (comment != null) {
+                /*
                 comment.depth = if (thing == Thing.POST) {
                     0
                 } else {
                     -1
                 }
+                 */
 
                 ApiResponse.Success(comment)
             } else {

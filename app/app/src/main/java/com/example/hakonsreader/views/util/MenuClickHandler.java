@@ -83,7 +83,7 @@ public class MenuClickHandler {
             }
 
             // Set text to "Undistinguish"
-            if (comment.isMod()) {
+            if (comment.isUserMod()) {
                 MenuItem modItem = menu.getMenu().findItem(R.id.menuDistinguishCommentAsMod);
                 modItem.setTitle(R.string.commentRemoveModDistinguish);
             }
@@ -124,7 +124,7 @@ public class MenuClickHandler {
                 saveCommentOnClick(view, comment);
                 return true;
             } else if (itemId == R.id.menuDistinguishCommentAsMod) {
-                if (comment.isMod()) {
+                if (comment.isUserMod()) {
                     api.comment(comment.getId()).removeDistinguishAsMod(distinguishAndStickyResponse, (e, t) -> {
                         Util.handleGenericResponseErrors(view, e, t);
                     });
@@ -277,7 +277,7 @@ public class MenuClickHandler {
             menu.inflate(R.menu.post_extra_user_is_mod);
 
             // Set text to "Undistinguish"
-            if (post.isMod()) {
+            if (post.isUserMod()) {
                 MenuItem modItem = menu.getMenu().findItem(R.id.menuDistinguishPostAsMod);
                 modItem.setTitle(R.string.postRemoveModDistinguish);
             }

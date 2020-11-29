@@ -2,15 +2,11 @@ package com.example.hakonsreader.activites;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,16 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.enums.PostType;
-import com.example.hakonsreader.api.enums.Thing;
-import com.example.hakonsreader.api.interfaces.ReplyableRequest;
-import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
-import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ActivityReplyBinding;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
-import com.example.hakonsreader.misc.Util;
-import com.google.gson.Gson;
 
 import io.noties.markwon.Markwon;
 import io.noties.markwon.editor.MarkwonEditor;
@@ -111,6 +100,7 @@ public class ReplyActivity extends AppCompatActivity {
             }
         }
 
+        /*
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String jsonData = extras.getString(PostActivity.LISTING_KEY);
@@ -136,6 +126,7 @@ public class ReplyActivity extends AppCompatActivity {
             binding.setListing(replyingTo);
         }
 
+         */
         // Set this link movement method so links work the same way in the preview as the rest of the app
         binding.preview.setMovementMethod(InternalLinkMovementMethod.getInstance(this));
 
@@ -211,6 +202,7 @@ public class ReplyActivity extends AppCompatActivity {
      * @param view Ignored
      */
     public void sendReply(View view) {
+        /*
         String text = binding.replyText.getText().toString();
 
         // TODO add text change listener and disable button if empty
@@ -248,6 +240,7 @@ public class ReplyActivity extends AppCompatActivity {
             t.printStackTrace();
             Util.handleGenericResponseErrors(binding.parentLayout, error, t);
         });
+         */
     }
 
     /**

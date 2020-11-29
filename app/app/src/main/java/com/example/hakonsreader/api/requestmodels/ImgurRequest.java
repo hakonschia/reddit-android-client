@@ -8,7 +8,6 @@ import com.example.hakonsreader.api.service.ImgurService;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,8 +53,12 @@ public class ImgurRequest {
                 }
 
                 List<Image> images = album.getImages();
+                // TODO this
+                /*
                 postWithImgurAlbum.setGallery(true);
                 postWithImgurAlbum.setGalleryImages(images);
+
+                 */
             } catch (URISyntaxException | IOException e) {
                 // This really should never happen but worst case is the album would be loaded as a link
                 e.printStackTrace();

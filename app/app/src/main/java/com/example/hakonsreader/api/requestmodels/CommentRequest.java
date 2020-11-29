@@ -24,13 +24,12 @@ import retrofit2.internal.EverythingIsNonNull;
  * Class that provides an interface towards the Reddit API related to comments, such as
  * replying to the comment or voting on it
  */
-public class CommentRequest implements VoteableRequest, ReplyableRequest, SaveableRequest {
+public class CommentRequest implements VoteableRequest, SaveableRequest {
 
     private final String commentId;
     private final AccessToken accessToken;
     private final CommentService api;
     private final VoteableRequestModel voteRequest;
-    private final ReplyableRequestModel replyRequest;
     private final SaveableRequestModel saveRequest;
     private final ModRequestModel modRequest;
 
@@ -40,27 +39,8 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest, Saveab
         this.accessToken = accessToken;
         this.api = api;
         this.voteRequest = new VoteableRequestModel(accessToken, api);
-        this.replyRequest = new ReplyableRequestModel(accessToken, api);
         this.saveRequest = new SaveableRequestModel(accessToken, api);
         this.modRequest = new ModRequestModel(accessToken, api);
-    }
-
-    /**
-     * Submit a new comment as a reply to another comment. Note: The depth of the new comment is not
-     * set (it is -1) and must be set manually with {@link RedditComment#setDepth(int)} (as the parents depth + 1)
-     *
-     * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
-     *
-     * <p>OAuth scope required: {@code submit} </p>
-     *
-     * @param comment The comment to submit, formatted as <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
-     * @param onResponse Callback for successful responses. Holds the newly created comment
-     * @param onFailure Callback for failed requests
-     */
-    @Override
-    @EverythingIsNonNull
-    public void reply(String comment, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
-        replyRequest.postComment(Thing.COMMENT, commentId, comment, onResponse, onFailure);
     }
 
 
@@ -107,6 +87,8 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest, Saveab
         ).enqueue(new Callback<JsonResponse>() {
             @Override
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                //TODO this
+                /*
                 JsonResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -122,6 +104,7 @@ public class CommentRequest implements VoteableRequest, ReplyableRequest, Saveab
                 } else {
                     Util.handleHttpErrors(response, onFailure);
                 }
+                 */
             }
 
             @Override

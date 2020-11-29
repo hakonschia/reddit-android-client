@@ -5,12 +5,12 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.jsonadapters.FloatToLongDeserializer
-import com.example.hakonsreader.api.jsonadapters.ListingAdapterKt
+import com.example.hakonsreader.api.jsonadapters.ListingAdapter
 import com.google.gson.annotations.JsonAdapter
 
 @Entity
-@JsonAdapter(ListingAdapterKt::class)
-abstract class RedditListingKt {
+@JsonAdapter(ListingAdapter::class)
+abstract class RedditListing {
 
     /**
      * The timestamp the listing was created at (ie. inserted into the local database)

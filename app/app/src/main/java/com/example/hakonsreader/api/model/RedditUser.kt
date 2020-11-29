@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * Class representing a Reddit user
  */
-class RedditUser : RedditListingKt() {
+class RedditUser : RedditListing() {
 
     /**
      * The username of the user

@@ -13,7 +13,6 @@ import com.google.gson.JsonObject;
 
 import java.lang.reflect.Type;
 
-
 /**
  * Json deserializer that automatically converts a listing to its appropriate class
  */

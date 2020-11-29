@@ -1,6 +1,8 @@
 package com.example.hakonsreader.api.service;
 
+import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.responses.JsonResponse;
+import com.example.hakonsreader.api.responses.JsonResponseKt;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -24,7 +26,7 @@ public interface ReplyService {
      */
     @POST("api/comment")
     @FormUrlEncoded
-    Call<JsonResponse> postComment(
+    Call<JsonResponseKt<RedditComment>> postComment(
             @Field("text") String comment,
             @Field("thing_id") String parentId,
             @Field("api_type") String apiType,

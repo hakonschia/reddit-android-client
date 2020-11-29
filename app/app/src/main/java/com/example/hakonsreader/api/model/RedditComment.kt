@@ -1,9 +1,14 @@
 package com.example.hakonsreader.api.model
 
+import com.example.hakonsreader.api.enums.VoteType
+import com.example.hakonsreader.api.interfaces.VoteableListing
+import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
+import com.example.hakonsreader.api.responses.ListingResponseKt
+import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 
-class RedditCommentKt : RedditListingKt() {
+class RedditComment : RedditListing(), VoteableListing {
 
     /**
      * The body of comment in Markdown
@@ -51,7 +56,6 @@ class RedditCommentKt : RedditListingKt() {
      */
     @SerializedName("subreddit")
     var subreddit = ""
-
 
     /**
      * The depth of the comment
@@ -151,50 +155,122 @@ class RedditCommentKt : RedditListingKt() {
     @SerializedName("author_flair_richtext")
     var authorRichtextFlairs = ArrayList<RichtextFlair>()
 
+    /**
+     * The permalink to the comment (eg. /r/GlobalOffensive/comments/<postID>/<title>/<commentID>)
+     */
+    @SerializedName("permalink")
+    var permalink = ""
 
-    // TODO when everything is converted and ListingResponseKt takes T : RedditListingKt then do this
-    /*
+    /**
+     * How the comment is distinguished
+     *
+     * @see isMod
+     * @see isAdmin
+     */
+    @SerializedName("distinguished")
+    var distinguished = ""
+
+    /**
+     * @return True if the comment is made by, and distinguished as, a moderator
+     * @see distinguished
+     */
+    fun isMod() : Boolean = distinguished == "moderator"
+
+    /**
+     * @return True if the comment is made by, and distinguished as, an admin (Reddit employee)
+     * @see distinguished
+     */
+    fun isAdmin() : Boolean = distinguished == "admin"
+
+    /**
+     * True if the comment is made by the poster of the post
+     */
+    @SerializedName("is_submitter")
+    var isByPoster = false
+
+
+    /**
+     * The score of the listing
+     */
+    @SerializedName("score")
+    override var score = 0
+
+    /**
+     * True if the score should be hidden
+     */
+    @SerializedName("score_hidden")
+    override var isScoreHidden = false
+
+    @SerializedName("likes")
+    private var liked: Boolean? = null
+
+    override fun getVoteType() : VoteType {
+        return when (liked) {
+            true -> VoteType.UPVOTE
+            false -> VoteType.DOWNVOTE
+            null -> VoteType.NO_VOTE
+        }
+    }
+
+    override fun setVoteType(newVote: VoteType) {
+        val original = getVoteType()
+
+        // Don't do anything if there is no update to the vote
+
+        // Don't do anything if there is no update to the vote
+        if (original == newVote) {
+            return
+        }
+
+        // Going from upvote to downvote: -1 - 1 = -2
+        // Going from downvote to upvote: 1 - (-1) = 2
+        // Going from downvote to no vote: 0 - (-1) = 1
+
+        // Going from upvote to downvote: -1 - 1 = -2
+        // Going from downvote to upvote: 1 - (-1) = 2
+        // Going from downvote to no vote: 0 - (-1) = 1
+        val difference: Int = newVote.getValue() - original.value
+
+        score += difference
+
+        // Update the internal data as that is used in getVoteType
+        liked = when (newVote) {
+            VoteType.UPVOTE -> true
+            VoteType.DOWNVOTE -> false
+            VoteType.NO_VOTE -> null
+        }
+    }
+
+
     @SerializedName("replies")
     // No replies are represented as: {"replies": ""} which would cause an error since it's a string
     @JsonAdapter(EmptyStringAsNullAdapter::class)
     private var repliesInternal: ListingResponseKt<RedditComment>? = null
-  //  var ListingResponseKt: ListingResponseKt<RedditCommentKt>? = null
-
-    var replies = ArrayList<RedditComment>()
-     */
 
     /**
-     * Retrieves the list of replies this comment has
-     *
-     * @return The list of replies
+     * The list of replies this comment has
      */
-    /*
-    fun getReplies(): List<RedditComment?>? {
-        // First time retrieving replies, create the list from data.replies
-        if (repliesActual == null) {
+    var replies = ArrayList<RedditComment>()
+        get() {
             if (repliesInternal != null) {
-                repliesActual = getRepliesInternal()
-            } else {
-                // No more for the comment
-                repliesActual = java.util.ArrayList<RedditComment>()
+                replies = getRepliesInternal() as ArrayList<RedditComment>
             }
+
+            return field
         }
-        return repliesActual
-    }
 
     private fun getRepliesInternal(): List<RedditComment> {
         // All the comments from the current and its replies
         val all: MutableList<RedditComment> = java.util.ArrayList()
 
         // Loop through the list of replies and add the reply and the replies to the reply
-        repliesActual = repliesInternal!!.getListings() as List<RedditComment?>?
-        for (reply in repliesActual) {
+        replies = repliesInternal!!.getListings() as ArrayList<RedditComment>
+        for (reply in replies) {
             all.add(reply)
             all.addAll(reply.replies)
         }
         return all
     }
-     */
 
     /**
      * Removes a reply from the comment
@@ -204,11 +280,9 @@ class RedditCommentKt : RedditListingKt() {
      *
      * @param reply The reply to remove
      */
-    /*
     fun removeReply(reply: RedditComment?) {
-        repliesActual.remove(reply)
+        replies.remove(reply)
     }
-     */
 
     /**
      * Adds a list of comments as replies. This sets the replies for every comment downwards in the chain
@@ -220,7 +294,6 @@ class RedditCommentKt : RedditListingKt() {
      * [RedditComment.getChildren] was called on, as the comments received are replies to the
      * parent, not that object itself
      */
-    /*
     fun addReplies(replies: List<RedditComment>?) {
         var replies = replies
         if (replies == null) {
@@ -228,7 +301,7 @@ class RedditCommentKt : RedditListingKt() {
         }
 
         // Add all as replies to this comment
-        this.repliesActual.addAll(replies)
+        this.replies.addAll(replies)
 
         // Each comment holds a list of the replies to itself, so for every reply add the rest of
         // the comment chain as a reply to it
@@ -237,13 +310,9 @@ class RedditCommentKt : RedditListingKt() {
 
             // Create the chain of this replies comments and add them
             val replyChain = createCommentChain(replies, i)
-            if (reply.repliesActual == null) {
-                reply.repliesActual = java.util.ArrayList()
-            }
-            reply.repliesActual.addAll(replyChain)
+            reply.replies.addAll(replyChain)
         }
     }
-    */
 
     /**
      * Creates a subchain of comments
@@ -252,7 +321,6 @@ class RedditCommentKt : RedditListingKt() {
      * @param pos The position of `parentChain` to start at
      * @return The comment chain after `pos`
      */
-    /*
     private fun createCommentChain(parentChain: List<RedditComment>, pos: Int): List<RedditComment> {
         val chain: MutableList<RedditComment> = java.util.ArrayList()
         val start = parentChain[pos]
@@ -266,5 +334,4 @@ class RedditCommentKt : RedditListingKt() {
         }
         return chain
     }
-    */
 }

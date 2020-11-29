@@ -2,7 +2,6 @@ package com.example.hakonsreader.recyclerviewadapters;
 
 import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

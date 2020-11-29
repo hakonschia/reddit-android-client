@@ -1,11 +1,12 @@
 package com.example.hakonsreader.api.service;
 
-import com.example.hakonsreader.api.responses.JsonResponse;
+import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.responses.JsonResponseKt;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public interface ModService {
@@ -29,7 +30,7 @@ public interface ModService {
      */
     @POST("api/distinguish")
     @FormUrlEncoded
-    Call<JsonResponse> distinguishAsModComment(
+    Call<JsonResponseKt<RedditComment>> distinguishAsModComment(
             @Field("id") String fullname,
             @Field("how") String how,
             @Field("sticky") boolean sticky,
@@ -48,7 +49,7 @@ public interface ModService {
      */
     @POST("api/distinguish")
     @FormUrlEncoded
-    Call<JsonResponse> distinguishAsModPost(
+    Call<JsonResponseKt<RedditPost>> distinguishAsModPost(
             @Field("id") String fullname,
             @Field("how") String how,
             @Field("api_type") String apiType
@@ -66,7 +67,7 @@ public interface ModService {
      */
     @POST("api/set_subreddit_sticky")
     @FormUrlEncoded
-    Call<JsonResponse> stickyPost(
+    Call<JsonResponseKt<RedditPost>> stickyPost(
             @Field("id") String fullname,
             @Field("state") boolean sticky,
             @Field("api_type") String apiType

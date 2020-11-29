@@ -180,9 +180,10 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_REPLY && data != null) {
                 RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING_KEY), RedditComment.class);
-                RedditComment parent = replyingTo instanceof RedditComment ? (RedditComment) replyingTo : null;
+                // TODO this
+                //RedditComment parent = replyingTo instanceof RedditComment ? (RedditComment) replyingTo : null;
 
-                commentsViewModel.insertComment(newComment, parent);
+               // commentsViewModel.insertComment(newComment, parent);
             }
         }
     }
@@ -343,7 +344,8 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      */
     private void setupCommentsList() {
         commentsAdapter = new CommentsAdapter(post);
-        commentsAdapter.setOnReplyListener(this::replyTo);
+        // TODO this
+        //commentsAdapter.setOnReplyListener(this::replyTo);
         commentsAdapter.setCommentIdChain(getIntent().getExtras().getString(COMMENT_ID_CHAIN, ""));
         commentsAdapter.setLoadMoreCommentsListener((c, p) -> commentsViewModel.loadMoreComments(c, p));
 

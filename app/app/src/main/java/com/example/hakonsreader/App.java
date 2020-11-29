@@ -110,6 +110,8 @@ public class App extends Application {
         }
 
         // Remove records that are older than 12 hours, as they likely won't be used again
+        // TODO this
+        /*
         new Thread(() -> {
             long maxAge = (long)60 * 60 * 12;
 
@@ -118,6 +120,7 @@ public class App extends Application {
 
             Log.d(TAG, "onCreate: # of records=" + count + "; # of deleted=" + deleted);
         }).start();
+         */
     }
 
     /**

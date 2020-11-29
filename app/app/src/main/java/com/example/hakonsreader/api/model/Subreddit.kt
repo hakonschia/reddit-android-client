@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName
  * This class has local database support with Room
  */
 @Entity(tableName = "subreddits")
-class Subreddit(name: String) : RedditListingKt() {
+class Subreddit(name: String) : RedditListing() {
 
     /**
      * The name of the Subreddit

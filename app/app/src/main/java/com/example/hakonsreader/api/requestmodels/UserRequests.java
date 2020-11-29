@@ -6,16 +6,13 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditListing;
-import com.example.hakonsreader.api.model.RedditListingKt;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.responses.GenericError;
-import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
 
-import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -166,10 +163,10 @@ public class UserRequests {
      * @param onFailure The callback for failed requests
      */
     private void getInfoByUsername(String username, OnResponse<RedditUser> onResponse, OnFailure onFailure) {
-        api.getUserInfoOtherUsers(username).enqueue(new Callback<RedditListingKt>() {
+        api.getUserInfoOtherUsers(username).enqueue(new Callback<RedditListing>() {
             @Override
-            public void onResponse(Call<RedditListingKt> call, Response<RedditListingKt> response) {
-                RedditListingKt body = null;
+            public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
+                RedditListing body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
@@ -182,7 +179,7 @@ public class UserRequests {
             }
 
             @Override
-            public void onFailure(Call<RedditListingKt> call, Throwable t) {
+            public void onFailure(Call<RedditListing> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
@@ -275,6 +272,8 @@ public class UserRequests {
         // on the current thread the RedditPost objects will be updated after the response is given with
         // onResponse, which means the UI potentially wont be correct, so we have to run this entire thing on
         // a background thread
+        // TODO this
+        /*
         new Thread(() -> {
             try {
                 Response<ListingResponse> response = api.getListingsFromUser(
@@ -304,5 +303,6 @@ public class UserRequests {
                 onFailure.onFailure(new GenericError(-1), e);
             }
         }).start();
+         */
     }
 }

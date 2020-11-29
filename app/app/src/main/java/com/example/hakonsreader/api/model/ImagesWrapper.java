@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Wrapper class for "preview.images" in JSON posts responses
  */
-class ImagesWrapper {
+public class ImagesWrapper {
     @SerializedName("source")
     Image source;
 

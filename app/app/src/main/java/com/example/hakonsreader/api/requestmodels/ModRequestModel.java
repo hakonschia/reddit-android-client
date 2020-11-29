@@ -8,7 +8,7 @@ import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.responses.GenericError;
-import com.example.hakonsreader.api.responses.JsonResponse;
+import com.example.hakonsreader.api.responses.JsonResponseKt;
 import com.example.hakonsreader.api.service.ModService;
 import com.example.hakonsreader.api.utils.Util;
 
@@ -41,14 +41,14 @@ public class ModRequestModel {
                 distinguish ? "yes" : "no",
                 sticky,
                 RedditApi.API_TYPE
-        ).enqueue(new Callback<JsonResponse>() {
+        ).enqueue(new Callback<JsonResponseKt<RedditComment>>() {
             @Override
-            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+            public void onResponse(Call<JsonResponseKt<RedditComment>> call, Response<JsonResponseKt<RedditComment>> response) {
                 if (response.isSuccessful()) {
-                    JsonResponse body = response.body();
+                    JsonResponseKt<RedditComment> body = response.body();
 
                     if (body != null) {
-                        RedditComment comment = (RedditComment) body.getListings().get(0);
+                        RedditComment comment = (RedditComment) body.getResponse().getListings().get(0);
                         onResponse.onResponse(comment);
                     } else {
                         Util.handleHttpErrors(response, onFailure);
@@ -59,7 +59,7 @@ public class ModRequestModel {
             }
 
             @Override
-            public void onFailure(Call<JsonResponse> call, Throwable t) {
+            public void onFailure(Call<JsonResponseKt<RedditComment>> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
@@ -74,19 +74,21 @@ public class ModRequestModel {
      * @param onFailure Callback for failed requests.
      */
     public void distinguishAsModPost(String id, boolean distinguish, OnResponse<RedditPost> onResponse, OnFailure onFailure) {
+        // TODO this
+        /*
         api.distinguishAsModPost(
                 Util.createFullName(Thing.POST, id),
                 distinguish ? "yes" : "no",
                 RedditApi.API_TYPE
-        ).enqueue(new Callback<JsonResponse>() {
+        ).enqueue(new Callback<JsonResponseKt<RedditPost>>() {
             @Override
-            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+            public void onResponse(Call<JsonResponseKt<RedditPost>> call, Response<JsonResponseKt<RedditPost>> response) {
                 if (response.isSuccessful()) {
-                    JsonResponse body = response.body();
+                    JsonResponseKt<RedditPost> body = response.body();
 
                     if (body != null) {
-                        RedditPost comment = (RedditPost) body.getListings().get(0);
-                        onResponse.onResponse(comment);
+                        RedditPost post = (RedditPost) body.getResponse().getListings().get(0);
+                        onResponse.onResponse(post);
                     } else {
                         Util.handleHttpErrors(response, onFailure);
                     }
@@ -96,10 +98,11 @@ public class ModRequestModel {
             }
 
             @Override
-            public void onFailure(Call<JsonResponse> call, Throwable t) {
+            public void onFailure(Call<JsonResponseKt<RedditPost>> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
+         */
     }
 
     /**
@@ -113,15 +116,17 @@ public class ModRequestModel {
      * @param onFailure The callback for failed requests
      */
     public void stickyPost(String id, boolean sticky, OnResponse<Void> onResponse, OnFailure onFailure) {
+        // TODO this
+        /*
         api.stickyPost(
                 Util.createFullName(Thing.POST, id),
                 sticky,
                 RedditApi.API_TYPE
-        ).enqueue(new Callback<JsonResponse>() {
+        ).enqueue(new Callback<JsonResponseKt<RedditPost>>() {
             @Override
-            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+            public void onResponse(Call<JsonResponseKt<RedditPost>> call, Response<JsonResponseKt<RedditPost>> response) {
                 if (response.isSuccessful()) {
-                    JsonResponse body = response.body();
+                    JsonResponseKt<RedditPost> body = response.body();
 
                     if (body != null) {
                         // There is no actual data in the response
@@ -135,9 +140,10 @@ public class ModRequestModel {
             }
 
             @Override
-            public void onFailure(Call<JsonResponse> call, Throwable t) {
+            public void onFailure(Call<JsonResponseKt<RedditPost>> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
+         */
     }
 }

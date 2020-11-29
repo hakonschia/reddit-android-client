@@ -8,7 +8,6 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
-import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.requestmodels.CommentRequest;
 import com.example.hakonsreader.api.requestmodels.CommentRequestKt;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
@@ -41,8 +40,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;

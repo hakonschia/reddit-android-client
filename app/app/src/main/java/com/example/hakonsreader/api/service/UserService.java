@@ -1,7 +1,6 @@
 package com.example.hakonsreader.api.service;
 
 import com.example.hakonsreader.api.model.RedditListing;
-import com.example.hakonsreader.api.model.RedditListingKt;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.responses.ListingResponse;
 
@@ -36,7 +35,7 @@ public interface UserService {
      * @return A Call with {@link RedditUser}
      */
     @GET("u/{username}/about?raw_json=1")
-    Call<RedditListingKt> getUserInfoOtherUsers(@Path("username") String username);
+    Call<RedditListing> getUserInfoOtherUsers(@Path("username") String username);
 
     /**
      * <p>OAauth scope required: {@code history}</p>

@@ -6,9 +6,11 @@
     <data>
         <import type="com.example.hakonsreader.views.util.ClickHandler" />
 
+        <!-- TODO this
         <variable
             name="listing"
             type="com.example.hakonsreader.api.model.RedditListing" />
+            -->
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,7 +29,6 @@
 
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{@string/replyingTo(listing.author)}"
             android:textColor="@color/text_color"
             android:textSize="20sp"
             app:layout_constrainedWidth="true"

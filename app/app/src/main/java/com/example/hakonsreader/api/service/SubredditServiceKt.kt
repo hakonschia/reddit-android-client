@@ -1,9 +1,9 @@
 package com.example.hakonsreader.api.service
 
-import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ListingResponseKt
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import retrofit2.Response
 import retrofit2.http.*
