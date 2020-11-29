@@ -76,11 +76,6 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
 
 
     /**
-     * The key used in intent extras for listings
-     */
-    public static final String LISTING_KEY = "listing";
-
-    /**
      * Request code for opening a reply activity
      */
     public static final int REQUEST_REPLY = 1;
@@ -179,7 +174,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
 
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_REPLY && data != null) {
-                RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING_KEY), RedditComment.class);
+                RedditComment newComment = new Gson().fromJson(data.getStringExtra(ReplyActivity.LISTING_KEY), RedditComment.class);
                 RedditComment parent = replyingTo instanceof RedditComment ? (RedditComment) replyingTo : null;
 
                 commentsViewModel.insertComment(newComment, parent);
@@ -423,8 +418,8 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
 
         // Open activity or fragment or something to allow reply
         Intent intent = new Intent(this, ReplyActivity.class);
-        intent.putExtra(KIND_KEY, listing.getKind());
-        intent.putExtra(LISTING_KEY, new Gson().toJson(listing));
+        intent.putExtra(ReplyActivity.LISTING_KIND_KEY, listing.getKind());
+        intent.putExtra(ReplyActivity.LISTING_KEY, new Gson().toJson(listing));
 
         startActivityForResult(intent, REQUEST_REPLY);
         overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
