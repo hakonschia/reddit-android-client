@@ -6,6 +6,7 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditListing;
+import com.example.hakonsreader.api.model.RedditListingKt;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.responses.GenericError;
@@ -165,10 +166,10 @@ public class UserRequests {
      * @param onFailure The callback for failed requests
      */
     private void getInfoByUsername(String username, OnResponse<RedditUser> onResponse, OnFailure onFailure) {
-        api.getUserInfoOtherUsers(username).enqueue(new Callback<RedditListing>() {
+        api.getUserInfoOtherUsers(username).enqueue(new Callback<RedditListingKt>() {
             @Override
-            public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
-                RedditListing body = null;
+            public void onResponse(Call<RedditListingKt> call, Response<RedditListingKt> response) {
+                RedditListingKt body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
                 }
@@ -181,7 +182,7 @@ public class UserRequests {
             }
 
             @Override
-            public void onFailure(Call<RedditListing> call, Throwable t) {
+            public void onFailure(Call<RedditListingKt> call, Throwable t) {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });

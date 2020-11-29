@@ -52,7 +52,7 @@ public class MenuClickHandler {
         }
         RedditUser user = App.getStoredUser();
 
-        if (!App.get().isUserLoggedInPrivatelyBrowsing() && user != null && user.getName().equalsIgnoreCase(comment.getAuthor())) {
+        if (!App.get().isUserLoggedInPrivatelyBrowsing() && user != null && user.getUsername().equalsIgnoreCase(comment.getAuthor())) {
             showPopupForCommentExtraForLoggedInUser(view, comment, adapter);
         } else {
             showPopupForCommentExtraForNonLoggedInUser(view, comment, adapter);
@@ -253,7 +253,7 @@ public class MenuClickHandler {
         }
         RedditUser user = App.getStoredUser();
 
-        if (!App.get().isUserLoggedInPrivatelyBrowsing() && user != null && user.getName().equalsIgnoreCase(post.getAuthor())) {
+        if (!App.get().isUserLoggedInPrivatelyBrowsing() && user != null && user.getUsername().equalsIgnoreCase(post.getAuthor())) {
             showPopupForPostExtraForLoggedInUser(view, post);
         } else {
             showPopupForPostExtraForNonLoggedInUser(view, post);

@@ -45,7 +45,7 @@
             android:id="@+id/profilePicture"
             android:layout_width="@dimen/userAndSubredditIconSizePreAnim"
             android:layout_height="@dimen/userAndSubredditIconSizePreAnim"
-            android:onClick="@{view -> ClickHandler.openImageInFullscreen(view, user.profilePictureUrl)}"
+            android:onClick="@{view -> ClickHandler.openImageInFullscreen(view, user.profilePicture)}"
 
             android:src="@drawable/ic_baseline_person_100"
 
@@ -57,7 +57,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/topLayout"
-            app:profilePicture="@{user.profilePictureUrl}" />
+            app:profilePicture="@{user.profilePicture}" />
 
         <TextView
             android:id="@+id/username"
@@ -68,7 +68,7 @@
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{user.name}"
+            android:text="@{user.username}"
 
             android:textColor="@color/text_color"
             android:textSize="25sp"

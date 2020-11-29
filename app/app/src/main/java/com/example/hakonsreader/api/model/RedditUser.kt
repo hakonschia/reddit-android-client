@@ -6,15 +6,18 @@ import com.google.gson.annotations.SerializedName
 /**
  * Class representing a Reddit user
  */
-class RedditUserKt : RedditListingKt() {
+class RedditUser : RedditListingKt() {
 
     /**
      * The username of the user
      */
-    var username = super.fullname
+    // The "username" in the JSOn is "name" (which for other listings are the fullname)
+    val username
+        get() = super.fullname
 
     // The "name" in the user JSON returned is the username, so manually create the fullname
-    override var fullname: String = Thing.ACCOUNT.value + "_" + super.id
+    override var fullname = ""
+        get() = Thing.ACCOUNT.value + "_" + super.id
 
 
     /**

@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * Response for any request that returns a list of listings
  */
-class ListingResponseKt<T : RedditListing> {
+class ListingResponseKt<T> {
 
     @SerializedName("errors")
     private var errors: List<List<String>>? = null
@@ -28,7 +28,7 @@ class ListingResponseKt<T : RedditListing> {
     }
 
     public fun hasErrors() : Boolean {
-        return errors != null && errors!!.isNotEmpty()
+        return !errors.isNullOrEmpty()
     }
 
     public fun getErrors() : List<List<String>>? {

@@ -5,11 +5,11 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.jsonadapters.FloatToLongDeserializer
-import com.example.hakonsreader.api.jsonadapters.ListingAdapter
+import com.example.hakonsreader.api.jsonadapters.ListingAdapterKt
 import com.google.gson.annotations.JsonAdapter
 
 @Entity
-@JsonAdapter(ListingAdapter::class)
+@JsonAdapter(ListingAdapterKt::class)
 abstract class RedditListingKt {
 
     /**

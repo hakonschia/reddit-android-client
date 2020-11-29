@@ -116,7 +116,7 @@ public class ProfileFragment extends Fragment {
     public static ProfileFragment newInstance(String username) {
         // Hardcoding values like this is obviously bad, but this is the only case we're doing something special
         RedditUser user = App.getStoredUser();
-        if (username.equalsIgnoreCase("me") || (user != null && username.equalsIgnoreCase(user.getName()))) {
+        if (username.equalsIgnoreCase("me") || (user != null && username.equalsIgnoreCase(user.getUsername()))) {
             return ProfileFragment.newInstance();
         }
 
@@ -143,7 +143,7 @@ public class ProfileFragment extends Fragment {
         if (isLoggedInUser) {
             user = App.getStoredUser();
             if (user != null) {
-                username = user.getName();
+                username = user.getUsername();
             }
         }
     }
@@ -295,7 +295,7 @@ public class ProfileFragment extends Fragment {
         // user(null) gets information about the logged in user, so we can use username directly
         redditApi.user(username).info(newUser -> {
             user = newUser;
-            username = user.getName();
+            username = user.getUsername();
 
             // Store the updated user information if this profile is for the logged in user
             if (isLoggedInUser) {
@@ -303,7 +303,7 @@ public class ProfileFragment extends Fragment {
 
                 // If this is the first time the user is on their profile, the username won't be set
                 // on the ViewModel, so set it
-                postsViewModel.setUserOrSubredditName(newUser.getName());
+                postsViewModel.setUserOrSubredditName(newUser.getUsername());
             }
 
             // Load the posts for the user

@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.responses
 
-import com.example.hakonsreader.api.model.RedditListing
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -13,7 +12,7 @@ import com.google.gson.annotations.SerializedName
  * }
  *
  */
-class JsonResponseKt<T : RedditListing> {
+class JsonResponseKt<T> {
 
     @SerializedName("json")
     var response: ListingResponseKt<T>? = null
