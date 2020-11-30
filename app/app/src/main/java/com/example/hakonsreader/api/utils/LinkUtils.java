@@ -59,7 +59,7 @@ public final class LinkUtils {
      * Basic subreddit regex that only matches "{@code < u(ser)/<allowed_subreddit_characters>}". This
      * does not match a preceding or trailing slash
      */
-    public static final String BASE_USER_REGEX = "(^|\\s)u(ser)?/[A-Za-z0-9_-]+";
+    public static final String BASE_USER_REGEX = "u(ser)?/[A-Za-z0-9_-]+";
 
     /**
      * Regex for matching a URL to a user. Matches either a full URL (only https, www optional) or only "u/...."

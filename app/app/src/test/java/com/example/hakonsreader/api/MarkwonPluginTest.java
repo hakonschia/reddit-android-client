@@ -1,5 +1,7 @@
-package com.example.hakonsreader.markwonplugins;
+package com.example.hakonsreader.api;
 
+import com.example.hakonsreader.markwonplugins.RedditLinkPlugin;
+import com.example.hakonsreader.markwonplugins.SuperscriptPlugin;
 
 import org.junit.Test;
 
@@ -9,9 +11,9 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.*;
 
 /**
- * Tests that the regex on {@link RedditLinkPlugin}
+ * Tests that the regex on the custom Markwon plugins work as expected
  */
-public class RedditLinkPluginTest {
+public class MarkwonPluginTest {
 
 
     private int totalMatches(Matcher m) {
