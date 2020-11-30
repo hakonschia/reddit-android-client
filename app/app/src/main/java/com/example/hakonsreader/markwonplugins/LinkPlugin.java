@@ -29,8 +29,15 @@ import io.noties.markwon.AbstractMarkwonPlugin;
 public class LinkPlugin extends AbstractMarkwonPlugin {
     private static final String TAG = "LinkPlugin";
 
+    // TODO links with some characters dont get autolinked by markwon
+    //  https://www.reddit.com/r/hakonschia/comments/jtyz0e/cool_image/ge534qc?utm_source=share&utm_medium=web2x&context=3
+
     // Pattern taken from: https://stackoverflow.com/a/3809435/7750841
-    private static final Pattern RE = Pattern.compile("https://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=,]*)");
+    public static final Pattern RE = Pattern.compile(
+            // Match whitespace, start of string, in a parenthesis, or not in a [] (ie. already a markdown link)
+            "(^|\\s)" +
+            "https://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=,{}\"\\s]*)"
+    );
 
 
     private final Context context;
@@ -49,6 +56,7 @@ public class LinkPlugin extends AbstractMarkwonPlugin {
             final int s = matcher.start();
             final int e = matcher.end();
             final String link = matcher.group();
+            Log.d(TAG, "beforeSetText: " + link);
 
             final ClickableSpan clickableSpan = new ClickableSpan() {
                 @Override

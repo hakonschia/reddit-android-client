@@ -35,11 +35,11 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
 
     // Subreddits are alphanumericals, numbers, and underscores. Users are the same and dashes
     public static final Pattern RE = Pattern.compile(
-            // Match whitespace, start of string, in a parenthesis, or not in a [] (ie. already a markdown link)
-            "(^|\\s|\\(|(?=\\[))" +
+            // Match start of string, whitespace
+            "(^|\\s" +
             // Match either subreddit or user regex
             "(/?" + LinkUtils.BASE_SUBREDDIT_REGEX + ")" +
-            "|(/?" + LinkUtils.BASE_USER_REGEX + ")"
+            "|(/?" + LinkUtils.BASE_USER_REGEX + "))"
     );
 
 
