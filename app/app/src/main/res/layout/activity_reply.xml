@@ -6,11 +6,9 @@
     <data>
         <import type="com.example.hakonsreader.views.util.ClickHandler" />
 
-        <!-- TODO this
         <variable
             name="listing"
-            type="com.example.hakonsreader.api.model.RedditListing" />
-            -->
+            type="com.example.hakonsreader.api.interfaces.ReplyableListing" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,6 +27,7 @@
 
             android:ellipsize="end"
             android:maxLines="1"
+            android:text="@{@string/replyingTo(listing.author)}"
             android:textColor="@color/text_color"
             android:textSize="20sp"
             app:layout_constrainedWidth="true"
@@ -57,56 +56,16 @@
 
             tools:text="@tools:sample/lorem/random" />
 
-        <!-- Ideally the preview and preview header would be right under
-        the input field (instead of at the middle of the screen), but it's
-        really hard to get both the input field and preview text to not go
-        over each other (either the input field will grow so it fills the screen or
-        the preview text will grow upwards and remove the input field) -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout"
+        <com.example.hakonsreader.views.MarkdownInput
+            android:id="@+id/markdownInput"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-
-            app:layout_constraintBottom_toTopOf="@id/btnAddComment"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/summary">
-
-            <!-- The EditText has 4dp margin which makes the it look like
-            it's not lined up with the text above/below, so remove it with negative margin -->
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/replyText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="-4dp"
-                android:layout_marginEnd="-4dp"
-
-                android:hint="@string/replyHint"
-                android:inputType="textMultiLine"
-
-                android:textColor="@color/text_color"
-                android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg"
-                android:textSize="14sp"
-
-                tools:text="@tools:sample/lorem[10]" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/previewHeader"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
 
-            android:text="@string/replyPreview"
-            android:textColor="@color/secondary_text_color"
-            android:textSize="13sp"
-
-            app:layout_constraintBottom_toTopOf="@id/preview"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
-            app:layout_constraintVertical_bias="0.8" />
+            app:layout_constraintTop_toBottomOf="@+id/summary" />
 
         <!-- TODO the padding inside the button messes up the view, makes it look
         like the button is a little bit above the preview header (thanks android?)-->
@@ -122,163 +81,8 @@
             android:onLongClick="@{(view) -> ClickHandler.showToastWithContentDescription(view)}"
             android:src="@drawable/ic_baseline_send_24"
 
-            app:layout_constraintBottom_toTopOf="@id/preview"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/summary" />
 
-        <TextView
-            android:id="@+id/preview"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-
-            android:fadeScrollbars="false"
-            android:scrollbars="vertical"
-
-            android:textColor="@color/text_color"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toTopOf="@+id/markdownButtons"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnAddComment" />
-
-        <HorizontalScrollView
-            android:id="@+id/markdownButtons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-
-            android:fadeScrollbars="false"
-            android:scrollbarStyle="insideInset"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <LinearLayout
-                android:id="@+id/markdownButtonsInnerLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/markdownBold"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_bold"
-                    android:onClick="boldOnClick"
-
-                    android:text="@string/markdownBtnBold" />
-
-                <Button
-                    android:id="@+id/markdownItalic"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_italic"
-                    android:onClick="italicOnClick"
-
-                    android:text="@string/markdownBtnItalic" />
-
-                <Button
-                    android:id="@+id/markdownStrikethrough"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_strikethrough"
-                    android:onClick="strikethroughOnClick"
-
-                    android:text="@string/markdownBtnStrikethrough" />
-
-                <ImageButton
-                    android:id="@+id/markdownLink"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_link"
-                    android:onClick="linkOnClick"
-
-                    android:src="@drawable/ic_baseline_link_24" />
-
-                <!-- This looks kinda weird, would look better if I could add some text after the quote block -->
-                <ImageButton
-                    android:id="@+id/markdownQuote"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_quote"
-                    android:onClick="quoteOnClick"
-                    android:src="@drawable/quoteblock_drawable" />
-
-                <Button
-                    android:id="@+id/markdownSpoiler"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_spoiler"
-                    android:onClick="spoilerOnClick"
-
-                    android:text="@string/markdownSpoiler" />
-
-                <Button
-                    android:id="@+id/markdownSuperscript"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_superscript"
-                    android:onClick="superscriptOnClick"
-
-                    android:text="@string/markdownSuperscript" />
-
-                <Button
-                    android:id="@+id/markdownInlineCode"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_inline_code"
-                    android:onClick="inlineCodeOnClick"
-
-                    android:text="@string/markdownInlineCode" />
-
-                <Button
-                    android:id="@+id/markdownCodeBlock"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_code_block"
-                    android:onClick="codeBlockOnClick"
-                    android:text="@string/markdownCodeBlock"
-
-                    android:textAllCaps="false" />
-
-                <ImageButton
-                    android:id="@+id/markdownBulletList"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_bullet_list"
-                    android:onClick="bulletListOnClick"
-                    android:src="@drawable/ic_baseline_format_list_bulleted_24"
-
-                    android:textAllCaps="false" />
-
-                <ImageButton
-                    android:id="@+id/markdownNumberedList"
-                    android:layout_width="@dimen/markdownBtnWidth"
-                    android:layout_height="@dimen/markdownBtnHeight"
-
-                    android:contentDescription="@string/content_description_markdown_btn_numbered_list"
-                    android:onClick="numberedListOnClick"
-                    android:src="@drawable/ic_baseline_format_list_numbered_24"
-
-                    android:textAllCaps="false" />
-
-            </LinearLayout>
-        </HorizontalScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

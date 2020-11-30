@@ -17,4 +17,8 @@ interface ReplyableListing {
      */
     var kind: String
 
+    /**
+     * The author of the listing being replied to
+     */
+    var author: String
 }

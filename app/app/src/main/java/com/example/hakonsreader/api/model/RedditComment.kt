@@ -31,7 +31,7 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing {
      * The author of the comment
      */
     @SerializedName("author")
-    var author = ""
+    override var author = ""
 
     /**
      * The fullname of the author

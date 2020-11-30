@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="subredditName"
+            type="String" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        tools:context=".activites.SubmitActivity">
+
+        <TextView
+            android:id="@+id/subredditNameTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{@string/submittingTo(subredditName)}"
+            android:textColor="@color/text_color"
+            android:textSize="20sp"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Submitting to GlobalOffensive" />
+
+        <!-- TODO the submit text is markdown text -->
+        <TextView
+            android:id="@+id/subredditSubmitText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+
+            android:textColor="@color/secondary_text_color"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/subredditNameTitle"
+            tools:text="@tools:sample/lorem[30]" />
+
+        <TextView
+            android:id="@+id/titleCharacterLength"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="0 / 300"
+            android:textColor="@color/secondary_text_color"
+
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
+            app:layout_constraintTop_toTopOf="@+id/textInputLayout" />
+        <!-- This will have a max character length of 300 -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/subredditSubmitText">
+
+            <!-- The EditText has 4dp margin which makes the it look like
+            it's not lined up with the text above/below, so remove it with negative margin -->
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="-4dp"
+                android:layout_marginEnd="-4dp"
+
+                android:hint="@string/submittingTitleHint"
+                android:inputType="textMultiLine"
+
+                android:textColor="@color/text_color"
+                android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg"
+                android:textSize="14sp"
+
+                tools:text="@tools:sample/lorem[35]" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Add nsfw, spoiler buttons -->
+        <CheckBox
+            android:id="@+id/nsfw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/submittingNSFW"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+
+        <CheckBox
+            android:id="@+id/spoiler"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/submittingSpoiler"
+            app:layout_constraintStart_toEndOf="@+id/nsfw"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+
+        <CheckBox
+            android:id="@+id/sendNotifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/submittingReceiveNotifications"
+            android:checked="true"
+            app:layout_constraintStart_toEndOf="@+id/spoiler"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+
+
+        <!-- TODO when there is text being edited this should scroll to the top or something
+         so the text input fields are actually visible-->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/submitPost"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nsfw"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/submissionTypes"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/submitPost"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tabs"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <Button
+            android:id="@+id/submitPost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/submitPostBtn"
+            android:enabled="false"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

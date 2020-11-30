@@ -1,67 +1,38 @@
-package com.example.hakonsreader.activites;
+package com.example.hakonsreader.views;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.os.Bundle;
+import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.api.RedditApi;
-import com.example.hakonsreader.api.model.RedditListing;
-import com.example.hakonsreader.databinding.ActivityReplyBinding;
-import com.example.hakonsreader.misc.InternalLinkMovementMethod;
+import com.example.hakonsreader.databinding.MarkdownInputBinding;
 
 import io.noties.markwon.Markwon;
 import io.noties.markwon.editor.MarkwonEditor;
 import io.noties.markwon.editor.MarkwonEditorTextWatcher;
 
-public class ReplyActivity extends AppCompatActivity {
-    private static final String TAG = "ReplyActivity";
-
-    /**
-     * Key used to store the state of the reply text
-     */
-    private static final String REPLY_TEXT = "replyText";
-    /**
-     * Key used to store the state of the preview text
-     */
-    private static final String PREVIEW_TEXT = "previewText";
-
-    /**
-     * Key used to store if the URL dialog is shown
-     */
-    private static final String LINK_DIALOG_SHOWN = "urlDialogShown";
-    /**
-     * Key used to store the state of the URL dialog link text
-     */
-    private static final String LINK_DIALOG_TEXT = "urlDialogText";
-    /**
-     * Key used to store the state of the URL dialog link
-     */
-    private static final String LINK_DIALOG_LINK = "urlDialogLink";
-
-    /**
-     * The key used used to store if the confirm discard dialog is shown
-     */
-    private static final String CONFIRM_DIALOG_SHOWN = "confirmDialogShown";
+/**
+ * Class wrapping a text input field with markdown buttons to easily insert markdown formatting
+ * into the input field
+ */
+public class MarkdownInput extends FrameLayout {
+    private static final String TAG = "MarkdownInput";
 
 
-
-    private ActivityReplyBinding binding;
-
-    private final RedditApi redditApi = App.get().getApi();
-    private RedditListing replyingTo;
+    private final MarkdownInputBinding binding;
 
     /**
      * Dialog that allows the user to easily insert a markdown link. If this is
@@ -69,214 +40,48 @@ public class ReplyActivity extends AppCompatActivity {
      */
     private Dialog linkDialog;
 
-    /**
-     * Dialog displayed when the user wants to finish the activity with text in the input field
-     * that ensures the user wants to discard the text
-     */
-    private Dialog confirmDiscardDialog;
 
+    public MarkdownInput(Context context) {
+        this(context, null, 0, 0);
+    }
+    public MarkdownInput(Context context, @Nullable AttributeSet attrs) {
+        this(context, attrs, 0, 0);
+    }
+    public MarkdownInput(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        this(context, attrs, defStyleAttr, 0);
+    }
+    public MarkdownInput(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        binding = MarkdownInputBinding.inflate(LayoutInflater.from(context), this, true);
+        this.setup();
+    }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityReplyBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        if (savedInstanceState != null) {
-            binding.replyText.setText(savedInstanceState.getString(REPLY_TEXT));
-            binding.preview.setText(savedInstanceState.getString(PREVIEW_TEXT));
-
-            // Restore state of the link dialog
-            boolean showLinkDialog = savedInstanceState.getBoolean(LINK_DIALOG_SHOWN);
-            if (showLinkDialog) {
-                String text = savedInstanceState.getString(LINK_DIALOG_TEXT);
-                String link = savedInstanceState.getString(LINK_DIALOG_LINK);
-                this.showLinkDialog(text, link);
-            }
-
-            boolean showConfirmDialog = savedInstanceState.getBoolean(CONFIRM_DIALOG_SHOWN);
-            if (showConfirmDialog) {
-                this.showConfirmDialog();
-            }
-        }
-
-        /*
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            String jsonData = extras.getString(PostActivity.LISTING_KEY);
-            String kind = extras.getString(PostActivity.KIND_KEY);
-
-            if (Thing.POST.getValue().equals(kind)) {
-                replyingTo = new Gson().fromJson(jsonData, RedditPost.class);
-
-                RedditPost post = (RedditPost) replyingTo;
-
-                // If the post is a text post, set the summary to the text post, otherwise the title of the post
-                if (post.getPostType().equals(PostType.TEXT)) {
-                    App.get().getMark().setMarkdown(binding.summary, post.getSelftext());
-                } else {
-                    binding.summary.setText(post.getTitle());
-                }
-            } else if (Thing.COMMENT.getValue().equals(kind)) {
-                replyingTo = new Gson().fromJson(jsonData, RedditComment.class);
-
-                App.get().getMark().setMarkdown(binding.summary, ((RedditComment)replyingTo).getBody());
-            }
-
-            binding.setListing(replyingTo);
-        }
-
-         */
-        // Set this link movement method so links work the same way in the preview as the rest of the app
-        binding.preview.setMovementMethod(InternalLinkMovementMethod.getInstance(this));
-
+    private void setup() {
+        this.bindMarkdownClickListeners();
+        this.bindMarkdownLongClickListeners();
         this.setTextListeners();
-        this.attachLongClickListenerToMarkdownButtons();
-        this.showNotLoggedInDialogIfNotLoggedIn();
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        // Store what is in the edit text
-        outState.putString(REPLY_TEXT, binding.replyText.getText().toString());
-        outState.putString(PREVIEW_TEXT, binding.preview.getText().toString());
-
-        // Store state of the link dialog
-        if (linkDialog != null && linkDialog.isShowing()) {
-            outState.putBoolean(LINK_DIALOG_SHOWN, true);
-
-            TextView text = linkDialog.findViewById(R.id.textText);
-            TextView link = linkDialog.findViewById(R.id.linkText);
-
-            outState.putString(LINK_DIALOG_TEXT, text.getText().toString());
-            outState.putString(LINK_DIALOG_LINK, link.getText().toString());
-
-            // Ensure the dialog is dismissed or else it will cause a leak
-            linkDialog.dismiss();
-        } else {
-            outState.putBoolean(LINK_DIALOG_SHOWN, false);
-        }
-
-        // Store state of the confirm discard dialog
-        if (confirmDiscardDialog != null && confirmDiscardDialog.isShowing()) {
-            outState.putBoolean(CONFIRM_DIALOG_SHOWN, true);
-
-            confirmDiscardDialog.dismiss();
-        } else {
-            outState.putBoolean(CONFIRM_DIALOG_SHOWN, false);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        App.get().setActiveActivity(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        binding = null;
     }
 
     /**
-     * If there is text a dialog is shown to warn the user that they are leaving text behind
-     * and makes the user confirm they want to discard the text
+     * Binds the markdown button click listeners to its appropriate function
      */
-    @Override
-    public void finish() {
-        if (!binding.replyText.getText().toString().isEmpty()) {
-            this.showConfirmDialog();
-        } else {
-            super.finish();
-        }
-
-        // Might not actually finish, but it shouldn't matter
-        overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
+    private void bindMarkdownClickListeners() {
+        // Setting onClick from XML doesn't work since it doesn't find the functions not in an activity
+        binding.markdownBold.setOnClickListener(this::boldOnClick);
+        binding.markdownItalic.setOnClickListener(this::italicOnClick);
+        binding.markdownStrikethrough.setOnClickListener(this::strikethroughOnClick);
+        binding.markdownLink.setOnClickListener(this::linkOnClick);
+        binding.markdownQuote.setOnClickListener(this::quoteOnClick);
+        binding.markdownSpoiler.setOnClickListener(this::spoilerOnClick);
+        binding.markdownSuperscript.setOnClickListener(this::superscriptOnClick);
+        binding.markdownInlineCode.setOnClickListener(this::inlineCodeOnClick);
+        binding.markdownCodeBlock.setOnClickListener(this::codeBlockOnClick);
+        binding.markdownBulletList.setOnClickListener(this::bulletListOnClick);
+        binding.markdownNumberedList.setOnClickListener(this::numberedListOnClick);
     }
 
     /**
-     * Sends the reply
-     *
-     * @param view Ignored
-     */
-    public void sendReply(View view) {
-        /*
-        String text = binding.replyText.getText().toString();
-
-        // TODO add text change listener and disable button if empty
-        if (text.isEmpty() || replyingTo == null) {
-            return;
-        }
-
-        // Hide the keyboard
-        View v = getCurrentFocus();
-        if (v != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-        }
-
-        String id = replyingTo.getId();
-
-        ReplyableRequest request = replyingTo instanceof RedditPost ? redditApi.post(id) : redditApi.comment(id);
-        request.reply(text, comment -> {
-            Log.d(TAG, "sendReply: Comment posted ");
-
-            // No depth set means we're replying to a comment, set depth manually
-            if (comment.getDepth() == -1) {
-                comment.setDepth(((RedditComment)replyingTo).getDepth() + 1);
-            }
-
-            // Pass the new comment back and finish
-            Intent intent = getIntent().putExtra(PostActivity.LISTING_KEY, new Gson().toJson(comment));
-
-            // Kind of a bad way to do it, but if we call finish with text in the input a dialog is shown
-            // Other option is to create a flag (ie "replySent") and not show the dialog if true
-            binding.replyText.getText().clear();
-            setResult(RESULT_OK, intent);
-            finish();
-        }, (error, t) -> {
-            t.printStackTrace();
-            Util.handleGenericResponseErrors(binding.parentLayout, error, t);
-        });
-         */
-    }
-
-    /**
-     * Attaches a longClick listener to each of the markdown syntax buttons.
-     *
-     * <p>The listener looks for the "contentDescription" attribute and shows a toast with
-     * the text if found</p>
-     */
-    private void attachLongClickListenerToMarkdownButtons() {
-        View.OnLongClickListener markdownButtonsLongClick = v -> {
-            CharSequence description = v.getContentDescription();
-
-            if (description != null) {
-                String desc = v.getContentDescription().toString();
-
-                if (!desc.isEmpty()) {
-                    Toast.makeText(ReplyActivity.this, description, Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            // Always return true, otherwise a long click with no description would act like
-            // a single press, which is weird behaviour
-            return true;
-        };
-
-        // Find all the children in the inner layout and add the listener
-        int markdownButtonsCount = binding.markdownButtonsInnerLayout.getChildCount();
-        for (int i = 0; i < markdownButtonsCount; i++) {
-            View v = binding.markdownButtonsInnerLayout.getChildAt(i);
-            v.setOnLongClickListener(markdownButtonsLongClick);
-        }
-    }
-
-
-    /**
-     * Sets various text listeners on {@link ActivityReplyBinding#replyText} to update the
+     * Sets various text listeners on {@link MarkdownInputBinding#replyText} to update the
      * text to highlight markdown syntax, to automatically continue markdown syntax, and to update the preview text
      */
     private void setTextListeners() {
@@ -297,29 +102,86 @@ public class ReplyActivity extends AppCompatActivity {
 
         // Listens to changes and automatically continues markdown syntax
         binding.replyText.addTextChangedListener(new MarkdownInsertTextWatcher());
-
-        // Updates the preview text
-        binding.replyText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                // It's probably horribly inefficient to update the entire markdown every text change
-                // Might be possible to implement onTextChanged and render only the markdown that changed
-                // and insert it into the text. This works for now
-                markwon.setMarkdown(binding.preview, s.toString());
-
-                binding.btnAddComment.setEnabled(!s.toString().isEmpty());
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not implemented
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Not implemented
-            }
-        });
     }
+
+    /**
+     * Attaches a longClick listener to each of the markdown syntax buttons.
+     *
+     * <p>The listener looks for the "contentDescription" attribute and shows a toast with
+     * the text if found</p>
+     */
+    private void bindMarkdownLongClickListeners() {
+        View.OnLongClickListener markdownButtonsLongClick = v -> {
+            CharSequence description = v.getContentDescription();
+
+            if (description != null) {
+                String desc = v.getContentDescription().toString();
+
+                if (!desc.isEmpty()) {
+                    Toast.makeText(getContext(), description, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            // Always return true, otherwise a long click with no description would act like
+            // a single press, which is weird behaviour
+            return true;
+        };
+
+        // Find all the children in the inner layout and add the listener
+        int markdownButtonsCount = binding.markdownButtonsInnerLayout.getChildCount();
+        for (int i = 0; i < markdownButtonsCount; i++) {
+            View v = binding.markdownButtonsInnerLayout.getChildAt(i);
+            v.setOnLongClickListener(markdownButtonsLongClick);
+        }
+    }
+
+    /**
+     * Adds a {@link TextWatcher} to the input field
+     *
+     * @param watcher The watched to add
+     */
+    public void addTextChangeListener(TextWatcher watcher) {
+        binding.replyText.addTextChangedListener(watcher);
+    }
+
+    /**
+     * Clears the text in the input field
+     */
+    public void clearText() {
+        binding.replyText.setText("");
+    }
+
+    /**
+     * Sets the text to show in the input field
+     *
+     * @param text The text to show
+     */
+    public void setText(String text) {
+        binding.replyText.setText(text);
+    }
+
+
+    /**
+     * Retrieves the current text in the input field
+     *
+     * @return The Markdown in the input field
+     */
+    public String getInputText() {
+        return binding.replyText.getText().toString();
+    }
+
+    /**
+     * Shows a preview of the markdown input in a popup dialog
+     */
+    public void showPreviewInPopupDialog() {
+        Markwon m = App.get().getMark();
+
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.preview)
+                .setMessage(m.toMarkdown(binding.replyText.getText().toString()))
+                .show();
+    }
+
 
     /**
      * Adds the specified markdown syntax to an editable text. The cursor of the editable is moved
@@ -478,8 +340,6 @@ public class ReplyActivity extends AppCompatActivity {
     /**
      * onClick for the "Inline code" button. Adds inline code markdown to the text where the cursor is.
      *
-     * <p>For code blocks use {@link ReplyActivity}</p>
-     *
      * @param view Ignored
      */
     public void inlineCodeOnClick(View view) {
@@ -495,8 +355,6 @@ public class ReplyActivity extends AppCompatActivity {
 
     /**
      * onClick for the "Code block" button. Adds code block markdown to the text where the cursor is.
-     *
-     * <p>For code blocks use {@link ReplyActivity}</p>
      *
      * @param view Ignored
      */
@@ -528,8 +386,6 @@ public class ReplyActivity extends AppCompatActivity {
     /**
      * onClick for the "Bullet list" button. Adds bullet list markdown to the text where the cursor is.
      *
-     * <p>For code blocks use {@link ReplyActivity}</p>
-     *
      * @param view Ignored
      */
     public void bulletListOnClick(View view) {
@@ -547,8 +403,6 @@ public class ReplyActivity extends AppCompatActivity {
     /**
      * onClick for the "Numbered list" button. Adds numbered list markdown to the text where the cursor is.
      *
-     * <p>For code blocks use {@link ReplyActivity}</p>
-     *
      * @param view Ignored
      */
     public void numberedListOnClick(View view) {
@@ -563,16 +417,15 @@ public class ReplyActivity extends AppCompatActivity {
         this.addMarkdownSyntax(binding.replyText.getText(), start, end, "1. ", "");
     }
 
-
     /**
      * Shows a dialog to let the user insert a link into the markdown text
      *
      * @param linkText The initial text to set for the link text
      * @param link The initial text to set for the link
      */
-    private void showLinkDialog(String linkText, String link) {
+    public void showLinkDialog(String linkText, String link) {
         if (linkDialog == null) {
-            linkDialog = new Dialog(this);
+            linkDialog = new Dialog(getContext());
             linkDialog.setContentView(R.layout.dialog_reply_add_link);
         }
 
@@ -642,42 +495,55 @@ public class ReplyActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows a dialog to let the user confirm they want to leave
-     *
-     * <p>If the user selects to leave, {@link super#finish()} is called</p>
+     * @return True if the link dialog is currently shown to the user
      */
-    private void showConfirmDialog() {
-        if (confirmDiscardDialog == null) {
-            confirmDiscardDialog = new Dialog(this);
-            confirmDiscardDialog.setContentView(R.layout.dialog_reply_confirm_back_press);
-        }
-        confirmDiscardDialog.show();
-
-        // Because using match_parent in the layout file doesn't actually match the parent (screen width)
-        // This looks weird on horizontal orientation though
-        confirmDiscardDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        Button discard = confirmDiscardDialog.findViewById(R.id.btnDiscard);
-        Button cancel = confirmDiscardDialog.findViewById(R.id.btnCancel);
-
-        discard.setOnClickListener(v -> super.finish());
-        cancel.setOnClickListener(v -> confirmDiscardDialog.dismiss());
-
-        // TODO add button for "discard and save" that saves the text and whats being responded to so we can resume later
+    public boolean isLinkDialogShown() {
+        return linkDialog != null && linkDialog.isShowing();
     }
 
     /**
-     * If there is no user logged in a dialog is shown to the user that
-     * they are not logged in and won't be able to send a reply
+     * Dismisses the link dialog if it is shown
      */
-    private void showNotLoggedInDialogIfNotLoggedIn() {
-        if (!App.get().isUserLoggedIn()) {
-            new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.dialogReplyNotLoggedInTitle))
-                    .setMessage(getString(R.string.dialogReplyNotLoggedInContent))
-                    .show();
+    public void dismissLinkDialog() {
+        if (isLinkDialogShown()) {
+            linkDialog.dismiss();
         }
     }
+
+    /**
+     * If the link dialog is shown this gets the text input into the link dialog (ie. what the link
+     * is shown as when hyperlinked)
+     *
+     * @return The text of the link dialog. If the dialog isn't shown this returns an empty string
+     * @see MarkdownInput#getLinkDialogLink()
+     * @see MarkdownInput#showLinkDialog(String, String)
+     */
+    public String getLinkDialogText() {
+        if (!isLinkDialogShown()) {
+            return "";
+        }
+
+        TextView text = linkDialog.findViewById(R.id.textText);
+        return text.getText().toString();
+    }
+
+    /**
+     * If the link dialog is shown this gets the link input into the link dialog (ie. what the link
+     * is linking to when hyperlinked)
+     *
+     * @return The link of the link dialog. If the dialog isn't shown this returns an empty string
+     * @see MarkdownInput#getLinkDialogText()
+     * @see MarkdownInput#showLinkDialog(String, String)
+     */
+    public String getLinkDialogLink() {
+        if (!isLinkDialogShown()) {
+            return "";
+        }
+
+        TextView text = linkDialog.findViewById(R.id.linkText);
+        return text.getText().toString();
+    }
+
 
     /**
      * Class that implements {@link TextWatcher} that inserts automatically continues various

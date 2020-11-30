@@ -1,5 +1,6 @@
 package com.example.hakonsreader.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -16,9 +17,11 @@ import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.activites.SubmitActivity;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.SortingMethods;
 import com.example.hakonsreader.api.enums.PostTimeSort;
@@ -81,8 +84,15 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     private final ObservableField<Subreddit> subreddit = new ObservableField<Subreddit>() {
         @Override
         public void set(Subreddit value) {
-            super.set(value);
+            // If there is no subscribers previously the ticker animation looks very weird
+            // so disable it if it would like weird
+            Subreddit old = subreddit.get();
+            boolean enableTickerAnimation = old != null && old.getSubscribers() != 0;
+
+            binding.subredditSubscribers.setAnimationDuration(enableTickerAnimation ? getResources().getInteger(R.integer.tickerAnimationDefault) : 0);
+
             // Probably not how ObservableField is supposed to be used? Works though
+            super.set(value);
 
             ViewUtil.setSubredditIcon(binding.subredditIcon, value);
             binding.setSubreddit(value);
@@ -122,6 +132,9 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
         // Set the subreddit based on the argument based to newInstance()
         this.setSubredditObservable();
+
+        // Setup the FAB for submitting a new post to the subreddit
+        this.setupSubmitPostFab();
 
         // Set the ViewModel now that we have a subreddit name to create it with
         this.setupViewModel();
@@ -293,12 +306,18 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     private void setupBinding(ViewGroup container) {
         binding = FragmentSubredditBinding.inflate(getLayoutInflater(), container, false);
 
+        binding.setPrivatelyBrowsing(App.get().isUserLoggedInPrivatelyBrowsing());
+        // Setting the conditional in xml causes an error because of color/int mismatch
+        binding.subredditIcon.setBorderColor(
+                ContextCompat.getColor(requireContext(),
+                        App.get().isUserLoggedInPrivatelyBrowsing() ? R.color.privatelyBrowsing : R.color.opposite_background)
+        );
         binding.subredditRefresh.setOnClickListener(view -> this.refreshPosts());
         binding.subscribe.setOnClickListener(this::subscribeOnClick);
 
         // Although only the numbers will actually change, we need to add alphabet characters as well
         // for the initial animation when going from an empty string to "341 subscribers"
-        binding.subredditSubscribers.setCharacterLists(TickerUtils.provideAlphabeticalList(), TickerUtils.provideAlphabeticalList());
+        binding.subredditSubscribers.setCharacterLists(TickerUtils.provideNumberList());
 
         // Set listener for when the swipe refresh layout is refreshed, and the color of the icon
         binding.postsRefreshLayout.setOnRefreshListener(() -> {
@@ -370,6 +389,32 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         binding.posts.setAdapter(adapter);
         binding.posts.setLayoutManager(layoutManager);
         binding.posts.setOnScrollChangeListener(new PostScrollListener(binding.posts, () -> postsViewModel.loadPosts()));
+    }
+
+    /**
+     * Sets up {@link FragmentSubredditBinding#submitPostFab}
+     */
+    private void setupSubmitPostFab() {
+        // Not a default sub, add listener to show/hide submit post FAB
+        if (!RedditApi.STANDARD_SUBS.contains(getSubredditName().toLowerCase())) {
+            binding.posts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (dy > 0) {
+                        binding.submitPostFab.hide();
+                    } else {
+                        binding.submitPostFab.show();
+                    }
+                }
+            });
+
+            binding.submitPostFab.setOnClickListener(v -> {
+                Intent i = new Intent(getContext(), SubmitActivity.class);
+                i.putExtra(SubmitActivity.SUBREDDIT_KEY, getSubredditName());
+                startActivity(i);
+            });
+        }
     }
 
     /**

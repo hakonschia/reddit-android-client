@@ -35,7 +35,7 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
      * The author of the post
      */
     @SerializedName("author")
-    var author = ""
+    override var author = ""
 
     /**
      * The text of the post in Markdown if this is a text post

@@ -5,6 +5,8 @@ import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
+import com.example.hakonsreader.api.model.Submission
+import com.example.hakonsreader.api.responses.JsonResponseKt
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -70,4 +72,51 @@ interface SubredditServiceKt {
             @Field("make_favorite") favorite: Boolean,
             @Field("sr_name") subredditName: String,
     ) : Response<Nothing>
+
+
+    /**
+     * Submit a post to a subreddit
+     *
+     * OAuth scope required: *submit*
+     *
+     * @param subredditName The name of the subreddit to submit the post to
+     * @param kind One of: *link*, *self*, *crosspost*, *image*, *video*, *videogif*
+     * @param title The title of the post (max 300 characters)
+     *
+     * @param text For *kind* = *self*: The Markdown text of the post. Default to an
+     * empty string (can be omit if not a selfpost)
+     * @param link For *kind* = *link*: The URL of the post used when *kind* is *link*.
+     * Default to an empty string (omit if not a link post)
+     * @param crosspostFullname For *kind* = *crosspost*: The fullname of the post to crosspost.
+     * Default to an empty string (omit if not a crosspost)
+     *
+     * @param nsfw True if the post should should be marked as NSFW. Default to *false*
+     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     * @param sendNotifications True if the poster of the post wants to receive notifications on the post.
+     * Default to *true*
+     * @param resubmit For *kind* = *link*: Resubmit the post is the link is already posted to the subreddit.
+     * Default to *true*
+     *
+     * @param apiType The string *json*
+     * @param rawJson The value *1*
+     */
+    @POST("api/submit")
+    @FormUrlEncoded
+    suspend fun submit(
+            @Field("sr") subredditName: String,
+            @Field("kind") kind: String,
+            @Field("title") title: String,
+
+            @Field("text") text: String = "",
+            @Field("url") link: String = "",
+            @Field("crosspost_fullname") crosspostFullname: String = "",
+
+            @Field("nsfw") nsfw: Boolean = false,
+            @Field("spoiler") spoiler: Boolean = false,
+            @Field("sendreplies") sendNotifications: Boolean = true,
+            @Field("resubmit") resubmit: Boolean = true,
+
+            @Field("api_type") apiType: String = "json",
+            @Field("raw_json") rawJson: Int = 1
+    ) : Response<JsonResponseKt<Submission>>
 }
