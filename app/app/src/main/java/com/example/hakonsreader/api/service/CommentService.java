@@ -5,7 +5,6 @@ import com.example.hakonsreader.api.responses.JsonResponse;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 /**

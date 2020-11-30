@@ -326,25 +326,24 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
             subredditName = args.getString("subreddit", "");
         }
 
-        subreddit.set(new Subreddit(subredditName));
+        Subreddit sub = new Subreddit();
+        sub.setName(subredditName);
+        subreddit.set(sub);
         binding.setStandardSub(RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase()));
 
         // Standard subs won't have information, so there is no point in attempting to get it
         if (!RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())) {
 
-            // TODO fix subreddits database
-           /*
             // Check the local database to see if there is previous information stored
             String finalSubredditName = subredditName;
             new Thread(() -> {
-                Subreddit sub = database.subreddits().get(finalSubredditName);
-                if (sub != null) {
+                Subreddit s = database.subreddits().get(finalSubredditName);
+                if (s != null) {
                     requireActivity().runOnUiThread(() -> {
-                        subreddit.set(sub);
+                        subreddit.set(s);
                     });
                 }
             }).start();
-             */
             this.retrieveSubredditInfo(subredditName);
         }
     }

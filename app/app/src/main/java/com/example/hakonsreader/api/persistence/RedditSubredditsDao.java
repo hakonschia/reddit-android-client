@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Interface to store subreddits in a persistent Room database
  */
-//@Dao
+@Dao
 public interface RedditSubredditsDao {
 
     /**

@@ -51,7 +51,6 @@ class PostsViewModel(
             field = value
 
             // TODO this
-            /*
             CoroutineScope(IO).launch {
                 val postsFromDb = database.posts().getPostsById(value)
                 val sorted = ArrayList<RedditPost>()
@@ -64,14 +63,13 @@ class PostsViewModel(
                         sorted.add(post)
                         val crosspostIds = post.crosspostIds
                         if (crosspostIds?.isNotEmpty() == true) {
-                           /post.crossposts = database.posts().getPostsById(crosspostIds)
+                           post.crossposts = database.posts().getPostsById(crosspostIds)
                         }
                     }
                 }
 
                 posts.postValue(sorted)
             }
-             */
         }
 
     private fun findPost(list: List<RedditPost>, id: String) : RedditPost? {
@@ -180,11 +178,9 @@ class PostsViewModel(
         val postsToInsertIntoDb = ArrayList<RedditPost>()
         postsToInsertIntoDb.addAll(newPosts)
 
-        // TODO this
-        /*
         // Store the crossposts
-        newPosts.forEach {
-            val crossposts = it.crossposts
+        for (newPost in newPosts) {
+            val crossposts = newPost.crossposts
 
             if (!crossposts.isNullOrEmpty()) {
                 val crosspostIds = ArrayList<String>()
@@ -192,13 +188,13 @@ class PostsViewModel(
                 // Insert all crossposts and copy the IDs and set that list on the post itself
                 // We have to store the crossposts by ID this way since room doesn't like it
                 // when there are RedditPost objects inside a RedditPost (or I just don't know how to)
-                crossposts.forEach { crosspost ->
+                for (crosspost in crossposts) {
                     database.posts().insert(crosspost)
                     postsToInsertIntoDb.add(crosspost)
                     crosspostIds.add(crosspost.id)
                 }
 
-                it.crosspostIds = crosspostIds
+                newPost.crosspostIds = crosspostIds
             }
         }
 
@@ -206,6 +202,5 @@ class PostsViewModel(
         // We use all the posts here as duplicates will just be updated, which is fine
         // This must be called after the crossposts are set or else the IDs wont be stored
         database.posts().insertAll(postsToInsertIntoDb)
-         */
     }
 }

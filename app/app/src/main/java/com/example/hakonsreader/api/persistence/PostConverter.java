@@ -79,7 +79,7 @@ public class PostConverter {
 
 
     @TypeConverter
-    public static List<RichtextFlair> rickTextFlairListFromString(String value) {
+    public static ArrayList<RichtextFlair> rickTextFlairListFromString(String value) {
         Type listType = new TypeToken<ArrayList<RichtextFlair>>() {}.getType();
         return gson.fromJson(value, listType);
     }

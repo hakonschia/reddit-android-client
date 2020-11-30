@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName
  * This class has local database support with Room
  */
 @Entity(tableName = "subreddits")
-class Subreddit(name: String) : RedditListing() {
+class Subreddit : RedditListing() {
 
     /**
      * The name of the Subreddit
@@ -44,7 +44,7 @@ class Subreddit(name: String) : RedditListing() {
      * @see description
      */
     @SerializedName("description_html")
-    var descriptionHtml = ""
+    var descriptionHtml: String? = null
 
     /**
      * The public description of the Subreddit in Markdown.
@@ -60,14 +60,14 @@ class Subreddit(name: String) : RedditListing() {
      * This is typically a short summary of the Subreddit, for the full description see [descriptionHtml]
      */
     @SerializedName("public_description_html")
-    var publicDescriptionHtml = ""
+    var publicDescriptionHtml: String? = null
 
 
     /**
      * The URL pointing to the subreddits icon image
      */
     @SerializedName("icon_img")
-    var icon = ""
+    var icon: String? = null
 
     /**
      * The URL pointing to the subreddits community icon
@@ -79,7 +79,7 @@ class Subreddit(name: String) : RedditListing() {
      * The URL pointing to the subreddits header image
      */
     @SerializedName("header_img")
-    var headerImage = ""
+    var headerImage: String? = null
 
     /**
      * The URL pointing to the subreddits banner background image

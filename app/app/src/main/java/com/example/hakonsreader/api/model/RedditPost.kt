@@ -50,7 +50,8 @@ class RedditPost : RedditListing(), VoteableListing {
      * @see selftext
      */
     @SerializedName("selftext_html")
-    var selftextHtml = ""
+    // The HTML selftext is nullable, but selftext will just be empty if no selftext
+    var selftextHtml: String? = null
 
 
     /**
@@ -118,16 +119,20 @@ class RedditPost : RedditListing(), VoteableListing {
     var isSelf = false
 
     /**
+     * Don't use this directly, use [getPostType]
+     *
      * True if the post is a video post
      */
     @SerializedName("is_video")
-    private var isVideo = false
+    var isVideo = false
 
     /**
+     * Don't use this directly, use [getPostType]
+     *
      * True if the post is a gallery post
      */
     @SerializedName("is_gallery")
-    private var isGallery = false
+    var isGallery = false
 
 
     /**
@@ -168,7 +173,7 @@ class RedditPost : RedditListing(), VoteableListing {
      * The domain the post is posted in (eg. "imgur.com")
      */
     @SerializedName("domain")
-    val domain = ""
+    var domain = ""
 
     /**
      * For when the post has been removed, this says which category (mod, author etc.) removed the post
@@ -177,10 +182,12 @@ class RedditPost : RedditListing(), VoteableListing {
     var removedByCategory: String? = null
 
     /**
+     * Don't use this directly, use [getPostType]
+     *
      * The hint for what kind of post this is
      */
     @SerializedName("post_hint")
-    private var postHint = ""
+    var postHint = ""
 
     /**
      * The hex color of the background of the authors flair
@@ -188,19 +195,19 @@ class RedditPost : RedditListing(), VoteableListing {
      * This might be the string "transparent" for transparent backgrounds
      */
     @SerializedName("author_flair_background_color")
-    var authorFlairBackgroundColor = ""
+    var authorFlairBackgroundColor: String? = null
 
     /**
      * The text color for the authors flair
      */
     @SerializedName("author_flair_text_color")
-    var authorFlairTextColor = ""
+    var authorFlairTextColor: String? = null
 
     /**
      * The text for the authors flair
      */
     @SerializedName("author_flair_text")
-    var authorFlairText = ""
+    var authorFlairText: String? = null
 
     /**
      * The list of [RichtextFlair] the authors flair is combined of
@@ -214,19 +221,19 @@ class RedditPost : RedditListing(), VoteableListing {
      * This might be the string "transparent" for transparent backgrounds
      */
     @SerializedName("link_flair_background_color")
-    var linkFlairBackgroundColor = ""
+    var linkFlairBackgroundColor: String? = null
 
     /**
      * The text color for the links flair
      */
     @SerializedName("link_flair_text_color")
-    var linkFlairTextColor = ""
+    var linkFlairTextColor: String? = null
 
     /**
      * The text for the links flair
      */
     @SerializedName("link_flair_text")
-    var linkFlairText = ""
+    var linkFlairText: String? = null
 
     /**
      * The list of [RichtextFlair] the links flair is combined of
@@ -239,19 +246,19 @@ class RedditPost : RedditListing(), VoteableListing {
      * The ID of the post this is a crosspost of
      */
     @SerializedName("crosspost_parent")
-    val crosspostParentId: String? = null
+    var crosspostParentId: String? = null
 
     /**
      * The list of crossposts
      */
     @SerializedName("crosspost_parent_list")
     @Ignore
-    val crossposts: List<RedditPost>? = null
+    var crossposts: List<RedditPost>? = null
 
     /**
      * The list of crosspost IDs (must be set manually)
      */
-    val crosspostIds: List<String>? = null
+    var crosspostIds: List<String>? = null
 
 
     /**
@@ -273,23 +280,25 @@ class RedditPost : RedditListing(), VoteableListing {
 
 
     /**
+     * Don't use this directly, use [galleryImages]
+     *
      * This holds the data for gallery items. The objects in this are either strings or other
      * [LinkedTreeMap]. The source image is found in a [LinkedTreeMap] called "s"
      */
     @SerializedName("media_metadata")
-    private val mediaMetadata: LinkedTreeMap<String, Any>? = null
+    var mediaMetadata: LinkedTreeMap<String, Any>? = null
 
     var galleryImages: MutableList<Image>? = null
         get() {
             if (mediaMetadata != null) {
-                galleryImages = java.util.ArrayList(mediaMetadata.size)
+                field = java.util.ArrayList(mediaMetadata!!.size)
                 val gson = Gson()
-                mediaMetadata.forEach(BiConsumer { s: String?, obj: Any ->
+                mediaMetadata!!.forEach { (s: String?, obj: Any) ->
                     // The source is found in the "s" object, which can be converted to a PreviewImage
                     val converted = obj as LinkedTreeMap<String, Any>
                     val asJson = gson.toJson(converted["s"])
-                    (galleryImages as java.util.ArrayList<Image>).add(gson.fromJson(asJson, Image::class.java))
-                })
+                    (field as java.util.ArrayList<Image>).add(gson.fromJson(asJson, Image::class.java))
+                }
             }
             return field
         }
@@ -316,10 +325,8 @@ class RedditPost : RedditListing(), VoteableListing {
         return preview?.images?.get(0)?.source
     }
 
-    fun getPreviewImages() : List<Image> {
-        return if (preview != null && preview!!.images != null) {
-            preview!!.images!![0].resolutions
-        } else java.util.ArrayList()
+    fun getPreviewImages() : List<Image>? {
+        return preview?.images?.get(0)?.resolutions
     }
 
     fun getObfuscatedPreviewImages() : List<Image>? {
@@ -381,8 +388,11 @@ class RedditPost : RedditListing(), VoteableListing {
     @SerializedName("score_hidden")
     override var isScoreHidden = false
 
+    /**
+     * Don't use this directly, use [voteType]
+     */
     @SerializedName("likes")
-    private var liked: Boolean? = null
+    var liked: Boolean? = null
 
     /**
      * The vote type the post has

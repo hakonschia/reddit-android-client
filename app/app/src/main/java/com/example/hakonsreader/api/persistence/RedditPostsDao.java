@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Interface to store posts in a persistent Room database
  */
-//@Dao
+@Dao
 public interface RedditPostsDao {
 
     /**

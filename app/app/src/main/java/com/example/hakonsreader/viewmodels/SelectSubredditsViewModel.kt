@@ -38,7 +38,7 @@ class SelectSubredditsViewModelK(context: Context) : ViewModel() {
                 CoroutineScope(IO).launch {
                     // TODO fix subreddits database
 
-                    //subreddits.postValue(database.subreddits().getSubsById(ids))
+                    subreddits.postValue(database.subreddits().getSubsById(ids))
                 }
             }
         }
@@ -87,7 +87,7 @@ class SelectSubredditsViewModelK(context: Context) : ViewModel() {
                     // Although NSFW subs might be inserted with this, it's fine as if the user
                     // has subscribed to them it's fine (for non-logged in users, default subs don't include NSFW)
                     // TODO fix subreddits database
-                    // database.subreddits().insertAll(subs)
+                     database.subreddits().insertAll(subs)
                 }
                 is ApiResponse.Error -> {
                     response.throwable.printStackTrace()
