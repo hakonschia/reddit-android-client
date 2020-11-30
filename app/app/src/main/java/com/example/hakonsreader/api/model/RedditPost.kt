@@ -164,14 +164,23 @@ class RedditPost : RedditListing(), VoteableListing {
     fun isAdmin() : Boolean = distinguished == "admin"
 
 
+    /**
+     * The domain the post is posted in (eg. "imgur.com")
+     */
     @SerializedName("domain")
     val domain = ""
 
+    /**
+     * For when the post has been removed, this says which category (mod, author etc.) removed the post
+     */
     @SerializedName("removed_by_category")
-    var removedByCategory = ""
+    var removedByCategory: String? = null
 
+    /**
+     * The hint for what kind of post this is
+     */
     @SerializedName("post_hint")
-    var postHint = ""
+    private var postHint = ""
 
     /**
      * The hex color of the background of the authors flair
@@ -438,7 +447,7 @@ class RedditPost : RedditListing(), VoteableListing {
                 PostType.LINK
             }
         }
-        if (postHint.equals("link")) {
+        if (postHint == "link") {
             // If link matches "imgur.com/...", add a .png to the end and it will redirect to the direct link
 
             // If we have a link post that is a link to imgur, redirect it to get the image directly
@@ -462,7 +471,6 @@ class RedditPost : RedditListing(), VoteableListing {
         }
         return when (postHint) {
             "image" -> {
-                // .gif is treated as image
                 if (url.endsWith(".gif")) {
                     PostType.GIF
                 } else PostType.IMAGE

@@ -79,8 +79,10 @@ class RedditComment : RedditListing(), VoteableListing {
     /**
      * True if the comment has been edited after it was posted
      */
-    @SerializedName("edited")
-    var isEdited = false
+    // TODO when the comment isn't edited, this is a boolean "false", when it is edited it's a float
+    //  timestamp of when it was edited
+    //@SerializedName("edited")
+    //var isEdited = false
 
     /**
      * True if the comment is locked and cannot be replied to
@@ -108,8 +110,7 @@ class RedditComment : RedditListing(), VoteableListing {
      * @see isCollapsed
      */
     @SerializedName("collapsed_reason")
-    // TODO this can be null in the response, should maybe be "String?"
-    var collapsedReason = ""
+    var collapsedReason: String? = null
 
 
     /**
@@ -201,6 +202,13 @@ class RedditComment : RedditListing(), VoteableListing {
     @SerializedName("score_hidden")
     override var isScoreHidden = false
 
+    /**
+     * The internal value used for [voteType]
+     *
+     * True = upvote
+     * False = downvote
+     * Null = no vote
+     */
     @SerializedName("likes")
     private var liked: Boolean? = null
 
@@ -249,27 +257,41 @@ class RedditComment : RedditListing(), VoteableListing {
     private var repliesInternal: ListingResponseKt<RedditComment>? = null
 
     /**
+     * The actual replies for the comment. If this is *null* then [replies] has not yet been accessed
+     */
+    private var repliesActual: ArrayList<RedditComment>? = null
+
+    /**
      * The list of replies this comment has
      */
+    // This has to be transient as GSON would clash between this and repliesInternal, since it is
+    // marked with "replies" as its serialized name
+    @Transient
     var replies = ArrayList<RedditComment>()
         get() {
-            if (repliesInternal != null) {
-                replies = getRepliesInternal() as ArrayList<RedditComment>
+            if (repliesActual == null) {
+                repliesActual = if (repliesInternal != null) {
+                    getRepliesInternal() as ArrayList<RedditComment>
+                } else {
+                    ArrayList()
+                }
             }
 
-            return field
+            return repliesActual as ArrayList<RedditComment>
         }
+
 
     private fun getRepliesInternal(): List<RedditComment> {
         // All the comments from the current and its replies
-        val all: MutableList<RedditComment> = java.util.ArrayList()
+        val all = ArrayList<RedditComment>()
 
         // Loop through the list of replies and add the reply and the replies to the reply
-        replies = repliesInternal!!.getListings() as ArrayList<RedditComment>
-        for (reply in replies) {
+        repliesActual = repliesInternal?.getListings() as ArrayList<RedditComment>
+        for (reply in repliesActual!!) {
             all.add(reply)
             all.addAll(reply.replies)
         }
+
         return all
     }
 
@@ -295,12 +317,7 @@ class RedditComment : RedditListing(), VoteableListing {
      * [RedditComment.getChildren] was called on, as the comments received are replies to the
      * parent, not that object itself
      */
-    fun addReplies(replies: List<RedditComment>?) {
-        var replies = replies
-        if (replies == null) {
-            replies = java.util.ArrayList()
-        }
-
+    fun addReplies(replies: List<RedditComment>) {
         // Add all as replies to this comment
         this.replies.addAll(replies)
 

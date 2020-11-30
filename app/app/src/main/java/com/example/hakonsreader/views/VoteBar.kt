@@ -23,7 +23,12 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 class VoteBar : FrameLayout {
-    private var api = App.get().api
+    // TODO when you upvote a post, go into the post, unvote/downvote, then go out to the list again
+    //  and cast another vote it will be unsynced since it doesn't update the post in the list of posts
+    //  Not really relevant to this class, but putting it here as a reminder
+
+
+    private val api = App.get().api
     private lateinit var binding: VoteBarBinding
     var hideScore = false
     var listing: VoteableListing? = null

@@ -42,7 +42,9 @@ class ContentPostRemoved : Content {
  */
 @BindingAdapter("removedBy")
 fun removedBy(tv: TextView, post: RedditPost) {
-    val removedByCategory: String = post.removedByCategory
+    // We shouldn't get here with this being null, but in case it is return as the else branch
+    // wouldn't make sense (it's not removed)
+    val removedByCategory: String = post.removedByCategory ?: return
 
     tv.text = when (removedByCategory) {
         "moderator" -> tv.resources.getString(R.string.postRemovedByMods, post.subreddit)

@@ -234,7 +234,7 @@ public class Post extends Content {
         // For instance, if the post is not uploaded to reddit the URL will still link to something (like an imgur gif)
         // TODO maybe the only posts actually removed completely so they're not able ot be watched are videos? Even text/images uploaded
         //  to reddit directly are still there
-        if (!post.getRemovedByCategory().isEmpty()) {
+        if (post.getRemovedByCategory() != null) {
             ContentPostRemoved c = new ContentPostRemoved(context);
             c.setRedditPost(post);
             return c;

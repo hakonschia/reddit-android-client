@@ -42,6 +42,7 @@ public class Util {
      */
     public static void handleGenericResponseErrors(View parent, GenericError error, Throwable t) {
         int code = error.getCode();
+        t.printStackTrace();
 
         if (t instanceof IOException) {
             Util.showNoInternetSnackbar(parent);
