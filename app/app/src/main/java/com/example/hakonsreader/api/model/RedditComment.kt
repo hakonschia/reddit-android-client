@@ -190,7 +190,7 @@ class RedditComment : RedditListing(), VoteableListing {
 
 
     /**
-     * The score of the listing
+     * The score of the comment
      */
     @SerializedName("score")
     override var score = 0
@@ -204,42 +204,43 @@ class RedditComment : RedditListing(), VoteableListing {
     @SerializedName("likes")
     private var liked: Boolean? = null
 
-    override fun getVoteType() : VoteType {
-        return when (liked) {
-            true -> VoteType.UPVOTE
-            false -> VoteType.DOWNVOTE
-            null -> VoteType.NO_VOTE
+    /**
+     * The vote type the post has
+     *
+     * Setting this value will automatically update [score], and is idempotent
+     */
+    override var voteType: VoteType
+        get() {
+            return when (liked) {
+                true -> VoteType.UPVOTE
+                false -> VoteType.DOWNVOTE
+                null -> VoteType.NO_VOTE
+            }
         }
-    }
+        set(value) {
+            // Don't do anything if there is no update to the vote
+            if (value == voteType) {
+                return
+            }
 
-    override fun setVoteType(newVote: VoteType) {
-        val original = getVoteType()
+            // Going from upvote to downvote: -1 - 1 = -2
+            // Going from downvote to upvote: 1 - (-1) = 2
+            // Going from downvote to no vote: 0 - (-1) = 1
 
-        // Don't do anything if there is no update to the vote
+            // Going from upvote to downvote: -1 - 1 = -2
+            // Going from downvote to upvote: 1 - (-1) = 2
+            // Going from downvote to no vote: 0 - (-1) = 1
+            val difference: Int = value.value - voteType.value
 
-        // Don't do anything if there is no update to the vote
-        if (original == newVote) {
-            return
+            score += difference
+
+            // Update the internal data as that is used in getVoteType
+            liked = when (value) {
+                VoteType.UPVOTE -> true
+                VoteType.DOWNVOTE -> false
+                VoteType.NO_VOTE -> null
+            }
         }
-
-        // Going from upvote to downvote: -1 - 1 = -2
-        // Going from downvote to upvote: 1 - (-1) = 2
-        // Going from downvote to no vote: 0 - (-1) = 1
-
-        // Going from upvote to downvote: -1 - 1 = -2
-        // Going from downvote to upvote: 1 - (-1) = 2
-        // Going from downvote to no vote: 0 - (-1) = 1
-        val difference: Int = newVote.getValue() - original.value
-
-        score += difference
-
-        // Update the internal data as that is used in getVoteType
-        liked = when (newVote) {
-            VoteType.UPVOTE -> true
-            VoteType.DOWNVOTE -> false
-            VoteType.NO_VOTE -> null
-        }
-    }
 
 
     @SerializedName("replies")

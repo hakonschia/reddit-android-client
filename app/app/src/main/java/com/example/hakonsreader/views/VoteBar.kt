@@ -66,7 +66,7 @@ class VoteBar : FrameLayout {
             return
         }
         listing?.let {
-            val currentVote = it.getVoteType()
+            val currentVote = it.voteType
             val actualVote = if (currentVote == voteType) {
                 // Ie. if upvote is clicked when the listing is already upvoted, unvote the listing
                 VoteType.NO_VOTE
@@ -76,7 +76,7 @@ class VoteBar : FrameLayout {
 
             // Assume it's successful as it feels like the buttons aren't pressed when you have to wait
             // until the colors are updated
-            it.setVoteType(actualVote)
+            it.voteType = actualVote
             updateVoteStatus()
 
             val id = it.id
@@ -92,7 +92,7 @@ class VoteBar : FrameLayout {
                     is ApiResponse.Success -> {}
                     is ApiResponse.Error -> {
                         // Request failed, set back to default
-                        it.setVoteType(currentVote)
+                        it.voteType = currentVote
                         withContext(Main) {
                             updateVoteStatus()
                             resp.throwable.printStackTrace()
@@ -130,7 +130,7 @@ class VoteBar : FrameLayout {
         binding.downvote.setColorFilter(context.getColor(R.color.noVote))
 
         listing?.let {
-            binding.score.textColor = when (it.getVoteType()) {
+            binding.score.textColor = when (it.voteType) {
                 VoteType.UPVOTE -> {
                     binding.upvote.setColorFilter(context.getColor(R.color.upvoted))
                     context.getColor(R.color.upvoted)
@@ -139,7 +139,7 @@ class VoteBar : FrameLayout {
                     binding.downvote.setColorFilter(context.getColor(R.color.downvoted))
                     context.getColor(R.color.downvoted)
                 }
-                else -> {
+                VoteType.NO_VOTE -> {
                     context.getColor(R.color.text_color)
                 }
             }

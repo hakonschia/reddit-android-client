@@ -8,7 +8,7 @@ public enum VoteType {
     DOWNVOTE(-1),
     NO_VOTE(0);
 
-    private int value;
+    private final int value;
 
     VoteType(int value) {
         this.value = value;
