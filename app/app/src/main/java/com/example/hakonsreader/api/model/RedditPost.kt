@@ -5,6 +5,7 @@ import androidx.room.Ignore
 import androidx.room.TypeConverters
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.VoteType
+import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
 import com.example.hakonsreader.api.persistence.PostConverter
@@ -16,7 +17,7 @@ import java.util.function.BiConsumer
 
 @Entity(tableName = "posts")
 @TypeConverters(PostConverter::class)
-class RedditPost : RedditListing(), VoteableListing {
+class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
 
     /**
      * The title of the post

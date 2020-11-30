@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.model
 
 import com.example.hakonsreader.api.enums.VoteType
+import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
@@ -8,7 +9,7 @@ import com.example.hakonsreader.api.responses.ListingResponseKt
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 
-class RedditComment : RedditListing(), VoteableListing {
+class RedditComment : RedditListing(), VoteableListing, ReplyableListing {
 
     /**
      * The body of comment in Markdown

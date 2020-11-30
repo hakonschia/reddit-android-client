@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
+import com.example.hakonsreader.api.interfaces.ReplyableListing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -94,7 +95,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
     private boolean videoPlayingWhenPaused;
 
     private RedditPost post;
-    private RedditListing replyingTo;
+    private ReplyableListing replyingTo;
     private SlidrInterface slidrInterface;
 
     @Override
@@ -180,10 +181,8 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_REPLY && data != null) {
                 RedditComment newComment = new Gson().fromJson(data.getStringExtra(LISTING_KEY), RedditComment.class);
-                // TODO this
-                //RedditComment parent = replyingTo instanceof RedditComment ? (RedditComment) replyingTo : null;
-
-               // commentsViewModel.insertComment(newComment, parent);
+                RedditComment parent = replyingTo instanceof RedditComment ? (RedditComment) replyingTo : null;
+                commentsViewModel.insertComment(newComment, parent);
             }
         }
     }
@@ -345,7 +344,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
     private void setupCommentsList() {
         commentsAdapter = new CommentsAdapter(post);
         // TODO this
-        //commentsAdapter.setOnReplyListener(this::replyTo);
+        commentsAdapter.setOnReplyListener(this::replyTo);
         commentsAdapter.setCommentIdChain(getIntent().getExtras().getString(COMMENT_ID_CHAIN, ""));
         commentsAdapter.setLoadMoreCommentsListener((c, p) -> commentsViewModel.loadMoreComments(c, p));
 
@@ -420,7 +419,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      *
      * @param listing The listing to reply to
      */
-    private void replyTo(RedditListing listing) {
+    private void replyTo(ReplyableListing listing) {
         replyingTo = listing;
 
         // Open activity or fragment or something to allow reply

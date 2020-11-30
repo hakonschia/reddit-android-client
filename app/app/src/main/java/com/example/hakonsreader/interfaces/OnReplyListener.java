@@ -1,10 +1,10 @@
 package com.example.hakonsreader.interfaces;
 
-import com.example.hakonsreader.api.model.RedditListing;
+import com.example.hakonsreader.api.interfaces.ReplyableListing;
 
 /**
  * Interface used to indicate that a listing can be replied to (posts and comments)
  */
 public interface OnReplyListener {
-    void replyTo(RedditListing listing);
+    void replyTo(ReplyableListing listing);
 }

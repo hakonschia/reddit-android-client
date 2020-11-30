@@ -63,7 +63,7 @@ class ContentLink : Content {
         binding as ContentLinkBinding
 
         // The previews will (I believe) never be above 1080p, and that should be fine for most devices
-        var previews: List<Image> = redditPost.getPreviewImages()
+        var previews: List<Image>? = redditPost.getPreviewImages()
 
         if (redditPost.isNsfw) {
             val obfuscatedPreviews: List<Image>? = redditPost.getObfuscatedPreviewImages()
@@ -72,7 +72,7 @@ class ContentLink : Content {
             }
         }
 
-        if (previews.isNotEmpty()) {
+        if (!previews.isNullOrEmpty()) {
             val preview: Image = previews.last()
 
             if (preview.url.isNotBlank()) {
