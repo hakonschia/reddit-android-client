@@ -149,7 +149,7 @@ class RedditPost : RedditListing(), VoteableListing {
      * @see isAdmin
      */
     @SerializedName("distinguished")
-    var distinguished = ""
+    var distinguished: String? = null
 
     /**
      * @return True if the comment is made by, and distinguished as, a moderator
@@ -432,7 +432,8 @@ class RedditPost : RedditListing(), VoteableListing {
             return PostType.VIDEO
         } else if (isSelf) {
             return PostType.TEXT
-        } else if (isGallery) {
+        } else if (isGallery || !galleryImages.isNullOrEmpty()) {
+            // If the gallery images are set from imgurRequest isGallery would be false
             return PostType.GALLERY
         } else if (crosspostParentId != null) {
             return PostType.CROSSPOST

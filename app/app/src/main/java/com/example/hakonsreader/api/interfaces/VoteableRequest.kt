@@ -9,7 +9,7 @@ import com.example.hakonsreader.api.responses.ApiResponse
  * This interface is intended to be used with methods from [com.example.hakonsreader.api.RedditApi]
  * to use the same code for voting on different types of listings (comments or posts).
  */
-interface VoteableRequestKt {
+interface VoteableRequest {
 
     suspend fun vote(voteType: VoteType) : ApiResponse<Nothing?>
 

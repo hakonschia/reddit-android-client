@@ -41,7 +41,7 @@ class ModRequestModelKt(
                     RedditApi.API_TYPE
             )
 
-            val comment = resp.body()?.response?.getListings()?.get(0)
+            val comment = resp.body()?.getListings()?.get(0)
             if (comment != null) {
                 ApiResponse.Success(comment)
             } else {
@@ -72,7 +72,7 @@ class ModRequestModelKt(
                     RedditApi.API_TYPE
             )
 
-            val post = resp.body()?.response?.getListings()?.get(0)
+            val post = resp.body()?.getListings()?.get(0)
             if (post != null) {
                 ApiResponse.Success(post)
             } else {

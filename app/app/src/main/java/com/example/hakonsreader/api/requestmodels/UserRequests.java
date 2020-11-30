@@ -9,10 +9,12 @@ import com.example.hakonsreader.api.model.RedditListing;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.responses.GenericError;
+import com.example.hakonsreader.api.responses.ListingResponse;
 import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
 
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -183,126 +185,5 @@ public class UserRequests {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
-    }
-
-
-    /**
-     * NOTE: the response for this request is sent on a background thread
-     *
-     * <p>Get posts by a user</p>
-     *
-     * <p>The posts retrieved here are sorted by "new", if you want to retrieve posts with a
-     * different sort use {@link UserRequests#posts()}</p>
-     *
-     * <p>OAuth scope required: {@code history}</p>
-     *
-     * @param onResponse The handler for successful responses. Holds the list of posts
-     * @param onFailure The handler for failed responses
-     */
-    public void posts(OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        this.getPosts("new", PostTimeSort.ALL_TIME, onResponse, onFailure);
-    }
-
-    /**
-     * Retrieve an object to make API calls for posts by the user
-     *
-     * @return An object that can retrieve new, top, and controversial posts for a user
-     */
-    public UserPostsRequets posts() {
-        return new UserPostsRequets();
-    }
-
-    /**
-     * Class to retrieve posts from a user. The functions declared here define how to sort the posts
-     * (new, hot etc.)
-     */
-    public class UserPostsRequets {
-        /**
-         * NOTE: the response for this request is sent on a background thread
-         *
-         * <p>Get the current "hot" posts for the user</p>
-         *
-         * <p>OAuth scope required: {@code history}</p>
-         */
-        public void hot(OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-            getPosts("hot", null, onResponse, onFailure);
-        }
-
-        /**
-         * NOTE: the response for this request is sent on a background thread
-         *
-         * <p>Get the "top" posts for the user</p>
-         *
-         * <p>OAuth scope required: {@code history}</p>
-         *
-         * @param sort How to sort the posts
-         */
-        public void top(PostTimeSort sort, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-            getPosts("top", sort, onResponse, onFailure);
-        }
-
-        /**
-         * NOTE: the response for this request is sent on a background thread
-         *
-         * <p>Get the "controversial" posts for the user</p>
-         *
-         * <p>OAuth scope required: {@code history}</p>
-         *
-         * @param sort How to sort the posts
-         */
-        public void controversial(PostTimeSort sort, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-            getPosts("controversial", sort, onResponse, onFailure);
-        }
-    }
-
-
-    /**
-     * NOTE: the response for this request is sent on a background thread
-     *
-     * <p>Convenience method that the other functions use internally</p>
-     *
-     * @param sort The sort for the posts (new, hot, top, or controversial)
-     * @param timeSort How the posts should be time sorted. This only has an affect on top and controversial,
-     *                 and can be set to null for new and hot
-     * @param onResponse The handler for successful responses
-     * @param onFailure The handler for failed responses
-     */
-    private void getPosts(String sort, PostTimeSort timeSort, OnResponse<List<RedditPost>> onResponse, OnFailure onFailure) {
-        // Loading Imgur albums requires API calls inside the callback. If we use "enqueue" and operate
-        // on the current thread the RedditPost objects will be updated after the response is given with
-        // onResponse, which means the UI potentially wont be correct, so we have to run this entire thing on
-        // a background thread
-        // TODO this
-        /*
-        new Thread(() -> {
-            try {
-                Response<ListingResponse> response = api.getListingsFromUser(
-                        username,
-                        "submitted",
-                        sort,
-                        timeSort == null ? "" : timeSort.getValue()
-                ).execute();
-
-                ListingResponse body = null;
-                if (response.isSuccessful()) {
-                    body = response.body();
-                }
-
-                if (body != null) {
-                    List<RedditPost> posts = (List<RedditPost>) body.getListings();
-
-                    if (loadImgurAlbumsAsRedditGalleries) {
-                        imgurRequest.loadAlbums(posts);
-                    }
-
-                    onResponse.onResponse(posts);
-                } else {
-                    Util.handleHttpErrors(response, onFailure);
-                }
-            } catch (IOException e) {
-                onFailure.onFailure(new GenericError(-1), e);
-            }
-        }).start();
-         */
     }
 }

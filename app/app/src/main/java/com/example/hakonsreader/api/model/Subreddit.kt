@@ -166,8 +166,7 @@ class Subreddit(name: String) : RedditListing() {
      * @see submitText
      */
     @SerializedName("submit_text_html")
-    // TODO this can be null in the response, check if this should be String? instead
-    var submitTextHtml = ""
+    var submitTextHtml: String? = null
 
     /**
      * The Subreddit type (eg. "user" for user subreddits)

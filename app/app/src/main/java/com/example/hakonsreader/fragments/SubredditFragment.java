@@ -128,6 +128,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
         // TODO if you go to settings, rotate and change theme, then the IDs wont be saved. The subreddit will be notified about
         //  the first change, save the state, but the state isn't restored again for the second save so there's nothing to restore then
+        //  saveState() should use the bundle "saveState"
         postIds = new ArrayList<>();
 
         if (saveState != null) {

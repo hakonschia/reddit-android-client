@@ -53,12 +53,7 @@ public class ImgurRequest {
                 }
 
                 List<Image> images = album.getImages();
-                // TODO this
-                /*
-                postWithImgurAlbum.setGallery(true);
                 postWithImgurAlbum.setGalleryImages(images);
-
-                 */
             } catch (URISyntaxException | IOException e) {
                 // This really should never happen but worst case is the album would be loaded as a link
                 e.printStackTrace();

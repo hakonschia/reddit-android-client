@@ -28,9 +28,9 @@ class ReplyableRequestModelKt(
      *
      * @param thing The type of thing to comment on
      * @param id The ID of the thing being commented on
-     * @param comment The comment to submit, formatted as <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
+     * @param commentText The comment to submit, formatted as <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
      */
-    suspend fun postComment(thing: Thing, id: String, comment: String) : ApiResponse<RedditComment> {
+    suspend fun postComment(thing: Thing, id: String, commentText: String) : ApiResponse<RedditComment> {
         try {
             Util.verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -39,7 +39,7 @@ class ReplyableRequestModelKt(
 
         return try {
             val resp = api.postComment(
-                    comment,
+                    commentText,
                     Util.createFullName(thing, id),
                     RedditApi.API_TYPE,
                     false
@@ -47,15 +47,13 @@ class ReplyableRequestModelKt(
             // TODO when this is used listing/http errors probably have to be separated as it is
             //  in the java version (response.hasErrors() etc)
 
-            val comment = resp.body()?.response?.getListings()?.get(0)
+            val comment = resp.body()?.getListings()?.get(0)
             if (comment != null) {
-                /*
                 comment.depth = if (thing == Thing.POST) {
                     0
                 } else {
                     -1
                 }
-                 */
 
                 ApiResponse.Success(comment)
             } else {

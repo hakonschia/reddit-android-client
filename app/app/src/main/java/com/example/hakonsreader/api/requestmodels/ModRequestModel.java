@@ -48,7 +48,7 @@ public class ModRequestModel {
                     JsonResponseKt<RedditComment> body = response.body();
 
                     if (body != null) {
-                        RedditComment comment = (RedditComment) body.getResponse().getListings().get(0);
+                        RedditComment comment = (RedditComment) body.getListings().get(0);
                         onResponse.onResponse(comment);
                     } else {
                         Util.handleHttpErrors(response, onFailure);
@@ -74,8 +74,6 @@ public class ModRequestModel {
      * @param onFailure Callback for failed requests.
      */
     public void distinguishAsModPost(String id, boolean distinguish, OnResponse<RedditPost> onResponse, OnFailure onFailure) {
-        // TODO this
-        /*
         api.distinguishAsModPost(
                 Util.createFullName(Thing.POST, id),
                 distinguish ? "yes" : "no",
@@ -87,7 +85,7 @@ public class ModRequestModel {
                     JsonResponseKt<RedditPost> body = response.body();
 
                     if (body != null) {
-                        RedditPost post = (RedditPost) body.getResponse().getListings().get(0);
+                        RedditPost post = (RedditPost) body.getListings().get(0);
                         onResponse.onResponse(post);
                     } else {
                         Util.handleHttpErrors(response, onFailure);
@@ -102,7 +100,6 @@ public class ModRequestModel {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
-         */
     }
 
     /**
@@ -116,8 +113,6 @@ public class ModRequestModel {
      * @param onFailure The callback for failed requests
      */
     public void stickyPost(String id, boolean sticky, OnResponse<Void> onResponse, OnFailure onFailure) {
-        // TODO this
-        /*
         api.stickyPost(
                 Util.createFullName(Thing.POST, id),
                 sticky,
@@ -144,6 +139,5 @@ public class ModRequestModel {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
-         */
     }
 }

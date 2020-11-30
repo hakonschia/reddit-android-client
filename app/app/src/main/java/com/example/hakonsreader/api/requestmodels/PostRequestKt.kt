@@ -4,9 +4,9 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.enums.VoteType
-import com.example.hakonsreader.api.interfaces.ReplyableRequestKt
+import com.example.hakonsreader.api.interfaces.ReplyableRequest
 import com.example.hakonsreader.api.interfaces.SaveableRequestKt
-import com.example.hakonsreader.api.interfaces.VoteableRequestKt
+import com.example.hakonsreader.api.interfaces.VoteableRequest
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
@@ -21,7 +21,7 @@ class PostRequestKt(
         private val accessToken: AccessToken,
         private val api: PostServiceKt,
         private val postId: String
-) : VoteableRequestKt, ReplyableRequestKt, SaveableRequestKt {
+) : VoteableRequest, ReplyableRequest, SaveableRequestKt {
 
     private val voteRequest: VoteableRequestModelKt = VoteableRequestModelKt(accessToken, api)
     private val replyRequest: ReplyableRequestModelKt = ReplyableRequestModelKt(accessToken, api)
@@ -93,7 +93,7 @@ class PostRequestKt(
                     RedditApi.RAW_JSON
             )
 
-            val comments = resp?.body()?.response?.getListings()
+            val comments = resp.body()?.getListings() as List<RedditComment>?
             if (comments != null) {
 
                 parent?.addReplies(comments)

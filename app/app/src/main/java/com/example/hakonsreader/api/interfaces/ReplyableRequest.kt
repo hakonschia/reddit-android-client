@@ -9,6 +9,6 @@ import com.example.hakonsreader.api.responses.ApiResponse
  * his interface is intended to be used with methods from [com.example.hakonsreader.api.RedditApi]
  * to use the same code for replying to different types of listings (comments or posts).
  */
-interface ReplyableRequestKt {
+interface ReplyableRequest {
     suspend fun reply(text: String) : ApiResponse<RedditComment>
 }

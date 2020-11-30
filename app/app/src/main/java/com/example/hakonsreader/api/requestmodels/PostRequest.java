@@ -2,12 +2,9 @@ package com.example.hakonsreader.api.requestmodels;
 
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.Thing;
-import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
-import com.example.hakonsreader.api.interfaces.ReplyableRequest;
 import com.example.hakonsreader.api.interfaces.SaveableRequest;
-import com.example.hakonsreader.api.interfaces.VoteableRequest;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -30,13 +27,12 @@ import retrofit2.internal.EverythingIsNonNull;
  * Class that provides an interface towards the Reddit API related to post, such as retrieving
  * information about the post and commenting
  */
-public class PostRequest implements VoteableRequest, SaveableRequest {
+public class PostRequest implements SaveableRequest {
 
     private final AccessToken accessToken;
     private final PostService api;
     private final String postId;
 
-    private final VoteableRequestModel voteRequest;
     private final SaveableRequestModel saveRequest;
     private final ModRequestModel modRequest;
 
@@ -45,7 +41,6 @@ public class PostRequest implements VoteableRequest, SaveableRequest {
         this.api = api;
         this.postId = postId;
 
-        this.voteRequest = new VoteableRequestModel(accessToken, api);
         this.saveRequest = new SaveableRequestModel(accessToken, api);
         this.modRequest = new ModRequestModel(accessToken, api);
     }
@@ -211,24 +206,6 @@ public class PostRequest implements VoteableRequest, SaveableRequest {
                 onFailure.onFailure(new GenericError(-1), t);
             }
         });
-    }
-
-    /**
-     * Vote on the post
-     *
-     * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
-     *
-     * <p>OAuth scope required: {@code vote}</p>
-     *
-     * @param type The type of vote to cast
-     * @param onResponse The callback for successful requests. The value returned will always be null
-     *                   as this request does not return any data
-     * @param onFailure The callback for failed requests
-     */
-    @EverythingIsNonNull
-    @Override
-    public void vote(VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
-        voteRequest.vote(Thing.POST, postId, type, onResponse, onFailure);
     }
 
 

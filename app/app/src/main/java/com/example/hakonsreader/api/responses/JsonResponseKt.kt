@@ -15,6 +15,20 @@ import com.google.gson.annotations.SerializedName
 class JsonResponseKt<T> {
 
     @SerializedName("json")
-    var response: ListingResponseKt<T>? = null
+    private var response: ListingResponseKt<T>? = null
 
+    /**
+     * @return The list of more response
+     */
+    fun getListings(): List<T?>? {
+        return response?.getListings()
+    }
+
+    fun hasErrors(): Boolean {
+        return response?.hasErrors() == true
+    }
+
+    fun errors(): List<List<String?>?>? {
+        return response?.getErrors()
+    }
 }

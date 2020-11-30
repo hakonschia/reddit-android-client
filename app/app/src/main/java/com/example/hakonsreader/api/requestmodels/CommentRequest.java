@@ -5,9 +5,7 @@ import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.enums.VoteType;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnResponse;
-import com.example.hakonsreader.api.interfaces.ReplyableRequest;
 import com.example.hakonsreader.api.interfaces.SaveableRequest;
-import com.example.hakonsreader.api.interfaces.VoteableRequest;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.responses.GenericError;
@@ -24,12 +22,11 @@ import retrofit2.internal.EverythingIsNonNull;
  * Class that provides an interface towards the Reddit API related to comments, such as
  * replying to the comment or voting on it
  */
-public class CommentRequest implements VoteableRequest, SaveableRequest {
+public class CommentRequest implements SaveableRequest {
 
     private final String commentId;
     private final AccessToken accessToken;
     private final CommentService api;
-    private final VoteableRequestModel voteRequest;
     private final SaveableRequestModel saveRequest;
     private final ModRequestModel modRequest;
 
@@ -38,7 +35,6 @@ public class CommentRequest implements VoteableRequest, SaveableRequest {
 
         this.accessToken = accessToken;
         this.api = api;
-        this.voteRequest = new VoteableRequestModel(accessToken, api);
         this.saveRequest = new SaveableRequestModel(accessToken, api);
         this.modRequest = new ModRequestModel(accessToken, api);
     }
@@ -80,6 +76,7 @@ public class CommentRequest implements VoteableRequest, SaveableRequest {
      * @param onFailure Response handler for failed requests
      */
     public void edit(String editedText, OnResponse<RedditComment> onResponse, OnFailure onFailure) {
+        // TODO this isn't tested
         api.edit(
                 Util.createFullName(Thing.COMMENT, commentId),
                 editedText,
@@ -87,8 +84,6 @@ public class CommentRequest implements VoteableRequest, SaveableRequest {
         ).enqueue(new Callback<JsonResponse>() {
             @Override
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
-                //TODO this
-                /*
                 JsonResponse body = null;
                 if (response.isSuccessful()) {
                     body = response.body();
@@ -104,7 +99,6 @@ public class CommentRequest implements VoteableRequest, SaveableRequest {
                 } else {
                     Util.handleHttpErrors(response, onFailure);
                 }
-                 */
             }
 
             @Override
@@ -141,25 +135,6 @@ public class CommentRequest implements VoteableRequest, SaveableRequest {
             }
         });
     }
-
-    /**
-     * Cast a vote on the comment
-     *
-     * <p>Requires a user access token to be set. {@code onFailure} will be called if no access token is set</p>
-     *
-     * <p>OAuth scope required: {@code vote}</p>
-     *
-     * @param type The type of vote to cast
-     * @param onResponse The callback for successful requests. The value returned will always be null
-     *                   as this request does not return any data
-     * @param onFailure The callback for failed requests
-     */
-    @Override
-    @EverythingIsNonNull
-    public void vote(VoteType type, OnResponse<Void> onResponse, OnFailure onFailure) {
-        voteRequest.vote(Thing.COMMENT, commentId, type, onResponse, onFailure);
-    }
-
 
     /**
      * Distinguish the comment as a moderator. If the currently logged in user is not a moderator

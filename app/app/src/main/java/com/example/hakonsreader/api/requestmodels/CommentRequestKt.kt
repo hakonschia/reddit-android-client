@@ -4,9 +4,9 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
-import com.example.hakonsreader.api.interfaces.ReplyableRequestKt
+import com.example.hakonsreader.api.interfaces.ReplyableRequest
 import com.example.hakonsreader.api.interfaces.SaveableRequestKt
-import com.example.hakonsreader.api.interfaces.VoteableRequestKt
+import com.example.hakonsreader.api.interfaces.VoteableRequest
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -20,7 +20,7 @@ class CommentRequestKt(
         private val accessToken: AccessToken,
         private val api: CommentServiceKt,
         private val commentId: String
-) : VoteableRequestKt, ReplyableRequestKt, SaveableRequestKt {
+) : VoteableRequest, ReplyableRequest, SaveableRequestKt {
 
     private val voteRequest: VoteableRequestModelKt = VoteableRequestModelKt(accessToken, api)
     private val replyRequest: ReplyableRequestModelKt = ReplyableRequestModelKt(accessToken, api)
@@ -29,6 +29,7 @@ class CommentRequestKt(
 
 
     suspend fun edit(editedText: String) : ApiResponse<RedditComment> {
+        // TODO this isn't tested
         try {
             Util.verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -42,7 +43,7 @@ class CommentRequestKt(
                     RedditApi.API_TYPE
             )
 
-            val comment = resp.body()?.response?.getListings()?.get(0)
+            val comment = resp.body()?.getListings()?.get(0)
             if (comment != null) {
                 ApiResponse.Success(comment)
             } else {

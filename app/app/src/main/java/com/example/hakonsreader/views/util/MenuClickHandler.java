@@ -277,7 +277,7 @@ public class MenuClickHandler {
             menu.inflate(R.menu.post_extra_user_is_mod);
 
             // Set text to "Undistinguish"
-            if (post.isUserMod()) {
+            if (post.isMod()) {
                 MenuItem modItem = menu.getMenu().findItem(R.id.menuDistinguishPostAsMod);
                 modItem.setTitle(R.string.postRemoveModDistinguish);
             }
