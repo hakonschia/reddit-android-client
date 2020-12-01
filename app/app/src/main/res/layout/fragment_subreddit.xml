@@ -195,6 +195,8 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:layout_gravity="bottom|end"
+            app:backgroundTint="@color/colorAccent"
+            app:borderWidth="0dp"
             android:src="@drawable/ic_baseline_add_24"
 
             android:visibility="@{standardSub ? View.GONE : View.VISIBLE, default=gone}"

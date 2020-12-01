@@ -207,4 +207,7 @@
     <string name="submitPostBtn">Send inn post</string>
     <string name="submittingLinkNoLink">Vennligst skriv inn en link å sende inn</string>
     <string name="submittingCrosspostNoId">Vennligst skriv inn en post ID å sende inn</string>
+    <string name="showPreview">Vis forhåndsvisning</string>
+    <string name="submittingNoTitle">Vennligst skriv inn en tittel</string>
+    <string name="submittingTitleTooLong">Tittelen er for lang</string>
 </resources>

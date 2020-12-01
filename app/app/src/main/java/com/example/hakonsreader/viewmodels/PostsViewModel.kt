@@ -46,18 +46,15 @@ class PostsViewModel(
      *
      * Setting this value will retrieve the posts from the local database and set the value on [posts]
      */
-    var postIds = mutableListOf("")
+    var postIds = mutableListOf<String>()
         set(value) {
             field = value
 
-            // TODO this
             CoroutineScope(IO).launch {
                 val postsFromDb = database.posts().getPostsById(value)
                 val sorted = ArrayList<RedditPost>()
 
                 value.forEach {
-                    // TODO crossposts aren't stored/retrieved correctly and they will cause a crash
-                    //  when attempting to create content
                     val post = findPost(postsFromDb, it)
                     if (post != null) {
                         sorted.add(post)
@@ -189,7 +186,6 @@ class PostsViewModel(
                 // We have to store the crossposts by ID this way since room doesn't like it
                 // when there are RedditPost objects inside a RedditPost (or I just don't know how to)
                 for (crosspost in crossposts) {
-                    database.posts().insert(crosspost)
                     postsToInsertIntoDb.add(crosspost)
                     crosspostIds.add(crosspost.id)
                 }

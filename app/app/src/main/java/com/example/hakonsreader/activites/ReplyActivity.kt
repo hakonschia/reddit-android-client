@@ -16,7 +16,6 @@ import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.model.RedditComment
-import com.example.hakonsreader.api.model.RedditListing
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.ActivityReplyBinding
@@ -88,6 +87,7 @@ class ReplyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityReplyBinding.inflate(layoutInflater)
         setContentView(binding?.root)
+        binding?.showPreview?.setOnClickListener { showPreview() }
 
         if (savedInstanceState != null) {
             restoreInstanceState(savedInstanceState)
@@ -243,6 +243,20 @@ class ReplyActivity : AppCompatActivity() {
                     .setMessage(getString(R.string.dialogReplyNotLoggedInContent))
                     .show()
         }
+    }
+
+    /**
+     * Shows a preview of the reply text in a dialog
+     */
+    private fun showPreview() {
+        // TODO this should use a custom dialog to be able to render the custom markdown plugins
+        //  also copy it to SubmitActivity when it's done (should maybe add a function in markdownInput to show the preview instead)
+        val asMarkdown = binding?.markdownInput?.inputText?.let { App.get().mark.toMarkdown(it) }
+
+        AlertDialog.Builder(this)
+                .setTitle(R.string.preview)
+                .setMessage(asMarkdown)
+                .show()
     }
 
 

@@ -54,16 +54,7 @@
             app:layout_constraintTop_toBottomOf="@id/subredditNameTitle"
             tools:text="@tools:sample/lorem[30]" />
 
-        <TextView
-            android:id="@+id/titleCharacterLength"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:text="0 / 300"
-            android:textColor="@color/secondary_text_color"
-
-            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
-            app:layout_constraintTop_toTopOf="@+id/textInputLayout" />
+        <!-- TODO it should also show the error when on 0 -->
         <!-- This will have a max character length of 300 -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
@@ -73,6 +64,11 @@
 
             android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
+            style="@style/TextInputStyle"
+            app:counterEnabled="true"
+            app:counterMaxLength="@integer/submissionTitleMaxLength"
+            app:errorEnabled="true"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/subredditSubmitText">
@@ -83,11 +79,9 @@
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="-4dp"
-                android:layout_marginEnd="-4dp"
 
                 android:hint="@string/submittingTitleHint"
-                android:inputType="textMultiLine"
+                android:inputType="text|textCapSentences"
 
                 android:textColor="@color/text_color"
                 android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg"
@@ -96,7 +90,6 @@
                 tools:text="@tools:sample/lorem[35]" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Add nsfw, spoiler buttons -->
         <CheckBox
             android:id="@+id/nsfw"
             android:layout_width="wrap_content"
@@ -146,12 +139,22 @@
             android:layout_height="0dp"
 
             android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintBottom_toTopOf="@+id/submitPost"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tabs"
             app:layout_constraintVertical_bias="0.0" />
+
+        <Button
+            android:id="@+id/showPreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/showPreview"
+            app:layout_constraintEnd_toStartOf="@+id/submitPost"
+            app:layout_constraintTop_toTopOf="@+id/submitPost" />
 
         <Button
             android:id="@+id/submitPost"
@@ -161,7 +164,6 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:text="@string/submitPostBtn"
-            android:enabled="false"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

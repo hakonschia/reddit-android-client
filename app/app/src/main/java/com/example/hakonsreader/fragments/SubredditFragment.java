@@ -167,6 +167,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         // If the fragment is selected without any posts load posts automatically
         // Check both the adapter and the postIds, as the postIds might have been set in onCreateView
         // while the adapter might not have gotten the update yet from the ViewModel
+        // TODO postIds sometimes has 1 element which is an empty string (when it should be empty)
+        //  might be something to do with restoreState
         if (adapter.getPosts().isEmpty() && postIds.isEmpty()) {
             postsViewModel.loadPosts();
         }
@@ -279,6 +281,7 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
 
     @Override
     public void newSort() {
+        // TODO store this for when the fragment gets restarted
         postsViewModel.restart(SortingMethods.NEW, null);
     }
 

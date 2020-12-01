@@ -1,6 +1,5 @@
 package com.example.hakonsreader.recyclerviewadapters;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,7 +102,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             return;
         }
 
-        tv.setTypeface(Typeface.DEFAULT);
         if (post.isAdmin()) {
             tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.commentByAdminBackground));
         } else if (post.isMod()) {

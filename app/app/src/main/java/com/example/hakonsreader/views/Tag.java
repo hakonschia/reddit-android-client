@@ -50,6 +50,9 @@ public class Tag extends LinearLayout {
         }
 
         binding = TagBinding.inflate(LayoutInflater.from(context), this, true);
+
+        // With elevation the card will have a weird looking shadow (only visible on light mode)
+        binding.cardView.setCardElevation(0);
     }
 
     /**

@@ -29,7 +29,6 @@
         app:layoutDescription="@xml/activity_post_xml_parentlayout_scene"
         tools:context=".activites.PostActivity">
 
-
         <com.example.hakonsreader.views.Post
             android:id="@+id/post"
             android:layout_width="0dp"
@@ -194,12 +193,14 @@
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:indeterminateOnly="true"
+            android:paddingTop="2.5dp"
+
             android:visibility="gone"
 
+            app:layout_constraintBottom_toBottomOf="@id/post"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/post"

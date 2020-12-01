@@ -1,6 +1,6 @@
 <resources>
     <!-- Base application theme -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -13,6 +13,11 @@
         <item name="android:textColorSecondary">@color/secondary_text_color</item>
         <item name="android:textColorHint">@color/colorAccent</item>
         <item name="android:textColorLink">@color/link_color</item>
+
+        <item name="materialButtonStyle">@style/ButtonStyle</item>
+        <item name="imageButtonStyle">@style/ImageButtonStyle</item>
+        <item name="snackbarStyle">@style/SnackbarStyle</item>
+        <item name="snackbarTextViewStyle">@style/SnackbarTextStyle</item>
     </style>
 
     <!-- The launcher theme is the "default" for the App. It shows on start up (and should ONLY be
@@ -34,5 +39,43 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/buttonBackground</item>
+        <item name="android:textColor">@color/buttonTextColor</item>
+
+        <!-- Remove the inner padding of the buttons -->
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <style name="ImageButtonStyle">
+        <item name="android:background">@drawable/image_button_background</item>
+        <item name="android:tint">@color/buttonTextColor</item>
+    </style>
+
+    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeColor">@color/colorAccent</item>
+        <item name="boxBackgroundColor">@color/secondary_background</item>
+        <item name="boxCornerRadiusTopStart">@dimen/buttonCornerRadius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/buttonCornerRadius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/buttonCornerRadius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/buttonCornerRadius</item>
+
+        <item name="android:textColorHint">@color/colorAccent</item>
+
+        <!-- I want the hint ideally, but it has a background and I'm not sure how to set the
+          background of the label so it doesn't look weird against the background color of the input layout
+          Like this: https://github.com/material-components/material-components-android/pull/1660-->
+        <item name="hintEnabled">false</item>
+    </style>
+
+    <style name="SnackbarStyle" parent="Widget.MaterialComponents.Snackbar">
+        <item name="backgroundTint">@color/secondary_background</item>
+    </style>
+    <style name="SnackbarTextStyle" parent="Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textColor">@color/text_color</item>
     </style>
 </resources>

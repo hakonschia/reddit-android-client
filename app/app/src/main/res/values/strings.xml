@@ -202,6 +202,7 @@
     <string name="replyingTo">Replying to <b>%s</b></string>
     <string name="replyHint">Say something nice</string>
     <string name="preview">Preview</string>
+    <string name="showPreview">Show preview</string>
 
     <string name="replyAddLinkDialogHeader">Add link</string>
     <string name="replyAddLinkDialogLinkTextHint">Text</string>
@@ -226,6 +227,8 @@
     <string name="submittingLinkNoLink">Please enter a link to submit</string>
     <string name="submittingCrosspostNoId">Please enter a post ID to submit</string>
 
+    <string name="submittingNoTitle">Please enter a title</string>
+    <string name="submittingTitleTooLong">The title is too long</string>
 
     <!-- The text inside the markdown buttons (these aren't language specific so marked as untranslatable) -->
     <string name="markdownBtnBold" translatable="false"><b>B</b></string>
@@ -235,7 +238,7 @@
     <string name="markdownSuperscript" translatable="false">A<sup>B</sup></string>
     <string name="markdownSpoiler" translatable="false">\?</string>
     <string name="markdownInlineCode" translatable="false">&lt;/&gt;</string>
-    <string name="markdownCodeBlock" translatable="false">if (..)</string>
+    <string name="markdownCodeBlock" translatable="false">if ()</string>
 
     <string name="content_description_markdown_btn_bold">Bold text</string>
     <string name="content_description_markdown_btn_italic">Italic text</string>

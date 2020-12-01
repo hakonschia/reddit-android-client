@@ -65,24 +65,37 @@
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/summary" />
+            app:layout_constraintTop_toBottomOf="@+id/summary"
 
-        <!-- TODO the padding inside the button messes up the view, makes it look
-        like the button is a little bit above the preview header (thanks android?)-->
-        <ImageButton
-            android:id="@+id/btnAddComment"
+            tools:layout_height="150dp"/>
+
+        <Button
+            android:id="@+id/showPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/showPreview"
+            app:layout_constraintEnd_toStartOf="@+id/btnAddComment"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/markdownInput" />
 
+        <ImageButton
+            android:id="@+id/btnAddComment"
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+
+            android:layout_marginEnd="8dp"
             android:contentDescription="@string/btnAddComment"
             android:enabled="false"
             android:onClick="sendReply"
             android:onLongClick="@{(view) -> ClickHandler.showToastWithContentDescription(view)}"
-            android:src="@drawable/ic_baseline_send_24"
 
+            android:src="@drawable/ic_baseline_send_24"
+            app:layout_constraintBottom_toBottomOf="@+id/showPreview"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/summary" />
+            app:layout_constraintTop_toTopOf="@+id/showPreview" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

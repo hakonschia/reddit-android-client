@@ -11,6 +11,7 @@
     <color name="opposite_background">#000000</color>
     <color name="opposite_secondaryBackground">#121212</color>
     <color name="background_with_alpha">#FFFFFFFF</color>
+    <color name="dialogBackground">#D5D5D5</color>
 
     <color name="text_color">#000000</color>
     <color name="textColorTextPosts">#202020</color>
@@ -22,8 +23,7 @@
     <!-- Upvote/downvote button colors-->
     <color name="upvoted">#FF6130</color>
     <color name="downvoted">#2196F3</color>
-    <color name="noVote">#818181</color>
-
+    <color name="noVote">#3A3A3A</color>
 
     <color name="divider">#959595</color>
     <color name="iconColor">#3A3A3A</color>
@@ -46,14 +46,13 @@
     <color name="flairBackgroundLight">#292929</color>
 
     <color name="quoteLine">#5EB8FF</color>
-
     <color name="subredditFavorited">#FFE714</color>
-
     <color name="commentSideBar">#424242</color>
-
     <color name="ripplePressedColor">#AEAEAE</color>
-
     <color name="videoControlBackground">#80000000</color>
-
     <color name="privatelyBrowsing">#FF9800</color>
+
+    <color name="buttonBackground">#E4E4E4</color>
+    <color name="buttonTextColor">#000000</color>
+
 </resources>

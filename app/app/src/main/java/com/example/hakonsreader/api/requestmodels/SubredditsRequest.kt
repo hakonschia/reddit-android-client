@@ -115,7 +115,7 @@ class SubredditsRequest(
             val resp = api.search(query, includeNsfw)
             val subreddits = resp.body()?.getListings()
 
-            if (!subreddits.isNullOrEmpty()) {
+            if (subreddits != null) {
                 ApiResponse.Success(subreddits)
             } else {
                 apiError(resp)

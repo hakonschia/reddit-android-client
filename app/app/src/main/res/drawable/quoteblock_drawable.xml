@@ -7,7 +7,6 @@
 
         <color
             android:color="@color/quoteLine"/>
-
     </item>
 
 </layer-list>

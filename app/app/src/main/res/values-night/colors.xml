@@ -7,10 +7,11 @@
     <color name="toolbar">#191919</color>
 
     <color name="background">#000000</color>
-    <color name="secondary_background">#121212</color>
+    <color name="secondary_background">#1C1C1C</color>
     <color name="opposite_background">#FFFFFF</color>
     <color name="opposite_secondaryBackground">#EAEAEA</color>
     <color name="background_with_alpha">#FF000000</color>
+    <color name="dialogBackground">#202020</color>
 
     <color name="text_color">#FFFFFF</color>
     <color name="textColorTextPosts">#DFDFDF</color>
@@ -28,4 +29,7 @@
 
     <color name="divider">#434343</color>
     <color name="iconColor">#DADADA</color>
+
+    <color name="buttonBackground">#121212</color>
+    <color name="buttonTextColor">#FFFFFF</color>
 </resources>

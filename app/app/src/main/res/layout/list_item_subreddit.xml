@@ -8,6 +8,7 @@
     android:layout_marginBottom="8dp"
     android:background="?android:selectableItemBackground">
 
+    <!-- TODO add a nsfw tag for 18+ subs -->
     <!-- This image goes a bit above the text, since the TextView height will differ
       a bit depending on which characters are in the view. We can offset a little bit
       manually (and use includeFontPadding=false), but it's not a perfect solution as it will look a bit off depending
@@ -57,6 +58,7 @@
         android:textColor="@color/secondary_text_color"
         android:textSize="12sp"
         android:singleLine="false"
+        android:scrollbars="none"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -10,16 +10,17 @@
         android:id="@+id/textInputLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        style="@style/TextInputStyle"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- TODO only allowed characters for this is a-z0-9 -->
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/crosspostSubmission"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
 
             android:hint="@string/submittingCrosspostHint"
             android:inputType="text"

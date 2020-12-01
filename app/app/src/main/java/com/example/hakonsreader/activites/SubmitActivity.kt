@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
@@ -59,19 +61,32 @@ class SubmitActivity : AppCompatActivity() {
 
         binding.subredditName = subredditName
 
-        // Set text change listener on binding.title, disable submitPost if not in range 0..300
-
-        binding.title.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable) {
-                binding.submitPost.isEnabled = s.length in 1..300
-                binding.titleCharacterLength.text = "${s.length} / 300"
-                // TODO if above 300 show some red outline on the input field
+        // Add a listener to the ViewPager to show/remove the "Show preview" button as it is only for text posts
+        binding.submissionTypes.addOnPageChangeListener(object : OnPageChangeListener {
+            override fun onPageSelected(position: Int) {
+                binding.showPreview.visibility = if (submissionFragments[position] is SubmissionTextFragment) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             }
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+            override fun onPageScrollStateChanged(state: Int) {}
         })
 
         binding.submitPost.setOnClickListener {
+            if (binding.title.text?.length == 0) {
+                // Too short
+                Snackbar.make(binding.root, R.string.submittingNoTitle, Snackbar.LENGTH_LONG).show()
+
+                return@setOnClickListener
+            } else if (binding.title.text?.length!! > resources.getInteger(R.integer.submissionTitleMaxLength)) {
+                // Too long
+                Snackbar.make(binding.root, R.string.submittingTitleTooLong, Snackbar.LENGTH_LONG).show()
+
+                return@setOnClickListener
+            }
+
             // Check which page is active, submit based on that
             when (val fragment = submissionFragments[binding.submissionTypes.currentItem]) {
                 is SubmissionTextFragment -> submitText(fragment)
@@ -92,7 +107,7 @@ class SubmitActivity : AppCompatActivity() {
                     checkSubmissionTypes(subreddit)
                 }
             }  else {
-                // Get from API
+                // TODO Get from API
             }
         }
     }
