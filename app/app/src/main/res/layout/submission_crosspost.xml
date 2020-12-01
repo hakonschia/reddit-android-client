@@ -12,6 +12,8 @@
         android:layout_height="wrap_content"
         style="@style/TextInputStyle"
 
+        app:startIconDrawable="@drawable/ic_crosspost_textinputlayout"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -29,7 +31,7 @@
             android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg"
             android:textSize="14sp"
 
-            tools:text="@tools:sample/lorem[35]" />
+            tools:text="@tools:sample/lorem[1]" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

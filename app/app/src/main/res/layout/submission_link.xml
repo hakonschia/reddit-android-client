@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         style="@style/TextInputStyle"
 
+        app:startIconDrawable="@drawable/ic_baseline_link_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
