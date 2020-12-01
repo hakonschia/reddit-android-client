@@ -5,6 +5,10 @@
 
     <dimen name="defaultIndent">8dp</dimen>
 
+    <dimen name="defaultMargin">8dp</dimen>
+    <dimen name="defaultMarginHalf">4dp</dimen>
+    <dimen name="noMargin">0dp</dimen>
+
     <dimen name="commentDepthIndent">12dp</dimen>
     <dimen name="commentSideBarWidth">1dp</dimen>
     <dimen name="topLevelCommentTopPadding">7dp</dimen>

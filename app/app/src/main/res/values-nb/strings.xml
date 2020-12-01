@@ -210,4 +210,6 @@
     <string name="showPreview">Vis forhåndsvisning</string>
     <string name="submittingNoTitle">Vennligst skriv inn en tittel</string>
     <string name="submittingTitleTooLong">Tittelen er for lang</string>
+    <string name="postedIn">"Postet i "</string>
+    <string name="postedBy">" av "</string>
 </resources>

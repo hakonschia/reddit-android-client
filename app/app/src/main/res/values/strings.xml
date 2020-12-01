@@ -322,4 +322,7 @@
 
     <string name="disable">Disable</string>
     <string name="imageLoadFailedDialogTitle">Image failed to load</string>
+
+    <string name="postedIn">"Posted in "</string>
+    <string name="postedBy">" by "</string>
 </resources>

@@ -12,9 +12,6 @@ public class GenericBindingAdapters {
 
     private GenericBindingAdapters() {}
 
-    // TODO these dont actually work because there a ClassCastException since which type of layoutparams
-    //  to get (ViewGroup/ConstriantLayout etc) are based on the parent view
-
     /**
      * Adapter to set "layout_marginBottom" with the use of data binding
      *
@@ -23,12 +20,10 @@ public class GenericBindingAdapters {
      */
     @BindingAdapter("marginBottom")
     public static void marginBottom(View view, float margin) {
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        layoutParams.bottomMargin = (int)margin;
 
-        ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(layoutParams);
-        marginParams.bottomMargin = (int)margin;
-
-        view.setLayoutParams(marginParams);
+        view.setLayoutParams(layoutParams);
     }
 
     /**
@@ -39,12 +34,10 @@ public class GenericBindingAdapters {
      */
     @BindingAdapter("marginTop")
     public static void marginTop(View view, float margin) {
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        layoutParams.topMargin = (int)margin;
 
-        ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(layoutParams);
-        marginParams.topMargin = (int)margin;
-
-        view.setLayoutParams(marginParams);
+        view.setLayoutParams(layoutParams);
     }
     /**
      * Adapter to set "layout_marginStart" with the use of data binding
@@ -54,12 +47,10 @@ public class GenericBindingAdapters {
      */
     @BindingAdapter("marginStart")
     public static void marginStart(View view, float margin) {
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        layoutParams.setMarginStart((int)margin);
 
-        ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(layoutParams);
-        marginParams.setMarginStart((int)margin);
-
-        view.setLayoutParams(marginParams);
+        view.setLayoutParams(layoutParams);
     }
     /**
      * Adapter to set "layout_marginEnd" with the use of data binding
@@ -69,11 +60,9 @@ public class GenericBindingAdapters {
      */
     @BindingAdapter("marginEnd")
     public static void marginEnd(View view, float margin) {
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        layoutParams.setMarginEnd((int)margin);
 
-        ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(layoutParams);
-        marginParams.setMarginEnd((int)margin);
-
-        view.setLayoutParams(marginParams);
+        view.setLayoutParams(layoutParams);
     }
 }

@@ -18,63 +18,77 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/postedIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"
+            android:text="@string/postedIn"
+            android:textColor="@color/text_color"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/subreddit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
 
             android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, post.subreddit)}"
             android:text='@{post.subreddit != null ? @string/subreddit_prefixed(post.subreddit) : ""}'
             android:textColor="@color/link_color"
-            android:textSize="14sp"
             android:textStyle="bold"
+            android:textSize="13sp"
 
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/postedIn"
+            app:layout_constraintStart_toEndOf="@+id/postedIn"
             tools:text="r/GlobalOffensive" />
+
+        <TextView
+            android:id="@+id/postedBy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/postedBy"
+            android:textColor="@color/text_color"
+            android:textSize="13sp"
+
+            app:layout_constraintStart_toEndOf="@+id/subreddit"
+            app:layout_constraintTop_toTopOf="@+id/postedIn" />
 
         <TextView
             android:id="@+id/domain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
 
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text='@{post != null &amp;&amp; !post.self ? post.domain : ""}'
             android:textColor="@color/secondary_text_color"
+
             android:textSize="13sp"
             android:visibility="@{post != null &amp;&amp; !post.self ? View.VISIBLE : View.GONE}"
 
             app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
-            app:layout_constraintEnd_toStartOf="@+id/age"
-            app:layout_constraintStart_toEndOf="@+id/subreddit"
-            app:layout_constraintTop_toTopOf="@+id/subreddit"
-
-            tools:text="ihopeiactually.seeadomainthatwillcutsoff.com" />
+            app:layout_constraintStart_toEndOf="@+id/age"
+            app:layout_constraintTop_toTopOf="@+id/age"
+            tools:text="ihopeiactually.seeareallylongdomainonce.com" />
 
         <TextView
             android:id="@+id/age"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:textColor="@color/secondary_text_color"
+            app:marginStart="@{post.stickied || post.locked || post.archived ? @dimen/defaultMargin : @dimen/noMargin}"
 
+            android:textColor="@color/secondary_text_color"
             android:textSize="13sp"
             app:createdAt="@{post != null ? post.createdAt : -1}"
-            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
-
-            app:layout_constraintEnd_toStartOf="@+id/stickied"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toEndOf="@+id/domain"
-
-            app:layout_constraintTop_toTopOf="@+id/subreddit"
+            app:layout_constraintStart_toEndOf="@+id/lock"
+            app:layout_constraintTop_toBottomOf="@+id/postedIn"
             tools:text="2 hours ago" />
 
 
@@ -82,15 +96,12 @@
             android:id="@+id/stickied"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:layout_marginEnd="8dp"
 
             android:src="@drawable/ic_stickied"
 
             android:visibility="@{post.stickied ? View.VISIBLE : View.GONE, default=gone}"
-            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
-            app:layout_constraintEnd_toStartOf="@+id/archived"
-            app:layout_constraintTop_toTopOf="@+id/subreddit"
-
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/domain"
             tools:visibility="visible" />
 
         <!-- Extra icons such as stickied, locked etc. -->
@@ -99,12 +110,14 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
 
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_baseline_archive_24"
+            app:marginStart="@{post.stickied ? @dimen/defaultMarginHalf : @dimen/noMargin}"
 
+            android:src="@drawable/ic_baseline_archive_24"
             android:visibility="@{post.archived ? View.VISIBLE : View.GONE, default=gone}"
-            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
-            app:layout_constraintEnd_toStartOf="@+id/lock"
+
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/stickied"
+            app:layout_constraintTop_toTopOf="@+id/stickied"
             tools:visibility="visible" />
 
         <ImageView
@@ -112,32 +125,39 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
 
+            app:marginStart="@{post.archived ? @dimen/defaultMarginHalf : @dimen/noMargin}"
+
             android:src="@drawable/ic_baseline_lock_24"
 
             android:visibility="@{post.locked ? View.VISIBLE : View.GONE, default=gone}"
-
-            app:layout_constraintBottom_toBottomOf="@+id/subreddit"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/subreddit"
+            app:layout_constraintStart_toEndOf="@+id/archived"
+            app:layout_constraintTop_toTopOf="@+id/stickied"
             tools:visibility="visible" />
 
-        <!-- For some reason some author views get 4dp padding to start and end
-        so explicitly set it to 0 as that fixes the issue -->
+
+        <!-- TODO Author flair might be pushed outside of the screen -->
         <TextView
             android:id="@+id/author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
+            android:ellipsize="end"
+            android:maxLines="1"
 
             android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, post.author)}"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
             android:text='@{post != null ? @string/author_prefixed(post.author) : "" }'
+            android:textStyle="bold"
             android:textSize="13sp"
-            app:authorTextColorPost="@{post}"
 
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subreddit"
-            tools:text="u/hakonschia" />
+            app:authorTextColorPost="@{post}"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@+id/postedIn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/postedBy"
+            tools:text="u/hakonschia dddddddddddddddddd" />
 
         <FrameLayout
             android:id="@+id/authorFlair"
@@ -160,35 +180,38 @@
             android:id="@+id/tags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginStart="8dp"
             android:orientation="horizontal"
 
-            app:layout_constraintEnd_toEndOf="@+id/subreddit"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/subreddit"
-            app:layout_constraintTop_toBottomOf="@+id/author"
+            app:layout_constraintStart_toEndOf="@+id/domain"
+            app:layout_constraintTop_toTopOf="@+id/domain"
 
             app:linkFlair="@{post}"
             app:nsfw="@{post.nsfw}"
-            app:spoiler="@{post.spoiler}" />
+            app:spoiler="@{post.spoiler}"
+
+            tools:layout_height="20dp"
+            tools:layout_width="150dp" />
 
         <TextView
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
 
+            android:layout_marginBottom="5dp"
             android:text="@{post.title}"
+
             android:textColor="@color/text_color"
             android:textSize="16sp"
             android:textStyle="bold"
-
             app:layout_constraintBottom_toBottomOf="parent"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-
-            app:layout_constraintTop_toBottomOf="@+id/tags"
+            app:layout_constraintTop_toBottomOf="@+id/age"
             app:layout_constraintVertical_bias="0.0"
             tools:text="FaZe wins major /s. To show a long title I am adding a bunch of random text here Lorem ipsum etc etc" />
     </androidx.constraintlayout.widget.ConstraintLayout>
