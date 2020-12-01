@@ -265,29 +265,9 @@ public class Post extends Content {
                 break;
 
             case CROSSPOST:
+                // Generate the content the parent post would generate and show that
                 RedditPost parent = post.getCrossposts().get(0);
-
-                // If we are in a post only care about the actual post content, as it's not enough space
-                // to show the entire parent post info
-                if (getContext() instanceof PostActivity) {
-                    content = generatePostContent(parent, context);
-                } else {
-                    // Otherwise the content is the entire parents info
-                    Post c = new Post(context);
-
-                    // Propagate any information about the parent post to the crosspost, or else
-                    // it will act as a full post ignoring values it should have
-                    c.setAllowPostOpen(allowPostOpen);
-                    c.setMaxHeight(maxHeight);
-                    c.setImageLoadedCallback(imageLoadedCallback);
-                    c.setShowTextContent(showTextContent);
-                    c.setHideScore(binding.postFullBar.getHideScore());
-                    c.setRedditPost(parent);
-
-                    // Add a border around to show where the crosspost post is and where the actual post it
-                    c.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.border_crosspost));
-                    content = c;
-                }
+                content = generatePostContent(parent, context);
                 break;
 
             case LINK:

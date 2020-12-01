@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="69dp"
+    android:height="49dp"
+    android:viewportWidth="69"
+    android:viewportHeight="49">
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M63.97,10.42L0.25,10.42"
+      android:strokeWidth="5"
+      android:fillAlpha="0"
+      android:strokeColor="@color/opposite_background"/>
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M33.06,38.56C17.58,38.97 10.49,28.96 11.8,8.54"
+      android:strokeWidth="5"
+      android:fillAlpha="0"
+      android:strokeColor="@color/opposite_background"/>
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M63.97,38.57L30.85,38.57"
+      android:strokeWidth="5"
+      android:fillAlpha="0"
+      android:strokeColor="@color/opposite_background"/>
+  <path
+      android:pathData="M67.44,36.52C68.44,36.93 68.9,38.06 68.48,39.05C68.32,39.42 68.61,38.74 68.45,39.11C68.02,40.1 66.87,40.58 65.87,40.17C61.62,38.45 50.69,34.04 46.44,32.32C45.45,31.92 44.98,30.78 45.41,29.8C45.57,29.43 45.27,30.11 45.44,29.74C45.87,28.74 47.01,28.27 48.02,28.68C52.27,30.39 63.2,34.81 67.44,36.52Z"
+      android:fillColor="@color/opposite_background"/>
+  <path
+      android:pathData="M65.75,36.53C66.74,36.11 67.87,36.59 68.27,37.58C68.42,37.96 68.14,37.27 68.29,37.65C68.69,38.66 68.21,39.8 67.21,40.22C63,42.01 52.15,46.62 47.93,48.41C46.95,48.83 45.81,48.35 45.42,47.36C45.27,46.98 45.54,47.67 45.39,47.3C44.99,46.29 45.47,45.14 46.47,44.72C50.69,42.93 61.54,38.32 65.75,36.53Z"
+      android:fillColor="@color/opposite_background"/>
+  <path
+      android:pathData="M67.69,8.43C68.69,8.83 69.15,9.97 68.73,10.95C68.57,11.32 68.86,10.64 68.7,11.01C68.27,12.01 67.12,12.48 66.12,12.07C61.87,10.36 50.94,5.94 46.69,4.23C45.7,3.83 45.23,2.69 45.66,1.71C45.82,1.33 45.52,2.02 45.69,1.64C46.12,0.65 47.26,0.18 48.27,0.58C52.52,2.3 63.45,6.71 67.69,8.43Z"
+      android:fillColor="@color/opposite_background"/>
+  <path
+      android:pathData="M66,8.44C66.99,8.02 68.12,8.5 68.52,9.49C68.67,9.87 68.39,9.18 68.54,9.55C68.94,10.56 68.46,11.71 67.46,12.13C63.25,13.92 52.4,18.53 48.18,20.32C47.2,20.73 46.06,20.26 45.67,19.26C45.52,18.89 45.79,19.58 45.64,19.2C45.24,18.19 45.72,17.05 46.72,16.62C50.94,14.83 61.79,10.23 66,8.44Z"
+      android:fillColor="@color/opposite_background"/>
+</vector>

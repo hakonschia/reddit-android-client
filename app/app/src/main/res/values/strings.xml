@@ -325,4 +325,7 @@
 
     <string name="postedIn">"Posted in "</string>
     <string name="postedBy">" by "</string>
+
+    <string name="crosspostText">Crosspost</string>
+    <string name="crosspostFrom">" from "</string>
 </resources>

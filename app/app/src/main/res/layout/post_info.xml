@@ -11,6 +11,13 @@
         <variable
             name="post"
             type="com.example.hakonsreader.api.model.RedditPost" />
+
+        <variable
+            name="crosspost"
+            type="com.example.hakonsreader.api.model.RedditPost" />
+        <variable
+            name="isCrosspost"
+            type="boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -82,15 +89,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            app:marginStart="@{post.stickied || post.locked || post.archived ? @dimen/defaultMargin : @dimen/noMargin}"
-
             android:textColor="@color/secondary_text_color"
+
             android:textSize="13sp"
             app:createdAt="@{post != null ? post.createdAt : -1}"
             app:layout_constraintStart_toEndOf="@+id/lock"
-            app:layout_constraintTop_toBottomOf="@+id/postedIn"
+            app:layout_constraintTop_toTopOf="@+id/stickied"
+            app:marginStart="@{post.stickied || post.locked || post.archived ? @dimen/defaultMargin : @dimen/noMargin}"
             tools:text="2 hours ago" />
-
 
         <ImageView
             android:id="@+id/stickied"
@@ -101,7 +107,7 @@
 
             android:visibility="@{post.stickied ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/domain"
+            app:layout_constraintTop_toBottomOf="@+id/crosspostIcon"
             tools:visibility="visible" />
 
         <!-- Extra icons such as stickied, locked etc. -->
@@ -136,6 +142,7 @@
 
 
         <!-- TODO Author flair might be pushed outside of the screen -->
+
         <TextView
             android:id="@+id/author"
             android:layout_width="wrap_content"
@@ -147,8 +154,8 @@
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
             android:text='@{post != null ? @string/author_prefixed(post.author) : "" }'
-            android:textStyle="bold"
             android:textSize="13sp"
+            android:textStyle="bold"
 
             app:authorTextColorPost="@{post}"
             app:layout_constrainedWidth="true"
@@ -195,24 +202,87 @@
             tools:layout_height="20dp"
             tools:layout_width="150dp" />
 
+        <!-- Visibility group for the crosspost views -->
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:visibility="@{isCrosspost ? View.VISIBLE : View.GONE, default=visible}"
+            app:constraint_referenced_ids="crosspostText, crosspostFrom, crosspostIcon, crosspostSubreddit"/>
+
+        <ImageView
+            android:id="@+id/crosspostIcon"
+            android:layout_width="35dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
+            android:src="@drawable/ic_crosspost"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/postedIn" />
+
+        <!-- Can probably combine these into one TextView but this works I guess (same as
+         the "Posted in r/... by u/..." above)-->
+        <TextView
+            android:id="@+id/crosspostText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="@string/crosspostText"
+            android:textColor="@color/link_color"
+            android:textSize="12sp"
+            android:textStyle="bold"
+
+            app:layout_constraintBottom_toBottomOf="@+id/crosspostIcon"
+            app:layout_constraintStart_toEndOf="@+id/crosspostIcon"
+            app:layout_constraintTop_toTopOf="@+id/crosspostIcon" />
+
+        <TextView
+            android:id="@+id/crosspostFrom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="@string/crosspostFrom"
+            android:textSize="12sp"
+
+            app:layout_constraintStart_toEndOf="@+id/crosspostText"
+            app:layout_constraintTop_toTopOf="@+id/crosspostText" />
+
+        <TextView
+            android:id="@+id/crosspostSubreddit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textStyle="bold"
+            android:textColor="@color/link_color"
+            android:textSize="12sp"
+
+            android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, crosspost.subreddit)}"
+            android:text='@{post.subreddit != null ? @string/subreddit_prefixed(crosspost.subreddit) : ""}'
+
+            app:layout_constraintStart_toEndOf="@+id/crosspostFrom"
+            app:layout_constraintTop_toTopOf="@+id/crosspostFrom"
+
+            tools:text="r/GlobalOffensive"/>
+
         <TextView
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
             android:layout_marginBottom="5dp"
+
             android:text="@{post.title}"
-
             android:textColor="@color/text_color"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
 
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/age"
             app:layout_constraintVertical_bias="0.0"
+
             tools:text="FaZe wins major /s. To show a long title I am adding a bunch of random text here Lorem ipsum etc etc" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
