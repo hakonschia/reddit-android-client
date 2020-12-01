@@ -55,6 +55,9 @@ public class ContentGallery extends Content {
 
     @Override
     protected void updateView() {
+        // TODO galleries can contain GIFs from reddit (and imgur)
+        //  https://www.reddit.com/r/LadyBoners/comments/k4id7n/presenting_mr_misha_collins/
+
         images = redditPost.getGalleryImages();
 
         // Find the largest height and width and set the layout to that

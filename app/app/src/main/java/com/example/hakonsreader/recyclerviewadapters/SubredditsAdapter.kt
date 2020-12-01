@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
@@ -194,6 +195,12 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
         } else {
             View.GONE
         }
+
+        holder.binding.nsfwTagLayout.visibility = if (sub.isNsfw) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -202,6 +209,9 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
                 parent,
                 false
         )
+
+        // Kind of bad way to do it? But add when created and set visibility in onBind
+        binding.nsfwTagLayout.addView(ViewUtil.createNsfwTag(binding.nsfwTagLayout.context))
 
         return ViewHolder(binding)
     }

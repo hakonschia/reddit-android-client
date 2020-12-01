@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
@@ -32,38 +31,36 @@
         android:layout_marginEnd="8dp"
         android:ellipsize="end"
 
+        android:includeFontPadding="false"
         android:maxLines="1"
         android:textColor="@color/text_color"
         android:textSize="20sp"
-        android:includeFontPadding="false"
+        android:textStyle="bold"
 
         app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toStartOf="@+id/favoriteSub"
+        app:layout_constraintEnd_toStartOf="@+id/nsfwTagLayout"
         app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/icon"
         app:layout_constraintTop_toTopOf="parent"
+        tools:text="GlobalOffensiveReallyLongSubredditName" />
 
-        tools:text="GlobalOffensiveReallyReallyLongSubreddit" />
-
-    <!-- TODO Ellipsize isn't showing during runtime, something to do with Markwon -->
-    <TextView
-        android:id="@+id/subredditDescription"
-        android:layout_width="0dp"
+    <FrameLayout
+        android:id="@+id/nsfwTagLayout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:layout_marginEnd="8dp"
 
-        android:ellipsize="end"
-        android:maxLines="3"
-        android:text="@tools:sample/lorem/random"
-        android:textColor="@color/secondary_text_color"
-        android:textSize="12sp"
-        android:singleLine="false"
-        android:scrollbars="none"
+        android:visibility="gone"
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/name"
-        app:layout_constraintTop_toBottomOf="@+id/name" />
+        app:layout_constraintBottom_toBottomOf="@+id/name"
+        app:layout_constraintEnd_toStartOf="@+id/favoriteSub"
+        app:layout_constraintStart_toEndOf="@id/name"
+        app:layout_constraintTop_toTopOf="@+id/name"
+        tools:layout_height="15dp"
+        tools:layout_width="35dp"
+        tools:visibility="visible" />
 
     <ImageButton
         android:id="@+id/favoriteSub"
@@ -75,5 +72,25 @@
         android:src="@drawable/ic_baseline_star_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- TODO Ellipsize isn't showing during runtime, something to do with Markwon -->
+    <TextView
+        android:id="@+id/subredditDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:scrollbars="none"
+        android:singleLine="false"
+        android:text="@tools:sample/lorem/random"
+        android:textColor="@color/secondary_text_color"
+        android:textSize="12sp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/name"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
