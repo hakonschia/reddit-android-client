@@ -472,11 +472,11 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
             }
 
             // Link posts might be images not uploaded to reddit
-            // Technically this doesn't match just URLs as anything can preceed the .png/.jpg/.jpeg
+            // Technically this doesn't match just URLs as anything can precede the .png/.jpg/.jpeg
             // but that shouldn't really matter
-            if (url.matches(".+(.png|.jpeg|.jpg)$".toRegex())) {
+            if (url.matches(".+(.png|.jpeg|.jpg)$".toRegex()) || domain.matches("prnt.sc".toRegex())) {
                 return PostType.IMAGE
-            } else if (url.endsWith(".gifv") || domain.matches("giphy.com".toRegex())) {
+            }  else if (url.endsWith(".gifv") || domain.matches("giphy.com".toRegex())) {
                 return PostType.GIF
             }
             return PostType.LINK

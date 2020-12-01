@@ -79,8 +79,6 @@ public class ContentImage extends Content {
 
         // Set with setPost() not setWithImageUrl()
         if (imageUrl == null) {
-            imageUrl = redditPost.getUrl();
-
             List<Image> images = redditPost.getPreviewImages();
 
             // This should be improved and is a pretty poor way of doing it, but this will reduce some
@@ -88,10 +86,14 @@ public class ContentImage extends Content {
             // the same size later by Picasso, so it won't give loss of image quality)
             for (int i = 0; i < images.size(); i++) {
                 Image image = images.get(i);
-                if (image.getWidth() == screenWidth) {
+                if (image.getWidth() <= screenWidth) {
                     imageUrl = image.getUrl();
-                    break;
                 }
+            }
+
+            // No image found in the previews, use the standard url
+            if (imageUrl == null) {
+                imageUrl = redditPost.getUrl();
             }
         }
 

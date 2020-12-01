@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.enums;
 
+import com.example.hakonsreader.api.model.RedditPost;
+
 /**
  * Enum representing what a post is
  */
@@ -15,7 +17,8 @@ public enum PostType {
     LINK,
 
     /**
-     * Image post
+     * Image post. Images will either be found in {@link RedditPost#getUrl()}, or if the URL is pointing
+     * to an URL that is linking to a webpage, image previews will be found in {@link RedditPost#getPreviewImages()}
      */
     IMAGE,
 
