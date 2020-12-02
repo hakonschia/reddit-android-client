@@ -174,12 +174,14 @@ public class MarkdownInput extends FrameLayout {
      * Shows a preview of the markdown input in a popup dialog
      */
     public void showPreviewInPopupDialog() {
-        Markwon m = App.get().getMark();
+        // An AlertDialog didn't render custom markwon plugins, so use a custom dialog
+        Dialog previewDialog = new Dialog(getContext());
+        previewDialog.setContentView(R.layout.dialog_markdown_preview);
+        TextView previewText = previewDialog.findViewById(R.id.previewText);
+        App.get().getMark().setMarkdown(previewText, binding.replyText.getText().toString());
 
-        new AlertDialog.Builder(getContext())
-                .setTitle(R.string.preview)
-                .setMessage(m.toMarkdown(binding.replyText.getText().toString()))
-                .show();
+        previewDialog.show();
+        previewDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
 

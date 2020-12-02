@@ -68,6 +68,11 @@ class SubmitActivity : AppCompatActivity() {
 
         binding.subredditName = subredditName
 
+        binding.showPreview.setOnClickListener {
+            val textFragment = submissionFragments[0] as SubmissionTextFragment
+            textFragment.binding?.markdownInput?.showPreviewInPopupDialog()
+        }
+
         // Add a listener to the ViewPager to show/remove the "Show preview" button as it is only for text posts
         binding.submissionTypes.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageSelected(position: Int) {
@@ -145,16 +150,13 @@ class SubmitActivity : AppCompatActivity() {
      * Submits the post based on what is in text tab
      */
     private fun submitText(fragment: SubmissionTextFragment) {
-        // TODO the text is markdown, so the code with buttons etc from ReplyActivity should be extracted
-        //  to its own class/fragment/whatever so it can be used here and in ReplyActivity
-
         val title = binding.title.text.toString()
         val nsfw = binding.nsfw.isChecked
         val spoiler = binding.spoiler.isChecked
         val receiveNotifications = binding.sendNotifications.isChecked
 
         // TODO match the text against a regex looking for links, if it looks like a link ask "It looks like you're only
-        //   submitting a link, do you want to submit this as a link post instead of a text post?" (idk if some subs disallow
+        //  submitting a link, do you want to submit this as a link post instead of a text post?" (idk if some subs disallow
         //  text posts, but if they do don't ask then)
 
         val text = fragment.getText()

@@ -87,7 +87,7 @@ class ReplyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityReplyBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-        binding?.showPreview?.setOnClickListener { showPreview() }
+        binding?.showPreview?.setOnClickListener { binding?.markdownInput?.showPreviewInPopupDialog() }
 
         if (savedInstanceState != null) {
             restoreInstanceState(savedInstanceState)
@@ -244,21 +244,6 @@ class ReplyActivity : AppCompatActivity() {
                     .show()
         }
     }
-
-    /**
-     * Shows a preview of the reply text in a dialog
-     */
-    private fun showPreview() {
-        // TODO this should use a custom dialog to be able to render the custom markdown plugins
-        //  also copy it to SubmitActivity when it's done (should maybe add a function in markdownInput to show the preview instead)
-        val asMarkdown = binding?.markdownInput?.inputText?.let { App.get().mark.toMarkdown(it) }
-
-        AlertDialog.Builder(this)
-                .setTitle(R.string.preview)
-                .setMessage(asMarkdown)
-                .show()
-    }
-
 
     /**
      * Sends the reply
