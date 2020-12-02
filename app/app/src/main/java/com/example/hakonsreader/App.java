@@ -548,6 +548,16 @@ public class App extends Application {
         }
     }
 
+    /**
+     * Retrieves the user setting for if comments that have been posted after the last time a post was opened
+     * should be highlighted
+     *
+     * @return True if comments should be highlighted
+     */
+    public boolean highlightNewComments() {
+        return settings.getBoolean(getString(R.string.prefs_key_highlight_new_comments), getResources().getBoolean(R.bool.prefs_default_highlight_new_comments));
+    }
+
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that

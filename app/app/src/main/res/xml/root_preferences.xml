@@ -102,6 +102,12 @@
             app:useSimpleSummaryProvider="true"
             app:defaultValue="@integer/prefs_default_hide_comments_threshold"/>
 
+        <SwitchPreference
+            app:key="@string/prefs_key_highlight_new_comments"
+            app:title="@string/prefs_title_highlight_new_comments"
+            app:defaultValue="@bool/prefs_default_highlight_new_comments"
+            app:iconSpaceReserved="false" />
+
         <!-- TODO hide comments from users ("This will also remove their child comments") -->
     </PreferenceCategory>
 

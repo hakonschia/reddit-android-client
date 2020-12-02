@@ -92,6 +92,7 @@
     <string name="prefs_title_show_nsfw_preview_normal">Normal</string>
     <string name="prefs_title_show_nsfw_preview_blur">Blurred</string>
     <string name="prefs_title_show_nsfw_preview_no_image">No image</string>
+    <string name="prefs_title_highlight_new_comments">Highlight new comments</string>
 
 
     <!-- Preferences keys -->
@@ -120,9 +121,10 @@
     <string name="prefs_key_data_saving_always" translatable="false">data_saving_always</string>
     <string name="prefs_key_data_saving_never" translatable="false">data_saving_never</string>
     <string name="prefs_key_show_nsfw_preview" translatable="false">show_nsfw_preview</string>
-    <string name="prefs_key_show_nsfw_preview_normal" translatable="false">Normal</string>
-    <string name="prefs_key_show_nsfw_preview_blur" translatable="false">Blurred</string>
-    <string name="prefs_key_show_nsfw_preview_no_image" translatable="false">No image</string>
+    <string name="prefs_key_show_nsfw_preview_normal" translatable="false">normal</string>
+    <string name="prefs_key_show_nsfw_preview_blur" translatable="false">blurred</string>
+    <string name="prefs_key_show_nsfw_preview_no_image" translatable="false">no_image</string>
+    <string name="prefs_key_highlight_new_comments" translatable="false">highlight_new_comments</string>
 
     <!-- String for post ages that are "just posted", ie. < 1 minute -->
     <string name="postAgeJustPosted">Just posted</string>

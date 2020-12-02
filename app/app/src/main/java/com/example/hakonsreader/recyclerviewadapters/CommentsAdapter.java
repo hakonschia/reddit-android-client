@@ -435,7 +435,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         // If we're in a chain and on the first element (the start of the chain) then highlight it
         // Or if the comment has been added since the previous time the post was opened
-        boolean highlight = (position == 0 && !chain.isEmpty())
+        boolean highlight = App.get().highlightNewComments() && (position == 0 && !chain.isEmpty())
                 || (lastTimePostOpened > 0 && (comment.getCreatedAt() > lastTimePostOpened));
 
         switch (holder.getItemViewType()) {
