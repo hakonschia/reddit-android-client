@@ -1,57 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        style="@style/TextInputStyle"
-
-        app:layout_constraintBottom_toTopOf="@+id/markdownButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintVertical_chainStyle="packed">
-
-        <!-- The EditText has 4dp margin which makes the it look like
-        it's not lined up with the text above/below, so remove it with negative margin -->
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/replyText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:hint="@string/replyHint"
-            android:inputType="textMultiLine|textCapSentences"
-
-            android:textColor="@color/text_color"
-            android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg"
-            android:textSize="14sp"
-
-            tools:text="@tools:sample/lorem[50]" />
-    </com.google.android.material.textfield.TextInputLayout>
+    android:layout_height="wrap_content">
 
     <!-- TODO the ImageButtons have a darker color than they should have on dark mode -->
     <HorizontalScrollView
         android:id="@+id/markdownButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:fadeScrollbars="false"
 
-        android:scrollbarStyle="insideInset"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
-        app:layout_constraintVertical_bias="0.0">
+        android:fadeScrollbars="false"
+        android:scrollbarStyle="insideInset">
 
         <LinearLayout
             android:id="@+id/markdownButtonsInnerLayout"
@@ -145,6 +108,7 @@
                 android:layout_marginEnd="4dp"
 
                 android:background="@drawable/image_button_background"
+                android:backgroundTint="@color/buttonBackground"
                 android:tint="@color/text_color"
                 android:src="@drawable/ic_baseline_format_list_numbered_24"
                 android:contentDescription="@string/content_description_markdown_btn_numbered_list" />
@@ -171,4 +135,27 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        style="@style/TextInputStyle">
+
+        <!-- The EditText has 4dp margin which makes the it look like
+        it's not lined up with the text above/below, so remove it with negative margin -->
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/replyText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:hint="@string/replyHint"
+            android:inputType="textMultiLine|textCapSentences"
+
+            android:textColor="@color/text_color"
+            android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg"
+            android:textSize="14sp"
+
+            tools:text="@tools:sample/lorem[50]" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>

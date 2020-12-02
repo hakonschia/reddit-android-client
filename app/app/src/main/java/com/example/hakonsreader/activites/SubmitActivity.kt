@@ -29,11 +29,18 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Activity for submitting a post to a subreddit
+ */
 class SubmitActivity : AppCompatActivity() {
 
     companion object {
-        const val SUBREDDIT_KEY = "submittingToSubredditName"
         private const val TAG = "SubmitActivity"
+
+        /**
+         * The key used to tell the name of the subreddit being submitted to
+         */
+        const val SUBREDDIT_KEY = "submittingToSubredditName"
     }
 
     private val api = App.get().api
@@ -117,7 +124,9 @@ class SubmitActivity : AppCompatActivity() {
      */
     private fun updateViews() {
         binding.subredditSubmitText.movementMethod = InternalLinkMovementMethod.getInstance(this)
-        App.get().mark.setMarkdown(binding.subredditSubmitText, subreddit.submitText)
+
+        val submitTextAdjusted = App.get().adjuster.adjust(subreddit.submitText)
+        App.get().mark.setMarkdown(binding.subredditSubmitText, submitTextAdjusted)
     }
 
     private fun setupTabs() {
