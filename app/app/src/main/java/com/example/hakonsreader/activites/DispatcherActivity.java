@@ -128,6 +128,9 @@ public class DispatcherActivity extends AppCompatActivity {
             intent.putExtra(ProfileActivity.USERNAME_KEY, username);
 
         } else if (url.matches(LinkUtils.POST_REGEX)) {
+            // TODO URLs like this failed, caused a 404 and when refreshing crashes the app since commetsAdapter is null
+            //  /r/dontdeadopeninside/comments/ib8rwp/if_you_were_in_a_car_would_you_know_what_accident/g1u9zot/
+
             // The URL will look like: reddit.com/r/<subreddit>/comments/<postId/...
             String postId = pathSegments.get(3);
 

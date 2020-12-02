@@ -14,14 +14,19 @@ import java.util.List;
 public class ListingListAdapter implements JsonDeserializer<List<RedditListing>> {
     @Override
     public List<RedditListing> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonArray listingsJson = (JsonArray) json;
-        List<RedditListing> listings = new ArrayList<>();
+        // The json might be empty ("{}") which would cause a crash
+        if (json.isJsonArray()) {
+            JsonArray listingsJson = (JsonArray) json;
+            List<RedditListing> listings = new ArrayList<>();
 
-        listingsJson.forEach(lj -> {
-            RedditListing listing = context.deserialize(lj, RedditListing.class);
-            listings.add(listing);
-        });
+            listingsJson.forEach(lj -> {
+                RedditListing listing = context.deserialize(lj, RedditListing.class);
+                listings.add(listing);
+            });
 
-        return listings;
+            return listings;
+        }
+
+        return new ArrayList<>();
     }
 }

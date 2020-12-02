@@ -24,6 +24,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Group to control visibility of views that shouldn't show before the post is loaded -->
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:visibility="@{post == null ? View.GONE : View.VISIBLE}"
+
+            app:constraint_referenced_ids="postedIn, postedBy" />
+
         <TextView
             android:id="@+id/postedIn"
             android:layout_width="wrap_content"

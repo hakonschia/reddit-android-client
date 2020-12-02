@@ -399,7 +399,6 @@ public class App extends Application {
      * @return True if NSFW videos should be automatically played
      */
     public boolean autoPlayNsfwVideos() {
-        Log.d(TAG, "autoPlayNsfwVideos: " + settings.getBoolean(getString(R.string.prefs_key_auto_play_nsfw_videos), getResources().getBoolean(R.bool.prefs_default_autoplay_nsfw_videos)));
         return settings.getBoolean(getString(R.string.prefs_key_auto_play_nsfw_videos), getResources().getBoolean(R.bool.prefs_default_autoplay_nsfw_videos));
     }
 
