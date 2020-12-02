@@ -170,7 +170,7 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing {
      * @see isAdmin
      */
     @SerializedName("distinguished")
-    var distinguished = ""
+    var distinguished: String? = null
 
     /**
      * @return True if the comment is made by, and distinguished as, a moderator

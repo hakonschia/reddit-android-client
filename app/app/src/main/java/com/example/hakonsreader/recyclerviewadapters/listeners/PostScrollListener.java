@@ -38,7 +38,7 @@ public class PostScrollListener implements View.OnScrollChangeListener {
     /**
      * The amount of posts left in the list before calling {@link PostScrollListener#onEndOfList}
      */
-    private int numRemainingPostsBeforeRun = 5;
+    private int numRemainingPostsBeforeRun = 10;
 
 
     /**

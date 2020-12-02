@@ -48,6 +48,17 @@
             app:barrierDirection="end"
             app:sidebars="@{comment.depth - adapter.baseDepth}" />
 
+        <View
+            android:id="@+id/commentLockedBorder"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            app:layout_constraintStart_toEndOf="@id/sideBarsBarrier"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            android:background="@{comment.locked ? @drawable/comment_locked : null}" />
         <TextView
             android:id="@+id/commentAuthor"
             android:layout_width="wrap_content"
