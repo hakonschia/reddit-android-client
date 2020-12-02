@@ -1,10 +1,20 @@
 package com.example.hakonsreader.activites;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.webkit.WebBackForwardList;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -34,6 +44,12 @@ public class WebViewActivity extends AppCompatActivity {
     private ActivityWebViewBinding binding;
 
 
+    // If we want to show/hide the toolbar on scrolling, we need to nest the WebView in a scrolling
+    // container (NestedScrollView), but that disables zooming
+    // NestedWebView from: https://github.com/takahirom/webview-in-coordinatorlayout allows for toolbar
+    // show/hide, but it messes up zooming in a very weird way
+
+    @SuppressLint("setJavaScriptEnabled")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,11 +65,32 @@ public class WebViewActivity extends AppCompatActivity {
                 binding.webViewUrl.setText(uri.toString());
                 return super.shouldOverrideUrlLoading(view, request);
             }
-
+        });
+        binding.webView.setWebChromeClient(new WebChromeClient() {
             @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                binding.refreshWebView.setRefreshing(false);
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+
+                // Animate the progress change
+                int oldProgress = binding.progressBar.getProgress();
+                binding.progressBar.setProgress(newProgress);
+
+                // If the old progress is 100 don't animate the change, as it would go from completely full
+                // to whatever the new progress is, which makes it go backwards which looks weird
+                if (oldProgress != 100) {
+                    ObjectAnimator animation = ObjectAnimator.ofInt(binding.progressBar, "progress", oldProgress, newProgress);
+                    animation.setDuration(150);
+                    animation.setInterpolator(new LinearInterpolator());
+                    animation.start();
+                }
+
+                // Finished loading, fade the progress bar out so that it's visible that it finishes
+                if (newProgress == 100) {
+                    binding.progressBar.animate().setDuration(500).alpha(0).start();
+                } else {
+                    binding.progressBar.setAlpha(1f);
+                    binding.progressBar.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -61,6 +98,9 @@ public class WebViewActivity extends AppCompatActivity {
         webViewSettings.setJavaScriptEnabled(true);
         // Some websites wont load without this enabled (such as imgur albums)
         webViewSettings.setDomStorageEnabled(true);
+        webViewSettings.setDisplayZoomControls(false);
+        webViewSettings.setBuiltInZoomControls(true);
+
         binding.webView.loadUrl(url);
         binding.webViewUrl.setText(url);
 
@@ -69,7 +109,11 @@ public class WebViewActivity extends AppCompatActivity {
         binding.webViewMenu.setOnClickListener(this::openMenu);
 
         binding.refreshWebView.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this, R.color.colorAccent));
-        binding.refreshWebView.setOnRefreshListener(binding.webView::reload);
+        binding.refreshWebView.setOnRefreshListener(() -> {
+            binding.webView.reload();
+            // The progress bar will show the progress so we don't need the refresh icon
+            binding.refreshWebView.setRefreshing(false);
+        });
     }
 
     @Override
@@ -102,8 +146,6 @@ public class WebViewActivity extends AppCompatActivity {
 
             if (itemId == R.id.webViewMenuRefresh) {
                 binding.webView.reload();
-                // Use the SwipeRefreshLayout refresher for this as well
-                binding.refreshWebView.setRefreshing(true);
                 return true;
             } else if (itemId == R.id.webViewMenuOpenInBrowser) {
                 Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(binding.webView.getUrl()));

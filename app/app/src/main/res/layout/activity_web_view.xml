@@ -8,17 +8,18 @@
     android:orientation="vertical"
     android:background="@color/background">
 
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorAccent">
+        android:background="@color/toolbar">
 
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:contentInsetStart="0dp"
-            app:layout_scrollFlags="enterAlways|scroll">
+            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
             <ImageButton
                 android:id="@+id/webViewMenu"
@@ -26,8 +27,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
 
+                android:foreground="@drawable/ripple_main_bg"
+                android:tint="@color/iconColor"
                 android:backgroundTint="#00000000"
-                android:tint="#222222"
                 android:src="@drawable/ic_baseline_more_vert_24" />
 
             <ImageButton
@@ -36,7 +38,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
 
-                android:tint="#222222"
+                android:foreground="@drawable/ripple_main_bg"
+                android:tint="@color/iconColor"
                 android:backgroundTint="#00000000"
                 android:src="@drawable/ic_baseline_close_24" />
 
@@ -47,8 +50,9 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 android:layout_marginStart="15dp"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_color"
                 android:maxLines="2"
+                android:ellipsize="end"
 
                 tools:text="https://stackoverflow.com/questions/34436076/how-to-right-align-the-image-on-the-toolbar-in-android/34436190" />
 
@@ -61,17 +65,21 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.core.widget.NestedScrollView
+        <WebView
+            android:id="@+id/webView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="fill_vertical">
-
-            <WebView
-                android:id="@+id/webView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </androidx.core.widget.NestedScrollView>
+            android:layout_height="match_parent"/>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        app:layout_anchor="@id/appBar"
+        app:layout_anchorGravity="bottom"
+        style="?android:attr/progressBarStyleHorizontal"
+
+        tools:progress="50"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
