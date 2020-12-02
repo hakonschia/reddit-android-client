@@ -214,4 +214,5 @@
     <string name="postedBy">" av "</string>
     <string name="crosspostText">Krosspost</string>
     <string name="crosspostFrom">" fra "</string>
+    <string name="prefs_title_highlight_new_comments">Fremhev nye kommentarer</string>
 </resources>
