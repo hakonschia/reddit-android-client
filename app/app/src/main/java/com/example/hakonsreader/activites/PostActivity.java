@@ -15,6 +15,8 @@ import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -363,11 +365,7 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
         // Add 1 so that we can go directly from a top level to the next without scrolling
         int next = commentsAdapter.getNextTopLevelCommentPos(currentPos + 1);
 
-        // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
-        binding.comments.stopScroll();
-
-        // Scroll to the position, with 0 pixels offset from the top
-        layoutManager.scrollToPositionWithOffset(next, 0);
+        smoothScrollHelper(currentPos, next);
     }
 
     /**
@@ -376,12 +374,48 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      */
     public void goToPreviousTopLevelComment(View view) {
         int currentPos = layoutManager.findFirstVisibleItemPosition();
+        // We're at the top so we can't scroll further up
+        if (currentPos == 0) {
+            return;
+        }
+
         // Subtract 1 so that we can go directly from a top level to the previous without scrolling
         int previous = commentsAdapter.getPreviousTopLevelCommentPos(currentPos - 1);
 
+        smoothScrollHelper(currentPos, previous);
+    }
+
+    /**
+     * Scrolls {@link ActivityPostBinding#comments} to a given position, respecting the users
+     * setting for whether or not the scroll should be smooth or instant.
+     *
+     * @param currentPos The current scroll position
+     * @param scrollPos The position to scroll to
+     */
+    private void smoothScrollHelper(int currentPos, int scrollPos) {
+        int gapSize;
+        // Scrolling up
+        if (currentPos > scrollPos) {
+            gapSize = currentPos - scrollPos;
+        } else {
+            // Scrolling down
+            gapSize = scrollPos - currentPos;
+        }
+
         // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
         binding.comments.stopScroll();
-        layoutManager.scrollToPositionWithOffset(previous, 0);
+
+        if (App.get().commentSmoothScrollThreshold() >= gapSize) {
+            RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(this) {
+                @Override protected int getVerticalSnapPreference() {
+                    return LinearSmoothScroller.SNAP_TO_START;
+                }
+            };
+            smoothScroller.setTargetPosition(scrollPos);
+            layoutManager.startSmoothScroll(smoothScroller);
+        } else {
+            layoutManager.scrollToPositionWithOffset(scrollPos, 0);
+        }
     }
 
     /**

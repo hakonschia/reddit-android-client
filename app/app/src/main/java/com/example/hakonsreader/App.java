@@ -558,6 +558,14 @@ public class App extends Application {
         return settings.getBoolean(getString(R.string.prefs_key_highlight_new_comments), getResources().getBoolean(R.bool.prefs_default_highlight_new_comments));
     }
 
+    /**
+     * Gets the comment threshold for when navigating in comments should smoothly scroll
+     *
+     * @return The max amount of comments for smooth scrolling to happen
+     */
+    public int commentSmoothScrollThreshold() {
+        return settings.getInt(getString(R.string.prefs_key_comment_smooth_scroll_threshold), getResources().getInteger(R.integer.prefs_default_comment_smooth_scroll_threshold));
+    }
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that

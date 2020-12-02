@@ -94,6 +94,15 @@
         app:title="@string/prefs_group_comments"
         app:iconSpaceReserved="false">
 
+        <SeekBarPreference
+            app:key="@string/prefs_key_comment_smooth_scroll_threshold"
+            android:title="@string/prefs_title_comment_smooth_scroll_threshold"
+            app:min="0"
+            android:max="500"
+            app:defaultValue="@integer/prefs_default_comment_smooth_scroll_threshold"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
         <!-- This is only a (signed) number, but this cannot be set (anymore) with XML, so it is set in code -->
         <EditTextPreference
             app:key="@string/prefs_key_hide_comments_threshold"

@@ -252,6 +252,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+
+
     /**
      * Sets what comment chain should be shown. If this is null or empty the entire list is shown.
      *
