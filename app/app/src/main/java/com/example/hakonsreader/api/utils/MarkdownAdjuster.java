@@ -25,7 +25,6 @@ public class MarkdownAdjuster {
         boolean bCheckRedditSpecificLinks = false;
         boolean bCheckHeaderSpaces = false;
         boolean bCheckNormalLinks = false;
-        boolean bCheckSuperScript = false;
         boolean bCheckUrlEncoding = false;
 
 
@@ -63,18 +62,6 @@ public class MarkdownAdjuster {
          */
         public Builder checkNormalLinks() {
             bCheckNormalLinks = true;
-            return this;
-        }
-
-        /**
-         * Sets if the adjuster should look for superscript symbols (^) and replace them with
-         * {@code <sup>} HTML tags. If you are using this ensure that your markdown renderer supports
-         * HTML tags
-         *
-         * @return This builder
-         */
-        public Builder checkSuperScript() {
-            bCheckSuperScript = true;
             return this;
         }
 
@@ -203,18 +190,6 @@ public class MarkdownAdjuster {
 
         // Need to escape characters like ?
         return this.replace(markdown, pattern, replaceFormat);
-    }
-
-    /**
-     * Adjusts superscript tags from ^() to {@code <sup></sup>}
-     *
-     * @param markdown The markdown to adjust
-     * @return The adjusted markdown
-     */
-    private String adjustSuperScript(String markdown) {
-        // Every ^( needs to be replaced with "<sup>" and every ) that matches with a ^( needs to be
-        // replaced with "</sup>"
-        return markdown;
     }
 
     /**

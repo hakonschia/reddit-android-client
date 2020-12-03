@@ -162,36 +162,6 @@ public class MarkdownAdjusterTest {
         assertEquals(expected, actual);
     }
 
-    /**
-     * Tests that "^" gets replaced with "<sup>" tags
-     */
-    @Test
-    public void testSuperScript() {
-        MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
-                .checkSuperScript()
-                .build();
-
-        // Check that "https://..." gets wrapped with a markdown link
-        String markdown = "You should check how to use ^(superscript) in markdown, it's a pretty good news site";
-        String expected = "You should check how to use <sup>superscript</sup> in markdown, it's a pretty good news site";
-        String actual = adjuster.adjust(markdown);
-        assertEquals(expected, actual);
-
-        // Test nested superscripts
-        markdown = "^(^(s)uper)";
-        expected = "<sup><sup>s</sup>per</sup>";
-        actual = adjuster.adjust(markdown);
-        assertEquals(expected, actual);
-
-
-        // Test nested superscripts
-        markdown = "Superscript is pretty ^(^(^(c))ool)";
-        expected = "Superscript is pretty <sup><sup><sup>c</sup></sup>ool</sup>";
-        actual = adjuster.adjust(markdown);
-        assertEquals(expected, actual);
-    }
-
-
     @Test
     public void testHeadersAndLinks() {
         MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
