@@ -49,6 +49,16 @@
         <item name="android:insetBottom">0dp</item>
     </style>
 
+    <style name="ButtonStyleSmall" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/buttonBackground</item>
+        <item name="android:textColor">@color/buttonTextColor</item>
+
+        <item name="android:paddingStart">@dimen/buttonPadding</item>
+        <item name="android:paddingEnd">@dimen/buttonPadding</item>
+        <item name="android:paddingTop">@dimen/buttonPadding</item>
+        <item name="android:paddingBottom">@dimen/buttonPadding</item>
+    </style>
+
     <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeColor">@color/colorAccent</item>

@@ -65,6 +65,7 @@
     <dimen name="buttonCornerRadius">8dp</dimen>
     <!-- For drawables the radius has to be half to look the same -->
     <dimen name="buttonCornerRadiusDrawable">4dp</dimen>
+    <dimen name="buttonPadding">6dp</dimen>
 
     <integer name="submissionTitleMaxLength">300</integer>
 </resources>

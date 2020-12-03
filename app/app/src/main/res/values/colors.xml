@@ -55,4 +55,8 @@
     <color name="buttonBackground">#E4E4E4</color>
     <color name="buttonTextColor">#000000</color>
 
+    <color name="commentLocked">#EDB403</color>
+    <color name="commentLockedWithAlpha">#26EDB403</color>
+    <color name="commentArchived">#EDB403</color>
+
 </resources>

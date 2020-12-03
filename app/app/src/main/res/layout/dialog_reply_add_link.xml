@@ -81,6 +81,7 @@
 
         android:layout_marginBottom="16dp"
         android:enabled="false"
+        style="@style/ButtonStyleSmall"
 
         android:text="@string/add"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -92,6 +93,7 @@
         android:id="@+id/btnCancelLink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/ButtonStyleSmall"
 
         android:layout_marginEnd="16dp"
 
