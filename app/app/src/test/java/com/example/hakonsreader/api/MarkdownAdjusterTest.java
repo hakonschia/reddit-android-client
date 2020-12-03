@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api;
 
+import android.view.textclassifier.TextClassification;
+
 import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 
 import org.junit.Test;
@@ -203,7 +205,54 @@ public class MarkdownAdjusterTest {
         assertEquals(expected, actual);
 
         markdown = "#This is a header with a link to a r/subreddit";
-        expected = "# This is a header with a link to a [r/subreddit](https://www.reddit.com/r/subreddit)";
+        expected = "# This is a header with a link to a [r/subreddit](https://www.reddit.com/r/subreddit/)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Tests that URLs in markdown links are encoded correctly
+     *
+     * Some users/bots use spaces, curly brackets, double quotes etc. in URLs which makes Markwon
+     * not recognize them as links
+     */
+    @Test
+    public void testUrlEncodeChange() {
+        MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
+                .checkUrlEncoding()
+                .build();
+        String markdown;
+        String expected;
+        String actual;
+
+        // Spaces should be replaced with %20
+        markdown = "[Link with spaces](https://www.reddit.com/hello there general kenobi)";
+        expected = "[Link with spaces](https://www.reddit.com/hello%20there%20general%20kenobi)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // Opening curly brackets should be replaced with "%7B" and closing with "%7D"
+        // Double quotes should be replaced with %22
+        markdown = "[False Positive](https://www.reddit.com/message/compose/?to=RepostSleuthBot&amp;subject=False%20Positive&amp;message={\"post_id\": \"k3tlrg\", \"meme_template\": null})";
+        expected = "[False Positive](https://www.reddit.com/message/compose/?to=RepostSleuthBot&amp;subject=False%20Positive&amp;message=%7B%22post_id%22:%20%22k3tlrg%22,%20%22meme_template%22:%20null%7D)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // No errors, should be the same
+        markdown = "[Nothing wrong with this link](https://meta.stackexchange.com/questions/79057/curly-brackets-in-urls)";
+        expected = "[Nothing wrong with this link](https://meta.stackexchange.com/questions/79057/curly-brackets-in-urls)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // In a sentence
+        markdown = "This markdown link contains errors [False Positive](https://www.reddit.com/message/compose/?to=RepostSleuthBot&amp;subject=False%20Positive&amp;message={\"post_id\": \"k3tlrg\", \"meme_template\": null}) since it is using curly brackets";
+        expected = "This markdown link contains errors [False Positive](https://www.reddit.com/message/compose/?to=RepostSleuthBot&amp;subject=False%20Positive&amp;message=%7B%22post_id%22:%20%22k3tlrg%22,%20%22meme_template%22:%20null%7D) since it is using curly brackets";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // Multiple errors in one sentence
+        markdown = "This is an error [error](https://reddit.com/horsing around), and another one [error 2](https://nrk.no/cool article)";
+        expected = "This is an error [error](https://reddit.com/horsing%20around), and another one [error 2](https://nrk.no/cool%20article)";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
     }

@@ -16,6 +16,7 @@ public class MarkdownAdjuster {
     private boolean checkRedditSpecificLinks;
     private boolean checkHeaderSpaces;
     private boolean checkNormalLinks;
+    private boolean checkUrlEncoding;
 
 
     private MarkdownAdjuster() {}
@@ -25,6 +26,7 @@ public class MarkdownAdjuster {
         boolean bCheckHeaderSpaces = false;
         boolean bCheckNormalLinks = false;
         boolean bCheckSuperScript = false;
+        boolean bCheckUrlEncoding = false;
 
 
         /**
@@ -77,6 +79,26 @@ public class MarkdownAdjuster {
         }
 
         /**
+         * Checks links in markdown links for errors in URL encoding which might cause markdown
+         * renderers not to recognize them as URLs.
+         *
+         * This will check and replace:
+         * <ol>
+         *     <li>Spaces to %20</li>
+         *     <li>Double quotes <i>"</i> to %22</li>
+         *     <li>Curly brackets to %7B <i>{</i> and %7D <i>}</i></li>
+         * </ol>
+         *
+         * Eg. "[link](https://link.com/{some path})" will become "[link](https://link.com/%7Bsome%20path%7D")
+         *
+         * @return This builder
+         */
+        public Builder checkUrlEncoding() {
+            bCheckUrlEncoding = true;
+            return this;
+        }
+
+        /**
          * Builds the MarkdownAdjuster
          *
          * @return The MarkdownAdjuster
@@ -86,6 +108,7 @@ public class MarkdownAdjuster {
             adjuster.checkHeaderSpaces = bCheckHeaderSpaces;
             adjuster.checkRedditSpecificLinks = bCheckRedditSpecificLinks;
             adjuster.checkNormalLinks = bCheckNormalLinks;
+            adjuster.checkUrlEncoding = bCheckUrlEncoding;
 
             return adjuster;
         }
@@ -107,6 +130,9 @@ public class MarkdownAdjuster {
         }
         if (checkNormalLinks) {
             markdown = this.adjustNormalLinks(markdown);
+        }
+        if (checkUrlEncoding) {
+            markdown = this.adjustUrlEncoding(markdown);
         }
 
         return markdown;
@@ -308,6 +334,67 @@ public class MarkdownAdjuster {
             StringBuilder stringBuilder = new StringBuilder(markdown);
             stringBuilder.insert(textStart, ' ');
             markdown = stringBuilder.toString();
+        }
+
+        return markdown;
+    }
+
+
+    /**
+     * Adjusts incorrect URL encoding in markdown links
+     *
+     * @param markdown The markdown to adjust
+     * @return The adjusted markdown
+     */
+    private String adjustUrlEncoding(String markdown) {
+        // Find all markdown links: (some text)[some text which is the link]
+        // Replace characters that should be replaced
+        // Spaces = %20
+        // Double quotes = %22
+        // Opening curly brackets = %7B
+        // Closing curly brackets = %7D
+
+        // Match []() with anything between both [] and ()
+        Pattern p = Pattern.compile("\\[([^()]+)]\\(([^()]+)\\)");
+        Matcher m = p.matcher(markdown);
+
+        // The amount of characters added to the markdown string during the loop
+        int charactersAdded = 0;
+
+        while (m.find()) {
+            int start = m.start();
+            String group = m.group();
+
+            // Find pos of the first "]" as that will be the end of the text, the next pos is a "(" which is the
+            // start of the link wrapper, and the link is everything from after the "(" to a ")"
+            // From "](<here>)" to "<here>)"
+            int linkStart = group.indexOf(']') + 2;
+            int linkEnd = group.length() - 1;
+
+            String link = group.substring(linkStart, linkEnd);
+
+            int markdownLength = markdown.length();
+
+            // Perform all replacements
+            link = link.replaceAll(" ", "%20");
+            link = link.replaceAll("\"", "%22");
+            link = link.replaceAll("\\{", "%7B");
+            // If "}" isn't escaped it fails when using it in the android app, but it doesn't in tests ¯\_(ツ)_/¯
+            link = link.replaceAll("\\}", "%7D");
+
+            // Replace the new link in the original text
+            StringBuilder buffer = new StringBuilder(markdown);
+
+            int startInMarkdown = start + linkStart + charactersAdded;
+            int endInMarkdown = start + linkEnd + charactersAdded;
+            buffer.replace(startInMarkdown, endInMarkdown, link);
+
+            markdown = buffer.toString();
+
+            // For when multiple matches occur we need to save how many characters have been previously added
+            // as we're changing the markdown text in the loop, which messes up the matcher somewhat
+            // as "start" will be what the start would have been before any changes
+            charactersAdded += markdown.length() - markdownLength;
         }
 
         return markdown;

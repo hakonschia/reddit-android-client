@@ -335,7 +335,7 @@ public class App extends Application {
     /**
      * Retrieves the markdown adjuster
      *
-     * <p>The adjuster only checks for missing header spaces</p>
+     * <p>The adjuster checks for missing header spaces and URL encoding in markdown links</p>
      *
      * @return The markdown adjuster
      */
@@ -343,6 +343,7 @@ public class App extends Application {
         if (adjuster == null) {
             adjuster = new MarkdownAdjuster.Builder()
                     .checkHeaderSpaces()
+                    .checkUrlEncoding()
                     .build();
         }
 

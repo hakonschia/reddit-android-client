@@ -68,7 +68,6 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
             String textToSpan = matcher.group();
             int s = matcher.start();
             int e = matcher.end();
-            Log.d(TAG, "applyLinkSpanRedditLinkPlugin: " + textToSpan);
 
             // The link is inside parenthesis such as a superscript, remove the parenthesis
             if (textToSpan.startsWith("(")) {

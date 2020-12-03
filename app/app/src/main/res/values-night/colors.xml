@@ -30,6 +30,6 @@
     <color name="divider">#434343</color>
     <color name="iconColor">#DADADA</color>
 
-    <color name="buttonBackground">#121212</color>
+    <color name="buttonBackground">#1C1C1C</color>
     <color name="buttonTextColor">#FFFFFF</color>
 </resources>
