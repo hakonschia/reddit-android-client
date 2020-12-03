@@ -400,7 +400,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * will be the first comments depth, which should be used to calculate how many sidebars so show
      */
     public int getBaseDepth() {
-        Log.d(TAG, "getBaseDepth: " + comments.get(0).getDepth());
         return comments.get(0).getDepth();
     }
 
@@ -495,7 +494,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     @BindingAdapter("sidebars")
     public static void addSidebars(Barrier barrier, int depth) {
-        Log.d(TAG, "addSidebars: " + depth);
         final ConstraintLayout parent = (ConstraintLayout) barrier.getParent();
         // The contentDescription for the sidebars, this is used to find the sidebars again later
         final String contentDescription = "sidebar";

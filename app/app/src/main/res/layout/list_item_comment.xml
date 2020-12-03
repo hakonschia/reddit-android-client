@@ -61,13 +61,13 @@
 
             android:background="@{comment.locked ? @drawable/comment_locked : null}" />
 
-        <!-- Normal comment layout. Even if the layout visibility is set to GONE it might still render
-         the view, which is probably inefficient (function calls are still called). Might be better for
-         performance to do something with this in code instead -->
+        <!-- Setting the padding on this for locked comments is probably kind of bad, but it needs
+         to have some padding somehow so that the border doesn't look like it almost goes over the text-->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/normalComment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:padding="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

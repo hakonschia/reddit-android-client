@@ -59,13 +59,15 @@
             app:layout_constraintEnd_toEndOf="parent"
 
             android:background="@{comment.locked ? @drawable/comment_locked : null}" />
+
         <TextView
             android:id="@+id/commentAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
+
+            android:paddingStart="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
+            android:paddingTop="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
 
             android:text='@{comment != null ? @string/author_prefixed(comment.author) : ""}'
             android:textStyle="italic"
@@ -83,6 +85,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
 
+            android:paddingTop="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
+
             android:textColor="@color/secondary_text_color"
             android:textStyle="italic"
             app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"
@@ -99,23 +103,30 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
 
+            android:paddingTop="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
+
             android:text="@{comment.scoreHidden ? @string/scoreHiddenText : @string/scoreWithText(comment.score)}"
             android:textColor="@color/secondary_text_color"
             android:textStyle="italic"
 
             android:maxLines="1"
             android:ellipsize="end"
+
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toStartOf="@+id/hiddenCommentNumChildren"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/commentAge"
             app:layout_constraintTop_toTopOf="parent"
+
             tools:text="@string/scoreWithText" />
 
         <TextView
             android:id="@+id/hiddenCommentNumChildren"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
+            android:paddingEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
+            android:paddingTop="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
