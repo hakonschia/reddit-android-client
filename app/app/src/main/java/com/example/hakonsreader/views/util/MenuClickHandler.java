@@ -455,10 +455,12 @@ public class MenuClickHandler {
             } else if (itemId == R.id.menuBrowsePrivately) {
                 App.get().enablePrivateBrowsing(!isPrivatelyBrowsing);
 
+                /*
                 Fragment f = FragmentManager.findFragment(view);
                 if (f instanceof ProfileFragment) {
                     ((ProfileFragment)f).enablePrivateBrowsing(!isPrivatelyBrowsing);
                 }
+                 */
 
                 return true;
             }

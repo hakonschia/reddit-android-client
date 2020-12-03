@@ -46,6 +46,8 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -784,7 +786,7 @@ public class RedditApi {
      *
      * @return An object that can perform various user related API requests for non-logged in users
      */
-    public UserRequests user(String username) {
+    public UserRequests user(@Nonnull String username) {
         return new UserRequests(userApi, accessToken, username, imgurService);
     }
 

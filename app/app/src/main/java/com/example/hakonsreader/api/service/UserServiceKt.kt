@@ -12,7 +12,7 @@ interface UserServiceKt {
 
     /**
      * Retrieves information about the logged in user. For information about any user see
-     * [userInfoOtherUsers]
+     * [getUserInfoOtherUsers]
      *
      * OAuth scope required: *identity*
      *
@@ -27,10 +27,10 @@ interface UserServiceKt {
      *
      * OAuth scope required: *read*
      *
-     * @return A Response holding a [RedditUser]
+     * @return A Response holding a [RedditListing] that should be cast to a [RedditUser]
      */
-    @GET("u/{username}/about?raw_json=1")
-    suspend fun getUserInfoOtherUsers(@Path("username") username: String) : Response<RedditUser>
+    @GET("user/{username}/about?raw_json=1")
+    suspend fun getUserInfoOtherUsers(@Path("username") username: String) : Response<RedditListing>
 
 
     /**

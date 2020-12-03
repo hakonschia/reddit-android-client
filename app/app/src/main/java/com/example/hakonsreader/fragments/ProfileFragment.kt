@@ -1,0 +1,381 @@
+package com.example.hakonsreader.fragments
+
+import android.os.Bundle
+import android.os.Parcelable
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.databinding.BindingAdapter
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.hakonsreader.App
+import com.example.hakonsreader.R
+import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.databinding.FragmentProfileBinding
+import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
+import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
+import com.example.hakonsreader.viewmodels.PostsViewModel
+import com.example.hakonsreader.viewmodels.factories.PostsFactory
+import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.util.*
+
+class ProfileFragment : Fragment() {
+
+    companion object {
+        private const val TAG = "ProfileFragment"
+
+        private const val POST_IDS_KEY = "post_ids_profile"
+
+        private const val LAYOUT_STATE_KEY = "layout_state_profile"
+
+        /**
+         * The key used to save the progress of the MotionLayout
+         */
+        private const val LAYOUT_ANIMATION_PROGRESS_KEY = "layout_progress"
+
+        /**
+         * The key set in the bundle with getArguments() that says the username the fragment is for
+         */
+        private const val USERNAME_KEY = "username"
+
+        /**
+         * The key set in the bundle with getArguments() that says if the fragment is for the logged in user
+         */
+        private const val IS_LOGGED_IN_USER_KEY = "isLoggedInUser"
+
+
+        /**
+         * Creates a new ProfileFragment for logged in users
+         *
+         * @return A new ProfileFragment for logged in users
+         */
+        fun newInstance() : ProfileFragment {
+            val args = Bundle()
+            args.putBoolean(IS_LOGGED_IN_USER_KEY, true)
+
+            val fragment = ProfileFragment()
+            fragment.arguments = args
+
+            return fragment
+        }
+
+        /**
+         * Create a new ProfileFragment for a user by their username
+         *
+         * @param username The username to create the fragment for. If this is equal to "me" or the username
+         *                 stored in SharedPreferences, the fragment will be for the logged in user
+         * @return A ProfileFragment for a user
+         */
+        fun newInstance(username: String) : ProfileFragment {
+            val user = App.getStoredUser()
+            Log.d(TAG, "newInstance: Creating new ProfileFragment for $username")
+
+            if (username == "me" || username.equals(user?.username, ignoreCase = true)) {
+                return newInstance()
+            }
+
+            val args = Bundle()
+            args.putString(USERNAME_KEY, username)
+
+            val fragment = ProfileFragment()
+            fragment.arguments = args
+
+            return fragment
+        }
+    }
+
+    private val api = App.get().api
+    private var binding: FragmentProfileBinding? = null
+
+    /**
+     * The object representing the Reddit user the fragment is for
+     */
+    private var user: RedditUser? = null
+
+    /**
+     * Flag to check if the fragment has loaded user information
+     */
+    private var firstLoad = true
+
+    /**
+     * Flag to set if the fragment is for the logged in user or not
+     */
+    private var isLoggedInUser = false
+
+
+    private var username: String? = null
+
+    private var saveState: Bundle? = null
+    private var postIds = ArrayList<String>()
+    private var postsViewModel: PostsViewModel? = null
+    private var postsAdapter: PostsAdapter? = null
+    private var postsLayoutManager: LinearLayoutManager? = null
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            username = it.getString(USERNAME_KEY)
+            isLoggedInUser = it.getBoolean(IS_LOGGED_IN_USER_KEY)
+        }
+
+        if (isLoggedInUser) {
+            user = App.getStoredUser()
+            user?.let {
+                if (it.username.isNotBlank()) {
+                    username = it.username
+                }
+            }
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        setupBinding()
+        setupPostsList()
+        setupPostsViewModel()
+
+        if (savedInstanceState != null) {
+            binding?.parentLayout?.progress = savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)
+        }
+
+        if (isLoggedInUser) {
+            enablePrivateBrowsing(App.get().isUserLoggedInPrivatelyBrowsing)
+            // If we're on a logged in user we might have some old info, so set that
+            updateViews()
+        }
+
+        // Retrieve user info if the fragment hasn't loaded any already
+        if (firstLoad) {
+            firstLoad = false
+
+            retrieveUserInfo()
+        }
+
+
+
+        if (saveState != null) {
+            // getFloat() will return 0.0f if not found, and won't ever be null
+            binding?.parentLayout?.progress = saveState?.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)!!
+
+            postIds = saveState?.getStringArrayList(POST_IDS_KEY) as ArrayList<String>
+            postsViewModel?.postIds = postIds
+        }
+
+        return binding?.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // If we have no username we can't get posts (we can't ask for posts for the logged in user without
+        // their username). The posts are retrieved automatically when the user information loads
+        if (postsAdapter?.posts?.isEmpty() == true && postIds.isEmpty() && username != null) {
+            postsViewModel?.loadPosts()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        // onSaveInstanceState is called for configuration changes (such as orientation)
+        // so we need to store the animation state here and in saveState (for when the fragment has
+        // been replaced but not destroyed)
+        binding?.parentLayout?.progress?.let { outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, it) }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        if (saveState == null) {
+            saveState = Bundle()
+        }
+
+        binding?.parentLayout?.progress?.let { saveState?.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, it) }
+        saveState?.putParcelable(LAYOUT_STATE_KEY, postsLayoutManager?.onSaveInstanceState())
+        saveState?.putStringArrayList(POST_IDS_KEY, postsViewModel?.postIds as ArrayList<String>?)
+
+        binding = null
+    }
+
+    /**
+     * Updates [binding] with new user information, if [user] isn't *null*
+     */
+    private fun updateViews() {
+        if (user != null) {
+            binding?.user = user
+        }
+    }
+
+    /**
+     * Inflates and sets up [binding]
+     */
+    private fun setupBinding() {
+        binding = FragmentProfileBinding.inflate(layoutInflater)
+
+        // We might not have a username at this point (first time loading for logged in user)
+        if (username != null) {
+            binding?.username?.text = username
+        }
+
+        // Kinda weird to do this here, but even if we are privately browsing and on another users profile
+        // it should indicate that we're privately browsing (as with your own profile and subreddits)
+        binding?.loggedInUser = isLoggedInUser
+        enablePrivateBrowsing(App.get().isUserLoggedInPrivatelyBrowsing)
+    }
+
+    /**
+     * Sets up [postsViewModel] and observes the values it exposes
+     *
+     * If [username] is not set (is null or blank) then this won't do anything
+     */
+    private fun setupPostsViewModel() {
+        if (username.isNullOrBlank()) {
+            return
+        }
+
+        postsViewModel = ViewModelProvider(this, PostsFactory(
+                requireContext(),
+                username,
+                true
+        )).get(PostsViewModel::class.java)
+
+        postsViewModel?.getPosts()?.observe(viewLifecycleOwner, { posts ->
+            postsAdapter?.submitList(posts)
+
+            // Restore state of layout manager if possible
+            if (saveState != null) {
+                val layoutState: Parcelable? = saveState?.getParcelable(LAYOUT_STATE_KEY)
+                if (layoutState != null) {
+                    postsLayoutManager?.onRestoreInstanceState(layoutState)
+                }
+            }
+        })
+        postsViewModel?.getError()?.observe(viewLifecycleOwner, { e ->
+            Util.handleGenericResponseErrors(binding?.parentLayout, e.error, e.throwable)
+        })
+        postsViewModel?.onLoadingCountChange()?.observe(viewLifecycleOwner, { up -> binding?.loadingIcon?.onCountChange(up) })
+    }
+
+    /**
+     * Sets up [FragmentProfileBinding.posts] and related variables it uses
+     */
+    private fun setupPostsList() {
+        postsAdapter = PostsAdapter()
+        postsLayoutManager = LinearLayoutManager(requireContext())
+
+        binding?.posts?.adapter = postsAdapter
+        binding?.posts?.layoutManager = postsLayoutManager
+        binding?.posts?.setOnScrollChangeListener(PostScrollListener(binding?.posts) { postsViewModel?.loadPosts() })
+    }
+
+    /**
+     * Enables or disables private browsing. This will only update the UI for the fragment
+     * based on if private browsing is now enabled or disabled
+     *
+     * @param enable True if private browsing is now enabled, false if disabled
+     */
+    private fun enablePrivateBrowsing(enable: Boolean) {
+        binding?.privatelyBrowsing = enable
+        binding?.profilePicture?.borderColor = ContextCompat.getColor(
+                requireContext(),
+                if (enable) R.color.privatelyBrowsing else R.color.opposite_background
+        )
+    }
+
+    private fun retrieveUserInfo() {
+        binding?.loadingIcon?.onCountChange(true)
+
+        CoroutineScope(IO).launch {
+            val name = username
+            val userResponse = if (isLoggedInUser || name == null) {
+                api.userKt().info()
+            } else {
+                api.userKt(name).info()
+            }
+
+            withContext(Main) {
+                binding?.loadingIcon?.onCountChange(false)
+
+                when (userResponse) {
+                    is ApiResponse.Success -> onUserResponse(userResponse.value)
+                    is ApiResponse.Error -> {
+                        Util.handleGenericResponseErrors(binding?.parentLayout, userResponse.error, userResponse.throwable)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the fragments user information and loads posts automatically
+     *
+     * @param newUser The new user information
+     */
+    private fun onUserResponse(newUser: RedditUser) {
+        user = newUser
+        username = newUser.username
+
+        // Store the updated user information if this profile is for the logged in user
+        if (isLoggedInUser) {
+            App.storeUserInfo(newUser)
+        }
+
+        if (postsViewModel == null) {
+            setupPostsViewModel()
+        }
+
+        postsViewModel?.loadPosts()
+        updateViews()
+    }
+}
+
+/**
+ * Binding adapter for loading a profile picture
+ *
+ * @param imageView The view to load the picture into
+ * @param url The URL to the picture
+ */
+@BindingAdapter("profilePicture")
+fun setProfilePicture(imageView: ImageView, url: String) {
+    // Load the users profile picture
+    if (url.isNotBlank()) {
+        Picasso.get()
+                .load(url)
+                .placeholder(R.drawable.ic_baseline_person_100)
+                .error(R.drawable.ic_baseline_person_100)
+                .into(imageView)
+    }
+}
+
+/**
+ * Binding adapter to set the profile age text. The text is formatted as "d. MMMM y",
+ * 5. September 2012"
+ *
+ * @param textView The TextView to set the text on
+ * @param createdAt The timestamp, in seconds, the profile was created. If this is negative, nothing is done
+ */
+@BindingAdapter("profileAge")
+fun setProfileAge(textView: TextView, createdAt: Long) {
+    if (createdAt >= 0) {
+        // Format date as "5. September 2012"
+        val dateFormat = SimpleDateFormat("d. MMMM y", Locale.getDefault())
+        val date = Date.from(Instant.ofEpochSecond(createdAt))
+
+        textView.text = String.format(textView.resources.getString(R.string.profileAge), dateFormat.format(date))
+    }
+}

@@ -34,11 +34,11 @@ class UserRequestsKt(
      */
     suspend fun info() : ApiResponse<RedditUser> {
         return try {
-            val resp = api.getUserInfoOtherUsers(username!!)
+            val resp = api.getUserInfoOtherUsers(username)
             val user = resp.body()
 
             if (user != null) {
-                ApiResponse.Success(user)
+                ApiResponse.Success(user as RedditUser)
             } else {
                 apiError(resp)
             }

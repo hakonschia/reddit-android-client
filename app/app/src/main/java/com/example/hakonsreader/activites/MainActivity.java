@@ -29,8 +29,6 @@ import com.example.hakonsreader.misc.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.ArrayList;
-
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
 
@@ -495,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             // If logged in, show profile, otherwise show log in page
             if (App.get().isUserLoggedIn()) {
                 if (profileFragment == null) {
-                    profileFragment = ProfileFragment.newInstance();
+                    profileFragment = ProfileFragment.Companion.newInstance();
                 }
 
                 return profileFragment;

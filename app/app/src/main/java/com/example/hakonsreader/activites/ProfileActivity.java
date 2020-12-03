@@ -34,7 +34,7 @@ public class ProfileActivity extends AppCompatActivity implements LockableSlidr 
 
         String username = getIntent().getExtras().getString(USERNAME_KEY);
 
-        ProfileFragment fragment = ProfileFragment.newInstance(username);
+        ProfileFragment fragment = ProfileFragment.Companion.newInstance(username);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.profileContainer, fragment)

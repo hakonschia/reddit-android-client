@@ -42,6 +42,8 @@ import java.security.SecureRandom;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import io.noties.markwon.Markwon;
 import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
@@ -292,6 +294,7 @@ public class App extends Application {
      * @param enable True to enable private browsing, false to disable
      */
     public void enablePrivateBrowsing(boolean enable) {
+        // TODO create some sort of observable for this to automatically notify views
         redditApi.enablePrivateBrowsing(enable);
         settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, enable).apply();
     }
@@ -582,6 +585,7 @@ public class App extends Application {
     /**
      * @return Retrieves the user information stored in SharedPreferences
      */
+    @Nullable
     public static RedditUser getStoredUser() {
         return SharedPreferencesManager.get(SharedPreferencesConstants.USER_INFO, RedditUser.class);
     }
