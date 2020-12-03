@@ -198,7 +198,7 @@ public class DispatcherActivity extends AppCompatActivity {
             // If no activity found and user wants to open links in app, open in WebView (internal browser)
             if (!appActivityFound && App.get().openLinksInApp()) {
                 intent = new Intent(this, WebViewActivity.class);
-                intent.putExtra(WebViewActivity.URL_KEY, url);
+                intent.putExtra(WebViewActivity.URL, url);
             }
         }
 

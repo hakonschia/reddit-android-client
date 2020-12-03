@@ -92,6 +92,10 @@ public class PostScrollListener implements View.OnScrollChangeListener {
 
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldX, int oldY) {
+        // TODO if a video has been manually paused, scrolling when it would be selected automatically
+        //  shouldn't select it again. This is especially annoying when going into a post which pauses the video
+        //  and then going out, scrolling down to get to the next post which then plays the video for a split second
+
         // Find the positions of first and last visible items to find all visible items
         int posFirstItem = layoutManager.findFirstVisibleItemPosition();
         int posLastItem = layoutManager.findLastVisibleItemPosition();

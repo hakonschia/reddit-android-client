@@ -6,8 +6,6 @@ import android.content.res.Resources;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
@@ -17,7 +15,6 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.RateLimitException;
 import com.example.hakonsreader.api.exceptions.ThreadLockedException;
 import com.example.hakonsreader.api.responses.GenericError;
-import com.example.hakonsreader.fragments.ProfileFragment;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -108,7 +105,7 @@ public class Util {
         Context context = parent.getContext();
 
         snackbar.setAction(context.getString(R.string.log_in), v -> {
-            // If getContext instance of MainAcitivty we can set the navbar item to profile and, otherwise create activity for logging in
+            // If getContext instance of MainActivity we can set the navbar item to profile and, otherwise create activity for logging in
             if (context instanceof MainActivity) {
                 ((MainActivity)context).selectProfileNavBar();
             } else {
