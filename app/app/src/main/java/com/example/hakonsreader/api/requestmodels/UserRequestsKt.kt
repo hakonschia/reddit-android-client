@@ -15,7 +15,7 @@ import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
 
 class UserRequestsKt(
-        private val username: String?,
+        private val username: String,
         private val accessToken: AccessToken,
         private val api: UserServiceKt,
         imgurApi: ImgurService?
@@ -26,58 +26,13 @@ class UserRequestsKt(
 
 
     /**
-     * Retrieves information about the user. If the username was set to *null* then information
-     * is retrieved about the logged in user (if possible), otherwise information is retrieved
-     * about the username set
+     * Retrieves information about the user
      *
-     * OAuth scopes required:
-     * 1. For logged in users: *identity*
-     * 2. For other users: *read*
+     * OAuth scope required: *read*
      *
      * @return A [RedditUser] object representing the user if successful
      */
     suspend fun info() : ApiResponse<RedditUser> {
-        return if (username == null) {
-            infoForLoggedInUser()
-        } else {
-            infoForNonLoggedInUser()
-        }
-    }
-
-    /**
-     * Retrieves information about the logged in user. If [accessToken] is not valid for a logged in
-     * user this will return an error
-     *
-     * @return A [RedditUser] object representing the user if successful
-     */
-    private suspend fun infoForLoggedInUser() : ApiResponse<RedditUser> {
-        try {
-            Util.verifyLoggedInToken(accessToken)
-        } catch (e: InvalidAccessTokenException) {
-            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't get user information without access token for a logged in user", e))
-        }
-
-        return try {
-            val resp = api.getUserInfo()
-            val user = resp.body()
-
-            if (user != null) {
-                ApiResponse.Success(user)
-            } else {
-                apiError(resp)
-            }
-        } catch (e: Exception) {
-            ApiResponse.Error(GenericError(-1), e)
-        }
-    }
-
-    /**
-     * Retrieves information about another user. [username] must not be null in this call
-     * as it will use the username set as the user to get information about
-     *
-     * @return A [RedditUser] object representing the user if successful
-     */
-    private suspend fun infoForNonLoggedInUser() : ApiResponse<RedditUser> {
         return try {
             val resp = api.getUserInfoOtherUsers(username!!)
             val user = resp.body()
@@ -107,10 +62,6 @@ class UserRequestsKt(
      * @param limit The amount of posts to retrieve
      */
     suspend fun posts(postSort: SortingMethods = SortingMethods.HOT, timeSort: PostTimeSort = PostTimeSort.DAY, after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditPost>> {
-        if (username == null) {
-            return ApiResponse.Error(GenericError(-1), IllegalStateException("Cannot get posts without a username"))
-        }
-
         return try {
             val resp = api.getListingsFromUser<RedditPost>(
                     username,
@@ -151,10 +102,6 @@ class UserRequestsKt(
             Util.verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't get user information without access token for a logged in user", e))
-        }
-
-        if (username == null) {
-            return ApiResponse.Error(GenericError(-1), IllegalStateException("No username set to block"))
         }
 
         return try {

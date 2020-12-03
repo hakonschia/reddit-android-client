@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api.requestmodels;
 
+import androidx.annotation.NonNull;
+
 import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
@@ -33,27 +35,13 @@ public class UserRequests {
     private final boolean loadImgurAlbumsAsRedditGalleries;
 
     /**
-     * @param api The API service to use for requests
-     * @param accessToken The access token to use for requests
-     * @param imgurService The service to optionally use for loading Imgur albums directly. Set to
-     *                     {@code null} to not load albums.
-     */
-    public UserRequests(UserService api, AccessToken accessToken, ImgurService imgurService) {
-        this.api = api;
-        this.accessToken = accessToken;
-        this.imgurRequest = new ImgurRequest(imgurService);
-        this.loadImgurAlbumsAsRedditGalleries = imgurService != null;
-        this.username = null;
-    }
-
-    /**
      * @param username The username to make requests towards
      * @param api The API service to use for requests
      * @param accessToken The access token to use for requests
      * @param imgurService The service to optionally use for loading Imgur albums directly. Set to
      *                     {@code null} to not load albums.
      */
-    public UserRequests(UserService api, AccessToken accessToken, String username, ImgurService imgurService) {
+    public UserRequests(@NonNull UserService api, @NonNull AccessToken accessToken, @NonNull String username, ImgurService imgurService) {
         this.accessToken = accessToken;
         this.api = api;
         this.username = username;
@@ -66,22 +54,32 @@ public class UserRequests {
      *
      * <p>Requires a valid access token for the request to be made</p>
      *
-     * <p>OAuth scopes required:
-     * <ol>
-     *     <li>For information about logged in users: {@code identity}</li>
-     *     <li>For information about other users: {@code read}</li>
-     * </ol>
-     * </p>
+     * <p>OAuth scope required: {@code read}</p>
      *
      * @param onResponse The callback for successful requests. Holds the {@link RedditUser} object representing the user
      * @param onFailure The callback for failed requests
      */
     public void info(OnResponse<RedditUser> onResponse, OnFailure onFailure) {
-        if (username == null) {
-            this.getInfoForLoggedInUser(onResponse, onFailure);
-        } else {
-           this.getInfoByUsername(username, onResponse, onFailure);
-        }
+        api.getUserInfoOtherUsers(username).enqueue(new Callback<RedditListing>() {
+            @Override
+            public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
+                RedditListing body = null;
+                if (response.isSuccessful()) {
+                    body = response.body();
+                }
+
+                if (body != null) {
+                    onResponse.onResponse((RedditUser) body);
+                } else {
+                    Util.handleHttpErrors(response, onFailure);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RedditListing> call, Throwable t) {
+                onFailure.onFailure(new GenericError(-1), t);
+            }
+        });
     }
 
     /**
@@ -119,71 +117,5 @@ public class UserRequests {
             }
         });
 
-    }
-
-    /**
-     * Retrieves information about logged in users
-     *
-     * @param onResponse The callback for successful requests. Holds the {@link RedditUser} object representing the user
-     * @param onFailure The callback for failed requests
-     */
-    private void getInfoForLoggedInUser(OnResponse<RedditUser> onResponse, OnFailure onFailure) {
-        try {
-            Util.verifyLoggedInToken(accessToken);
-        } catch (InvalidAccessTokenException e) {
-            onFailure.onFailure(new GenericError(-1), new InvalidAccessTokenException("Can't get user information without access token for a logged in user", e));
-            return;
-        }
-
-        api.getUserInfo().enqueue(new Callback<RedditUser>() {
-            @Override
-            public void onResponse(Call<RedditUser> call, Response<RedditUser> response) {
-                RedditUser body = null;
-                if (response.isSuccessful()) {
-                    body = response.body();
-                }
-
-                if (body != null) {
-                    onResponse.onResponse(body);
-                } else {
-                    Util.handleHttpErrors(response, onFailure);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RedditUser> call, Throwable t) {
-                onFailure.onFailure(new GenericError(-1), t);
-            }
-        });
-    }
-
-    /**
-     * Retrieves information about a user by username
-     *
-     * @param username The username to retrieve information for
-     * @param onResponse The callback for successful requests. Holds the {@link RedditUser} object representing the user
-     * @param onFailure The callback for failed requests
-     */
-    private void getInfoByUsername(String username, OnResponse<RedditUser> onResponse, OnFailure onFailure) {
-        api.getUserInfoOtherUsers(username).enqueue(new Callback<RedditListing>() {
-            @Override
-            public void onResponse(Call<RedditListing> call, Response<RedditListing> response) {
-                RedditListing body = null;
-                if (response.isSuccessful()) {
-                    body = response.body();
-                }
-
-                if (body != null) {
-                    onResponse.onResponse((RedditUser) body);
-                } else {
-                    Util.handleHttpErrors(response, onFailure);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RedditListing> call, Throwable t) {
-                onFailure.onFailure(new GenericError(-1), t);
-            }
-        });
     }
 }

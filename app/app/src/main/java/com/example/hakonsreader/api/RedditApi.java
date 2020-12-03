@@ -1,5 +1,7 @@
 package com.example.hakonsreader.api;
 
+import androidx.annotation.NonNull;
+
 import com.example.hakonsreader.api.constants.OAuthConstants;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
@@ -8,6 +10,7 @@ import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.requestmodels.CommentRequest;
 import com.example.hakonsreader.api.requestmodels.CommentRequestKt;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
@@ -17,6 +20,8 @@ import com.example.hakonsreader.api.requestmodels.SubredditRequestKt;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequest;
 import com.example.hakonsreader.api.requestmodels.UserRequests;
 import com.example.hakonsreader.api.requestmodels.UserRequestsKt;
+import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUser;
+import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUserKt;
 import com.example.hakonsreader.api.service.CommentService;
 import com.example.hakonsreader.api.service.CommentServiceKt;
 import com.example.hakonsreader.api.service.ImgurService;
@@ -507,7 +512,7 @@ public class RedditApi {
          *
          * <p>Typically, an Imgur album will be represented as {@link PostType#LINK}. With this set to
          * true the API will automatically call the Imgur API when posts are received and get the individual
-         * images and store them so they are accessible through {@link RedditPost#getGalleryImages()}
+         * images and store them so they are accessible through {@link RedditPost#getGalleryImages()}  }
          * in the same way as a normal Reddit gallery would. The post type will be {@link PostType#GALLERY}.
          * While Imgur albums are typically for multiple images, these albums sometimes only contain one image.
          * The API will still treat one image albums as a gallery</p>
@@ -766,8 +771,8 @@ public class RedditApi {
      *
      * @return An object that can perform various user related API requests
      */
-    public UserRequests user() {
-        return new UserRequests(userApi, accessToken, imgurService);
+    public UserRequestsLoggedInUser user() {
+        return new UserRequestsLoggedInUser(accessToken, userApi);
     }
 
     /**
@@ -783,8 +788,28 @@ public class RedditApi {
         return new UserRequests(userApi, accessToken, username, imgurService);
     }
 
-    public UserRequestsKt userKt(String username) {
+    /**
+     * Retrieve a kotlin based {@link UserRequests} object that can get handle requests for non-logged in users.
+     * For logged in users use {@link #user()}
+     *
+     * @param username the username to to make calls towards.
+     *
+     * @return An object that can perform various user related API requests for non-logged in users
+     */
+    public UserRequestsKt userKt(@NonNull String username) {
         return new UserRequestsKt(username, accessToken, userApiKt, imgurService);
+    }
+
+    /**
+     * Retrieve a Kotlin based request object that offers API calls for logged in users
+     *
+     * <p>For logged in users use {@link RedditApi#userKt(String)}</p>
+     *
+     * @return An object that can perform various user related API requests for logged in users
+     * @see #userKt(String)
+     */
+    public UserRequestsLoggedInUserKt userKt() {
+        return new UserRequestsLoggedInUserKt(accessToken, userApiKt);
     }
 
 
