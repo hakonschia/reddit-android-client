@@ -25,6 +25,7 @@ import com.example.hakonsreader.api.utils.MarkdownAdjuster;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.enums.ShowNsfwPreview;
+import com.example.hakonsreader.interfaces.PrivateBrowsingObservable;
 import com.example.hakonsreader.markwonplugins.LinkPlugin;
 import com.example.hakonsreader.markwonplugins.SuperscriptPlugin;
 import com.example.hakonsreader.markwonplugins.ThemePlugin;
@@ -39,6 +40,8 @@ import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrPosition;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -81,6 +84,7 @@ public class App extends Application {
     private Markwon markwon;
     private MarkdownAdjuster adjuster;
 
+    private final List<PrivateBrowsingObservable> privateBrowsingObservables = new ArrayList<>();
     private Activity activeActivity;
 
     private static App app;
@@ -294,10 +298,33 @@ public class App extends Application {
      * @param enable True to enable private browsing, false to disable
      */
     public void enablePrivateBrowsing(boolean enable) {
-        // TODO create some sort of observable for this to automatically notify views
         redditApi.enablePrivateBrowsing(enable);
         settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, enable).apply();
+
+        privateBrowsingObservables.forEach(observable -> observable.privateBrowsingStateChanged(enable));
     }
+
+    /**
+     * Registers an observer for private browsing changes
+     *
+     * <p>The observable will be called automatically when registered</p>
+     *
+     * @param observable The observable to register
+     */
+    public void registerPrivateBrowsingObservable(PrivateBrowsingObservable observable) {
+        privateBrowsingObservables.add(observable);
+        observable.privateBrowsingStateChanged(isUserLoggedInPrivatelyBrowsing());
+    }
+
+    /**
+     * Unregisters an observer from the observers of private browsing changes
+     *
+     * @param observable The observable to remove
+     */
+    public void unregisterPrivateBrowsingObservable(PrivateBrowsingObservable observable) {
+        privateBrowsingObservables.remove(observable);
+    }
+
 
     /**
      * Retrieve the {@link Markwon} object that is used to format markdown text

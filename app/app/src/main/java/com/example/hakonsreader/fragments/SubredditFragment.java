@@ -34,6 +34,7 @@ import com.example.hakonsreader.databinding.FragmentSubredditBinding;
 import com.example.hakonsreader.databinding.SubredditBannedBinding;
 import com.example.hakonsreader.databinding.SubredditNotFoundBinding;
 import com.example.hakonsreader.databinding.SubredditPrivateBinding;
+import com.example.hakonsreader.interfaces.PrivateBrowsingObservable;
 import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener;
 import com.example.hakonsreader.misc.Util;
@@ -49,7 +50,7 @@ import java.util.List;
 /**
  * Fragment containing a subreddit
  */
-public class SubredditFragment extends Fragment implements SortableWithTime {
+public class SubredditFragment extends Fragment implements SortableWithTime, PrivateBrowsingObservable {
     private static final String TAG = "SubredditFragment";
 
     /**
@@ -164,6 +165,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         super.onResume();
         Log.d(TAG, "onResume " + getSubredditName());
 
+        App.get().registerPrivateBrowsingObservable(this);
+
         // If the fragment is selected without any posts load posts automatically
         // Check both the adapter and the postIds, as the postIds might have been set in onCreateView
         // while the adapter might not have gotten the update yet from the ViewModel
@@ -218,6 +221,8 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     public void onDestroyView() {
         super.onDestroyView();
         Log.d(TAG, "onDestroyView " + getSubredditName());
+
+        App.get().unregisterPrivateBrowsingObservable(this);
 
         // Ensure that all videos are cleaned up
         for (int i = 0; i < adapter.getItemCount(); i++) {
@@ -300,6 +305,14 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
         postsViewModel.restart(SortingMethods.CONTROVERSIAL, timeSort);
     }
 
+    @Override
+    public void privateBrowsingStateChanged(boolean privatelyBrowsing) {
+        binding.setPrivatelyBrowsing(privatelyBrowsing);
+        binding.subredditIcon.setBorderColor(ContextCompat.getColor(
+                requireContext(),
+                privatelyBrowsing ? R.color.privatelyBrowsing : R.color.opposite_background)
+        );
+    }
 
     /**
      * Inflates and sets up {@link SubredditFragment#binding}
@@ -309,12 +322,6 @@ public class SubredditFragment extends Fragment implements SortableWithTime {
     private void setupBinding(ViewGroup container) {
         binding = FragmentSubredditBinding.inflate(getLayoutInflater(), container, false);
 
-        binding.setPrivatelyBrowsing(App.get().isUserLoggedInPrivatelyBrowsing());
-        // Setting the conditional in xml causes an error because of color/int mismatch
-        binding.subredditIcon.setBorderColor(
-                ContextCompat.getColor(requireContext(),
-                        App.get().isUserLoggedInPrivatelyBrowsing() ? R.color.privatelyBrowsing : R.color.opposite_background)
-        );
         binding.subredditRefresh.setOnClickListener(view -> this.refreshPosts());
         binding.subscribe.setOnClickListener(this::subscribeOnClick);
 

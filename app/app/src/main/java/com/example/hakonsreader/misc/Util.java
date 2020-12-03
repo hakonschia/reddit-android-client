@@ -93,14 +93,6 @@ public class Util {
 
         snackbar.setAction(context.getString(R.string.disable), v -> {
             App.get().enablePrivateBrowsing(false);
-            // If we're in the ProfileFragment notify it as well to update the UI
-            //
-            /*
-            Fragment f = FragmentManager.findFragment(parent);
-            if (f instanceof ProfileFragment) {
-                ((ProfileFragment)f).enablePrivateBrowsing(false);
-            }
-             */
         });
         snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
         snackbar.show();

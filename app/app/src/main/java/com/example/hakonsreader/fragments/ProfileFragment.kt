@@ -18,6 +18,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentProfileBinding
+import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
@@ -33,7 +34,7 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
 
-class ProfileFragment : Fragment() {
+class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
     companion object {
         private const val TAG = "ProfileFragment"
@@ -153,9 +154,8 @@ class ProfileFragment : Fragment() {
             binding?.parentLayout?.progress = savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)
         }
 
+        // If we're on a logged in user we might have some old info, so set that
         if (isLoggedInUser) {
-            enablePrivateBrowsing(App.get().isUserLoggedInPrivatelyBrowsing)
-            // If we're on a logged in user we might have some old info, so set that
             updateViews()
         }
 
@@ -182,6 +182,8 @@ class ProfileFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
+        App.get().registerPrivateBrowsingObservable(this)
+        
         // If we have no username we can't get posts (we can't ask for posts for the logged in user without
         // their username). The posts are retrieved automatically when the user information loads
         if (postsAdapter?.posts?.isEmpty() == true && postIds.isEmpty() && username != null) {
@@ -201,6 +203,8 @@ class ProfileFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
+        App.get().unregisterPrivateBrowsingObservable(this)
+        
         if (saveState == null) {
             saveState = Bundle()
         }
@@ -235,7 +239,6 @@ class ProfileFragment : Fragment() {
         // Kinda weird to do this here, but even if we are privately browsing and on another users profile
         // it should indicate that we're privately browsing (as with your own profile and subreddits)
         binding?.loggedInUser = isLoggedInUser
-        enablePrivateBrowsing(App.get().isUserLoggedInPrivatelyBrowsing)
     }
 
     /**
@@ -283,26 +286,26 @@ class ProfileFragment : Fragment() {
         binding?.posts?.setOnScrollChangeListener(PostScrollListener(binding?.posts) { postsViewModel?.loadPosts() })
     }
 
-    /**
-     * Enables or disables private browsing. This will only update the UI for the fragment
-     * based on if private browsing is now enabled or disabled
-     *
-     * @param enable True if private browsing is now enabled, false if disabled
-     */
-    private fun enablePrivateBrowsing(enable: Boolean) {
-        binding?.privatelyBrowsing = enable
+    override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
+        Log.d(TAG, "privateBrowsingStateChanged: $privatelyBrowsing")
+        binding?.privatelyBrowsing = privatelyBrowsing
         binding?.profilePicture?.borderColor = ContextCompat.getColor(
                 requireContext(),
-                if (enable) R.color.privatelyBrowsing else R.color.opposite_background
+                if (privatelyBrowsing) R.color.privatelyBrowsing else R.color.opposite_background
         )
     }
+
 
     private fun retrieveUserInfo() {
         binding?.loadingIcon?.onCountChange(true)
 
         CoroutineScope(IO).launch {
             val name = username
-            val userResponse = if (isLoggedInUser || name == null) {
+            // If we're privately browsing, attempting to get user info for a logged in user would
+            // fail with a "You're currently privately browsing"
+            // If the user is privately browsing but no name is previously set this would fail since name would be null
+            // But that should never happen? A logged in user should always have a user object with name stored
+            val userResponse = if ((isLoggedInUser && !App.get().isUserLoggedInPrivatelyBrowsing) || name == null) {
                 api.userKt().info()
             } else {
                 api.userKt(name).info()
