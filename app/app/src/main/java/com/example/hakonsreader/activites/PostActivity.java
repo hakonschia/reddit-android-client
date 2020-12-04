@@ -340,7 +340,6 @@ public class PostActivity extends AppCompatActivity implements LockableSlidr {
      */
     private void setupCommentsList() {
         commentsAdapter = new CommentsAdapter(post);
-        // TODO this
         commentsAdapter.setOnReplyListener(this::replyTo);
         commentsAdapter.setCommentIdChain(getIntent().getExtras().getString(COMMENT_ID_CHAIN, ""));
         commentsAdapter.setLoadMoreCommentsListener((c, p) -> commentsViewModel.loadMoreComments(c, p));
