@@ -75,5 +75,5 @@ interface ModServiceKt {
             @Field("id") fullname: String,
             @Field("state") sticky: Boolean,
             @Field("api_type") apiType: String
-    ) : Response<JsonResponseKt<Nothing>>
+    ) : Response<JsonResponseKt<Void>>
 }

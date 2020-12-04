@@ -476,7 +476,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             val newSubscription = !it.isSubscribed
 
             CoroutineScope(IO).launch {
-                val response = api.subredditKt(sub.name).subscribe(newSubscription)
+                val response = api.subreddit(sub.name).subscribe(newSubscription)
 
                 withContext(Main) {
                     when (response) {
@@ -505,7 +505,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     private fun retrieveSubredditInfo(subredditName: String) {
         CoroutineScope(IO).launch {
-            when (val response = api.subredditKt(subredditName).info()) {
+            when (val response = api.subreddit(subredditName).info()) {
                 is ApiResponse.Success -> {
                     val sub = response.value
 

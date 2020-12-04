@@ -17,6 +17,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.persistence.AppDatabase
+import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentSelectSubredditBinding
 import com.example.hakonsreader.interfaces.OnClickListener
 import com.example.hakonsreader.interfaces.OnSubredditSelected
@@ -28,7 +29,9 @@ import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -229,25 +232,24 @@ class SelectSubredditFragmentK : Fragment() {
      */
     private fun favoriteClicked(subreddit: Subreddit) {
         val favorite = !subreddit.isFavorited
-        api.subreddit(subreddit.name).favorite(favorite, {
-            run {
-                subreddit.isFavorited = favorite
-                subredditsAdapter?.onFavorite(subreddit)
 
-                // If the top is visible make sure the top is also visible after the item has moved
-                if (subredditsLayoutManager?.findFirstCompletelyVisibleItemPosition() == 0) {
-                    subredditsLayoutManager?.scrollToPosition(0)
-                }
+        CoroutineScope(IO).launch {
+            when (val response = api.subreddit(subreddit.name).favorite(favorite)) {
+                is ApiResponse.Success -> {
+                    subreddit.isFavorited = favorite
+                    database.subreddits().update(subreddit)
 
-                CoroutineScope(IO).launch {
-                 //   database.subreddits().update(subreddit)
+                    withContext(Main) {
+                        subredditsAdapter?.onFavorite(subreddit)
+                        // If the top is visible make sure the top is also visible after the item has moved
+                        if (subredditsLayoutManager?.findFirstCompletelyVisibleItemPosition() == 0) {
+                            subredditsLayoutManager?.scrollToPosition(0)
+                        }
+                    }
                 }
+                is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
             }
-        }, { error, throwable ->
-            run {
-                Util.handleGenericResponseErrors(view, error, throwable)
-            }
-        })
+        }
     }
 
 

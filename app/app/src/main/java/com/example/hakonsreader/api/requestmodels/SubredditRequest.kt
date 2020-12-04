@@ -18,7 +18,7 @@ import com.example.hakonsreader.api.service.SubredditServiceKt
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 
-class SubredditRequestKt(
+class SubredditRequest(
         private val subredditName: String,
         private val accessToken: AccessToken,
         private val api: SubredditServiceKt,

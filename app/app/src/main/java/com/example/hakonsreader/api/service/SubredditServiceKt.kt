@@ -59,7 +59,7 @@ interface SubredditServiceKt {
     suspend fun subscribeToSubreddit(
             @Field("action") action: String,
             @Field("sr_name") subredditName: String
-    ) : Response<Nothing>
+    ) : Response<Void>
 
     /**
      * Favorite or un-favorite a subreddit
@@ -72,7 +72,7 @@ interface SubredditServiceKt {
     suspend fun favoriteSubreddit(
             @Field("make_favorite") favorite: Boolean,
             @Field("sr_name") subredditName: String,
-    ) : Response<Nothing>
+    ) : Response<Void>
 
 
     /**

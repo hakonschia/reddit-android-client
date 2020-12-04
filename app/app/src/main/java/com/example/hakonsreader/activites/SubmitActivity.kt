@@ -1,8 +1,6 @@
 package com.example.hakonsreader.activites
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
@@ -162,7 +159,7 @@ class SubmitActivity : AppCompatActivity() {
         val text = fragment.getText()
 
         CoroutineScope(IO).launch {
-            api.subredditKt("hakonschia").submitTextPost(
+            api.subreddit("hakonschia").submitTextPost(
                     title,
                     text,
                     nsfw,
@@ -189,7 +186,7 @@ class SubmitActivity : AppCompatActivity() {
         }
 
         CoroutineScope(IO).launch {
-            api.subredditKt("hakonschia").submitLinkPost(
+            api.subreddit("hakonschia").submitLinkPost(
                     title,
                     fragment.getLink(),
                     nsfw,
@@ -217,7 +214,7 @@ class SubmitActivity : AppCompatActivity() {
         }
 
         CoroutineScope(IO).launch {
-            api.subredditKt("hakonschia").submitCrosspost(
+            api.subreddit("hakonschia").submitCrosspost(
                     title,
                     id,
                     nsfw,

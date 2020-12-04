@@ -21,7 +21,7 @@ interface SaveServiceKt {
      */
     @POST("api/save")
     @FormUrlEncoded
-    suspend fun save(@Field("id") fullname: String) : Response<Nothing>
+    suspend fun save(@Field("id") fullname: String) : Response<Void>
 
 
     /**
@@ -34,5 +34,5 @@ interface SaveServiceKt {
      */
     @POST("api/unsave")
     @FormUrlEncoded
-    suspend fun unsave(@Field("id") fullname: String) : Response<Nothing>
+    suspend fun unsave(@Field("id") fullname: String) : Response<Void>
 }
