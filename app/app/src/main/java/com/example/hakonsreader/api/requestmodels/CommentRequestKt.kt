@@ -28,6 +28,31 @@ class CommentRequestKt(
     private val modRequest: ModRequestModelKt = ModRequestModelKt(accessToken, api)
 
 
+    /**
+     * Delete a comment. The comment being deleted must be posted by the user the access token represents
+     *
+     * @return The response will not hold any data. Note: Even if the comment couldn't be deleted because
+     * it didn't belong to the user it will seem successful as Reddit returns a 200 OK for every request
+     */
+    suspend fun delete() : ApiResponse<Any?> {
+        try {
+            Util.verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot delete comments without an access token for a logged in user", e))
+        }
+
+        return try {
+            val response = api.delete(Util.createFullName(Thing.COMMENT, commentId))
+            if (response.isSuccessful) {
+                ApiResponse.Success(null)
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
     suspend fun edit(editedText: String) : ApiResponse<RedditComment> {
         // TODO this isn't tested
         try {
