@@ -167,8 +167,8 @@ class PostActivity : AppCompatActivity() {
             it.commentChainShown = false
 
             // Go to first/last comment on long clicks on navigation buttons
-            it.goToNextTopLevelComment.setOnLongClickListener(this::goToFirstComment)
-            it.goToPreviousTopLevelComment.setOnLongClickListener(this::goToLastComment)
+            it.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment)
+            it.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment)
 
             it.commentsSwipeRefresh.setOnRefreshListener {
                 // We're using our own loading icon, so remove this

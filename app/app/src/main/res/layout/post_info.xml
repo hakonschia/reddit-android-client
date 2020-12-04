@@ -91,7 +91,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/age"
             app:layout_constraintTop_toTopOf="@+id/age"
-            tools:text="ihopeiactually.seeareallylongdomainonce.com" />
+            tools:text="ihopeiactually..com" />
 
         <TextView
             android:id="@+id/age"
@@ -204,6 +204,7 @@
             app:layout_constraintStart_toEndOf="@+id/domain"
             app:layout_constraintTop_toTopOf="@+id/domain"
 
+            app:layout_constrainedWidth="true"
             app:linkFlair="@{post}"
             app:nsfw="@{post.nsfw}"
             app:spoiler="@{post.spoiler}"
@@ -221,8 +222,8 @@
 
         <ImageView
             android:id="@+id/crosspostIcon"
-            android:layout_width="35dp"
-            android:layout_height="20dp"
+            android:layout_width="24dp"
+            android:layout_height="13dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="2dp"
             android:src="@drawable/ic_crosspost"
