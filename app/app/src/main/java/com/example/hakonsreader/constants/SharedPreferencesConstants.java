@@ -10,6 +10,11 @@ public class SharedPreferencesConstants {
      */
     public static final String PREFS_NAME = "preferences";
 
+    /**
+     * The name of the SharedPreferences storing the post opened values
+     */
+    public static final String PREFS_NAME_POST_OPENED = "preferencesPostOpened";
+
 
     /**
      * The key for access tokens from the default SharedPreferences
