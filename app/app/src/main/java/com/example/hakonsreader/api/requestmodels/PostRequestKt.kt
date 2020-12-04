@@ -23,7 +23,7 @@ class PostRequestKt(
         private val postId: String
 ) : VoteableRequest, ReplyableRequest, SaveableRequestKt {
 
-    private val voteRequest: VoteableRequestModelKt = VoteableRequestModelKt(accessToken, api)
+    private val voteRequest: VoteableRequestModel = VoteableRequestModel(accessToken, api)
     private val replyRequest: ReplyableRequestModelKt = ReplyableRequestModelKt(accessToken, api)
     private val saveRequest: SaveableRequestModelKt = SaveableRequestModelKt(accessToken, api)
     private val modRequest: ModRequestModelKt = ModRequestModelKt(accessToken, api)

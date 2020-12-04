@@ -16,7 +16,7 @@ import retrofit2.http.Query;
 /**
  * Service interface to make post related API calls towards Reddit
  */
-public interface PostService extends VoteService, ReplyService, SaveService, ModService {
+public interface PostService extends ReplyService, SaveService, ModService {
     /**
      * Retrieves comments for a post
      *

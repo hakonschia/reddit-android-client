@@ -10,7 +10,7 @@ import retrofit2.http.POST;
 /**
  * Service interface towards a comment on Reddit
  */
-public interface CommentService extends VoteService, ReplyService, SaveService, ModService {
+public interface CommentService extends ReplyService, SaveService, ModService {
 
 
     /**
