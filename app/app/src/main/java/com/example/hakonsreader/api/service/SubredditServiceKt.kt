@@ -3,6 +3,7 @@ package com.example.hakonsreader.api.service
 import com.example.hakonsreader.api.responses.ListingResponseKt
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
+import com.example.hakonsreader.api.model.RedditListing
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.Submission
@@ -19,10 +20,10 @@ interface SubredditServiceKt {
      * Retrieve information about a subreddit
      *
      * @param subreddit The name of the subreddit to get info from
-     * @return A Response holding a [Subreddit] object
+     * @return A Response holding a [RedditListing] which can be cast into a [Subreddit] object
      */
     @GET("r/{subreddit}/about?raw_json=1")
-    suspend fun getSubredditInfo(@Path("subreddit") subreddit: String) : Response<Subreddit>
+    suspend fun getSubredditInfo(@Path("subreddit") subreddit: String) : Response<RedditListing>
 
     /**
      * Retrieves posts from a subreddit

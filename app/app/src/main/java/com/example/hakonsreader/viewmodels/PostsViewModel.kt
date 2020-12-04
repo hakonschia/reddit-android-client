@@ -97,16 +97,13 @@ class PostsViewModel(
      * Updates how to sort posts and restarts the posts from start
      *
      * @param sort How to sort the posts
-     * @param timeSort How to sort the posts based on time. Only applicable for *top* and *controversial*
+     * @param timeSort How to sort the posts based on time. Only applicable for *top* and *controversial*.
+     * Default is [PostTimeSort.DAY]
      */
-    fun restart(sort: SortingMethods?, timeSort: PostTimeSort?) {
+    fun restart(sort: SortingMethods, timeSort: PostTimeSort = PostTimeSort.DAY) {
         // TODO until the fragments using this method use Kotlin these can be null (for new, hot)
-        if (sort != null) {
-            this.sort = sort
-        }
-        if (timeSort != null) {
-            this.timeSort = timeSort
-        }
+        this.sort = sort
+        this.timeSort = timeSort
         restart()
     }
 

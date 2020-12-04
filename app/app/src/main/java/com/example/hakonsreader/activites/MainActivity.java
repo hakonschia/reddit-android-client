@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     @Override
     public void subredditSelected(String subredditName) {
         // Create new subreddit fragment and replace
-        activeSubreddit = SubredditFragment.newInstance(subredditName);
+        activeSubreddit = SubredditFragment.Companion.newInstance(subredditName);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, activeSubreddit)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -268,10 +268,10 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
 
         // Active subreddit not restored directly, check if it should be restored manually
         if (activeSubreddit == null) {
-            String activeSubredditName = restoredState.getString("active_subreddit_name");
+            String activeSubredditName = restoredState.getString(ACTIVE_SUBREDDIT_NAME);
             if (activeSubredditName != null) {
                 // The state of the fragment itself is restored when it is accessed again
-                activeSubreddit = SubredditFragment.newInstance(activeSubredditName);
+                activeSubreddit = SubredditFragment.Companion.newInstance(activeSubredditName);
             }
         }
 

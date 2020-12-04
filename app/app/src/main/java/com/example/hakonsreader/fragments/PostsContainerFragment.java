@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.interfaces.ItemLoadingListener;
 import com.example.hakonsreader.misc.SectionsPageAdapter;
 
 
@@ -40,9 +39,9 @@ public class PostsContainerFragment extends Fragment  {
     private void setupFragments() {
         if (this.fragments == null) {
             this.fragments = new SubredditFragment[]{
-                    SubredditFragment.newInstance(""),
-                    SubredditFragment.newInstance("Popular"),
-                    SubredditFragment.newInstance("All")
+                    SubredditFragment.Companion.newInstance(""),
+                    SubredditFragment.Companion.newInstance("Popular"),
+                    SubredditFragment.Companion.newInstance("All")
             };
 
             for (SubredditFragment fragment : fragments) {

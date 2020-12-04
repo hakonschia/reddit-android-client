@@ -34,15 +34,15 @@ class SubredditRequestKt(
      * OAuth scope required: *read*
      */
     suspend fun info() : ApiResponse<Subreddit> {
-        if (RedditApi.STANDARD_SUBS.contains(subredditName)) {
+        if (RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())) {
             return ApiResponse.Error(GenericError(-1), NoSubredditInfoException("The subreddits: " + RedditApi.STANDARD_SUBS.toString() + " do not have any info to retrieve"))
         }
-
-        val resp = api.getSubredditInfo(subredditName)
-        val sub = resp.body()
         return try {
+            val resp = api.getSubredditInfo(subredditName)
+            val sub = resp.body()
+
             if (sub != null) {
-                ApiResponse.Success(sub)
+                ApiResponse.Success(sub as Subreddit)
             } else {
                 apiError(resp)
             }

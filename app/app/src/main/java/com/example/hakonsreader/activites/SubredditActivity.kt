@@ -93,6 +93,6 @@ class SubredditActivity : AppCompatActivity() {
      * @return The name of the subreddit the activity is displaying
      */
     fun getSubredditName(): String? {
-        return fragment!!.subredditName
+        return fragment?.getSubredditName()
     }
 }
