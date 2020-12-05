@@ -224,6 +224,7 @@ class PostActivity : AppCompatActivity() {
                 binding?.noComments = comments.isEmpty()
             })
 
+            it.onLoadingCountChange().observe(this, { up -> binding?.loadingIcon?.onCountChange(up) })
             it.getError().observe(this, { error ->
                 Util.handleGenericResponseErrors(binding?.parentLayout, error.error, error.throwable)
             })
