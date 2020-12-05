@@ -66,7 +66,4 @@ public class GenericError {
         return reason;
     }
 
-
-
-
 }

@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * Response for any request that returns a list of listings
  */
-class ListingResponseKt<T> {
+class ListingResponse<T> {
 
     @SerializedName("errors")
     private var errors: List<List<String>>? = null

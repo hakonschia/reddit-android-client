@@ -1,13 +1,13 @@
 package com.example.hakonsreader.api.service
 
-import com.example.hakonsreader.api.responses.ListingResponseKt
+import com.example.hakonsreader.api.responses.ListingResponse
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditListing
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.Submission
-import com.example.hakonsreader.api.responses.JsonResponseKt
+import com.example.hakonsreader.api.responses.JsonResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -46,7 +46,7 @@ interface SubredditService {
             @Query("after") after: String,
             @Query("count") count: Int,
             @Query("limit") limit: Int
-    ) : Response<ListingResponseKt<RedditPost>>
+    ) : Response<ListingResponse<RedditPost>>
 
     /**
      * Subscribe or unsubscribe to a subreddit
@@ -119,5 +119,5 @@ interface SubredditService {
 
             @Field("api_type") apiType: String = "json",
             @Field("raw_json") rawJson: Int = 1
-    ) : Response<JsonResponseKt<Submission>>
+    ) : Response<JsonResponse<Submission>>
 }

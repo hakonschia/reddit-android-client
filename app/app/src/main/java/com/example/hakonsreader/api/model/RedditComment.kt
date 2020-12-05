@@ -5,7 +5,7 @@ import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
-import com.example.hakonsreader.api.responses.ListingResponseKt
+import com.example.hakonsreader.api.responses.ListingResponse
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 
@@ -255,7 +255,7 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing {
     @SerializedName("replies")
     // No replies are represented as: {"replies": ""} which would cause an error since it's a string
     @JsonAdapter(EmptyStringAsNullAdapter::class)
-    private var repliesInternal: ListingResponseKt<RedditComment>? = null
+    private var repliesInternal: ListingResponse<RedditComment>? = null
 
     /**
      * The actual replies for the comment. If this is *null* then [replies] has not yet been accessed

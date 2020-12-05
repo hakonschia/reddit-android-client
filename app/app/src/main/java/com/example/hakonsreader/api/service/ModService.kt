@@ -2,7 +2,7 @@ package com.example.hakonsreader.api.service
 
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.responses.JsonResponseKt
+import com.example.hakonsreader.api.responses.JsonResponse
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -28,7 +28,7 @@ interface ModService {
      * @param how "yes" to distinguish as mod, "no" to remove the mod distinguish
      * @param sticky True to also sticky the comment (comments will also be mod distinguished when stickied)
      * @param apiType The string "json"
-     * @return A Response with a [JsonResponseKt]. The response will hold the updated comment
+     * @return A Response with a [JsonResponse]. The response will hold the updated comment
      */
     @POST("api/distinguish")
     @FormUrlEncoded
@@ -37,7 +37,7 @@ interface ModService {
             @Field("how") how: String,
             @Field("sticky") sticky: Boolean,
             @Field("api_type") apiType: String
-    ) : Response<JsonResponseKt<RedditComment>>
+    ) : Response<JsonResponse<RedditComment>>
 
 
     /**
@@ -48,7 +48,7 @@ interface ModService {
      * @param fullname The fullname of the post
      * @param how "yes" to distinguish as mod, "no" to remove the mod distinguish
      * @param apiType The string "json"
-     * @return A Response with a [JsonResponseKt]. The response will hold the updated post
+     * @return A Response with a [JsonResponse]. The response will hold the updated post
      */
     @POST("api/distinguish")
     @FormUrlEncoded
@@ -56,7 +56,7 @@ interface ModService {
             @Field("id") fullname: String,
             @Field("how") how: String,
             @Field("api_type") apiType: String
-    ) : Response<JsonResponseKt<RedditPost>>
+    ) : Response<JsonResponse<RedditPost>>
 
     /**
      * Sticky a post on the subreddit
@@ -67,7 +67,7 @@ interface ModService {
      * @param sticky True to sticky the post
      * @param apiType The string "json"
      * @return The response will not hold any data, but potential errors will be handled by the
-     * [JsonResponseKt]
+     * [JsonResponse]
      */
     @POST("api/set_subreddit_sticky")
     @FormUrlEncoded
@@ -75,5 +75,5 @@ interface ModService {
             @Field("id") fullname: String,
             @Field("state") sticky: Boolean,
             @Field("api_type") apiType: String
-    ) : Response<JsonResponseKt<Void>>
+    ) : Response<JsonResponse<Void>>
 }

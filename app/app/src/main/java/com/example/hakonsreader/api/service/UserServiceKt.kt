@@ -4,7 +4,7 @@ import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditListing
 import com.example.hakonsreader.api.model.RedditUser
-import com.example.hakonsreader.api.responses.ListingResponseKt
+import com.example.hakonsreader.api.responses.ListingResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -52,7 +52,7 @@ interface UserServiceKt {
      * corresponding value
      * @param timeSort How to sort the posts. This should use [PostTimeSort] and its corresponding value
      * @param T The type of listing to retrieve. This should match the type expected (ie. for posts the type
-     * should be [RedditPost]. The [ListingResponseKt] returned will hold a list of objects of this class
+     * should be [RedditPost]. The [ListingResponse] returned will hold a list of objects of this class
      * @return A ListingResponse call. The listings returned depend on the value of "what" (comments, post, etc.)
      */
     @GET("user/{username}/{what}?raw_json=1")
@@ -64,7 +64,7 @@ interface UserServiceKt {
             @Query("after") after: String,
             @Query("count") count: Int,
             @Query("limit") limit: Int
-    ) : Response<ListingResponseKt<T>>
+    ) : Response<ListingResponse<T>>
 
 
     /**

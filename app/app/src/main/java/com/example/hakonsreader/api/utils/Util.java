@@ -8,7 +8,6 @@ import com.example.hakonsreader.api.exceptions.ThreadLockedException;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.responses.GenericError;
-import com.example.hakonsreader.api.responses.ListingResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -50,13 +49,7 @@ public class Util {
         return new Throwable("Error executing request: " + code);
     }
 
-    /**
-     * Handles listing errors (from {@link ListingResponse#hasErrors()}). Based on the error type
-     * an attempt to handle the error is done, otherwise a generic error message is sent.
-     *
-     * @param errors The errors for the response (as retrieved with {@link ListingResponse#getErrors()})
-     * @param onFailure The failure handler for the request
-     */
+    // TODO this should be tested against the kotlin version to see how this should be handled now
     public static void handleListingErrors(List<List<String>> errors, OnFailure onFailure) {
         // There can be more errors, not sure the best way to handle it other than returning the info for the first
         String errorType = errors.get(0).get(0);

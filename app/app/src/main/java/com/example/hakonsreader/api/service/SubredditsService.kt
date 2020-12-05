@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.service
 
 import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.responses.ListingResponseKt
+import com.example.hakonsreader.api.responses.ListingResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -21,7 +21,7 @@ interface SubredditsService {
             @Query("after") after: String,
             @Query("count") count: Int,
             @Query("limit") limit: Int
-    ) : Response<ListingResponseKt<Subreddit>>
+    ) : Response<ListingResponse<Subreddit>>
 
 
     /**
@@ -37,7 +37,7 @@ interface SubredditsService {
             @Query("after") after: String,
             @Query("count") count: Int,
             @Query("limit") limit: Int
-    ) : Response<ListingResponseKt<Subreddit>>
+    ) : Response<ListingResponse<Subreddit>>
 
 
     /**
@@ -50,5 +50,5 @@ interface SubredditsService {
     suspend fun search(
             @Query("q") query: String,
             @Query("include_over_18") includeNsfw: Boolean
-    ) : Response<ListingResponseKt<Subreddit>>
+    ) : Response<ListingResponse<Subreddit>>
 }

@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.service
 
 import com.example.hakonsreader.api.model.RedditComment
-import com.example.hakonsreader.api.responses.JsonResponseKt
+import com.example.hakonsreader.api.responses.JsonResponse
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -28,6 +28,6 @@ interface ReplyService {
             @Field("thing_id") parentId: String,
             @Field("api_type") apiType: String,
             @Field("return_rtjson") returnJson: Boolean
-    ) : Response<JsonResponseKt<RedditComment>>
+    ) : Response<JsonResponse<RedditComment>>
 
 }
