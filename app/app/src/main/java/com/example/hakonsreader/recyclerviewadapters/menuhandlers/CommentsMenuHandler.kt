@@ -76,6 +76,8 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
             R.id.menuDistinguishCommentAsMod -> { distinguishAsModOnclick(view, comment, adapter); true }
             R.id.menuStickyComment -> { stickyOnClick(view, comment, adapter); true }
             R.id.menuBlockUser -> { blockUserOnClick(view, comment); true }
+            R.id.menuShowCommentChain -> { adapter.commentIdChain = comment.id; true }
+            R.id.menuCopyCommentLink -> { copyCommentLinkOnClick(view, comment); true }
             else -> false
         }
     }
@@ -96,18 +98,8 @@ fun showPopupForCommentExtraForNonLoggedInUser(view: View, comment: RedditCommen
 
     menu.setOnMenuItemClickListener { item: MenuItem ->
         return@setOnMenuItemClickListener when (item.itemId) {
-            R.id.menuShowCommentChain -> {
-                adapter.commentIdChain = comment.id
-                true
-            }
-            R.id.menuCopyCommentLink -> {
-                val url = "https://reddit.com" + comment.permalink
-                val clipboard = view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("Reddit comment link", url)
-                clipboard.setPrimaryClip(clip)
-                Toast.makeText(view.context, R.string.linkCopied, Toast.LENGTH_SHORT).show()
-                true
-            }
+            R.id.menuShowCommentChain -> { adapter.commentIdChain = comment.id; true }
+            R.id.menuCopyCommentLink -> { copyCommentLinkOnClick(view, comment); true }
             else -> false
         }
     }
@@ -229,6 +221,14 @@ private fun blockUserOnClick(view: View, comment: RedditComment) {
     }
 }
 
+
+private fun copyCommentLinkOnClick(view: View, comment: RedditComment) {
+    val url = "https://reddit.com" + comment.permalink
+    val clipboard = view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("Reddit comment link", url)
+    clipboard.setPrimaryClip(clip)
+    Snackbar.make(view, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
+}
 
 /**
  * Updates distinguished/stickied in a comment based on a new comment
