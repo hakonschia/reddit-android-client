@@ -33,7 +33,13 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
     val menu = PopupMenu(view.context, view)
     menu.inflate(R.menu.comment_extra_generic_for_all_users)
     menu.inflate(R.menu.comment_extra_for_logged_in_users)
-    menu.inflate(R.menu.comment_extra_by_user)
+
+    // Add menus depending on if the logged in user is the poster of the comment
+    if (comment.author == user?.username) {
+        menu.inflate(R.menu.comment_extra_by_user)
+    } else {
+        menu.inflate(R.menu.comment_extra_for_logged_in_users_comment_not_by_user)
+    }
 
     // Add mod specific if user is a mod in the subreddit the post is in
     if (comment.isUserMod) {
@@ -61,11 +67,6 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
     if (comment.isSaved) {
         val savedItem = menu.menu.findItem(R.id.menuSaveOrUnsaveComment)
         savedItem.title = view.context.getString(R.string.unsaveComment)
-    }
-
-    // Add extra menus for logged in users, but only visible if the comment isn't by the logged in user
-    if (comment.author != user?.username) {
-        menu.inflate(R.menu.comment_extra_for_logged_in_users_comment_not_by_user)
     }
 
     menu.setOnMenuItemClickListener { item: MenuItem ->
@@ -231,6 +232,8 @@ private fun blockUserOnClick(view: View, comment: RedditComment) {
 
 /**
  * Updates distinguished/stickied in a comment based on a new comment
+ *
+ * Must run on the main thread
  *
  * @param oldComment The old/original comment to update in the adapter
  * @param newComment The new comment holding the updated information

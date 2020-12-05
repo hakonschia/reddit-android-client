@@ -216,4 +216,6 @@
     <string name="crosspostFrom">" fra "</string>
     <string name="prefs_title_highlight_new_comments">Fremhev nye kommentarer</string>
     <string name="prefs_title_comment_smooth_scroll_threshold">Terskel for jevn kommentarskrolling</string>
+    <string name="copyPostLink">Kopier lenke til posten</string>
+    <string name="copyPostContentLink">Kopier lenke til innholdet i posten</string>
 </resources>

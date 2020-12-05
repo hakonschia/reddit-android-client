@@ -281,6 +281,8 @@
     <string name="unsavePost">Unsave post</string>
     <string name="postSaved">Post saved</string>
     <string name="postUnsaved">Post unsaved</string>
+    <string name="copyPostLink">Copy post link</string>
+    <string name="copyPostContentLink">Copy link to post content</string>
 
     <string name="blockUser">Block user</string>
     <string name="userBlocked">User blocked</string>

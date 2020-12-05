@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="com.example.hakonsreader.views.util.MenuClickHandler" />
+        <import type="com.example.hakonsreader.recyclerviewadapters.menuhandlers.PostsMenuHandlerKt" />
 
         <variable
             name="post"
@@ -50,7 +51,7 @@
             android:background="@null"
             android:src="@drawable/ic_baseline_more_horiz_24"
 
-            android:onClick="@{(view) -> MenuClickHandler.showPopupForPost(view, post)}"
+            android:onClick="@{(view) -> PostsMenuHandlerKt.showPopupForPost(view, post)}"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/voteBar"
