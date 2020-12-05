@@ -1,11 +1,17 @@
 package com.example.hakonsreader.recyclerviewadapters
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.Typeface
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.PopupMenu
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -16,15 +22,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.Thing
+import com.example.hakonsreader.api.interfaces.OnResponse
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.ListItemCommentBinding
 import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding
 import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.OnReplyListener
+import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
+import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForLoggedInUser
+import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForNonLoggedInUser
+import com.example.hakonsreader.views.util.MenuClickHandler
 import com.example.hakonsreader.views.util.ViewUtil
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * Adapter for a RecyclerView populated with [RedditComment] objects. This adapter
@@ -401,13 +415,30 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
         loadMoreCommentsListener!!.loadMoreComments(comment, parent)
     }
 
+    /**
+     * OnClick listener for the "more" button on a normal comment. This will show a popup menu with
+     * extra options such as saving the comment, or deleting it
+     */
+    fun moreOnClick(view: View, comment: RedditComment?) {
+        if (comment == null) {
+            return
+        }
+
+        // We could check if privately browsing. Mod/save etc. won't appear anyways, only delete comment
+        // since we only have the user, the API doesn't send back that data since the access token is anonymous
+        if (App.get().isUserLoggedIn) {
+            showPopupForCommentExtraForLoggedInUser(view, comment, this)
+        } else {
+            showPopupForCommentExtraForNonLoggedInUser(view, comment, this)
+        }
+    }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val comment = comments[position]
 
         val highlight = position == 0 && chain.isNotEmpty() // Always highlight first comment in a chain
                 // User wants to highlight new comments, and the comment was added after the last time the post was opened
-                || (App.get().highlightNewComments() && comment.createdAt > lastTimeOpened)
+                || (App.get().highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
 
         when (holder.itemViewType) {
             MORE_COMMENTS_TYPE -> (holder as MoreCommentsViewHolder).bind(comment)

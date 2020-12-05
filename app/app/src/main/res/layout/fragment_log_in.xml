@@ -33,6 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/btnLogIn"
+        style="@style/ButtonStyleSmall"
 
         app:layout_constraintTop_toBottomOf="@id/logInDescription"
         app:layout_constraintBottom_toBottomOf="parent"

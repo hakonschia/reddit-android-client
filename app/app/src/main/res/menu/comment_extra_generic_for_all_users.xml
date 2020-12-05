@@ -2,9 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Menu for comment extras that are common for both comments by the logged
      in user and comments by other users -->
-    <item
-        android:id="@+id/menuSaveOrUnsaveComment"
-        android:title="@string/saveComment"/>
 
     <item
         android:id="@+id/menuShowCommentChain"

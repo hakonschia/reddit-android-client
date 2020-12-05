@@ -185,7 +185,7 @@
 
                 android:foreground="@drawable/ripple_main_bg"
                 android:background="@null"
-                android:onClick="@{(view) -> MenuClickHandler.showPopupForCommentExtra(view, comment, adapter)}"
+                android:onClick="@{(view) -> adapter.moreOnClick(view, comment)}"
                 android:src="@drawable/ic_baseline_more_horiz_24"
 
                 app:layout_constraintEnd_toStartOf="@+id/reply"

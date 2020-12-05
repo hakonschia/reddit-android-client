@@ -1,12 +1,9 @@
 package com.example.hakonsreader.views.util;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 
 import androidx.annotation.IdRes;
 import androidx.fragment.app.Fragment;
@@ -17,12 +14,10 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.PostTimeSort;
 import com.example.hakonsreader.api.interfaces.OnResponse;
-import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.interfaces.SortableWithTime;
 import com.example.hakonsreader.misc.Util;
-import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter;
 import com.google.android.material.snackbar.Snackbar;
 
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
@@ -34,208 +29,6 @@ public class MenuClickHandler {
     private static final String TAG = "MenuClickHandler";
 
     private MenuClickHandler() { }
-
-
-    /**
-     * Shows the popup for comments. Based on the user status, a different popup is shown
-     * (ie. if the logged in user is the comment poster a different popup is shown)
-     *
-     * @param view The view clicked
-     * @param comment The comment the popup is for
-     * @param adapter The RecyclerView adapter the comment is in
-     */
-    public static void showPopupForCommentExtra(View view, RedditComment comment, CommentsAdapter adapter) {
-        // If the menu is clicked before the comment loads, it will be passed as null
-        if (comment == null) {
-            return;
-        }
-        RedditUser user = App.getStoredUser();
-
-        if (!App.get().isUserLoggedInPrivatelyBrowsing() && user != null && user.getUsername().equalsIgnoreCase(comment.getAuthor())) {
-            showPopupForCommentExtraForLoggedInUser(view, comment, adapter);
-        } else {
-            showPopupForCommentExtraForNonLoggedInUser(view, comment, adapter);
-        }
-    }
-
-    /**
-     * Shows the popup for comments for when the comment is posted by the user currently logged in
-     *
-     * <p>See also: {@link MenuClickHandler#showPopupForCommentExtra(View, RedditComment, CommentsAdapter)}</p>
-     *
-     * @param view The view clicked (where the popup will be attached)
-     * @param comment The comment the popup is for
-     * @param adapter The RecyclerView adapter the comment is in
-     */
-    public static void showPopupForCommentExtraForLoggedInUser(View view, RedditComment comment, CommentsAdapter adapter) {
-        PopupMenu menu = new PopupMenu(view.getContext(), view);
-        menu.inflate(R.menu.comment_extra_by_user);
-        menu.inflate(R.menu.comment_extra_generic_for_all_users);
-
-        // Add mod specific if user is a mod in the subreddit the post is in
-        // TODO only top-level comments can be stickied, but any comment can be distinguished
-        if (comment.isUserMod()) {
-            if (comment.getDepth() == 0) {
-                menu.inflate(R.menu.comment_extra_by_user_user_is_mod);
-            } else {
-                menu.inflate(R.menu.comment_extra_by_user_user_is_mod_no_sticky);
-            }
-
-            // Set text to "Undistinguish"
-            if (comment.isMod()) {
-                MenuItem modItem = menu.getMenu().findItem(R.id.menuDistinguishCommentAsMod);
-                modItem.setTitle(R.string.commentRemoveModDistinguish);
-            }
-
-            // Set text to "Remove sticky"
-            if (comment.getDepth() == 0 && comment.isStickied()) {
-                MenuItem modItem = menu.getMenu().findItem(R.id.menuStickyComment);
-                modItem.setTitle(R.string.commentRemoveSticky);
-            }
-        }
-
-        // Default is "Save comment", if comment already is saved, change the text
-        if (comment.isSaved()) {
-            MenuItem savedItem = menu.getMenu().findItem(R.id.menuSaveOrUnsaveComment);
-            savedItem.setTitle(view.getContext().getString(R.string.unsaveComment));
-        }
-
-        RedditApi api = App.get().getApi();
-
-        // This response handler will work for any API call updating the distinguish/sticky status of a comment
-        OnResponse<RedditComment> distinguishAndStickyResponse = response -> {
-            comment.setDistinguished(response.getDistinguished());
-            comment.setStickied(response.isStickied());
-            adapter.notifyItemChanged(comment);
-        };
-
-        menu.setOnMenuItemClickListener(item -> {
-            int itemId = item.getItemId();
-
-            if (itemId == R.id.menuDeleteComment) {
-                // This won't actually return anything valid, so we just assume the comment was deleted
-                // This should update the adapter probably?
-                api.comment(comment.getId()).delete(response -> Snackbar.make(view, R.string.commentDeleted, LENGTH_SHORT).show(), ((error, t) -> {
-                    Util.handleGenericResponseErrors(view, error, t);
-                }));
-                return true;
-            } else if (itemId == R.id.menuSaveOrUnsaveComment) {
-                saveCommentOnClick(view, comment);
-                return true;
-            } else if (itemId == R.id.menuDistinguishCommentAsMod) {
-                if (comment.isMod()) {
-                    api.comment(comment.getId()).removeDistinguishAsMod(distinguishAndStickyResponse, (e, t) -> {
-                        Util.handleGenericResponseErrors(view, e, t);
-                    });
-                } else {
-                    api.comment(comment.getId()).distinguishAsMod(distinguishAndStickyResponse, (e, t) -> {
-                        Util.handleGenericResponseErrors(view, e, t);
-                    });
-                }
-            } else if (itemId == R.id.menuStickyComment) {
-                if (comment.isStickied()) {
-                    api.comment(comment.getId()).removeSticky(distinguishAndStickyResponse, (e, t) -> {
-                        Util.handleGenericResponseErrors(view, e, t);
-                    });
-                } else {
-                    api.comment(comment.getId()).sticky(distinguishAndStickyResponse, (e, t) -> {
-                        Util.handleGenericResponseErrors(view, e, t);
-                    });
-                }
-            }
-
-            return false;
-        });
-
-        menu.show();
-    }
-
-    /**
-     * Shows the popup for comments for when the comment is NOT posted by the user currently logged in
-     *
-     * <p>See also: {@link MenuClickHandler#showPopupForCommentExtra(View, RedditComment, CommentsAdapter)}</p>
-     *
-     * @param view The view clicked (where the popup will be attached)
-     * @param comment The comment the popup is for
-     * @param adapter The RecyclerView adapter the comment is in
-     */
-    public static void showPopupForCommentExtraForNonLoggedInUser(View view, RedditComment comment, CommentsAdapter adapter) {
-        PopupMenu menu = new PopupMenu(view.getContext(), view);
-        menu.inflate(R.menu.comment_extra_generic_for_all_users);
-        menu.inflate(R.menu.comment_extra_not_by_user);
-
-        // Default is "Save comment", if comment already is saved, change the text
-        if (comment.isSaved()) {
-            MenuItem savedItem = menu.getMenu().findItem(R.id.menuSaveOrUnsaveComment);
-            savedItem.setTitle(view.getContext().getString(R.string.unsaveComment));
-        }
-
-        RedditApi api = App.get().getApi();
-
-        menu.setOnMenuItemClickListener(item -> {
-            int itemId = item.getItemId();
-
-            // TODO a lot of copy&paste code for this and showPopupForCommentExtraForLoggedInUser
-            if (itemId == R.id.blockUser) {
-                api.user(comment.getAuthor()).block(ignored -> {
-                    Snackbar.make(view, R.string.userBlocked, LENGTH_SHORT).show();
-                }, (e, t) -> {
-                    Util.handleGenericResponseErrors(view, e, t);
-                });
-                return true;
-            } else if (itemId == R.id.menuSaveOrUnsaveComment) {
-                saveCommentOnClick(view, comment);
-                return true;
-            } else if (itemId == R.id.menuShowCommentChain) {
-                adapter.setCommentIdChain(comment.getId());
-                return true;
-            } else if (itemId == R.id.menuCopyCommentLink) {
-                // The permalink is only the path
-                String url = "https://reddit.com" + comment.getPermalink();
-
-                ClipboardManager clipboard = (ClipboardManager) view.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("Reddit comment link", url);
-                clipboard.setPrimaryClip(clip);
-
-                Toast.makeText(view.getContext(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-
-            return false;
-        });
-
-        menu.show();
-    }
-
-    /**
-     * Convenience method for when "Save comment" or "Unsave comment" has been clicked in a menu.
-     *
-     * <p>Makes an API request to save or unsave the comment based on the current save state</p>
-     *
-     * @param view The view clicked (used to attach the snackbar with potential error messages)
-     * @param comment The comment to save/unsave. This is updated if the request is successful
-     */
-    private static void saveCommentOnClick(View view, RedditComment comment) {
-        RedditApi api = App.get().getApi();
-
-        if (comment.isSaved()) {
-            // Unsave
-            api.comment(comment.getId()).unsave(ignored -> {
-                comment.setSaved(false);
-                Snackbar.make(view, R.string.commentUnsaved, LENGTH_SHORT).show();
-            }, (e, t) -> {
-                Util.handleGenericResponseErrors(view, e, t);
-            });
-        } else {
-            // Save
-            api.comment(comment.getId()).save(ignored -> {
-                comment.setSaved(true);
-                Snackbar.make(view, R.string.commentSaved, LENGTH_SHORT).show();
-            }, (e, t) -> {
-                Util.handleGenericResponseErrors(view, e, t);
-            });
-        }
-    }
 
 
     /**

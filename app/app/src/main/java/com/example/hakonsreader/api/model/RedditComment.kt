@@ -158,7 +158,7 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing {
     var authorRichtextFlairs = ArrayList<RichtextFlair>()
 
     /**
-     * The permalink to the comment (eg. /r/GlobalOffensive/comments/<postID>/<title>/<commentID>)
+     * The permalink to the comment (eg. /r/GlobalOffensive/comments/postID/title/commentID)
      */
     @SerializedName("permalink")
     var permalink = ""
