@@ -8,14 +8,14 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.ModServiceKt
+import com.example.hakonsreader.api.service.ModService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
 
-class ModRequestModelKt(
+class ModRequestModel(
         private val accessToken: AccessToken,
-        private val api: ModServiceKt
+        private val api: ModService
 ) {
 
 

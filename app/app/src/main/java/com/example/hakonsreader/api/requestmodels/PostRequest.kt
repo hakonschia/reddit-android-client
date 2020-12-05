@@ -12,21 +12,21 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.PostServiceKt
+import com.example.hakonsreader.api.service.PostService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
 
-class PostRequestKt(
+class PostRequest(
         private val accessToken: AccessToken,
-        private val api: PostServiceKt,
+        private val api: PostService,
         private val postId: String
 ) : VoteableRequest, ReplyableRequest, SaveableRequestKt {
 
     private val voteRequest: VoteableRequestModel = VoteableRequestModel(accessToken, api)
-    private val replyRequest: ReplyableRequestModelKt = ReplyableRequestModelKt(accessToken, api)
-    private val saveRequest: SaveableRequestModelKt = SaveableRequestModelKt(accessToken, api)
-    private val modRequest: ModRequestModelKt = ModRequestModelKt(accessToken, api)
+    private val replyRequest: ReplyableRequestModel = ReplyableRequestModel(accessToken, api)
+    private val saveRequest: SaveableRequestModel = SaveableRequestModel(accessToken, api)
+    private val modRequest: ModRequestModel = ModRequestModel(accessToken, api)
 
 
     class CommentsResponse(val comments: List<RedditComment>, val post: RedditPost)

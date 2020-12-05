@@ -6,7 +6,6 @@ import android.content.Context
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
-import android.widget.Toast
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditComment
@@ -113,7 +112,7 @@ private fun deleteCommentOnClick(view: View, comment: RedditComment) {
     val api = App.get().api
 
     CoroutineScope(IO).launch {
-        val response = api.commentKt(comment.id).delete()
+        val response = api.comment(comment.id).delete()
         withContext(Main) {
             when (response) {
                 is ApiResponse.Success -> Snackbar.make(view, R.string.commentDeleted, BaseTransientBottomBar.LENGTH_SHORT).show()
@@ -139,9 +138,9 @@ private fun saveCommentOnClick(view: View, comment: RedditComment) {
         val save = !comment.isSaved
 
         val response = if (save) {
-            api.commentKt(comment.id).save()
+            api.comment(comment.id).save()
         } else {
-            api.commentKt(comment.id).unsave()
+            api.comment(comment.id).unsave()
         }
 
         when (response) {
@@ -167,9 +166,9 @@ private fun distinguishAsModOnclick(view: View, comment: RedditComment, adapter:
 
     CoroutineScope(IO).launch {
         val response = if (comment.isMod()) {
-            api.commentKt(comment.id).removeModDistinguish()
+            api.comment(comment.id).removeModDistinguish()
         } else {
-            api.commentKt(comment.id).distinguishAsMod()
+            api.comment(comment.id).distinguishAsMod()
         }
 
         withContext(Main) {
@@ -193,9 +192,9 @@ private fun stickyOnClick(view: View, comment: RedditComment, adapter: CommentsA
 
     CoroutineScope(IO).launch {
         val response = if (comment.isStickied) {
-            api.commentKt(comment.id).unsticky()
+            api.comment(comment.id).unsticky()
         } else {
-            api.commentKt(comment.id).sticky()
+            api.comment(comment.id).sticky()
         }
 
         withContext(Main) {
@@ -214,7 +213,7 @@ private fun blockUserOnClick(view: View, comment: RedditComment) {
     val api = App.get().api
 
     CoroutineScope(IO).launch {
-        when (val response = api.userKt(comment.author).block()) {
+        when (val response = api.user(comment.author).block()) {
             is ApiResponse.Success -> Snackbar.make(view, R.string.userBlocked, BaseTransientBottomBar.LENGTH_SHORT).show()
             is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
         }

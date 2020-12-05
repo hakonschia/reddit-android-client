@@ -308,7 +308,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             val userResponse = if ((isLoggedInUser && !App.get().isUserLoggedInPrivatelyBrowsing) || name == null) {
                 api.userKt().info()
             } else {
-                api.userKt(name).info()
+                api.user(name).info()
             }
 
             withContext(Main) {

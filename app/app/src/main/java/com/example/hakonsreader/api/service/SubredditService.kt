@@ -14,7 +14,7 @@ import retrofit2.http.*
 /**
  * Service interface to make API calls towards a subreddit
  */
-interface SubredditServiceKt {
+interface SubredditService {
 
     /**
      * Retrieve information about a subreddit

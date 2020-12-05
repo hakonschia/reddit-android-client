@@ -129,7 +129,7 @@ class PostsViewModel(
         loadingChange.value = true
         CoroutineScope(IO).launch {
             val resp = if (isUser) {
-                api.userKt(userOrSubredditName).posts(sort, timeSort, after, count)
+                api.user(userOrSubredditName).posts(sort, timeSort, after, count)
             } else {
                 api.subreddit(userOrSubredditName).posts(sort, timeSort, after, count)
             }

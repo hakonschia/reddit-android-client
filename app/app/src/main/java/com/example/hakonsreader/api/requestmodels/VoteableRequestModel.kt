@@ -6,7 +6,7 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.VoteServiceKt
+import com.example.hakonsreader.api.service.VoteService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
@@ -18,7 +18,7 @@ import java.lang.Exception
  */
 internal class VoteableRequestModel(
         private val accessToken: AccessToken,
-        private val api: VoteServiceKt
+        private val api: VoteService
 ) {
 
 

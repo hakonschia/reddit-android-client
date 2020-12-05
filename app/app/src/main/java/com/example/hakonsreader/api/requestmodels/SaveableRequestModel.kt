@@ -5,14 +5,14 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.SaveServiceKt
+import com.example.hakonsreader.api.service.SaveService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
 
-class SaveableRequestModelKt(
+class SaveableRequestModel(
         private val accessToken: AccessToken,
-        private val api: SaveServiceKt
+        private val api: SaveService
 ) {
 
     /**

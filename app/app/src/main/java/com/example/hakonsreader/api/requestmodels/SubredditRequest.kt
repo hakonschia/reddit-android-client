@@ -14,14 +14,14 @@ import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.ImgurService
-import com.example.hakonsreader.api.service.SubredditServiceKt
+import com.example.hakonsreader.api.service.SubredditService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 
 class SubredditRequest(
         private val subredditName: String,
         private val accessToken: AccessToken,
-        private val api: SubredditServiceKt,
+        private val api: SubredditService,
         imgurApi: ImgurService?
 ) {
 

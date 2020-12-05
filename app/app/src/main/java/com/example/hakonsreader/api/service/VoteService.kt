@@ -8,7 +8,7 @@ import retrofit2.http.POST
 /**
  * Service interface for listings that can be voted on
  */
-interface VoteServiceKt {
+interface VoteService {
 
     /**
      * Cast a vote on a something

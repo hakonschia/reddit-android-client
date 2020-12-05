@@ -11,7 +11,7 @@ import retrofit2.http.POST
 /**
  * Interface for making mod related API requests
  */
-interface ModServiceKt {
+interface ModService {
 
     // Comments and posts work a bit differently. If comments are stickied, they MUST also be distinguished as mod
     // Posts can be stickied WITHOUT being distinguished as mod, and they use a different api call to sticky

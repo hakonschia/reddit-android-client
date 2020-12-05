@@ -10,7 +10,7 @@ import retrofit2.http.*
 /**
  * Service interface to make post related API calls towards Reddit
  */
-interface PostServiceKt : VoteServiceKt, ReplyServiceKt, SaveServiceKt, ModServiceKt {
+interface PostService : VoteService, ReplyService, SaveService, ModService {
 
     /**
      * Retrieves comments for a post

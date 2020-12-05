@@ -7,14 +7,14 @@ import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.ReplyServiceKt
+import com.example.hakonsreader.api.service.ReplyService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
 
-class ReplyableRequestModelKt(
+class ReplyableRequestModel(
         private val accessToken: AccessToken,
-        private val api: ReplyServiceKt
+        private val api: ReplyService
 ) {
 
 

@@ -13,7 +13,7 @@ import java.lang.Exception
 /**
  * Request call for API calls related to logged in users
  *
- * @see UserRequestsKt
+ * @see UserRequests
  */
 class UserRequestsLoggedInUserKt(
         private val accessToken: AccessToken,

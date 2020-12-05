@@ -270,9 +270,9 @@ class ReplyActivity : AppCompatActivity() {
 
             CoroutineScope(IO).launch {
                 val response = if (replyingTo is RedditPost) {
-                    api.postKt(id)
+                    api.post(id)
                 } else {
-                    api.commentKt(id)
+                    api.comment(id)
                 }.reply(text)
 
                 when (response) {

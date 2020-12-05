@@ -8,7 +8,7 @@ import retrofit2.http.POST
 /**
  * Service for saving and unsaving posts/comments
  */
-interface SaveServiceKt {
+interface SaveService {
 
 
     /**

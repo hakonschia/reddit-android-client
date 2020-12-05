@@ -44,7 +44,7 @@ class CommentsViewModel : ViewModel() {
         loadingChange.value = true
 
         CoroutineScope(IO).launch {
-            val resp = api.postKt(postId).comments()
+            val resp = api.post(postId).comments()
             loadingChange.postValue(false)
 
             when (resp) {
@@ -65,7 +65,7 @@ class CommentsViewModel : ViewModel() {
         loadingChange.value = true
 
         CoroutineScope(IO).launch {
-            val resp = api.postKt(postId).moreComments(comment.children, parent)
+            val resp = api.post(postId).moreComments(comment.children, parent)
             loadingChange.postValue(false)
 
             when (resp) {

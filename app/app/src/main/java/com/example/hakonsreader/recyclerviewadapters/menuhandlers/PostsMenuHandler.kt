@@ -6,7 +6,6 @@ import android.content.Context
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
-import android.widget.Toast
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
@@ -127,9 +126,9 @@ private fun savePostOnClick(view: View, post: RedditPost) {
     CoroutineScope(IO).launch {
         val save = !post.isSaved
         val response = if (save) {
-            api.postKt(post.id).save()
+            api.post(post.id).save()
         } else {
-            api.postKt(post.id).unsave()
+            api.post(post.id).unsave()
         }
 
         when (response) {
@@ -153,9 +152,9 @@ private fun distinguishAsModOnClick(view: View, post: RedditPost) {
     // TODO this should update the UI (need to notify either PostActivity or the adapter)
     CoroutineScope(IO).launch {
         val response = if (post.isMod()) {
-            api.postKt(post.id).removeModDistinguish()
+            api.post(post.id).removeModDistinguish()
         } else {
-            api.postKt(post.id).distinguishAsMod()
+            api.post(post.id).distinguishAsMod()
         }
 
         when (response) {
@@ -172,9 +171,9 @@ private fun stickyOnClick(view: View, post: RedditPost) {
     // TODO this should update the UI (need to notify either PostActivity or the adapter)
     CoroutineScope(IO).launch {
         val response = if (post.isStickied) {
-            api.postKt(post.id).unsticky()
+            api.post(post.id).unsticky()
         } else {
-            api.postKt(post.id).sticky()
+            api.post(post.id).sticky()
         }
 
         when (response) {
@@ -189,7 +188,7 @@ private fun blockUserOnClick(view: View, post: RedditPost) {
     val api = App.get().api
 
     CoroutineScope(IO).launch {
-        when (val response = api.userKt(post.author).block()) {
+        when (val response = api.user(post.author).block()) {
             is ApiResponse.Success -> Snackbar.make(view, R.string.userBlocked, BaseTransientBottomBar.LENGTH_SHORT).show()
             is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
         }

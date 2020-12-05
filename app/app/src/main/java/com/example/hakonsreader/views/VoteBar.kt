@@ -88,9 +88,9 @@ class VoteBar : FrameLayout {
 
             CoroutineScope(IO).launch {
                 val resp = if (listing is RedditPost) {
-                    api.postKt(id)
+                    api.post(id)
                 } else {
-                    api.commentKt(id)
+                    api.comment(id)
                 }.vote(actualVote)
 
                 when (resp) {

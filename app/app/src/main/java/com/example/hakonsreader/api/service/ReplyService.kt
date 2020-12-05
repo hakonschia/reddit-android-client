@@ -10,7 +10,7 @@ import retrofit2.http.POST
 /**
  * Service interface for listings that can be replied to
  */
-interface ReplyServiceKt {
+interface ReplyService {
 
     /**
      * Submit a new comment to either a post, another comment (reply), or a private message.

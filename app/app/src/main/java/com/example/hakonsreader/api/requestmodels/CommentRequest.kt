@@ -11,21 +11,21 @@ import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.CommentServiceKt
+import com.example.hakonsreader.api.service.CommentService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
 
-class CommentRequestKt(
+class CommentRequest(
         private val accessToken: AccessToken,
-        private val api: CommentServiceKt,
+        private val api: CommentService,
         private val commentId: String
 ) : VoteableRequest, ReplyableRequest, SaveableRequestKt {
 
     private val voteRequest: VoteableRequestModel = VoteableRequestModel(accessToken, api)
-    private val replyRequest: ReplyableRequestModelKt = ReplyableRequestModelKt(accessToken, api)
-    private val saveRequest: SaveableRequestModelKt = SaveableRequestModelKt(accessToken, api)
-    private val modRequest: ModRequestModelKt = ModRequestModelKt(accessToken, api)
+    private val replyRequest: ReplyableRequestModel = ReplyableRequestModel(accessToken, api)
+    private val saveRequest: SaveableRequestModel = SaveableRequestModel(accessToken, api)
+    private val modRequest: ModRequestModel = ModRequestModel(accessToken, api)
 
 
     /**

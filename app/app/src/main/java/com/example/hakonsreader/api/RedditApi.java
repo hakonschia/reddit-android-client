@@ -12,22 +12,17 @@ import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.requestmodels.CommentRequest;
-import com.example.hakonsreader.api.requestmodels.CommentRequestKt;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
-import com.example.hakonsreader.api.requestmodels.PostRequestKt;
 import com.example.hakonsreader.api.requestmodels.SubredditRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequest;
 import com.example.hakonsreader.api.requestmodels.UserRequests;
-import com.example.hakonsreader.api.requestmodels.UserRequestsKt;
 import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUser;
 import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUserKt;
 import com.example.hakonsreader.api.service.CommentService;
-import com.example.hakonsreader.api.service.CommentServiceKt;
 import com.example.hakonsreader.api.service.ImgurService;
-import com.example.hakonsreader.api.service.PostService;
 import com.example.hakonsreader.api.service.OAuthService;
-import com.example.hakonsreader.api.service.PostServiceKt;
-import com.example.hakonsreader.api.service.SubredditServiceKt;
+import com.example.hakonsreader.api.service.PostService;
+import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.service.SubredditsService;
 import com.example.hakonsreader.api.service.UserServiceKt;
 import com.example.hakonsreader.api.service.UserService;
@@ -43,8 +38,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -186,7 +179,7 @@ public class RedditApi {
      * The service object used to communicate with the Reddit API about subreddit related calls,
      * such as getting posts for the subreddit and subscribing
      */
-    private SubredditServiceKt subredditApiKt;
+    private SubredditService subredditApi;
 
     /**
      * The service object used to communicate with the Reddit API about multiple subreddits related calls
@@ -198,14 +191,10 @@ public class RedditApi {
      */
     private PostService postApi;
 
-    private PostServiceKt postApiKt;
-
     /**
      * The service object used to communicate with the Reddit API about comment related calls
      */
     private CommentService commentApi;
-
-    private CommentServiceKt commentApiKt;
 
     /**
      * The service object used to communicate only with the part of the Reddit API
@@ -320,12 +309,10 @@ public class RedditApi {
 
         userApi = apiRetrofit.create(UserService.class);
         userApiKt = apiRetrofit.create(UserServiceKt.class);
-        subredditApiKt = apiRetrofit.create(SubredditServiceKt.class);
+        subredditApi = apiRetrofit.create(SubredditService.class);
         subredditsApi = apiRetrofit.create(SubredditsService.class);
         postApi = apiRetrofit.create(PostService.class);
-        postApiKt = apiRetrofit.create(PostServiceKt.class);
         commentApi = apiRetrofit.create(CommentService.class);
-        commentApiKt = apiRetrofit.create(CommentServiceKt.class);
 
         // For Imgur we don't need any authentication, and adding it would cause issues
         // as adding the access token for Reddit would break things for Imgur, so only add the logger
@@ -705,7 +692,6 @@ public class RedditApi {
     }
     /* --------------- End access token calls --------------- */
 
-
     /**
      * Retrieve a {@link PostRequest} object that can be used to make API calls towards posts
      *
@@ -716,22 +702,15 @@ public class RedditApi {
         return new PostRequest(accessToken, postApi, postId);
     }
 
-    public PostRequestKt postKt(String postId) {
-        return new PostRequestKt(accessToken, postApiKt, postId);
-    }
-
     /**
      * Retrieve a {@link CommentRequest} object that can be used to make API calls towards comments
      *
      * @param commentId The ID of the comment
      * @return An object that can perform various comment related API requests
      */
-    public CommentRequest comment(String commentId) {
-        return new CommentRequest(commentId, accessToken, commentApi);
-    }
 
-    public CommentRequestKt commentKt(String commentId) {
-        return new CommentRequestKt(accessToken, commentApiKt, commentId);
+    public CommentRequest comment(String commentId) {
+        return new CommentRequest(accessToken, commentApi, commentId);
     }
 
     /**
@@ -741,7 +720,7 @@ public class RedditApi {
      * @return An object that can perform various subreddit related API requests
      */
     public SubredditRequest subreddit(String subredditName) {
-        return new SubredditRequest(subredditName, accessToken, subredditApiKt, imgurService);
+        return new SubredditRequest(subredditName, accessToken, subredditApi, imgurService);
     }
 
     /**
@@ -757,25 +736,11 @@ public class RedditApi {
 
     /**
      * Retrieve a {@link UserRequests} object for logged in users only. For non-logged in users
-     * use {@link RedditApi#user(String)}.
      *
      * @return An object that can perform various user related API requests
      */
     public UserRequestsLoggedInUser user() {
         return new UserRequestsLoggedInUser(accessToken, userApi);
-    }
-
-    /**
-     * Retrieve a {@link UserRequests} object that can get handle requests for non-logged in users.
-     * For logged in users use {@link RedditApi#user()}
-     *
-     * @param username the username to to make calls towards. Passing {@code null} to this has
-     *                 the same effect as using {@link RedditApi#user()}.
-     *
-     * @return An object that can perform various user related API requests for non-logged in users
-     */
-    public UserRequests user(@Nonnull String username) {
-        return new UserRequests(userApi, accessToken, username, imgurService);
     }
 
     /**
@@ -786,17 +751,17 @@ public class RedditApi {
      *
      * @return An object that can perform various user related API requests for non-logged in users
      */
-    public UserRequestsKt userKt(@NonNull String username) {
-        return new UserRequestsKt(username, accessToken, userApiKt, imgurService);
+    public UserRequests user(@NonNull String username) {
+        return new UserRequests(username, accessToken, userApiKt, imgurService);
     }
 
     /**
      * Retrieve a Kotlin based request object that offers API calls for logged in users
      *
-     * <p>For logged in users use {@link RedditApi#userKt(String)}</p>
+     * <p>For logged in users use {@link RedditApi#user(String)}</p>
      *
      * @return An object that can perform various user related API requests for logged in users
-     * @see #userKt(String)
+     * @see #user(String)
      */
     public UserRequestsLoggedInUserKt userKt() {
         return new UserRequestsLoggedInUserKt(accessToken, userApiKt);

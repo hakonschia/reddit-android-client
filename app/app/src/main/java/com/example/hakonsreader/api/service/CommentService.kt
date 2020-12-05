@@ -10,7 +10,7 @@ import retrofit2.http.POST
 /**
  * Service interface towards a comment on Reddit
  */
-interface CommentServiceKt : VoteServiceKt, ReplyServiceKt, SaveServiceKt, ModServiceKt {
+interface CommentService : VoteService, ReplyService, SaveService, ModService {
 
 
     /**
