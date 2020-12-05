@@ -21,6 +21,8 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityPostBinding
+import com.example.hakonsreader.interfaces.LoadMoreComments
+import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.example.hakonsreader.viewmodels.CommentsViewModel
@@ -34,7 +36,7 @@ import com.squareup.picasso.Callback
 /**
  * Activity to show a Reddit post with its comments
  */
-class PostActivity : AppCompatActivity() {
+class PostActivity : AppCompatActivity(), OnReplyListener {
 
     companion object {
         /**
@@ -218,8 +220,8 @@ class PostActivity : AppCompatActivity() {
                 // Update the value
                 preferences.edit().putLong(lastTimeOpenedKey, System.currentTimeMillis() / 1000L).apply()
 
-                commentsAdapter?.setLastTimePostOpened(lastTimeOpened)
-                commentsAdapter?.setComments(comments)
+                commentsAdapter?.lastTimeOpened = lastTimeOpened
+                commentsAdapter?.submitList(comments)
 
                 binding?.noComments = comments.isEmpty()
             })
@@ -236,19 +238,19 @@ class PostActivity : AppCompatActivity() {
      */
     private fun setupCommentsList() {
         commentsLayoutManager = LinearLayoutManager(this)
-        commentsAdapter = CommentsAdapter(post)
+        commentsAdapter = CommentsAdapter(post!!)
         commentsAdapter?.let {
-            it.setOnReplyListener(this::replyTo)
-            it.setCommentIdChain(intent.extras?.getString(COMMENT_ID_CHAIN, ""))
-            it.setLoadMoreCommentsListener { comment, parent -> commentsViewModel?.loadMoreComments(comment, parent) }
-            it.setOnChainShown { binding?.commentChainShown = true }
+            it.replyListener = this
+            it.commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
+            it.loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel?.loadMoreComments(comment, parent) }
+            it.onChainShown = Runnable { binding?.commentChainShown = true }
         }
 
         binding?.let { bind ->
             bind.comments.adapter = commentsAdapter
             bind.comments.layoutManager = commentsLayoutManager
             bind.showAllComments.setOnClickListener {
-                commentsAdapter?.setCommentIdChain("")
+                commentsAdapter?.commentIdChain = ""
                 bind.commentChainShown = false
             }
         }
@@ -447,7 +449,7 @@ class PostActivity : AppCompatActivity() {
      *
      * @param listing The listing to reply to
      */
-    private fun replyTo(listing: ReplyableListing) {
+    override fun replyTo(listing: ReplyableListing) {
         replyingTo = listing
 
         val intent = Intent(this, ReplyActivity::class.java)

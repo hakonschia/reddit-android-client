@@ -158,20 +158,20 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
     var distinguished: String? = null
 
     /**
-     * @return True if the comment is made by, and distinguished as, a moderator
+     * @return True if the post is made by, and distinguished as, a moderator
      * @see distinguished
      */
     fun isMod() : Boolean = distinguished == "moderator"
 
     /**
-     * @return True if the comment is made by, and distinguished as, an admin (Reddit employee)
+     * @return True if the post is made by, and distinguished as, an admin (Reddit employee)
      * @see distinguished
      */
     fun isAdmin() : Boolean = distinguished == "admin"
 
 
     /**
-     * The domain the post is posted in (eg. "imgur.com")
+     * The domain the post is posted in (eg. "imgur.com" or "self.GlobalOffensive")
      */
     @SerializedName("domain")
     var domain = ""

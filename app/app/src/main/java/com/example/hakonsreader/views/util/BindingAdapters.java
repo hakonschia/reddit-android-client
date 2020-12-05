@@ -4,10 +4,14 @@ import android.widget.TextView;
 
 import androidx.databinding.BindingAdapter;
 
+import com.example.hakonsreader.App;
+import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
 
 import java.time.Duration;
 import java.time.Instant;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -53,4 +57,25 @@ public class BindingAdapters {
         }
     }
 
+
+    /**
+     * Sets a TextView with markdown text.
+     *
+     * <p>The markdown will be adjusted with {@link App#getAdjuster()}</p>
+     *
+     * <p>The TextView will have its movement method set to {@link InternalLinkMovementMethod}</p>
+     *
+     * @param textView The TextView to add the markdown to
+     * @param markdown The markdown text
+     */
+    @BindingAdapter("markdown")
+    public static void setMarkdown(TextView textView, @Nullable String markdown) {
+        if (markdown == null) {
+            return;
+        }
+
+        textView.setMovementMethod(InternalLinkMovementMethod.getInstance(textView.getContext()));
+        markdown = App.get().getAdjuster().adjust(markdown);
+        App.get().getMark().setMarkdown(textView, markdown);
+    }
 }

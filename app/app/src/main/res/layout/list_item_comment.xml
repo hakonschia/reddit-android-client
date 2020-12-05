@@ -167,7 +167,7 @@
                 android:textColor="@color/text_color"
                 android:textColorLink="@color/link_color"
 
-                app:commentMarkdown="@{comment.body}"
+                app:markdown="@{comment.body}"
 
                 app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toEndOf="parent"
