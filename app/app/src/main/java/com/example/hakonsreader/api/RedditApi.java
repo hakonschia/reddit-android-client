@@ -11,6 +11,7 @@ import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.responses.ApiResponse;
 import com.example.hakonsreader.api.requestmodels.CommentRequest;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditRequest;
@@ -64,10 +65,10 @@ import retrofit2.internal.EverythingIsNonNull;
  * <p>Example usage of the builder:
  * <pre>{@code
  * // User-Agent and client ID must always be set and cannot be empty
- * String userAgent = "User-Agent for your application";
- * String clientId = "client ID for your application";
+ * val userAgent = "User-Agent for your application";
+ * val clientId = "client ID for your application";
  *
- * RedditApi api = new RedditApi.Builder(userAgent, clientId)
+ * val api = RedditApi.Builder(userAgent, clientId)
  *         // Set the initial access token to use (when the application has previously saved one)
  *         .accessToken(savedAccessToken)
  *         // Register the callback for when new access tokens have been retrieved
@@ -78,43 +79,57 @@ import retrofit2.internal.EverythingIsNonNull;
  * </p>
  * <br>
  *
+ * <p>API endpoints are grouped together based on functionality, and are exposed through request models.
+ * The request models are returned from functions in this class, such as {@link #subreddit(String)} returning
+ * a {@link SubredditRequest} object.</p>
  *
- * <p>The class exposes request objects through functions that return these models (such as
- * {@link RedditApi#subreddit(String)} returning a {@link SubredditRequest} object). These request objects expose API
- * endpoints that are grouped together based on their functionality.</p>
+ * <p>The API endpoints are suspended using Kotlin coroutines to make the network requests. The functions
+ * will return a {@link ApiResponse}. This class is a wrapper for either a {@link ApiResponse.Success} or
+ * {@link ApiResponse.Error}. On successful requests, {@link ApiResponse.Success} will be populated with
+ * with the response data, otherwise {@link ApiResponse.Error} will be populated with a {@link GenericError}
+ * and a {@link Throwable}. The error code in {@link GenericError} will be the HTTP error code, or if
+ * another type of error occurred this will be -1 and the throwable will hold the information needed to debug the issue.</p>
  *
- * <p>The endpoints exposed handle responses back with the use of callback methods. There will be generally be
- * two callbacks for each endpoint; one for successful responses ({@link OnResponse}) and one for failed responses
- * ({@link OnFailure}). If the API endpoint returns multiple values that are of different types (such as
- * {@link PostRequest#comments(OnResponse, OnResponse, OnFailure)}) there will be multiple {@link OnResponse} callbacks.
- * The {@link OnFailure} includes a {@link GenericError} and a {@link Throwable} with error information.
- * The error code in {@link GenericError} will be the HTTP error code, or if another type of error occurred this will be -1
- * and the throwable will hold the information needed to debug the issue.</p>
  *
  * <p>Usage example:
  *
  * <pre>{@code
  * // Build object with RedditApi.Builder
- * RedditApi api = ...
+ * val api = RedditApi.Builder()...
  *
  * // Retrieve information about the "GlobalOffensive" subreddit
- * api.subreddit("GlobalOffensive").info(subreddit -> {
- *     String subredditName = subreddit.getName();
- *     int subscribers = subreddit.getSubscribers();
- * }, (error, throwable) -> {
- *      int errorCode = error.getCode();
- *      throwable.printStackTrace();
- * });
+ * // The response for this is ApiResponse<Subreddit>
+ * CoroutineScope(IO).launch {
+ *     val response = api.subreddit("GlobalOffensive").info()
  *
- * api.subreddit("Norge").subscribe(true, response -> {
- *     // Some endpoints won't have a return value (they take a callback of OnResponse<Void>)
- *     // For these endpoints these callbacks are still called to indicate that the response was
- *     // successful, but will not have any data so "response" is never used
- * }, (error, throwable) -> {
- *     // This is still called as normal
- *     int errorCode = error.getCode();
- *     throwable.printStackTrace();
- * });
+ *      when (response) {
+ *          is ApiResponse.Success -> {
+ *              val subredditName = subreddit.name
+ *              val subscribers = subreddit.subscribers
+ *          }
+ *          is ApiResponse.Error {
+ *              val errorCode = response.error.code
+ *              responses.throwable.printStackTrace()
+ *          }
+ *      }
+ * }
+ *
+ * // Subscribe to the subreddit "Norge"
+ * CoroutineScope(IO).launch {
+ *     val response = api.subreddit("Norge").subscribe(subscribe = true)
+ *
+ *     when (response) {
+ *         is ApiResponse.Success -> {
+ *             // Some endpoints won't have a return value (they return ApiResponse<Any?>)
+ *             // For these endpoints "response" will still be "ApiResponse.Success", but
+ *             // "response.value" will be null
+ *             val isNull = response.value == null // true
+ *         }
+ *         is ApiResponse.Error -> {
+ *              val errorCode = response.error.code
+ *              responses.throwable.printStackTrace()
+ *         }
+ *     }
  * }
  * </pre>
  * </p>
@@ -316,7 +331,6 @@ public class RedditApi {
 
         // For Imgur we don't need any authentication, and adding it would cause issues
         // as adding the access token for Reddit would break things for Imgur, so only add the logger
-
         if (imgurClientId != null && !imgurClientId.isEmpty()) {
             OkHttpClient imgurClient = new OkHttpClient.Builder()
                     .addInterceptor(chain -> {
