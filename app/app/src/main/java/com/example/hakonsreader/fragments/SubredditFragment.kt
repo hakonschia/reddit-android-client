@@ -323,7 +323,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * when scrolling, and an onClickListener is set to the fab to open a [SubmitActivity]
      */
     private fun setupSubmitPostFab() {
-        if (RedditApi.STANDARD_SUBS.contains(getSubredditName()?.toLowerCase())) {
+        if (!RedditApi.STANDARD_SUBS.contains(getSubredditName()?.toLowerCase())) {
             binding?.let {
                 it.posts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
