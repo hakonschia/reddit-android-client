@@ -23,6 +23,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.VideoActivity;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditVideo;
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.ContentVideoBinding;
 import com.example.hakonsreader.enums.ShowNsfwPreview;
@@ -592,9 +593,16 @@ public class ContentVideo extends Content {
 
     /**
      * Called when the video has been selected. If the user has enabled auto play the video will start playing
+     *
+     * If the users setting allows for autoplay then it is autoplayed, if the video is marked as a
+     * spoiler it will never play, if marked as NSFW it will only play if the user has allowed NSFW autoplay
      */
     @Override
     public void viewSelected() {
+        if (redditPost.isSpoiler()) {
+            return;
+        }
+
         if (redditPost.isNsfw()) {
             if (App.get().autoPlayNsfwVideos()) {
                 setPlayback(true);
