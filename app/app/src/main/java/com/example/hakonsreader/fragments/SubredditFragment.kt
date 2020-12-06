@@ -219,7 +219,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      *
      * @see restoreState
      */
-    public fun saveState(saveState: Bundle) {
+    fun saveState(saveState: Bundle) {
+        // If no items in the list it's no point in saving any state (as it would potentially cause issues)
+        if (postsAdapter?.itemCount == 0) {
+            return
+        }
         postsViewModel?.let { saveState.putStringArrayList(saveKey(POST_IDS_KEY), it.postIds as java.util.ArrayList<String>) }
         postsLayoutManager?.let { saveState.putParcelable(saveKey(LAYOUT_STATE_KEY), it.onSaveInstanceState()) }
     }
@@ -232,12 +236,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      *
      * @see saveState
      */
-    public fun restoreState(state: Bundle?) {
-        if (state != null) {
-            // Might be asking for trouble by doing overriding saveState like this? This function
-            // is meant to only be called when there is no saved state by the fragment
-            saveState = state
-        }
+    fun restoreState(state: Bundle?) {
+        // Might be asking for trouble by doing overriding saveState like this? This function
+        // is meant to only be called when there is no saved state by the fragment
+        saveState = state
     }
 
 
@@ -368,7 +370,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             val previousSize = postsAdapter?.itemCount
             postsAdapter?.submitList(posts)
 
-            if (saveState != null && previousSize != 0) {
+            if (saveState != null && previousSize == 0) {
                 val layoutState: Parcelable? = saveState?.getParcelable(saveKey(LAYOUT_STATE_KEY))
                 if (layoutState != null) {
                     postsLayoutManager?.onRestoreInstanceState(layoutState)

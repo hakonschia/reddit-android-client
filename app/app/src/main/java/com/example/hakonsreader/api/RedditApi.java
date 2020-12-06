@@ -86,9 +86,10 @@ import retrofit2.internal.EverythingIsNonNull;
  * <p>The API endpoints are suspended using Kotlin coroutines to make the network requests. The functions
  * will return a {@link ApiResponse}. This class is a wrapper for either a {@link ApiResponse.Success} or
  * {@link ApiResponse.Error}. On successful requests, {@link ApiResponse.Success} will be populated with
- * with the response data, otherwise {@link ApiResponse.Error} will be populated with a {@link GenericError}
- * and a {@link Throwable}. The error code in {@link GenericError} will be the HTTP error code, or if
- * another type of error occurred this will be -1 and the throwable will hold the information needed to debug the issue.</p>
+ * with the response data, retrieved with {@link ApiResponse.Success#getValue()}, otherwise
+ * {@link ApiResponse.Error} will be populated with a {@link GenericError} and a {@link Throwable}.
+ * The error code in {@link GenericError} will be the HTTP error code, or if another type of error occurred
+ * this will be -1 and the throwable will hold the information needed to debug the issue.</p>
  *
  *
  * <p>Usage example:
@@ -102,16 +103,17 @@ import retrofit2.internal.EverythingIsNonNull;
  * CoroutineScope(IO).launch {
  *     val response = api.subreddit("GlobalOffensive").info()
  *
- *      when (response) {
- *          is ApiResponse.Success -> {
- *              val subredditName = subreddit.name
- *              val subscribers = subreddit.subscribers
- *          }
- *          is ApiResponse.Error {
- *              val errorCode = response.error.code
- *              responses.throwable.printStackTrace()
- *          }
- *      }
+ *     when (response) {
+ *         is ApiResponse.Success -> {
+ *             val subreddit = response.value
+ *             val subredditName = subreddit.name
+ *             val subscribers = subreddit.subscribers
+ *         }
+ *         is ApiResponse.Error {
+ *             val errorCode = response.error.code
+ *             responses.throwable.printStackTrace()
+ *         }
+ *     }
  * }
  *
  * // Subscribe to the subreddit "Norge"
@@ -131,7 +133,6 @@ import retrofit2.internal.EverythingIsNonNull;
  *         }
  *     }
  * }
- * </pre>
  * </p>
  */
 public class RedditApi {
