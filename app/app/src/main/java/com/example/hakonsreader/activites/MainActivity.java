@@ -1,11 +1,14 @@
 package com.example.hakonsreader.activites;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,8 +19,11 @@ import androidx.preference.PreferenceManager;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.RedditApi;
+import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.constants.NetworkConstants;
+import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import com.example.hakonsreader.databinding.ActivityMainBinding;
+import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
@@ -25,9 +31,16 @@ import com.example.hakonsreader.fragments.SelectSubredditFragmentK;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
+import com.example.hakonsreader.misc.SharedPreferencesManager;
+import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 
@@ -75,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        checkAccessTokenScopes();
 
         // For testing purposes hardcode going into a subreddit/post etc.
         Intent intent = new Intent(this, DispatcherActivity.class);
@@ -230,6 +245,42 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 .replace(R.id.fragmentContainer, activeSubreddit)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
+    }
+
+    /**
+     * Checks the scopes of the access token stored in the application against {@link NetworkConstants#SCOPE}
+     * to see if scopes have been added since the access token was retrieved
+     */
+    private void checkAccessTokenScopes() {
+        AccessToken token = TokenManager.getToken();
+        // No token, or token for a non-logged in user
+        if (token == null || token.getRefreshToken() == null) {
+            return;
+        }
+
+        // TODO this should only be shown once (probably?) Can store the list checked in sharedpreferences, if the list matches
+        //  requiredScopesAsArray then we can return since it has already been by the user
+
+        String[] requiredScopesAsArray = NetworkConstants.SCOPE.split(" ");
+        List<String> storedScopesAsArray =  Arrays.asList(token.getScopes());
+
+        ArrayList<String> missingScopes = new ArrayList<>();
+
+        for (String scope : requiredScopesAsArray) {
+            if (!storedScopesAsArray.contains(scope)) {
+                missingScopes.add(scope);
+            }
+        }
+
+        if (!missingScopes.isEmpty()) {
+            OAuthScopeAdapter adapter = new OAuthScopeAdapter(this, R.layout.list_item_oauth_explanation, missingScopes);
+            View view = getLayoutInflater().inflate(R.layout.new_permissions_title, binding.parentLayout, false);
+
+            new AlertDialog.Builder(this)
+                    .setCustomTitle(view)
+                    .setAdapter(adapter, null)
+                    .show();
+        }
     }
 
     /**

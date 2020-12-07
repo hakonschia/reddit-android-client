@@ -23,7 +23,7 @@ import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
 import com.example.hakonsreader.databinding.SubmissionLinkBinding
 import com.example.hakonsreader.databinding.SubmissionTextBinding
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
-import com.example.hakonsreader.recyclerviewadapters.SubmissionFlairAdapter
+import com.example.hakonsreader.dialogadapters.SubmissionFlairAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO

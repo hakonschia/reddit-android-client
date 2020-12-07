@@ -88,6 +88,7 @@ public class MenuClickHandler {
      * Shows a popup of the applications OAuth privileges
      */
     private static void showApplicationPrivileges(Context context) {
+        // TODO use OAuthScopeAdapter
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_oauth_explanations);
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

@@ -286,6 +286,32 @@
             app:layout_constraintStart_toEndOf="@+id/flair"
             app:layout_constraintTop_toTopOf="@+id/flair" />
 
+
+        <TextView
+            android:id="@+id/privatemessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="privatemessages - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/flairExplanation" />
+
+        <TextView
+            android:id="@+id/privatemessageExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationPrivatemessage"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/privatemessage"
+            app:layout_constraintTop_toTopOf="@+id/privatemessage" />
+
+
         <TextView
             android:id="@+id/modposts"
             android:layout_width="wrap_content"
@@ -296,7 +322,7 @@
             android:textColor="@color/text_color"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/identity"
-            app:layout_constraintTop_toBottomOf="@+id/flairExplanation" />
+            app:layout_constraintTop_toBottomOf="@+id/privatemessageExplanation" />
 
         <TextView
             android:id="@+id/modpostsExplanation"

@@ -232,4 +232,7 @@
     <string name="oauthScopeExplanationModposts">Tillater applikasjonen å utføre visse moderator oppgaver, som å vise poster og kommentarer som moderator</string>
     <string name="menuShowApplicationAccessExplanations">Applikasjonsprivilegier</string>
     <string name="oauthRevokeApplicationAccess">For å oppheve applikasjonens tilgang til kontoen din, gå til: https://www.reddit.com/prefs/apps/</string>
+    <string name="newPermissionsRequiredHeader">Ny tilgang kreves</string>
+    <string name="newPermissionsRequiredContent">Vennligst logg inn og ut igjen for å forsikre at applikasjonen virker som forventet.\n\nEn liste med de nye tillatelsene er gitt under.</string>
+    <string name="oauthScopeExplanationPrivatemessage">Tillater applikasjonen å lese meldingene i innboksen din</string>
 </resources>

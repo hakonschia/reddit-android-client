@@ -1,4 +1,4 @@
-package com.example.hakonsreader.recyclerviewadapters
+package com.example.hakonsreader.dialogadapters
 
 import android.content.Context
 import android.util.Log
@@ -61,7 +61,6 @@ class SubmissionFlairAdapter(
     }
 
     private fun getCustomView(position: Int, viewGroup: ViewGroup) : View {
-        Log.d(TAG, "getCustomView: $position")
         val view = LayoutInflater.from(context).inflate(R.layout.spinner_submission_flair_view, viewGroup, false)
         val submissionFlair = flairs[position]
 
