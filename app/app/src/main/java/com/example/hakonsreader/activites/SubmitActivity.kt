@@ -142,7 +142,10 @@ class SubmitActivity : AppCompatActivity() {
                 }
                 // Not sure what makes sense to do on these errors, if flairs are required then
                 // it matters, if not then it's not critical if it fails
-                is ApiResponse.Error -> {}
+                is ApiResponse.Error -> {
+                    // If the sub doesn't allow flairs, a 403 is returned
+                    binding.submissionFlairLoadingIcon.visibility = GONE
+                }
             }
         }
     }

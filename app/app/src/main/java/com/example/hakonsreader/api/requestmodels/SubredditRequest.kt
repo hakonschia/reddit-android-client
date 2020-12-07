@@ -388,6 +388,8 @@ class SubredditRequest(
      * Gets the submission flairs for the subreddit
      *
      * OAuth scope required: *flair*
+     *
+     * If the subreddit doesn't allow submission flairs, a 403 Forbidden error is returned
      */
     suspend fun submissionFlairs() : ApiResponse<List<SubmissionFlair>> {
         try {
