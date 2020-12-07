@@ -198,6 +198,8 @@ class SubredditRequest(
      * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
      * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
+     * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
+     * retrieved with [SubmissionFlair.id]. Default is an empty string (ie. no flair)
      *
      * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
@@ -207,7 +209,9 @@ class SubredditRequest(
 
             nsfw: Boolean = false,
             spoiler: Boolean = false,
-            receiveNotifications: Boolean = true
+            receiveNotifications: Boolean = true,
+
+            flairId: String = ""
     ) : ApiResponse<Submission> {
         val submissionError = verifyGenericSubmission(title)
         if (submissionError != null) {
@@ -215,7 +219,16 @@ class SubredditRequest(
         }
 
         return try {
-            val resp = api.submit(subredditName, kind = "self", title = title, text = text, nsfw = nsfw, spoiler = spoiler, sendNotifications = receiveNotifications)
+            val resp = api.submit(
+                    subredditName,
+                    kind = "self",
+                    title = title,
+                    text = text,
+                    nsfw = nsfw,
+                    spoiler = spoiler,
+                    sendNotifications = receiveNotifications,
+                    flairId = flairId
+            )
             val body = resp.body()?.getListings()?.get(0)
 
             if (body != null) {
@@ -239,6 +252,8 @@ class SubredditRequest(
      * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
      * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
+     * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
+     * retrieved with [SubmissionFlair.id]. Default is an empty string (ie. no flair)
      *
      * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
@@ -248,7 +263,9 @@ class SubredditRequest(
 
             nsfw: Boolean = false,
             spoiler: Boolean = false,
-            receiveNotifications: Boolean = true
+            receiveNotifications: Boolean = true,
+
+            flairId: String = ""
     ) : ApiResponse<Submission> {
         val submissionError = verifyGenericSubmission(title)
         if (submissionError != null) {
@@ -258,7 +275,16 @@ class SubredditRequest(
         val linkSpaceConverted = link.replace(" ", "%20")
 
         return try {
-            val resp = api.submit(subredditName, kind = "link", title = title, link = linkSpaceConverted, nsfw = nsfw, spoiler = spoiler, sendNotifications = receiveNotifications)
+            val resp = api.submit(
+                    subredditName,
+                    kind = "link",
+                    title = title,
+                    link = linkSpaceConverted,
+                    nsfw = nsfw,
+                    spoiler = spoiler,
+                    sendNotifications = receiveNotifications,
+                    flairId = flairId
+            )
             val body = resp.body()?.getListings()?.get(0)
 
             if (body != null) {
@@ -281,6 +307,8 @@ class SubredditRequest(
      * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
      * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
+     * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
+     * retrieved with [SubmissionFlair.id]. Default is an empty string (ie. no flair)
      *
      * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
@@ -290,7 +318,9 @@ class SubredditRequest(
 
             nsfw: Boolean = false,
             spoiler: Boolean = false,
-            receiveNotifications: Boolean = true
+            receiveNotifications: Boolean = true,
+
+            flairId: String = ""
     ) : ApiResponse<Submission> {
         val submissionError = verifyGenericSubmission(title)
         if (submissionError != null) {
@@ -305,7 +335,16 @@ class SubredditRequest(
         val fullname = Util.createFullName(Thing.POST, crosspostId)
 
         return try {
-            val resp = api.submit(subredditName, kind = "crosspost", title = title, crosspostFullname = fullname, nsfw = nsfw, spoiler = spoiler, sendNotifications = receiveNotifications)
+            val resp = api.submit(
+                    subredditName,
+                    kind = "crosspost",
+                    title = title,
+                    crosspostFullname =
+                    fullname, nsfw = nsfw,
+                    spoiler = spoiler,
+                    sendNotifications = receiveNotifications,
+                    flairId = flairId
+            )
             val body = resp.body()?.getListings()?.get(0)
 
             if (body != null) {

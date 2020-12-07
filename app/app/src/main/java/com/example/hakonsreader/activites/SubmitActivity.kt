@@ -14,6 +14,7 @@ import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
+import com.example.hakonsreader.api.model.flairs.SubmissionFlair
 import com.example.hakonsreader.api.persistence.AppDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.ActivitySubmitBinding
@@ -48,6 +49,7 @@ class SubmitActivity : AppCompatActivity() {
     private lateinit var binding:  ActivitySubmitBinding
     private lateinit var subreddit: Subreddit
     private val submissionFragments = ArrayList<Fragment>()
+    private var submissionFlairs = ArrayList<SubmissionFlair>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,10 +128,9 @@ class SubmitActivity : AppCompatActivity() {
 
     private fun getSubmissionFlairs(subredditName: String) {
         CoroutineScope(IO).launch {
-            val response = api.subreddit(subredditName).submissionFlairs()
-
-            when (response) {
+            when (val response = api.subreddit(subredditName).submissionFlairs()) {
                 is ApiResponse.Success -> {
+                    submissionFlairs = response.value as ArrayList<SubmissionFlair>
                     val text = ArrayList<String>()
                     // Kind of bad way to do it? We want the first item to be an "unselected" instead of
                     // the first in the actual list of flairs
@@ -191,7 +192,8 @@ class SubmitActivity : AppCompatActivity() {
                     text,
                     nsfw,
                     spoiler,
-                    receiveNotifications
+                    receiveNotifications,
+                    flairId =  getFlairId()
             )
         }
     }
@@ -218,7 +220,8 @@ class SubmitActivity : AppCompatActivity() {
                     fragment.getLink(),
                     nsfw,
                     spoiler,
-                    receiveNotifications
+                    receiveNotifications,
+                    flairId =  getFlairId()
             )
         }
 
@@ -246,11 +249,25 @@ class SubmitActivity : AppCompatActivity() {
                     id,
                     nsfw,
                     spoiler,
-                    receiveNotifications
+                    receiveNotifications,
+                    flairId =  getFlairId()
             )
         }
     }
 
+    /**
+     * @return The ID of the flair selected, or an empty string if no item is selected
+     */
+    private fun getFlairId() : String {
+        val selectedItem = binding.flairSpinner.selectedItemPosition
+        // The first item will be the "Select flair" ie. no item selected
+        return if (selectedItem == 0) {
+            ""
+        } else {
+            // The actual list of flairs doesn't include the first "Select flair" item
+            submissionFlairs[selectedItem - 1].id
+        }
+    }
 
 
 

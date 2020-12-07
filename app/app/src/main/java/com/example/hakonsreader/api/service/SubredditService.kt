@@ -118,6 +118,8 @@ interface SubredditService {
             @Field("sendreplies") sendNotifications: Boolean = true,
             @Field("resubmit") resubmit: Boolean = true,
 
+            @Field("flair_id") flairId: String = "",
+
             @Field("api_type") apiType: String = "json",
             @Field("raw_json") rawJson: Int = 1
     ) : Response<JsonResponse<Submission>>
