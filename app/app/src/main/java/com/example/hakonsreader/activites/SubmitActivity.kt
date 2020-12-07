@@ -132,19 +132,20 @@ class SubmitActivity : AppCompatActivity() {
      * Calls the API to get the submission flairs for this subreddit
      */
     private fun getSubmissionFlairs(subredditName: String) {
+        binding.submissionFlairLoadingIcon.visibility = VISIBLE
         CoroutineScope(IO).launch {
-            binding.submissionFlairLoadingIcon.visibility = VISIBLE
-            when (val response = api.subreddit(subredditName).submissionFlairs()) {
-                is ApiResponse.Success -> {
-                    withContext(Main) {
+            val response = api.subreddit(subredditName).submissionFlairs()
+            withContext(Main) {
+                when (response) {
+                    is ApiResponse.Success -> {
                         onSubmissionFlairResponse(response.value)
                     }
-                }
-                // Not sure what makes sense to do on these errors, if flairs are required then
-                // it matters, if not then it's not critical if it fails
-                is ApiResponse.Error -> {
-                    // If the sub doesn't allow flairs, a 403 is returned
-                    binding.submissionFlairLoadingIcon.visibility = GONE
+                    // Not sure what makes sense to do on these errors, if flairs are required then
+                    // it matters, if not then it's not critical if it fails
+                    is ApiResponse.Error -> {
+                        // If the sub doesn't allow flairs, a 403 is returned
+                        binding.submissionFlairLoadingIcon.visibility = GONE
+                    }
                 }
             }
         }
