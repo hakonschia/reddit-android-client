@@ -220,6 +220,7 @@
     <string name="submittingTextHint">Text</string>
     <string name="submittingLinkHint">Link</string>
     <string name="submitPostBtn">Submit post</string>
+    <string name="submitFlairSpinner">Select flair</string>
 
     <string name="submittingCrosspostTitle">Crosspost</string>
     <string name="submittingCrosspostHint">ID of post to crosspost</string>
@@ -242,7 +243,7 @@
     <string name="markdownSuperscript" translatable="false">A<sup>B</sup></string>
     <string name="markdownSpoiler" translatable="false">\?</string>
     <string name="markdownInlineCode" translatable="false">&lt;/&gt;</string>
-    <string name="markdownCodeBlock" translatable="false">if ()</string>
+    <string name="markdownCodeBlock" translatable="false">if</string>
 
     <string name="content_description_markdown_btn_bold">Bold text</string>
     <string name="content_description_markdown_btn_italic">Italic text</string>

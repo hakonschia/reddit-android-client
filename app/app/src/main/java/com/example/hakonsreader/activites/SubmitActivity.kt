@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -14,6 +15,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.persistence.AppDatabase
+import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.ActivitySubmitBinding
 import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
 import com.example.hakonsreader.databinding.SubmissionLinkBinding
@@ -62,6 +64,7 @@ class SubmitActivity : AppCompatActivity() {
         // We need information about the subreddit, try to get it from the local database and if it doesn't exist, get it from
         // the api
         getSubredditInfo(subredditName)
+        getSubmissionFlairs(subredditName)
 
         binding.subredditName = subredditName
 
@@ -117,6 +120,30 @@ class SubmitActivity : AppCompatActivity() {
                 }
             }  else {
                 // TODO Get from API
+            }
+        }
+    }
+
+    private fun getSubmissionFlairs(subredditName: String) {
+        CoroutineScope(IO).launch {
+            val response = api.subreddit(subredditName).submissionFlairs()
+
+            when (response) {
+                is ApiResponse.Success -> {
+                    val text = ArrayList<String>()
+                    // Kind of bad way to do it? We want the first item to be an "unselected" instead of
+                    // the first in the actual list of flairs
+                    text.add(getString(R.string.submitFlairSpinner))
+                    response.value.forEach {
+                        text.add(it.text)
+                    }
+
+                    val adapter = ArrayAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, text)
+                    withContext(Main) {
+                        binding.flairSpinner.adapter = adapter
+                    }
+                }
+                is ApiResponse.Error -> {}
             }
         }
     }

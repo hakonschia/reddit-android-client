@@ -11,6 +11,7 @@ import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Submission
 import com.example.hakonsreader.api.model.Subreddit
+import com.example.hakonsreader.api.model.flairs.SubmissionFlair
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.ImgurService
@@ -342,5 +343,31 @@ class SubredditRequest(
         }
 
         return null
+    }
+
+    /**
+     * Gets the submission flairs for the subreddit
+     *
+     * OAuth scope required: *flair*
+     */
+    suspend fun submissionFlairs() : ApiResponse<List<SubmissionFlair>> {
+        try {
+            Util.verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Retrieving submission flairs requires a valid access token for a logged in user", e))
+        }
+
+        return try {
+            val response = api.getLinkFlairs(subredditName)
+            val flairs = response.body()
+
+            if (flairs != null) {
+                ApiResponse.Success(flairs)
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
     }
 }

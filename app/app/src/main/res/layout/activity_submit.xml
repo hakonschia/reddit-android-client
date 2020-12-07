@@ -102,7 +102,6 @@
                 android:layout_marginStart="8dp"
                 android:text="@string/submittingNSFW"
                 app:layout_constraintStart_toStartOf="parent"
-                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
             <CheckBox
@@ -110,7 +109,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/submittingSpoiler"
-                android:visibility="gone"
                 app:layout_constraintStart_toEndOf="@+id/nsfw"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
@@ -120,10 +118,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/submittingReceiveNotifications"
                 android:checked="true"
-                android:visibility="gone"
                 app:layout_constraintStart_toEndOf="@+id/spoiler"
                 app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
 
+            <Spinner
+                android:id="@+id/flairSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:prompt="@string/submitFlairSpinner"
+                app:layout_constraintStart_toStartOf="@+id/nsfw"
+                app:layout_constraintTop_toBottomOf="@+id/nsfw" />
 
             <!-- TODO when there is text being edited this should scroll to the top or something
              so the text input fields are actually visible-->
@@ -134,16 +138,16 @@
 
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+
                 android:layout_marginEnd="8dp"
-
-                app:tabIndicatorColor="@color/colorAccent"
-                app:tabSelectedTextColor="@color/colorAccent"
-
                 app:layout_constraintBottom_toTopOf="@+id/submitPost"
+
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/nsfw"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toBottomOf="@+id/flairSpinner"
+                app:layout_constraintVertical_bias="0.0"
+                app:tabIndicatorColor="@color/colorAccent"
+                app:tabSelectedTextColor="@color/colorAccent" />
 
             <!-- Apparently dynamic height on ViewPagers doesn't work in a ScrollView ¯\_(ツ)_/¯-->
             <androidx.viewpager.widget.ViewPager

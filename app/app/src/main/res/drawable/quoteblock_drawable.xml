@@ -4,9 +4,11 @@
     <item
         android:id="@+id/half_overlay"
         android:width="@dimen/quoteWidth">
-
-        <color
-            android:color="@color/quoteLine"/>
+        <shape android:shape="rectangle">
+            <padding android:left="4dp"/>
+            <corners android:topLeftRadius="4dp"
+                android:bottomLeftRadius="4dp"/>
+        </shape>
     </item>
 
 </layer-list>

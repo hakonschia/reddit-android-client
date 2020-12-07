@@ -7,6 +7,7 @@ import com.example.hakonsreader.api.model.RedditListing
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.Submission
+import com.example.hakonsreader.api.model.flairs.SubmissionFlair
 import com.example.hakonsreader.api.responses.JsonResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -120,4 +121,14 @@ interface SubredditService {
             @Field("api_type") apiType: String = "json",
             @Field("raw_json") rawJson: Int = 1
     ) : Response<JsonResponse<Submission>>
+
+
+    /**
+     * Gets submission/link flairs for a subreddit
+     *
+     * @param subredditName The name of the subreddit to get flairs for
+     * @return A list of [SubmissionFlair]
+     */
+    @GET("r/{subreddit}/api/link_flair_v2?raw_json=1")
+    suspend fun getLinkFlairs(@Path("subreddit") subredditName: String) : Response<List<SubmissionFlair>>
 }
