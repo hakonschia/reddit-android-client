@@ -1,8 +1,12 @@
 package com.example.hakonsreader.views.util;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.PopupMenu;
 
 import androidx.annotation.IdRes;
@@ -69,12 +73,25 @@ public class MenuClickHandler {
             } else if (itemId == R.id.menuBrowsePrivately) {
                 App.get().enablePrivateBrowsing(!isPrivatelyBrowsing);
                 return true;
+            } else if (itemId == R.id.menuApplicationPrivileges) {
+                showApplicationPrivileges(view.getContext());
+                return true;
             }
 
             return false;
         });
 
         menu.show();
+    }
+
+    /**
+     * Shows a popup of the applications OAuth privileges
+     */
+    private static void showApplicationPrivileges(Context context) {
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_oauth_explanations);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.show();
     }
 
     /**

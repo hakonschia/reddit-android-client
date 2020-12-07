@@ -8,4 +8,8 @@
     <item
         android:id="@+id/menuBrowsePrivately"
         android:title="@string/menuPrivateBrowsingEnable" />
+
+    <item
+        android:id="@+id/menuApplicationPrivileges"
+        android:title="@string/menuShowApplicationAccessExplanations" />
 </menu>

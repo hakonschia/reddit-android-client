@@ -219,4 +219,17 @@
     <string name="copyPostLink">Kopier lenke til posten</string>
     <string name="copyPostContentLink">Kopier lenke til innholdet i posten</string>
     <string name="submitFlairSpinner">Velg flair</string>
+    <string name="oauthScopeExplanationIdentity">Tillater applikasjonen å aksessere din private bruker informasjon</string>
+    <string name="oauthScopeExplanationVote">"Tillater applikasjonen å avgi stemmer på poster og kommentarer "</string>
+    <string name="oauthScopeExplanationSubmit">Tillater applikasjonen å sende inn poster</string>
+    <string name="oauthScopeExplanationMysubreddits">Tillater applikasjonen å lese hvilke subredditer du har abonnert på</string>
+    <string name="oauthScopeExplanationSubscribe">Tillater applikasjonen å abonnere på subredditer</string>
+    <string name="oauthScopeExplanationHistory">Tillater applikasjonen å aksessere post- og kommentarhistorien din (inkludert din private historie som lagrete poster)</string>
+    <string name="oauthScopeExplanationSave">Tillater applikasjonen å lagre poster og kommentarer</string>
+    <string name="oauthScopeExplanationFlair">Tillater applikasjonen å forandre dine flairs, samt å innhente innformasjon om flairs fra subredditer</string>
+    <string name="oauthScopeExplanationEdit">Tillater applikasjonen å redigere og slette poster og kommentarer</string>
+    <string name="oauthScopeExplanationAccount">Tillater applikasjonen å blokkere brukere og aksessere dine preferanser</string>
+    <string name="oauthScopeExplanationModposts">Tillater applikasjonen å utføre visse moderator oppgaver, som å vise poster og kommentarer som moderator</string>
+    <string name="menuShowApplicationAccessExplanations">Applikasjonsprivilegier</string>
+    <string name="oauthRevokeApplicationAccess">For å oppheve applikasjonens tilgang til kontoen din, gå til: https://www.reddit.com/prefs/apps/</string>
 </resources>

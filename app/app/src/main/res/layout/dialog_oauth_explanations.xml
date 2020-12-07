@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Needs to be in a ScrollView as this can exceed the screen height on some devices -->
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/dialogBackground">
+
+    <!-- Because i cba to create an adapter and use some sort of list :) -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:id="@+id/revokeAccess"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+
+            android:autoLink="web"
+
+            android:text="@string/oauthRevokeApplicationAccess"
+            android:textColor="@color/text_color"
+            android:textColorLink="@color/link_color"
+            android:textSize="17sp"
+            app:layout_constrainedWidth="true"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/identity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+
+            android:layout_marginTop="16dp"
+            android:text="identity - "
+            android:textColor="@color/text_color"
+
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/revokeAccess" />
+
+        <TextView
+            android:id="@+id/identityExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="@string/oauthScopeExplanationIdentity"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/identity"
+            app:layout_constraintTop_toTopOf="@+id/identity" />
+
+        <TextView
+            android:id="@+id/account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="4dp"
+            android:text="account - "
+            android:textColor="@color/text_color"
+
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/identityExplanation" />
+
+        <TextView
+            android:id="@+id/accountExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationAccount"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/account"
+            app:layout_constraintTop_toTopOf="@+id/account" />
+
+        <TextView
+            android:id="@+id/history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="4dp"
+            android:text="history - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/accountExplanation" />
+
+        <TextView
+            android:id="@+id/historyExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationHistory"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/history"
+            app:layout_constraintTop_toTopOf="@+id/history" />
+
+        <TextView
+            android:id="@+id/mysubreddits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="mysubreddits - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/historyExplanation" />
+
+        <TextView
+            android:id="@+id/mysubredditsExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationMysubreddits"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/mysubreddits"
+            app:layout_constraintTop_toTopOf="@+id/mysubreddits" />
+
+
+        <TextView
+            android:id="@+id/vote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="vote - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/mysubredditsExplanation" />
+
+        <TextView
+            android:id="@+id/voteExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationVote"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/vote"
+            app:layout_constraintTop_toTopOf="@+id/vote" />
+
+
+        <TextView
+            android:id="@+id/subscribe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="subscribe - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/voteExplanation" />
+
+        <TextView
+            android:id="@+id/subscribeExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationSubscribe"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/subscribe"
+            app:layout_constraintTop_toTopOf="@+id/subscribe" />
+
+        <TextView
+            android:id="@+id/submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="submit - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/subscribeExplanation" />
+
+        <TextView
+            android:id="@+id/submitExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationSubmit"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/submit"
+            app:layout_constraintTop_toTopOf="@+id/submit" />
+
+
+        <TextView
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="save - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/submitExplanation" />
+
+        <TextView
+            android:id="@+id/saveExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationSave"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/save"
+            app:layout_constraintTop_toTopOf="@+id/save" />
+
+
+        <TextView
+            android:id="@+id/edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="edit - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/saveExplanation" />
+
+        <TextView
+            android:id="@+id/editExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationEdit"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/edit"
+            app:layout_constraintTop_toTopOf="@+id/edit" />
+
+
+        <TextView
+            android:id="@+id/flair"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="flair - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/editExplanation" />
+
+        <TextView
+            android:id="@+id/flairExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/oauthScopeExplanationFlair"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/flair"
+            app:layout_constraintTop_toTopOf="@+id/flair" />
+
+        <TextView
+            android:id="@+id/modposts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="modposts - "
+
+            android:textColor="@color/text_color"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/identity"
+            app:layout_constraintTop_toBottomOf="@+id/flairExplanation" />
+
+        <TextView
+            android:id="@+id/modpostsExplanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/oauthScopeExplanationModposts"
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/identityExplanation"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/modposts"
+            app:layout_constraintTop_toTopOf="@+id/modposts" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

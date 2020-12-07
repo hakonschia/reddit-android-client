@@ -335,4 +335,18 @@
 
     <string name="crosspostText">Crosspost</string>
     <string name="crosspostFrom">" from "</string>
+
+    <string name="menuShowApplicationAccessExplanations">Application privileges</string>
+    <string name="oauthRevokeApplicationAccess">To revoke the applications access to your account, go to: https://www.reddit.com/prefs/apps/</string>
+    <string name="oauthScopeExplanationIdentity">Allows the application to access your private account information</string>
+    <string name="oauthScopeExplanationAccount">Allows the application to block users and access your preferences</string>
+    <string name="oauthScopeExplanationHistory">Allows the application to access your post and comment history (including your private history such as saved posts)</string>
+    <string name="oauthScopeExplanationMysubreddits">Allows the application to read which subreddits you are subscribed to</string>
+    <string name="oauthScopeExplanationVote">Allows the application to vote on posts and comments</string>
+    <string name="oauthScopeExplanationSubscribe">Allows the application to subscribe to subreddits</string>
+    <string name="oauthScopeExplanationSubmit">Allows the application to submit posts</string>
+    <string name="oauthScopeExplanationSave">Allows the application to save posts and comments</string>
+    <string name="oauthScopeExplanationEdit">Allows the application to edit and delete posts and comments</string>
+    <string name="oauthScopeExplanationFlair">Allows the application to modify your flairs, as well as retrieve information about flairs on subreddits</string>
+    <string name="oauthScopeExplanationModposts">Allows the application to do certain mod actions, such as distinguishing posts and comments as a moderator</string>
 </resources>
