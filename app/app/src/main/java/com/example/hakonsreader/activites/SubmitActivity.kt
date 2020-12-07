@@ -3,8 +3,9 @@ package com.example.hakonsreader.activites
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -22,6 +23,7 @@ import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
 import com.example.hakonsreader.databinding.SubmissionLinkBinding
 import com.example.hakonsreader.databinding.SubmissionTextBinding
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
+import com.example.hakonsreader.recyclerviewadapters.SubmissionFlairAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -126,27 +128,37 @@ class SubmitActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Calls the API to get the submission flairs for this subreddit
+     */
     private fun getSubmissionFlairs(subredditName: String) {
         CoroutineScope(IO).launch {
+            binding.submissionFlairLoadingIcon.visibility = VISIBLE
             when (val response = api.subreddit(subredditName).submissionFlairs()) {
                 is ApiResponse.Success -> {
-                    submissionFlairs = response.value as ArrayList<SubmissionFlair>
-                    val text = ArrayList<String>()
-                    // Kind of bad way to do it? We want the first item to be an "unselected" instead of
-                    // the first in the actual list of flairs
-                    text.add(getString(R.string.submitFlairSpinner))
-                    response.value.forEach {
-                        text.add(it.text)
-                    }
-
-                    val adapter = ArrayAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, text)
                     withContext(Main) {
-                        binding.flairSpinner.adapter = adapter
+                        onSubmissionFlairResponse(response.value)
                     }
                 }
+                // Not sure what makes sense to do on these errors, if flairs are required then
+                // it matters, if not then it's not critical if it fails
                 is ApiResponse.Error -> {}
             }
         }
+    }
+
+    /**
+     * Handles successful responses for submission flairs. The loading icon is removed and
+     * [ActivitySubmitBinding.flairSpinner] is updated with the flairs
+     *
+     * @param flairs The flairs retrieved
+     */
+    private fun onSubmissionFlairResponse(flairs: List<SubmissionFlair>) {
+        submissionFlairs = flairs as ArrayList<SubmissionFlair>
+
+        val adapter = SubmissionFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, submissionFlairs)
+        binding.flairSpinner.adapter = adapter
+        binding.submissionFlairLoadingIcon.visibility = GONE
     }
 
     /**
@@ -260,7 +272,7 @@ class SubmitActivity : AppCompatActivity() {
      */
     private fun getFlairId() : String {
         val selectedItem = binding.flairSpinner.selectedItemPosition
-        // The first item will be the "Select flair" ie. no item selected
+        // The first item will is "Select flair", ie. no item selected
         return if (selectedItem == 0) {
             ""
         } else {
@@ -268,7 +280,6 @@ class SubmitActivity : AppCompatActivity() {
             submissionFlairs[selectedItem - 1].id
         }
     }
-
 
 
     inner class PagerAdapter(fragmentManager: FragmentManager, behaviour: Int) : FragmentPagerAdapter(fragmentManager, behaviour) {

@@ -129,6 +129,23 @@
                 app:layout_constraintStart_toStartOf="@+id/nsfw"
                 app:layout_constraintTop_toBottomOf="@+id/nsfw" />
 
+            <ProgressBar
+                android:id="@+id/submissionFlairLoadingIcon"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:indeterminateOnly="true"
+
+                android:visibility="gone"
+
+                app:layout_constraintBottom_toBottomOf="@+id/flairSpinner"
+                app:layout_constraintEnd_toEndOf="@+id/flairSpinner"
+                app:layout_constraintStart_toStartOf="@+id/flairSpinner"
+
+                app:layout_constraintTop_toBottomOf="@+id/flairSpinner"
+                tools:visibility="visible" />
+
             <!-- TODO when there is text being edited this should scroll to the top or something
              so the text input fields are actually visible-->
             <com.google.android.material.tabs.TabLayout
@@ -137,14 +154,13 @@
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
 
                 android:layout_marginEnd="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/submitPost"
 
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/flairSpinner"
+                app:layout_constraintTop_toBottomOf="@+id/submissionFlairLoadingIcon"
                 app:layout_constraintVertical_bias="0.0"
                 app:tabIndicatorColor="@color/colorAccent"
                 app:tabSelectedTextColor="@color/colorAccent" />
