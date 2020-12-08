@@ -235,4 +235,6 @@
     <string name="newPermissionsRequiredHeader">Ny tilgang kreves</string>
     <string name="newPermissionsRequiredContent">Vennligst logg inn og ut igjen for å forsikre at applikasjonen virker som forventet.\n\nEn liste med de nye tillatelsene er gitt under.</string>
     <string name="oauthScopeExplanationPrivatemessage">Tillater applikasjonen å lese meldingene i innboksen din</string>
+    <string name="ok">Ok</string>
+    <string name="newPermissionsDontShowAgain">Ikke vis igjen</string>
 </resources>

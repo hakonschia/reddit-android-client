@@ -72,12 +72,24 @@ public class AccessToken {
         return deviceId;
     }
 
+
     /**
-     * Retrieves scopes the access token is valid for
+     * Returns the space separated string of the scopes the access token is valid for
+     *
+     * @return A string
+     * @see #getScopesAsArray()
+     */
+    public String getScope() {
+        return scope;
+    }
+
+    /**
+     * Retrieves an array representation of the scopes the access token is valid for.
      *
      * @return An array of the scopes
+     * @see #getScope()
      */
-    public String[] getScopes() {
+    public String[] getScopesAsArray() {
         return scope.split(" ");
     }
 

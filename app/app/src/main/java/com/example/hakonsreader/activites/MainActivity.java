@@ -1,6 +1,7 @@
 package com.example.hakonsreader.activites;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -8,7 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,13 +31,11 @@ import com.example.hakonsreader.fragments.SelectSubredditFragmentK;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
-import com.example.hakonsreader.misc.SharedPreferencesManager;
 import com.example.hakonsreader.misc.TokenManager;
 import com.example.hakonsreader.misc.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -262,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         //  requiredScopesAsArray then we can return since it has already been by the user
 
         String[] requiredScopesAsArray = NetworkConstants.SCOPE.split(" ");
-        List<String> storedScopesAsArray =  Arrays.asList(token.getScopes());
+        List<String> storedScopesAsArray =  Arrays.asList(token.getScopesAsArray());
 
         ArrayList<String> missingScopes = new ArrayList<>();
 
@@ -272,13 +270,30 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             }
         }
 
+        // Missing scope found
         if (!missingScopes.isEmpty()) {
+            // Check if we have already shown the dialog, if we have don't show again
+            // This will only be stored in SharedPreferences if the user clicked "Dont show again"
+            SharedPreferences preferences = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE);
+            String[] checkedScopes = preferences.getString(SharedPreferencesConstants.ACCESS_TOKEN_SCOPES_CHECKED, "").split(" ");
+
+            Arrays.sort(checkedScopes);
+            Arrays.sort(requiredScopesAsArray);
+            if (Arrays.equals(requiredScopesAsArray, checkedScopes)) {
+                return;
+            }
+
             OAuthScopeAdapter adapter = new OAuthScopeAdapter(this, R.layout.list_item_oauth_explanation, missingScopes);
             View view = getLayoutInflater().inflate(R.layout.new_permissions_title, binding.parentLayout, false);
 
             new AlertDialog.Builder(this)
                     .setCustomTitle(view)
                     .setAdapter(adapter, null)
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {})
+                    .setNegativeButton(R.string.newPermissionsDontShowAgain, (dialog, which) -> {
+                        // Store in SharedPreferences so the next time the code above will trigger a return
+                        preferences.edit().putString(SharedPreferencesConstants.ACCESS_TOKEN_SCOPES_CHECKED, NetworkConstants.SCOPE).apply();
+                    })
                     .show();
         }
     }

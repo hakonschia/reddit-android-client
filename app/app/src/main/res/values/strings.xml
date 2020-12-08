@@ -353,4 +353,7 @@
 
     <string name="newPermissionsRequiredHeader">New permissions required</string>
     <string name="newPermissionsRequiredContent">Please log in and out again to ensure the application works as expected.\n\nBelow are a list of the new permissions required.</string>
+    <string name="newPermissionsDontShowAgain">Don\'t show again</string>
+
+    <string name="ok">Ok</string>
 </resources>

@@ -33,4 +33,10 @@ public class SharedPreferencesConstants {
      * <p>The value stored should be a Unix timestamp.</p>
      */
     public static final String POST_LAST_OPENED_TIMESTAMP = "postLastOpenedTimestamp";
+
+    /**
+     * The key used to store the string of access tokens checked, to decide if the dialog
+     * for "New permissions required" should be shown or not
+     */
+    public static final String ACCESS_TOKEN_SCOPES_CHECKED = "accessTokenScopesChecked";
 }
