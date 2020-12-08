@@ -5,12 +5,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="android.view.View" />
+
         <variable
             name="comment"
             type="com.example.hakonsreader.api.model.RedditComment" />
 
         <variable
             name="highlight"
+            type="boolean" />
+
+        <variable
+            name="isByLoggedInUser"
             type="boolean" />
 
         <variable
@@ -79,22 +85,38 @@
 
             tools:text="u/hakonschia" />
 
+        <ImageView
+            android:id="@+id/profileIcon"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:layout_marginStart="4dp"
+            android:src="@drawable/ic_baseline_person_100"
+            android:visibility="@{isByLoggedInUser ? View.VISIBLE : View.GONE, default=gone}"
+
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintBottom_toBottomOf="@+id/commentAuthor"
+            app:layout_constraintStart_toEndOf="@+id/commentAuthor"
+            app:layout_constraintTop_toTopOf="@+id/commentAuthor"
+
+            tools:visibility="visible"/>
+
         <TextView
             android:id="@+id/commentAge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:layout_marginStart="8dp"
 
             android:paddingTop="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
-
             android:textColor="@color/secondary_text_color"
             android:textStyle="italic"
+
             app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"
-
             app:layout_constrainedWidth="true"
-            app:layout_constraintStart_toEndOf="@id/commentAuthor"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/profileIcon"
 
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="2h" />
 
         <TextView

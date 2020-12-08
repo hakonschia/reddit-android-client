@@ -26,6 +26,10 @@
             type="boolean" />
 
         <variable
+            name="isByLoggedInUser"
+            type="boolean" />
+
+        <variable
             name="adapter"
             type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
     </data>
@@ -94,22 +98,43 @@
 
                 tools:text="u/hakonschia" />
 
+            <ImageView
+                android:id="@+id/profileIcon"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_baseline_person_100"
+                android:visibility="@{isByLoggedInUser ? View.VISIBLE : View.GONE, default=gone}"
+
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintBottom_toBottomOf="@+id/commentAuthor"
+                app:layout_constraintStart_toEndOf="@+id/commentAuthor"
+                app:layout_constraintTop_toTopOf="@+id/commentAuthor"
+
+                tools:visibility="visible"/>
+
             <!-- Note: the visibility of this is set to GONE if there is no authorFlair -->
             <FrameLayout
                 android:id="@+id/authorFlair"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-
+                android:layout_marginStart="4dp"
                 app:authorFlair="@{comment}"
+
                 app:layout_constrainedWidth="true"
-                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintVertical_chainStyle="packed"
 
                 app:layout_constraintBottom_toBottomOf="@+id/commentAuthor"
                 app:layout_constraintEnd_toStartOf="@id/commentAge"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/commentAuthor"
-                app:layout_constraintTop_toTopOf="@+id/commentAuthor" />
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/profileIcon"
+                app:layout_constraintTop_toTopOf="@+id/commentAuthor"
+
+                tools:background="@color/tagNSFW"
+                tools:layout_height="20dp"
+                tools:layout_width="20dp" />
 
             <TextView
                 android:id="@+id/commentAge"
@@ -120,6 +145,7 @@
                 android:textColor="@color/secondary_text_color"
                 app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"
 
+                android:maxLines="1"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toStartOf="@+id/stickied"
                 app:layout_constraintHorizontal_bias="0.0"

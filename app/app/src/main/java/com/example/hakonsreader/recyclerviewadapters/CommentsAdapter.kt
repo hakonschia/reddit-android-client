@@ -428,10 +428,12 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
                 // User wants to highlight new comments, and the comment was added after the last time the post was opened
                 || (App.get().highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
 
+        val byLoggedInUser = comment.author == App.getStoredUser()?.username
+
         when (holder.itemViewType) {
             MORE_COMMENTS_TYPE -> (holder as MoreCommentsViewHolder).bind(comment)
-            HIDDEN_COMMENT_TYPE -> (holder as HiddenCommentViewHolder).bind(comment, highlight)
-            NORMAL_COMMENT_TYPE -> (holder as NormalCommentViewHolder).bind(comment, highlight)
+            HIDDEN_COMMENT_TYPE -> (holder as HiddenCommentViewHolder).bind(comment, highlight, byLoggedInUser)
+            NORMAL_COMMENT_TYPE -> (holder as NormalCommentViewHolder).bind(comment, highlight, byLoggedInUser)
         }
     }
 
@@ -491,9 +493,10 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
          * @param comment The comment to bind
          * @param highlight True if the comment should have a slight highlight around it
          */
-        fun bind(comment: RedditComment, highlight: Boolean) {
+        fun bind(comment: RedditComment, highlight: Boolean, byLoggedInUser: Boolean) {
             binding.comment = comment
             binding.highlight = highlight
+            binding.isByLoggedInUser = byLoggedInUser
 
             // If the ticker has animation enabled it will animate from the previous comment to this one
             // which is very weird behaviour, so disable the animation and enable it again when we have set the comment
@@ -505,24 +508,20 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             // small, but noticeable delay, causing the old comment to still appear
             binding.executePendingBindings()
         }
-
-        private fun hideCommentsLongClick(comment: RedditComment) : Boolean {
-            hideComments(comment)
-            return true
-        }
     }
 
     /**
      * ViewHolder for comments that are hidden (the comments explicitly selected to be hidden)
      */
     inner class HiddenCommentViewHolder(private val binding: ListItemHiddenCommentBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(comment: RedditComment, highlight: Boolean) {
+        fun bind(comment: RedditComment, highlight: Boolean, byLoggedInUser: Boolean) {
             binding.root.setOnClickListener {
                 showComments(comment)
             }
 
             binding.comment = comment
             binding.highlight = highlight
+            binding.isByLoggedInUser = byLoggedInUser
             binding.executePendingBindings()
         }
     }
