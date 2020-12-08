@@ -1,12 +1,12 @@
 package com.example.hakonsreader.views.util;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.view.ViewParent;
 import android.widget.PopupMenu;
 
 import androidx.annotation.IdRes;
@@ -15,16 +15,13 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.api.RedditApi;
 import com.example.hakonsreader.api.enums.PostTimeSort;
-import com.example.hakonsreader.api.interfaces.OnResponse;
-import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.api.model.RedditUser;
+import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter;
 import com.example.hakonsreader.interfaces.SortableWithTime;
-import com.example.hakonsreader.misc.Util;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.hakonsreader.misc.TokenManager;
 
-import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Class containing click handlers for menus
@@ -74,7 +71,7 @@ public class MenuClickHandler {
                 App.get().enablePrivateBrowsing(!isPrivatelyBrowsing);
                 return true;
             } else if (itemId == R.id.menuApplicationPrivileges) {
-                showApplicationPrivileges(view.getContext());
+                showApplicationPrivileges(view.getContext(), view.getParent());
                 return true;
             }
 
@@ -87,12 +84,17 @@ public class MenuClickHandler {
     /**
      * Shows a popup of the applications OAuth privileges
      */
-    private static void showApplicationPrivileges(Context context) {
-        // TODO use OAuthScopeAdapter
-        Dialog dialog = new Dialog(context);
-        dialog.setContentView(R.layout.dialog_oauth_explanations);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.show();
+    private static void showApplicationPrivileges(Context context, ViewParent parent) {
+        // TODO if scopes have been added to the application that isn't in the stored token, show which are missing as well
+        ArrayList<String> scopes = new ArrayList<>(Arrays.asList(TokenManager.getToken().getScopesAsArray()));
+        OAuthScopeAdapter adapter = new OAuthScopeAdapter(context, R.layout.list_item_oauth_explanation, scopes);
+
+        View title = LayoutInflater.from(context).inflate(R.layout.dialog_title_oauth_explanation, (ViewGroup) parent, false);
+
+        new AlertDialog.Builder(context)
+                .setCustomTitle(title)
+                .setAdapter(adapter, null)
+                .show();
     }
 
     /**

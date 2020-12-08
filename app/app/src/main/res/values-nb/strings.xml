@@ -237,4 +237,5 @@
     <string name="oauthScopeExplanationPrivatemessage">Tillater applikasjonen å lese meldingene i innboksen din</string>
     <string name="ok">Ok</string>
     <string name="newPermissionsDontShowAgain">Ikke vis igjen</string>
+    <string name="oauthScopeExplanationRead">Tillater applikasjonen å lese informasjon fra Reddit (dette har ingenting å gjøre med din personlige bruker)</string>
 </resources>

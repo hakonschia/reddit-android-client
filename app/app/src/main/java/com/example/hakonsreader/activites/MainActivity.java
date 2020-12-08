@@ -1,7 +1,6 @@
 package com.example.hakonsreader.activites;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -284,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             }
 
             OAuthScopeAdapter adapter = new OAuthScopeAdapter(this, R.layout.list_item_oauth_explanation, missingScopes);
-            View view = getLayoutInflater().inflate(R.layout.new_permissions_title, binding.parentLayout, false);
+            View view = getLayoutInflater().inflate(R.layout.dialog_title_new_permissions, binding.parentLayout, false);
 
             new AlertDialog.Builder(this)
                     .setCustomTitle(view)

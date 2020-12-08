@@ -54,6 +54,7 @@ class OAuthScopeAdapter(
             "save" -> R.string.oauthScopeExplanationSave
             "edit" -> R.string.oauthScopeExplanationEdit
             "flair" -> R.string.oauthScopeExplanationFlair
+            "read" -> R.string.oauthScopeExplanationRead
             "privatemessages" -> R.string.oauthScopeExplanationPrivatemessage
             "modposts" -> R.string.oauthScopeExplanationModposts
             else -> -1

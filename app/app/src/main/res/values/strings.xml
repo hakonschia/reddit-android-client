@@ -348,9 +348,9 @@
     <string name="oauthScopeExplanationSave">Allows the application to save posts and comments</string>
     <string name="oauthScopeExplanationEdit">Allows the application to edit and delete posts and comments</string>
     <string name="oauthScopeExplanationFlair">Allows the application to modify your flairs, as well as retrieve information about flairs on subreddits</string>
+    <string name="oauthScopeExplanationRead">Allows the application to read information from Reddit (this has nothing to do with your personal account)</string>
     <string name="oauthScopeExplanationPrivatemessage">Allows the application to read your inbox messages</string>
     <string name="oauthScopeExplanationModposts">Allows the application to do certain mod actions, such as distinguishing posts and comments as a moderator</string>
-
     <string name="newPermissionsRequiredHeader">New permissions required</string>
     <string name="newPermissionsRequiredContent">Please log in and out again to ensure the application works as expected.\n\nBelow are a list of the new permissions required.</string>
     <string name="newPermissionsDontShowAgain">Don\'t show again</string>
