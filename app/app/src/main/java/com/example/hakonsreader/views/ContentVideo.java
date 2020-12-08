@@ -65,7 +65,7 @@ public class ContentVideo extends Content {
      * and are lowercased
      */
     // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
-    public static final List<String> KNOWN_VIDEO_DOMAINS = Collections.unmodifiableList(Arrays.asList(
+    private static final List<String> KNOWN_VIDEO_DOMAINS = Collections.unmodifiableList(Arrays.asList(
             "v.redd.it", "i.redd.it", "redgifs.com", "gfycat.com", "i.imgur.com", "giphy.com", "media1.giphy.com", "media2.giphy.com"
     ));
 
@@ -682,5 +682,22 @@ public class ContentVideo extends Content {
         }
 
         return null;
+    }
+
+
+    /**
+     * Checks if a {@link RedditPost} is possible to play as a video. Even if {@link RedditPost#getPostType()}
+     * indicates that the post is a video, it might not include any supported video formats since
+     * old posts might have different content.
+     *
+     * @param post The post to check
+     * @return True if the post can be played as a video, false otherwise
+     */
+    public static boolean isRedditPostVideoPlayable(@NonNull RedditPost post) {
+        // TODO imgur .gifv links aren't recognized
+        //  https://www.reddit.com/r/gifs/comments/k8wqgb/how_to_test_positive_the_sequel/
+        // Needs to be a known domain, and one of the video formats must not be null
+       return KNOWN_VIDEO_DOMAINS.contains(post.getDomain().toLowerCase())
+                && (post.getVideo() != null || post.getVideoGif() != null || post.getMp4Source() != null);
     }
 }

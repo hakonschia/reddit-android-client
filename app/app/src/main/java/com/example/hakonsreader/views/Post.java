@@ -254,7 +254,11 @@ public class Post extends Content {
             // Links such as youtube, gfycat etc are rich video posts
             case RICH_VIDEO:
                 // Ensure we know how to handle a video, otherwise it might not load
-                if (ContentVideo.KNOWN_VIDEO_DOMAINS.contains(post.getDomain().toLowerCase())) {
+                // TODO check that there actually is a video, link below doesnt have a video which causes a NPE when trying
+                //  to get the source preview, create static function in ContentVideo: isRedditPostVideoPlayable() : Boolean
+                //  that checks if redditVideo, redditVideoGif, sourcePreview is all not null
+                //  https://www.reddit.com/r/reallifedoodles/comments/72cdtz/hey/
+                if (ContentVideo.isRedditPostVideoPlayable(post)) {
                     content = new ContentVideo(context);
                 } else {
                     content = new ContentLink(context);
