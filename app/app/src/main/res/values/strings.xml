@@ -231,6 +231,7 @@
 
     <string name="submittingLinkNoLink">Please enter a link to submit</string>
     <string name="submittingCrosspostNoId">Please enter a post ID to submit</string>
+    <string name="submittingCrosspostPostNotFound">Post not found</string>
 
     <string name="submittingNoTitle">Please enter a title</string>
     <string name="submittingTitleTooLong">The title is too long</string>

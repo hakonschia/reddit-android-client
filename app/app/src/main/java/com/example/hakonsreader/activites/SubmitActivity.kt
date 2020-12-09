@@ -1,6 +1,9 @@
 package com.example.hakonsreader.activites
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -14,6 +17,8 @@ import androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_F
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.SubmissionFlair
 import com.example.hakonsreader.api.persistence.AppDatabase
@@ -30,6 +35,9 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * Activity for submitting a post to a subreddit
@@ -339,9 +347,18 @@ class SubmitActivity : AppCompatActivity() {
 
     class SubmissionCrosspostFragment : Fragment() {
         var binding: SubmissionCrosspostBinding? = null
+        val api: RedditApi = App.get().api
+        val timer = Timer()
+        var timerTask: TimerTask? = null
+
+        /**
+         * Map mapping post IDs to a [RedditPost], holding the posts that have been retrieved so far
+         */
+        val postsMap = HashMap<String, RedditPost>()
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             binding = SubmissionCrosspostBinding.inflate(layoutInflater)
+            binding?.crosspostSubmission?.addTextChangedListener(textWatcher)
             return binding?.root
         }
 
@@ -350,8 +367,111 @@ class SubmitActivity : AppCompatActivity() {
             binding = null
         }
 
+        /**
+         * Gets the id input in the input field
+         */
         fun getCrosspostId() : String {
             return binding?.crosspostSubmission?.text.toString()
+        }
+
+        /**
+         * TextWatcher for the crosspost ID input field that retrieves information about the post the
+         * ID represents.
+         *
+         * Posts are stored in [postsMap]
+         */
+        private val textWatcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val id = getCrosspostId()
+                // TODO find out what limitations there are on post IDs and match that to not make
+                //  api calls that never return an actual post
+                if (id.isBlank()) {
+                    binding?.crosspostSubmission?.error = null
+                    clearPostInfo()
+                    return
+                }
+
+                val post = postsMap[id]
+
+                // Post previously retrieved, use that instead of making new API call
+                if (post != null) {
+                    setPostInfo(post)
+                } else {
+                    // Cancel previous task
+                    timerTask?.cancel()
+                    timerTask = object : TimerTask() {
+                        override fun run() {
+                            getPostInfo(id)
+                        }
+                    }
+                    timer.schedule(timerTask, 500L)
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Not implemented
+            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Not implemented
+            }
+        }
+
+        /**
+         * Sets the post info displayed to the user
+         */
+        private fun setPostInfo(redditPost: RedditPost) {
+            binding?.crosspostPostInfo?.setPost(redditPost)
+            binding?.crosspostPostInfo?.visibility = VISIBLE
+        }
+
+        /**
+         * Removes the post info from being shown
+         */
+        private fun clearPostInfo() {
+            binding?.crosspostPostInfo?.visibility = GONE
+        }
+
+        /**
+         * Gets post info from the API
+         *
+         * @param id The ID of the post to retrieve information for
+         */
+        private fun getPostInfo(id: String) {
+            (context as AppCompatActivity).runOnUiThread {
+                binding?.crosspostLoadingIcon?.onCountChange(true)
+            }
+
+            CoroutineScope(IO).launch {
+                val resp = api.post(id).info()
+
+                withContext(Main) {
+                    binding?.crosspostLoadingIcon?.onCountChange(false)
+                }
+
+                when (resp) {
+                    is ApiResponse.Success -> {
+                        val post = resp.value
+                        withContext(Main) {
+                            if (post != null) {
+                                postsMap[id] = post
+                                withContext(Main) {
+                                    setPostInfo(post)
+                                }
+                                binding?.crosspostSubmission?.error = null
+                            } else {
+                                // The ID in the input might have changed since the request was made
+                                if (getCrosspostId() == id) {
+                                    binding?.crosspostSubmission?.error = getString(R.string.submittingCrosspostPostNotFound)
+                                    clearPostInfo()
+                                }
+                            }
+                        }
+                    }
+                    is ApiResponse.Error -> {
+
+                    }
+                }
+            }
         }
     }
 }

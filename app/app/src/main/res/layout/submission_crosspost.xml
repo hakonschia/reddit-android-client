@@ -34,4 +34,27 @@
             tools:text="@tools:sample/lorem[1]" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.example.hakonsreader.views.LoadingIcon
+        android:id="@+id/crosspostLoadingIcon"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:indeterminateOnly="true"
+
+        android:visibility="gone"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+        tools:visibility="visible" />
+
+    <com.example.hakonsreader.views.PostInfo
+        android:id="@+id/crosspostPostInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/crosspostLoadingIcon" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
