@@ -52,6 +52,13 @@
             app:showSeekBarValue="true"
             app:iconSpaceReserved="false" />
 
+        <EditTextPreference
+            app:key="@string/prefs_key_filter_posts_from_default_subreddits"
+            android:title="@string/prefs_title_filter_posts_from_default_subreddits"
+            android:dialogMessage="@string/prefs_dialog_message_filter_posts_from_default_subreddits"
+            app:defaultValue=""
+            app:iconSpaceReserved="false" />
+
         <ListPreference
             app:key="@string/prefs_key_fullscreen_swipe_direction"
             app:title="@string/prefs_title_fullscreen_swipe_direction"

@@ -599,6 +599,18 @@ public class App extends Application {
     }
 
     /**
+     * Returns the array of subreddits the user has selected to filter from front page/popular/all
+     *
+     * @return An array of strings (can be empty)
+     */
+    public String[] subredditsToFilterFromDefaultSubreddits() {
+        String asString = settings.getString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), "");
+        Log.d(TAG, "subredditsToFilterFromDefaultSubreddits: " + asString);
+        return asString.split("\n");
+    }
+
+
+    /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that
      * the user has revoked the applications access and a dialog must be shown that they must log in again
      *

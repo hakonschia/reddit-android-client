@@ -23,6 +23,7 @@ import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.persistence.AppDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -45,6 +46,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.stream.Collectors
 
 class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservable {
 
@@ -94,6 +96,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var binding: FragmentSubredditBinding? = null
     private var saveState: Bundle? = null
     private var postIds = ArrayList<String>()
+    private var isDefaultSubreddit = false
 
     private var postsViewModel: PostsViewModel? = null
     private var postsAdapter: PostsAdapter? = null
@@ -113,8 +116,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
             // Probably not how ObservableField is supposed to be used? Works though
             super.set(value)
-
-            Log.d(TAG, "setting subreddit with name " + value.name)
 
             ViewUtil.setSubredditIcon(binding!!.subredditIcon, value)
             binding?.subreddit = value
@@ -296,16 +297,16 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         } else {
             ""
         }
-        val isStandardSub = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
+        isDefaultSubreddit = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
 
         val sub = Subreddit()
         sub.name = subredditName
         subreddit.set(sub)
 
-        binding?.standardSub = isStandardSub
+        binding?.standardSub = isDefaultSubreddit
 
         // Not a standard sub, get info from local database if previously stored
-        if (!isStandardSub) {
+        if (!isDefaultSubreddit) {
             CoroutineScope(IO).launch {
                 val s = database.subreddits().get(subredditName)
                 if (s != null) {
@@ -368,7 +369,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             }
 
             val previousSize = postsAdapter?.itemCount
-            postsAdapter?.submitList(posts)
+            postsAdapter?.submitList(filterPosts(posts))
 
             if (saveState != null && previousSize == 0) {
                 val layoutState: Parcelable? = saveState?.getParcelable(saveKey(LAYOUT_STATE_KEY))
@@ -523,6 +524,26 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 }
                 is ApiResponse.Error -> handleErrors(response.error, response.throwable)
             }
+        }
+    }
+
+    /**
+     * Filters a list of posts based on [App.subredditsToFilterFromDefaultSubreddits]
+     *
+     * If [isDefaultSubreddit] is false, then the original list is returned
+     *
+     * @param posts The posts to filter
+     * @return The filtered posts, or [posts] if this is not a default subreddit
+     */
+    private fun filterPosts(posts: List<RedditPost>) : List<RedditPost> {
+        return if (isDefaultSubreddit) {
+            val subsToFilter = App.get().subredditsToFilterFromDefaultSubreddits()
+            posts.filter {
+                // Keep the post if the subreddit it is in isn't found in subsToFilter
+                !subsToFilter.contains(it.subreddit)
+            }
+        } else {
+            posts
         }
     }
 

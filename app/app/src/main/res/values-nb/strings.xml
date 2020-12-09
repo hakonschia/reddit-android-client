@@ -239,4 +239,6 @@
     <string name="oauthScopeExplanationRead">Tillater applikasjonen å lese informasjon fra Reddit (dette har ingenting å gjøre med din personlige bruker)</string>
     <string name="logInDescription">"Når du trykker på knappen under for å logge inn vil du bli videresendt til Reddit.com.  Du vil bli vist en liste med tillatelser denne applikasjonen trenger, og hvis du autoriserer applikasjonen vil du bli videresendt tilbake. Hvis du vil fjerne applikasjonens tilgang til kontoen din, gå til: <a href="https://www.reddit.com/prefs/apps">https://www.reddit.com/prefs/apps</a>. Listen med tillatelser kan også bli sett fra profilen din etter innlogging.  Passordet ditt vil aldri forlate Reddit.com; denne applikasjonen vil aldri se eller lagre passordet ditt.  "</string>
     <string name="submittingCrosspostPostNotFound">Posten finnes ikke</string>
+    <string name="prefs_title_filter_posts_from_default_subreddits">Filtrer poster</string>
+    <string name="prefs_dialog_message_filter_posts_from_default_subreddits">Filtrer poster fra subredditer fra å vises i startsiden, popular, og alle. Én subreddit per linje</string>
 </resources>
