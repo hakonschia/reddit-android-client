@@ -6,8 +6,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -75,7 +74,6 @@ class SubmitActivity : AppCompatActivity() {
         // Setup with all tabs initially until we know which submissions are supported on the subreddit
         setupTabs()
 
-
         // We need information about the subreddit, try to get it from the local database and if it doesn't exist, get it from
         // the api
         getSubredditInfo(subredditName)
@@ -94,7 +92,8 @@ class SubmitActivity : AppCompatActivity() {
                 binding.showPreview.visibility = if (submissionFragments[position] is SubmissionTextFragment) {
                     VISIBLE
                 } else {
-                    GONE
+                    // Use INVISIBLE instead of GONE since the "Submit post" button relies on the position of the preview
+                    INVISIBLE
                 }
             }
         })
@@ -198,6 +197,7 @@ class SubmitActivity : AppCompatActivity() {
         submissionFragments.add(SubmissionCrosspostFragment())
 
         binding.submissionTypes.adapter = PagerAdapter(this)
+
         TabLayoutMediator(binding.tabs, binding.submissionTypes) { tab, position ->
             tab.text = when (submissionFragments[position]) {
                 is SubmissionLinkFragment -> getString(R.string.submittingLinkHint)
@@ -207,7 +207,6 @@ class SubmitActivity : AppCompatActivity() {
                 }
             }
         }.attach()
-
     }
 
     private fun checkSubmissionTypes(subreddit: Subreddit) {
@@ -230,7 +229,7 @@ class SubmitActivity : AppCompatActivity() {
         val text = fragment.getText()
 
         CoroutineScope(IO).launch {
-            api.subreddit("hakonschia").submitTextPost(
+            api.subreddit(subreddit.name).submitTextPost(
                     title,
                     text,
                     nsfw,
@@ -258,7 +257,7 @@ class SubmitActivity : AppCompatActivity() {
         }
 
         CoroutineScope(IO).launch {
-            api.subreddit("hakonschia").submitLinkPost(
+            api.subreddit(subreddit.name).submitLinkPost(
                     title,
                     fragment.getLink(),
                     nsfw,
@@ -287,7 +286,7 @@ class SubmitActivity : AppCompatActivity() {
         }
 
         CoroutineScope(IO).launch {
-            api.subreddit("hakonschia").submitCrosspost(
+            api.subreddit(subreddit.name).submitCrosspost(
                     title,
                     id,
                     nsfw,
@@ -328,6 +327,11 @@ class SubmitActivity : AppCompatActivity() {
             return binding?.root
         }
 
+        override fun onResume() {
+            super.onResume()
+            binding?.root?.requestLayout()
+        }
+
         override fun onDestroyView() {
             super.onDestroyView()
             binding = null
@@ -344,6 +348,11 @@ class SubmitActivity : AppCompatActivity() {
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             binding = SubmissionLinkBinding.inflate(layoutInflater)
             return binding?.root
+        }
+
+        override fun onResume() {
+            super.onResume()
+            binding?.root?.requestLayout()
         }
 
         override fun onDestroyView() {
@@ -371,6 +380,11 @@ class SubmitActivity : AppCompatActivity() {
             binding = SubmissionCrosspostBinding.inflate(layoutInflater)
             binding?.crosspostSubmission?.addTextChangedListener(textWatcher)
             return binding?.root
+        }
+
+        override fun onResume() {
+            super.onResume()
+            binding?.root?.requestLayout()
         }
 
         override fun onDestroyView() {
@@ -431,15 +445,15 @@ class SubmitActivity : AppCompatActivity() {
          * Sets the post info displayed to the user
          */
         private fun setPostInfo(redditPost: RedditPost) {
-            binding?.crosspostPostInfo?.setPost(redditPost)
-            binding?.crosspostPostInfo?.visibility = VISIBLE
+            binding?.crosspostPost?.redditPost = redditPost
+            binding?.crosspostPost?.visibility = VISIBLE
         }
 
         /**
          * Removes the post info from being shown
          */
         private fun clearPostInfo() {
-            binding?.crosspostPostInfo?.visibility = GONE
+            binding?.crosspostPost?.visibility = GONE
         }
 
         /**

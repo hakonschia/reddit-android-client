@@ -52,7 +52,7 @@ interface PostService : VoteService, ReplyService, SaveService, ModService {
      * @param fullname The fullname of the post, or a comma separated string of the fullnames of the posts
      * @return A Response with a [ListingResponse] holding the list of the posts
      */
-    @GET("api/info")
+    @GET("api/info?raw_json=1")
     suspend fun getInfo(
             @Query("id") fullname: String
     ) : Response<ListingResponse<RedditPost>>
