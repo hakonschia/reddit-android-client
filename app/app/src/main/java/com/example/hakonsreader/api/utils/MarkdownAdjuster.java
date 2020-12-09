@@ -330,7 +330,7 @@ public class MarkdownAdjuster {
         // Closing curly brackets = %7D
 
         // Match []() with anything between both [] and ()
-        Pattern p = Pattern.compile("\\[([^()]+)]\\(([^()]+)\\)");
+        Pattern p = Pattern.compile("\\[([^\\[\\])]+)]\\(([^()]+)\\)");
         Matcher m = p.matcher(markdown);
 
         // The amount of characters added to the markdown string during the loop

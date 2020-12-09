@@ -225,5 +225,25 @@ public class MarkdownAdjusterTest {
         expected = "This is an error [error](https://reddit.com/horsing%20around), and another one [error 2](https://nrk.no/cool%20article)";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
+
+        // Spaces should be replaced with %20
+        markdown = "Hello there general\n\n Kenobi [Link with spaces](https://www.reddit.com/hello there general kenobi)";
+        expected = "Hello there general\n\n Kenobi [Link with spaces](https://www.reddit.com/hello%20there%20general%20kenobi)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // Brackets that aren't for a link and a link later
+        markdown = "COMMUNITY: Yeah LETS DO IT [gather 100k usd]\n" +
+                "\n" +
+                "COMMUNITY[after first loss]: THIS HAS BEEN THE WORST TRADE DEAL IN THE HISTORY OF THE WORLD!\n" +
+                "\n" +
+                "LAUNDER: [OMG I AGREE](https://tenor.com/view/zombie-land-comedy-crying-upset-sad-gif-3359111)";
+        expected = "COMMUNITY: Yeah LETS DO IT [gather 100k usd]\n" +
+                "\n" +
+                "COMMUNITY[after first loss]: THIS HAS BEEN THE WORST TRADE DEAL IN THE HISTORY OF THE WORLD!\n" +
+                "\n" +
+                "LAUNDER: [OMG I AGREE](https://tenor.com/view/zombie-land-comedy-crying-upset-sad-gif-3359111)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
     }
 }

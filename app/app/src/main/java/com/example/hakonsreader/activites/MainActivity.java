@@ -89,11 +89,11 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         checkAccessTokenScopes();
 
         // For testing purposes hardcode going into a subreddit/post etc.
-        Intent intent = new Intent(this, SubmitActivity.class);
+        Intent intent = new Intent(this, DispatcherActivity.class);
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
-        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/GlobalOffensive/comments/jznuc5/just_finished_the_m4a4_cybershark_a_new_skin_from/");
-        //startActivity(intent);
+        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/insaneparents/comments/k5l14m/accidentally_knocking_over_toddlers_toys/gefm9lp?utm_source=share&utm_medium=web2x&context=3");
+        startActivity(intent);
 
         if (savedInstanceState != null) {
             savedState = savedInstanceState;
