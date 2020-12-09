@@ -601,12 +601,11 @@ public class App extends Application {
     /**
      * Returns the array of subreddits the user has selected to filter from front page/popular/all
      *
-     * @return An array of strings (can be empty)
+     * @return An array of lowercased subreddit names
      */
     public String[] subredditsToFilterFromDefaultSubreddits() {
         String asString = settings.getString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), "");
-        Log.d(TAG, "subredditsToFilterFromDefaultSubreddits: " + asString);
-        return asString.split("\n");
+        return asString.toLowerCase().split("\n");
     }
 
 

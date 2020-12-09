@@ -540,7 +540,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             val subsToFilter = App.get().subredditsToFilterFromDefaultSubreddits()
             posts.filter {
                 // Keep the post if the subreddit it is in isn't found in subsToFilter
-                !subsToFilter.contains(it.subreddit)
+                !subsToFilter.contains(it.subreddit.toLowerCase())
             }
         } else {
             posts

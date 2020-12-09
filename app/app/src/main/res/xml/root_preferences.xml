@@ -9,6 +9,7 @@
             app:key="@string/prefs_key_theme"
             app:title="@string/prefs_title_theme"
             app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_theme" />
 
         <ListPreference
@@ -18,6 +19,7 @@
             app:entries="@array/language_entries"
             app:entryValues="@array/language_values"
             app:useSimpleSummaryProvider="true"
+            app:singleLineTitle="false"
             app:defaultValue="@string/prefs_default_language" />
     </PreferenceCategory>
 
@@ -33,6 +35,7 @@
             app:entryValues="@array/data_saving_values"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true"
+            app:singleLineTitle="false"
             app:defaultValue="@string/prefs_default_data_saving" />
 
     </PreferenceCategory>
@@ -49,6 +52,7 @@
             app:min="25"
             android:max="80"
             app:defaultValue="@integer/prefs_default_max_post_size_percentage"
+            app:singleLineTitle="false"
             app:showSeekBarValue="true"
             app:iconSpaceReserved="false" />
 
@@ -57,6 +61,7 @@
             android:title="@string/prefs_title_filter_posts_from_default_subreddits"
             android:dialogMessage="@string/prefs_dialog_message_filter_posts_from_default_subreddits"
             app:defaultValue=""
+            app:singleLineTitle="false"
             app:iconSpaceReserved="false" />
 
         <ListPreference
@@ -64,6 +69,7 @@
             app:title="@string/prefs_title_fullscreen_swipe_direction"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true"
+            app:singleLineTitle="false"
             app:entries="@array/fullscreen_swipe_entries"
             app:entryValues="@array/fullscreen_swipe_values"
             app:defaultValue="@string/prefs_default_fullscreen_swipe_direction"/>
@@ -72,6 +78,7 @@
             app:key="@string/prefs_key_cache_nsfw"
             app:iconSpaceReserved="false"
             app:title="@string/prefs_title_cache_nsfw"
+            app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_value_cache_nsfw" />
 
         <ListPreference
@@ -79,6 +86,7 @@
             android:title="@string/prefs_title_show_nsfw_preview"
             android:entries="@array/show_nsfw_entries"
             app:entryValues="@array/show_nsfw_values"
+            app:singleLineTitle="false"
             app:defaultValue="@string/prefs_default_show_nsfw"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false" />
@@ -93,6 +101,7 @@
             app:key="@string/prefs_key_opening_links_in_app"
             android:title="@string/prefs_title_opening_links_in_app"
             app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_opening_links_in_app" />
 
     </PreferenceCategory>
@@ -107,6 +116,7 @@
             app:min="0"
             android:max="500"
             app:defaultValue="@integer/prefs_default_comment_smooth_scroll_threshold"
+            app:singleLineTitle="false"
             app:showSeekBarValue="true"
             app:iconSpaceReserved="false" />
 
@@ -116,12 +126,14 @@
             app:title="@string/prefs_title_hide_comments_threshold"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true"
+            app:singleLineTitle="false"
             app:defaultValue="@integer/prefs_default_hide_comments_threshold"/>
 
         <SwitchPreference
             app:key="@string/prefs_key_highlight_new_comments"
             app:title="@string/prefs_title_highlight_new_comments"
             app:defaultValue="@bool/prefs_default_highlight_new_comments"
+            app:singleLineTitle="false"
             app:iconSpaceReserved="false" />
 
         <!-- TODO hide comments from users ("This will also remove their child comments") -->
@@ -139,30 +151,35 @@
             app:useSimpleSummaryProvider="true"
             app:defaultValue="@string/prefs_default_value_auto_play_videos"
             app:entries="@array/auto_play_entries"
+            app:singleLineTitle="false"
             app:entryValues="@array/auto_play_values" />
 
         <SwitchPreference
             app:key="@string/prefs_key_auto_play_nsfw_videos"
             app:title="@string/prefs_title_auto_play_nsfw_videos"
             app:defaultValue="@bool/prefs_default_autoplay_nsfw_videos"
+            app:singleLineTitle="false"
             app:iconSpaceReserved="false" />
 
         <SwitchPreference
             app:key="@string/prefs_key_play_muted_videos"
             app:title="@string/prefs_title_play_muted_videos"
             app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_play_muted_videos" />
 
         <SwitchPreference
             app:key="@string/prefs_key_play_muted_videos_fullscreen"
             app:title="@string/prefs_title_play_muted_videos_fullscreen"
             app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_play_muted_videos_fullscreen" />
 
         <SwitchPreference
             app:key="@string/prefs_key_loop_videos"
             app:title="@string/prefs_title_loop_videos"
             app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_loop_videos" />
     </PreferenceCategory>
 </PreferenceScreen>
