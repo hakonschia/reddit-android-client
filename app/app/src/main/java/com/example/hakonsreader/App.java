@@ -602,12 +602,25 @@ public class App extends Application {
      * Returns the array of subreddits the user has selected to filter from front page/popular/all
      *
      * @return An array of lowercased subreddit names
+     * @see #addSubredditToPostFilters(String)
      */
     public String[] subredditsToFilterFromDefaultSubreddits() {
         String asString = settings.getString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), "");
         return asString.toLowerCase().split("\n");
     }
 
+    /**
+     * Adds a subreddit to the filters
+     * 
+     * @param subreddit The name of the subreddit to add
+     * @see #subredditsToFilterFromDefaultSubreddits() 
+     */
+    public void addSubredditToPostFilters(String subreddit) {
+        String previous = settings.getString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), "");
+        previous += "\n" + subreddit;
+        settings.edit().putString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), previous).apply();
+    }
+    
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that

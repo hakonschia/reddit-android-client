@@ -84,6 +84,8 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
         menu.menu.removeItem(R.id.menuCopyPostContent)
     }
 
+    menu.menu.findItem(R.id.menuPostAddSubredditToFilter).title = view.context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
+
     menu.setOnMenuItemClickListener { item: MenuItem ->
         // TODO add delete post, edit post (if selftext and logged in user is poster)
         return@setOnMenuItemClickListener when (item.itemId) {
@@ -93,6 +95,7 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
             R.id.menuBlockUser -> { blockUserOnClick(view, post); true }
             R.id.menuCopyPostLink -> { copyPostLinkOnClick(view, post); true }
             R.id.menuCopyPostContent -> { copyPostContentOnClick(view, post); true }
+            R.id.menuPostAddSubredditToFilter -> { filterSubredditOnClick(post.subreddit); true }
             else -> false
         }
     }
@@ -109,10 +112,13 @@ fun showPopupForPostExtraForNonLoggedInUser(view: View, post: RedditPost) {
     val menu = PopupMenu(view.context, view)
     menu.inflate(R.menu.post_extra_generic_for_all_users)
 
+    menu.menu.findItem(R.id.menuPostAddSubredditToFilter).title = view.context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
+
     menu.setOnMenuItemClickListener { item: MenuItem ->
         return@setOnMenuItemClickListener when (item.itemId) {
             R.id.menuCopyPostLink -> { copyPostLinkOnClick(view, post); true }
             R.id.menuCopyPostContent -> { copyPostContentOnClick(view, post); true }
+            R.id.menuPostAddSubredditToFilter -> { filterSubredditOnClick(post.subreddit); true }
             else -> false
         }
     }
@@ -218,4 +224,8 @@ private fun copyPostContentOnClick(view: View, post: RedditPost) {
     val clip = ClipData.newPlainText("Reddit post content link", post.url)
     clipboard.setPrimaryClip(clip)
     Snackbar.make(view, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
+}
+
+private fun filterSubredditOnClick(subredditName: String) {
+    App.get().addSubredditToPostFilters(subredditName)
 }

@@ -3,10 +3,13 @@
 
     <item
         android:id="@+id/menuCopyPostLink"
-        android:title="@string/copyPostLink"
-        />
+        android:title="@string/copyPostLink" />
 
     <item
         android:id="@+id/menuCopyPostContent"
         android:title="@string/copyPostContentLink" />
+
+    <item
+        android:id="@+id/menuPostAddSubredditToFilter"
+        android:title="@string/postMenuAddSubredditToFilter" />
 </menu>

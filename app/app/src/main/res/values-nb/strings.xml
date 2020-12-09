@@ -241,4 +241,5 @@
     <string name="submittingCrosspostPostNotFound">Posten finnes ikke</string>
     <string name="prefs_title_filter_posts_from_default_subreddits">Filtrer poster</string>
     <string name="prefs_dialog_message_filter_posts_from_default_subreddits">Filtrer poster fra subredditer fra å vises i startsiden, popular, og alle. Én subreddit per linje</string>
+    <string name="postMenuAddSubredditToFilter">Filtrer poster fra %s</string>
 </resources>
