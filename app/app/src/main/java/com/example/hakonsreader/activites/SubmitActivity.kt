@@ -11,10 +11,13 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
@@ -30,6 +33,7 @@ import com.example.hakonsreader.databinding.SubmissionTextBinding
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.dialogadapters.SubmissionFlairAdapter
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -70,7 +74,6 @@ class SubmitActivity : AppCompatActivity() {
 
         // Setup with all tabs initially until we know which submissions are supported on the subreddit
         setupTabs()
-        binding.tabs.setupWithViewPager(binding.submissionTypes)
 
 
         // We need information about the subreddit, try to get it from the local database and if it doesn't exist, get it from
@@ -85,17 +88,15 @@ class SubmitActivity : AppCompatActivity() {
             textFragment.binding?.markdownInput?.showPreviewInPopupDialog()
         }
 
-        // Add a listener to the ViewPager to show/remove the "Show preview" button as it is only for text posts
-        binding.submissionTypes.addOnPageChangeListener(object : OnPageChangeListener {
+        binding.submissionTypes.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
                 binding.showPreview.visibility = if (submissionFragments[position] is SubmissionTextFragment) {
-                    View.VISIBLE
+                    VISIBLE
                 } else {
-                    View.GONE
+                    GONE
                 }
             }
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-            override fun onPageScrollStateChanged(state: Int) {}
         })
 
         binding.submitPost.setOnClickListener {
@@ -196,7 +197,17 @@ class SubmitActivity : AppCompatActivity() {
         submissionFragments.add(SubmissionLinkFragment())
         submissionFragments.add(SubmissionCrosspostFragment())
 
-        binding.submissionTypes.adapter = PagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT)
+        binding.submissionTypes.adapter = PagerAdapter(this)
+        TabLayoutMediator(binding.tabs, binding.submissionTypes) { tab, position ->
+            tab.text = when (submissionFragments[position]) {
+                is SubmissionLinkFragment -> getString(R.string.submittingLinkHint)
+                is SubmissionCrosspostFragment -> getString(R.string.submittingCrosspostTitle)
+                else -> {
+                    getString(R.string.submittingTextHint)
+                }
+            }
+        }.attach()
+
     }
 
     private fun checkSubmissionTypes(subreddit: Subreddit) {
@@ -302,19 +313,11 @@ class SubmitActivity : AppCompatActivity() {
     }
 
 
-    inner class PagerAdapter(fragmentManager: FragmentManager, behaviour: Int) : FragmentPagerAdapter(fragmentManager, behaviour) {
-        override fun getCount(): Int = submissionFragments.size
-        override fun getItem(position: Int): Fragment = submissionFragments[position]
-
-        override fun getPageTitle(position: Int): CharSequence {
-            return when (submissionFragments[position]) {
-                is SubmissionLinkFragment -> getString(R.string.submittingLinkHint)
-                is SubmissionCrosspostFragment -> getString(R.string.submittingCrosspostTitle)
-                else -> {
-                    getString(R.string.submittingTextHint)
-                }
-            }
-        }
+    inner class PagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
+        override fun getItemCount(): Int = submissionFragments.size
+        // TODO apparently this shouldn't reuse fragments, but create a new one each time, but it doesn't
+        //  seem to cause an issue
+        override fun createFragment(position: Int): Fragment = submissionFragments[position]
     }
 
     class SubmissionTextFragment : Fragment() {
@@ -461,10 +464,8 @@ class SubmitActivity : AppCompatActivity() {
                         val post = resp.value
                         withContext(Main) {
                             if (post != null) {
+                                setPostInfo(post)
                                 postsMap[id] = post
-                                withContext(Main) {
-                                    setPostInfo(post)
-                                }
                                 binding?.crosspostSubmission?.error = null
                             } else {
                                 // The ID in the input might have changed since the request was made

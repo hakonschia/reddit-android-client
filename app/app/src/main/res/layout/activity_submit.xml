@@ -166,10 +166,10 @@
                 app:tabSelectedTextColor="@color/colorAccent" />
 
             <!-- Apparently dynamic height on ViewPagers doesn't work in a ScrollView ¯\_(ツ)_/¯-->
-            <androidx.viewpager.widget.ViewPager
+            <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/submissionTypes"
                 android:layout_width="0dp"
-                android:layout_height="250dp"
+                android:layout_height="wrap_content"
 
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
@@ -183,14 +183,15 @@
 
             <Button
                 android:id="@+id/showPreview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_marginEnd="8dp"
-                android:text="@string/showPreview"
-                android:backgroundTint="@color/buttonBackground"
                 style="@style/ButtonStyleSmall"
+                android:layout_width="wrap_content"
 
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/buttonBackground"
+
+                android:text="@string/showPreview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/submitPost"
                 app:layout_constraintHorizontal_bias="1.0"
