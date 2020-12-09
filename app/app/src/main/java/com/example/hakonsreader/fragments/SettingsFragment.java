@@ -3,9 +3,9 @@ package com.example.hakonsreader.fragments;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
-import android.widget.Switch;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -45,6 +45,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         boolean neverAutoPlayVideos = settings.getString(getString(R.string.prefs_key_auto_play_videos), getString(R.string.prefs_default_value_auto_play_videos))
                 .equals(getString(R.string.prefs_key_auto_play_videos_never));
         autoPlayNsfwVideos.setEnabled(!neverAutoPlayVideos);
+
+        EditTextPreference filteredSubreddits = findPreference(getString(R.string.prefs_key_filter_posts_from_default_subreddits));
+        filteredSubreddits.setOnPreferenceChangeListener(filteredSubredditsChangeListener);
+        setFilteredSubredditsSummary(filteredSubreddits, null);
     }
 
     @Override
@@ -79,6 +83,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             // return false = don't update since we're manually updating the value ourselves
             // TODO This doesn't update the summary however, until the user goes out of the preferences and back
             //  this is only a visual "bug", as when the value is used it will be updated
+            //  If simpleSummaryProvider is set to false in the XML and it is set manually in the fragment
+            //  as with filtered subreddits it probably works though
             return false;
         }
 
@@ -124,4 +130,40 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         return true;
     };
 
+    private final Preference.OnPreferenceChangeListener filteredSubredditsChangeListener = (preference, value) -> {
+        setFilteredSubredditsSummary((EditTextPreference) preference, (String) value);
+        return true;
+    };
+
+    /**
+     * Sets the summary for the filtered subreddits preference
+     *
+     * @param preference The preference
+     * @param value The value to use directly. If this is {@code null} then the value stored
+     *              in the preference is used
+     */
+    private void setFilteredSubredditsSummary(@NonNull EditTextPreference preference, @Nullable String value) {
+        // The value must be passed since when it is used in the changeListener the value in
+        // the preference wont be updated until the change listener returns
+
+        // This won't update before you go in/out of the settings, since changing the summary provider
+        // when it already has been is apparently not allowed
+
+        if (value == null) {
+            value = preference.getText();
+        }
+
+        String[] filteredSubs = value.split("\n");
+        int count = 0;
+        // Count only the non-empty subreddits (as they're not actual subredits)
+        // Probably a better way to do this but whatever
+        for (String filteredSub : filteredSubs) {
+            if (!filteredSub.isEmpty()) {
+                count++;
+            }
+        }
+
+        String filteredSummary = getResources().getQuantityString(R.plurals.filteredSubredditsSummary, count, count);
+        preference.setSummary(filteredSummary);
+    }
 }

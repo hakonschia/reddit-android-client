@@ -134,6 +134,12 @@
     <string name="prefs_key_show_all_sidebars" translatable="false">show_all_sidebars</string>
 
 
+    <plurals name="filteredSubredditsSummary">
+        <item quantity="zero">No subreddits filtered</item>
+        <item quantity="one">%d subreddit filtered</item>
+        <item quantity="other">%d subreddits filtered</item>
+    </plurals>
+
     <!-- String for post ages that are "just posted", ie. < 1 minute -->
     <string name="postAgeJustPosted">Just posted</string>
     <plurals name="postAgeMinutes">
