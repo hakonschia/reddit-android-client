@@ -213,4 +213,34 @@ class PostRequest(
         return modRequest.stickyPost(postId, false)
     }
 
+    /**
+     * Retrieves information about the post
+     *
+     * Retrieving comments also retrieves the post information, only use this if you only want
+     * the post information
+     *
+     * OAuth scope required: *read*
+     *
+     * @return The post will be returned in the response. If the post wasn't found, this will be *null*
+     * @see comments
+     */
+    suspend fun info() : ApiResponse<RedditPost?> {
+        return try {
+            val response = api.getInfo(Util.createFullName(Thing.POST, postId))
+            val body = response.body()
+
+            if (body != null){
+                val listings = body.getListings()
+                if (listings?.isNotEmpty() == true) {
+                    ApiResponse.Success(listings[0])
+                } else {
+                    ApiResponse.Success(null)
+                }
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
 }

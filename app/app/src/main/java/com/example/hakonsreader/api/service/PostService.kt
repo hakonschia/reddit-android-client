@@ -2,6 +2,7 @@ package com.example.hakonsreader.api.service
 
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditListing
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.JsonResponse
 import com.example.hakonsreader.api.responses.ListingResponse
 import retrofit2.Response
@@ -44,4 +45,15 @@ interface PostService : VoteService, ReplyService, SaveService, ModService {
             @Field("api_type") apiType: String,
             @Field("raw_json") rawJson: Int
     ) : Response<JsonResponse<RedditComment>>
+
+    /**
+     * Retrieves information about a post/a group of posts
+     *
+     * @param fullname The fullname of the post, or a comma separated string of the fullnames of the posts
+     * @return A Response with a [ListingResponse] holding the list of the posts
+     */
+    @GET("api/info")
+    suspend fun getInfo(
+            @Query("id") fullname: String
+    ) : Response<ListingResponse<RedditPost>>
 }
