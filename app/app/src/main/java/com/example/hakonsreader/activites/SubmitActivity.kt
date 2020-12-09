@@ -153,6 +153,7 @@ class SubmitActivity : AppCompatActivity() {
                     is ApiResponse.Error -> {
                         // If the sub doesn't allow flairs, a 403 is returned
                         binding.submissionFlairLoadingIcon.visibility = GONE
+                        binding.flairSpinner.visibility = GONE
                     }
                 }
             }
@@ -161,12 +162,19 @@ class SubmitActivity : AppCompatActivity() {
 
     /**
      * Handles successful responses for submission flairs. The loading icon is removed and
-     * [ActivitySubmitBinding.flairSpinner] is updated with the flairs
+     * [ActivitySubmitBinding.flairSpinner] is updated with the flairs.
+     *
+     * If no flairs are returned, then the spinner view is removed
      *
      * @param flairs The flairs retrieved
      */
     private fun onSubmissionFlairResponse(flairs: List<SubmissionFlair>) {
         submissionFlairs = flairs as ArrayList<SubmissionFlair>
+
+        if (submissionFlairs.isEmpty()) {
+            binding.flairSpinner.visibility = GONE
+            return
+        }
 
         val adapter = SubmissionFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, submissionFlairs)
         binding.flairSpinner.adapter = adapter
