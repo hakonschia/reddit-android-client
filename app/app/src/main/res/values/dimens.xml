@@ -11,6 +11,8 @@
 
     <dimen name="commentDepthIndent">12dp</dimen>
     <dimen name="commentSideBarWidth">1dp</dimen>
+    <dimen name="commentSideBarWidthOneBar">3dp</dimen>
+    <dimen name="commentSideBarMarginOneBar">5dp</dimen>
     <dimen name="topLevelCommentTopPadding">7dp</dimen>
     <dimen name="hiddenCommentBottomPadding">12dp</dimen>
     <dimen name="commentLockedBorderPadding">4dp</dimen>

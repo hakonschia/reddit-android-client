@@ -20,6 +20,10 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+// TODO genericMenu: Add "peek parent" that shows the parent comment in some sort of popup window
+//  that is easily dismissable (not a dialog that appears "over" the entire screen, but something small "in" the screen)
+
+
 /**
  * Shows the popup for comments for when the comment is posted by the user currently logged in
  *

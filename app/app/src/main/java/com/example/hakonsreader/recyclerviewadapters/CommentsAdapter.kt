@@ -2,14 +2,17 @@ package com.example.hakonsreader.recyclerviewadapters
 
 import android.graphics.Typeface
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.constraintlayout.solver.state.State
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.constraintlayout.widget.Constraints
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -638,15 +641,96 @@ fun addAuthorFlair(view: FrameLayout, comment: RedditComment?) {
     }
 }
 
+/**
+ * Adds sidebars to a ConstraintLayout
+ *
+ * This adds different sidebars based on [App.showAllSidebars]
+ */
+@BindingAdapter("sidebars")
+fun addSidebars(barrier: Barrier, depth: Int) {
+    if (App.get().showAllSidebars()) {
+        addAllSidebars(barrier, depth)
+    } else {
+        addOneColoredSidebar(barrier, depth)
+    }
+}
+
+/**
+ * Adds one colored sidebar to a ConstraintLayout to show the boundary of the comment. The comment
+ * will be indented according to [depth]
+ *
+ * @param barrier The barrier to reference the sidebar to
+ * @param depth The depth of the comment, if this is 0 then no sidebar is added
+ */
+private fun addOneColoredSidebar(barrier: Barrier, depth: Int) {
+    val parent = barrier.parent as ConstraintLayout
+    val res = barrier.context.resources
+    val indent = res.getDimension(R.dimen.commentDepthIndent).toInt()
+    val barWidth = res.getDimension(R.dimen.commentSideBarWidthOneBar).toInt()
+    val barMargin = res.getDimension(R.dimen.commentSideBarMarginOneBar).toInt()
+    val contentDescription = "sidebar"
+
+    val previousSidebars = java.util.ArrayList<View>()
+    parent.findViewsWithText(previousSidebars, contentDescription, View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
+
+    // No sidebar for top-level comments
+    if (depth == 0) {
+        previousSidebars.forEach { parent.removeView(it) }
+        barrier.referencedIds = intArrayOf(R.id.emptyView)
+        return
+    }
+
+    // Reuse the previous sidebar if possible
+    val view = if (previousSidebars.isNotEmpty()) {
+        previousSidebars[0]
+    } else {
+        // Create the view
+        val id = View.generateViewId()
+        val v = View(barrier.context)
+        v.id = id
+        v.contentDescription = contentDescription
+        // Use a drawable for rounded corners, although this makes the sidebars of same depth
+        // with a tiny gap
+        v.background = ContextCompat.getDrawable(barrier.context, R.drawable.comment_sidebar_one_sidebar_background)
+        parent.addView(v)
+
+        v
+    }
+
+    // Set constraints
+    val constraintSet = ConstraintSet()
+    constraintSet.clone(parent)
+
+    // Set width of the view
+    constraintSet.constrainWidth(view.id, barWidth)
+    constraintSet.constrainHeight(view.id, 0)
+
+    // start_toStartOf=parent, margin_start = indent*depth
+    constraintSet.connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, indent * depth)
+
+    // end_toEndOf=barrier
+    constraintSet.connect(view.id, ConstraintSet.END, barrier.id, ConstraintSet.END, barMargin)
+
+    // bottom_toBottomOf=parent
+    constraintSet.connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+    // top_toTopOf=parent
+    constraintSet.connect(view.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+
+    // Apply all the constraints
+    constraintSet.applyTo(parent)
+
+    val referencedIds = IntArray(1)
+    referencedIds[0] = view.id
+    barrier.referencedIds = referencedIds
+}
 
 /**
  * Adds sidebars to a ConstraintLayout to visually show the comment depth
  *
- * @param barrier The layout to add the sidebars to
- * @param depth The depth of the comment
+ * @param barrier The barrier to reference the sidebar to
+ * @param depth The depth of the comment, if this is 0 then no sidebars are added
  */
-@BindingAdapter("sidebars")
-fun addSidebars(barrier: Barrier, depth: Int) {
+private fun addAllSidebars(barrier: Barrier, depth: Int) {
     val parent = barrier.parent as ConstraintLayout
     // The contentDescription for the sidebars, this is used to find the sidebars again later
     val contentDescription = "sidebar"

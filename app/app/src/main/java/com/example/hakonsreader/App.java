@@ -620,7 +620,19 @@ public class App extends Application {
         previous += "\n" + subreddit;
         settings.edit().putString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), previous).apply();
     }
-    
+
+    /**
+     * Returns if the user wants to show all sidebars, or just one colored at the last indent
+     *
+     * @return True to show all sidebars, false to show one colored
+     */
+    public boolean showAllSidebars() {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_show_all_sidebars),
+                getResources().getBoolean(R.bool.prefs_default_show_all_sidebars)
+        );
+    }
+
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that

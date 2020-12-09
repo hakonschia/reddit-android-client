@@ -96,6 +96,7 @@
     <string name="prefs_title_comment_smooth_scroll_threshold">Threshold for smooth scroll comment navigation</string>
     <string name="prefs_title_filter_posts_from_default_subreddits">Filter posts</string>
     <string name="prefs_dialog_message_filter_posts_from_default_subreddits">Filter posts from subreddits from appearing in front page, popular, and all. One subreddit per line</string>
+    <string name="prefs_title_show_all_sidebars">Show all sidebars (or just one colored)</string>
 
 
     <!-- Preferences keys -->
@@ -130,6 +131,7 @@
     <string name="prefs_key_highlight_new_comments" translatable="false">highlight_new_comments</string>
     <string name="prefs_key_comment_smooth_scroll_threshold" translatable="false">max_comments_for_smooth_scroll</string>
     <string name="prefs_key_filter_posts_from_default_subreddits" translatable="false">filter_posts_from_default_subreddits</string>
+    <string name="prefs_key_show_all_sidebars" translatable="false">show_all_sidebars</string>
 
 
     <!-- String for post ages that are "just posted", ie. < 1 minute -->

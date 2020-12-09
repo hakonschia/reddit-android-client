@@ -16,5 +16,6 @@
     <string name="prefs_default_show_nsfw" translatable="false">@string/prefs_key_show_nsfw_preview_blur</string>
     <bool name="prefs_default_highlight_new_comments" translatable="false">true</bool>
     <integer name="prefs_default_comment_smooth_scroll_threshold">75</integer>
+    <bool name="prefs_default_show_all_sidebars">true</bool>
 
 </resources>

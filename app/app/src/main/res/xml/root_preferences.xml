@@ -136,6 +136,13 @@
             app:singleLineTitle="false"
             app:iconSpaceReserved="false" />
 
+        <SwitchPreference
+            app:key="@string/prefs_key_show_all_sidebars"
+            android:title="@string/prefs_title_show_all_sidebars"
+            app:defaultValue="@bool/prefs_default_show_all_sidebars"
+            app:singleLineTitle="false"
+            app:iconSpaceReserved="false" />
+
         <!-- TODO hide comments from users ("This will also remove their child comments") -->
     </PreferenceCategory>
 
