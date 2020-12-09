@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters
 
 import android.graphics.Typeface
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -96,6 +97,12 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
 
             setChain(comments)
         }
+
+    /**
+     * The layout state at the time when a comment chain was set. This can be used to restore
+     * the state when going back to all comments
+     */
+    private var layoutStateWhenChainShown: Parcelable? = null
 
     /**
      * The listener for when the reply button has been clicked on an item
@@ -210,6 +217,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
                     // This list should take us back to all the comments, so if we're setting a chain
                     // from within a chain, don't store the list
                     if (previousChainSize == 0) {
+                        layoutStateWhenChainShown = recyclerViewAttachedTo?.layoutManager?.onSaveInstanceState()
                         commentsShownWhenChainSet = comments
                     }
                     comments = chain
@@ -222,12 +230,15 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             chain.clear()
         }
 
+        // Go back to before the chain was set
         if (chain.isEmpty() && commentsShownWhenChainSet != null) {
             comments = commentsShownWhenChainSet as ArrayList<RedditComment>
+            if (layoutStateWhenChainShown != null) {
+                recyclerViewAttachedTo?.layoutManager?.onRestoreInstanceState(layoutStateWhenChainShown)
+            }
         }
 
         notifyDataSetChanged()
-        recyclerViewAttachedTo?.layoutManager?.scrollToPosition(0)
     }
 
 
