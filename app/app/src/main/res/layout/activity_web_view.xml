@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<!-- Since I can't get the scrolling behaviour to work, might as well use a ConstraintLayout
+ instead of CoordinatorLayout so that the WebView fits the screen-->
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,12 +10,14 @@
     android:orientation="vertical"
     android:background="@color/background">
 
-
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/toolbar">
+        android:background="@color/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
@@ -27,10 +31,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
 
-                android:foreground="@drawable/ripple_main_bg"
-                android:tint="@color/iconColor"
                 android:backgroundTint="#00000000"
-                android:src="@drawable/ic_baseline_more_vert_24" />
+                android:foreground="@drawable/ripple_main_bg"
+                android:src="@drawable/ic_baseline_more_vert_24"
+                android:tint="@color/iconColor" />
 
             <ImageButton
                 android:id="@+id/webViewClose"
@@ -38,21 +42,21 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
 
-                android:foreground="@drawable/ripple_main_bg"
-                android:tint="@color/iconColor"
                 android:backgroundTint="#00000000"
-                android:src="@drawable/ic_baseline_close_24" />
+                android:foreground="@drawable/ripple_main_bg"
+                android:src="@drawable/ic_baseline_close_24"
+                android:tint="@color/iconColor" />
 
             <TextView
                 android:id="@+id/webViewUrl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
-                android:layout_marginStart="15dp"
-                android:textColor="@color/text_color"
-                android:maxLines="2"
                 android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/text_color"
 
                 tools:text="https://stackoverflow.com/questions/34436076/how-to-right-align-the-image-on-the-toolbar-in-android/34436190" />
 
@@ -61,25 +65,33 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/refreshWebView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBar">
 
         <WebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 
     <ProgressBar
         android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="3dp"
         app:layout_anchor="@id/appBar"
         app:layout_anchorGravity="bottom"
-        style="?android:attr/progressBarStyleHorizontal"
 
-        tools:progress="50"/>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appBar"
+        tools:progress="50" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
 
