@@ -63,8 +63,8 @@
         <item quantity="other">%d dager siden</item>
     </plurals>
     <plurals name="extraComments">
-        <item quantity="one">%d mer kommentar</item>
-        <item quantity="other">%d flere kommentarer</item>
+        <item quantity="one">%d kommentar til</item>
+        <item quantity="other">%d kommentarer til</item>
     </plurals>
     <plurals name="numComments">
         <item quantity="one">%d kommentar</item>
