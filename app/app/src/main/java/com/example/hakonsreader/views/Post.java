@@ -144,8 +144,7 @@ public class Post extends Content {
         this.addContent();
         binding.postFullBar.setPost(redditPost);
 
-        setOnClickListener(v -> openPost());
-        setOnLongClickListener(v -> copyLinkToClipboard());
+        //setOnLongClickListener(v -> copyLinkToClipboard());
     }
 
     /**
@@ -303,44 +302,6 @@ public class Post extends Content {
     }
 
     /**
-     * Opens {@link Post#redditPost} in a new activity
-     */
-    private void openPost() {
-        // If the post has already been opened don't open it again
-        // This is to avoid if a user clicks on the post twice fast before it opens it will open twice
-        // which a) looks weird as two posts will be open twice, and b) when going back to the posts the post
-        // view will be missing
-        if (allowPostOpen && !postOpened) {
-            Intent intent = new Intent(getContext(), PostActivity.class);
-            intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(redditPost));
-
-            Bundle extras = getExtras();
-            intent.putExtra(Content.EXTRAS, extras);
-            intent.putExtra(PostActivity.HIDE_SCORE_KEY, binding.postFullBar.getHideScore());
-
-            // Only really applicable for videos, as they should be paused
-            this.viewUnselected();
-
-            Activity activity = (Activity)getContext();
-
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, getTransitionViews());
-            activity.startActivityForResult(intent,2, options.toBundle());
-
-            // Set it back to un-opened after a short amount of time so the user can open the post again after exiting
-            // The sleep time just has to be long enough to avoid double clicks, the sleep time is fairly arbitrary
-            postOpened = true;
-            new Thread(() -> {
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                postOpened = false;
-            }).start();
-        }
-    }
-
-    /**
      * Copies the link of the post to the clipboard
      *
      * @return True (ie. event handled in a long click)
@@ -384,7 +345,7 @@ public class Post extends Content {
     @Override
     public Bundle getExtras() {
         Content c = (Content) binding.content.getChildAt(0);
-        return c != null ? c.getExtras() : new Bundle();
+        return  c != null ? c.getExtras() : new Bundle();
     }
 
     /**
@@ -404,7 +365,8 @@ public class Post extends Content {
     }
 
     /**
-     * Retrieve the list of views mapped to the corresponding transition name
+     * Retrieve the list of views mapped to the corresponding transition name, to be used in a
+     * shared element transition
      *
      * @return A list of pairs with a View mapped to a transition name
      */

@@ -1,14 +1,15 @@
 package com.example.hakonsreader.fragments
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableField
 import androidx.fragment.app.Fragment
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activites.PostActivity
 import com.example.hakonsreader.activites.SubmitActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -39,14 +41,15 @@ import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
+import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.util.ViewUtil
+import com.google.gson.Gson
 import com.robinhood.ticker.TickerUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.stream.Collectors
 
 class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservable {
 
@@ -282,6 +285,25 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
             postsScrollListener = PostScrollListener(it.posts) { postsViewModel?.loadPosts() }
             it.posts.setOnScrollChangeListener(postsScrollListener)
+
+            postsAdapter?.setOnPostClicked { post ->
+                // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
+                // autoplay the video
+                val redditPost = post.redditPost
+                postsScrollListener?.setPostToIgnore(redditPost.id)
+
+                val intent = Intent(context, PostActivity::class.java)
+                intent.putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))
+                intent.putExtra(Content.EXTRAS, post.extras)
+                intent.putExtra(PostActivity.HIDE_SCORE_KEY, post.hideScore)
+
+                // Only really applicable for videos, as they should be paused
+                post.viewUnselected()
+
+                val activity = requireActivity()
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews)
+                activity.startActivityForResult(intent, 2, options.toBundle())
+            }
         }
     }
 

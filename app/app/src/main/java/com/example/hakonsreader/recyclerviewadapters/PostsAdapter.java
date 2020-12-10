@@ -37,6 +37,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      */
     private int hideScoreTime = -1;
 
+    private OnPostClicked onPostClicked;
+
+    public void setOnPostClicked(OnPostClicked onPostClicked) {
+        this.onPostClicked = onPostClicked;
+    }
+
 
     /**
      * Submits the list of posts to show in the RecyclerView
@@ -158,13 +164,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     /**
      * The view for the items in the list
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private final Post post;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             post = itemView.findViewById(R.id.post);
+            itemView.setOnClickListener(v -> {
+                if (onPostClicked != null) {
+                    if (getAdapterPosition() != RecyclerView.NO_POSITION) {
+                        onPostClicked.postClicked(post);
+                    }
+                }
+            });
         }
 
         /**
@@ -238,5 +251,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public void destroy() {
             post.cleanUpContent();
         }
+    }
+
+    @FunctionalInterface
+    public interface OnPostClicked {
+        void postClicked(Post post);
     }
 }
