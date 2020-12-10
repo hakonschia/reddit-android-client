@@ -13,6 +13,7 @@ import androidx.preference.PreferenceManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
@@ -26,6 +27,9 @@ import com.example.hakonsreader.misc.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import java.util.*
 
 class MainActivity : AppCompatActivity(), OnSubredditSelected {
@@ -218,7 +222,12 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
         api.getAccessToken(code, {
             // Get information about the user. If this fails it doesn't really matter, as it isn't
             // strictly needed at this point
-            api.user().info({ user: RedditUser? -> App.storeUserInfo(user) }) { e: GenericError?, t: Throwable? -> }
+            CoroutineScope(IO).launch {
+                when (val resp = api.user().info()) {
+                    is ApiResponse.Success -> App.storeUserInfo(resp.value)
+                    is ApiResponse.Error -> {}
+                }
+            }
 
             // Re-create the start fragment as it now should load posts for the logged in user
             // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
@@ -268,8 +277,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
             AlertDialog.Builder(this)
                     .setCustomTitle(view)
                     .setAdapter(adapter, null)
-                    .setPositiveButton(android.R.string.ok) { dialog: DialogInterface?, which: Int -> }
-                    .setNegativeButton(R.string.newPermissionsDontShowAgain) { dialog, which ->
+                    .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int -> }
+                    .setNegativeButton(R.string.newPermissionsDontShowAgain) { _, _ ->
                         // Store in SharedPreferences so the next time the code above will trigger a return
                         preferences.edit().putString(SharedPreferencesConstants.ACCESS_TOKEN_SCOPES_CHECKED, NetworkConstants.SCOPE).apply()
                     }
