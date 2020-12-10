@@ -206,7 +206,7 @@
     <string name="submittingCrosspostHint">IDen til posten å krossposte</string>
     <string name="submittingCrosspostTitle">Krosspost</string>
     <string name="submittingSpoiler">Spoiler</string>
-    <string name="submittingReceiveNotifications">Motta notifikasjonedr</string>
+    <string name="submittingReceiveNotifications">Motta notifikasjoner</string>
     <string name="submitPostBtn">Send inn post</string>
     <string name="submittingLinkNoLink">Vennligst skriv inn en link å sende inn</string>
     <string name="submittingCrosspostNoId">Vennligst skriv inn en post ID å sende inn</string>
