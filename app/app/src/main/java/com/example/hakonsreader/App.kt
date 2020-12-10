@@ -96,7 +96,7 @@ class App : Application() {
      *
      * @return The current OAuth state
      */
-    var oAuthState: String? = null
+    var oauthState: String? = null
         private set
 
     /**
@@ -275,7 +275,7 @@ class App : Application() {
      * Use this when the state has been verified
      */
     fun clearOAuthState() {
-        oAuthState = null
+        oauthState = null
     }
 
     /**
@@ -299,8 +299,8 @@ class App : Application() {
      * @return A random string to use in the request for access
      */
     fun generateAndGetOAuthState(): String? {
-        oAuthState = generateOauthState()
-        return oAuthState
+        oauthState = generateOauthState()
+        return oauthState
     }
 
     /**
