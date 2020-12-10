@@ -6,10 +6,12 @@ import android.content.Context
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.fragments.PeekCommentBottomSheetDialog
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -19,10 +21,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-// TODO genericMenu: Add "peek parent" that shows the parent comment in some sort of popup window
-//  that is easily dismissable (not a dialog that appears "over" the entire screen, but something small "in" the screen)
-
 
 /**
  * Shows the popup for comments for when the comment is posted by the user currently logged in
@@ -72,6 +70,12 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
         savedItem.title = view.context.getString(R.string.unsaveComment)
     }
 
+    val parentComment = adapter.getCommentById(comment.parentId)
+    if (parentComment == null) {
+        // No parent comment, remove the "Peek parent" option
+        menu.menu.removeItem(R.id.menuPeekParentComment)
+    }
+
     menu.setOnMenuItemClickListener { item: MenuItem ->
         return@setOnMenuItemClickListener when (item.itemId) {
             R.id.menuDeleteComment -> { deleteCommentOnClick(view, comment); true }
@@ -81,6 +85,7 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
             R.id.menuBlockUser -> { blockUserOnClick(view, comment); true }
             R.id.menuShowCommentChain -> { adapter.commentIdChain = comment.id; true }
             R.id.menuCopyCommentLink -> { copyCommentLinkOnClick(view, comment); true }
+            R.id.menuPeekParentComment -> { peekParentOnClick(view.context, parentComment!!); true }
             else -> false
         }
     }
@@ -99,10 +104,17 @@ fun showPopupForCommentExtraForNonLoggedInUser(view: View, comment: RedditCommen
     val menu = PopupMenu(view.context, view)
     menu.inflate(R.menu.comment_extra_generic_for_all_users)
 
+    val parentComment = adapter.getCommentById(comment.parentId)
+    if (parentComment == null) {
+        // No parent comment, remove the "Peek parent" option
+        menu.menu.removeItem(R.id.menuPeekParentComment)
+    }
+
     menu.setOnMenuItemClickListener { item: MenuItem ->
         return@setOnMenuItemClickListener when (item.itemId) {
             R.id.menuShowCommentChain -> { adapter.commentIdChain = comment.id; true }
             R.id.menuCopyCommentLink -> { copyCommentLinkOnClick(view, comment); true }
+            R.id.menuPeekParentComment -> { peekParentOnClick(view.context, parentComment!!); true }
             else -> false
         }
     }
@@ -233,6 +245,13 @@ private fun copyCommentLinkOnClick(view: View, comment: RedditComment) {
     Snackbar.make(view, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
 }
 
+private fun peekParentOnClick(context: Context, comment: RedditComment) {
+    context as AppCompatActivity
+    val bottomSheet = PeekCommentBottomSheetDialog()
+    bottomSheet.comment = comment
+    bottomSheet.show(context.supportFragmentManager, "peekParentBottomSheet")
+}
+
 /**
  * Updates distinguished/stickied in a comment based on a new comment
  *
@@ -247,3 +266,4 @@ private fun updateDistinguishAndSticky(oldComment: RedditComment, newComment: Re
     oldComment.isStickied = newComment.isStickied
     adapter.notifyItemChanged(oldComment)
 }
+

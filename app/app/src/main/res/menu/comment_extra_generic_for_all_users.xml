@@ -4,6 +4,10 @@
      in user and comments by other users -->
 
     <item
+        android:id="@+id/menuPeekParentComment"
+        android:title="Peek parent" />
+
+    <item
         android:id="@+id/menuShowCommentChain"
         android:title="@string/commentShowChain"/>
 
