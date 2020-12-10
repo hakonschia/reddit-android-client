@@ -30,7 +30,7 @@
         android:layout_below="@id/postInfo"
         android:layout_centerInParent="true" />
 
-    <com.example.hakonsreader.views.FullPostBar
+    <com.example.hakonsreader.views.PostBar
         android:id="@+id/postFullBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

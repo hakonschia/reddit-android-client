@@ -10,30 +10,30 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
-import com.example.hakonsreader.databinding.FullPostBarBinding;
+import com.example.hakonsreader.databinding.PostBarBinding;
 import com.robinhood.ticker.TickerUtils;
 
 /**
  * View for the full bar underneath a Reddit post
  */
-public class FullPostBar extends ConstraintLayout {
+public class PostBar extends ConstraintLayout {
     private RedditPost post;
 
-    private final FullPostBarBinding binding;
+    private final PostBarBinding binding;
     private int hideScoreTime;
 
-    public FullPostBar(@NonNull Context context) {
+    public PostBar(@NonNull Context context) {
         this(context, null, 0, 0);
     }
-    public FullPostBar(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public PostBar(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0, 0);
     }
-    public FullPostBar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public PostBar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
-    public FullPostBar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public PostBar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        binding = FullPostBarBinding.inflate(LayoutInflater.from(context), this, true);
+        binding = PostBarBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
     /**
@@ -51,7 +51,7 @@ public class FullPostBar extends ConstraintLayout {
     }
 
     /**
-     * Call this if the score should always be hidden. Must be called before {@link FullPostBar#setPost(RedditPost)}
+     * Call this if the score should always be hidden. Must be called before {@link PostBar#setPost(RedditPost)}
      */
     public void setHideScore(boolean hideScore) {
         binding.voteBar.setHideScore(hideScore);
@@ -67,7 +67,7 @@ public class FullPostBar extends ConstraintLayout {
     }
 
     /**
-     * Updates the view based on the post set with {@link FullPostBar#post}
+     * Updates the view based on the post set with {@link PostBar#post}
      */
     private void updateView() {
         binding.voteBar.updateVoteStatus();
