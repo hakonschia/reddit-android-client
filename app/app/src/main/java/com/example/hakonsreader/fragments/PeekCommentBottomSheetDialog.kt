@@ -20,7 +20,7 @@ class PeekCommentBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = PeekParentCommentBinding.inflate(inflater)
-        binding?.isByLoggedInUser = comment?.author == App.getStoredUser()?.username
+        binding?.isByLoggedInUser = comment?.author == App.storedUser?.username
         binding?.comment = comment
 
         return binding?.root

@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private final BottomNavigationViewListener navigationViewListener = new BottomNavigationViewListener();
 
     // Interface towards the Reddit API
-    private final RedditApi redditApi = App.get().getApi();
+    private final RedditApi redditApi = App.Companion.get().getApi();
 
 
     @Override
@@ -106,13 +106,13 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         }
 
         this.setupNavBar(savedInstanceState);
-        App.get().registerReceivers();
+        App.Companion.get().registerReceivers();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        App.get().unregisterReceivers();
+        App.Companion.get().unregisterReceivers();
         binding = null;
     }
 
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     @Override
     protected void onResume() {
         super.onResume();
-        App.get().setActiveActivity(this);
+        App.Companion.get().setActiveActivity(this);
 
         Uri uri = getIntent().getData();
         if (uri == null) {
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             String state = uri.getQueryParameter("state");
 
             // Not a match from the state we generated, something weird is happening
-            if (state == null || !state.equals(App.get().getOAuthState())) {
+            if (state == null || !state.equals(App.Companion.get().getOAuthState())) {
                 Util.showErrorLoggingInSnackbar(binding.parentLayout);
                 return;
             }
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 return;
             }
 
-            App.get().clearOAuthState();
+            App.Companion.get().clearOAuthState();
 
             // This might be bad, but onResume is called when opening a post and going back and still
             // holds the same intent which causes this branch to execute again, causing issues
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             redditApi.getAccessToken(code, ignored -> {
                 // Get information about the user. If this fails it doesn't really matter, as it isn't
                 // strictly needed at this point
-                redditApi.user().info(App::storeUserInfo, (e, t) -> {
+                redditApi.user().info(App.Companion::storeUserInfo, (e, t) -> {
                     // Ignored
                 });
 
@@ -559,7 +559,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
          */
         private Fragment onNavBarProfile() {
             // If logged in, show profile, otherwise show log in page
-            if (App.get().isUserLoggedIn()) {
+            if (App.Companion.get().isUserLoggedIn()) {
                 if (profileFragment == null) {
                     profileFragment = ProfileFragment.Companion.newInstance();
                 }

@@ -90,7 +90,7 @@ public class MarkdownInput extends FrameLayout {
         // Using this markwon instance has the benefit of highlighting reddit links etc. in the preview
         // Although it doesn't actually add the links around the markdown, reddit doesn't do that
         // themselves so it's fine
-        final Markwon markwon = App.get().getMark();
+        final Markwon markwon = App.Companion.get().getMarkwon();
 
         // TODO custom markwon plugins wont affect the edit text
         // Create editor
@@ -178,7 +178,7 @@ public class MarkdownInput extends FrameLayout {
         Dialog previewDialog = new Dialog(getContext());
         previewDialog.setContentView(R.layout.dialog_markdown_preview);
         TextView previewText = previewDialog.findViewById(R.id.previewText);
-        App.get().getMark().setMarkdown(previewText, binding.replyText.getText().toString());
+        App.Companion.get().getMarkwon().setMarkdown(previewText, binding.replyText.getText().toString());
 
         previewDialog.show();
         previewDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

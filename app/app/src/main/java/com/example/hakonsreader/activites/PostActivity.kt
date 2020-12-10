@@ -263,7 +263,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
         // If we're in landscape the "height" is the width of the screen
         val portrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         val height = if (portrait) App.get().screenHeight else App.get().screenWidth
-        val maxHeight = (height * (App.get().maxPostSizePercentage / 100f)).toInt()
+        val maxHeight = (height * (App.get().getMaxPostSizePercentage() / 100f)).toInt()
 
         binding?.let {
             it.post.setMaxHeight(maxHeight)

@@ -75,7 +75,7 @@ public class ContentImage extends Content {
      */
     @Override
     protected void updateView() {
-        int screenWidth = App.get().getScreenWidth();
+        int screenWidth = App.Companion.get().getScreenWidth();
 
         // Set with setPost() not setWithImageUrl()
         if (imageUrl == null) {
@@ -102,7 +102,7 @@ public class ContentImage extends Content {
         String obfuscatedUrl = null;
         int noImageId = -1;
         if (redditPost.isNsfw() ) {
-            ShowNsfwPreview show = App.get().showNsfwPreview();
+            ShowNsfwPreview show = App.Companion.get().showNsfwPreview();
 
             switch (show) {
                 case NORMAL:
@@ -150,12 +150,12 @@ public class ContentImage extends Content {
                         .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
                         .error(R.drawable.ic_baseline_wifi_tethering_150)
                         // Scale so the image fits the width of the screen
-                        .resize(App.get().getScreenWidth(), 0);
+                        .resize(App.Companion.get().getScreenWidth(), 0);
 
                 // Post is NSFW and user has chosen not to cache NSFW
                 // TODO this won't work as the actual image is only loaded in fullscreen, what is not cached here
                 //  is the obfuscated image, need to pass "dontCache" to ImageActivity
-                if (redditPost.isNsfw() && App.get().dontCacheNSFW()) {
+                if (redditPost.isNsfw() && App.Companion.get().dontCacheNSFW()) {
                     // Don't store in cache and don't look in cache as this image will never be there
                     creator = creator.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
                 }

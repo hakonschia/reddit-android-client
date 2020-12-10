@@ -173,14 +173,14 @@ public class ContentVideo extends Content {
         this.setFullscreenListener();
         this.setVolumeListener();
 
-        if (App.get().muteVideoByDefault()) {
+        if (App.Companion.get().muteVideoByDefault()) {
             this.toggleVolume(false);
         }
 
         // Match the width to the screen width. This makes the controller match the screen width, but the
         // video player itself will be resized based on its actual size
         ViewGroup.LayoutParams params = getLayoutParams();
-        params.width = App.get().getScreenWidth();
+        params.width = App.Companion.get().getScreenWidth();
         setLayoutParams(params);
     }
 
@@ -228,7 +228,7 @@ public class ContentVideo extends Content {
                 .setTrackSelector(new DefaultTrackSelector(context, new AdaptiveTrackSelection.Factory()))
                 .build();
 
-        if (App.get().autoLoopVideos()) {
+        if (App.Companion.get().autoLoopVideos()) {
             exoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
         }
 
@@ -280,7 +280,7 @@ public class ContentVideo extends Content {
         // Data source is constant for all media sources
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT);
         // Convert the data source into a cache source if the user has selected to cache NSFW videos
-        if (!(redditPost.isNsfw() && App.get().dontCacheNSFW())) {
+        if (!(redditPost.isNsfw() && App.Companion.get().dontCacheNSFW())) {
             dataSourceFactory = new CacheDataSourceFactory(VideoCache.getCache(context), dataSourceFactory);
         }
 
@@ -325,7 +325,7 @@ public class ContentVideo extends Content {
         String obfuscatedUrl = null;
         int noImageId = -1;
         if (redditPost.isNsfw()) {
-            ShowNsfwPreview show = App.get().showNsfwPreview();
+            ShowNsfwPreview show = App.Companion.get().showNsfwPreview();
 
             switch (show) {
                 case NORMAL:
@@ -537,6 +537,7 @@ public class ContentVideo extends Content {
      * doesn't go too large, while keeping the aspect ratio the same
      */
     private void setSize() {
+        App app = App.Companion.get();
         int videoWidth;
         int videoHeight;
 
@@ -554,7 +555,7 @@ public class ContentVideo extends Content {
         }
 
         // Ensure the video size to screen ratio isn't too large or too small
-        float widthRatio = (float) videoWidth / App.get().getScreenWidth();
+        float widthRatio = (float) videoWidth / app.getScreenWidth();
         if (widthRatio > MAX_WIDTH_RATIO) {
             widthRatio = MAX_WIDTH_RATIO;
         } else if (widthRatio < MIN_WIDTH_RATIO) {
@@ -562,18 +563,18 @@ public class ContentVideo extends Content {
         }
 
         // Calculate and set the new width and height
-        int width = (int)(App.get().getScreenWidth() * widthRatio);
+        int width = (int)(App.Companion.get().getScreenWidth() * widthRatio);
 
         // Find how much the width was scaled by and use that to find the new height
         float widthScaledBy = videoWidth / (float)width;
         int height = (int)(videoHeight / widthScaledBy);
 
-        float heightRatio = (float) height / App.get().getScreenHeight();
+        float heightRatio = (float) height / app.getScreenHeight();
         if (heightRatio > MAX_HEIGHT_RATIO) {
             heightRatio = MAX_HEIGHT_RATIO;
         }
 
-        height = (int)(App.get().getScreenHeight() * heightRatio);
+        height = (int)(app.getScreenHeight() * heightRatio);
 
         float heightScaledBy = videoHeight / (float)height;
         width = (int)(videoWidth / heightScaledBy);
@@ -604,10 +605,10 @@ public class ContentVideo extends Content {
         }
 
         if (redditPost.isNsfw()) {
-            if (App.get().autoPlayNsfwVideos()) {
+            if (App.Companion.get().autoPlayNsfwVideos()) {
                 setPlayback(true);
             }
-        } else if (App.get().autoPlayVideos()) {
+        } else if (App.Companion.get().autoPlayVideos()) {
             setPlayback(true);
         }
     }

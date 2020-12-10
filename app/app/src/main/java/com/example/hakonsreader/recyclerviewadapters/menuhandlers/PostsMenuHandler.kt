@@ -30,7 +30,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
         return
     }
 
-    if (App.get().isUserLoggedIn) {
+    if (App.get().isUserLoggedIn()) {
         showPopupForPostExtraForLoggedInUser(view, post)
     } else {
         showPopupForPostExtraForNonLoggedInUser(view, post)
@@ -45,7 +45,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
  * @param post The post the popup is for
  */
 private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
-    val user = App.getStoredUser()
+    val user = App.storedUser
     val menu = PopupMenu(view.context, view)
     menu.inflate(R.menu.post_extra_generic_for_all_users)
     menu.inflate(R.menu.post_extra_for_logged_in_users)

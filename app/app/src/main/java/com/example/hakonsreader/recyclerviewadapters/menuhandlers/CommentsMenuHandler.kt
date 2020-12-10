@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
  * @param adapter The RecyclerView adapter the comment is in
  */
 fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, adapter: CommentsAdapter) {
-    val user = App.getStoredUser()
+    val user = App.storedUser
     val menu = PopupMenu(view.context, view)
     menu.inflate(R.menu.comment_extra_generic_for_all_users)
     menu.inflate(R.menu.comment_extra_for_logged_in_users)

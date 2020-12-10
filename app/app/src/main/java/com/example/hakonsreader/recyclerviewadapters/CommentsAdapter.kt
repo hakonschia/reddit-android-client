@@ -192,7 +192,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
      */
     private fun checkAndSetHiddenComments() {
         val commentsToRemove: MutableList<RedditComment> = java.util.ArrayList()
-        val hideThreshold = App.get().autoHideScoreThreshold
+        val hideThreshold = App.get().getAutoHideScoreThreshold()
 
         comments.forEach { comment: RedditComment ->
             if (hideThreshold >= comment.score || comment.isCollapsed) {
@@ -443,7 +443,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
 
         // We could check if privately browsing. Mod/save etc. won't appear anyways, only delete comment
         // since we only have the user, the API doesn't send back that data since the access token is anonymous
-        if (App.get().isUserLoggedIn) {
+        if (App.get().isUserLoggedIn()) {
             showPopupForCommentExtraForLoggedInUser(view, comment, this)
         } else {
             showPopupForCommentExtraForNonLoggedInUser(view, comment, this)
@@ -457,7 +457,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
                 // User wants to highlight new comments, and the comment was added after the last time the post was opened
                 || (App.get().highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
 
-        val byLoggedInUser = comment.author == App.getStoredUser()?.username
+        val byLoggedInUser = comment.author == App.storedUser?.username
 
         when (holder.itemViewType) {
             MORE_COMMENTS_TYPE -> (holder as MoreCommentsViewHolder).bind(comment)

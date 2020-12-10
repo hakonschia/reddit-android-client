@@ -55,7 +55,7 @@ public class MenuClickHandler {
         PopupMenu menu = new PopupMenu(view.getContext(), view);
         menu.inflate(R.menu.profile_menu_logged_in_user);
 
-        boolean isPrivatelyBrowsing = App.get().getApi().isPrivatelyBrowsing();
+        boolean isPrivatelyBrowsing = App.Companion.get().getApi().isPrivatelyBrowsing();
         if (isPrivatelyBrowsing) {
             MenuItem savedItem = menu.getMenu().findItem(R.id.menuBrowsePrivately);
             savedItem.setTitle(view.getContext().getString(R.string.menuPrivateBrowsingDisable));
@@ -65,10 +65,10 @@ public class MenuClickHandler {
             int itemId = item.getItemId();
 
             if (itemId == R.id.menuLogOut) {
-                App.get().logOut();
+                App.Companion.get().logOut();
                 return true;
             } else if (itemId == R.id.menuBrowsePrivately) {
-                App.get().enablePrivateBrowsing(!isPrivatelyBrowsing);
+                App.Companion.get().enablePrivateBrowsing(!isPrivatelyBrowsing);
                 return true;
             } else if (itemId == R.id.menuApplicationPrivileges) {
                 showApplicationPrivileges(view.getContext(), view.getParent());

@@ -188,7 +188,7 @@ class SubmitActivity : AppCompatActivity() {
         binding.subredditSubmitText.movementMethod = InternalLinkMovementMethod.getInstance(this)
 
         val submitTextAdjusted = App.get().adjuster.adjust(subreddit.submitText)
-        App.get().mark.setMarkdown(binding.subredditSubmitText, submitTextAdjusted)
+        App.get().markwon.setMarkdown(binding.subredditSubmitText, submitTextAdjusted)
     }
 
     private fun setupTabs() {

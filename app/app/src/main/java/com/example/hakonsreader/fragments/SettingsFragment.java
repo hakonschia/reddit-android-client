@@ -58,7 +58,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         // Update the theme right away
         if (key.equals(getString(R.string.prefs_key_theme))) {
-            App.get().updateTheme();
+            App.Companion.get().updateTheme();
         }
 
         return super.onPreferenceTreeClick(preference);

@@ -14,7 +14,7 @@ import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 public class PostScrollListener implements View.OnScrollChangeListener {
     private static final String TAG = "PostScrollListener";
 
-    private static final int SCREEN_HEIGHT = App.get().getScreenHeight();
+    private static final int SCREEN_HEIGHT = App.Companion.get().getScreenHeight();
 
 
     private final LinearLayoutManager layoutManager;

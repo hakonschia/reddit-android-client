@@ -33,7 +33,7 @@ class ContentText : Content {
             binding.content.movementMethod = InternalLinkMovementMethod.getInstance(context)
 
             markdown = App.get().adjuster.adjust(markdown)
-            App.get().mark.setMarkdown(binding.content, markdown)
+            App.get().markwon.setMarkdown(binding.content, markdown)
         }
     }
 

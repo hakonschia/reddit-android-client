@@ -185,7 +185,7 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
         val sub = subreddits[position]
 
         holder.binding.name.text = sub.name
-        App.get().mark.setMarkdown(holder.binding.subredditDescription, sub.publicDescription)
+        App.get().markwon.setMarkdown(holder.binding.subredditDescription, sub.publicDescription)
         ViewUtil.setSubredditIcon(holder.binding.icon, sub)
 
         // You can only favorite subs you are subscribed to

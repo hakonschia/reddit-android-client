@@ -44,7 +44,7 @@ public class Util {
         if (t instanceof IOException) {
             Util.showNoInternetSnackbar(parent);
         } else if (t instanceof InvalidAccessTokenException) {
-            if (App.get().isUserLoggedInPrivatelyBrowsing()) {
+            if (App.Companion.get().isUserLoggedInPrivatelyBrowsing()) {
                 Util.showPrivatelyBrowsingSnackbar(parent);
             } else {
                 Util.showNotLoggedInSnackbar(parent);
@@ -89,7 +89,7 @@ public class Util {
         Context context = parent.getContext();
 
         snackbar.setAction(context.getString(R.string.disable), v -> {
-            App.get().enablePrivateBrowsing(false);
+            App.Companion.get().enablePrivateBrowsing(false);
         });
         snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
         snackbar.show();

@@ -77,7 +77,7 @@ public class ContentGallery extends Content {
         }
 
         // Should scale height to fit with the width as the image will be scaled later
-        int screenWidth = App.get().getScreenWidth();
+        int screenWidth = App.Companion.get().getScreenWidth();
         float widthScale = screenWidth / (float)maxWidth;
         setLayoutParams(new ViewGroup.LayoutParams(screenWidth, (int) (maxHeight * widthScale)));
 

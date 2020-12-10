@@ -46,7 +46,7 @@ class ImageActivity : AppCompatActivity() {
         // Offset 3 bytes and get the value there to find the alpha
         val alpha = color shr 8 * 3 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
-        val config = App.get().videoAndImageSlidrConfig // To keep the background the same the entire way the alpha is always the same
+        val config = App.get().getVideoAndImageSlidrConfig() // To keep the background the same the entire way the alpha is always the same
                 // Otherwise the background of the activity slides with, which looks weird
                 .scrimStartAlpha(alphaPercentage)
                 .scrimEndAlpha(alphaPercentage)

@@ -67,7 +67,7 @@ class VideoActivity : AppCompatActivity() {
         val color = getColor(R.color.imageVideoActivityBackground)
         val alpha = color shr 24 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
-        val config = App.get().videoAndImageSlidrConfig // To keep the background the same the entire way the alpha is always the same
+        val config = App.get().getVideoAndImageSlidrConfig() // To keep the background the same the entire way the alpha is always the same
                 // Otherwise the background of the activity slides with, which looks weird
                 .scrimStartAlpha(alphaPercentage)
                 .scrimEndAlpha(alphaPercentage)

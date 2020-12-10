@@ -190,7 +190,7 @@ class ReplyActivity : AppCompatActivity() {
                 // If the post is a selftext post then use that as the summary, otherwise
                 // use the title
                 if (it.getPostType() == PostType.TEXT) {
-                    App.get().mark.setMarkdown(binding!!.summary, it.selftext)
+                    App.get().markwon.setMarkdown(binding!!.summary, it.selftext)
                 } else {
                     binding?.summary?.text = it.title
                 }
@@ -199,7 +199,7 @@ class ReplyActivity : AppCompatActivity() {
             replyingTo = Gson().fromJson(jsonData, RedditComment::class.java)
             replyingTo.let {
                 it as RedditComment
-                App.get().mark.setMarkdown(binding!!.summary, it.body)
+                App.get().markwon.setMarkdown(binding!!.summary, it.body)
             }
         }
 
@@ -237,7 +237,7 @@ class ReplyActivity : AppCompatActivity() {
      */
     private fun showNotLoggedInDialogIfNotLoggedIn() {
         // TODO private browsing
-        if (!App.get().isUserLoggedIn) {
+        if (!App.get().isUserLoggedIn()) {
             AlertDialog.Builder(this)
                     .setTitle(getString(R.string.dialogReplyNotLoggedInTitle))
                     .setMessage(getString(R.string.dialogReplyNotLoggedInContent))

@@ -79,7 +79,7 @@ public class ViewUtil {
         String bannerURL = subreddit.getBannerBackgroundImage();
         if (bannerURL != null && !bannerURL.isEmpty()) {
             // Data saving on, only load if the image is already cached
-            if (App.get().dataSavingEnabled()) {
+            if (App.Companion.get().dataSavingEnabled()) {
                 Picasso.get()
                         .load(bannerURL)
                         .networkPolicy(NetworkPolicy.OFFLINE)
