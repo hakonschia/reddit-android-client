@@ -1,9 +1,9 @@
 package com.example.hakonsreader.fragments
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +34,7 @@ import com.example.hakonsreader.databinding.FragmentSubredditBinding
 import com.example.hakonsreader.databinding.SubredditBannedBinding
 import com.example.hakonsreader.databinding.SubredditNotFoundBinding
 import com.example.hakonsreader.databinding.SubredditPrivateBinding
+import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.Util
@@ -42,6 +43,7 @@ import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListene
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.views.Content
+import com.example.hakonsreader.views.ContentVideo
 import com.example.hakonsreader.views.util.ViewUtil
 import com.google.gson.Gson
 import com.robinhood.ticker.TickerUtils
@@ -285,6 +287,13 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
             postsScrollListener = PostScrollListener(it.posts) { postsViewModel?.loadPosts() }
             it.posts.setOnScrollChangeListener(postsScrollListener)
+
+            postsAdapter?.setOnVideoManuallyPaused(object : OnVideoManuallyPaused {
+                override fun postPaused(contentVideo: ContentVideo) {
+                    // Ignore post when scrolling if manually paused
+                    postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
+                }
+            })
 
             postsAdapter?.setOnPostClicked { post ->
                 // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't

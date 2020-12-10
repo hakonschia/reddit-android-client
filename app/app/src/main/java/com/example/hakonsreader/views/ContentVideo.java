@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -27,6 +28,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.constants.NetworkConstants;
 import com.example.hakonsreader.databinding.ContentVideoBinding;
 import com.example.hakonsreader.enums.ShowNsfwPreview;
+import com.example.hakonsreader.interfaces.OnVideoManuallyPaused;
 import com.example.hakonsreader.misc.Util;
 import com.example.hakonsreader.views.util.VideoCache;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -138,6 +140,9 @@ public class ContentVideo extends Content {
      */
     private boolean isPrepared = false;
 
+    @Nullable
+    private OnVideoManuallyPaused onVideoManuallyPaused;
+
 
     public ContentVideo(Context context) {
         this(context, null, 0);
@@ -149,6 +154,15 @@ public class ContentVideo extends Content {
         super(context, attrs, defStyleAttr);
         binding = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true);
         player = binding.getRoot();
+    }
+
+    /**
+     * Sets the callback for when a video post has been manually paused
+     *
+     * @param onVideoManuallyPaused The callback
+     */
+    public void setOnVideoManuallyPaused(@Nullable OnVideoManuallyPaused onVideoManuallyPaused) {
+        this.onVideoManuallyPaused = onVideoManuallyPaused;
     }
 
     /**
@@ -171,6 +185,7 @@ public class ContentVideo extends Content {
 
         this.loadThumbnail();
         this.setFullscreenListener();
+        this.setPauseListener();
         this.setVolumeListener();
 
         if (App.Companion.get().muteVideoByDefault()) {
@@ -412,6 +427,22 @@ public class ContentVideo extends Content {
     }
 
     /**
+     * Sets a click listener for when the pause button has been clicked
+     *
+     * Calls {@link #onVideoManuallyPaused} if it is not {@code null}
+     */
+    private void setPauseListener() {
+        ImageButton pausedButton = findViewById(R.id.exo_pause);
+        pausedButton.setOnClickListener(v -> {
+            // When overriding the click listener we need to manually pause the video
+            setPlayback(false);
+            if (onVideoManuallyPaused != null) {
+                onVideoManuallyPaused.postPaused(this);
+            }
+        });
+    }
+
+    /**
      * Sets the listener for the volume button
      *
      * <p>This also changes the drawable of the button</p>
@@ -591,6 +622,8 @@ public class ContentVideo extends Content {
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         setLayoutParams(params);
     }
+
+
 
     /**
      * Called when the video has been selected. If the user has enabled auto play the video will start playing

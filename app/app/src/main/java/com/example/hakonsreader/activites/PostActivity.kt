@@ -268,8 +268,6 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
         binding?.let {
             it.post.setMaxHeight(maxHeight)
             it.post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
-            // Don't allow to open the post again when we are now in the post
-            it.post.setAllowPostOpen(false)
         }
     }
 

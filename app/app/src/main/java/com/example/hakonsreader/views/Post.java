@@ -1,10 +1,8 @@
 package com.example.hakonsreader.views;
 
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -14,15 +12,13 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.util.Pair;
 
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
-import com.google.gson.Gson;
+import com.example.hakonsreader.interfaces.OnVideoManuallyPaused;
 import com.squareup.picasso.Callback;
 
 import java.util.ArrayList;
@@ -38,17 +34,11 @@ public class Post extends Content {
 
     private final PostBinding binding;
     private boolean showTextContent = true;
-    /**
-     * If set to true the post can be opened in a new activity
-     */
-    private boolean allowPostOpen = true;
-    /**
-     * If set to true the post has been opened in a new activity
-     */
-    private boolean postOpened = false;
     private int maxHeight = NO_MAX_HEIGHT;
 
     private Callback imageLoadedCallback;
+    @Nullable
+    private OnVideoManuallyPaused onVideoManuallyPaused;
 
 
     public Post(Context context) {
@@ -63,6 +53,15 @@ public class Post extends Content {
     public Post(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         binding = PostBinding.inflate(LayoutInflater.from(context), this, true);
+    }
+
+    /**
+     * Sets the callback for when a video post has been manually paused
+     *
+     * @param onVideoManuallyPaused The callback
+     */
+    public void setOnVideoPostPaused(@Nullable OnVideoManuallyPaused onVideoManuallyPaused) {
+        this.onVideoManuallyPaused = onVideoManuallyPaused;
     }
 
     /**
@@ -102,16 +101,6 @@ public class Post extends Content {
      */
     public void setShowTextContent(boolean showTextContent) {
         this.showTextContent = showTextContent;
-    }
-
-    /**
-     * Sets if the post should be allowed to be opened
-     *
-     * @param allowPostOpen True if clicking on the post should open it in a new {@link PostActivity}
-     *                      Default is true
-     */
-    public void setAllowPostOpen(boolean allowPostOpen) {
-        this.allowPostOpen = allowPostOpen;
     }
 
     /**
@@ -259,6 +248,7 @@ public class Post extends Content {
                 //  https://www.reddit.com/r/reallifedoodles/comments/72cdtz/hey/
                 if (ContentVideo.isRedditPostVideoPlayable(post)) {
                     content = new ContentVideo(context);
+                    ((ContentVideo)content).setOnVideoManuallyPaused(onVideoManuallyPaused);
                 } else {
                     content = new ContentLink(context);
                 }

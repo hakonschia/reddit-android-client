@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 import androidx.recyclerview.widget.DiffUtil;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.interfaces.OnVideoManuallyPaused;
 import com.example.hakonsreader.recyclerviewadapters.diffutils.PostsDiffCallback;
 import com.example.hakonsreader.views.ListDivider;
 import com.example.hakonsreader.views.Post;
@@ -37,12 +39,28 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      */
     private int hideScoreTime = -1;
 
+    @Nullable
     private OnPostClicked onPostClicked;
+    @Nullable
+    private OnVideoManuallyPaused onVideoManuallyPaused;
 
-    public void setOnPostClicked(OnPostClicked onPostClicked) {
+    /**
+     * Sets the callback for when a video post in the list has been clicked
+     *
+     * @param onPostClicked The callback
+     */
+    public void setOnPostClicked(@Nullable OnPostClicked onPostClicked) {
         this.onPostClicked = onPostClicked;
     }
 
+    /**
+     * Sets the callback for when a video post has been manually paused
+     *
+     * @param onVideoManuallyPaused The callback
+     */
+    public void setOnVideoManuallyPaused(@Nullable OnVideoManuallyPaused onVideoManuallyPaused) {
+        this.onVideoManuallyPaused = onVideoManuallyPaused;
+    }
 
     /**
      * Submits the list of posts to show in the RecyclerView
@@ -138,8 +156,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final RedditPost post = posts.get(position);
 
-        // Don't show text posts here (only show when a post is opened)
-        holder.post.setShowTextContent(false);
 
         // Disable ticker animation to avoid it updating when scrolling
         holder.post.enableTickerAnimation(false);
@@ -169,8 +185,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             post = itemView.findViewById(R.id.post);
+
+            post.setOnVideoPostPaused(onVideoManuallyPaused);
+
+            // Text posts shouldn't be shown in lists of posts
+            post.setShowTextContent(false);
+
             itemView.setOnClickListener(v -> {
                 if (onPostClicked != null) {
                     if (getAdapterPosition() != RecyclerView.NO_POSITION) {
@@ -253,6 +274,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
     }
 
+    /**
+     * Interface for when a post in the adapter has been clicked
+     */
     @FunctionalInterface
     public interface OnPostClicked {
         void postClicked(Post post);
