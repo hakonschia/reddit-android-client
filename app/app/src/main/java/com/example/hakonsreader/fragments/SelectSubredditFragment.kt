@@ -57,7 +57,7 @@ private const val SUBREDDIT_SEARCH_DELAY: Long = 500
  * in users subscribed subreddits or a list of default subreddits) and allows the user
  * to search for subreddits by a search field
  */
-class SelectSubredditFragmentK : Fragment() {
+class SelectSubredditFragment : Fragment() {
     private val TAG = "SelectSubredditFragment"
 
     private var binding: FragmentSelectSubredditBinding? = null

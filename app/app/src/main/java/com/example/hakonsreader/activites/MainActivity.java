@@ -26,7 +26,8 @@ import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter;
 import com.example.hakonsreader.fragments.LogInFragment;
 import com.example.hakonsreader.fragments.PostsContainerFragment;
 import com.example.hakonsreader.fragments.ProfileFragment;
-import com.example.hakonsreader.fragments.SelectSubredditFragmentK;
+import com.example.hakonsreader.fragments.SelectSubredditFragment;
+import com.example.hakonsreader.fragments.SelectSubredditFragmentKt;
 import com.example.hakonsreader.fragments.SettingsFragment;
 import com.example.hakonsreader.fragments.SubredditFragment;
 import com.example.hakonsreader.interfaces.OnSubredditSelected;
@@ -68,10 +69,11 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     // The fragments to show in the nav bar
     private PostsContainerFragment postsFragment;
     private SubredditFragment activeSubreddit;
-    private SelectSubredditFragmentK selectSubredditFragment;
+    private SelectSubredditFragment selectSubredditFragment;
     private ProfileFragment profileFragment;
     private LogInFragment logInFragment;
     private SettingsFragment settingsFragment;
+    private Fragment lastShownFragment = null;
     private final BottomNavigationViewListener navigationViewListener = new BottomNavigationViewListener();
 
     // Interface towards the Reddit API
@@ -211,12 +213,15 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     @Override
     public void onBackPressed() {
         // TODO we should actually go back to the previous navbar, not always just go back like this
-        if (binding.bottomNav.getSelectedItemId() == R.id.navSubreddit && activeSubreddit != null) {
+        // If we are in the subreddit navbar
+        if (binding.bottomNav.getSelectedItemId() == R.id.navSubreddit
+                // In a subreddit, and the last item was the list, go back to the list
+                && activeSubreddit != null && lastShownFragment instanceof SelectSubredditFragment) {
             activeSubreddit = null;
 
             // If the fragment has been killed by the OS make a new one (after a while it might be killed)
             if (selectSubredditFragment == null) {
-                selectSubredditFragment = new SelectSubredditFragmentK();
+                selectSubredditFragment = new SelectSubredditFragment();
             }
             // Since we are in a way going back in the same navbar item, use the close transition
             getSupportFragmentManager().beginTransaction()
@@ -229,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     }
 
     /**
-     * Called when a subreddit has been selected from a {@link SelectSubredditFragmentK} fragment
+     * Called when a subreddit has been selected from a {@link SelectSubredditFragment} fragment
      * <p>A new instance of {@link SubredditFragment} is created and shown</p>
      *
      * @param subredditName The subreddit selected
@@ -254,9 +259,6 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         if (token == null || token.getRefreshToken() == null) {
             return;
         }
-
-        // TODO this should only be shown once (probably?) Can store the list checked in sharedpreferences, if the list matches
-        //  requiredScopesAsArray then we can return since it has already been by the user
 
         String[] requiredScopesAsArray = NetworkConstants.SCOPE.split(" ");
         List<String> storedScopesAsArray =  Arrays.asList(token.getScopesAsArray());
@@ -320,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
     private void restoreFragmentStates(@NonNull Bundle restoredState) {
         postsFragment = (PostsContainerFragment) getSupportFragmentManager().getFragment(restoredState, POSTS_FRAGMENT);
         activeSubreddit = (SubredditFragment) getSupportFragmentManager().getFragment(restoredState, ACTIVE_SUBREDDIT_FRAGMENT);
-        selectSubredditFragment = (SelectSubredditFragmentK) getSupportFragmentManager().getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT);
+        selectSubredditFragment = (SelectSubredditFragment) getSupportFragmentManager().getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT);
         profileFragment = (ProfileFragment) getSupportFragmentManager().getFragment(restoredState, PROFILE_FRAGMENT);
 
         if (postsFragment == null) {
@@ -375,9 +377,11 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                 activeSubreddit = null;
 
                 if (selectSubredditFragment == null) {
-                    selectSubredditFragment = new SelectSubredditFragmentK();
+                    selectSubredditFragment = new SelectSubredditFragment();
                     selectSubredditFragment.setSubredditSelected(this);
                 }
+
+                lastShownFragment = selectSubredditFragment;
 
                 // Since we are in a way going back in the same navbar item, use the close transition
                 getSupportFragmentManager().beginTransaction()
@@ -465,6 +469,8 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
                     return false;
             }
 
+            lastShownFragment = selected;
+
             // Example: previous = 2, current = 3. We are going right
             boolean goingRight = previousPos < navBarPos;
 
@@ -534,7 +540,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             // No subreddit created (first time here), or we in a subreddit looking to get back
             if (activeSubreddit == null) {
                 if (selectSubredditFragment == null) {
-                    selectSubredditFragment = new SelectSubredditFragmentK();
+                    selectSubredditFragment = new SelectSubredditFragment();
                     selectSubredditFragment.setSubredditSelected(MainActivity.this);
                 }
                 return selectSubredditFragment;
