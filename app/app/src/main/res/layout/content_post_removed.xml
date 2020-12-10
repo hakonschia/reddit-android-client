@@ -61,6 +61,7 @@
                 android:textColor="@color/secondary_text_color"
                 android:textSize="12sp"
 
+                app:layout_constrainedWidth="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"

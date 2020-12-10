@@ -5,6 +5,8 @@ import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.viewbinding.ViewBinding
 import com.example.hakonsreader.App
@@ -97,10 +99,17 @@ class ContentLink : Content {
         binding as ContentLinkSimpleBinding
 
         val thumbnail = redditPost.thumbnail
-        if (thumbnail.isNotBlank()) {
+        // If no thumbnail is given, reddit might give it as "default"
+        if (thumbnail.isNotBlank() && thumbnail != "default") {
+            binding.thumbnail.scaleType = ImageView.ScaleType.CENTER_CROP
             Picasso.get()
                     .load(thumbnail)
                     .into(binding.thumbnail)
+        } else {
+            // No thumbnail, set default link symbol
+            // This should only be centered, not cropped to fit (as this would stretch the icon)
+            binding.thumbnail.scaleType = ImageView.ScaleType.CENTER
+            binding.thumbnail.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_link_24))
         }
 
         binding.link.text = redditPost.url
