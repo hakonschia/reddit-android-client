@@ -24,7 +24,7 @@ import com.example.hakonsreader.interfaces.OnSubredditSelected
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.viewmodels.SearchForSubredditsViewModel
-import com.example.hakonsreader.viewmodels.SelectSubredditsViewModelK
+import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -68,7 +68,7 @@ class SelectSubredditFragment : Fragment() {
 
     private var subredditsAdapter: SubredditsAdapter? = null
     private var subredditsLayoutManager: LinearLayoutManager? = null
-    private var subredditsViewModel: SelectSubredditsViewModelK? = null
+    private var subredditsViewModel: SelectSubredditsViewModel? = null
 
     private var searchSubredditsAdapter: SubredditsAdapter? = null
     private var searchSubredditsLayoutManager: LinearLayoutManager? = null
@@ -179,7 +179,7 @@ class SelectSubredditFragment : Fragment() {
      */
     private fun setupSubredditsViewModel() {
         subredditsViewModel = ViewModelProvider(this, SelectSubredditsFactory(context))
-                .get(SelectSubredditsViewModelK::class.java)
+                .get(SelectSubredditsViewModel::class.java)
 
         subredditsViewModel!!.getSubreddits().observe(viewLifecycleOwner, { subreddits ->
             subredditsLoaded = true

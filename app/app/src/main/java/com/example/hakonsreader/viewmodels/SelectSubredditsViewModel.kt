@@ -23,7 +23,7 @@ private const val TAG = "SelectSubredditsViewModelK"
  * ViewModel for retrieving subreddits. The subreddits retrieved are automatically chosen for
  * a logged in users subscribed subreddits, or for default subreddits for non-logged in users
  */
-class SelectSubredditsViewModelK(context: Context) : ViewModel() {
+class SelectSubredditsViewModel(context: Context) : ViewModel() {
     companion object {
         const val SUBSCRIBED_SUBREDDITS_KEY = "subscribedSubreddits"
     }
@@ -36,8 +36,6 @@ class SelectSubredditsViewModelK(context: Context) : ViewModel() {
             val ids = SharedPreferencesManager.get(SUBSCRIBED_SUBREDDITS_KEY, Array<String>::class.java)
             if (!ids.isNullOrEmpty()) {
                 CoroutineScope(IO).launch {
-                    // TODO fix subreddits database
-
                     subreddits.postValue(database.subreddits().getSubsById(ids))
                 }
             }

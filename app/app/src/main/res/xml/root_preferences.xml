@@ -125,7 +125,6 @@
             app:key="@string/prefs_key_hide_comments_threshold"
             app:title="@string/prefs_title_hide_comments_threshold"
             app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true"
             app:singleLineTitle="false"
             app:defaultValue="@integer/prefs_default_hide_comments_threshold"/>
 

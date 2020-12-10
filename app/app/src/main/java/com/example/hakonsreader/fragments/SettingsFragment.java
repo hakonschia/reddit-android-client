@@ -32,6 +32,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         EditTextPreference hideComments = findPreference(getString(R.string.prefs_key_hide_comments_threshold));
         hideComments.setOnBindEditTextListener(editText -> editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED));
         hideComments.setOnPreferenceChangeListener(hideCommentsChangeListener);
+        setHideCommentsSummary(hideComments, null);
 
         ListPreference language = findPreference(getString(R.string.prefs_key_language));
         language.setOnPreferenceChangeListener(languageChangeListener);
@@ -80,13 +81,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             settings.edit()
                     .putString(getString(R.string.prefs_key_hide_comments_threshold), defaultAsString)
                     .apply();
+
+            // TODO going into the setting again still shows the old value, even though it is actually updated
+            //  going out of the fragment and then going back shows the correct value
+            setHideCommentsSummary((EditTextPreference) preference, defaultAsString);
+
             // return false = don't update since we're manually updating the value ourselves
-            // TODO This doesn't update the summary however, until the user goes out of the preferences and back
-            //  this is only a visual "bug", as when the value is used it will be updated
-            //  If simpleSummaryProvider is set to false in the XML and it is set manually in the fragment
-            //  as with filtered subreddits it probably works though
             return false;
         }
+
+        setHideCommentsSummary((EditTextPreference) preference, value);
 
         return true;
     };
@@ -134,6 +138,21 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setFilteredSubredditsSummary((EditTextPreference) preference, (String) value);
         return true;
     };
+
+
+    /**
+     * Sets the summary for the hide comments threshold preference
+     *
+     * @param preference The preference
+     * @param value The value to use directly. If this is {@code null} then the value stored
+     *              in the preference is used
+     */
+    private void setHideCommentsSummary(EditTextPreference preference, @Nullable String value) {
+        if (value == null) {
+            value = preference.getText();
+        }
+        preference.setSummary(value);
+    }
 
     /**
      * Sets the summary for the filtered subreddits preference
