@@ -101,6 +101,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var postsViewModel: PostsViewModel? = null
     private var postsAdapter: PostsAdapter? = null
     private var postsLayoutManager: LinearLayoutManager? = null
+    private var postsScrollListener: PostScrollListener? = null
 
     private val subreddit: ObservableField<Subreddit> = object : ObservableField<Subreddit>() {
         override fun set(value: Subreddit) {
@@ -278,7 +279,9 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
             it.posts.adapter = postsAdapter
             it.posts.layoutManager = postsLayoutManager
-            it.posts.setOnScrollChangeListener(PostScrollListener(it.posts) { postsViewModel?.loadPosts() })
+
+            postsScrollListener = PostScrollListener(it.posts) { postsViewModel?.loadPosts() }
+            it.posts.setOnScrollChangeListener(postsScrollListener)
         }
     }
 

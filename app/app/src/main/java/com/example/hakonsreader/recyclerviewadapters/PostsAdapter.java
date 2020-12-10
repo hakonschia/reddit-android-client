@@ -168,6 +168,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
         /**
+         * Gets the ID of the {@link RedditPost} this ViewHolder is currently holding
+         *
+         * @return A string ID
+         */
+        public String getPostId() {
+            return post.getRedditPost().getId();
+        }
+
+        /**
          * Call when the view holder has been selected (ie. it is now the main visible view holder)
          */
         public void onSelected() {

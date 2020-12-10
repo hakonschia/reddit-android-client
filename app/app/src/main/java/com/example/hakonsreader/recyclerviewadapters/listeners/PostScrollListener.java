@@ -40,6 +40,11 @@ public class PostScrollListener implements View.OnScrollChangeListener {
      */
     private int numRemainingPostsBeforeRun = 10;
 
+    /**
+     * The ID of the post to ignore when calling {@link PostsAdapter.ViewHolder#onSelected()}
+     */
+    private String postToIgnore = "";
+
 
     /**
      * Scroll listener that can be used for a {@link RecyclerView} with a {@link PostsAdapter} attached to it.
@@ -89,6 +94,16 @@ public class PostScrollListener implements View.OnScrollChangeListener {
         this.numRemainingPostsBeforeRun = numRemainingPostsBeforeRun;
     }
 
+    /**
+     * Sets the ID of a post to ignore when calling {@link PostsAdapter.ViewHolder#onSelected()}, so that
+     * scrolling past the post will be ignored. This will be reset when {@link PostsAdapter.ViewHolder#onUnselected()}
+     * would be called, so that scrolling up again later will still produce the expected behaviour
+     *
+     * @param postToIgnore The ID of the post to ignore
+     */
+    public void setPostToIgnore(String postToIgnore) {
+        this.postToIgnore = postToIgnore;
+    }
 
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldX, int oldY) {
@@ -149,6 +164,7 @@ public class PostScrollListener implements View.OnScrollChangeListener {
                 // TODO this might be a bit weird as scrolling up on the first item wont autplay
                 if (viewBottom > SCREEN_HEIGHT) {
                     viewHolder.onUnselected();
+                    postToIgnore = "";
                 }
             } else {
                 // If the view is above the screen (< 0) it is "unselected"
@@ -156,7 +172,9 @@ public class PostScrollListener implements View.OnScrollChangeListener {
                 if (y < 0) {
                     viewHolder.onUnselected();
                 } else if (y < SCREEN_HEIGHT * 0.35f) {
-                    viewHolder.onSelected();
+                    if (!viewHolder.getPostId().equals(postToIgnore)) {
+                        viewHolder.onSelected();
+                    }
                 }
             }
 
