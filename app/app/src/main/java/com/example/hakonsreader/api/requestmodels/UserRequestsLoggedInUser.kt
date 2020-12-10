@@ -15,7 +15,7 @@ import java.lang.Exception
  *
  * @see UserRequests
  */
-class UserRequestsLoggedInUserKt(
+class UserRequestsLoggedInUser(
         private val accessToken: AccessToken,
         private val api: UserServiceKt,
 ) {

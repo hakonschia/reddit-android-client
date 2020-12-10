@@ -306,7 +306,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             // If the user is privately browsing but no name is previously set this would fail since name would be null
             // But that should never happen? A logged in user should always have a user object with name stored
             val userResponse = if ((isLoggedInUser && !App.get().isUserLoggedInPrivatelyBrowsing()) || name == null) {
-                api.userKt().info()
+                api.user().info()
             } else {
                 api.user(name).info()
             }

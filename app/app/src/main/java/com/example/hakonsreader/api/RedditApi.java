@@ -18,7 +18,6 @@ import com.example.hakonsreader.api.requestmodels.SubredditRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequest;
 import com.example.hakonsreader.api.requestmodels.UserRequests;
 import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUser;
-import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUserKt;
 import com.example.hakonsreader.api.service.CommentService;
 import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.OAuthService;
@@ -750,16 +749,7 @@ public class RedditApi {
     }
 
     /**
-     * Retrieve a {@link UserRequests} object for logged in users only. For non-logged in users
-     *
-     * @return An object that can perform various user related API requests
-     */
-    public UserRequestsLoggedInUser user() {
-        return new UserRequestsLoggedInUser(accessToken, userApi);
-    }
-
-    /**
-     * Retrieve a kotlin based {@link UserRequests} object that can get handle requests for non-logged in users.
+     * Retrieve a {@link UserRequests} object that can get handle requests for non-logged in users.
      * For logged in users use {@link #user()}
      *
      * @param username the username to to make calls towards.
@@ -778,8 +768,8 @@ public class RedditApi {
      * @return An object that can perform various user related API requests for logged in users
      * @see #user(String)
      */
-    public UserRequestsLoggedInUserKt userKt() {
-        return new UserRequestsLoggedInUserKt(accessToken, userApiKt);
+    public UserRequestsLoggedInUser user() {
+        return new UserRequestsLoggedInUser(accessToken, userApiKt);
     }
 
 
