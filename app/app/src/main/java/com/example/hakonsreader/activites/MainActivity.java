@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
         intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/todayilearned/comments/k67p30/til_that_psychologist_george_stratton_wore/");
-        startActivity(intent);
+        //startActivity(intent);
 
         if (savedInstanceState != null) {
             savedState = savedInstanceState;
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements OnSubredditSelect
             new AlertDialog.Builder(this)
                     .setCustomTitle(view)
                     .setAdapter(adapter, null)
-                    .setPositiveButton(R.string.ok, (dialog, which) -> {})
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {})
                     .setNegativeButton(R.string.newPermissionsDontShowAgain, (dialog, which) -> {
                         // Store in SharedPreferences so the next time the code above will trigger a return
                         preferences.edit().putString(SharedPreferencesConstants.ACCESS_TOKEN_SCOPES_CHECKED, NetworkConstants.SCOPE).apply();

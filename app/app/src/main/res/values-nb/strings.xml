@@ -238,7 +238,6 @@
     <string name="newPermissionsRequiredHeader">Ny tilgang kreves</string>
     <string name="newPermissionsRequiredContent">Vennligst logg inn og ut igjen for å forsikre at applikasjonen virker som forventet.\n\nEn liste med de nye tillatelsene er gitt under.</string>
     <string name="oauthScopeExplanationPrivatemessage">Tillater applikasjonen å lese meldingene i innboksen din</string>
-    <string name="ok">Ok</string>
     <string name="newPermissionsDontShowAgain">Ikke vis igjen</string>
     <string name="oauthScopeExplanationRead">Tillater applikasjonen å lese informasjon fra Reddit (dette har ingenting å gjøre med din personlige bruker)</string>
     <string name="logInDescription">"Når du trykker på knappen under for å logge inn vil du bli videresendt til Reddit.com.  Du vil bli vist en liste med tillatelser denne applikasjonen trenger, og hvis du autoriserer applikasjonen vil du bli videresendt tilbake. Hvis du vil fjerne applikasjonens tilgang til kontoen din, gå til: <a href="https://www.reddit.com/prefs/apps">https://www.reddit.com/prefs/apps</a>. Listen med tillatelser kan også bli sett fra profilen din etter innlogging.  Passordet ditt vil aldri forlate Reddit.com; denne applikasjonen vil aldri se eller lagre passordet ditt.  "</string>
@@ -247,4 +246,5 @@
     <string name="prefs_dialog_message_filter_posts_from_default_subreddits">Filtrer poster fra subredditer fra å vises i startsiden, popular, og alle. Én subreddit per linje</string>
     <string name="postMenuAddSubredditToFilter">Filtrer poster fra %s</string>
     <string name="prefs_title_show_all_sidebars">Vis alle sidebarer (eller bare én farget)</string>
+    <string name="menuCommentPeekParent">Vis foreldrekommentar</string>
 </resources>

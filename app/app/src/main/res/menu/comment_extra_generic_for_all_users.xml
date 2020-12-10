@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/menuPeekParentComment"
-        android:title="Peek parent" />
+        android:title="@string/menuCommentPeekParent" />
 
     <item
         android:id="@+id/menuShowCommentChain"
