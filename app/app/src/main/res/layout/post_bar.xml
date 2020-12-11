@@ -11,9 +11,15 @@
             type="com.example.hakonsreader.api.model.RedditPost" />
     </data>
 
+    <!-- The height has to be match_parent, if it's wrap_content the elements that are
+     wrap_content (instead of a fixed size) sometimes disappear when going into posts.
+     I don't know why it happens, and having the height be match_parent is a terrible "solution"
+     (even though it doesn't seem to cause any other issues, since when it's used the view height
+     is set to wrap_content), but I have no idea why it happens and I'm not really interested in
+     finding out -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/postCommentsImg"
