@@ -360,19 +360,21 @@ public class Post extends Content {
      *
      * @return A list of pairs with a View mapped to a transition name
      */
-    public Pair<View, String>[] getTransitionViews() {
+    @Override
+    public List<Pair<View, String>> getTransitionViews() {
         Context context = getContext();
 
         List<Pair<View, String>> pairs = new ArrayList<>();
         pairs.add(Pair.create(binding.postInfo, context.getString(R.string.transition_post_info)));
         pairs.add(Pair.create(binding.postFullBar, context.getString(R.string.transition_post_full_bar)));
 
-        View content = binding.content.getChildAt(0);
+        Content content = (Content) binding.content.getChildAt(0);
         if (content != null) {
+            pairs.addAll(content.getTransitionViews());
             pairs.add(Pair.create(content, context.getString(R.string.transition_post_content)));
         }
 
-        return pairs.toArray(new Pair[0]);
+        return pairs;
     }
 
     @Override

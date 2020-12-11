@@ -3,11 +3,16 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
 
 import com.example.hakonsreader.api.model.RedditPost;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generic superclass for a view displaying Reddit content
@@ -103,5 +108,15 @@ public abstract class Content extends FrameLayout {
      */
     public void viewUnselected() {
         // Default implementation of this is empty
+    }
+
+
+    /**
+     * Gets the list of mappings from views to transition names for this view
+     *
+     * @return A list of {@link Pair} mapping a view to its transition name (this might be empty)
+     */
+    public List<Pair<View, String>> getTransitionViews() {
+        return new ArrayList<>();
     }
 }

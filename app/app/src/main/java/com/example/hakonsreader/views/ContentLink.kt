@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.util.Pair
 import androidx.databinding.DataBindingUtil
 import androidx.viewbinding.ViewBinding
 import com.example.hakonsreader.App
@@ -56,6 +58,13 @@ class ContentLink : Content {
         }
 
         setOnClickListener { openLink() }
+    }
+
+    override fun getTransitionViews(): MutableList<Pair<View, String>> {
+        // TODO this isn't a perfect transition as the corners of the view isn't rounded during the transition
+        return super.getTransitionViews().also {
+            it.add(Pair(binding.root, "content_link_root_view"))
+        }
     }
 
     /**
