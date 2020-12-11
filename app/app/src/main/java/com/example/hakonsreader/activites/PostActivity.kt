@@ -354,8 +354,6 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
                 // TODO this doesn't work perfectly as the "loading" image is still shown sometimes for a split second
                 PostType.IMAGE -> {
                     postponeEnterTransition()
-                    onPostLoaded(postExtras)
-
                     binding?.post?.setImageLoadedCallback(object : Callback {
                         override fun onSuccess() {
                             startPostponedEnterTransition()
@@ -364,6 +362,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
                             startPostponedEnterTransition()
                         }
                     })
+
+                    onPostLoaded(postExtras)
                 }
 
                 // Add a transition listener that sets the extras for videos after the enter transition is done,
