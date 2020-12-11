@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.transition.Transition
 import android.transition.TransitionListenerAdapter
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.motion.widget.MotionLayout
@@ -39,6 +40,8 @@ import com.squareup.picasso.Callback
 class PostActivity : AppCompatActivity(), OnReplyListener {
 
     companion object {
+        private const val TAG = "PostActivity"
+
         /**
          * The key used to store the stat of the post transition in saved instance states
          */
@@ -91,6 +94,9 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      */
     private var replyingTo: ReplyableListing? = null
 
+    /**
+     * True if the video content for the post was playing when [onPause] was called
+     */
     private var videoPlayingWhenPaused = false
 
 
@@ -193,7 +199,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
 
         commentsViewModel?.let {
             it.getPost().observe(this, { newPost ->
-                val postPreviouslySet = post != null
+                val postPreviouslySet = binding?.post?.redditPost != null
                 post = newPost
 
                 // If we have a post already just update the info so the content isn't reloaded
@@ -234,24 +240,26 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
     }
 
     /**
-     * Sets up [ActivityPostBinding.comments]
+     * Sets up [ActivityPostBinding.comments], if [post] isn't `null`
      */
     private fun setupCommentsList() {
-        commentsLayoutManager = LinearLayoutManager(this)
-        commentsAdapter = CommentsAdapter(post!!)
-        commentsAdapter?.let {
-            it.replyListener = this
-            it.commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
-            it.loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel?.loadMoreComments(comment, parent) }
-            it.onChainShown = Runnable { binding?.commentChainShown = true }
-        }
+        post?.let { post ->
+            commentsLayoutManager = LinearLayoutManager(this)
 
-        binding?.let { bind ->
-            bind.comments.adapter = commentsAdapter
-            bind.comments.layoutManager = commentsLayoutManager
-            bind.showAllComments.setOnClickListener {
-                commentsAdapter?.commentIdChain = ""
-                bind.commentChainShown = false
+            commentsAdapter = CommentsAdapter(post).apply {
+                replyListener = this@PostActivity
+                commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
+                loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel?.loadMoreComments(comment, parent) }
+                onChainShown = Runnable { binding?.commentChainShown = true }
+            }
+
+            binding?.let { bind ->
+                bind.comments.adapter = commentsAdapter
+                bind.comments.layoutManager = commentsLayoutManager
+                bind.showAllComments.setOnClickListener {
+                    commentsAdapter?.commentIdChain = ""
+                    bind.commentChainShown = false
+                }
             }
         }
     }
@@ -274,6 +282,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
 
     /**
      * Updates the post info without re-drawing the content
+     *
+     * @see onPostLoaded
      */
     private fun updatePostInfo() {
         binding?.let {
@@ -283,7 +293,11 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
     }
 
     /**
-     * Sets [post] on [binding] and calls [setupCommentsList]
+     * This should be called when [post] has been set and should generate the view for the post
+     *
+     * [setupCommentsList] is automatically called
+     *
+     * @see updatePostInfo
      */
     private fun onPostLoaded(extras: Bundle? = null) {
         binding?.let {
@@ -304,30 +318,60 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      */
     private fun loadComments() {
         val postJson = intent.extras?.getString(POST_KEY)
+
+        // Started from inside the app (post already loaded from before)
         val postId = if (postJson != null) {
-            post = Gson().fromJson(postJson, RedditPost::class.java)
+            setPostFromJson(postJson)
+        } else {
+            intent.extras?.getString(POST_ID_KEY)
+        }
 
-            binding?.post?.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY) == true
+        if (postId != null) {
+            commentsViewModel?.let {
+                it.postId = postId
+                it.loadComments()
+            }
+        }
+    }
 
-            var postExtras: Bundle? = intent.extras?.getBundle(Content.EXTRAS)
+    /**
+     * Sets [post] from a JSON string
+     *
+     * If the post is an image post, then the enter transition is delayed until the image has loaded
+     *
+     * @param json The JSON to set the post from
+     * @return The ID of the post, or null if the json is invalid
+     */
+    private fun setPostFromJson(json: String) : String? {
+        val redditPost = Gson().fromJson(json, RedditPost::class.java)
 
-            // TODO this doesn't work perfectly as the "loading" image is still shown sometimes for a split second
-            // If we have an image wait with the transition until the image is loaded
-            when {
-                post?.getPostType() == PostType.IMAGE -> {
+        return if (redditPost != null) {
+            post = redditPost
+            val postExtras: Bundle? = intent.extras?.getBundle(Content.EXTRAS)
+
+            when (redditPost.getPostType()) {
+                // Postpone the enter transition until the image is loaded
+                // TODO this doesn't work perfectly as the "loading" image is still shown sometimes for a split second
+                PostType.IMAGE -> {
                     postponeEnterTransition()
+                    onPostLoaded(postExtras)
 
                     binding?.post?.setImageLoadedCallback(object : Callback {
                         override fun onSuccess() {
                             startPostponedEnterTransition()
                         }
-
                         override fun onError(e: Exception) {
                             startPostponedEnterTransition()
                         }
                     })
                 }
-                post?.getPostType() == PostType.VIDEO -> {
+
+                // Add a transition listener that sets the extras for videos after the enter transition is done,
+                // so that the video doesn't play during the transition (which looks odd since it's very choppy)
+                PostType.VIDEO -> {
+                    // Load the post, but don't set extras yet
+                    onPostLoaded()
+
                     // For videos we don't want to set the extras right away. If a video is playing during the
                     // animation the animation looks very choppy, so it should only be played at the end
                     window.sharedElementEnterTransition.addListener(object : TransitionListenerAdapter() {
@@ -340,23 +384,14 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
                         }
                     })
                 }
-                else -> {
-                    postExtras = intent.extras?.getBundle(Content.EXTRAS)
-                }
+
+                // Nothing special for the post, set the extras
+                else -> onPostLoaded(postExtras)
             }
 
-            onPostLoaded(postExtras)
-
-            post?.id
+            redditPost.id
         } else {
-            intent.extras?.getString(POST_ID_KEY)
-        }
-
-        commentsViewModel?.let {
-            if (postId != null) {
-                it.postId = postId
-                it.loadComments()
-            }
+            null
         }
     }
 
@@ -463,7 +498,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      *
      * @param view Ignored
      */
-    public fun replyToPost(view: View) {
+    fun replyToPost(view: View) {
         post?.let { replyTo(it) }
     }
 

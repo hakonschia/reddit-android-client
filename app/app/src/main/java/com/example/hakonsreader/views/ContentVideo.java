@@ -694,7 +694,13 @@ public class ContentVideo extends Content {
         // Video has been played previously so make sure the player is prepared
         if (timestamp != 0) {
             prepare();
+
+            // If the video was paused, remove the thumbnail so it shows the correct frame
+            if (!isPlaying) {
+                thumbnail.setVisibility(GONE);
+            }
         }
+
         setPosition(timestamp);
         setPlayback(isPlaying);
         setControllerVisible(showController);

@@ -346,7 +346,7 @@ public class Post extends Content {
      * @param data The data to use for restoring the state
      */
     @Override
-    public void setExtras(Bundle data) {
+    public void setExtras(@Nullable Bundle data) {
         Content c = (Content) binding.content.getChildAt(0);
 
         if (c != null) {
