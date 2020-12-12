@@ -18,7 +18,7 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.SubmissionFlair
-import com.example.hakonsreader.api.persistence.AppDatabase
+import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.ActivitySubmitBinding
 import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
@@ -52,7 +52,7 @@ class SubmitActivity : AppCompatActivity() {
     }
 
     private val api = App.get().api
-    private val database = AppDatabase.getInstance(this)
+    private val database = RedditDatabase.getInstance(this)
 
     private var _binding:  ActivitySubmitBinding? = null
     private val binding get() = _binding!!

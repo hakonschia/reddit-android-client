@@ -12,7 +12,7 @@ import androidx.preference.PreferenceManager
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditUser
-import com.example.hakonsreader.api.persistence.AppDatabase
+import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.MarkdownAdjuster
 import com.example.hakonsreader.constants.NetworkConstants
@@ -158,7 +158,7 @@ class App : Application() {
             Stetho.initializeWithDefaults(this)
         }
 
-        val db = AppDatabase.getInstance(this)
+        val db = RedditDatabase.getInstance(this)
         // Remove records that are older than 12 hours, as they likely won't be used again
         CoroutineScope(IO).launch {
             val maxAge = 60.toLong() * 60 * 12
@@ -659,7 +659,7 @@ class App : Application() {
             TokenManager.getToken()?.let { api.accessToken().revoke(it) }
 
             // Clear any user specific state from database records (such as vote status on posts)
-            AppDatabase.getInstance(this@App).clearUserState()
+            RedditDatabase.getInstance(this@App).clearUserState()
 
             // Might be bad to just restart the app? Easiest way to ensure everything is reset though
             ProcessPhoenix.triggerRebirth(this@App)

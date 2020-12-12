@@ -1,12 +1,13 @@
 package com.example.hakonsreader.api.model
 
-import androidx.room.Ignore
+import androidx.room.Entity
 import com.example.hakonsreader.api.enums.RedditMessageType
 import com.google.gson.annotations.SerializedName
 
 /**
  * Class representing a Reddit message. This class handles both inbox messages and private messages
  */
+@Entity(tableName = "messages")
 class RedditMessage : RedditListing() {
 
     /**
@@ -54,7 +55,7 @@ class RedditMessage : RedditListing() {
      * in a subreddit)
      */
     @SerializedName("subreddit")
-    var subreddit: String? = null
+    var subreddit: String? = ""
 
     /**
      * The subject of the message, if this is a private message.
@@ -71,16 +72,18 @@ class RedditMessage : RedditListing() {
     var context = ""
 
     /**
-     * The internal value of the type, as used by [type]
+     * The internal value of the type, as used by [getType]
      */
     @SerializedName("type")
-    private var typeInternal = ""
+    var typeInternal = ""
 
     /**
      * What type of message this is
+     *
+     * @see typeInternal
      */
-    val type: RedditMessageType by lazy {
-        when (typeInternal) {
+    fun getType() : RedditMessageType {
+        return when (typeInternal) {
             "comment_reply" -> RedditMessageType.COMMENT_REPLY
             else -> RedditMessageType.UNKNOWN
         }

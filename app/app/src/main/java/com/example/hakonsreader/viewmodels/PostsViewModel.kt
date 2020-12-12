@@ -9,7 +9,7 @@ import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.persistence.AppDatabase
+import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -31,7 +31,7 @@ class PostsViewModel(
         private val isUser: Boolean
 ) : ViewModel() {
 
-    private val database = AppDatabase.getInstance(context)
+    private val database = RedditDatabase.getInstance(context)
     private val api = App.get().api
 
     private val posts = MutableLiveData<List<RedditPost>>()
