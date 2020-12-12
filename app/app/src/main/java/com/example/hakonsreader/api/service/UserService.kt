@@ -8,7 +8,7 @@ import com.example.hakonsreader.api.responses.ListingResponse
 import retrofit2.Response
 import retrofit2.http.*
 
-interface UserServiceKt {
+interface UserService {
 
     /**
      * Retrieves information about the logged in user. For information about any user see

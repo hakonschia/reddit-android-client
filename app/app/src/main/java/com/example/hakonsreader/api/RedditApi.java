@@ -11,6 +11,7 @@ import com.example.hakonsreader.api.interfaces.OnNewToken;
 import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.api.requestmodels.AccessTokenModel;
 import com.example.hakonsreader.api.responses.ApiResponse;
 import com.example.hakonsreader.api.requestmodels.CommentRequest;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
@@ -18,13 +19,13 @@ import com.example.hakonsreader.api.requestmodels.SubredditRequest;
 import com.example.hakonsreader.api.requestmodels.SubredditsRequest;
 import com.example.hakonsreader.api.requestmodels.UserRequests;
 import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUser;
+import com.example.hakonsreader.api.service.AccessTokenService;
 import com.example.hakonsreader.api.service.CommentService;
 import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.OAuthService;
 import com.example.hakonsreader.api.service.PostService;
 import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.service.SubredditsService;
-import com.example.hakonsreader.api.service.UserServiceKt;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.utils.Util;
 import com.example.hakonsreader.api.responses.GenericError;
@@ -180,15 +181,14 @@ public class RedditApi {
 
 
     /**
-     * The service object used to communicate with the Reddit API about user related calls
+     * The service object used to communicate with the Reddit API about access token calls (OAuth calls)
      */
-    private UserService userApi;
+    private AccessTokenService accessTokenApi;
 
     /**
      * The service object used to communicate with the Reddit API about user related calls
-     * for Kotlin
      */
-    private UserServiceKt userApiKt;
+    private UserService userApi;
 
     /**
      * The service object used to communicate with the Reddit API about subreddit related calls,
@@ -215,7 +215,7 @@ public class RedditApi {
      * The service object used to communicate only with the part of the Reddit API
      * that deals with OAuth access tokens
      */
-    private OAuthService oauthService;
+    private OAuthService accessTokenApiInternal;
 
     /**
      * The service object used to communicate with the Imgur API
@@ -303,6 +303,7 @@ public class RedditApi {
      * Creates the service objects used for API calls
      */
     private void createServices() {
+        // Http client for API calls that use an access token as the authorization
         OkHttpClient apiClient = new OkHttpClient.Builder()
                 // Automatically refresh access token on authentication errors (401)
                 .authenticator(new Authenticator())
@@ -310,9 +311,10 @@ public class RedditApi {
                 .addInterceptor(new UserAgentInterceptor(userAgent))
                 // Ensure that an access token is always set before sending a request
                 .addInterceptor(new TokenInterceptor())
+                // Add stetho interceptor for enhanced network debugging in Android
+                .addNetworkInterceptor(new StethoInterceptor())
                 // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(logger)
-                .addNetworkInterceptor(new StethoInterceptor())
                 .build();
 
         // Create the API service used to make calls towards oauth.reddit.com
@@ -323,7 +325,6 @@ public class RedditApi {
                 .build();
 
         userApi = apiRetrofit.create(UserService.class);
-        userApiKt = apiRetrofit.create(UserServiceKt.class);
         subredditApi = apiRetrofit.create(SubredditService.class);
         subredditsApi = apiRetrofit.create(SubredditsService.class);
         postApi = apiRetrofit.create(PostService.class);
@@ -351,9 +352,28 @@ public class RedditApi {
             imgurService = imgurRetrofit.create(ImgurService.class);
         }
 
+
+        // Http client for OAuth related API calls (such as retrieving access tokens)
+        // The service created with this is for "RedditApi.accessToken()"
+        OkHttpClient oauthClient = new OkHttpClient.Builder()
+                .addInterceptor(new BasicAuthInterceptor())
+                // Add stetho interceptor for enhanced network debugging in Android
+                .addNetworkInterceptor(new StethoInterceptor())
+                // Logger has to be at the end or else it won't log what has been added before
+                .addInterceptor(logger)
+                .build();
+
+        Retrofit oauthRetrofit = new Retrofit.Builder()
+                .baseUrl(REDDIT_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(oauthClient)
+                .build();
+
+        accessTokenApi = oauthRetrofit.create(AccessTokenService.class);
+
         // The OAuth client does not need interceptors/authenticators for tokens as it doesn't
         // use the access tokens for authorization
-        OkHttpClient oauthClient = new OkHttpClient.Builder()
+        OkHttpClient oauthClientInternal = new OkHttpClient.Builder()
                 // Add User-Agent header to every request
                 .addInterceptor(new UserAgentInterceptor(userAgent))
                 .addInterceptor(logger)
@@ -361,12 +381,12 @@ public class RedditApi {
                 .build();
 
         // Create the API service used to make API calls towards www.reddit.com
-        Retrofit oauthRetrofit = new Retrofit.Builder()
+        Retrofit oauthRetrofitInternal = new Retrofit.Builder()
                 .baseUrl(REDDIT_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(oauthClient)
+                .client(oauthClientInternal)
                 .build();
-        oauthService = oauthRetrofit.create(OAuthService.class);
+        accessTokenApiInternal = oauthRetrofitInternal.create(OAuthService.class);
     }
 
     /**
@@ -617,94 +637,18 @@ public class RedditApi {
         return savedToken != null;
     }
 
-    /* --------------- Access token calls --------------- */
-    /**
-     * Asynchronously retrieves an access token from Reddit.
-     *
-     * <p>Note: The new access token is given with the registered token listener. Use
-     * {@link RedditApi.Builder#onNewToken(OnNewToken)} when creating the API object to retrieve the new token</p>
-     * <p>Note: The callback URL must be set with {@link RedditApi.Builder#callbackUrl(String)}</p>
-     *
-     * @param code The authorization code retrieved from the initial login process
-     * @param onResponse The callback for successful requests. Does not hold anything, but is called with
-     *                   {@code null} when successful.
-     * @param onFailure The callback for failed requests
-     *
-     * @throws IllegalStateException If the callback URL was not set when the API object was built
-     */
-    @EverythingIsNonNull
-    public void getAccessToken(String code, OnResponse<Void> onResponse, OnFailure onFailure) {
-        if (callbackUrl == null) {
-            throw new IllegalStateException("Callback URL is not set. Use RedditApi.Builder.callbackUrl()");
-        }
-
-        oauthService.getAccessToken(
-                basicAuthHeader,
-                code,
-                OAuthConstants.GRANT_TYPE_AUTHORIZATION,
-                callbackUrl
-        ).enqueue(new Callback<AccessToken>() {
-            @Override
-            public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
-                AccessToken token = null;
-                if (response.isSuccessful()) {
-                    token = response.body();
-                }
-
-                if (token != null) {
-                    setTokenInternal(token);
-                    onResponse.onResponse(null);
-                }  else {
-                    Util.handleHttpErrors(response, onFailure);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<AccessToken> call, Throwable t) {
-                onFailure.onFailure(new GenericError(-1), t);
-            }
-        });
-    }
 
     /**
-     * Revokes the refresh token. This will also invalidate the corresponding access token,
-     * effectively logging the user out as the client can no longer make calls on behalf of the user
+     * Retrieves a {@link AccessTokenModel} that can be used to make API calls for access tokens
+     * for logged in users.
      *
-     * <p>This does nothing with access tokens for non-logged in users</p>
+     * <p>Access tokens for non-logged in users are handled automatically and doesn't require any specific code</p>
      *
-     * @param onResponse The callback for successful requests. Doesn't return anything, but is called when successful
-     * @param onFailure The callback for failed requests
+     * @return An object that can perform various access token related API requests
      */
-    @EverythingIsNonNull
-    public void revokeRefreshToken(OnResponse<Void> onResponse, OnFailure onFailure) {
-        if (accessToken.getRefreshToken() == null) {
-            onFailure.onFailure(new GenericError(-1), new Throwable("No token to revoke"));
-            return;
-        }
-
-        oauthService.revokeToken(
-                basicAuthHeader,
-                accessToken.getRefreshToken(),
-                OAuthConstants.TOKEN_TYPE_REFRESH
-        ).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    onResponse.onResponse(null);
-                } else {
-                    Util.handleHttpErrors(response, onFailure);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                onFailure.onFailure(new GenericError(-1), t);
-            }
-        });
-
-        setTokenInternal(new AccessToken());
+    public AccessTokenModel accessToken() {
+        return new AccessTokenModel(accessTokenApi, callbackUrl, this::setTokenInternal);
     }
-    /* --------------- End access token calls --------------- */
 
     /**
      * Retrieve a {@link PostRequest} object that can be used to make API calls towards posts
@@ -757,7 +701,7 @@ public class RedditApi {
      * @return An object that can perform various user related API requests for non-logged in users
      */
     public UserRequests user(@NonNull String username) {
-        return new UserRequests(username, accessToken, userApiKt, imgurService);
+        return new UserRequests(username, accessToken, userApi, imgurService);
     }
 
     /**
@@ -769,7 +713,7 @@ public class RedditApi {
      * @see #user(String)
      */
     public UserRequestsLoggedInUser user() {
-        return new UserRequestsLoggedInUser(accessToken, userApiKt);
+        return new UserRequestsLoggedInUser(accessToken, userApi);
     }
 
 
@@ -785,7 +729,7 @@ public class RedditApi {
         try {
             String device = (deviceId == null || deviceId.isEmpty() ? "DO_NOT_TRACK_THIS_DEVICE" : deviceId);
 
-            newToken = oauthService.getAccessTokenNoUser(
+            newToken = accessTokenApiInternal.getAccessTokenNoUser(
                     basicAuthHeader,
                     OAuthConstants.GRANT_TYPE_INSTALLED_CLIENT,
                     device
@@ -847,7 +791,7 @@ public class RedditApi {
         private AccessToken refreshToken() {
             AccessToken newToken = null;
             try {
-                Response<AccessToken> call =  oauthService.refreshToken(
+                Response<AccessToken> call =  accessTokenApiInternal.refreshToken(
                         basicAuthHeader,
                         accessToken.getRefreshToken(),
                         OAuthConstants.GRANT_TYPE_REFRESH
@@ -902,6 +846,27 @@ public class RedditApi {
             request.header("Authorization", accessToken.generateHeaderString());
 
             return chain.proceed(request.build());
+        }
+    }
+
+
+    /**
+     * Interceptor that adds the "Authorization: basic " header to a request. This should be used for OAuth related
+     * API calls that do not use the access token as the authorization header
+     *
+     * <p>The interceptor adds the value found in {@link #basicAuthHeader}</p>
+     */
+    private class BasicAuthInterceptor implements Interceptor {
+
+        @NotNull
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            Request original = chain.request();
+            Request request = original.newBuilder()
+                    .header("Authorization", basicAuthHeader)
+                    .build();
+
+            return chain.proceed(request);
         }
     }
 }

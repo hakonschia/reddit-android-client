@@ -29,7 +29,9 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class MainActivity : AppCompatActivity(), OnSubredditSelected {
@@ -219,22 +221,30 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
 
         val api = App.get().api
 
-        api.getAccessToken(code, {
-            // Get information about the user. If this fails it doesn't really matter, as it isn't
-            // strictly needed at this point
-            CoroutineScope(IO).launch {
-                when (val resp = api.user().info()) {
-                    is ApiResponse.Success -> App.storeUserInfo(resp.value)
-                    is ApiResponse.Error -> {}
+        CoroutineScope(IO).launch {
+            when (val resp = api.accessToken().get(code)) {
+                is ApiResponse.Success -> {
+                    when (val userInfo = api.user().info()) {
+                        // Get information about the user. If this fails it doesn't really matter, as it isn't
+                        // strictly needed at this point
+                        is ApiResponse.Success -> App.storeUserInfo(userInfo.value)
+                        is ApiResponse.Error -> {}
+                    }
+
+                    // Re-create the start fragment as it now should load posts for the logged in user
+                    // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
+                    withContext(Main) {
+                        postsFragment = null
+                        setupStartFragment()
+                        Snackbar.make(binding!!.parentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT).show()
+                    }
+                }
+
+                is ApiResponse.Error -> {
+                    Util.handleGenericResponseErrors(binding!!.parentLayout, resp.error, resp.throwable)
                 }
             }
-
-            // Re-create the start fragment as it now should load posts for the logged in user
-            // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
-            postsFragment = null
-            setupStartFragment()
-            Snackbar.make(binding!!.parentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT).show()
-        }) { e: GenericError?, t: Throwable? -> Util.handleGenericResponseErrors(binding!!.parentLayout, e, t) }
+        }
     }
 
     /**

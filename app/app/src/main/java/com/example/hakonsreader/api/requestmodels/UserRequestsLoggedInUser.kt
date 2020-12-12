@@ -5,7 +5,7 @@ import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.UserServiceKt
+import com.example.hakonsreader.api.service.UserService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
@@ -17,7 +17,7 @@ import java.lang.Exception
  */
 class UserRequestsLoggedInUser(
         private val accessToken: AccessToken,
-        private val api: UserServiceKt,
+        private val api: UserService,
 ) {
 
     /**

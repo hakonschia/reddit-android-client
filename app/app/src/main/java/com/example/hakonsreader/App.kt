@@ -637,13 +637,14 @@ class App : Application() {
      * Clears any user information stored, logging a user out. The application will be restarted
      */
     fun logOut() {
-        // Revoke token, the response to this never holds any data. If it fails we could potentially
-        // store that it failed and retry again later
-        api.revokeRefreshToken({ }) { call: GenericError?, t: Throwable? -> }
-
         // Clear shared preferences
         clearUserInfo()
+
         CoroutineScope(IO).launch {
+            // Revoke token, the response to this never holds any data. If it fails we could potentially
+            // store that it failed and retry again later
+            TokenManager.getToken()?.let { api.accessToken().revoke(it) }
+
             // Clear any user specific state from database records (such as vote status on posts)
             AppDatabase.getInstance(this@App).clearUserState()
 
