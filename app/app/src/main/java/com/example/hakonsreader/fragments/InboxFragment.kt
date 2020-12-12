@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.hakonsreader.R
 import com.example.hakonsreader.databinding.FragmentInboxBinding
+import com.google.android.material.tabs.TabLayoutMediator
 
 /**
  * Fragment for displaying a users inbox
@@ -25,6 +27,8 @@ class InboxFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentInboxBinding.inflate(layoutInflater)
 
+        setupTabs()
+
         return binding!!.root
     }
 
@@ -37,6 +41,14 @@ class InboxFragment : Fragment() {
     private fun setupTabs() {
         inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.ALL))
         inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.UNREAD))
+
+        binding!!.inboxPages.adapter = PagerAdapter(requireActivity())
+        TabLayoutMediator(binding!!.inboxPagesTitle, binding!!.inboxPages) { tab, position ->
+            tab.text = when (inboxFragments[position].inboxType) {
+                InboxGroupTypes.ALL -> getString(R.string.inboxAllMessages)
+                InboxGroupTypes.UNREAD -> getString(R.string.inboxUnreadMessages)
+            }
+        }.attach()
     }
 
 

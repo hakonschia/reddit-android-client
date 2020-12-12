@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.hakonsreader.App
+import com.example.hakonsreader.R
 import com.example.hakonsreader.databinding.FragmentInboxGroupBinding
 
 /**
@@ -12,29 +14,21 @@ import com.example.hakonsreader.databinding.FragmentInboxGroupBinding
  */
 class InboxGroupFragment : Fragment() {
     companion object {
-        /**
-         * What type of inbox group this is (from [InboxFragment.InboxGroupTypes])
-         */
-        private const val TYPE = "type"
-
         fun newInstance(type: InboxFragment.InboxGroupTypes) : InboxGroupFragment {
-            val args = Bundle()
-            args.putInt(TYPE, type.ordinal)
-
+            // Should probably use arguments for this, but it doesn't get set before the tablayout
+            // using the value runs, so ¯\_(ツ)_/¯
             val fragment = InboxGroupFragment()
-            fragment.arguments = args
+            fragment.inboxType = type
             return fragment
         }
     }
 
     private var binding: FragmentInboxGroupBinding? = null
+    private val api = App.get().api
 
-    var inboxType: InboxFragment.InboxGroupTypes? = null
+    lateinit var inboxType: InboxFragment.InboxGroupTypes
+        private set
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        inboxType = InboxFragment.InboxGroupTypes.values()[requireArguments().getInt(TYPE)]
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setupBinding()
@@ -51,8 +45,8 @@ class InboxGroupFragment : Fragment() {
         binding = FragmentInboxGroupBinding.inflate(layoutInflater)
 
         when (inboxType) {
-            InboxFragment.InboxGroupTypes.ALL -> binding!!.inboxGroupTitle.text = "All messages"
-            InboxFragment.InboxGroupTypes.UNREAD -> binding!!.inboxGroupTitle.text = "Unread"
+            InboxFragment.InboxGroupTypes.ALL -> binding!!.inboxGroupTitle.text = getString(R.string.inboxAllMessages)
+            InboxFragment.InboxGroupTypes.UNREAD -> binding!!.inboxGroupTitle.text = getString(R.string.inboxUnreadMessages)
         }
     }
 

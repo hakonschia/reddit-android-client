@@ -249,4 +249,6 @@
     <string name="menuCommentPeekParent">Vis foreldrekommentar</string>
     <string name="commentHasBeenArchivedVote">Kommentaren er arkivert</string>
     <string name="postHasBeenArchivedVote">Posten er arkivert</string>
+    <string name="inboxAllMessages">Alle meldinger</string>
+    <string name="inboxUnreadMessages">Ulest</string>
 </resources>

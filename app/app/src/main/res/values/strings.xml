@@ -372,4 +372,7 @@
 
     <string name="commentHasBeenArchivedVote">The comment is archived</string>
     <string name="postHasBeenArchivedVote">The post is archived</string>
+
+    <string name="inboxAllMessages">All messages</string>
+    <string name="inboxUnreadMessages">Unread</string>
 </resources>
