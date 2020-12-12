@@ -14,6 +14,8 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.VoteBarBinding
 import com.example.hakonsreader.misc.Util
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.robinhood.ticker.TickerUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -63,14 +65,18 @@ class VoteBar : FrameLayout {
     /**
      * Sends a request to vote on the listing
      *
+     * If the listing is archived a snackbar is shown and the API request is not made
+     *
      * @param voteType The vote type to cast
      */
     private fun vote(voteType: VoteType) {
         // In a case that the post doesn't load, clicking on the vote buttons would cause a NPE
-        if (listing == null) {
-            return
-        }
         listing?.let {
+            if (it.isArchived) {
+                showArchivedSnackbar()
+                return
+            }
+
             val currentVote = it.voteType
             val actualVote = if (currentVote == voteType) {
                 // Ie. if upvote is clicked when the listing is already upvoted, unvote the listing
@@ -186,5 +192,18 @@ class VoteBar : FrameLayout {
      */
     fun tickerAnimationEnabled(): Boolean {
         return binding.score.animationDuration != 0L
+    }
+
+    /**
+     * Shows a snackbar saying that the listing has been archived
+     */
+    private fun showArchivedSnackbar() {
+        val stringRes = if (listing is RedditPost) {
+            context.getString(R.string.postHasBeenArchivedVote)
+        } else {
+            context.getString(R.string.commentHasBeenArchivedVote)
+        }
+
+        Snackbar.make(this, stringRes, BaseTransientBottomBar.LENGTH_SHORT).show()
     }
 }

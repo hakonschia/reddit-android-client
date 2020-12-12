@@ -84,7 +84,7 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
      * Archived posts cannot be voted/commented on
      */
     @SerializedName("archived")
-    var isArchived = false
+    override var isArchived = false
 
     /**
      * True if the post is locked

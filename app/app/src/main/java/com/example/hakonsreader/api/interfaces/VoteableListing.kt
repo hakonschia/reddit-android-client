@@ -28,4 +28,12 @@ interface VoteableListing {
      */
     var voteType: VoteType
 
+    /**
+     * True if the listing is archived
+     *
+     * Archived listings cannot be voted on, and should therefore not attempt to make API requests
+     * to vote, as the will always fail
+     */
+    var isArchived: Boolean
+
 }

@@ -247,4 +247,6 @@
     <string name="postMenuAddSubredditToFilter">Filtrer poster fra \'%s\'</string>
     <string name="prefs_title_show_all_sidebars">Vis alle sidebarer (eller bare én farget)</string>
     <string name="menuCommentPeekParent">Vis foreldrekommentar</string>
+    <string name="commentHasBeenArchivedVote">Kommentaren er arkivert</string>
+    <string name="postHasBeenArchivedVote">Posten er arkivert</string>
 </resources>

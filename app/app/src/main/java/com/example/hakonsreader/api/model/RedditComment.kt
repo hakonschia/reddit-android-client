@@ -190,6 +190,14 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing {
     @SerializedName("is_submitter")
     var isByPoster = false
 
+    /**
+     * True if the comment is archived (ie. the post the comment is in is archived)
+     *
+     * Archived comments cannot be voted on or replied to
+     */
+    @SerializedName("archived")
+    override var isArchived = false
+
 
     /**
      * The score of the comment
