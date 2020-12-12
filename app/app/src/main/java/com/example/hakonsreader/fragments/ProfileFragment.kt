@@ -18,6 +18,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentProfileBinding
+import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
@@ -117,6 +118,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
      */
     private var isLoggedInUser = false
 
+    var onInboxClicked: OnInboxClicked? = null
 
     private var username: String? = null
 
@@ -239,6 +241,10 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         // Kinda weird to do this here, but even if we are privately browsing and on another users profile
         // it should indicate that we're privately browsing (as with your own profile and subreddits)
         binding?.loggedInUser = isLoggedInUser
+
+        binding?.inbox?.setOnClickListener {
+            onInboxClicked?.onInboxClicked()
+        }
     }
 
     /**

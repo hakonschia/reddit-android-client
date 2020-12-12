@@ -21,6 +21,7 @@ import com.example.hakonsreader.databinding.ActivityMainBinding
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.*
 import com.example.hakonsreader.fragments.ProfileFragment.Companion.newInstance
+import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.interfaces.OnSubredditSelected
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.misc.Util
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class MainActivity : AppCompatActivity(), OnSubredditSelected {
+class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
 
     companion object {
         private const val TAG = "MainActivity"
@@ -47,7 +48,6 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
 
         /**
          * The key used to store the name of the subreddit represented in [MainActivity.activeSubreddit]
-         *
          *
          * When this key holds a value it does not necessarily mean the subreddit was active (shown on screen)
          * at the time the instance was saved, but means that when clicking on the subreddit navbar, this should
@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
     private var activeSubreddit: SubredditFragment? = null
     private var selectSubredditFragment: SelectSubredditFragment? = null
     private var profileFragment: ProfileFragment? = null
+    private var inboxFragment: InboxFragment? = null
     private var logInFragment: LogInFragment? = null
     private var settingsFragment: SettingsFragment? = null
     private var lastShownFragment: Fragment? = null
@@ -154,6 +155,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
     }
 
     override fun onBackPressed() {
+        // TODO if we're in inbox, go back to profile
         // If we are in the subreddit navbar
         if (binding?.bottomNav?.selectedItemId == R.id.navSubreddit
                 // In a subreddit, and the last item was the list, go back to the list
@@ -190,6 +192,15 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
                 .commit()
     }
 
+    override fun onInboxClicked() {
+        inboxFragment = InboxFragment()
+        // Should maybe be sure that the profile navbar is clicked? Dunno
+        // Change the navbar name to be "Inbox" maybe?
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, inboxFragment!!)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit()
+    }
 
     /**
      * Handles when the activity resumes from an OAuth intent. If the intent is a successful
@@ -334,7 +345,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
             }
         }
 
-        // Restore the listener as it won't be set automatically
+        // Restore the listeners as it won't be set automatically
+        profileFragment?.onInboxClicked = this
         selectSubredditFragment?.subredditSelected = this
     }
 
@@ -365,20 +377,26 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
 
         // Set listener for when an item has been clicked when already selected
         binding!!.bottomNav.setOnNavigationItemReselectedListener { item ->
-            // When the subreddit is clicked when already in subreddit go back to the subreddit list
-            if (item.itemId == R.id.navSubreddit) {
-                activeSubreddit = null
-                if (selectSubredditFragment == null) {
-                    selectSubredditFragment = SelectSubredditFragment()
-                    selectSubredditFragment!!.subredditSelected = this
-                }
-                lastShownFragment = selectSubredditFragment
+            when (item.itemId) {
+                // When the subreddit is clicked when already in subreddit go back to the subreddit list
+                R.id.navSubreddit -> {
+                    activeSubreddit = null
+                    if (selectSubredditFragment == null) {
+                        selectSubredditFragment = SelectSubredditFragment()
+                        selectSubredditFragment!!.subredditSelected = this
+                    }
+                    lastShownFragment = selectSubredditFragment
 
-                // Since we are in a way going back in the same navbar item, use the close transition
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainer, selectSubredditFragment!!)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                        .commit()
+                    // Since we are in a way going back in the same navbar item, use the close transition
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentContainer, selectSubredditFragment!!)
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                            .commit()
+                }
+
+                R.id.navProfile -> {
+                    // If we're in the inbox, go back to profile
+                }
             }
         }
 
@@ -534,9 +552,11 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected {
         private fun onNavBarProfile(): Fragment {
             // If logged in, show profile, otherwise show log in page
             return if (App.get().isUserLoggedIn()) {
+                // TODO handle inbox
                 if (profileFragment == null) {
                     profileFragment = newInstance()
                 }
+                profileFragment!!.onInboxClicked = this@MainActivity
                 profileFragment!!
             } else {
                 if (logInFragment == null) {
