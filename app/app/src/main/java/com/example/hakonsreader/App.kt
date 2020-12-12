@@ -230,9 +230,9 @@ class App : Application() {
                 .usePlugin(RedditSpoilerPlugin())
                 .usePlugin(RedditLinkPlugin(this))
                 .usePlugin(SuperscriptPlugin())
-                .usePlugin(LinkPlugin(this))
-                .usePlugin(ThemePlugin(this))
+                .usePlugin(LinkPlugin())
                 .usePlugin(EnlargeLinkPlugin())
+                .usePlugin(ThemePlugin(this))
                 .build()
     }
 
