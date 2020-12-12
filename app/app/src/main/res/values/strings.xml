@@ -96,7 +96,7 @@
     <string name="prefs_title_comment_smooth_scroll_threshold">Threshold for smooth scroll comment navigation</string>
     <string name="prefs_title_filter_posts_from_default_subreddits">Filter posts</string>
     <string name="prefs_dialog_message_filter_posts_from_default_subreddits">Filter posts from subreddits from appearing in front page, popular, and all. One subreddit per line</string>
-    <string name="prefs_title_show_all_sidebars">Show all sidebars (or just one colored)</string>
+    <string name="prefs_title_show_all_sidebars">Show all sidebars (or just one)</string>
 
 
     <!-- Preferences keys -->
