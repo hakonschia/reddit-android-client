@@ -105,5 +105,11 @@
             motion:layout_constraintTop_toTopOf="@+id/topLayout"
             android:layout_marginTop="8dp"
             android:id="@+id/menuProfile" />
+        <Constraint
+            android:id="@+id/inbox"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            motion:layout_constraintTop_toBottomOf="@+id/menuProfile"
+            motion:layout_constraintEnd_toEndOf="@+id/menuProfile" />
     </ConstraintSet>
 </MotionScene>
