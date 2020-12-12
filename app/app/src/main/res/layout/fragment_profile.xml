@@ -178,6 +178,7 @@
             android:layout_marginEnd="8dp"
             android:src="@drawable/ic_baseline_mail_24"
             android:foreground="@drawable/ripple_main_bg"
+            android:visibility="@{loggedInUser ? View.VISIBLE : View.GONE}"
 
             app:layout_constraintEnd_toStartOf="@+id/menuProfile"
             app:layout_constraintTop_toTopOf="@+id/menuProfile" />

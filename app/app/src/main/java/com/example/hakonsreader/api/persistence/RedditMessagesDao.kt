@@ -47,13 +47,13 @@ interface RedditMessagesDao {
      * @see delete
      */
     // TODO this causes a NPE when building the project, because I don't know
-    // @Query("DELETE FROM messages")
+    //@Query("DELETE FROM messages")
     //fun deleteAll() : Int
 
 
     /**
      * @return the amount of messages in the database marked as "new", ie. not seen by the user
      */
-    @Query("SELECT COUNT() FROM messages WHERE isNew=1")
-    fun getNewMessagesCount() : Int
+    // @Query("SELECT COUNT() FROM messages WHERE isNew=1")
+   // fun getNewMessagesCount() : Int
 }
