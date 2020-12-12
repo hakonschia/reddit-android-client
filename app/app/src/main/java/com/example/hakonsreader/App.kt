@@ -232,6 +232,7 @@ class App : Application() {
                 .usePlugin(SuperscriptPlugin())
                 .usePlugin(LinkPlugin(this))
                 .usePlugin(ThemePlugin(this))
+                .usePlugin(EnlargeLinkPlugin())
                 .build()
     }
 
@@ -600,6 +601,18 @@ class App : Application() {
                 resources.getBoolean(R.bool.prefs_default_show_all_sidebars)
         )
     }
+
+    /**
+     * Gets the integer value of the link scale. This should be divided by 100 to get the actual
+     * float scale to use
+     */
+    fun linkScale() : Int {
+        return settings.getInt(
+                getString(R.string.prefs_key_link_scale),
+                resources.getInteger(R.integer.prefs_default_link_scale)
+        )
+    }
+
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that

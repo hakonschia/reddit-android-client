@@ -11,6 +11,7 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+import androidx.preference.SeekBarPreference;
 import androidx.preference.SwitchPreference;
 
 import com.example.hakonsreader.App;
@@ -20,6 +21,10 @@ import com.example.hakonsreader.activites.MainActivity;
 public class SettingsFragment extends PreferenceFragmentCompat {
     private static final String TAG = "SettingsFragment";
 
+    /**
+     * The String.format() format used for formatting the summary for the link scale
+     */
+    private static final String LINK_SCALE_SUMMARY_FORMAT = "%.2f";
     private SharedPreferences settings;
 
     @Override
@@ -50,6 +55,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         EditTextPreference filteredSubreddits = findPreference(getString(R.string.prefs_key_filter_posts_from_default_subreddits));
         filteredSubreddits.setOnPreferenceChangeListener(filteredSubredditsChangeListener);
         setFilteredSubredditsSummary(filteredSubreddits, null);
+
+        SeekBarPreference linkScalePreference = findPreference(getString(R.string.prefs_key_link_scale));
+        linkScalePreference.setOnPreferenceChangeListener(linkScaleChangeListener);
+        linkScalePreference.setSummary(String.format(LINK_SCALE_SUMMARY_FORMAT, linkScalePreference.getValue() / 100f));
     }
 
     @Override
@@ -136,6 +145,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     private final Preference.OnPreferenceChangeListener filteredSubredditsChangeListener = (preference, value) -> {
         setFilteredSubredditsSummary((EditTextPreference) preference, (String) value);
+        return true;
+    };
+
+    /**
+     * Listener that updates the summary on the preference to the actual value the new value represents
+     */
+    private final Preference.OnPreferenceChangeListener linkScaleChangeListener = (preference, newValue) -> {
+        Integer value = (Integer) newValue;
+        float actualValue = value / 100f;
+        preference.setSummary(String.format(LINK_SCALE_SUMMARY_FORMAT, actualValue));
         return true;
     };
 

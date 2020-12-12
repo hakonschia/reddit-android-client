@@ -97,6 +97,7 @@
     <string name="prefs_title_filter_posts_from_default_subreddits">Filter posts</string>
     <string name="prefs_dialog_message_filter_posts_from_default_subreddits">Filter posts from subreddits from appearing in front page, popular, and all. One subreddit per line</string>
     <string name="prefs_title_show_all_sidebars">Show all sidebars (or just one)</string>
+    <string name="prefs_title_link_scale">Link text scale</string>
 
 
     <!-- Preferences keys -->
@@ -132,6 +133,7 @@
     <string name="prefs_key_comment_smooth_scroll_threshold" translatable="false">max_comments_for_smooth_scroll</string>
     <string name="prefs_key_filter_posts_from_default_subreddits" translatable="false">filter_posts_from_default_subreddits</string>
     <string name="prefs_key_show_all_sidebars" translatable="false">show_all_sidebars</string>
+    <string name="prefs_key_link_scale" translatable="false">link_scale</string>
 
 
     <plurals name="filteredSubredditsSummary">

@@ -15,7 +15,7 @@ import io.noties.markwon.core.MarkwonTheme;
  * Markwon plugin that defines the theme
  */
 public class ThemePlugin extends AbstractMarkwonPlugin {
-    private Context context;
+    private final Context context;
 
     public ThemePlugin(Context context) {
         this.context = context;

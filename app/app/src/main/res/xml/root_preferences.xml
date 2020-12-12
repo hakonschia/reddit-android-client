@@ -104,6 +104,18 @@
             app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_opening_links_in_app" />
 
+        <!-- Since the seekbar only supports ints we have to manually adjust the value
+         ourselves and set the converted float value, so don't show the seekbar value-->
+        <SeekBarPreference
+            app:key="@string/prefs_key_link_scale"
+            android:title="@string/prefs_title_link_scale"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:showSeekBarValue="false"
+            app:updatesContinuously="true"
+            app:min="100"
+            android:max="250"
+            app:defaultValue="@integer/prefs_default_link_scale" />
     </PreferenceCategory>
 
     <PreferenceCategory
