@@ -60,7 +60,8 @@ private const val SUBREDDIT_SEARCH_DELAY: Long = 500
 class SelectSubredditFragment : Fragment() {
     private val TAG = "SelectSubredditFragment"
 
-    private var binding: FragmentSelectSubredditBinding? = null
+    private var _binding: FragmentSelectSubredditBinding? = null
+    private val binding get() = _binding!!
     private val api = App.get().api
     private val database = AppDatabase.getInstance(context)
 
@@ -115,7 +116,7 @@ class SelectSubredditFragment : Fragment() {
             subredditsViewModel?.loadSubreddits(loadDefault)
         }
 
-        return binding?.root
+        return binding.root
     }
 
     override fun onResume() {
@@ -135,7 +136,7 @@ class SelectSubredditFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        _binding = null
     }
 
 
@@ -143,10 +144,10 @@ class SelectSubredditFragment : Fragment() {
      * Infaltes and sets up [binding]
      */
     private fun setupBinding(container: ViewGroup?) {
-        binding = FragmentSelectSubredditBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentSelectSubredditBinding.inflate(layoutInflater, container, false)
 
-        binding?.subredditSearch?.setOnEditorActionListener(actionDoneListener)
-        binding?.subredditSearch?.addTextChangedListener(automaticSearchListener)
+        binding.subredditSearch.setOnEditorActionListener(actionDoneListener)
+        binding.subredditSearch.addTextChangedListener(automaticSearchListener)
     }
 
     /**
@@ -158,8 +159,8 @@ class SelectSubredditFragment : Fragment() {
         subredditsAdapter?.favoriteClicked = OnClickListener { subreddit -> favoriteClicked(subreddit) }
         subredditsLayoutManager = LinearLayoutManager(context)
 
-        binding?.subreddits?.adapter = subredditsAdapter
-        binding?.subreddits?.layoutManager = subredditsLayoutManager
+        binding.subreddits.adapter = subredditsAdapter
+        binding.subreddits.layoutManager = subredditsLayoutManager
     }
 
     /**
@@ -170,8 +171,8 @@ class SelectSubredditFragment : Fragment() {
         searchSubredditsAdapter?.subredditSelected = subredditSelected
         searchSubredditsLayoutManager = LinearLayoutManager(context)
 
-        binding?.searchedSubreddits?.adapter = searchSubredditsAdapter
-        binding?.searchedSubreddits?.layoutManager = searchSubredditsLayoutManager
+        binding.searchedSubreddits.adapter = searchSubredditsAdapter
+        binding.searchedSubreddits.layoutManager = searchSubredditsLayoutManager
     }
 
     /**
@@ -188,7 +189,7 @@ class SelectSubredditFragment : Fragment() {
         })
 
         subredditsViewModel!!.getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
-            binding?.loadingIcon?.onCountChange(onCountChange)
+            binding.loadingIcon.onCountChange(onCountChange)
         })
 
         subredditsViewModel!!.getError().observe(viewLifecycleOwner, { error ->
@@ -203,7 +204,7 @@ class SelectSubredditFragment : Fragment() {
         searchSubredditsViewModel = ViewModelProvider(this).get(SearchForSubredditsViewModel::class.java)
 
         searchSubredditsViewModel!!.getSearchResults().observe(viewLifecycleOwner, { subreddits ->
-            binding?.searchedSubredditsCount = subreddits.size
+            binding.searchedSubredditsCount = subreddits.size
 
             // TODO make some sort of animation for this
             if (subreddits.isEmpty()) {
@@ -217,7 +218,7 @@ class SelectSubredditFragment : Fragment() {
         })
 
         searchSubredditsViewModel!!.getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
-            binding?.loadingIcon?.onCountChange(onCountChange)
+            binding.loadingIcon.onCountChange(onCountChange)
         })
 
         searchSubredditsViewModel!!.getError().observe(viewLifecycleOwner, { error ->

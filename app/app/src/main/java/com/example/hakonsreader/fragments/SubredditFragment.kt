@@ -98,7 +98,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private val database = AppDatabase.getInstance(context)
     private val api = App.get().api
 
-    private var binding: FragmentSubredditBinding? = null
+    private var _binding: FragmentSubredditBinding? = null
+    private val binding get() = _binding!!
     private var saveState: Bundle? = null
     private var postIds = ArrayList<String>()
     private var isDefaultSubreddit = false
@@ -114,7 +115,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             // so disable it if it would like weird
             val old = this.get()
             val enableTickerAnimation = old != null && old.subscribers != 0
-            binding?.subredditSubscribers?.animationDuration = (if (enableTickerAnimation) {
+            binding.subredditSubscribers.animationDuration = (if (enableTickerAnimation) {
                 resources.getInteger(R.integer.tickerAnimationDefault)
             } else {
                 0
@@ -123,8 +124,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             // Probably not how ObservableField is supposed to be used? Works though
             super.set(value)
 
-            ViewUtil.setSubredditIcon(binding!!.subredditIcon, value)
-            binding?.subreddit = value
+            ViewUtil.setSubredditIcon(binding.subredditIcon, value)
+            binding.subreddit = value
             postsAdapter?.setHideScoreTime(value.hideScoreTime)
         }
     }
@@ -147,7 +148,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             }
         }
 
-        return binding?.root
+        return binding.root
     }
 
     /**
@@ -183,7 +184,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         postsAdapter?.let {
             // Ensure that all videos are cleaned up
             for (i in 0 until it.itemCount) {
-                val viewHolder = binding!!.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
+                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
                 viewHolder?.destroy()
             }
         }
@@ -197,7 +198,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
         saveState?.let { saveState(it) }
 
-        binding = null
+        _binding = null
     }
 
 
@@ -254,65 +255,61 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * Inflates and sets up [binding]
      */
     private fun setupBinding() {
-        binding = FragmentSubredditBinding.inflate(layoutInflater)
+        _binding = FragmentSubredditBinding.inflate(layoutInflater)
 
-        binding?.let {
-            it.subredditRefresh.setOnClickListener { refreshPosts() }
-            it.subscribe.setOnClickListener { subscribeOnclick() }
+        binding.subredditRefresh.setOnClickListener { refreshPosts() }
+        binding.subscribe.setOnClickListener { subscribeOnclick() }
 
-            it.subredditSubscribers.setCharacterLists(TickerUtils.provideNumberList())
+        binding.subredditSubscribers.setCharacterLists(TickerUtils.provideNumberList())
 
-            it.postsRefreshLayout.setOnRefreshListener {
-                refreshPosts()
+        binding.postsRefreshLayout.setOnRefreshListener {
+            refreshPosts()
 
-                // The refreshing will be visible with our own progress bar
-                it.postsRefreshLayout.isRefreshing = false
-            }
-            it.postsRefreshLayout.setProgressBackgroundColorSchemeColor(
-                    ContextCompat.getColor(requireContext(), R.color.colorAccent)
-            )
+            // The refreshing will be visible with our own progress bar
+            binding.postsRefreshLayout.isRefreshing = false
         }
+        binding.postsRefreshLayout.setProgressBackgroundColorSchemeColor(
+                ContextCompat.getColor(requireContext(), R.color.colorAccent)
+        )
     }
 
     /**
      * Sets up [FragmentSubredditBinding.posts] and [postsAdapter]/[postsLayoutManager]
      */
     private fun setupPostsList() {
-        binding?.let {
-            postsAdapter = PostsAdapter()
-            postsLayoutManager = LinearLayoutManager(context)
+        postsAdapter = PostsAdapter()
+        postsLayoutManager = LinearLayoutManager(context)
 
-            it.posts.adapter = postsAdapter
-            it.posts.layoutManager = postsLayoutManager
+        binding.posts.adapter = postsAdapter
+        binding.posts.layoutManager = postsLayoutManager
 
-            postsScrollListener = PostScrollListener(it.posts) { postsViewModel?.loadPosts() }
-            it.posts.setOnScrollChangeListener(postsScrollListener)
+        postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }
+        binding.posts.setOnScrollChangeListener(postsScrollListener)
 
-            postsAdapter?.setOnVideoManuallyPaused(object : OnVideoManuallyPaused {
-                override fun postPaused(contentVideo: ContentVideo) {
-                    // Ignore post when scrolling if manually paused
-                    postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
-                }
-            })
-
-            postsAdapter?.setOnPostClicked { post ->
-                // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
-                // autoplay the video
-                val redditPost = post.redditPost
-                postsScrollListener?.setPostToIgnore(redditPost.id)
-
-                val intent = Intent(context, PostActivity::class.java)
-                intent.putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))
-                intent.putExtra(Content.EXTRAS, post.extras)
-                intent.putExtra(PostActivity.HIDE_SCORE_KEY, post.hideScore)
-
-                // Only really applicable for videos, as they should be paused
-                post.viewUnselected()
-
-                val activity = requireActivity()
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())
-                activity.startActivityForResult(intent, 2, options.toBundle())
+        postsAdapter?.setOnVideoManuallyPaused(object : OnVideoManuallyPaused {
+            override fun postPaused(contentVideo: ContentVideo) {
+                // Ignore post when scrolling if manually paused
+                postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
             }
+        })
+
+        postsAdapter?.setOnPostClicked { post ->
+            // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
+            // autoplay the video
+            val redditPost = post.redditPost
+            postsScrollListener?.setPostToIgnore(redditPost.id)
+
+            val intent = Intent(context, PostActivity::class.java)
+            intent.putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))
+            intent.putExtra(Content.EXTRAS, post.extras)
+            intent.putExtra(PostActivity.HIDE_SCORE_KEY, post.hideScore)
+
+            // Only really applicable for videos, as they should be paused
+            post.viewUnselected()
+
+            val activity = requireActivity()
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())
+            activity.startActivityForResult(intent, 2, options.toBundle())
         }
     }
 
@@ -337,7 +334,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         sub.name = subredditName
         subreddit.set(sub)
 
-        binding?.standardSub = isDefaultSubreddit
+        binding.standardSub = isDefaultSubreddit
 
         // Not a standard sub, get info from local database if previously stored
         if (!isDefaultSubreddit) {
@@ -361,7 +358,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     private fun setupSubmitPostFab() {
         if (!RedditApi.STANDARD_SUBS.contains(getSubredditName()?.toLowerCase())) {
-            binding?.let {
+            binding.let {
                 it.posts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
@@ -410,11 +407,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 if (layoutState != null) {
                     postsLayoutManager?.onRestoreInstanceState(layoutState)
 
-                    // TODO this seems sometimes to happen when loading subs from scratch though
                     // If we're at this point we probably don't want the toolbar expanded
                     // We get here when the fragment/activity holding the fragment has been restarted
                     // so it usually looks odd if the toolbar now shows
-                    binding?.subredditAppBarLayout?.setExpanded(false, false)
+                    binding.subredditAppBarLayout.setExpanded(false, false)
 
                     // TODO should this be inside layoutState != null or can it be outside?
                     // Resume videos etc etc
@@ -442,7 +438,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             // It's probably not necessary to loop through all, but ViewHolders are still active even when not visible
             // so just getting firstVisible and lastVisible probably won't be enough
             for (i in 0 until postsAdapter?.itemCount!!) {
-                val viewHolder = binding?.posts?.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
+                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
 
                 if (viewHolder != null) {
                     val extras = viewHolder.extras
@@ -473,7 +469,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             val lastVisible = it.getInt(saveKey(LAST_VIEW_STATE_STORED_KEY))
 
             for (i in firstVisible..lastVisible) {
-                val viewHolder = binding!!.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
+                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
 
                 if (viewHolder != null) {
                     // If the view has been destroyed the ViewHolders haven't been created yet
@@ -522,7 +518,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                             subreddit.set(it)
                         }
                         is ApiResponse.Error -> Util.handleGenericResponseErrors(
-                                binding?.parentLayout,
+                                binding.parentLayout,
                                 response.error,
                                 response.throwable
                         )
@@ -595,13 +591,13 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         // These should also be in the center of the bottom parent/appbar or have margin to the bottom of the appbar
         // since now it might go over the appbar
         if (GenericError.SUBREDDIT_BANNED == errorReason) {
-            val layout: SubredditBannedBinding = SubredditBannedBinding.inflate(layoutInflater, binding!!.parentLayout, true)
+            val layout: SubredditBannedBinding = SubredditBannedBinding.inflate(layoutInflater, binding.parentLayout, true)
             layout.subreddit = getSubredditName()
 
             (layout.root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
             layout.root.requestLayout()
         } else if (GenericError.SUBREDDIT_PRIVATE == errorReason) {
-            val layout: SubredditPrivateBinding = SubredditPrivateBinding.inflate(layoutInflater, binding!!.parentLayout, true)
+            val layout: SubredditPrivateBinding = SubredditPrivateBinding.inflate(layoutInflater, binding.parentLayout, true)
             layout.subreddit = getSubredditName()
 
             (layout.root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
@@ -612,14 +608,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             if (throwable is NoSubredditInfoException) {
                 return
             } else if (throwable is SubredditNotFoundException) {
-                val layout: SubredditNotFoundBinding = SubredditNotFoundBinding.inflate(layoutInflater, binding!!.parentLayout, true)
+                val layout: SubredditNotFoundBinding = SubredditNotFoundBinding.inflate(layoutInflater, binding.parentLayout, true)
                 layout.subreddit = getSubredditName()
 
                 (layout.root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
                 layout.root.requestLayout()
                 return
             }
-            Util.handleGenericResponseErrors(binding!!.parentLayout, error, throwable)
+            Util.handleGenericResponseErrors(binding.parentLayout, error, throwable)
         }
     }
 
@@ -640,12 +636,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     }
 
     override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
-        binding?.let {
-            it.privatelyBrowsing = privatelyBrowsing
-            it.subredditIcon.borderColor = ContextCompat.getColor(
-                    requireContext(),
-                    if (privatelyBrowsing) R.color.privatelyBrowsing else R.color.opposite_background
-            )
-        }
+        binding.privatelyBrowsing = privatelyBrowsing
+        binding.subredditIcon.borderColor = ContextCompat.getColor(
+                requireContext(),
+                if (privatelyBrowsing) R.color.privatelyBrowsing else R.color.opposite_background
+        )
     }
 }

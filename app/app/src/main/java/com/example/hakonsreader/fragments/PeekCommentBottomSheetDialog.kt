@@ -11,7 +11,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class PeekCommentBottomSheetDialog : BottomSheetDialogFragment() {
 
-    private var binding: PeekParentCommentBinding? = null
+    private var _binding: PeekParentCommentBinding? = null
+    private val binding get() = _binding!!
 
     /**
      * The comment to show
@@ -19,11 +20,16 @@ class PeekCommentBottomSheetDialog : BottomSheetDialogFragment() {
     var comment: RedditComment? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = PeekParentCommentBinding.inflate(inflater)
-        binding?.isByLoggedInUser = comment?.author == App.storedUser?.username
-        binding?.comment = comment
+        _binding = PeekParentCommentBinding.inflate(inflater)
+        binding.isByLoggedInUser = comment?.author == App.storedUser?.username
+        binding.comment = comment
 
-        return binding?.root
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

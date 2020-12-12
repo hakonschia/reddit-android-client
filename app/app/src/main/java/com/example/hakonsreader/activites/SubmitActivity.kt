@@ -54,14 +54,15 @@ class SubmitActivity : AppCompatActivity() {
     private val api = App.get().api
     private val database = AppDatabase.getInstance(this)
 
-    private lateinit var binding:  ActivitySubmitBinding
+    private var _binding:  ActivitySubmitBinding? = null
+    private val binding get() = _binding!!
     private lateinit var subreddit: Subreddit
     private val submissionFragments = ArrayList<Fragment>()
     private var submissionFlairs = ArrayList<SubmissionFlair>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySubmitBinding.inflate(LayoutInflater.from(this))
+        _binding = ActivitySubmitBinding.inflate(LayoutInflater.from(this))
         setContentView(binding.root)
 
         val subredditName = intent?.extras?.getString(SUBREDDIT_KEY) ?: return
@@ -113,6 +114,11 @@ class SubmitActivity : AppCompatActivity() {
                 is SubmissionCrosspostFragment -> submitCrosspost(fragment)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun getSubredditInfo(subredditName: String) {

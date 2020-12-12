@@ -56,7 +56,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         private const val ACTIVE_SUBREDDIT_NAME = "active_subreddit_name"
     }
 
-    private var binding: ActivityMainBinding? = null
+    private var _binding: ActivityMainBinding? = null
+    private val binding get() = _binding!!
     private var savedState = Bundle()
 
     // The fragments to show in the nav bar
@@ -76,8 +77,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding!!.root)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         checkAccessTokenScopes()
 
@@ -115,7 +116,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
     override fun onDestroy() {
         super.onDestroy()
         App.get().unregisterReceivers()
-        binding = null
+        _binding = null
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

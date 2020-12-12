@@ -16,7 +16,8 @@ import com.google.android.material.tabs.TabLayoutMediator
  */
 class InboxFragment : Fragment() {
 
-    private var binding: FragmentInboxBinding? = null
+    private var _binding: FragmentInboxBinding? = null
+    private val binding get() = _binding!!
 
     /**
      * The fragments holding the different inbox groups
@@ -24,17 +25,17 @@ class InboxFragment : Fragment() {
     private val inboxFragments = ArrayList<InboxGroupFragment>()
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentInboxBinding.inflate(layoutInflater)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) : View? {
+        _binding = FragmentInboxBinding.inflate(layoutInflater)
 
         setupTabs()
 
-        return binding!!.root
+        return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        _binding = null
     }
 
 
@@ -42,8 +43,8 @@ class InboxFragment : Fragment() {
         inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.ALL))
         inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.UNREAD))
 
-        binding!!.inboxPages.adapter = PagerAdapter(requireActivity())
-        TabLayoutMediator(binding!!.inboxPagesTitle, binding!!.inboxPages) { tab, position ->
+        binding.inboxPages.adapter = PagerAdapter(requireActivity())
+        TabLayoutMediator(binding.inboxPagesTitle, binding.inboxPages) { tab, position ->
             tab.text = when (inboxFragments[position].inboxType) {
                 InboxGroupTypes.ALL -> getString(R.string.inboxAllMessages)
                 InboxGroupTypes.UNREAD -> getString(R.string.inboxUnreadMessages)

@@ -23,7 +23,8 @@ class InboxGroupFragment : Fragment() {
         }
     }
 
-    private var binding: FragmentInboxGroupBinding? = null
+    private var _binding: FragmentInboxGroupBinding? = null
+    private val binding get() = _binding!!
     private val api = App.get().api
 
     lateinit var inboxType: InboxFragment.InboxGroupTypes
@@ -33,20 +34,20 @@ class InboxGroupFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setupBinding()
 
-        return binding!!.root
+        return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        _binding = null
     }
 
     private fun setupBinding() {
-        binding = FragmentInboxGroupBinding.inflate(layoutInflater)
+        _binding = FragmentInboxGroupBinding.inflate(layoutInflater)
 
         when (inboxType) {
-            InboxFragment.InboxGroupTypes.ALL -> binding!!.inboxGroupTitle.text = getString(R.string.inboxAllMessages)
-            InboxFragment.InboxGroupTypes.UNREAD -> binding!!.inboxGroupTitle.text = getString(R.string.inboxUnreadMessages)
+            InboxFragment.InboxGroupTypes.ALL -> binding.inboxGroupTitle.text = getString(R.string.inboxAllMessages)
+            InboxFragment.InboxGroupTypes.UNREAD -> binding.inboxGroupTitle.text = getString(R.string.inboxUnreadMessages)
         }
     }
 

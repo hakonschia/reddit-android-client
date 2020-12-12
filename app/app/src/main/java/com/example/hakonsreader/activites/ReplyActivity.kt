@@ -68,7 +68,8 @@ class ReplyActivity : AppCompatActivity() {
     }
 
 
-    var binding: ActivityReplyBinding? = null
+    private var _binding: ActivityReplyBinding? = null
+    private val binding get() = _binding!!
     private val api = App.get().api
 
     /**
@@ -85,9 +86,9 @@ class ReplyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityReplyBinding.inflate(layoutInflater)
-        setContentView(binding?.root)
-        binding?.showPreview?.setOnClickListener { binding?.markdownInput?.showPreviewInPopupDialog() }
+        _binding = ActivityReplyBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.showPreview.setOnClickListener { binding.markdownInput.showPreviewInPopupDialog() }
 
         if (savedInstanceState != null) {
             restoreInstanceState(savedInstanceState)
@@ -113,14 +114,14 @@ class ReplyActivity : AppCompatActivity() {
 
         outState.putString(REPLY_TEXT, binding?.markdownInput?.inputText)
 
-        if (binding?.markdownInput?.isLinkDialogShown == true) {
+        if (binding.markdownInput.isLinkDialogShown == true) {
             outState.putBoolean(LINK_DIALOG_SHOWN, true)
 
-            outState.putString(LINK_DIALOG_TEXT, binding?.markdownInput?.linkDialogText)
-            outState.putString(LINK_DIALOG_LINK, binding?.markdownInput?.linkDialogLink)
+            outState.putString(LINK_DIALOG_TEXT, binding.markdownInput.linkDialogText)
+            outState.putString(LINK_DIALOG_LINK, binding.markdownInput.linkDialogLink)
 
             // Ensure the dialog is dismissed or else it will cause a leak
-            binding?.markdownInput?.dismissLinkDialog()
+            binding.markdownInput.dismissLinkDialog()
         }
 
         if (confirmDiscardDialog?.isShowing == true) {
@@ -131,7 +132,7 @@ class ReplyActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        binding = null
+        _binding = null
     }
 
     /**
@@ -139,7 +140,7 @@ class ReplyActivity : AppCompatActivity() {
      * and makes the user confirm they want to discard the text
      */
     override fun finish() {
-        if (binding?.markdownInput?.inputText.isNullOrBlank()) {
+        if (binding.markdownInput.inputText.isNullOrBlank()) {
             super.finish()
         } else {
             showConfirmDialog()
@@ -156,14 +157,14 @@ class ReplyActivity : AppCompatActivity() {
      * @param state The state to restore
      */
     private fun restoreInstanceState(state: Bundle) {
-        binding?.markdownInput?.setText(state.getString(REPLY_TEXT, ""))
+        binding.markdownInput.setText(state.getString(REPLY_TEXT, ""))
 
         // Restore the link dialog
         val showLinkDialog = state.getBoolean(LINK_DIALOG_SHOWN)
         if (showLinkDialog) {
             val text = state.getString(LINK_DIALOG_TEXT, "")
             val link = state.getString(LINK_DIALOG_LINK, "")
-            binding?.markdownInput?.showLinkDialog(text, link)
+            binding.markdownInput.showLinkDialog(text, link)
         }
 
         // Restore the confirmation for discarding dialog
@@ -190,20 +191,20 @@ class ReplyActivity : AppCompatActivity() {
                 // If the post is a selftext post then use that as the summary, otherwise
                 // use the title
                 if (it.getPostType() == PostType.TEXT) {
-                    App.get().markwon.setMarkdown(binding!!.summary, it.selftext)
+                    App.get().markwon.setMarkdown(binding.summary, it.selftext)
                 } else {
-                    binding?.summary?.text = it.title
+                    binding.summary.text = it.title
                 }
             }
         } else {
             replyingTo = Gson().fromJson(jsonData, RedditComment::class.java)
             replyingTo.let {
                 it as RedditComment
-                App.get().markwon.setMarkdown(binding!!.summary, it.body)
+                App.get().markwon.setMarkdown(binding.summary, it.body)
             }
         }
 
-        binding?.listing = replyingTo
+        binding.listing = replyingTo
     }
 
     /**
@@ -251,7 +252,7 @@ class ReplyActivity : AppCompatActivity() {
      * @param view Ignored
      */
     public fun sendReply(view: View) {
-        val text = binding?.markdownInput?.inputText
+        val text = binding.markdownInput.inputText
 
         // TODO add text change listener and disable button if empty
         if (text.isNullOrBlank() || replyingTo == null) {
@@ -277,7 +278,7 @@ class ReplyActivity : AppCompatActivity() {
 
                 when (response) {
                     is ApiResponse.Success -> withContext(Main) { replySuccess(response.value) }
-                    is ApiResponse.Error -> Util.handleGenericResponseErrors(binding?.parentLayout, response.error, response.throwable)
+                    is ApiResponse.Error -> Util.handleGenericResponseErrors(binding.parentLayout, response.error, response.throwable)
                 }
             }
         }
@@ -302,7 +303,7 @@ class ReplyActivity : AppCompatActivity() {
 
         // Kind of a bad way to do it, but if we call finish with text in the input a dialog is shown
         // Other option is to create a flag (ie "replySent") and not show the dialog if true
-        binding?.markdownInput?.clearText()
+        binding.markdownInput.clearText()
         setResult(RESULT_OK, intent)
         finish()
     }

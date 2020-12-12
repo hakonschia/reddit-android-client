@@ -101,7 +101,8 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     private val api = App.get().api
-    private var binding: FragmentProfileBinding? = null
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding!!
 
     /**
      * The object representing the Reddit user the fragment is for
@@ -153,7 +154,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         setupPostsViewModel()
 
         if (savedInstanceState != null) {
-            binding?.parentLayout?.progress = savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)
+            binding.parentLayout.progress = savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)
         }
 
         // If we're on a logged in user we might have some old info, so set that
@@ -172,13 +173,13 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
         if (saveState != null) {
             // getFloat() will return 0.0f if not found, and won't ever be null
-            binding?.parentLayout?.progress = saveState?.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)!!
+            binding.parentLayout.progress = saveState?.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)!!
 
             postIds = saveState?.getStringArrayList(POST_IDS_KEY) as ArrayList<String>
             postsViewModel?.postIds = postIds
         }
 
-        return binding?.root
+        return binding.root
     }
 
     override fun onResume() {
@@ -199,7 +200,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         // onSaveInstanceState is called for configuration changes (such as orientation)
         // so we need to store the animation state here and in saveState (for when the fragment has
         // been replaced but not destroyed)
-        binding?.parentLayout?.progress?.let { outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, it) }
+        outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.progress)
     }
 
     override fun onDestroyView() {
@@ -211,11 +212,11 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             saveState = Bundle()
         }
 
-        binding?.parentLayout?.progress?.let { saveState?.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, it) }
+        saveState?.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.progress)
         saveState?.putParcelable(LAYOUT_STATE_KEY, postsLayoutManager?.onSaveInstanceState())
         saveState?.putStringArrayList(POST_IDS_KEY, postsViewModel?.postIds as ArrayList<String>?)
 
-        binding = null
+        _binding = null
     }
 
     /**
@@ -223,7 +224,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
      */
     private fun updateViews() {
         if (user != null) {
-            binding?.user = user
+            binding.user = user
         }
     }
 
@@ -231,18 +232,18 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
      * Inflates and sets up [binding]
      */
     private fun setupBinding() {
-        binding = FragmentProfileBinding.inflate(layoutInflater)
+        _binding = FragmentProfileBinding.inflate(layoutInflater)
 
         // We might not have a username at this point (first time loading for logged in user)
         if (username != null) {
-            binding?.username?.text = username
+            binding.username.text = username
         }
 
         // Kinda weird to do this here, but even if we are privately browsing and on another users profile
         // it should indicate that we're privately browsing (as with your own profile and subreddits)
-        binding?.loggedInUser = isLoggedInUser
+        binding.loggedInUser = isLoggedInUser
 
-        binding?.inbox?.setOnClickListener {
+        binding.inbox.setOnClickListener {
             onInboxClicked?.onInboxClicked()
         }
     }
@@ -287,15 +288,14 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         postsAdapter = PostsAdapter()
         postsLayoutManager = LinearLayoutManager(requireContext())
 
-        binding?.posts?.adapter = postsAdapter
-        binding?.posts?.layoutManager = postsLayoutManager
-        binding?.posts?.setOnScrollChangeListener(PostScrollListener(binding?.posts) { postsViewModel?.loadPosts() })
+        binding.posts.adapter = postsAdapter
+        binding.posts.layoutManager = postsLayoutManager
+        binding.posts.setOnScrollChangeListener(PostScrollListener(binding.posts) { postsViewModel?.loadPosts() })
     }
 
     override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
-        Log.d(TAG, "privateBrowsingStateChanged: $privatelyBrowsing")
-        binding?.privatelyBrowsing = privatelyBrowsing
-        binding?.profilePicture?.borderColor = ContextCompat.getColor(
+        binding.privatelyBrowsing = privatelyBrowsing
+        binding.profilePicture.borderColor = ContextCompat.getColor(
                 requireContext(),
                 if (privatelyBrowsing) R.color.privatelyBrowsing else R.color.opposite_background
         )
@@ -303,7 +303,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
 
     private fun retrieveUserInfo() {
-        binding?.loadingIcon?.onCountChange(true)
+        binding.loadingIcon.onCountChange(true)
 
         CoroutineScope(IO).launch {
             val name = username
@@ -318,12 +318,12 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             }
 
             withContext(Main) {
-                binding?.loadingIcon?.onCountChange(false)
+                binding.loadingIcon.onCountChange(false)
 
                 when (userResponse) {
                     is ApiResponse.Success -> onUserResponse(userResponse.value)
                     is ApiResponse.Error -> {
-                        Util.handleGenericResponseErrors(binding?.parentLayout, userResponse.error, userResponse.throwable)
+                        Util.handleGenericResponseErrors(binding.parentLayout, userResponse.error, userResponse.throwable)
                     }
                 }
             }

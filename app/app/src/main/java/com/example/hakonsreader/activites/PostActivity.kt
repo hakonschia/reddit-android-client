@@ -76,7 +76,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
         const val REQUEST_REPLY = 1
     }
 
-    private var binding: ActivityPostBinding? = null
+    private var _binding: ActivityPostBinding? = null
+    private val binding get() = _binding!!
     private lateinit var slidrInterface: SlidrInterface
 
     private var commentsViewModel: CommentsViewModel? = null
@@ -112,7 +113,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
         if (savedInstanceState == null) {
             loadComments()
         } else {
-            binding?.parentLayout?.progress = savedInstanceState.getFloat(TRANSITION_STATE_KEY)
+            binding.parentLayout.progress = savedInstanceState.getFloat(TRANSITION_STATE_KEY)
         }
     }
 
@@ -121,30 +122,28 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
         App.get().setActiveActivity(this)
 
         if (videoPlayingWhenPaused) {
-            binding?.post?.viewSelected()
+            binding.post.viewSelected()
         }
     }
 
     override fun onPause() {
         super.onPause()
 
-        binding?.post?.let {
-            videoPlayingWhenPaused = it.extras.getBoolean(ContentVideo.EXTRA_IS_PLAYING)
-            it.viewUnselected()
-        }
+        videoPlayingWhenPaused = binding.post.extras.getBoolean(ContentVideo.EXTRA_IS_PLAYING)
+        binding.post.viewUnselected()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        binding?.parentLayout?.progress?.let { outState.putFloat(TRANSITION_STATE_KEY, it) }
+        binding.parentLayout.progress.let { outState.putFloat(TRANSITION_STATE_KEY, it) }
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
         // Ensure resources are freed when the activity exits
-        binding?.post?.cleanUpContent()
-        binding = null
+        binding.post.cleanUpContent()
+        _binding = null
     }
 
     /**
@@ -164,31 +163,28 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      * Sets up [binding]
      */
     private fun setupBinding() {
-        binding = ActivityPostBinding.inflate(layoutInflater)
+        _binding = ActivityPostBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        binding?.let {
-            setContentView(it.root)
+        // This is kinda hacky, but it looks weird if the "No comments yet" appears before the comments
+        // have had a chance to load
+        binding.noComments = false
+        binding.commentChainShown = false
 
-            // This is kinda hacky, but it looks weird if the "No comments yet" appears before the comments
-            // have had a chance to load
-            it.noComments = false
-            it.commentChainShown = false
+        // Go to first/last comment on long clicks on navigation buttons
+        binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment)
+        binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment)
 
-            // Go to first/last comment on long clicks on navigation buttons
-            it.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment)
-            it.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment)
-
-            it.commentsSwipeRefresh.setOnRefreshListener {
-                // We're using our own loading icon, so remove this
-                it.commentsSwipeRefresh.isRefreshing = false
-                commentsViewModel?.restart()
-            }
-            it.commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(
-                    ContextCompat.getColor(this, R.color.colorAccent)
-            )
-
-            it.parentLayout.setTransitionListener(transitionListener)
+        binding.commentsSwipeRefresh.setOnRefreshListener {
+            // We're using our own loading icon, so remove this
+            binding.commentsSwipeRefresh.isRefreshing = false
+            commentsViewModel?.restart()
         }
+        binding.commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(
+                ContextCompat.getColor(this, R.color.colorAccent)
+        )
+
+        binding.parentLayout.setTransitionListener(transitionListener)
     }
 
     /**
@@ -199,7 +195,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
 
         commentsViewModel?.let {
             it.getPost().observe(this, { newPost ->
-                val postPreviouslySet = binding?.post?.redditPost != null
+                val postPreviouslySet = binding.post.redditPost != null
                 post = newPost
 
                 // If we have a post already just update the info so the content isn't reloaded
@@ -229,12 +225,12 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
                 commentsAdapter?.lastTimeOpened = lastTimeOpened
                 commentsAdapter?.submitList(comments)
 
-                binding?.noComments = comments.isEmpty()
+                binding.noComments = comments.isEmpty()
             })
 
-            it.onLoadingCountChange().observe(this, { up -> binding?.loadingIcon?.onCountChange(up) })
+            it.onLoadingCountChange().observe(this, { up -> binding.loadingIcon.onCountChange(up) })
             it.getError().observe(this, { error ->
-                Util.handleGenericResponseErrors(binding?.parentLayout, error.error, error.throwable)
+                Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
             })
         }
     }
@@ -253,13 +249,11 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
                 onChainShown = Runnable { binding?.commentChainShown = true }
             }
 
-            binding?.let { bind ->
-                bind.comments.adapter = commentsAdapter
-                bind.comments.layoutManager = commentsLayoutManager
-                bind.showAllComments.setOnClickListener {
-                    commentsAdapter?.commentIdChain = ""
-                    bind.commentChainShown = false
-                }
+            binding.comments.adapter = commentsAdapter
+            binding.comments.layoutManager = commentsLayoutManager
+            binding.showAllComments.setOnClickListener {
+                commentsAdapter?.commentIdChain = ""
+                binding.commentChainShown = false
             }
         }
     }
@@ -273,10 +267,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
         val height = if (portrait) App.get().screenHeight else App.get().screenWidth
         val maxHeight = (height * (App.get().getMaxPostSizePercentage() / 100f)).toInt()
 
-        binding?.let {
-            it.post.setMaxHeight(maxHeight)
-            it.post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
-        }
+        binding.post.setMaxHeight(maxHeight)
+        binding.post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
     }
 
 
@@ -286,10 +278,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      * @see onPostLoaded
      */
     private fun updatePostInfo() {
-        binding?.let {
-            it.setPost(post)
-            it.post.updatePostInfo(post)
-        }
+        binding.setPost(post)
+        binding.post.updatePostInfo(post)
     }
 
     /**
@@ -300,13 +290,11 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      * @see updatePostInfo
      */
     private fun onPostLoaded(extras: Bundle? = null) {
-        binding?.let {
-            it.setPost(post)
-            it.post.redditPost = post
+        binding.setPost(post)
+        binding.post.redditPost = post
 
-            if (extras != null) {
-                it.post.extras = extras
-            }
+        if (extras != null) {
+            binding.post.extras = extras
         }
 
         setupCommentsList()
@@ -380,7 +368,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
 
                             // TODO the thumbnail is shown the entire time, make it so the frame the video
                             //  ended at is shown instead
-                            binding?.post?.extras = postExtras
+                            binding.post.extras = postExtras
                         }
                     })
                 }
@@ -428,8 +416,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      * @return Always true, as this function will be used to indicate a long click has been handled
      */
     private fun goToFirstComment(view: View): Boolean {
-        binding?.comments?.stopScroll()
-        binding?.comments?.scrollToPosition(0)
+        binding.comments.stopScroll()
+        binding.comments.scrollToPosition(0)
         return true
     }
 
@@ -440,8 +428,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      * @return Always true, as this function will be used to indicate a long click has been handled
      */
     private fun goToLastComment(view: View): Boolean {
-        binding?.comments?.stopScroll()
-        binding?.comments?.scrollToPosition(commentsAdapter!!.itemCount - 1)
+        binding.comments.stopScroll()
+        binding.comments.scrollToPosition(commentsAdapter!!.itemCount - 1)
         return true
     }
 
@@ -463,7 +451,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
         }
 
         // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
-        binding?.comments?.stopScroll()
+        binding.comments.stopScroll()
         if (App.get().commentSmoothScrollThreshold() >= gapSize) {
             val smoothScroller: SmoothScroller = object : LinearSmoothScroller(this) {
                 override fun getVerticalSnapPreference(): Int {
@@ -512,7 +500,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
             // We could potentially pause it earlier, like when the transition is halfway done?
             // We also can start it when we reach the start, not sure if that is good or bad
             if (currentId == R.id.end) {
-                binding?.post?.viewUnselected()
+                binding.post.viewUnselected()
             }
         }
 
