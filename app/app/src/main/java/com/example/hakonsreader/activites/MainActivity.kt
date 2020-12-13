@@ -179,7 +179,6 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                     .commit()
         } else if (activeFragment is InboxFragment && lastShownFragment is ProfileFragment) {
             // In the inbox, and the last active was the profile, go back to the profile
-
             if (profileFragment == null) {
                 profileFragment = ProfileFragment.newInstance()
             }
@@ -361,7 +360,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
     /**
      * Observes the unread messages in the local database and updates the profile navbar accordingly
      */
-    fun observeUnreadMessages() {
+    private fun observeUnreadMessages() {
         val unread = db.messages().unreadMessages
         unread.observe(this, { m ->
             val profileItem = binding.bottomNav.menu.findItem(R.id.navProfile)
@@ -389,7 +388,10 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         //updateLocale(new Locale(language));
     }
 
-    fun getActiveFragment() : Fragment? {
+    /**
+     * Gets the active fragment currently shown in the fragment container
+     */
+    private fun getActiveFragment() : Fragment? {
         return supportFragmentManager.findFragmentById(R.id.fragmentContainer)
     }
 
@@ -466,8 +468,16 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                             .commit()
                 }
 
+                // In the inbox, go back to profile
                 R.id.navProfile -> {
-                    // If we're in the inbox, go back to profile
+                    if (profileFragment == null) {
+                        profileFragment = ProfileFragment.newInstance()
+                    }
+
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentContainer, profileFragment!!)
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                            .commit()
                 }
             }
         }
