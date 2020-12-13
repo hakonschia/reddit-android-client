@@ -51,8 +51,36 @@ class MessagesRequestModel(
      * OAuth scope required: `privatemessages`
      *
      * @param messages The messages to mark as read
+     * @return This will not return any success data
+     *
+     * @see markUnread
      */
     suspend fun markRead(vararg messages: RedditMessage) : ApiResponse<Any?> {
+        return markInternal(markRead = true, *messages)
+    }
+
+    /**
+     * Mark inbox messages as unread
+     *
+     * OAuth scope required: `privatemessages`
+     *
+     * @param messages The messages to mark as read
+     * @return This will not return any success data
+     *
+     * @see markRead
+     */
+    suspend fun markUnread(vararg messages: RedditMessage) : ApiResponse<Any?> {
+        return markInternal(markRead = false, *messages)
+    }
+
+    /**
+     * Internal function to mark inbox messages as either read or unread
+     *
+     * OAuth scope required: `privatemessages`
+     *
+     * @param messages The messages to mark as read
+     */
+    private suspend fun markInternal(markRead: Boolean, vararg messages: RedditMessage) : ApiResponse<Any?> {
         if (messages.isEmpty()) {
             return ApiResponse.Success(null)
         }
@@ -79,7 +107,11 @@ class MessagesRequestModel(
                 fullnames.append(",")
             }
 
-            val response = api.markRead(fullnames.toString())
+            val response = if (markRead) {
+                api.markRead(fullnames.toString())
+            } else {
+                api.markUnread(fullnames.toString())
+            }
 
             if (response.isSuccessful) {
                 ApiResponse.Success(null)

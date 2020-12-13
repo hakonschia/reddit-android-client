@@ -33,4 +33,15 @@ interface MessageService {
     suspend fun markRead(
             @Field("id") fullnames: String
     ) : Response<Void>
+
+    /**
+     * Mark inbox messages as unread
+     *
+     * @param fullnames A comma separated list of the fullnames to mark as read
+     */
+    @POST("api/unread_message")
+    @FormUrlEncoded
+    suspend fun markUnread(
+            @Field("id") fullnames: String
+    ) : Response<Void>
 }
