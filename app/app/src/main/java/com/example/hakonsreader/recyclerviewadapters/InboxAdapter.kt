@@ -2,17 +2,22 @@ package com.example.hakonsreader.recyclerviewadapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.databinding.ListItemInboxMessageBinding
+import com.example.hakonsreader.recyclerviewadapters.diffutils.MessagesDiffCallback
 
 class InboxAdapter : RecyclerView.Adapter<InboxAdapter.ViewHolder>()  {
     private var messages = ArrayList<RedditMessage>()
 
-
     fun submitList(newMessages: List<RedditMessage>) {
+        val old = messages
         messages = newMessages as ArrayList<RedditMessage>
-        notifyDataSetChanged()
+
+        DiffUtil.calculateDiff(
+                MessagesDiffCallback(old, messages)
+        ).dispatchUpdatesTo(this)
     }
 
     fun getMessages() : List<RedditMessage> = messages

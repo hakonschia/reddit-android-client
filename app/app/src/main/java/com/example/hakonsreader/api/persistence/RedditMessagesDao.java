@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.persistence;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -60,14 +61,14 @@ public interface RedditMessagesDao {
      * @see #getUnreadMessages()
      */
     @Query("SELECT * FROM messages ORDER BY createdAt DESC")
-    public List<RedditMessage> getAllMessages();
+    public LiveData<List<RedditMessage>> getAllMessages();
 
     /**
      * @return A list of messages marked as "new", ie. not seen be the user
      * @see #getAllMessages()
      */
     @Query("SELECT * FROM messages WHERE isNew=1 ORDER BY createdAt DESC")
-    public List<RedditMessage> getUnreadMessages();
+    public LiveData<List<RedditMessage>> getUnreadMessages();
 
     // TODO this should take a List<RedditMessage> ?
     /**

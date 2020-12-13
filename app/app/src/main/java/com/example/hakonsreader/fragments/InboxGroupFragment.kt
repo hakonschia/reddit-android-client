@@ -88,7 +88,8 @@ class InboxGroupFragment : Fragment() {
                 InboxFragment.InboxGroupTypes.UNREAD -> {
                     val unread = db.messages().unreadMessages
 
-                    when (api.messages().markRead(*unread.toTypedArray())) {
+                    // This should probably always happen? New messages are shown in "ALL" as well
+                    when (unread?.value?.toTypedArray()?.let { api.messages().markRead(*it) }) {
                         is ApiResponse.Success -> {
                             Log.d(TAG, "loadMessagesFromDb: marked as unread")
                             db.messages().markRead()
@@ -101,7 +102,9 @@ class InboxGroupFragment : Fragment() {
             }
 
             withContext(Main) {
-                messageAdapter?.submitList(messages)
+                messages.observe(viewLifecycleOwner, { newMessages ->
+                    messageAdapter?.submitList(newMessages)
+                })
             }
         }
     }
