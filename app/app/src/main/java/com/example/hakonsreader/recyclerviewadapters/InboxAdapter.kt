@@ -1,6 +1,8 @@
 package com.example.hakonsreader.recyclerviewadapters
 
+import android.content.Intent
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -10,6 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.BR
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.databinding.InboxCommentBinding
 import com.example.hakonsreader.databinding.InboxMessageBinding
@@ -87,4 +90,19 @@ fun setSentAgoText(textView: TextView, createdAt: Long) {
     val createdAtText = Util.createAgeText(textView.resources, between)
 
     textView.text = textView.resources.getString(R.string.inboxSent, createdAtText)
+}
+
+/**
+ * Opens a message context, ie. the post the message is from
+ *
+ * @param view The view clicked
+ * @param context The context for a message ([RedditMessage.context])
+ */
+fun openMessageContext(view: View, context: String) {
+    val finalContext = "https://reddit.com$context"
+
+    val intent = Intent(view.context, DispatcherActivity::class.java)
+    intent.putExtra(DispatcherActivity.URL_KEY, finalContext)
+
+    view.context.startActivity(intent)
 }
