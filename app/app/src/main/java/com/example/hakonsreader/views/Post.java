@@ -181,7 +181,8 @@ public class Post extends Content {
                     int height = content.getMeasuredHeight();
                     int totalHeight = binding.postsParentLayout.getMeasuredHeight();
 
-                    // When loading from intent filter the total height is smaller than what it really is. hmm
+                    // TODO this sometimes fires multiple times and updates the height multiple times, causing
+                    //  the view to jump a tiny bit after it has done the initial transition
 
                     // Entire post is too large, set new content height
                     if (totalHeight > maxHeight) {
@@ -189,8 +190,6 @@ public class Post extends Content {
                         params.height = maxHeight - totalHeight + height;
                         content.setLayoutParams(params);
                     }
-
-                    // TODO if video post maybe resume video after this is done as animation might look better
                 });
             }
         }

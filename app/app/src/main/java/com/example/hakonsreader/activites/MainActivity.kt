@@ -13,6 +13,7 @@ import androidx.preference.PreferenceManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.constants.NetworkConstants
@@ -34,6 +35,7 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
 
@@ -60,6 +62,9 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
     private val binding get() = _binding!!
     private var savedState = Bundle()
 
+    private val api = App.get().api
+    private val db = RedditDatabase.getInstance(this)
+
     // The fragments to show in the nav bar
     private var postsFragment: PostsContainerFragment? = null
     private var activeSubreddit: SubredditFragment? = null
@@ -81,6 +86,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         setContentView(binding.root)
 
         checkAccessTokenScopes()
+        startInboxListener()
 
         // For testing purposes hardcode going into a subreddit/post etc.
         val intent = Intent(this, DispatcherActivity::class.java)
@@ -152,13 +158,13 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         // Login/settings fragments can just be recreated when needed as they don't store any specific state
 
         // Store state of navbar
-        outState.putInt(ACTIVE_NAV_ITEM, binding!!.bottomNav.selectedItemId)
+        outState.putInt(ACTIVE_NAV_ITEM, binding.bottomNav.selectedItemId)
     }
 
     override fun onBackPressed() {
         // TODO if we're in inbox, go back to profile
         // If we are in the subreddit navbar
-        if (binding?.bottomNav?.selectedItemId == R.id.navSubreddit
+        if (binding.bottomNav.selectedItemId == R.id.navSubreddit
                 // In a subreddit, and the last item was the list, go back to the list
                 && activeSubreddit != null && lastShownFragment is SelectSubredditFragment) {
             activeSubreddit = null
@@ -173,7 +179,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
                     .commit()
         } else {
-            binding?.bottomNav?.selectedItemId = R.id.navHome
+            binding.bottomNav.selectedItemId = R.id.navHome
         }
     }
 
@@ -212,13 +218,13 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
 
         // Not a match from the state we generated, something weird is happening
         if (state == null || state != App.get().oauthState) {
-            Util.showErrorLoggingInSnackbar(binding?.parentLayout)
+            Util.showErrorLoggingInSnackbar(binding.parentLayout)
             return
         }
 
         val code = uri.getQueryParameter("code")
         if (code == null) {
-            Util.showErrorLoggingInSnackbar(binding?.parentLayout)
+            Util.showErrorLoggingInSnackbar(binding.parentLayout)
             return
         }
 
@@ -248,12 +254,12 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                     withContext(Main) {
                         postsFragment = null
                         setupStartFragment()
-                        Snackbar.make(binding!!.parentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.parentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT).show()
                     }
                 }
 
                 is ApiResponse.Error -> {
-                    Util.handleGenericResponseErrors(binding!!.parentLayout, resp.error, resp.throwable)
+                    Util.handleGenericResponseErrors(binding.parentLayout, resp.error, resp.throwable)
                 }
             }
         }
@@ -294,7 +300,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
             }
 
             val adapter = OAuthScopeAdapter(this, R.layout.list_item_oauth_explanation, missingScopes)
-            val view = layoutInflater.inflate(R.layout.dialog_title_new_permissions, binding!!.parentLayout, false)
+            val view = layoutInflater.inflate(R.layout.dialog_title_new_permissions, binding.parentLayout, false)
 
             AlertDialog.Builder(this)
                     .setCustomTitle(view)
@@ -305,6 +311,32 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                         preferences.edit().putString(SharedPreferencesConstants.ACCESS_TOKEN_SCOPES_CHECKED, NetworkConstants.SCOPE).apply()
                     }
                     .show()
+        }
+    }
+
+
+    /**
+     * Starts a timer that runs at a given interval. Each run will make an API call for the users inbox
+     * to retrieve new messages
+     *
+     * If there is no user logged in then the timer is not started
+     */
+    private fun startInboxListener() {
+        // The activity should be recreated when a user logs in, so this should be fine
+        if (!App.get().isUserLoggedIn()) {
+            return
+        }
+
+        // Run every 10 minutes
+        fixedRateTimer("inboxTimer", false, 0L, 10 * 60 * 1000) {
+            println("MainActivity: inboxTimer running")
+            CoroutineScope(IO).launch {
+                // Get all messages
+                // We can get only the new messages, but if the user has viewed messages outside the application
+                // the total inbox with read messages would go unsynced
+
+
+            }
         }
     }
 
@@ -374,10 +406,10 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
      * stored in the state
      */
     private fun setupNavBar(restoredState: Bundle?) {
-        binding!!.bottomNav.setOnNavigationItemSelectedListener(navigationViewListener)
+        binding.bottomNav.setOnNavigationItemSelectedListener(navigationViewListener)
 
         // Set listener for when an item has been clicked when already selected
-        binding!!.bottomNav.setOnNavigationItemReselectedListener { item ->
+        binding.bottomNav.setOnNavigationItemReselectedListener { item ->
             when (item.itemId) {
                 // When the subreddit is clicked when already in subreddit go back to the subreddit list
                 R.id.navSubreddit -> {
@@ -407,7 +439,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
             // When we're restoring a state we don't want to play an animation, as the user hasn't manually
             // selected a change
             navigationViewListener.disableAnimationForNextChange()
-            binding!!.bottomNav.selectedItemId = active
+            binding.bottomNav.selectedItemId = active
         }
     }
 
@@ -416,7 +448,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
      * Selects the profile nav bar
      */
     fun selectProfileNavBar() {
-        binding?.bottomNav?.selectedItemId = R.id.navProfile
+        binding.bottomNav.selectedItemId = R.id.navProfile
     }
 
 
