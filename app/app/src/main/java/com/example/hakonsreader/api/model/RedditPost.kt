@@ -294,7 +294,7 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
             if (mediaMetadata != null) {
                 field = java.util.ArrayList(mediaMetadata!!.size)
                 val gson = Gson()
-                mediaMetadata!!.forEach { (s: String?, obj: Any) ->
+                mediaMetadata!!.forEach { (_: String?, obj: Any) ->
                     // The source is found in the "s" object, which can be converted to a PreviewImage
                     val converted = obj as LinkedTreeMap<String, Any>
                     val asJson = gson.toJson(converted["s"])

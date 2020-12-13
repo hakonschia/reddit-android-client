@@ -18,6 +18,7 @@ import com.example.hakonsreader.interfaces.LockableSlidr;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 
 /**
@@ -57,8 +58,10 @@ public class ContentGallery extends Content {
     protected void updateView() {
         // TODO galleries can contain GIFs from reddit (and imgur)
         //  https://www.reddit.com/r/LadyBoners/comments/k4id7n/presenting_mr_misha_collins/
-
-        images = redditPost.getGalleryImages();
+        // For now, if the url isn't found (it's a gif) then ignore the image
+        images = redditPost.getGalleryImages().stream()
+                .filter(image -> image.getUrl() != null)
+                .collect(Collectors.toList());
 
         // Find the largest height and width and set the layout to that
         int maxHeight = 0;

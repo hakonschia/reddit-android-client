@@ -81,13 +81,17 @@ public class ContentImage extends Content {
         if (imageUrl == null) {
             List<Image> images = redditPost.getPreviewImages();
 
-            // This should be improved and is a pretty poor way of doing it, but this will reduce some
-            // unnecessary loading as it will get some lower resolution images (it will be scaled down to
-            // the same size later by Picasso, so it won't give loss of image quality)
-            for (int i = 0; i < images.size(); i++) {
-                Image image = images.get(i);
-                if (image.getWidth() <= screenWidth) {
-                    imageUrl = image.getUrl();
+            // Since ContentImage is used in ContentGallery, and that might contain gifs, this might be null
+            // Otherwise it typically shouldn't be
+            if (images != null) {
+                // This should be improved and is a pretty poor way of doing it, but this will reduce some
+                // unnecessary loading as it will get some lower resolution images (it will be scaled down to
+                // the same size later by Picasso, so it won't give loss of image quality)
+                for (int i = 0; i < images.size(); i++) {
+                    Image image = images.get(i);
+                    if (image.getWidth() <= screenWidth) {
+                        imageUrl = image.getUrl();
+                    }
                 }
             }
 
