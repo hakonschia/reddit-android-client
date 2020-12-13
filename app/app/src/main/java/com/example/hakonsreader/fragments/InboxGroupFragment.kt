@@ -25,6 +25,12 @@ import kotlinx.coroutines.withContext
 class InboxGroupFragment : Fragment() {
     companion object {
         private const val TAG = "InboxGroupFragment"
+
+        /**
+         * The key used to store the inbox type in saved instance states
+         */
+        private const val INBOX_TYPE_KEY = "inboxType"
+
         
         fun newInstance(type: InboxFragment.InboxGroupTypes) : InboxGroupFragment {
             // Should probably use arguments for this, but it doesn't get set before the tablayout
@@ -50,12 +56,22 @@ class InboxGroupFragment : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        if (savedInstanceState != null) {
+            val type = savedInstanceState.getInt(INBOX_TYPE_KEY)
+            inboxType = InboxFragment.InboxGroupTypes.values()[type]
+        }
+
         setupBinding()
         setupMessagesList()
 
         loadMessagesFromDb()
 
         return binding.root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(INBOX_TYPE_KEY, inboxType.ordinal)
     }
 
     override fun onDestroyView() {

@@ -329,8 +329,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         // This runs when the application is minimized, might be bad? Can obviously send notifications this way, but
         // it should probably be done in a different way
 
-        // Run every 10 minutes
-        fixedRateTimer("inboxTimer", false, 0L, 10 * 60 * 1000) {
+        // Run every 30 minutes
+        fixedRateTimer("inboxTimer", false, 0L, 30 * 60 * 1000) {
             println("MainActivity: inboxTimer running")
             CoroutineScope(IO).launch {
                 // Get all messages
