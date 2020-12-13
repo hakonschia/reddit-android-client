@@ -8,6 +8,7 @@
         <import type="android.view.View" />
         <import type="com.example.hakonsreader.views.util.ClickHandler"/>
         <import type="com.example.hakonsreader.recyclerviewadapters.InboxAdapterKt"/>
+        <import type="com.example.hakonsreader.recyclerviewadapters.menuhandlers.InboxMenuHandlerKt"/>
 
         <variable
             name="message"
@@ -66,19 +67,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
+            android:ellipsize="end"
+            android:maxLines="1"
             android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, message.subreddit)}"
             android:text='@{message.subreddit != null ? @string/subreddit_prefixed(message.subreddit) : ""}'
             android:textColor="@color/link_color"
             android:textStyle="bold"
-            android:maxLines="1"
-            android:ellipsize="end"
 
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/popupMenu"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/via"
             app:layout_constraintTop_toTopOf="@+id/author"
             tools:text="r/hakonschia" />
+
+        <ImageButton
+            android:id="@+id/popupMenu"
+            android:layout_width="40dp"
+            android:layout_height="24dp"
+
+            android:background="@null"
+            android:foreground="@drawable/ripple_main_bg"
+            android:onClick="@{(view) -> InboxMenuHandlerKt.showInboxMenu(view, message)}"
+
+            android:src="@drawable/ic_baseline_more_horiz_24"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
 
         <TextView
             android:id="@+id/age"

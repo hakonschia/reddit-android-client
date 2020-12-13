@@ -382,4 +382,6 @@
     <string name="inboxMessageFrom">"Message from "</string>
     <string name="inboxMessageVia">" via "</string>
     <string name="inboxSent">Sent %s</string>
+    <string name="inboxMenuMarkUnread">Mark as unread</string>
+    <string name="inboxMenuMarkRead">Mark as read</string>
 </resources>

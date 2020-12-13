@@ -257,4 +257,6 @@
     <string name="inboxMessageFrom">"Melding fra "</string>
     <string name="inboxMessageVia">" via "</string>
     <string name="inboxSent">Sendt %s</string>
+    <string name="inboxMenuMarkUnread">Marker som ulest</string>
+    <string name="inboxMenuMarkRead">Marker som lest</string>
 </resources>
