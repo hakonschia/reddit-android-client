@@ -3,6 +3,8 @@ package com.example.hakonsreader.activites
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
@@ -12,7 +14,6 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.constants.NetworkConstants
@@ -326,6 +327,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
             return
         }
 
+        observeUnreadMessages()
+
         // This runs when the application is minimized, might be bad? Can obviously send notifications this way, but
         // it should probably be done in a different way
 
@@ -338,7 +341,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                 // the total inbox with read messages would go unsynced
 
                 when (val response = api.messages().inbox()) {
-                    is ApiResponse.Success -> handleInboxResponse(response.value)
+                    is ApiResponse.Success -> db.messages().insertAll(response.value)
                     is ApiResponse.Error -> {}
                 }
             }
@@ -346,25 +349,22 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
     }
 
     /**
-     * Handles responses to API calls for retrieving the inbox messages. This should not run on the
-     * main thread
-     *
-     * The messages are added to the local database and the navbar is updated if there are new messages
+     * Observes the unread messages in the local database and updates the profile navbar accordingly
      */
-    private suspend fun handleInboxResponse(messages: List<RedditMessage>) {
-        db.messages().insertAll(messages)
-
-        val newMessagesCount = messages.filter { it.isNew }.size
-
-        // New messages received, change the navbar icon so it shows the amount of new messages
-        if (newMessagesCount != 0) {
-            withContext(Main) {
-                // TODO update the icon, not the text
-                val profileItem = binding.bottomNav.menu.findItem(R.id.navProfile)
-                profileItem.title = "$newMessagesCount messages"
+    fun observeUnreadMessages() {
+        val unread = db.messages().unreadMessages
+        unread.observe(this, { m ->
+            val profileItem = binding.bottomNav.menu.findItem(R.id.navProfile)
+            val color = if (m.size == 0) {
+                R.color.iconColor
+            } else {
+                R.color.tagNSFW
             }
-        }
+
+            profileItem.icon.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+        })
     }
+
 
     /**
      * Updates the language
