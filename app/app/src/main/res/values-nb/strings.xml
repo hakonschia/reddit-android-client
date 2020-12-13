@@ -253,4 +253,8 @@
     <string name="inboxUnreadMessages">Ulest</string>
     <string name="prefs_title_link_scale">Tekstskalering på lenker</string>
     <string name="inboxNoMessages">Fant ingen meldinger her</string>
+    <string name="inboxCommentFrom">"Kommentar fra "</string>
+    <string name="inboxMessageFrom">"Melding fra "</string>
+    <string name="inboxMessageVia">" via "</string>
+    <string name="inboxSent">Sendt %s</string>
 </resources>

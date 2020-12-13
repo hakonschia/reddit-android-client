@@ -119,10 +119,10 @@ class InboxGroupFragment : Fragment() {
 
             withContext(Main) {
                 messages.observe(viewLifecycleOwner, { newMessages ->
+                    binding.noMessages = newMessages.isEmpty()
                     messageAdapter?.submitList(newMessages)
                 })
             }
         }
     }
-
 }

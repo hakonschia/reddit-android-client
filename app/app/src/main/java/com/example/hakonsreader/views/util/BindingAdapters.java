@@ -1,10 +1,13 @@
 package com.example.hakonsreader.views.util;
 
+import android.content.Context;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 
 import com.example.hakonsreader.App;
+import com.example.hakonsreader.R;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
 
@@ -77,5 +80,31 @@ public class BindingAdapters {
         textView.setMovementMethod(InternalLinkMovementMethod.getInstance(textView.getContext()));
         markdown = App.Companion.get().getAdjuster().adjust(markdown);
         App.Companion.get().getMarkwon().setMarkdown(textView, markdown);
+    }
+
+    /**
+     * Sets the text color of a TextView based on a reddit distinguish. By default this will use "text_color"
+     *
+     * @param textView The text view to set the color on
+     * @param distinguish A string defining how the thing is distinguished. If this is null the default color is used
+     */
+    @BindingAdapter("textColorFromRedditDistinguish")
+    public static void setTextColorFromRedditDistinguish(TextView textView, @Nullable String distinguish) {
+        int color = R.color.text_color;
+
+        Context context = textView.getContext();
+
+        if (distinguish == null) {
+            textView.setTextColor(ContextCompat.getColor(context, color));
+            return;
+        }
+
+        if (distinguish.equals("admin")) {
+            color = R.color.commentByAdminBackground;
+        } else if (distinguish.equals("moderator")) {
+            color = R.color.commentByAdminBackground;
+        }
+
+        textView.setTextColor(ContextCompat.getColor(context, color));
     }
 }

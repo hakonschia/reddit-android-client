@@ -9,5 +9,10 @@ enum class RedditMessageType {
      */
     COMMENT_REPLY,
 
+    /**
+     * When a message is a reply to a post (top-level comment)
+     */
+    POST_REPLY,
+
     UNKNOWN
 }

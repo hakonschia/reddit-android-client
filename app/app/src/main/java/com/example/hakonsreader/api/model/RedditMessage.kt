@@ -85,6 +85,7 @@ class RedditMessage : RedditListing() {
     fun getType() : RedditMessageType {
         return when (typeInternal) {
             "comment_reply" -> RedditMessageType.COMMENT_REPLY
+            "post_reply" -> RedditMessageType.POST_REPLY
             else -> RedditMessageType.UNKNOWN
         }
     }

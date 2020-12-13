@@ -378,4 +378,8 @@
     <string name="inboxAllMessages">All messages</string>
     <string name="inboxUnreadMessages">Unread</string>
     <string name="inboxNoMessages">No messages found here</string>
+    <string name="inboxCommentFrom">"Comment from "</string>
+    <string name="inboxMessageFrom">"Message from "</string>
+    <string name="inboxMessageVia">" via "</string>
+    <string name="inboxSent">Sent %s</string>
 </resources>

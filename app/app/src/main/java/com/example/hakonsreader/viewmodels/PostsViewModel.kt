@@ -101,7 +101,6 @@ class PostsViewModel(
      * Default is [PostTimeSort.DAY]
      */
     fun restart(sort: SortingMethods, timeSort: PostTimeSort = PostTimeSort.DAY) {
-        // TODO until the fragments using this method use Kotlin these can be null (for new, hot)
         this.sort = sort
         this.timeSort = timeSort
         restart()

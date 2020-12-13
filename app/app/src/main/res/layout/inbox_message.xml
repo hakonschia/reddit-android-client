@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+        <import type="com.example.hakonsreader.views.util.ClickHandler"/>
+
+        <variable
+            name="message"
+            type="com.example.hakonsreader.api.model.RedditMessage" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@{message.new ? @color/commentHighlightBackground : @color/background}">
+
+        <TextView
+            android:id="@+id/messageFrom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="@string/inboxMessageFrom"
+            android:textColor="@color/text_color"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, message.author)}"
+            android:text='@{message != null ? @string/author_prefixed(message.author) : "" }'
+            android:textStyle="bold"
+            textColorFromRedditDistinguish="@{message.distinguished}"
+
+            app:layout_constraintStart_toEndOf="@+id/messageFrom"
+            app:layout_constraintTop_toTopOf="@+id/messageFrom"
+            tools:textColor="@color/text_color"
+            tools:text="u/hakonschia" />
+
+        <TextView
+            android:id="@+id/subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="@{message.subject}"
+            android:textColor="@color/text_color"
+            android:textSize="17sp"
+            android:textStyle="bold"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/age"
+            tools:text="Bruh bruh bruh, bruha clause is in town" />
+
+        <TextView
+            android:id="@+id/age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textColor="@color/secondary_text_color"
+            app:inboxSentAgo="@{message.createdAt}"
+
+            app:layout_constraintStart_toStartOf="@+id/messageFrom"
+            app:layout_constraintTop_toBottomOf="@+id/messageFrom"
+            tools:text="Sent 5 hours ago" />
+
+        <TextView
+            android:id="@+id/body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:textColor="@color/text_color"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/subject"
+            app:layout_constraintTop_toBottomOf="@+id/subject"
+            app:markdown="@{message.body}"
+            tools:text="verynicemessage" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
