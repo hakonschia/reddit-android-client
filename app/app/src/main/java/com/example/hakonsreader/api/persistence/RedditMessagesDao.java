@@ -56,8 +56,16 @@ public interface RedditMessagesDao {
 
 
     /**
-     * @return A list of messages marked as "new", ie. not seen be the user
+     * @return A list of all messages stored in the database
+     * @see #getUnreadMessages()
      */
-    @Query("SELECT * FROM messages WHERE isNew=1")
-    public List<RedditMessage> getNewMessages();
+    @Query("SELECT * FROM messages ORDER BY createdAt")
+    public List<RedditMessage> getAllMessages();
+
+    /**
+     * @return A list of messages marked as "new", ie. not seen be the user
+     * @see #getAllMessages()
+     */
+    @Query("SELECT * FROM messages WHERE isNew=1 ORDER BY createdAt")
+    public List<RedditMessage> getUnreadMessages();
 }

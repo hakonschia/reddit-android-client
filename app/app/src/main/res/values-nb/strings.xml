@@ -252,4 +252,5 @@
     <string name="inboxAllMessages">Alle meldinger</string>
     <string name="inboxUnreadMessages">Ulest</string>
     <string name="prefs_title_link_scale">Tekstskalering på lenker</string>
+    <string name="inboxNoMessages">Fant ingen meldinger her</string>
 </resources>

@@ -377,4 +377,5 @@
 
     <string name="inboxAllMessages">All messages</string>
     <string name="inboxUnreadMessages">Unread</string>
+    <string name="inboxNoMessages">No messages found here</string>
 </resources>
