@@ -37,6 +37,12 @@ public class LoadingIcon extends ProgressBar {
      */
     private synchronized void decreaseLoadCount() {
         itemsLoading--;
+
+        // If this has been called too many times on accident it should not go below 0, as that would cause issues
+        if (itemsLoading < 0) {
+            itemsLoading = 0;
+        }
+
         if (itemsLoading == 0) {
             setVisibility(View.GONE);
         }
