@@ -8,10 +8,10 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.interceptors.UserAgentInterceptor;
 import com.example.hakonsreader.api.interfaces.OnFailure;
 import com.example.hakonsreader.api.interfaces.OnNewToken;
-import com.example.hakonsreader.api.interfaces.OnResponse;
 import com.example.hakonsreader.api.model.AccessToken;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.requestmodels.AccessTokenModel;
+import com.example.hakonsreader.api.requestmodels.MessagesRequestModel;
 import com.example.hakonsreader.api.responses.ApiResponse;
 import com.example.hakonsreader.api.requestmodels.CommentRequest;
 import com.example.hakonsreader.api.requestmodels.PostRequest;
@@ -22,12 +22,12 @@ import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUser;
 import com.example.hakonsreader.api.service.AccessTokenService;
 import com.example.hakonsreader.api.service.CommentService;
 import com.example.hakonsreader.api.service.ImgurService;
+import com.example.hakonsreader.api.service.MessageService;
 import com.example.hakonsreader.api.service.OAuthService;
 import com.example.hakonsreader.api.service.PostService;
 import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.service.SubredditsService;
 import com.example.hakonsreader.api.service.UserService;
-import com.example.hakonsreader.api.utils.Util;
 import com.example.hakonsreader.api.responses.GenericError;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
@@ -45,12 +45,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.internal.EverythingIsNonNull;
 
 
 /**
@@ -212,6 +209,11 @@ public class RedditApi {
     private CommentService commentApi;
 
     /**
+     * The service object used to communicate with the Reddit API about message related calls
+     */
+    private MessageService messageApi;
+
+    /**
      * The service object used to communicate only with the part of the Reddit API
      * that deals with OAuth access tokens
      */
@@ -329,6 +331,7 @@ public class RedditApi {
         subredditsApi = apiRetrofit.create(SubredditsService.class);
         postApi = apiRetrofit.create(PostService.class);
         commentApi = apiRetrofit.create(CommentService.class);
+        messageApi = apiRetrofit.create(MessageService.class);
 
         // For Imgur we don't need any authentication, and adding it would cause issues
         // as adding the access token for Reddit would break things for Imgur, so only add the logger
@@ -714,6 +717,15 @@ public class RedditApi {
      */
     public UserRequestsLoggedInUser user() {
         return new UserRequestsLoggedInUser(accessToken, userApi);
+    }
+
+    /**
+     * Retrieves a request object that offers API calls towards messages (inbox)
+     *
+     * @return An object that can perform various message related API requests for logged in users
+     */
+    public MessagesRequestModel messages() {
+        return new MessagesRequestModel(accessToken, messageApi);
     }
 
 

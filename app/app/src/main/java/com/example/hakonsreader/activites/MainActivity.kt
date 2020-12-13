@@ -12,10 +12,9 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityMainBinding
@@ -327,6 +326,9 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
             return
         }
 
+        // This runs when the application is minimized, might be bad? Can obviously send notifications this way, but
+        // it should probably be done in a different way
+
         // Run every 10 minutes
         fixedRateTimer("inboxTimer", false, 0L, 10 * 60 * 1000) {
             println("MainActivity: inboxTimer running")
@@ -335,7 +337,31 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                 // We can get only the new messages, but if the user has viewed messages outside the application
                 // the total inbox with read messages would go unsynced
 
+                when (val response = api.messages().inbox()) {
+                    is ApiResponse.Success -> handleInboxResponse(response.value)
+                    is ApiResponse.Error -> {}
+                }
+            }
+        }
+    }
 
+    /**
+     * Handles responses to API calls for retrieving the inbox messages. This should not run on the
+     * main thread
+     *
+     * The messages are added to the local database and the navbar is updated if there are new messages
+     */
+    private suspend fun handleInboxResponse(messages: List<RedditMessage>) {
+        db.messages().insertAll(messages)
+
+        val newMessagesCount = messages.filter { it.isNew }.size
+
+        // New messages received, change the navbar icon so it shows the amount of new messages
+        if (newMessagesCount != 0) {
+            withContext(Main) {
+                // TODO update the icon, not the text
+                val profileItem = binding.bottomNav.menu.findItem(R.id.navProfile)
+                profileItem.title = "$newMessagesCount messages"
             }
         }
     }

@@ -3,6 +3,7 @@ package com.example.hakonsreader.api.jsonadapters;
 import com.example.hakonsreader.api.enums.Thing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditListing;
+import com.example.hakonsreader.api.model.RedditMessage;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.RedditUser;
 import com.example.hakonsreader.api.model.Subreddit;
@@ -34,9 +35,14 @@ public class ListingAdapter implements JsonDeserializer<RedditListing> {
         data.addProperty("kind", kind);
 
         RedditListing listing;
-        // So far we only support posts, comments, and subreddits
+
         if (Thing.POST.getValue().equals(kind)) {
             listing = context.deserialize(data, RedditPost.class);
+        } else if (Thing.MESSAGE.getValue().equals(kind) || Thing.COMMENT.getValue().equals(kind) && data.has("was_comment")) {
+            // Inbox messages that are comment replies are also defined as "t1", but are identical to MESSAGE objects
+            // Add the property here so that it has the correct kind (t4 not t1)
+            data.addProperty("kind", Thing.MESSAGE.getValue());
+            listing = context.deserialize(data, RedditMessage.class);
         } else if (Thing.COMMENT.getValue().equals(kind) || Thing.MORE.getValue().equals(kind)) {
             // So far at least "more" kinds are only comments
             listing = context.deserialize(data, RedditComment.class);
