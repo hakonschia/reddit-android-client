@@ -21,7 +21,6 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityMainBinding
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.*
-import com.example.hakonsreader.fragments.ProfileFragment.Companion.newInstance
 import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.interfaces.OnSubredditSelected
 import com.example.hakonsreader.misc.TokenManager
@@ -162,20 +161,31 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
     }
 
     override fun onBackPressed() {
+        val activeFragment = getActiveFragment()
         // TODO if we're in inbox, go back to profile
-        // If we are in the subreddit navbar
-        if (binding.bottomNav.selectedItemId == R.id.navSubreddit
-                // In a subreddit, and the last item was the list, go back to the list
-                && activeSubreddit != null && lastShownFragment is SelectSubredditFragment) {
+        // In a subreddit, and the last item was the list, go back to the list
+        if (activeFragment is SubredditFragment && lastShownFragment is SelectSubredditFragment) {
             activeSubreddit = null
 
             // If the fragment has been killed by the OS make a new one (after a while it might be killed)
             if (selectSubredditFragment == null) {
                 selectSubredditFragment = SelectSubredditFragment()
             }
+
             // Since we are in a way going back in the same navbar item, use the close transition
             supportFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainer, selectSubredditFragment!!)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                    .commit()
+        } else if (activeFragment is InboxFragment && lastShownFragment is ProfileFragment) {
+            // In the inbox, and the last active was the profile, go back to the profile
+
+            if (profileFragment == null) {
+                profileFragment = ProfileFragment.newInstance()
+            }
+
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, profileFragment!!)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
                     .commit()
         } else {
@@ -379,6 +389,9 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         //updateLocale(new Locale(language));
     }
 
+    fun getActiveFragment() : Fragment? {
+        return supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+    }
 
     /**
      * Restores the state of the fragments as saved in [onSaveInstanceState]
@@ -613,7 +626,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
             return if (App.get().isUserLoggedIn()) {
                 // TODO handle inbox
                 if (profileFragment == null) {
-                    profileFragment = newInstance()
+                    profileFragment = ProfileFragment.newInstance()
                 }
                 profileFragment!!.onInboxClicked = this@MainActivity
                 profileFragment!!
