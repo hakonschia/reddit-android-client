@@ -61,9 +61,8 @@ class ContentLink : Content {
     }
 
     override fun getTransitionViews(): MutableList<Pair<View, String>> {
-        // TODO this isn't a perfect transition as the corners of the view isn't rounded during the transition
         return super.getTransitionViews().also {
-            it.add(Pair(binding.root, "content_link_root_view"))
+            it.add(Pair(binding.root, binding.root.transitionName))
         }
     }
 

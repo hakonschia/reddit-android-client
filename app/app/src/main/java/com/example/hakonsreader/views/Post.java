@@ -370,8 +370,14 @@ public class Post extends Content {
 
         Content content = (Content) binding.content.getChildAt(0);
         if (content != null) {
-            pairs.addAll(content.getTransitionViews());
-            pairs.add(Pair.create(content, context.getString(R.string.transition_post_content)));
+            // Not all subclasses add custom transition views, so if no custom view is found use the
+            // view itself as the transition view
+            List<Pair<View, String>> contentTransitionViews = content.getTransitionViews();
+            if (contentTransitionViews.isEmpty()) {
+                pairs.add(Pair.create(content, context.getString(R.string.transition_post_content)));
+            } else {
+                pairs.addAll(contentTransitionViews);
+            }
         }
 
         return pairs;

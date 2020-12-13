@@ -8,13 +8,13 @@
     android:orientation="vertical"
     android:layout_marginStart="@dimen/postMargin"
     android:layout_marginEnd="@dimen/postMargin"
+    android:transitionName="content_link_root_view"
     app:cardBackgroundColor="@color/secondary_background"
     app:cardCornerRadius="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:transitionName="content_link_root_view">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/thumbnail"
