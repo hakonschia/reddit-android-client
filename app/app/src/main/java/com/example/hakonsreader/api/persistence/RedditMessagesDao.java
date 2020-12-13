@@ -68,4 +68,11 @@ public interface RedditMessagesDao {
      */
     @Query("SELECT * FROM messages WHERE isNew=1 ORDER BY createdAt DESC")
     public List<RedditMessage> getUnreadMessages();
+
+    // TODO this should take a List<RedditMessage> ?
+    /**
+     * Marks all messages in the database as read
+     */
+    @Query("UPDATE messages SET isNew=0")
+    public void markRead();
 }

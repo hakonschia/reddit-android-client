@@ -15,6 +15,8 @@ class InboxAdapter : RecyclerView.Adapter<InboxAdapter.ViewHolder>()  {
         notifyDataSetChanged()
     }
 
+    fun getMessages() : List<RedditMessage> = messages
+
     override fun onBindViewHolder(holder: InboxAdapter.ViewHolder, position: Int) {
         holder.bind(messages[position])
     }
