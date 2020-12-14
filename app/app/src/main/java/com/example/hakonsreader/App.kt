@@ -623,6 +623,28 @@ class App : Application() {
         )
     }
 
+    /**
+     * Gets the update frequency for the inbox
+     *
+     * @return The update frequency in minutes, if this is -1 then the automatic updates are disabled
+     */
+    fun
+inboxUpdateFrequency() : Int {
+        val updateFrequencySetting = settings.getString(
+                getString(R.string.prefs_key_inbox_update_frequency),
+                getString(R.string.prefs_default_inbox_update_frequency)
+        )
+
+        return when (updateFrequencySetting) {
+            getString(R.string.prefs_key_inbox_update_frequency_5_min) -> 5
+            getString(R.string.prefs_key_inbox_update_frequency_15_min) -> 15
+            getString(R.string.prefs_key_inbox_update_frequency_30_min) -> 30
+            getString(R.string.prefs_key_inbox_update_frequency_60_min) -> 50
+            else -> -1
+        }
+    }
+
+
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that

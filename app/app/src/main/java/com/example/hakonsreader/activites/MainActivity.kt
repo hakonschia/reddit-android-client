@@ -361,17 +361,21 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
 
         val api = App.get().api
 
-        // Run every 30 minutes
-        fixedRateTimer("inboxTimer", false, 0L, 1 * 60 * 1000) {
-            println("MainActivity: inboxTimer running")
-            CoroutineScope(IO).launch {
-                // Get all messages
-                // We can get only the new messages, but if the user has viewed messages outside the application
-                // the total inbox with read messages would go unsynced
+        // This wont be updated until the app restarts
+        val updateFrequency = App.get().inboxUpdateFrequency()
+        Log.d(TAG, "InboxTimer frequency: $updateFrequency minutes")
+        if (updateFrequency != -1) {
+            fixedRateTimer("inboxTimer", false, 0L,  updateFrequency * 60 * 1000L) {
+                Log.d(TAG, "InboxTimer running")
+                CoroutineScope(IO).launch {
+                    // Get all messages
+                    // We can get only the new messages, but if the user has viewed messages outside the application
+                    // the total inbox with read messages would go unsynced
 
-                when (val response = api.messages().inbox()) {
-                    is ApiResponse.Success -> db.messages().insertAll(response.value)
-                    is ApiResponse.Error -> {}
+                    when (val response = api.messages().inbox()) {
+                        is ApiResponse.Success -> db.messages().insertAll(response.value)
+                        is ApiResponse.Error -> {}
+                    }
                 }
             }
         }
