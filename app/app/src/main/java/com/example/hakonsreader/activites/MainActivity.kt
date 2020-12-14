@@ -687,9 +687,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
             // If logged in, show profile, otherwise show log in page
             return if (App.get().isUserLoggedIn()) {
                 // Go to inbox if there are unread messages
-                // Should maybe be syncronized? Dunno tbh
-                unreadMessages = 0
-
+                // unreadMessages should maybe be synchronized? Dunno tbh
                 if (unreadMessages != 0) {
                     profileLastShownIsProfile = false
 
