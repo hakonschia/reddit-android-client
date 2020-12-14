@@ -1,7 +1,6 @@
 package com.example.hakonsreader.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,9 +47,8 @@ class InboxFragment : Fragment() {
         val api = App.get().api
 
         CoroutineScope(IO).launch {
-            val unread = db.messages().unreadMessages
-            // Not sure if it makes sense to only mark the messages as read in the inbox if it's a success
-            unread?.value?.toTypedArray()?.let { api.messages().markRead(*it) }
+            val unread = db.messages().unreadMessagesNoObservable
+            unread?.let { api.messages().markRead(*it.toTypedArray()) }
             db.messages().markRead()
         }
 

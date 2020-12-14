@@ -359,22 +359,21 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         // This runs when the application is minimized, might be bad? Can obviously send notifications this way, but
         // it should probably be done in a different way
 
+        val api = App.get().api
+
         // Run every 30 minutes
         fixedRateTimer("inboxTimer", false, 0L, 1 * 60 * 1000) {
             println("MainActivity: inboxTimer running")
-            /*
             CoroutineScope(IO).launch {
                 // Get all messages
                 // We can get only the new messages, but if the user has viewed messages outside the application
                 // the total inbox with read messages would go unsynced
-
 
                 when (val response = api.messages().inbox()) {
                     is ApiResponse.Success -> db.messages().insertAll(response.value)
                     is ApiResponse.Error -> {}
                 }
             }
-             */
         }
     }
 

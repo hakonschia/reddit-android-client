@@ -70,6 +70,16 @@ public interface RedditMessagesDao {
     @Query("SELECT * FROM messages WHERE isNew=1 ORDER BY createdAt DESC")
     public LiveData<List<RedditMessage>> getUnreadMessages();
 
+    /**
+     * Gets the direct list of message marked as new. For an observable version of this using {@link LiveData}
+     * use {@link #getUnreadMessages()}
+     *
+     * @return A list of messages marked as "new", ie. not seen be the user
+     * @see #getUnreadMessages()
+     */
+    @Query("SELECT * FROM messages WHERE isNew=1 ORDER BY createdAt DESC")
+    public List<RedditMessage> getUnreadMessagesNoObservable();
+
     // TODO this should take a List<RedditMessage> ?
     /**
      * Marks all messages in the database as read

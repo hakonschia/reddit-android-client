@@ -9,7 +9,6 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.MessageService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
-import retrofit2.http.Field
 import java.lang.Exception
 import java.lang.StringBuilder
 
