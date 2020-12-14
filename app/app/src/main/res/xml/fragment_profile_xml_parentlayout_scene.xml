@@ -56,7 +56,9 @@
             motion:layout_constraintStart_toEndOf="@+id/profilePicture"
             motion:layout_constraintHorizontal_bias="0.0"
             android:layout_marginStart="8dp"
-            motion:layout_constraintEnd_toStartOf="@+id/menuProfile" />
+            android:layout_marginEnd="8dp"
+            motion:layout_constrainedWidth="true"
+            motion:layout_constraintEnd_toStartOf="@+id/inbox" />
         <Constraint
             android:id="@+id/commentKarma"
             android:layout_width="wrap_content"
@@ -114,7 +116,8 @@
             android:id="@+id/inbox"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            motion:layout_constraintTop_toBottomOf="@+id/menuProfile"
-            motion:layout_constraintEnd_toEndOf="@+id/menuProfile" />
+            android:layout_marginEnd="8dp"
+            motion:layout_constraintEnd_toStartOf="@+id/menuProfile"
+            motion:layout_constraintTop_toTopOf="@+id/menuProfile" />
     </ConstraintSet>
 </MotionScene>

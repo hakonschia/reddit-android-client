@@ -78,7 +78,7 @@
             app:layout_constraintStart_toStartOf="parent"
 
             app:layout_constraintTop_toBottomOf="@+id/profilePicture"
-            tools:text="Hakonschiassssssssssssss" />
+            tools:text="Hakonschiasssssssssssssss" />
 
         <TextView
             android:id="@+id/profileAge"
