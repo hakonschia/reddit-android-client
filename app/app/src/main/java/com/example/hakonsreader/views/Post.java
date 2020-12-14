@@ -262,6 +262,8 @@ public class Post extends Content {
                     if (showTextContent) {
                         content = generatePostContent(parent, context);
                     }
+                } else {
+                    content = generatePostContent(parent, context);
                 }
                 break;
 
