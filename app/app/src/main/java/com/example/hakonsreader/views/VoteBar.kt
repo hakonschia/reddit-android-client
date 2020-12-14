@@ -29,8 +29,6 @@ class VoteBar : FrameLayout {
     //  and cast another vote it will be unsynced since it doesn't update the post in the list of posts
     //  Not really relevant to this class, but putting it here as a reminder
 
-
-    private val api = App.get().api
     private lateinit var binding: VoteBarBinding
     var hideScore = false
     var listing: VoteableListing? = null
@@ -92,6 +90,7 @@ class VoteBar : FrameLayout {
 
             val id = it.id
 
+            val api = App.get().api
             CoroutineScope(IO).launch {
                 val resp = if (listing is RedditPost) {
                     api.post(id)

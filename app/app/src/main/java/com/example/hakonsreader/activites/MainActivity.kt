@@ -3,13 +3,12 @@ package com.example.hakonsreader.activites
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.App
@@ -61,8 +60,12 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
     private val binding get() = _binding!!
     private var savedState = Bundle()
 
-    private val api = App.get().api
     private val db = RedditDatabase.getInstance(this)
+
+    /**
+     * The amount of unread messages in the inbox
+     */
+    private var unreadMessages = 0
 
     // The fragments to show in the nav bar
     private var postsFragment: PostsContainerFragment? = null
@@ -86,6 +89,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
 
         checkAccessTokenScopes()
         startInboxListener()
+        attachFragmentChangeListener()
 
         // For testing purposes hardcode going into a subreddit/post etc.
         val intent = Intent(this, DispatcherActivity::class.java)
@@ -162,7 +166,6 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
 
     override fun onBackPressed() {
         val activeFragment = getActiveFragment()
-        // TODO if we're in inbox, go back to profile
         // In a subreddit, and the last item was the list, go back to the list
         if (activeFragment is SubredditFragment && lastShownFragment is SelectSubredditFragment) {
             activeSubreddit = null
@@ -182,6 +185,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
             if (profileFragment == null) {
                 profileFragment = ProfileFragment.newInstance()
             }
+
+            navigationViewListener.profileLastShownIsProfile = true
 
             supportFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainer, profileFragment!!)
@@ -209,7 +214,12 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
     }
 
     override fun onInboxClicked() {
-        inboxFragment = InboxFragment()
+        if (inboxFragment == null) {
+            inboxFragment = InboxFragment()
+        }
+
+        navigationViewListener.profileLastShownIsProfile = false
+
         // Should maybe be sure that the profile navbar is clicked? Dunno
         // Change the navbar name to be "Inbox" maybe?
         supportFragmentManager.beginTransaction()
@@ -342,18 +352,21 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         // it should probably be done in a different way
 
         // Run every 30 minutes
-        fixedRateTimer("inboxTimer", false, 0L, 30 * 60 * 1000) {
+        fixedRateTimer("inboxTimer", false, 0L, 1 * 60 * 1000) {
             println("MainActivity: inboxTimer running")
+            /*
             CoroutineScope(IO).launch {
                 // Get all messages
                 // We can get only the new messages, but if the user has viewed messages outside the application
                 // the total inbox with read messages would go unsynced
+
 
                 when (val response = api.messages().inbox()) {
                     is ApiResponse.Success -> db.messages().insertAll(response.value)
                     is ApiResponse.Error -> {}
                 }
             }
+             */
         }
     }
 
@@ -363,17 +376,37 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
     private fun observeUnreadMessages() {
         val unread = db.messages().unreadMessages
         unread.observe(this, { m ->
-            val profileItem = binding.bottomNav.menu.findItem(R.id.navProfile)
-            val color = if (m.size == 0) {
-                R.color.iconColor
-            } else {
-                R.color.tagNSFW
-            }
+            unreadMessages = m.size
 
-            profileItem.icon.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+            val profileItemId = binding.bottomNav.menu.findItem(R.id.navProfile).itemId
+
+            // No unread messages, remove the badge
+            if (unreadMessages == 0) {
+                binding.bottomNav.removeBadge(profileItemId)
+            } else {
+                // Add or create a badge and update the number
+                val badge = binding.bottomNav.getOrCreateBadge(profileItemId)
+                badge.isVisible = true
+                badge.number = unreadMessages
+            }
         })
     }
 
+    /**
+     * Attaches a listener to [getSupportFragmentManager] that stores fragments when detached
+     * and saves it to [lastShownFragment]
+     */
+    private fun attachFragmentChangeListener() {
+        supportFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
+            override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
+                super.onFragmentDetached(fm, f)
+                // InboxGroupFragment is an "inner" fragment and not one we want to store directly
+                if (f !is InboxGroupFragment) {
+                    lastShownFragment = f
+                }
+            }
+        }, false)
+    }
 
     /**
      * Updates the language
@@ -452,14 +485,13 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         // Set listener for when an item has been clicked when already selected
         binding.bottomNav.setOnNavigationItemReselectedListener { item ->
             when (item.itemId) {
-                // When the subreddit is clicked when already in subreddit go back to the subreddit list
+                // When "Subreddit" is clicked when already in "subreddit" go back to the subreddit list
                 R.id.navSubreddit -> {
                     activeSubreddit = null
                     if (selectSubredditFragment == null) {
                         selectSubredditFragment = SelectSubredditFragment()
                         selectSubredditFragment!!.subredditSelected = this
                     }
-                    lastShownFragment = selectSubredditFragment
 
                     // Since we are in a way going back in the same navbar item, use the close transition
                     supportFragmentManager.beginTransaction()
@@ -473,6 +505,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                     if (profileFragment == null) {
                         profileFragment = ProfileFragment.newInstance()
                     }
+
+                    navigationViewListener.profileLastShownIsProfile = true
 
                     supportFragmentManager.beginTransaction()
                             .replace(R.id.fragmentContainer, profileFragment!!)
@@ -515,6 +549,15 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         private var navBarPos = 0
 
         /**
+         * Flag indicating if that the last time the profile was selected in the navbar, the profile
+         * was shown, and not the inbox
+         *
+         * If this is null, then no previous fragment has been shown and should decide which fragment
+         * should be shown depending on the normal execution branch
+         */
+        var profileLastShownIsProfile: Boolean? = null
+
+        /**
          * Disables the animation for the next nav bar change. Note this only lasts for one change
          */
         fun disableAnimationForNextChange() {
@@ -549,7 +592,6 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                 }
                 else -> return false
             }
-            lastShownFragment = selected
 
             // Example: previous = 2, current = 3. We are going right
             val goingRight = previousPos < navBarPos
@@ -628,18 +670,44 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         /**
          * Retrieves the correct fragment for profiles
          *
-         * @return If a user is logged in a [ProfileFragment] is shown, otherwise a [LogInFragment]
-         * is shown so the user can log in
+         * @return If a user is not logged in a [LogInFragment] is shown. If a user is logged in either
+         * a [ProfileFragment] or [InboxFragment] is shown, depending on if there are unread messages or not
          */
         private fun onNavBarProfile(): Fragment {
             // If logged in, show profile, otherwise show log in page
             return if (App.get().isUserLoggedIn()) {
-                // TODO handle inbox
-                if (profileFragment == null) {
-                    profileFragment = ProfileFragment.newInstance()
+                // Go to inbox if there are unread messages
+                // Should maybe be syncronized? Dunno tbh
+                unreadMessages = 0
+
+                if (unreadMessages != 0) {
+                    profileLastShownIsProfile = false
+
+                    if (inboxFragment == null) {
+                        inboxFragment = InboxFragment()
+                    }
+                    inboxFragment!!
+                } else {
+                    when (profileLastShownIsProfile) {
+                        // Profile shown last, or first time showing (and no inbox messages), show profile
+                        null, true -> {
+                            if (profileFragment == null) {
+                                profileFragment = ProfileFragment.newInstance()
+                            }
+
+                            profileFragment!!.onInboxClicked = this@MainActivity
+                            profileFragment!!
+                        }
+
+                        // Inbox shown last, show inbox again
+                        false -> {
+                            if (inboxFragment == null) {
+                                inboxFragment = InboxFragment()
+                            }
+                            inboxFragment!!
+                        }
+                    }
                 }
-                profileFragment!!.onInboxClicked = this@MainActivity
-                profileFragment!!
             } else {
                 if (logInFragment == null) {
                     logInFragment = LogInFragment()

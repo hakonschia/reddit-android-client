@@ -40,8 +40,11 @@ class InboxFragment : Fragment() {
 
 
     private fun setupTabs() {
-        inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.ALL))
-        inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.UNREAD))
+        // If the fragment is shown multiple times, don't add the tabs multiple times as well
+        if (inboxFragments.isEmpty()) {
+            inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.ALL))
+            inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.UNREAD))
+        }
 
         binding.inboxPages.adapter = PagerAdapter(requireActivity())
         TabLayoutMediator(binding.inboxPagesTitle, binding.inboxPages) { tab, position ->

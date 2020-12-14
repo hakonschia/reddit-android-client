@@ -169,8 +169,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             retrieveUserInfo()
         }
 
-
-
         if (saveState != null) {
             // getFloat() will return 0.0f if not found, and won't ever be null
             binding.parentLayout.progress = saveState?.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)!!
