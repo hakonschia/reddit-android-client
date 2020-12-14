@@ -22,6 +22,7 @@ import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.*
 import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.interfaces.OnSubredditSelected
+import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.misc.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -35,7 +36,7 @@ import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
-class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
+class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
 
     companion object {
         private const val TAG = "MainActivity"
@@ -228,6 +229,11 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                 .commit()
     }
 
+    override fun showUnreadMessagesBadge(show: Boolean) {
+        val badge = binding.bottomNav.getBadge(binding.bottomNav.menu.findItem(R.id.navProfile).itemId)
+        badge?.isVisible = show
+    }
+
     /**
      * Handles when the activity resumes from an OAuth intent. If the intent is a successful
      * login attempt, then the user info is retrieved
@@ -378,16 +384,19 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
         unread.observe(this, { m ->
             unreadMessages = m.size
 
-            val profileItemId = binding.bottomNav.menu.findItem(R.id.navProfile).itemId
+            // TODO add listener to settings fragment to update this when the setting changes
+            if (App.get().showUnreadMessagesBadge()) {
+                val profileItemId = binding.bottomNav.menu.findItem(R.id.navProfile).itemId
 
-            // No unread messages, remove the badge
-            if (unreadMessages == 0) {
-                binding.bottomNav.removeBadge(profileItemId)
-            } else {
-                // Add or create a badge and update the number
-                val badge = binding.bottomNav.getOrCreateBadge(profileItemId)
-                badge.isVisible = true
-                badge.number = unreadMessages
+                // No unread messages, remove the badge
+                if (unreadMessages == 0) {
+                    binding.bottomNav.removeBadge(profileItemId)
+                } else {
+                    // Add or create a badge and update the number
+                    val badge = binding.bottomNav.getOrCreateBadge(profileItemId)
+                    badge.isVisible = true
+                    badge.number = unreadMessages
+                }
             }
         })
     }
@@ -588,7 +597,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked {
                     if (settingsFragment == null) {
                         settingsFragment = SettingsFragment()
                     }
-                    selected = settingsFragment as SettingsFragment
+                    settingsFragment!!.setUnreadMessagesBadgeSettingChanged(this@MainActivity)
+                    selected = settingsFragment!!
                 }
                 else -> return false
             }

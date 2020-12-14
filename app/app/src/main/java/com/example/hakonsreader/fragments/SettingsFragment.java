@@ -17,6 +17,7 @@ import androidx.preference.SwitchPreference;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.MainActivity;
+import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
     private static final String TAG = "SettingsFragment";
@@ -26,6 +27,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
      */
     private static final String LINK_SCALE_SUMMARY_FORMAT = "%.2f";
     private SharedPreferences settings;
+
+    private OnUnreadMessagesBadgeSettingChanged unreadMessagesBadgeSettingChanged;
+
+    public void setUnreadMessagesBadgeSettingChanged(OnUnreadMessagesBadgeSettingChanged unreadMessagesBadgeSettingChanged) {
+        this.unreadMessagesBadgeSettingChanged = unreadMessagesBadgeSettingChanged;
+    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -59,6 +66,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         SeekBarPreference linkScalePreference = findPreference(getString(R.string.prefs_key_link_scale));
         linkScalePreference.setOnPreferenceChangeListener(linkScaleChangeListener);
         linkScalePreference.setSummary(String.format(LINK_SCALE_SUMMARY_FORMAT, linkScalePreference.getValue() / 100f));
+
+        SwitchPreference unreadMessagesBadgePreference = findPreference(getString(R.string.prefs_key_inbox_show_badge));
+        unreadMessagesBadgePreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            if (unreadMessagesBadgeSettingChanged != null) {
+                unreadMessagesBadgeSettingChanged.showUnreadMessagesBadge((Boolean) newValue);
+            }
+            return true;
+        });
     }
 
     @Override

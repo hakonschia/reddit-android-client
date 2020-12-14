@@ -259,4 +259,12 @@
     <string name="inboxSent">Sendt %s</string>
     <string name="inboxMenuMarkUnread">Marker som ulest</string>
     <string name="inboxMenuMarkRead">Marker som lest</string>
+    <string name="prefs_group_inbox">Inboks</string>
+    <string name="prefs_title_inbox_update_frequency">Oppdateringsfrekvens</string>
+    <string name="prefs_title_inbox_update_frequency_dont_update">Ikke oppdater automatisk</string>
+    <string name="prefs_title_inbox_update_frequency_5_min">5 minutter</string>
+    <string name="prefs_title_inbox_update_frequency_15_min">15 minutter</string>
+    <string name="prefs_title_inbox_update_frequency_30_min">30 minutter</string>
+    <string name="prefs_title_inbox_update_frequency_60_min">60 minutter</string>
+    <string name="prefs_title_inbox_show_badge">Vis ikon i navbar</string>
 </resources>

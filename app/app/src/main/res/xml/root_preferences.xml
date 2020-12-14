@@ -1,6 +1,8 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- TODO this should probably be split into multiple screens, it's gotten quite large -->
+
     <PreferenceCategory
         app:title="@string/prefs_group_appearance"
         app:iconSpaceReserved="false">
@@ -21,6 +23,30 @@
             app:useSimpleSummaryProvider="true"
             app:singleLineTitle="false"
             app:defaultValue="@string/prefs_default_language" />
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        app:title="@string/prefs_group_inbox"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="@string/prefs_key_inbox_show_badge"
+            app:title="@string/prefs_title_inbox_show_badge"
+            app:defaultValue="@bool/prefs_default_inbox_show_badge"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false" />
+
+        <ListPreference
+            app:key="@string/prefs_key_inbox_update_frequency"
+            app:title="@string/prefs_title_inbox_update_frequency"
+            app:entries="@array/inbox_update_frequency_entries"
+            app:entryValues="@array/inbox_update_frequency_values"
+            app:defaultValue="@string/prefs_default_inbox_update_frequency"
+            app:useSimpleSummaryProvider="true"
+            app:singleLineTitle="false"
+            app:iconSpaceReserved="false" />
+
     </PreferenceCategory>
 
 

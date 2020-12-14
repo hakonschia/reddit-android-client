@@ -18,5 +18,7 @@
     <integer name="prefs_default_comment_smooth_scroll_threshold">75</integer>
     <bool name="prefs_default_show_all_sidebars">true</bool>
     <integer name="prefs_default_link_scale">100</integer>
+    <bool name="prefs_default_inbox_show_badge">true</bool>
+    <string name="prefs_default_inbox_update_frequency" translatable="false">@string/prefs_key_inbox_update_frequency_30_min</string>
 
 </resources>

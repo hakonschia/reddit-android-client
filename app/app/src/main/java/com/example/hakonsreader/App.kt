@@ -613,6 +613,16 @@ class App : Application() {
         )
     }
 
+    /**
+     * Returns if the icon badge should be shown for unread messages in the navbar
+     */
+    fun showUnreadMessagesBadge() : Boolean {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_inbox_show_badge),
+                resources.getBoolean(R.bool.prefs_default_inbox_show_badge)
+        )
+    }
+
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that
