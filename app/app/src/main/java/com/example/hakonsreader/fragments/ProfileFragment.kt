@@ -152,6 +152,8 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         setupBinding()
         setupPostsList()
         setupPostsViewModel()
+        
+        App.get().registerPrivateBrowsingObservable(this)
 
         // Retrieve user info if the fragment hasn't loaded any already
         if (savedInstanceState == null) {
@@ -179,8 +181,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     override fun onResume() {
         super.onResume()
 
-        App.get().registerPrivateBrowsingObservable(this)
-        
         // If we have no username we can't get posts (we can't ask for posts for the logged in user without
         // their username). The posts are retrieved automatically when the user information loads
         if (postsAdapter?.posts?.isEmpty() == true && postIds.isEmpty() && username != null) {

@@ -137,6 +137,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         setupSubmitPostFab()
         setupPostsViewModel()
 
+        App.get().registerPrivateBrowsingObservable(this)
+
         // TODO if you go to settings, rotate and change theme, then the IDs wont be saved. The subreddit will be notified about
         //  the first change, save the state, but the state isn't restored again for the second save since it's restored here
         //  so there's nothing to restore. saveState() should use the bundle "saveState"
@@ -157,13 +159,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     override fun onResume() {
         super.onResume()
-        App.get().registerPrivateBrowsingObservable(this)
 
         // If the fragment is selected without any posts load posts automatically
         // Check both the adapter and the postIds, as the postIds might have been set in onCreateView
         // while the adapter might not have gotten the update yet from the ViewModel
-        // TODO postIds sometimes has 1 element which is an empty string (when it should be empty)
-        //  might be something to do with restoreState
         if (postsAdapter?.itemCount == 0 && postIds.isEmpty()) {
             postsViewModel?.loadPosts()
         }
