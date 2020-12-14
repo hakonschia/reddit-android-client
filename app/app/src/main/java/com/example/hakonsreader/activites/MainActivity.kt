@@ -92,6 +92,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         checkAccessTokenScopes()
         startInboxListener()
         attachFragmentChangeListener()
+        setProfileNavbarTitle()
 
         // For testing purposes hardcode going into a subreddit/post etc.
         val intent = Intent(this, DispatcherActivity::class.java)
@@ -295,7 +296,14 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
 
         CoroutineScope(IO).launch {
             when (val userInfo = api.user().info()) {
-                is ApiResponse.Success -> App.storeUserInfo(userInfo.value)
+                is ApiResponse.Success -> {
+                    App.storeUserInfo(userInfo.value)
+                    // This will be called after the activity has been restarted when logging in
+                    // so call it when user information is retrieved as well
+                    withContext(Main) {
+                        setProfileNavbarTitle()
+                    }
+                }
                 is ApiResponse.Error -> {
                     // Seeing as this is called when the access token was just retrieved, it is very
                     // unlikely to fail, but just in case
@@ -446,6 +454,17 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                 }
             }
         }, false)
+    }
+
+    /**
+     * Sets the profile navbar title to the logged in users name, if there is a logged in user and
+     * there is information about the user stored
+     */
+    private fun setProfileNavbarTitle() {
+        val user = App.storedUser
+        if (user != null) {
+            binding.bottomNav.menu.findItem(R.id.navProfile).title = user.username
+        }
     }
 
     /**
