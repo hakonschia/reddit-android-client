@@ -269,12 +269,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         CoroutineScope(IO).launch {
             when (val resp = api.accessToken().get(code)) {
                 is ApiResponse.Success -> {
-                    when (val userInfo = api.user().info()) {
-                        // Get information about the user. If this fails it doesn't really matter, as it isn't
-                        // strictly needed at this point
-                        is ApiResponse.Success -> App.storeUserInfo(userInfo.value)
-                        is ApiResponse.Error -> {}
-                    }
+                    getUserInfo()
 
                     // Re-create the start fragment as it now should load posts for the logged in user
                     // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
@@ -287,6 +282,28 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
 
                 is ApiResponse.Error -> {
                     Util.handleGenericResponseErrors(binding.parentLayout, resp.error, resp.throwable)
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets user info, if this fails then a snackbar is shown to let the user know and attempt again
+     */
+    private fun getUserInfo() {
+        val api = App.get().api
+
+        CoroutineScope(IO).launch {
+            when (val userInfo = api.user().info()) {
+                is ApiResponse.Success -> App.storeUserInfo(userInfo.value)
+                is ApiResponse.Error -> {
+                    // Seeing as this is called when the access token was just retrieved, it is very
+                    // unlikely to fail, but just in case
+                    Snackbar.make(binding.root, R.string.userInfoFailedToGet, Snackbar.LENGTH_INDEFINITE)
+                            .setAction(R.string.userInfoFailedToGetTryAgain) {
+                                getUserInfo()
+                            }
+                            .show()
                 }
             }
         }

@@ -399,4 +399,7 @@
     <string name="inboxSent">Sent %s</string>
     <string name="inboxMenuMarkUnread">Mark as unread</string>
     <string name="inboxMenuMarkRead">Mark as read</string>
+
+    <string name="userInfoFailedToGet">Failed to retrieve user information</string>
+    <string name="userInfoFailedToGetTryAgain">Try again</string>
 </resources>

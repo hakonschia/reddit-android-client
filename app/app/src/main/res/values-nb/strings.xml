@@ -267,4 +267,6 @@
     <string name="prefs_title_inbox_update_frequency_30_min">30 minutter</string>
     <string name="prefs_title_inbox_update_frequency_60_min">60 minutter</string>
     <string name="prefs_title_inbox_show_badge">Vis ikon i navbar</string>
+    <string name="userInfoFailedToGet">Kunne ikke hente inn bruker informasjon</string>
+    <string name="userInfoFailedToGetTryAgain">Prøv igjen</string>
 </resources>
