@@ -258,7 +258,11 @@ public class Post extends Content {
             case CROSSPOST:
                 // Generate the content the parent post would generate and show that
                 RedditPost parent = post.getCrossposts().get(0);
-                content = generatePostContent(parent, context);
+                if (parent.getPostType() == PostType.TEXT) {
+                    if (showTextContent) {
+                        content = generatePostContent(parent, context);
+                    }
+                }
                 break;
 
             case LINK:
