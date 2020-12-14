@@ -22,8 +22,41 @@ class MessagesRequestModel(
      *
      * OAuth scope required: `privatemessages`
      *
+     * @see unread
      */
     suspend fun inbox(after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>> {
+        return getInboxMessagesInternal(where = "inbox", after, count, limit)
+    }
+
+    /**
+     * Gets the unread messages in the inbox
+     *
+     * OAuth scope required: `privatemessages`
+     *
+     * @see inbox
+     */
+    suspend fun unread(after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>> {
+        return getInboxMessagesInternal(where = "unread", after, count, limit)
+    }
+
+    /**
+     * Gets the sent messages in the inbox
+     *
+     * OAuth scope required: `privatemessages`
+     *
+     * @see inbox
+     */
+    suspend fun sent(after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>> {
+        return getInboxMessagesInternal(where = "sent", after, count, limit)
+    }
+
+
+    /**
+     * Internal helper function for inbox messages
+     *
+     * @param where One of: *inbox*, *unread*, *sent*
+     */
+    private suspend fun getInboxMessagesInternal(where: String, after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>> {
         try {
             Util.verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -31,7 +64,7 @@ class MessagesRequestModel(
         }
 
         return try {
-            val response = api.getMessages(where = "inbox", after, count, limit)
+            val response = api.getMessages(where, after, count, limit)
             val messages = response.body()?.getListings()
 
             if (messages != null) {
@@ -43,6 +76,7 @@ class MessagesRequestModel(
             ApiResponse.Error(GenericError(-1), e)
         }
     }
+
 
     /**
      * Mark inbox messages as read
