@@ -1,9 +1,12 @@
 package com.example.hakonsreader.activites
 
 import android.os.Bundle
+import android.os.PersistableBundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.R
 import com.example.hakonsreader.fragments.ProfileFragment
+import com.example.hakonsreader.fragments.SubredditFragment
 import com.example.hakonsreader.interfaces.LockableSlidr
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface
@@ -14,15 +17,21 @@ import com.r0adkll.slidr.model.SlidrInterface
 class ProfileActivity : AppCompatActivity(), LockableSlidr {
 
     companion object {
+        private const val TAG = "ProfileActivity"
 
         /**
          * The key used to send which username the profile is for
          */
         const val USERNAME_KEY = "username"
+
+        /**
+         * The key used to save the fragment when the activity has been killed and recreated
+         */
+        const val SAVED_FRAGMENT = "savedFragment"
     }
 
     private lateinit var slidrInterface: SlidrInterface
-
+    private var fragment: ProfileFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,13 +44,24 @@ class ProfileActivity : AppCompatActivity(), LockableSlidr {
             return
         }
 
-        val fragment = ProfileFragment.newInstance(username)
+        fragment = if (savedInstanceState != null) {
+            supportFragmentManager.getFragment(savedInstanceState, SAVED_FRAGMENT) as ProfileFragment?
+        } else {
+            ProfileFragment.newInstance(username)
+        }
+
+        fragment?.retainInstance = true
 
         supportFragmentManager.beginTransaction()
-                .replace(R.id.profileContainer, fragment)
+                .replace(R.id.profileContainer, fragment!!)
                 .commit()
 
         slidrInterface = Slidr.attach(this)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        fragment?.let { supportFragmentManager.putFragment(outState, SAVED_FRAGMENT, it) }
     }
 
     override fun lock(lock: Boolean) {

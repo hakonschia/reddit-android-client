@@ -153,20 +153,13 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         setupPostsList()
         setupPostsViewModel()
 
-        if (savedInstanceState != null) {
-            binding.parentLayout.progress = savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)
-        }
-
-        // If we're on a logged in user we might have some old info, so set that
-        if (isLoggedInUser) {
-            updateViews()
-        }
-
         // Retrieve user info if the fragment hasn't loaded any already
-        if (firstLoad) {
-            firstLoad = false
-
+        if (savedInstanceState == null) {
             retrieveUserInfo()
+        } else {
+            binding.parentLayout.progress = savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)
+            postIds = savedInstanceState.getStringArrayList(POST_IDS_KEY) as ArrayList<String>
+            postsViewModel?.postIds = postIds
         }
 
         if (saveState != null) {
@@ -176,6 +169,9 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             postIds = saveState?.getStringArrayList(POST_IDS_KEY) as ArrayList<String>
             postsViewModel?.postIds = postIds
         }
+
+        // If we're on a logged in user, or the fragment has been recreated, we might have some old info
+        updateViews()
 
         return binding.root
     }
@@ -199,6 +195,8 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         // so we need to store the animation state here and in saveState (for when the fragment has
         // been replaced but not destroyed)
         outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.progress)
+        outState.putParcelable(LAYOUT_STATE_KEY, postsLayoutManager?.onSaveInstanceState())
+        outState.putStringArrayList(POST_IDS_KEY, postsViewModel?.postIds as ArrayList<String>?)
     }
 
     override fun onDestroyView() {
@@ -316,12 +314,15 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             }
 
             withContext(Main) {
-                binding.loadingIcon.onCountChange(false)
+                // In case the view has been destroyed before we get a response
+                if (_binding != null) {
+                    binding.loadingIcon.onCountChange(false)
 
-                when (userResponse) {
-                    is ApiResponse.Success -> onUserResponse(userResponse.value)
-                    is ApiResponse.Error -> {
-                        Util.handleGenericResponseErrors(binding.parentLayout, userResponse.error, userResponse.throwable)
+                    when (userResponse) {
+                        is ApiResponse.Success -> onUserResponse(userResponse.value)
+                        is ApiResponse.Error -> {
+                            Util.handleGenericResponseErrors(binding.parentLayout, userResponse.error, userResponse.throwable)
+                        }
                     }
                 }
             }
