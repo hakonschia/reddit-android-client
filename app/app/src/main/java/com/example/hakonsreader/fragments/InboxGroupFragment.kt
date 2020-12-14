@@ -101,20 +101,7 @@ class InboxGroupFragment : Fragment() {
         CoroutineScope(IO).launch {
             val messages = when (inboxType) {
                 InboxFragment.InboxGroupTypes.ALL -> db.messages().allMessages
-                InboxFragment.InboxGroupTypes.UNREAD -> {
-                    val unread = db.messages().unreadMessages
-
-                    // This should probably always happen? New messages are shown in "ALL" as well
-                    when (unread?.value?.toTypedArray()?.let { api.messages().markRead(*it) }) {
-                        is ApiResponse.Success -> {
-                            Log.d(TAG, "loadMessagesFromDb: marked as unread")
-                            db.messages().markRead()
-                        }
-                        is ApiResponse.Error -> {}
-                    }
-
-                    unread
-                }
+                InboxFragment.InboxGroupTypes.UNREAD -> db.messages().unreadMessages
             }
 
             withContext(Main) {
