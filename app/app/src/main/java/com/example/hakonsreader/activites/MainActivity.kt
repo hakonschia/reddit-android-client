@@ -365,14 +365,23 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         val updateFrequency = App.get().inboxUpdateFrequency()
         Log.d(TAG, "InboxTimer frequency: $updateFrequency minutes")
         if (updateFrequency != -1) {
+            var counter = 0
+
             fixedRateTimer("inboxTimer", false, 0L,  updateFrequency * 60 * 1000L) {
                 Log.d(TAG, "InboxTimer running")
-                CoroutineScope(IO).launch {
-                    // Get all messages
-                    // We can get only the new messages, but if the user has viewed messages outside the application
-                    // the total inbox with read messages would go unsynced
 
-                    when (val response = api.messages().inbox()) {
+                CoroutineScope(IO).launch {
+                    // Get all messages every 10th request, in case a message has been seen outside the
+                    // application then it won't be in the unread messages, so get all every once in a while
+                    val response = if (counter % 10 == 0) {
+                        api.messages().inbox()
+                    } else {
+                        api.messages().unread()
+                    }
+
+                    counter++
+
+                    when (response) {
                         is ApiResponse.Success -> db.messages().insertAll(response.value)
                         is ApiResponse.Error -> {}
                     }
