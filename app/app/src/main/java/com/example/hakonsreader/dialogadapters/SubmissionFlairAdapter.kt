@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.flairs.SubmissionFlair
+import com.example.hakonsreader.views.Tag
 import com.example.hakonsreader.views.util.ViewUtil
 
 /**
@@ -65,12 +66,13 @@ class SubmissionFlairAdapter(
         val submissionFlair = flairs[position]
 
         val parentLayout = view.findViewById<LinearLayout>(R.id.parentLayout)
-        val tag = ViewUtil.createFlair(
+        val tag = Tag(context)
+        ViewUtil.setFlair(
+                tag,
                 submissionFlair.richtextFlairs,
                 submissionFlair.text,
                 submissionFlair.textColor,
                 submissionFlair.backgroundColor,
-                context
         )
         parentLayout.addView(tag)
 

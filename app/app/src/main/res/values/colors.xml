@@ -35,8 +35,8 @@
 
     <color name="imageVideoActivityBackground">#CC060910</color>
 
-    <color name="tagNSFW">#FF4747</color>
-    <color name="tagSpoiler">#595959</color>
+    <color name="tagNSFWFill">#FF4747</color>
+    <color name="tagSpoilerFill">#595959</color>
     <color name="tagNSFWText">#FFFFFF</color>
     <color name="tagSpoilerText">#FFFFFF</color>
 

@@ -5,31 +5,27 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.databinding.TagBinding;
 import com.squareup.picasso.Picasso;
 
-public class Tag extends LinearLayout {
+public class Tag extends FrameLayout {
     private static final String TAG = "Tag";
     
-    private TagBinding binding;
-    private String text;
+    private final TagBinding binding;
     private int textColor;
-    private int fillColor;
-
-    private boolean textColorOverriden = false;
+    private boolean textColorOverridden = false;
 
     public Tag(Context context) {
         this(context, null, 0);
@@ -39,20 +35,38 @@ public class Tag extends LinearLayout {
     }
     public Tag(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        binding = TagBinding.inflate(LayoutInflater.from(context), this, true);
 
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.Tag, 0, 0);
         try {
-            text = a.getString(R.styleable.Tag_text);
-            textColor = a.getColor(R.styleable.Tag_textColor, ContextCompat.getColor(context, R.color.text_color));
-            fillColor = a.getColor(R.styleable.Tag_textColor, ContextCompat.getColor(context, R.color.background));
+            String defaultTextColor = "#000000";
+            textColor = a.getColor(R.styleable.Tag_textColor, Color.parseColor(defaultTextColor));
+
+            String defaultFillColor = "#EAEAEA";
+            int fillColor = a.getColor(R.styleable.Tag_fillColor, Color.parseColor(defaultFillColor));
+            setFillColor(fillColor);
+
+            String text = a.getString(R.styleable.Tag_text);
+            if (text != null) {
+                addText(text);
+            } else {
+                if (isInEditMode()) {
+                    addText("FaZe Clan fan");
+                }
+            }
         } finally {
             a.recycle();
         }
 
-        binding = TagBinding.inflate(LayoutInflater.from(context), this, true);
-
         // With elevation the card will have a weird looking shadow (only visible on light mode)
         binding.cardView.setCardElevation(0);
+    }
+
+    /**
+     * Clears all views from the tag
+     */
+    public void clear() {
+        binding.tags.removeAllViews();
     }
 
     /**
@@ -89,7 +103,7 @@ public class Tag extends LinearLayout {
             // it still returns 255? so set it here only, not in setFillColor(int))
             setFillColor(ContextCompat.getColor(getContext(), R.color.background_with_alpha));
             textColor = ContextCompat.getColor(getContext(), R.color.text_color);
-            textColorOverriden = true;
+            textColorOverridden = true;
             // The elevation shadow will still be visible on light backgrounds
             binding.cardView.setCardElevation(0f);
         } else {
@@ -104,7 +118,7 @@ public class Tag extends LinearLayout {
      * @param textColor The color to set for the text
      */
     public void setTextColor(int textColor) {
-        if (!textColorOverriden) {
+        if (!textColorOverridden) {
             this.textColor = textColor;
         }
     }

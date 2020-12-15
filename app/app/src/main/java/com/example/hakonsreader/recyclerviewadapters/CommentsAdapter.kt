@@ -30,6 +30,7 @@ import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForLoggedInUser
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForNonLoggedInUser
+import com.example.hakonsreader.views.Tag
 import com.example.hakonsreader.views.util.ViewUtil
 
 /**
@@ -623,37 +624,6 @@ private fun formatAuthorInternal(tv: TextView, comment: RedditComment, italic: B
         comment.isByPoster -> R.color.opposite_background
         else -> R.color.link_color
     }))
-}
-
-/**
- * Adds the authors flair to the comment. If the author has no flair the view is set to [View.GONE]
- *
- * @param view The view that holds the author flair
- * @param comment The comment
- */
-@BindingAdapter("authorFlair")
-fun addAuthorFlair(view: FrameLayout, comment: RedditComment?) {
-    if (comment == null) {
-        return
-    }
-    val tag = ViewUtil.createFlair(
-            comment.authorRichtextFlairs,
-            comment.authorFlairText,
-            comment.authorFlairTextColor,
-            comment.authorFlairBackgroundColor,
-            view.context
-    )
-
-    view.visibility = if (tag != null) {
-        // The view might still have old views
-        view.removeAllViews()
-        view.addView(tag)
-
-        View.VISIBLE
-    } else {
-        // No author flair, remove the view so it doesn't take up space
-       View.GONE
-    }
 }
 
 /**

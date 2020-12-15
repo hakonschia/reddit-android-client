@@ -4,15 +4,17 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Space;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.model.RedditComment;
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.views.Tag;
@@ -116,7 +118,7 @@ public class ViewUtil {
         Resources resources = context.getResources();
 
         Tag tag = new Tag(context);
-        tag.setFillColor(ContextCompat.getColor(context, R.color.tagSpoiler));
+        tag.setFillColor(ContextCompat.getColor(context, R.color.tagSpoilerFill));
         tag.setTextColor(ContextCompat.getColor(context, R.color.tagSpoilerText));
         tag.addText(resources.getString(R.string.tagSpoiler));
 
@@ -133,7 +135,7 @@ public class ViewUtil {
         Resources resources = context.getResources();
 
         Tag tag = new Tag(context);
-        tag.setFillColor(ContextCompat.getColor(context, R.color.tagNSFW));
+        tag.setFillColor(ContextCompat.getColor(context, R.color.tagNSFWFill));
         tag.setTextColor(ContextCompat.getColor(context, R.color.tagNSFWText));
         tag.addText(resources.getString(R.string.tagNSFW));
 
@@ -142,17 +144,107 @@ public class ViewUtil {
 
 
     /**
-     * Creates a flair for a post or comment
+     * Adds the authors flair to the comment. If the author has no flair the view is set to [View.GONE]
+     *
+     * @param tag The tag to set the flair on
+     * @param comment The comment
      */
-    public static Tag createFlair(List<RichtextFlair> flairs, String flairText, String flairColor, String backgroundColor, Context context) {
-        // No richtext flair items, and no standard flair text, return as there won't be anything to add
-        if ((flairs == null || flairs.isEmpty()) && (flairText == null || flairText.isEmpty())) {
-            return null;
+    @BindingAdapter("authorFlair")
+    public static void setAuthorFlair(Tag tag, RedditComment comment) {
+        if (comment == null) {
+            return;
         }
 
-        Tag tag = new Tag(context);
+        boolean tagAdded = ViewUtil.setFlair(
+                tag,
+                comment.getAuthorRichtextFlairs(),
+                comment.getAuthorFlairText(),
+                comment.getAuthorFlairTextColor(),
+                comment.getAuthorFlairBackgroundColor()
+        );
 
-        if (flairColor.equals("dark")) {
+        if (tagAdded) {
+            tag.setVisibility(View.VISIBLE);
+        } else {
+            tag.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Adds the authors flair to the comment. If the author has no flair the view is set to [View.GONE]
+     *
+     * @param tag The tag to set the flair on
+     * @param post The post
+     */
+    @BindingAdapter("authorFlair")
+    public static void setAuthorFlair(Tag tag, RedditPost post) {
+        if (post == null) {
+            return;
+        }
+
+        boolean tagAdded = ViewUtil.setFlair(
+                tag,
+                post.getAuthorRichtextFlairs(),
+                post.getAuthorFlairText(),
+                post.getAuthorFlairTextColor(),
+                post.getAuthorFlairBackgroundColor()
+        );
+
+        if (tagAdded) {
+            tag.setVisibility(View.VISIBLE);
+        } else {
+            tag.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Adds the authors flair to the comment. If the author has no flair the view is set to [View.GONE]
+     *
+     * @param tag The tag to set the flair on
+     * @param post The post
+     */
+    @BindingAdapter("linkFlair")
+    public static void setLinkFlair(Tag tag, RedditPost post) {
+        if (post == null) {
+            return;
+        }
+
+        boolean tagAdded = ViewUtil.setFlair(
+                tag,
+                post.getLinkRichtextFlairs(),
+                post.getLinkFlairText(),
+                post.getLinkFlairTextColor(),
+                post.getLinkFlairBackgroundColor()
+        );
+
+        if (tagAdded) {
+            tag.setVisibility(View.VISIBLE);
+        } else {
+            tag.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Sets the flairs from a Reddit post or comment on a Tag
+     *
+     * @param tag The tag to set the text on
+     * @param flairs The list of richtext flairs
+     * @param flairText The text for the flair
+     * @param textColor The text color for the flair (can be Reddit specific "dark" or "light")
+     * @param backgroundColor The flair background color
+     * @return True if the tag had something added to it, false otherwise
+     */
+    public static boolean setFlair(@NonNull Tag tag, List<RichtextFlair> flairs, String flairText, String textColor, String backgroundColor) {
+        // No richtext flair items, and no standard flair text, return as there won't be anything to add
+        if ((flairs == null || flairs.isEmpty()) && (flairText == null || flairText.isEmpty())) {
+            return false;
+        }
+
+        tag.clear();
+
+        Context context = tag.getContext();
+
+        if (textColor.equals("dark")) {
             tag.setTextColor(ContextCompat.getColor(context, R.color.flairTextDark));
             tag.setFillColor(ContextCompat.getColor(context, R.color.flairBackgroundDark));
         } else {
@@ -180,22 +272,6 @@ public class ViewUtil {
             });
         }
 
-        return tag;
+        return true;
     }
-
-
-    /**
-     * Adds a tag to a ViewGroup, with extra space after it
-     *
-     * @param layout The layout to add the tag to
-     * @param tag The tag to add
-     */
-    public static void addTagWithSpace(ViewGroup layout, Tag tag) {
-        layout.addView(tag);
-
-        Space space = new Space(layout.getContext());
-        space.setMinimumWidth((int)layout.getResources().getDimension(R.dimen.tagSpace));
-        layout.addView(space);
-    }
-
 }
