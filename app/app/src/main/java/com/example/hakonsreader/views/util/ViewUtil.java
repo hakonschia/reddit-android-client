@@ -107,42 +107,6 @@ public class ViewUtil {
         }
     }
 
-
-    /**
-     * Creates a spoiler tag
-     *
-     * @param context The context for the tag
-     * @return A {@link Tag} with spoiler text and formatting
-     */
-    public static Tag createSpoilerTag(Context context) {
-        Resources resources = context.getResources();
-
-        Tag tag = new Tag(context);
-        tag.setFillColor(ContextCompat.getColor(context, R.color.tagSpoilerFill));
-        tag.setTextColor(ContextCompat.getColor(context, R.color.tagSpoilerText));
-        tag.addText(resources.getString(R.string.tagSpoiler));
-
-        return tag;
-    }
-
-    /**
-     * Creates a NSFW tag
-     *
-     * @param context The context for the tag
-     * @return A {@link Tag} with NSFW text and formatting
-     */
-    public static Tag createNsfwTag(Context context) {
-        Resources resources = context.getResources();
-
-        Tag tag = new Tag(context);
-        tag.setFillColor(ContextCompat.getColor(context, R.color.tagNSFWFill));
-        tag.setTextColor(ContextCompat.getColor(context, R.color.tagNSFWText));
-        tag.addText(resources.getString(R.string.tagNSFW));
-
-        return tag;
-    }
-
-
     /**
      * Adds the authors flair to the comment. If the author has no flair the view is set to [View.GONE]
      *

@@ -196,7 +196,7 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
             View.GONE
         }
 
-        holder.binding.nsfwTagLayout.visibility = if (sub.isNsfw) {
+        holder.binding.nsfwTag.visibility = if (sub.isNsfw) {
             View.VISIBLE
         } else {
             View.GONE
@@ -209,9 +209,6 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
                 parent,
                 false
         )
-
-        // Kind of bad way to do it? But add when created and set visibility in onBind
-        binding.nsfwTagLayout.addView(ViewUtil.createNsfwTag(binding.nsfwTagLayout.context))
 
         return ViewHolder(binding)
     }

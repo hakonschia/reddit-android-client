@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,7 +8,6 @@
     android:layout_marginBottom="8dp"
     android:background="?android:selectableItemBackground">
 
-    <!-- TODO add a nsfw tag for 18+ subs -->
     <!-- This image goes a bit above the text, since the TextView height will differ
       a bit depending on which characters are in the view. We can offset a little bit
       manually (and use includeFontPadding=false), but it's not a perfect solution as it will look a bit off depending
@@ -20,7 +20,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.050000012"
+        app:layout_constraintVertical_bias="0.0"
         tools:src="@drawable/ic_baseline_emoji_emotions_200" />
 
     <TextView
@@ -28,7 +28,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
         android:ellipsize="end"
 
         android:includeFontPadding="false"
@@ -38,29 +37,28 @@
         android:textStyle="bold"
 
         app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toStartOf="@+id/nsfwTagLayout"
+        app:layout_constraintEnd_toStartOf="@+id/nsfwTag"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/icon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="GlobalOffensiveReallyLongSubredditName" />
 
-    <FrameLayout
-        android:id="@+id/nsfwTagLayout"
+    <com.example.hakonsreader.views.Tag
+        android:id="@id/nsfwTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
+        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-
-        android:visibility="gone"
-
+        app:fillColor="@color/tagNSFWFill"
         app:layout_constraintBottom_toBottomOf="@+id/name"
         app:layout_constraintEnd_toStartOf="@+id/favoriteSub"
+
         app:layout_constraintStart_toEndOf="@id/name"
         app:layout_constraintTop_toTopOf="@+id/name"
-        tools:layout_height="15dp"
-        tools:layout_width="35dp"
-        tools:visibility="visible" />
+        app:text="@string/tagNSFW"
+        app:textColor="@color/tagNSFWText" />
 
     <ImageButton
         android:id="@+id/favoriteSub"
