@@ -447,7 +447,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
                 if (viewHolder != null) {
                     val extras = viewHolder.extras
-                    saveBundle.putBundle(VIEW_STATE_STORED_KEY + i, extras)
+                    saveBundle.putBundle(saveKey(VIEW_STATE_STORED_KEY + i), extras)
                     viewHolder.onUnselected()
                 }
             }
