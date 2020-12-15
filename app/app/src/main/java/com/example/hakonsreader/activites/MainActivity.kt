@@ -443,11 +443,22 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
     /**
      * Attaches a listener to [getSupportFragmentManager] that stores fragments when detached
      * and saves it to [lastShownFragment]
+     *
+     * In addition, if the fragment detached was [activeSubreddit], its state is saved with [SubredditFragment.saveState]
+     * to [savedState]
      */
     private fun attachFragmentChangeListener() {
         supportFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
             override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
                 super.onFragmentDetached(fm, f)
+
+                // The active subreddit doesn't have a chance to save its state, so it would be reloaded
+                // when detached
+                if (f == activeSubreddit) {
+                    f as SubredditFragment
+                    f.saveState(savedState)
+                }
+
                 // InboxGroupFragment is an "inner" fragment and not one we want to store directly
                 if (f !is InboxGroupFragment) {
                     lastShownFragment = f
@@ -506,8 +517,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         if (activeSubreddit == null) {
             val activeSubredditName = restoredState.getString(ACTIVE_SUBREDDIT_NAME)
             if (activeSubredditName != null) {
-                // The state of the fragment itself is restored when it is accessed again
                 activeSubreddit = SubredditFragment.newInstance(activeSubredditName)
+                activeSubreddit?.restoreState(savedState)
             }
         }
 

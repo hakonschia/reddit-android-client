@@ -161,10 +161,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         super.onResume()
 
         // If the fragment is selected without any posts load posts automatically
-        // Check both the adapter and the postIds, as the postIds might have been set in onCreateView
-        // while the adapter might not have gotten the update yet from the ViewModel
-        if (postsAdapter?.itemCount == 0 && postIds.isEmpty()) {
-            postsViewModel?.loadPosts()
+        if (postsAdapter?.itemCount == 0) {
+            // Starting from scratch
+            if (postIds.isEmpty()) {
+                postsViewModel?.loadPosts()
+            } else {
+                // Post IDs restored, set those
+                postsViewModel?.postIds = postIds
+            }
         }
 
         restoreViewHolderStates()
@@ -223,15 +227,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * Saves the state of the fragment to a bundle. Restore the state with [restoreState]
      *
      * @param saveState The bundle to store the state to
-     *
      * @see restoreState
      */
     fun saveState(saveState: Bundle) {
-        // If no items in the list it's no point in saving any state (as it would potentially cause issues)
-        if (postsAdapter?.itemCount == 0) {
+        // If no items in the list it's no point in saving any state
+        if (postIds.isEmpty()) {
             return
         }
-        postsViewModel?.let { saveState.putStringArrayList(saveKey(POST_IDS_KEY), it.postIds as java.util.ArrayList<String>) }
+        saveState.putStringArrayList(saveKey(POST_IDS_KEY), postIds)
         postsLayoutManager?.let { saveState.putParcelable(saveKey(LAYOUT_STATE_KEY), it.onSaveInstanceState()) }
     }
 
@@ -240,12 +243,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * way that doesn't permit the fragment to store its own state
      *
      * @param state The bundle holding the stored state
-     *
      * @see saveState
      */
     fun restoreState(state: Bundle?) {
         // Might be asking for trouble by doing overriding saveState like this? This function
         // is meant to only be called when there is no saved state by the fragment
+        postIds = state?.getStringArrayList(saveKey(POST_IDS_KEY)) ?: ArrayList()
         saveState = state
     }
 
@@ -391,6 +394,9 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         )).get(PostsViewModel::class.java)
 
         postsViewModel?.getPosts()?.observe(viewLifecycleOwner, { posts ->
+            // Store the updated post IDs right away
+            postIds = postsViewModel?.postIds as ArrayList<String>
+
             // Posts have been cleared, clear the adapter and clear the layout manager state
             if (posts.isEmpty()) {
                 postsAdapter?.clearPosts()
