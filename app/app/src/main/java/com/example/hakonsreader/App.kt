@@ -584,9 +584,12 @@ class App : Application() {
      */
     fun addSubredditToPostFilters(subreddit: String) {
         var previous = settings.getString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), "")
-        previous += """
-             $subreddit
-             """.trimIndent()
+        // Only add newline before if necessary
+        if (previous!!.isNotBlank() && previous.takeLast(1) != "\n") {
+            previous += "\n"
+        }
+        previous += "$subreddit\n"
+
         settings.edit().putString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), previous).apply()
     }
 
@@ -628,8 +631,7 @@ class App : Application() {
      *
      * @return The update frequency in minutes, if this is -1 then the automatic updates are disabled
      */
-    fun
-inboxUpdateFrequency() : Int {
+    fun inboxUpdateFrequency() : Int {
         val updateFrequencySetting = settings.getString(
                 getString(R.string.prefs_key_inbox_update_frequency),
                 getString(R.string.prefs_default_inbox_update_frequency)
