@@ -70,4 +70,6 @@
     <dimen name="buttonPadding">6dp</dimen>
 
     <integer name="submissionTitleMaxLength">300</integer>
+
+    <dimen name="linkPreviewTopMargin">4dp</dimen>
 </resources>

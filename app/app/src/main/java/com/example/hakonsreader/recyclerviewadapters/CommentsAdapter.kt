@@ -2,18 +2,21 @@ package com.example.hakonsreader.recyclerviewadapters
 
 import android.graphics.Typeface
 import android.os.Parcelable
+import android.text.Spannable
+import android.text.style.URLSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.constraintlayout.solver.state.State
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Constraints
 import androidx.core.content.ContextCompat
+import androidx.core.text.toSpannable
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -30,8 +33,7 @@ import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForLoggedInUser
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForNonLoggedInUser
-import com.example.hakonsreader.views.Tag
-import com.example.hakonsreader.views.util.ViewUtil
+import com.example.hakonsreader.views.LinkPreview
 
 /**
  * Adapter for a RecyclerView populated with [RedditComment] objects. This adapter
@@ -42,6 +44,8 @@ import com.example.hakonsreader.views.util.ViewUtil
  */
 class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
+        private const val TAG = "CommentsAdapter"
+
         /**
          * The value returned from [getItemViewType] when the comment is
          * a "more comments" comment
@@ -518,6 +522,14 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
      */
     inner class NormalCommentViewHolder(private val binding: ListItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {
         /**
+         * The list of link previews that have been shown in this ViewHolder. The link previews that
+         * previously been created are not removed, but have their visibility set to GONE so that they
+         * can be recycled later. When adding previews, the views found in this list should be updated
+         * to reflect the new link it shows and set to VISIBLE again, or create new ones if needed
+         */
+        private val linkPreviews = ArrayList<LinkPreview>()
+
+        /**
          * Binds the ViewHolder to a comment
          *
          * @param comment The comment to bind
@@ -536,7 +548,116 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
 
             // Execute all the bindings now, or else scrolling/changes to the dataset will have a
             // small, but noticeable delay, causing the old comment to still appear
+            // This needs to be called before the link previews are added, since the previews use
+            // the spans set with Markwon, and it might not be set before the bindings are executed
             binding.executePendingBindings()
+
+            // TODO this should be a setting
+            val showLinkPreviews = true
+            if (showLinkPreviews) {
+                showLinkPreviews()
+            }
+            binding.executePendingBindings()
+        }
+
+        /**
+         * Shows link previews for the comment
+         */
+        private fun showLinkPreviews() {
+            val text = binding.commentContent.text.toSpannable()
+            val urls = text.getSpans(0, text.length, URLSpan::class.java)
+
+            if (urls.isNotEmpty()) {
+                setLinkPreviews(text, urls)
+            } else {
+                // No URLs in the text, remove all previews link previews
+                linkPreviews.forEach {
+                    it.visibility = GONE
+                }
+            }
+        }
+
+        /**
+         * Sets the link previews for the comment
+         *
+         * @param fullText The spannable holding the entire text
+         * @param spans The array of URLSpans to show previews for
+         */
+        private fun setLinkPreviews(fullText: Spannable, spans: Array<URLSpan>) {
+            spans.forEachIndexed { index, span ->
+                val start = fullText.getSpanStart(span)
+                val end = fullText.getSpanEnd(span)
+                val text = fullText.substring(start, end)
+                val url = span.url
+
+                // TODO this should be a setting
+                // If the text and the url is the same it's no point in showing a preview
+                if (text == url) {
+                    return@forEachIndexed
+                }
+
+                // It's not like every comment will have links, so it might make more sense to just
+                // create new ones every time? Not sure if it's better to create new ones, or keep the old ones
+                // in memory all the time in case a new link comes. Probably doesn't make that much of a difference
+                val linkPreview = if (linkPreviews.size > index) {
+                    // Reuse link preview
+                    linkPreviews[index]
+                } else {
+                    // Create new link preview
+                    val preview = createLinkPreview()
+                    linkPreviews.add(preview)
+                    preview
+                }
+
+                linkPreview.visibility = VISIBLE
+                linkPreview.setText(text)
+                linkPreview.setLink(url)
+            }
+
+            // Remove visibility of the overflows
+            (spans.size until linkPreviews.size).forEach {
+                linkPreviews[it].visibility = GONE
+            }
+        }
+
+        /**
+         * Creates a new [LinkPreview] and constrains is correctly depending on previous link preview views
+         *
+         * @return A [LinkPreview] set with appropriate constraints
+         */
+        private fun createLinkPreview() : LinkPreview {
+            val id = View.generateViewId()
+            val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            val preview = LinkPreview(binding.root.context)
+            preview.id = id
+            preview.layoutParams = params
+
+            val topMargin = binding.parentLayout.resources.getDimension(R.dimen.linkPreviewTopMargin).toInt()
+            binding.parentLayout.addView(preview)
+
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(binding.parentLayout)
+
+            if (linkPreviews.isEmpty()) {
+                // top_toBottomOf=popupMenu
+                constraintSet.connect(id, ConstraintSet.TOP, binding.popupMenu.id, ConstraintSet.BOTTOM)
+            } else {
+                // top_toBottomOf=<last link preview>
+                constraintSet.connect(id, ConstraintSet.TOP, linkPreviews.last().id, ConstraintSet.BOTTOM, topMargin)
+            }
+            // start_toEndOf=<barrier>
+            constraintSet.connect(id, ConstraintSet.START, binding.sideBarsBarrier.id, ConstraintSet.END)
+            // end_toEndOf=parent
+            constraintSet.connect(id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+
+            constraintSet.constrainedWidth(id, true)
+
+            // Align to the start of the parent
+            constraintSet.setHorizontalBias(id, 0f)
+
+            constraintSet.applyTo(binding.parentLayout)
+
+            return preview
         }
     }
 
