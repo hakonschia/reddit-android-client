@@ -1,12 +1,19 @@
 package com.example.hakonsreader.views
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.example.hakonsreader.App
+import com.example.hakonsreader.R
+import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.databinding.LinkPreviewBinding
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * Class for displaying the preview of a link
@@ -59,21 +66,33 @@ class LinkPreview : FrameLayout {
         binding.linkLink.text = link
     }
 
+
+    /**
+     * Opens the link
+     */
     private fun openLink() {
         val link = binding.linkLink.text.toString()
 
         if (link.isNotEmpty()) {
             // Open link
-            Log.d(TAG, "openLink: opening $link")
+            val intent = Intent(context, DispatcherActivity::class.java)
+            intent.putExtra(DispatcherActivity.URL_KEY, link)
+            context.startActivity(intent)
         }
     }
 
+    /**
+     * Copies the link to the clipboard
+     */
     private fun copyLink() {
         val link = binding.linkLink.text.toString()
 
         if (link.isNotEmpty()) {
-            // Open link
-            Log.d(TAG, "copyLink: copying $link")
+            // At what point do I make a function in a util class for this?
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Comment url", link)
+            clipboard.setPrimaryClip(clip)
+            Snackbar.make(binding.root, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
         }
     }
 }
