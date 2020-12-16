@@ -26,10 +26,7 @@ class WebViewActivity : AppCompatActivity() {
         const val URL = "url"
     }
 
-
-    private var _binding: ActivityWebViewBinding? = null
-    private val binding get() = _binding!!
-
+    private lateinit var binding: ActivityWebViewBinding
 
     // If we want to show/hide the toolbar on scrolling, we need to nest the WebView in a scrolling
     // container (NestedScrollView), but that disables zooming
@@ -39,9 +36,9 @@ class WebViewActivity : AppCompatActivity() {
     @SuppressLint("setJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _binding = ActivityWebViewBinding.inflate(layoutInflater)
+        binding = ActivityWebViewBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        setContentView(binding?.root)
         val url = intent.extras?.getString(URL)
         if (url == null) {
             finish()
@@ -115,11 +112,6 @@ class WebViewActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     /**

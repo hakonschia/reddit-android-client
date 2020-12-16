@@ -76,8 +76,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
         const val REQUEST_REPLY = 1
     }
 
-    private var _binding: ActivityPostBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: ActivityPostBinding
     private lateinit var slidrInterface: SlidrInterface
 
     private var commentsViewModel: CommentsViewModel? = null
@@ -143,7 +142,6 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
 
         // Ensure resources are freed when the activity exits
         binding.post.cleanUpContent()
-        _binding = null
     }
 
     /**
@@ -163,7 +161,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      * Sets up [binding]
      */
     private fun setupBinding() {
-        _binding = ActivityPostBinding.inflate(layoutInflater)
+        binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // This is kinda hacky, but it looks weird if the "No comments yet" appears before the comments

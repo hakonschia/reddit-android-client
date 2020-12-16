@@ -68,8 +68,7 @@ class ReplyActivity : AppCompatActivity() {
     }
 
 
-    private var _binding: ActivityReplyBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: ActivityReplyBinding
     private val api = App.get().api
 
     /**
@@ -86,7 +85,7 @@ class ReplyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _binding = ActivityReplyBinding.inflate(layoutInflater)
+        binding = ActivityReplyBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.showPreview.setOnClickListener { binding.markdownInput.showPreviewInPopupDialog() }
 
@@ -114,7 +113,7 @@ class ReplyActivity : AppCompatActivity() {
 
         outState.putString(REPLY_TEXT, binding?.markdownInput?.inputText)
 
-        if (binding.markdownInput.isLinkDialogShown == true) {
+        if (binding.markdownInput.isLinkDialogShown) {
             outState.putBoolean(LINK_DIALOG_SHOWN, true)
 
             outState.putString(LINK_DIALOG_TEXT, binding.markdownInput.linkDialogText)
@@ -128,11 +127,6 @@ class ReplyActivity : AppCompatActivity() {
             outState.putBoolean(CONFIRM_DIALOG_SHOWN, true)
             confirmDiscardDialog?.dismiss()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     /**
