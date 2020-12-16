@@ -46,5 +46,6 @@ public abstract class RedditDatabase extends RoomDatabase {
     public void clearUserState() {
         posts().clearUserState();
         subreddits().clearUserState();
+        messages().deleteAll();
     }
 }
