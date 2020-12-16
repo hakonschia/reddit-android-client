@@ -646,6 +646,29 @@ class App : Application() {
         }
     }
 
+    /**
+     * Returns if the user wants to show a preview of links in comments
+     *
+     * @see showEntireLinkInLinkPreview
+     */
+    fun showLinkPreview() : Boolean {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_comment_show_link_preview),
+                resources.getBoolean(R.bool.prefs_default_comment_show_link_preview)
+        )
+    }
+
+    /**
+     * Returns if
+     *
+     * @see showLinkPreview
+     */
+    fun showEntireLinkInLinkPreview() : Boolean {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_comment_link_preview_show_entire_link),
+                resources.getBoolean(R.bool.prefs_default_comment_link_preview_show_entire_link)
+        )
+    }
 
 
     /**

@@ -552,9 +552,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             // the spans set with Markwon, and it might not be set before the bindings are executed
             binding.executePendingBindings()
 
-            // TODO this should be a setting
-            val showLinkPreviews = true
-            if (showLinkPreviews) {
+            if (App.get().showLinkPreview()) {
                 showLinkPreviews()
             }
             binding.executePendingBindings()

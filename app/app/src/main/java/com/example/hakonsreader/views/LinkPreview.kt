@@ -5,20 +5,25 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import com.example.hakonsreader.App
 import com.example.hakonsreader.databinding.LinkPreviewBinding
 
+/**
+ * Class for displaying the preview of a link
+ *
+ * This shows a text (the hyperlink text of the link) and a link together to show what a link
+ * links to
+ */
 class LinkPreview : FrameLayout {
     companion object {
         private const val TAG = "LinkPreview"
     }
 
-    // TODO create a setting for "Display entire link in link preview", if this is false the link should have maxLines=2 or something
     private val binding: LinkPreviewBinding = LinkPreviewBinding.inflate(LayoutInflater.from(context), this, true).also {
         setOnClickListener { openLink() }
         setOnLongClickListener { copyLink(); return@setOnLongClickListener true }
 
-        val showEntireLink = false
-        if (!showEntireLink) {
+        if (!App.get().showEntireLinkInLinkPreview()) {
             it.linkLink.maxLines = 2
         }
     }

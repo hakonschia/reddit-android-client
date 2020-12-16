@@ -106,6 +106,8 @@
     <string name="prefs_title_inbox_update_frequency_15_min">15 minutes</string>
     <string name="prefs_title_inbox_update_frequency_30_min">30 minutes</string>
     <string name="prefs_title_inbox_update_frequency_60_min">60 minutes</string>
+    <string name="prefs_title_comment_show_link_preview">Show link previews in comments</string>
+    <string name="prefs_title_comment_link_preview_show_entire_link">Show entire link in link previews</string>
 
 
     <!-- Preferences keys -->
@@ -149,6 +151,8 @@
     <string name="prefs_key_inbox_update_frequency_15_min" translatable="false">inbox_update_15_minutes</string>
     <string name="prefs_key_inbox_update_frequency_30_min" translatable="false">inbox_update_30_minutes</string>
     <string name="prefs_key_inbox_update_frequency_60_min" translatable="false">inbox_update_60_minutes</string>
+    <string name="prefs_key_comment_show_link_preview" translatable="false">comment_show_link_preview</string>
+    <string name="prefs_key_comment_link_preview_show_entire_link" translatable="false">comment_link_preview_show_entire_link</string>
 
 
     <plurals name="filteredSubredditsSummary">

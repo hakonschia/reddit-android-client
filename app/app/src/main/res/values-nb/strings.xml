@@ -269,4 +269,5 @@
     <string name="prefs_title_inbox_show_badge">Vis ikon i navbar</string>
     <string name="userInfoFailedToGet">Kunne ikke hente inn bruker informasjon</string>
     <string name="userInfoFailedToGetTryAgain">Prøv igjen</string>
+    <string name="prefs_title_comment_show_link_preview">Vis forhåndsvisning av lenker i kommentarer</string>
 </resources>
