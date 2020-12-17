@@ -163,6 +163,13 @@
             app:singleLineTitle="false"
             app:iconSpaceReserved="false"/>
 
+        <SwitchPreference
+            app:key="@string/prefs_key_comment_link_preview_show_identical_links"
+            app:title="@string/prefs_title_comment_link_preview_show_identical_links"
+            app:dependency="@string/prefs_key_comment_show_link_preview"
+            app:singleLineTitle="false"
+            app:iconSpaceReserved="false" />
+
         <SeekBarPreference
             app:key="@string/prefs_key_comment_smooth_scroll_threshold"
             android:title="@string/prefs_title_comment_smooth_scroll_threshold"

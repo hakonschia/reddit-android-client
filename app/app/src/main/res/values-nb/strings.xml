@@ -270,4 +270,6 @@
     <string name="userInfoFailedToGet">Kunne ikke hente inn bruker informasjon</string>
     <string name="userInfoFailedToGetTryAgain">Prøv igjen</string>
     <string name="prefs_title_comment_show_link_preview">Vis forhåndsvisning av lenker i kommentarer</string>
+    <string name="prefs_title_comment_link_preview_show_entire_link">Vis hele lenken i forhåndsvisning</string>
+    <string name="prefs_title_comment_link_preview_show_identical_links">Vis forhåndsvisning for lenker med identisk tekst</string>
 </resources>

@@ -659,7 +659,8 @@ class App : Application() {
     }
 
     /**
-     * Returns if
+     * Returns if the entire link should be shown in link previews, or if it should cut off
+     * to save layout space
      *
      * @see showLinkPreview
      */
@@ -667,6 +668,21 @@ class App : Application() {
         return settings.getBoolean(
                 getString(R.string.prefs_key_comment_link_preview_show_entire_link),
                 resources.getBoolean(R.bool.prefs_default_comment_link_preview_show_entire_link)
+        )
+    }
+
+    /**
+     * Returns if links with identical text should show a preview for the link
+     *
+     * Eg. if this returns false, a hyperlink with text "https://reddit.com" and link "https://reddit.com"
+     * should not display a preview
+     *
+     * @see showLinkPreview
+     */
+    fun showLinkPreviewForIdenticalLinks() : Boolean {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_comment_link_preview_show_identical_links),
+                resources.getBoolean(R.bool.prefs_default_comment_link_preview_show_identical_links)
         )
     }
 

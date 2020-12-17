@@ -582,8 +582,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
          * @param spans The array of URLSpans to show previews for
          */
         private fun setLinkPreviews(fullText: Spannable, spans: Array<URLSpan>) {
-            // TODO this should be a setting
-            val showPreviewForIdenticalLinks = false
+            val showPreviewForIdenticalLinks = App.get().showLinkPreviewForIdenticalLinks()
 
             spans.forEach { span ->
                 val start = fullText.getSpanStart(span)
@@ -592,7 +591,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
                 val url = span.url
 
                 // If the text and the url is the same it's no point in showing a preview
-                if (!showPreviewForIdenticalLinks) {
+                if (text == url && !showPreviewForIdenticalLinks) {
                     return@forEach
                 }
 
