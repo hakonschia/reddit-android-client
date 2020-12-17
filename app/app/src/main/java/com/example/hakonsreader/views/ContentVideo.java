@@ -54,22 +54,12 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The view for video posts. This can only be used to display videos from certain domains. The list of known
- * domains is found with {@link ContentVideo#KNOWN_VIDEO_DOMAINS}
+ * View for playing video posts from Reddit. Use {@link #isRedditPostVideoPlayable(RedditPost)} to
+ * check if the post can be displayed with this view
  */
 public class ContentVideo extends Content {
     private static final String TAG = "PostContentVideo";
 
-    /**
-     * A list of domains that we know how to play videos for. Videos in this list can be used with
-     * {@link ContentVideo}, otherwise they should be provided as a {@link ContentLink} as they might
-     * (and probably wont) load. The domains in this list match the return from {@link RedditPost#getDomain()}
-     * and are lowercased
-     */
-    // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
-    private static final List<String> KNOWN_VIDEO_DOMAINS = Collections.unmodifiableList(Arrays.asList(
-            "v.redd.it", "i.redd.it", "redgifs.com", "gfycat.com", "i.imgur.com", "giphy.com", "media1.giphy.com", "media2.giphy.com"
-    ));
 
     /**
      * The key used for extra information about the timestamp of the video
@@ -734,10 +724,7 @@ public class ContentVideo extends Content {
      * @return True if the post can be played as a video, false otherwise
      */
     public static boolean isRedditPostVideoPlayable(@NonNull RedditPost post) {
-        // TODO imgur .gifv links aren't recognized
-        //  https://www.reddit.com/r/gifs/comments/k8wqgb/how_to_test_positive_the_sequel/
-        // Needs to be a known domain, and one of the video formats must not be null
-       return KNOWN_VIDEO_DOMAINS.contains(post.getDomain().toLowerCase())
-                && (post.getVideo() != null || post.getVideoGif() != null || post.getMp4Source() != null);
+        // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
+        return post.getVideo() != null || post.getVideoGif() != null || post.getMp4Source() != null;
     }
 }
