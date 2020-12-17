@@ -569,6 +569,8 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             // each comment usually won't have more than a few links, I'll take that minor performance
             // hit for a lot cleaner code (setting constraints via code is kind of messy)
             if (urls.isNotEmpty()) {
+                // The spans seems to always be in reversed order, so reverse them to the original order
+                urls.reverse()
                 setLinkPreviews(text, urls)
             } else {
                 binding.linkPreviews.removeAllViews()
