@@ -41,7 +41,6 @@
         android:background="@{highlight ? @color/commentHighlightBackground : @color/background}"
 
         android:onLongClick="@{view -> adapter.hideCommentsLongClick(view, comment)}"
-        android:padding="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
         android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}">
 
         <!-- The barrier for the side bars. The sidebars are referenced by the barrier, and everything else is
@@ -68,33 +67,35 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
 
-            app:layout_constraintStart_toEndOf="@id/sideBarsBarrier"
-            app:layout_constraintTop_toTopOf="parent"
+            android:background="@{comment.locked ? @drawable/comment_locked : null}"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-
-            android:background="@{comment.locked ? @drawable/comment_locked : null}" />
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/sideBarsBarrier"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
         <TextView
             android:id="@+id/commentAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, comment.author)}"
             android:onLongClick="@{view -> adapter.hideCommentsLongClick(view, comment)}"
-
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-
             android:text='@{comment != null ? @string/author_prefixed(comment.author) : "" }'
-            app:authorTextColorComment="@{comment}"
 
+            app:authorTextColorComment="@{comment}"
             app:layout_constraintBottom_toBottomOf="parent"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/sideBarsBarrier"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
+            app:marginStart="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
 
+            app:marginTop="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
             tools:text="u/hakonschia" />
 
         <ImageView
@@ -136,15 +137,15 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
 
-            android:textColor="@color/secondary_text_color"
-            app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"
-
             android:maxLines="1"
+            android:textColor="@color/secondary_text_color"
+
+            app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toStartOf="@+id/stickied"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/authorFlair"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/commentAuthor"
 
             tools:text="2h" />
 
@@ -156,7 +157,7 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
 
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="4dp"
             android:src="@drawable/ic_stickied"
 
             android:visibility="@{comment.stickied ? View.VISIBLE : View.GONE, default=gone}"
@@ -170,12 +171,13 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
 
+            app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
             android:src="@drawable/ic_baseline_lock_24"
-
             android:visibility="@{comment.locked ? View.VISIBLE : View.GONE, default=gone}"
-            app:layout_constraintEnd_toEndOf="parent"
 
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/commentAuthor"
+
             tools:visibility="visible" />
 
         <TextView
@@ -195,7 +197,7 @@
             app:layout_constraintStart_toStartOf="@+id/commentAuthor"
             app:layout_constraintTop_toBottomOf="@+id/commentAuthor"
 
-            tools:text="@tools:sample/lorem" />
+            tools:text="@tools:sample/lorem[50]" />
 
         <ImageButton
             android:id="@+id/popupMenu"
@@ -231,10 +233,31 @@
             app:layout_constraintEnd_toStartOf="@+id/commentVoteBar"
             app:layout_constraintTop_toBottomOf="@+id/commentContent" />
 
+        <LinearLayout
+            android:id="@+id/linkPreviews"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+            app:marginBottom="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
+            app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
+
+            android:showDividers="middle"
+            android:divider="@drawable/empty_divider"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/commentAuthor"
+            app:layout_constraintTop_toBottomOf="@id/popupMenu"
+            app:layout_constraintVertical_bias="0.0"
+
+            tools:layout_height="50dp" />
+
         <com.example.hakonsreader.views.VoteBar
             android:id="@+id/commentVoteBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/reply" />

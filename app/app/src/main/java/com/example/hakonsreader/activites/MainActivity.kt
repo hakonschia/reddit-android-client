@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
         intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/hakonschia/comments/jtyz0e/cool_image/")
-        //startActivity(intent)
+        startActivity(intent)
 
         if (savedInstanceState != null) {
             savedState = savedInstanceState

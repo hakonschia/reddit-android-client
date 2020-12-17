@@ -4,7 +4,6 @@ import android.graphics.Typeface
 import android.os.Parcelable
 import android.text.Spannable
 import android.text.style.URLSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -14,9 +13,9 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.constraintlayout.widget.Constraints
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
+import androidx.core.view.children
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -549,13 +548,13 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             // Execute all the bindings now, or else scrolling/changes to the dataset will have a
             // small, but noticeable delay, causing the old comment to still appear
             // This needs to be called before the link previews are added, since the previews use
-            // the spans set with Markwon, and it might not be set before the bindings are executed
+            // the spans set with Markwon, and it might not (and probably wont) be set before the previews are added
             binding.executePendingBindings()
 
             if (App.get().showLinkPreview()) {
                 showLinkPreviews()
+                binding.executePendingBindings()
             }
-            binding.executePendingBindings()
         }
 
         /**
@@ -565,13 +564,14 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             val text = binding.commentContent.text.toSpannable()
             val urls = text.getSpans(0, text.length, URLSpan::class.java)
 
+            // By using a LinearLayout for loading the link previews we will lose some performance
+            // because of nested layouts, but considering that links are relatively rare, and that
+            // each comment usually won't have more than a few links, I'll take that minor performance
+            // hit for a lot cleaner code (setting constraints via code is kind of messy)
             if (urls.isNotEmpty()) {
                 setLinkPreviews(text, urls)
             } else {
-                // No URLs in the text, remove all previews link previews
-                linkPreviews.forEach {
-                    it.visibility = GONE
-                }
+                binding.linkPreviews.removeAllViews()
             }
         }
 
@@ -582,80 +582,28 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
          * @param spans The array of URLSpans to show previews for
          */
         private fun setLinkPreviews(fullText: Spannable, spans: Array<URLSpan>) {
-            spans.forEachIndexed { index, span ->
+            // TODO this should be a setting
+            val showPreviewForIdenticalLinks = false
+
+            spans.forEach { span ->
                 val start = fullText.getSpanStart(span)
                 val end = fullText.getSpanEnd(span)
                 val text = fullText.substring(start, end)
                 val url = span.url
 
-                // TODO this should be a setting
                 // If the text and the url is the same it's no point in showing a preview
-                if (text == url) {
-                    return@forEachIndexed
+                if (!showPreviewForIdenticalLinks) {
+                    return@forEach
                 }
 
-                // It's not like every comment will have links, so it might make more sense to just
-                // create new ones every time? Not sure if it's better to create new ones, or keep the old ones
-                // in memory all the time in case a new link comes. Probably doesn't make that much of a difference
-                val linkPreview = if (linkPreviews.size > index) {
-                    // Reuse link preview
-                    linkPreviews[index]
-                } else {
-                    // Create new link preview
-                    val preview = createLinkPreview()
-                    linkPreviews.add(preview)
-                    preview
-                }
-
-                linkPreview.visibility = VISIBLE
+                val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                val linkPreview = LinkPreview(binding.root.context)
+                linkPreview.layoutParams = layoutParams
                 linkPreview.setText(text)
                 linkPreview.setLink(url)
+
+                binding.linkPreviews.addView(linkPreview)
             }
-
-            // Remove visibility of the overflows
-            (spans.size until linkPreviews.size).forEach {
-                linkPreviews[it].visibility = GONE
-            }
-        }
-
-        /**
-         * Creates a new [LinkPreview] and constrains is correctly depending on previous link preview views
-         *
-         * @return A [LinkPreview] set with appropriate constraints
-         */
-        private fun createLinkPreview() : LinkPreview {
-            val id = View.generateViewId()
-            val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            val preview = LinkPreview(binding.root.context)
-            preview.id = id
-            preview.layoutParams = params
-
-            val topMargin = binding.parentLayout.resources.getDimension(R.dimen.linkPreviewTopMargin).toInt()
-            binding.parentLayout.addView(preview)
-
-            val constraintSet = ConstraintSet()
-            constraintSet.clone(binding.parentLayout)
-
-            if (linkPreviews.isEmpty()) {
-                // top_toBottomOf=popupMenu
-                constraintSet.connect(id, ConstraintSet.TOP, binding.popupMenu.id, ConstraintSet.BOTTOM)
-            } else {
-                // top_toBottomOf=<last link preview>
-                constraintSet.connect(id, ConstraintSet.TOP, linkPreviews.last().id, ConstraintSet.BOTTOM, topMargin)
-            }
-            // start_toEndOf=<barrier>
-            constraintSet.connect(id, ConstraintSet.START, binding.sideBarsBarrier.id, ConstraintSet.END)
-            // end_toEndOf=parent
-            constraintSet.connect(id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-
-            constraintSet.constrainedWidth(id, true)
-
-            // Align to the start of the parent
-            constraintSet.setHorizontalBias(id, 0f)
-
-            constraintSet.applyTo(binding.parentLayout)
-
-            return preview
         }
     }
 
