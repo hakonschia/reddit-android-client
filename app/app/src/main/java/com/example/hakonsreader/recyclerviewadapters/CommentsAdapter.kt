@@ -520,13 +520,6 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
      * ViewHolder for comments that are shown as the entire comment
      */
     inner class NormalCommentViewHolder(private val binding: ListItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {
-        /**
-         * The list of link previews that have been shown in this ViewHolder. The link previews that
-         * previously been created are not removed, but have their visibility set to GONE so that they
-         * can be recycled later. When adding previews, the views found in this list should be updated
-         * to reflect the new link it shows and set to VISIBLE again, or create new ones if needed
-         */
-        private val linkPreviews = ArrayList<LinkPreview>()
 
         /**
          * Binds the ViewHolder to a comment
@@ -568,12 +561,14 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             // because of nested layouts, but considering that links are relatively rare, and that
             // each comment usually won't have more than a few links, I'll take that minor performance
             // hit for a lot cleaner code (setting constraints via code is kind of messy)
+
+            // Remove all previews views
+            binding.linkPreviews.removeAllViews()
+
             if (urls.isNotEmpty()) {
                 // The spans seems to always be in reversed order, so reverse them to the original order
                 urls.reverse()
                 setLinkPreviews(text, urls)
-            } else {
-                binding.linkPreviews.removeAllViews()
             }
         }
 
@@ -592,7 +587,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
                 val text = fullText.substring(start, end)
                 val url = span.url
 
-                // If the text and the url is the same it's no point in showing a preview
+                // If the text and the url is the same and the user doesn't want to preview those
                 if (text == url && !showPreviewForIdenticalLinks) {
                     return@forEach
                 }

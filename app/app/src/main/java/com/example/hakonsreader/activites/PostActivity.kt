@@ -244,7 +244,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
                 replyListener = this@PostActivity
                 commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
                 loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel?.loadMoreComments(comment, parent) }
-                onChainShown = Runnable { binding?.commentChainShown = true }
+                onChainShown = Runnable { binding.commentChainShown = true }
             }
 
             binding.comments.adapter = commentsAdapter
@@ -340,7 +340,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
                 // TODO this doesn't work perfectly as the "loading" image is still shown sometimes for a split second
                 PostType.IMAGE -> {
                     postponeEnterTransition()
-                    binding?.post?.setImageLoadedCallback(object : Callback {
+                    binding.post.setImageLoadedCallback(object : Callback {
                         override fun onSuccess() {
                             startPostponedEnterTransition()
                         }
