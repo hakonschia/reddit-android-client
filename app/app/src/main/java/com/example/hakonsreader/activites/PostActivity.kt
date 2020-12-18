@@ -23,6 +23,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityPostBinding
 import com.example.hakonsreader.interfaces.LoadMoreComments
+import com.example.hakonsreader.interfaces.LockableSlidr
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
@@ -37,7 +38,7 @@ import com.squareup.picasso.Callback
 /**
  * Activity to show a Reddit post with its comments
  */
-class PostActivity : AppCompatActivity(), OnReplyListener {
+class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
     companion object {
         private const val TAG = "PostActivity"
@@ -156,6 +157,15 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
             commentsViewModel?.insertComment(newComment, parent)
         }
     }
+
+    override fun lock(lock: Boolean) {
+        if (lock) {
+            slidrInterface.lock()
+        } else {
+            slidrInterface.unlock()
+        }
+    }
+
 
     /**
      * Sets up [binding]
@@ -494,10 +504,15 @@ class PostActivity : AppCompatActivity(), OnReplyListener {
      */
     private val transitionListener = object : MotionLayout.TransitionListener {
         override fun onTransitionCompleted(motionLayout: MotionLayout?, currentId: Int) {
-            // Pause video when the transition has finished to the end
             // We could potentially pause it earlier, like when the transition is halfway done?
-            // We also can start it when we reach the start, not sure if that is good or bad
-            if (currentId == R.id.end) {
+
+            // viewSelected has to be called for gallery slidr locks, but you might not want videos to
+            // play again if they weren't playing before. We could potentially store the extras and if
+            // it's a video and ContentVideo.EXTRA_IS_PLAYING is true, then we call viewSelected, or something
+            // (we probably have to check if it's a video manually though)
+            if (currentId == R.id.start) {
+                binding.post.viewSelected()
+            } else if (currentId == R.id.end) {
                 binding.post.viewUnselected()
             }
         }

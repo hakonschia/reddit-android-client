@@ -39,6 +39,13 @@ public class ContentGallery extends Content {
     private final ContentGalleryBinding binding;
     private List<Image> images;
 
+    /**
+     * The current Slidr lock this view has called. This should be checked to make sure duplicate calls
+     * to lock a Slidr isn't done
+     */
+    private boolean slidrLocked = false;
+
+
     public ContentGallery(Context context) {
         this(context, null, 0, 0);
     }
@@ -97,8 +104,8 @@ public class ContentGallery extends Content {
             public void onPageSelected(int position) {
                 setActiveImageText(position);
 
-                // TODO this is still not a great solution. If the user scrolls and doesn't go back
-                //  to the first image then the entire fragment/activity will be locked afterwards
+                // Make sure the slidr is locked when not on the first item, so that swiping right will
+                // swipe on the gallery, not remove the activity
                 lockSlidr(position != 0);
             }
 
@@ -190,6 +197,12 @@ public class ContentGallery extends Content {
      * @param lock True to lock, false to unlock
      */
     private void lockSlidr(boolean lock) {
+        // Return to avoid duplicate calls on the same type of lock
+        if (lock == slidrLocked) {
+            return;
+        }
+
+        slidrLocked = lock;
         Context context = getContext();
 
         // This might be bad? The "correct" way of doing it might be to add listeners
@@ -214,6 +227,27 @@ public class ContentGallery extends Content {
         int activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, images.size());
         binding.galleryImages.setCurrentItem(activeImage, false);
     }
+
+    @Override
+    public void viewSelected() {
+        super.viewSelected();
+
+        // Send a request to lock the slidr if the view is selected when not on the first image
+        if (binding.galleryImages.getCurrentItem() != 0) {
+            lockSlidr(true);
+        }
+    }
+
+    @Override
+    public void viewUnselected() {
+        super.viewUnselected();
+
+        // Send a request to unlock the slidr if the view is unselected when not on the first image
+        if (binding.galleryImages.getCurrentItem() != 0) {
+            lockSlidr(false);
+        }
+    }
+
 
     /**
      * The pager adapter responsible for handling the images in the post

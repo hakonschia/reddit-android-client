@@ -1,19 +1,23 @@
 package com.example.hakonsreader.activites
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.fragments.SubredditFragment
+import com.example.hakonsreader.interfaces.LockableSlidr
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface
 
 /**
  * Activity for a subreddit (used when a subreddit is clicked from a post)
  */
-class SubredditActivity : AppCompatActivity() {
+class SubredditActivity : AppCompatActivity(), LockableSlidr {
 
     companion object {
+        private const val TAG = "SubredditActivity"
+
         /**
          * The key used to save the subreddit fagment
          */
@@ -27,7 +31,8 @@ class SubredditActivity : AppCompatActivity() {
 
 
     private var fragment: SubredditFragment? = null
-    private var slidrInterface: SlidrInterface? = null
+    private lateinit var slidrInterface: SlidrInterface
+    private var totalSlidrLocks = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,14 +83,31 @@ class SubredditActivity : AppCompatActivity() {
         supportFragmentManager.putFragment(outState, SAVED_SUBREDDIT, fragment!!)
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    fun lock(lock: Boolean) {
+    override fun lock(lock: Boolean) {
         if (lock) {
-            slidrInterface!!.lock()
+            totalSlidrLocks++
         } else {
-            slidrInterface!!.unlock()
+            totalSlidrLocks--
+        }
+
+        checkSlidr()
+    }
+
+    /**
+     * Locks the [slidrInterface] if [totalSlidrLocks] is greater than 0, and unlocks otherwise
+     *
+     * if [totalSlidrLocks] has been set to below 0, then it is set back to 0 first
+     */
+    private fun checkSlidr() {
+        Log.d(TAG, "checkSlidr: $totalSlidrLocks")
+        if (totalSlidrLocks < 0) {
+            totalSlidrLocks = 0
+        }
+
+        if (totalSlidrLocks > 0) {
+            slidrInterface.lock()
+        } else {
+            slidrInterface.unlock()
         }
     }
 

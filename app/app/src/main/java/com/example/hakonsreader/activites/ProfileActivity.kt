@@ -30,8 +30,9 @@ class ProfileActivity : AppCompatActivity(), LockableSlidr {
         const val SAVED_FRAGMENT = "savedFragment"
     }
 
-    private lateinit var slidrInterface: SlidrInterface
     private var fragment: ProfileFragment? = null
+    private lateinit var slidrInterface: SlidrInterface
+    private var totalSlidrLocks = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +67,25 @@ class ProfileActivity : AppCompatActivity(), LockableSlidr {
 
     override fun lock(lock: Boolean) {
         if (lock) {
+            totalSlidrLocks++
+        } else {
+            totalSlidrLocks--
+        }
+
+        checkSlidr()
+    }
+
+    /**
+     * Locks the [slidrInterface] if [totalSlidrLocks] is greater than 0, and unlocks otherwise
+     *
+     * if [totalSlidrLocks] has been set to below 0, then it is set back to 0 first
+     */
+    private fun checkSlidr() {
+        if (totalSlidrLocks < 0) {
+            totalSlidrLocks = 0
+        }
+
+        if (totalSlidrLocks > 0) {
             slidrInterface.lock()
         } else {
             slidrInterface.unlock()
