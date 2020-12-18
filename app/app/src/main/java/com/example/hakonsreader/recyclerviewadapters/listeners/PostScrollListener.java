@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters.listeners;
 
+import android.util.Log;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -7,9 +8,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
+import com.example.hakonsreader.views.Content;
 
 /**
- * Scroll listener for RecyclerView of Reddit posts
+ * Scroll listener for RecyclerView of Reddit posts. This will automatically "select" a post
+ * when it is the main content on the screen. The behaviour of being "selected" and "unselected"
+ * is defined in subclasses' implementation of {@link Content#viewSelected()} and {@link Content#viewUnselected()}
  */
 public class PostScrollListener implements View.OnScrollChangeListener {
     private static final String TAG = "PostScrollListener";
@@ -107,10 +111,6 @@ public class PostScrollListener implements View.OnScrollChangeListener {
 
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldX, int oldY) {
-        // TODO if a video has been manually paused, scrolling when it would be selected automatically
-        //  shouldn't select it again. This is especially annoying when going into a post which pauses the video
-        //  and then going out, scrolling down to get to the next post which then plays the video for a split second
-
         // Find the positions of first and last visible items to find all visible items
         int posFirstItem = layoutManager.findFirstVisibleItemPosition();
         int posLastItem = layoutManager.findLastVisibleItemPosition();
@@ -140,11 +140,13 @@ public class PostScrollListener implements View.OnScrollChangeListener {
     private void checkSelectedPost(int startPost, int endPost, boolean scrollingUp) {
         // The behavior is:
         // When scrolling UP:
+        // 1. postToIgnore is reset when any view is UNSELECTED
         // 1. If the bottom of the content is under the screen, the view is UN SELECTED
 
         // When scrolling DOWN:
-        // 1. If the top of the content is above the screen, the view is UN SELECTED
-        // 2. If the top of the content is above 3/4th of the screen, the view is SELECTED
+        // 1. If the top of the content is above the screen, the view is UNSELECTED
+        // 2. If the bottom of the content is under the screen, the view is UNSELECTED
+        // 3. If the top of the content is above 3/4th of the screen, the view is SELECTED
 
 
         // Go through all visible views and select/un select the view holder based on where on the screen they are
@@ -160,24 +162,24 @@ public class PostScrollListener implements View.OnScrollChangeListener {
             int y = viewHolder.getContentY();
             int viewBottom = viewHolder.getContentBottomY();
 
-            if (scrollingUp) {
-                // TODO this might be a bit weird as scrolling up on the first item wont autplay
-                if (viewBottom > SCREEN_HEIGHT) {
-                    viewHolder.onUnselected();
+
+            // If the view is above the screen (< 0) it is "unselected"
+            // If the bottom of the view is above the screen height it is "unselected"
+            // If the view is below 35% of the screen height it is "selected" (kind of backwards since 0 is at the top)
+
+            if (y < 0 || viewBottom > SCREEN_HEIGHT) {
+                viewHolder.onUnselected();
+
+                // We only want to reset the post to ignore on scrolling up, otherwise we have to ensure
+                // that the view being unselected is the post that is being ignored
+                if (scrollingUp) {
                     postToIgnore = "";
                 }
-            } else {
-                // If the view is above the screen (< 0) it is "unselected"
-                // If the view is below 35% of the screen height it is "selected" (kind of backwards since 0 is at the top)
-                if (y < 0) {
-                    viewHolder.onUnselected();
-                } else if (y < SCREEN_HEIGHT * 0.35f) {
-                    if (!viewHolder.getPostId().equals(postToIgnore)) {
-                        viewHolder.onSelected();
-                    }
+            } else if (y < SCREEN_HEIGHT * 0.35f) {
+                if (!viewHolder.getPostId().equals(postToIgnore)) {
+                    viewHolder.onSelected();
                 }
             }
-
         }
     }
 }

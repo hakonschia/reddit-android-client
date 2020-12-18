@@ -99,7 +99,6 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
      * if [totalSlidrLocks] has been set to below 0, then it is set back to 0 first
      */
     private fun checkSlidr() {
-        Log.d(TAG, "checkSlidr: $totalSlidrLocks")
         if (totalSlidrLocks < 0) {
             totalSlidrLocks = 0
         }
