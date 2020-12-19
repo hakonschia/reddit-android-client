@@ -245,7 +245,7 @@ public class Post extends Content {
                 //  to get the source preview, create static function in ContentVideo: isRedditPostVideoPlayable() : Boolean
                 //  that checks if redditVideo, redditVideoGif, sourcePreview is all not null
                 //  https://www.reddit.com/r/reallifedoodles/comments/72cdtz/hey/
-                if (ContentVideo.isRedditPostVideoPlayable(post)) {
+                if (ContentVideo.Companion.isRedditPostVideoPlayable(post)) {
                     content = new ContentVideo(context);
                     ((ContentVideo)content).setOnVideoManuallyPaused(onVideoManuallyPaused);
                 } else {
