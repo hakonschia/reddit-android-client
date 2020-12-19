@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.exoplayer2.ui.PlayerView
+<com.example.hakonsreader.views.VideoPlayer
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/player"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-</com.google.android.exoplayer2.ui.PlayerView>
+    android:layout_height="match_parent"
+    android:transitionName="video_player_transition"/>
