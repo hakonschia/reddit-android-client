@@ -367,10 +367,12 @@ class VideoPlayer : PlayerView {
         // I don't even really know why this works, but the actual video player will be in the
         // middle of the screen without being stretched, as I want to, and the controller goes
         // to the screen width, which is also what I want to
-        layoutParams.width = app.screenWidth
-        layoutParams.height = height
+        // Kinda weird to create the params like this
+        val params = layoutParams ?: ViewGroup.LayoutParams(app.screenWidth, height)
+        params.width = app.screenWidth
+        params.height = height
 
-        requestLayout()
+        layoutParams = params
     }
 
     /**

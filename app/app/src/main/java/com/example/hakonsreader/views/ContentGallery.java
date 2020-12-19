@@ -16,6 +16,8 @@ import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.databinding.ContentGalleryBinding;
 import com.example.hakonsreader.interfaces.LockableSlidr;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -63,12 +65,7 @@ public class ContentGallery extends Content {
 
     @Override
     protected void updateView() {
-        // TODO galleries can contain GIFs from reddit (and imgur)
-        //  https://www.reddit.com/r/LadyBoners/comments/k4id7n/presenting_mr_misha_collins/
-        // For now, if the url isn't found (it's a gif) then ignore the image
-        images = redditPost.getGalleryImages().stream()
-                .filter(image -> image.getUrl() != null)
-                .collect(Collectors.toList());
+        images = redditPost.getGalleryImages();
 
         // Find the largest height and width and set the layout to that
         int maxHeight = 0;
@@ -107,6 +104,8 @@ public class ContentGallery extends Content {
                 // Make sure the slidr is locked when not on the first item, so that swiping right will
                 // swipe on the gallery, not remove the activity
                 lockSlidr(position != 0);
+
+                // TODO if image is gif, autoplay if user wants to autoplay videos
             }
 
             @Override
@@ -267,30 +266,55 @@ public class ContentGallery extends Content {
             return images.size();
         }
 
+        @NotNull
         @Override
-        public Object instantiateItem(ViewGroup container, final int position) {
+        public Object instantiateItem(@NotNull ViewGroup container, final int position) {
             //Image image = images.get(position % images.size());
             Image image = images.get(position);
 
-            // Use ContentImage as that already has listeners, NSFW caching etc already
-            ContentImage contentImage = new ContentImage(context);
-            contentImage.setWithImageUrl(redditPost, image.getUrl());
+            View view;
+            if (image.isGif()) {
+                view = getAsVideo(image);
+            } else {
+                view = getAsImage(image);
+            }
 
-            // TODO imgur albums might be gifs
+            container.addView(view);
 
-            container.addView(contentImage);
-
-            return contentImage;
+            return view;
         }
 
         @Override
-        public boolean isViewFromObject(View view, Object object) {
+        public boolean isViewFromObject(@NotNull View view, @NotNull Object object) {
             return view == object;
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((ContentImage) object);
+        public void destroyItem(@NotNull ViewGroup container, int position, @NotNull Object object) {
+            if (object instanceof ContentImage) {
+                container.removeView((ContentImage) object);
+            } else {
+                container.removeView((VideoPlayer) object);
+            }
+        }
+
+        public View getAsImage(Image image) {
+            // Use ContentImage as that already has listeners, NSFW caching etc already
+            ContentImage contentImage = new ContentImage(context);
+            contentImage.setWithImageUrl(redditPost, image.getUrl());
+            return contentImage;
+        }
+
+        public View getAsVideo(Image image) {
+            VideoPlayer videoPlayer = new VideoPlayer(context);
+
+            videoPlayer.setVideoHeight(image.getHeight());
+            videoPlayer.setVideoWidth(image.getWidth());
+            videoPlayer.setUrl(image.getMp4Url());
+
+            // TODO set thumbnail
+
+            return videoPlayer;
         }
     }
 }
