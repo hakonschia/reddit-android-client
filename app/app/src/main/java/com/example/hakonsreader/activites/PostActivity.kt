@@ -5,8 +5,9 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.transition.Transition
 import android.transition.TransitionListenerAdapter
-import android.util.Log
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
@@ -14,6 +15,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
+import androidx.transition.Fade
+import androidx.transition.TransitionManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
@@ -29,8 +32,9 @@ import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.example.hakonsreader.viewmodels.CommentsViewModel
 import com.example.hakonsreader.views.Content
-import com.example.hakonsreader.views.ContentVideo
 import com.example.hakonsreader.views.VideoPlayer
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface
@@ -194,6 +198,20 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         )
 
         binding.parentLayout.setTransitionListener(transitionListener)
+
+        binding.expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
+
+        // TODO this should be a setting
+        val collapsePostByDefault = true
+        val transition = binding.parentLayout.getTransition(R.id.postTransition)
+        binding.expandOrCollapsePostBlock.visibility = if (collapsePostByDefault) {
+            // This should be the default for the transition, but might as well set it
+            transition.setEnable(true)
+            GONE
+        } else {
+            transition.setEnable(false)
+            VISIBLE
+        }
     }
 
     /**
@@ -497,6 +515,26 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      */
     fun replyToPost(view: View) {
         post?.let { replyTo(it) }
+    }
+
+    /**
+     * Toggles the post expansion transition from being enabled and shows a snackbar that says if it
+     * is now enabled or disabled
+     */
+    private fun toggleTransitionEnabled() {
+        val transition = binding.parentLayout.getTransition(R.id.postTransition)
+        val enable = !transition.isEnabled
+        transition.setEnable(enable)
+
+        val stringId = if (enable) {
+            binding.expandOrCollapsePostBlock.visibility = GONE
+            R.string.postTransitionEnabled
+        } else {
+            binding.expandOrCollapsePostBlock.visibility = VISIBLE
+            R.string.postTransitionDisabled
+        }
+
+        Snackbar.make(binding.parentLayout, stringId, LENGTH_SHORT).show()
     }
 
     /**
