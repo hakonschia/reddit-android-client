@@ -71,6 +71,13 @@
         android:title="@string/prefs_group_posts"
         app:iconSpaceReserved="false">
 
+        <SwitchPreference
+            app:key="@string/prefs_key_post_collapse_by_default"
+            app:title="@string/prefs_title_post_collapse_by_default"
+            app:defaultValue="@bool/prefs_default_post_collapse_by_default"
+            app:singleLineTitle="false"
+            app:iconSpaceReserved="false" />
+
         <!-- app:min but android:max, for some reason? -->
         <SeekBarPreference
             app:key="@string/prefs_key_max_post_size_percentage"

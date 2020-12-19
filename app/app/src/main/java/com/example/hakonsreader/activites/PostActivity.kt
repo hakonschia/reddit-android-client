@@ -201,8 +201,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         binding.expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
 
-        // TODO this should be a setting
-        val collapsePostByDefault = true
+        val collapsePostByDefault = App.get().collapsePostsByDefaultWhenScrollingComments()
         val transition = binding.parentLayout.getTransition(R.id.postTransition)
         binding.expandOrCollapsePostBlock.visibility = if (collapsePostByDefault) {
             // This should be the default for the transition, but might as well set it

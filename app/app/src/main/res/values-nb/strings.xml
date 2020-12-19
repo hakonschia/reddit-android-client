@@ -274,4 +274,5 @@
     <string name="prefs_title_comment_link_preview_show_identical_links">Vis forhåndsvisning for lenker med identisk tekst</string>
     <string name="postTransitionEnabled">Post ekspandering skrudd på</string>
     <string name="postTransitionDisabled">Post ekspandering skrudd av</string>
+    <string name="prefs_title_post_collapse_by_default">Kollaps post ved skrolling i kommentarer</string>
 </resources>

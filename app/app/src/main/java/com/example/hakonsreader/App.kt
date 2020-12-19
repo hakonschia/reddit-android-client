@@ -686,6 +686,16 @@ class App : Application() {
         )
     }
 
+    /**
+     * Returns if posts should automatically be collapsed when scrolling comments
+     */
+    fun collapsePostsByDefaultWhenScrollingComments() : Boolean {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_post_collapse_by_default),
+                resources.getBoolean(R.bool.prefs_default_post_collapse_by_default)
+        )
+    }
+
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that
