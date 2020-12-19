@@ -4,12 +4,15 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
@@ -70,6 +73,49 @@ class VideoPlayer : PlayerView {
          * percentage of the height the video will take
          */
         private const val MAX_HEIGHT_RATIO = 0.65f
+
+
+        /**
+         * The key used in extras for sending which URL is being played in the video
+         *
+         * The value stored with this key will be a `string`
+         */
+        const val EXTRA_URL = "videoUrl"
+
+        /**
+         * The key used in extras for saying if the video displayed is a DASH video
+         *
+         * The value stored with this key will be a `boolean`
+         */
+        const val EXTRA_IS_DASH = "videoIsDash"
+
+        /**
+         * The key used for extra information about the timestamp of the video
+         *
+         * The value stored with this key will be a `long`
+         */
+        const val EXTRA_TIMESTAMP = "videoTimestamp"
+
+        /**
+         * The key used for extra information about the playback state of a video
+         *
+         * The value stored with this key will be a `boolean`
+         */
+        const val EXTRA_IS_PLAYING = "isPlaying"
+
+        /**
+         * The key used for extra information about the playback state of a video
+         *
+         * The value stored with this key will be a `boolean`
+         */
+        const val EXTRA_SHOW_CONTROLS = "showControls"
+
+        /**
+         * The key used for extra information about the volume of the video
+         *
+         * The value stored with this key will be a `boolean`
+         */
+        const val EXTRA_VOLUME = "volume"
     }
 
     /**
@@ -339,11 +385,9 @@ class VideoPlayer : PlayerView {
 
         // Open video if we are not in a video activity
         if (context !is VideoActivity) {
-            fullscreen.setOnClickListener { view: View? ->
-                // TODO resume at the same point where we ended (for fullscreen and in posts)
+            fullscreen.setOnClickListener {
                 val intent = Intent(context, VideoActivity::class.java)
-           //     intent.putExtra(VideoActivity.POST, Gson().toJson(redditPost))
-           //     intent.putExtra(Content.EXTRAS, getExtras())
+                intent.putExtra(VideoActivity.EXTRAS, getExtras())
 
                 // Pause the video here so it doesn't play both places
                 pause()
@@ -479,6 +523,62 @@ class VideoPlayer : PlayerView {
             button.setImageDrawable(drawable)
 
             audioComponent.volume = if (volumeOn) 1f else 0f
+        }
+    }
+
+    fun fitScreen() {
+        // TODO this is a pretty bad way of doing it as the controls get pushed to the bottom of the screen even
+        //  if the video itself isn't
+        // Can probably use videoWidth to the width the screen width?
+        val params = layoutParams
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT
+        layoutParams = params
+    }
+
+    fun getExtras() : Bundle {
+        return Bundle().also {
+            it.putLong(EXTRA_TIMESTAMP, getPosition())
+            it.putBoolean(EXTRA_IS_PLAYING, isPlaying())
+            it.putBoolean(EXTRA_SHOW_CONTROLS, isControllerVisible)
+            it.putBoolean(EXTRA_VOLUME, isAudioOn())
+
+            // Probably have to pass thumbnail?
+            it.putString(EXTRA_URL, url)
+            it.putBoolean(EXTRA_IS_DASH, dashVideo)
+        }
+    }
+
+    fun setExtras(extras: Bundle) {
+        val timestamp = extras.getLong(EXTRA_TIMESTAMP)
+        val isPlaying = extras.getBoolean(EXTRA_IS_PLAYING)
+        val showController = extras.getBoolean(EXTRA_SHOW_CONTROLS)
+        val volumeOn = extras.getBoolean(EXTRA_VOLUME)
+
+        toggleVolume(volumeOn)
+
+        // Video has been played previously so make sure the player is prepared
+        if (timestamp != 0L) {
+            prepare()
+            setPosition(timestamp)
+
+            // If the video was paused, remove the thumbnail so it shows the correct frame
+            if (!isPlaying) {
+                removeThumbnail()
+            }
+        }
+
+        if (isPlaying) {
+            play()
+        } else {
+            // Probably unnecessary?
+            pause()
+        }
+
+        if (showController) {
+            showController()
+        } else {
+            hideController()
         }
     }
 }

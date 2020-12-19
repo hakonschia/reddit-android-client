@@ -11,6 +11,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.ContentVideo
+import com.example.hakonsreader.views.VideoPlayer
 import com.google.gson.Gson
 import com.r0adkll.slidr.Slidr
 
@@ -24,14 +25,25 @@ class VideoActivity : AppCompatActivity() {
          * The key used for the post the video belongs to
          */
         const val POST = "post"
+
+        /**
+         * The key used to send information about the video playback that this activity should
+         * automatically resume.
+         *
+         * This should be a [Bundle]
+         */
+        const val EXTRAS = "extras"
     }
 
     private var content: ContentVideo? = null
 
+    private lateinit var videoPlayer: VideoPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video)
+
+        videoPlayer = findViewById(R.id.videoPlayer)
 
         val data = intent.extras
         if (data != null) {
@@ -39,35 +51,35 @@ class VideoActivity : AppCompatActivity() {
                 val controller = window.insetsController
                 controller?.hide(WindowInsets.Type.statusBars())
             } else {
-                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                        WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
-            val gson = Gson()
-            val redditPost = gson.fromJson(intent.extras!!.getString(POST), RedditPost::class.java)
-            val extras: Bundle?
 
             // Restore from the saved state if possible
-            extras = if (savedInstanceState != null) {
-                savedInstanceState.getBundle(Content.EXTRAS)
+            val extras: Bundle = if (savedInstanceState != null) {
+                savedInstanceState.getBundle(EXTRAS)
             } else {
-                data.getBundle(Content.EXTRAS)
-            }
+                data.getBundle(EXTRAS)
+            } ?: return
+
             if (!App.get().muteVideoByDefaultInFullscreen()) {
-                extras!!.putBoolean(ContentVideo.EXTRA_VOLUME, true)
+                extras.putBoolean(VideoPlayer.EXTRA_VOLUME, true)
             }
-            content = ContentVideo(this)
-            content!!.redditPost = redditPost
-            content!!.extras = extras!!
-            content!!.fitScreen()
-            val video = findViewById<FrameLayout>(R.id.video)
-            video.addView(content)
+
+            videoPlayer.dashVideo = extras.getBoolean(VideoPlayer.EXTRA_IS_DASH)
+            videoPlayer.url = extras.getString(VideoPlayer.EXTRA_URL) ?: ""
+            videoPlayer.setExtras(extras)
+
+            videoPlayer.fitScreen()
+            videoPlayer.play()
         } else {
             finish()
         }
+
         val color = getColor(R.color.imageVideoActivityBackground)
         val alpha = color shr 24 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
-        val config = App.get().getVideoAndImageSlidrConfig() // To keep the background the same the entire way the alpha is always the same
+        val config = App.get().getVideoAndImageSlidrConfig()
+                // To keep the background the same the entire way the alpha is always the same
                 // Otherwise the background of the activity slides with, which looks weird
                 .scrimStartAlpha(alphaPercentage)
                 .scrimEndAlpha(alphaPercentage)
@@ -80,17 +92,17 @@ class VideoActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         // Store the new extras so that we use that to update the video progress instead of
         // the one passed when the activity was started
-        outState.putBundle(Content.EXTRAS, content!!.extras)
+        outState.putBundle(EXTRAS, videoPlayer.getExtras())
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        content!!.release()
+        videoPlayer.release()
     }
 
     override fun finish() {
         super.finish()
-        content!!.release()
+        videoPlayer.release()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 

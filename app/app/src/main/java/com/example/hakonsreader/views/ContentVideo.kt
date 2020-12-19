@@ -18,35 +18,6 @@ class ContentVideo : Content {
     companion object {
         private const val TAG = "PostContentVideo"
 
-
-        /**
-         * The key used for extra information about the timestamp of the video
-         *
-         * The value stored with this key will be a `long`
-         */
-        const val EXTRA_TIMESTAMP = "videoTimestamp"
-
-        /**
-         * The key used for extra information about the playback state of a video
-         *
-         * The value stored with this key will be a `boolean`
-         */
-        const val EXTRA_IS_PLAYING = "isPlaying"
-
-        /**
-         * The key used for extra information about the playback state of a video
-         *
-         * The value stored with this key will be a `boolean`
-         */
-        const val EXTRA_SHOW_CONTROLS = "showControls"
-
-        /**
-         * The key used for extra information about the volume of the video
-         *
-         * The value stored with this key will be a `boolean`
-         */
-        const val EXTRA_VOLUME = "volume"
-
         /**
          * Checks if a [RedditPost] is possible to play as a video. Even if [RedditPost.getPostType]
          * indicates that the post is a video, it might not include any supported video formats since
@@ -174,14 +145,7 @@ class ContentVideo : Content {
      *
      * @return A bundle that might include state variables
      */
-    override fun getExtras(): Bundle {
-        val extras = Bundle()
-        extras.putLong(ContentVideo.EXTRA_TIMESTAMP, player.getPosition())
-        extras.putBoolean(ContentVideo.EXTRA_IS_PLAYING, player.isPlaying())
-        extras.putBoolean(ContentVideo.EXTRA_SHOW_CONTROLS, player.isControllerVisible)
-        extras.putBoolean(ContentVideo.EXTRA_VOLUME, player.isAudioOn())
-        return extras
-    }
+    override fun getExtras() = player.getExtras()
 
     /**
      * Sets the extras for the video.
@@ -189,38 +153,7 @@ class ContentVideo : Content {
      * @param extras The bundle of data to use. This should be the same bundle as retrieved with
      * [ContentVideo.getExtras]
      */
-    override fun setExtras(extras: Bundle) {
-        val timestamp = extras.getLong(EXTRA_TIMESTAMP)
-        val isPlaying = extras.getBoolean(EXTRA_IS_PLAYING)
-        val showController = extras.getBoolean(EXTRA_SHOW_CONTROLS)
-        val volumeOn = extras.getBoolean(EXTRA_VOLUME)
-
-        player.toggleVolume(volumeOn)
-
-        // Video has been played previously so make sure the player is prepared
-        if (timestamp != 0L) {
-            player.prepare()
-            player.setPosition(timestamp)
-
-            // If the video was paused, remove the thumbnail so it shows the correct frame
-            if (!isPlaying) {
-                player.removeThumbnail()
-            }
-        }
-
-        if (isPlaying) {
-            player.play()
-        } else {
-            // Probably unnecessary?
-            player.pause()
-        }
-
-        if (showController) {
-            player.showController()
-        } else {
-            player.hideController()
-        }
-    }
+    override fun setExtras(extras: Bundle) = player.setExtras(extras)
 
     /**
      * Sets the callback for when a video post has been manually paused
@@ -238,17 +171,6 @@ class ContentVideo : Content {
      */
     fun release() {
         player.release()
-    }
-
-    /**
-     * Ensures that the video fits the screen
-     */
-    fun fitScreen() {
-        // TODO this is a pretty bad way of doing it as the controls get pushed to the bottom of the screen even
-        //  if the video itself isn't
-        // Can probably use player.videoWidth to the width the screen width?
-        val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        layoutParams = params
     }
 
     private fun setThumbnailUrl() {

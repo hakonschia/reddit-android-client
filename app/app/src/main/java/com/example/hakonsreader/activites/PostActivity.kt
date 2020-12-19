@@ -30,6 +30,7 @@ import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.example.hakonsreader.viewmodels.CommentsViewModel
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.ContentVideo
+import com.example.hakonsreader.views.VideoPlayer
 import com.google.gson.Gson
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface
@@ -129,7 +130,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
     override fun onPause() {
         super.onPause()
 
-        videoPlayingWhenPaused = binding.post.extras.getBoolean(ContentVideo.EXTRA_IS_PLAYING)
+        videoPlayingWhenPaused = binding.post.extras.getBoolean(VideoPlayer.EXTRA_IS_PLAYING)
         binding.post.viewUnselected()
     }
 
