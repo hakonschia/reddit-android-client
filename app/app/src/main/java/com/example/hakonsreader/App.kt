@@ -246,10 +246,10 @@ class App : Application() {
         val api = RedditApi.Builder(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID)
                 .accessToken(TokenManager.getToken())
                 .onNewToken { newToken: AccessToken? -> TokenManager.saveToken(newToken) }
+                .onInvalidToken { error: GenericError, throwable: Throwable -> onInvalidAccessToken(error, throwable) }
                 .loggerLevel(HttpLoggingInterceptor.Level.BODY)
                 .callbackUrl(NetworkConstants.CALLBACK_URL)
                 .deviceId(UUID.randomUUID().toString())
-                .onInvalidToken { error: GenericError, throwable: Throwable -> onInvalidAccessToken(error, throwable) }
                 .loadImgurAlbumsAsRedditGalleries(NetworkConstants.IMGUR_CLIENT_ID)
                 .build()
 

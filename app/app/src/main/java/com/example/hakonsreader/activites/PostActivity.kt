@@ -15,8 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
-import androidx.transition.Fade
-import androidx.transition.TransitionManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
@@ -49,9 +47,20 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         private const val TAG = "PostActivity"
 
         /**
-         * The key used to store the stat of the post transition in saved instance states
+         * The key used to store the state of the post transition in saved instance states
+         *
+         * The value stored with this key is a [Float]
+         *
          */
         private const val TRANSITION_STATE_KEY = "transitionState"
+        /**
+         * The key used to store if the transition is enabled in saved instance states
+         *
+         * The value stored with this key is a [Boolean]. This value being `true` means the transition
+         * is enabled (ie. the post collapses automatically)
+         */
+        private const val TRANSITION_ENABLED_KEY = "transitionEnabled"
+
 
         /**
          * The key used for sending the post to this activity
@@ -119,6 +128,9 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
             loadComments()
         } else {
             binding.parentLayout.progress = savedInstanceState.getFloat(TRANSITION_STATE_KEY)
+
+            val transitionEnabled = savedInstanceState.getBoolean(TRANSITION_ENABLED_KEY, App.get().collapsePostsByDefaultWhenScrollingComments())
+            enableTransition(transitionEnabled, showSnackbar = false)
         }
     }
 
@@ -141,6 +153,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         binding.parentLayout.progress.let { outState.putFloat(TRANSITION_STATE_KEY, it) }
+
+        outState.putBoolean(TRANSITION_ENABLED_KEY, binding.parentLayout.getTransition(R.id.postTransition).isEnabled)
     }
 
     override fun onDestroy() {
@@ -202,7 +216,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         binding.expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
 
         val collapsePostByDefault = App.get().collapsePostsByDefaultWhenScrollingComments()
-        val transition = binding.parentLayout.getTransition(R.id.postTransition)
+        enableTransition(collapsePostByDefault, showSnackbar = false)
+/*
         binding.expandOrCollapsePostBlock.visibility = if (collapsePostByDefault) {
             // This should be the default for the transition, but might as well set it
             transition.setEnable(true)
@@ -211,6 +226,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
             transition.setEnable(false)
             VISIBLE
         }
+ */
     }
 
     /**
@@ -522,7 +538,18 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      */
     private fun toggleTransitionEnabled() {
         val transition = binding.parentLayout.getTransition(R.id.postTransition)
-        val enable = !transition.isEnabled
+        enableTransition(!transition.isEnabled)
+    }
+
+    /**
+     * Enables or disables the post collapse transition and optionally shows a snackbar to notify the
+     * user of the change
+     *
+     * @param enable True to enable the transition, false to disable
+     * @param showSnackbar True to show a snackbar. Default to `true`
+     */
+    private fun enableTransition(enable: Boolean, showSnackbar: Boolean = true) {
+        val transition = binding.parentLayout.getTransition(R.id.postTransition)
         transition.setEnable(enable)
 
         val stringId = if (enable) {
@@ -533,7 +560,9 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
             R.string.postTransitionDisabled
         }
 
-        Snackbar.make(binding.parentLayout, stringId, LENGTH_SHORT).show()
+        if (showSnackbar) {
+            Snackbar.make(binding.parentLayout, stringId, LENGTH_SHORT).show()
+        }
     }
 
     /**
