@@ -410,6 +410,6 @@
     <string name="userInfoFailedToGet">Failed to retrieve user information</string>
     <string name="userInfoFailedToGetTryAgain">Try again</string>
 
-    <string name="postTransitionEnabled">Post expansion enabled</string>
-    <string name="postTransitionDisabled">Post expansion disabled</string>
+    <string name="postTransitionEnabled">Post collapse enabled</string>
+    <string name="postTransitionDisabled">Post collapse disabled</string>
 </resources>

@@ -51,7 +51,7 @@ public class PostsContainerFragment extends Fragment  {
     }
 
     /**
-     * Adds the different subreddit (frontpage, popular, all, and custom) fragments to the view pager
+     * Adds the default subreddit (frontpage, popular, all) fragments to the view pager
      *
      * @param viewPager The view pager to add the fragments to
      */

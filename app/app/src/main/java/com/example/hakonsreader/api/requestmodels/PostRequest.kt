@@ -18,7 +18,7 @@ import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
 
 class PostRequest(
-        private val accessToken: AccessToken,
+        accessToken: AccessToken,
         private val api: PostService,
         private val postId: String
 ) : VoteableRequest, ReplyableRequest, SaveableRequestKt {
@@ -231,6 +231,8 @@ class PostRequest(
 
             if (body != null){
                 val listings = body.getListings()
+
+                // TODO this should also check for imgur albums and make those API calls if necessary
                 if (listings?.isNotEmpty() == true) {
                     ApiResponse.Success(listings[0])
                 } else {
