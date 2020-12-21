@@ -69,12 +69,10 @@
 
             android:background="@{comment.locked ? @drawable/comment_locked : null}"
 
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/sideBarsBarrier"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <TextView
             android:id="@+id/commentAuthor"
@@ -205,13 +203,14 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
 
-            android:foreground="@drawable/ripple_main_bg"
             android:background="@null"
+            android:foreground="@drawable/ripple_main_bg"
             android:onClick="@{(view) -> adapter.moreOnClick(view, comment)}"
             android:src="@drawable/ic_baseline_more_horiz_24"
 
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/reply"
-            app:layout_constraintTop_toTopOf="@+id/reply" />
+            app:layout_constraintTop_toBottomOf="@+id/linkPreviews" />
 
         <!-- We have to add commentHidden to the visibility here instead of adding reply to the
         moreComments group, since it would take precedence over post.locked/comment.locked and
@@ -230,26 +229,27 @@
 
             android:visibility="@{post.locked || post.archived || comment.locked ? View.GONE : View.VISIBLE}"
 
+            app:layout_constraintBottom_toBottomOf="@+id/popupMenu"
             app:layout_constraintEnd_toStartOf="@+id/commentVoteBar"
-            app:layout_constraintTop_toBottomOf="@+id/commentContent" />
+            app:layout_constraintTop_toTopOf="@+id/popupMenu" />
 
         <LinearLayout
             android:id="@+id/linkPreviews"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
+            android:layout_marginTop="4dp"
+            android:divider="@drawable/empty_divider"
             android:orientation="vertical"
-            app:marginBottom="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
-            app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
 
             android:showDividers="middle"
-            android:divider="@drawable/empty_divider"
 
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/commentAuthor"
-            app:layout_constraintTop_toBottomOf="@id/popupMenu"
-            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintTop_toBottomOf="@+id/commentContent"
+
+            app:marginBottom="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
+            app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
 
             tools:layout_height="50dp" />
 
@@ -257,9 +257,10 @@
             android:id="@+id/commentVoteBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
+            app:layout_constraintBottom_toBottomOf="@+id/popupMenu"
 
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/reply" />
+            app:layout_constraintTop_toTopOf="@+id/popupMenu"
+            app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

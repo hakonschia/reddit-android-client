@@ -561,14 +561,19 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             // because of nested layouts, but considering that links are relatively rare, and that
             // each comment usually won't have more than a few links, I'll take that minor performance
             // hit for a lot cleaner code (setting constraints via code is kind of messy)
+            // Also moving where the previews are in the layout is a lot easier, if I want to change that later
 
             // Remove all previews views
             binding.linkPreviews.removeAllViews()
 
-            if (urls.isNotEmpty()) {
+            binding.linkPreviews.visibility = if (urls.isNotEmpty()) {
                 // The spans seems to always be in reversed order, so reverse them to the original order
                 urls.reverse()
                 setLinkPreviews(text, urls)
+                VISIBLE
+            } else {
+                // Set to gone if no previews to remove the top margin the link layout has
+                GONE
             }
         }
 
@@ -586,6 +591,12 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
                 val end = fullText.getSpanEnd(span)
                 val text = fullText.substring(start, end)
                 val url = span.url
+
+                // TODO "text" will actually include superscripts, since that text isn't actually removed
+                //  from the text, it uses a RelativeSizeSpan with 0f to "remove" the characters
+                //  best solution would be to remove the text in the Markwon plugin
+                //  Easiest solution is probably to check if "text" starts with "^" or "^(" and remove it here
+                //  (and ")" at the end if it starts with "^("
 
                 // If the text and the url is the same and the user doesn't want to preview those
                 if (text == url && !showPreviewForIdenticalLinks) {
