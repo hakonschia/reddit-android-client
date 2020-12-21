@@ -54,7 +54,10 @@ public class MarkdownInput extends FrameLayout {
     public MarkdownInput(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         binding = MarkdownInputBinding.inflate(LayoutInflater.from(context), this, true);
-        this.setup();
+
+        if (!isInEditMode()){
+            this.setup();
+        }
     }
 
     private void setup() {
