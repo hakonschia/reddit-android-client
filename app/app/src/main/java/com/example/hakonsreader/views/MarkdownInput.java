@@ -6,6 +6,7 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,7 @@ public class MarkdownInput extends FrameLayout {
      */
     private void bindMarkdownClickListeners() {
         // Setting onClick from XML doesn't work since it doesn't find the functions not in an activity
+        binding.markdownHeader.setOnClickListener(this::headerOnClick);
         binding.markdownBold.setOnClickListener(this::boldOnClick);
         binding.markdownItalic.setOnClickListener(this::italicOnClick);
         binding.markdownStrikethrough.setOnClickListener(this::strikethroughOnClick);
@@ -212,6 +214,58 @@ public class MarkdownInput extends FrameLayout {
     }
 
     /**
+     * onClick for the "Header" button. Adds header syntax (#) to the start of the line, and a space
+     * afterwards if needed. One line may contain up to 6 header symbols for 6 headers of different sizes
+     *
+     * @param view Ignored
+     */
+    public void headerOnClick(View view) {
+        // Header in markdown: # Header here
+        // Up to 6 sizes: ### Smaller header
+        // ###### Smallest header
+
+        String text = binding.replyText.getText().toString();
+        int startPos = getStartOfLinePosition();
+
+        int posToInsert = startPos;
+
+        // Find the position to insert the new #
+        for (int i = startPos; i < startPos + 6; i++) {
+            if (text.length() > i) {
+                if (text.charAt(i) == '#') {
+                    posToInsert++;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // If we didn't find 6 # we can insert another one
+        if (posToInsert != startPos + 6) {
+            Log.d(TAG, "headerOnClick: posToInsert=" + posToInsert);
+            String textToAdd = "#";
+
+            // Text is long enough to might have a space already
+            if (text.length() > posToInsert) {
+                char charAt = text.charAt(posToInsert);
+                Log.d(TAG, "headerOnClick: charAt="+charAt);
+
+                // Not a space afterwards, so add it
+                if (text.charAt(posToInsert) != ' ') {
+                    textToAdd += " ";
+                    Log.d(TAG, "headerOnClick: Space might have been here, but it isn't");
+                }
+            } else {
+                // Text will never be long enough to have a space, so add it
+                textToAdd += " ";
+                Log.d(TAG, "headerOnClick: Text isn't long enough to have possibility of space being here");
+            }
+
+            binding.replyText.getText().insert(posToInsert, textToAdd);
+        }
+    }
+
+    /**
      * onClick for the "Bold" button. Adds bold markdown to the text where the cursor is
      *
      * @param view Ignored
@@ -281,21 +335,7 @@ public class MarkdownInput extends FrameLayout {
         // If we're on a line with a quote, remove it, if we're not, add at the start
         String text = binding.replyText.getText().toString();
 
-        int start = binding.replyText.getSelectionStart();
-
-        // Search backwards for a newline (start - 1 or else we might be on a newline if we're at the end of a line)
-        int indexOfLine = text.lastIndexOf("\n", start - 1);
-
-        int startPos = indexOfLine;
-
-        // No newline found means it's the first line, set pos to the start of the text
-        if (indexOfLine == -1) {
-            startPos = 0;
-        } else {
-            // If we're not on the first line we need to add one as we want to start after the newline
-            // not on it (the newline is on the end of the previous line, not the first character of the new line)
-            startPos++;
-        }
+        int startPos = getStartOfLinePosition();
 
         // Already a quote, remove it (if text is empty we're guaranteed to not have a >)
         // If startPos was incremented to the text length (we're at an empty line at the end of the text)
@@ -544,6 +584,36 @@ public class MarkdownInput extends FrameLayout {
 
         TextView text = linkDialog.findViewById(R.id.linkText);
         return text.getText().toString();
+    }
+
+
+    /**
+     * Gets the position of the start of the line the cursor in the input field is on. This will return
+     * the position of the start of the next line, not the position of where the newline character (\n)
+     * is
+     *
+     * @return An integer representing the start of the line the cursor is on
+     */
+    private int getStartOfLinePosition() {
+        String text = binding.replyText.getText().toString();
+
+        int start = binding.replyText.getSelectionStart();
+
+        // Search backwards for a newline (start - 1 or else we might be on a newline if we're at the end of a line)
+        int indexOfLine = text.lastIndexOf("\n", start - 1);
+
+        int startPos = indexOfLine;
+
+        // No newline found means it's the first line, set pos to the start of the text
+        if (indexOfLine == -1) {
+            startPos = 0;
+        } else {
+            // If we're not on the first line we need to add one as we want to start after the newline
+            // not on it (the newline is on the end of the previous line, not the first character of the new line)
+            startPos++;
+        }
+
+        return startPos;
     }
 
 

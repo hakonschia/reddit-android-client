@@ -273,6 +273,7 @@
     <string name="submittingTitleTooLong">The title is too long</string>
 
     <!-- The text inside the markdown buttons (these aren't language specific so marked as untranslatable) -->
+    <string name="markdownBtnHeader" translatable="false"><b>A</b>a</string>
     <string name="markdownBtnBold" translatable="false"><b>B</b></string>
     <string name="markdownBtnItalic" translatable="false"><i>I</i></string>
     <string name="markdownBtnStrikethrough" translatable="false"><strike>S</strike></string>
@@ -282,6 +283,7 @@
     <string name="markdownInlineCode" translatable="false">&lt;/&gt;</string>
     <string name="markdownCodeBlock" translatable="false">if</string>
 
+    <string name="content_description_markdown_btn_header">Header</string>
     <string name="content_description_markdown_btn_bold">Bold text</string>
     <string name="content_description_markdown_btn_italic">Italic text</string>
     <string name="content_description_markdown_btn_strikethrough">Strikethrough text</string>

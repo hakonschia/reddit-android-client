@@ -275,4 +275,5 @@
     <string name="postTransitionEnabled">Post kollaps skrudd på</string>
     <string name="postTransitionDisabled">Post kollaps skrudd av</string>
     <string name="prefs_title_post_collapse_by_default">Kollaps post ved skrolling i kommentarer</string>
+    <string name="content_description_markdown_btn_header">Header</string>
 </resources>

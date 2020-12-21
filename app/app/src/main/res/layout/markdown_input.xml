@@ -7,11 +7,34 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <!-- TODO the ImageButtons have a darker color than they should have on dark mode -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TextInputStyle">
+
+        <!-- The EditText has 4dp margin which makes the it look like
+        it's not lined up with the text above/below, so remove it with negative margin -->
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/replyText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:hint="@string/replyHint"
+            android:inputType="textMultiLine|textCapSentences"
+
+            android:textColor="@color/text_color"
+            android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg"
+            android:textSize="14sp"
+
+            tools:text="@tools:sample/lorem[50]" />
+    </com.google.android.material.textfield.TextInputLayout>
+
     <HorizontalScrollView
         android:id="@+id/markdownButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
 
         android:fadeScrollbars="false"
         android:scrollbarStyle="insideInset">
@@ -21,6 +44,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/markdownHeader"
+                android:layout_width="@dimen/markdownBtnWidth"
+                android:layout_height="@dimen/markdownBtnHeight"
+                android:layout_marginEnd="4dp"
+
+                android:textAllCaps="false"
+                android:text="@string/markdownBtnHeader"
+                android:contentDescription="@string/content_description_markdown_btn_header" />
 
             <Button
                 android:id="@+id/markdownBold"
@@ -134,28 +167,4 @@
                 android:contentDescription="@string/content_description_markdown_btn_code_block" />
         </LinearLayout>
     </HorizontalScrollView>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        style="@style/TextInputStyle">
-
-        <!-- The EditText has 4dp margin which makes the it look like
-        it's not lined up with the text above/below, so remove it with negative margin -->
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/replyText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:hint="@string/replyHint"
-            android:inputType="textMultiLine|textCapSentences"
-
-            android:textColor="@color/text_color"
-            android:textCursorDrawable="@drawable/edit_text_cursor_opposite_bg"
-            android:textSize="14sp"
-
-            tools:text="@tools:sample/lorem[50]" />
-    </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>
