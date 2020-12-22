@@ -193,16 +193,16 @@ class ContentVideo : Content {
                     obfuscatedUrl = getObfuscatedUrl()
                     // If we don't have a URL to show then show the NSFW drawable instead as a fallback
                     if (obfuscatedUrl == null) {
-                        noImageId = R.drawable.ic_baseline_image_nsfw_200
+                        noImageId = R.drawable.ic_image_not_supported_200dp
                     }
                 }
-                ShowNsfwPreview.NO_IMAGE -> noImageId = R.drawable.ic_baseline_image_nsfw_200
+                ShowNsfwPreview.NO_IMAGE -> noImageId = R.drawable.ic_image_not_supported_200dp
             }
         } else if (redditPost.isSpoiler) {
             obfuscatedUrl = getObfuscatedUrl()
             // If we don't have a URL to show then show the NSFW drawable instead as a fallback
             if (obfuscatedUrl == null) {
-                noImageId = R.drawable.ic_baseline_image_nsfw_200
+                noImageId = R.drawable.ic_image_not_supported_200dp
             }
         }
 

@@ -216,8 +216,7 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
     override fun getItemCount(): Int = subreddits.size
 
 
-    inner class ViewHolder(b: ListItemSubredditBinding) : RecyclerView.ViewHolder(b.root) {
-        val binding: ListItemSubredditBinding = b
+    inner class ViewHolder(val binding: ListItemSubredditBinding) : RecyclerView.ViewHolder(binding.root) {
 
         init {
             // The listener must be set on both the root view and the description since the description

@@ -21,7 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        tools:src="@drawable/ic_baseline_emoji_emotions_200" />
+        tools:src="@drawable/ic_emoji_emotions_200dp" />
 
     <TextView
         android:id="@+id/name"
@@ -67,7 +67,7 @@
         android:layout_gravity="center|end"
 
         android:background="?android:selectableItemBackground"
-        android:src="@drawable/ic_baseline_star_24"
+        android:src="@drawable/ic_star_24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -76,7 +76,6 @@
         android:id="@+id/subredditDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
 
         android:ellipsize="end"
         android:maxLines="3"

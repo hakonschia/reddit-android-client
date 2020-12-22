@@ -156,7 +156,7 @@
             android:layout_height="18dp"
 
             android:layout_marginEnd="4dp"
-            android:src="@drawable/ic_stickied"
+            android:src="@drawable/ic_pin_24dp"
 
             android:visibility="@{comment.stickied ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintEnd_toStartOf="@+id/lock"
@@ -170,7 +170,7 @@
             android:layout_height="18dp"
 
             app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
-            android:src="@drawable/ic_baseline_lock_24"
+            android:src="@drawable/ic_lock_24dp"
             android:visibility="@{comment.locked ? View.VISIBLE : View.GONE, default=gone}"
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -199,9 +199,8 @@
 
         <ImageButton
             android:id="@+id/popupMenu"
-            android:layout_width="wrap_content"
+            android:layout_width="36dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
 
             android:background="@null"
             android:foreground="@drawable/ripple_main_bg"
@@ -217,9 +216,8 @@
         always be shown-->
         <ImageButton
             android:id="@+id/reply"
-            android:layout_width="wrap_content"
+            android:layout_width="36dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
 
             android:background="?android:selectableItemBackground"
             android:contentDescription="@string/content_description_reply_to_comment"

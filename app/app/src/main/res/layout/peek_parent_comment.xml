@@ -109,7 +109,7 @@
             android:layout_height="18dp"
 
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_stickied"
+            android:src="@drawable/ic_pin_24dp"
 
             android:visibility="@{comment.stickied ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintEnd_toStartOf="@+id/lock"
@@ -122,7 +122,7 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
 
-            android:src="@drawable/ic_baseline_lock_24"
+            android:src="@drawable/ic_lock_24dp"
 
             android:visibility="@{comment.locked ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintEnd_toEndOf="parent"

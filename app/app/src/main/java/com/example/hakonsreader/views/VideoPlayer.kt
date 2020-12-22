@@ -135,7 +135,7 @@ class VideoPlayer : PlayerView {
             loadThumbnail()
         }
 
-    var thumbnailDrawable = R.drawable.ic_baseline_image_nsfw_200
+    var thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
         set(value) {
             field = value
             loadThumbnail()
@@ -398,7 +398,7 @@ class VideoPlayer : PlayerView {
             }
         } else {
             // If we are in a video activity and press fullscreen, show an "Exit fullscreen" icon and exit the activity
-            fullscreen.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_fullscreen_exit_24))
+            fullscreen.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fullscreen_exit_24dp))
             fullscreen.setOnClickListener { (context as Activity).finish() }
         }
     }
@@ -520,7 +520,7 @@ class VideoPlayer : PlayerView {
             // Use value of "on" if not null, otherwise toggle
             val volumeOn = on ?: (volume.toInt() != 1)
 
-            val drawable = ContextCompat.getDrawable(context, if (volumeOn) R.drawable.ic_baseline_volume_up_24 else R.drawable.ic_baseline_volume_off_24)
+            val drawable = ContextCompat.getDrawable(context, if (volumeOn) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
             val button = findViewById<ImageButton>(R.id.volumeButton)
             button.setImageDrawable(drawable)
 

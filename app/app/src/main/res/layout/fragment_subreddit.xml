@@ -88,7 +88,7 @@
                         app:civ_circle_background_color="@color/background"
                         app:civ_border_color="@color/opposite_background"
                         app:civ_border_width="2dp"
-                        android:src="@drawable/ic_baseline_emoji_emotions_200"
+                        android:src="@drawable/ic_emoji_emotions_200dp"
 
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -152,8 +152,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
+                        android:layout_marginEnd="8dp"
                         android:background="?android:selectableItemBackground"
-                        android:src="@drawable/ic_baseline_autorenew_24"
+                        android:src="@drawable/ic_refresh_24dp"
                         app:layout_constraintBottom_toBottomOf="@+id/subredditSort"
                         app:layout_constraintEnd_toStartOf="@+id/subredditSort" />
 
@@ -164,7 +165,7 @@
                         android:layout_marginEnd="8dp"
 
                         android:background="?android:selectableItemBackground"
-                        android:src="@drawable/ic_baseline_sort_24"
+                        android:src="@drawable/ic_sort_24dp"
                         android:onClick="@{view -> MenuClickHandler.showPopupSortWithTime(view)}"
 
                         app:layout_constraintBottom_toBottomOf="@+id/subredditSubscribers"
@@ -197,7 +198,7 @@
             android:layout_gravity="bottom|end"
             app:backgroundTint="@color/colorAccent"
             app:borderWidth="0dp"
-            android:src="@drawable/ic_baseline_add_24"
+            android:src="@drawable/ic_create_24dp"
 
             android:visibility="@{standardSub ? View.GONE : View.VISIBLE, default=gone}"
             tools:visibility="visible" />

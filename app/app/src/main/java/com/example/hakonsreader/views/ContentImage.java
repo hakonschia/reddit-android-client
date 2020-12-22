@@ -117,12 +117,12 @@ public class ContentImage extends Content {
                     obfuscatedUrl = getObfuscatedUrl();
                     // If we don't have a URL to show then show the NSFW drawable instead as a fallback
                     if (obfuscatedUrl == null) {
-                        noImageId = R.drawable.ic_baseline_image_nsfw_200;
+                        noImageId = R.drawable.ic_image_not_supported_200dp;
                     }
                     break;
 
                 case NO_IMAGE:
-                    noImageId = R.drawable.ic_baseline_image_nsfw_200;
+                    noImageId = R.drawable.ic_image_not_supported_200dp;
                     break;
             }
         } else if (redditPost.isSpoiler()) {
@@ -131,7 +131,7 @@ public class ContentImage extends Content {
             obfuscatedUrl = getObfuscatedUrl();
             // If we don't have a URL to show then show the NSFW drawable instead as a fallback
             if (obfuscatedUrl == null) {
-                noImageId = R.drawable.ic_baseline_image_nsfw_200;
+                noImageId = R.drawable.ic_image_not_supported_200dp;
             }
         }
 
@@ -151,8 +151,8 @@ public class ContentImage extends Content {
             } else {
                 // If we have an obfuscated image, load that here instead
                 creator = Picasso.get().load(obfuscatedUrl != null ? obfuscatedUrl : imageUrl)
-                        .placeholder(R.drawable.ic_baseline_wifi_tethering_150)
-                        .error(R.drawable.ic_baseline_wifi_tethering_150)
+                        .placeholder(R.drawable.ic_wifi_tethering_150dp)
+                        .error(R.drawable.ic_wifi_tethering_150dp)
                         // Scale so the image fits the width of the screen
                         .resize(App.Companion.get().getScreenWidth(), 0);
 

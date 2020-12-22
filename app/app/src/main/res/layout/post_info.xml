@@ -112,7 +112,7 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
 
-            android:src="@drawable/ic_stickied"
+            android:src="@drawable/ic_pin_24dp"
 
             android:visibility="@{post.stickied ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintStart_toStartOf="parent"
@@ -127,7 +127,7 @@
 
             app:marginStart="@{post.stickied ? @dimen/defaultMarginHalf : @dimen/noMargin}"
 
-            android:src="@drawable/ic_baseline_archive_24"
+            android:src="@drawable/ic_archive_24dp"
             android:visibility="@{post.archived ? View.VISIBLE : View.GONE, default=gone}"
 
             app:layout_constraintHorizontal_chainStyle="packed"
@@ -142,7 +142,7 @@
 
             app:marginStart="@{post.archived ? @dimen/defaultMarginHalf : @dimen/noMargin}"
 
-            android:src="@drawable/ic_baseline_lock_24"
+            android:src="@drawable/ic_lock_24dp"
 
             android:visibility="@{post.locked ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintStart_toEndOf="@+id/archived"

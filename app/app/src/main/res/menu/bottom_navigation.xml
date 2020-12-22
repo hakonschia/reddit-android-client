@@ -3,12 +3,12 @@
 
     <item
         android:id="@+id/navHome"
-        android:icon="@drawable/ic_baseline_home_24"
+        android:icon="@drawable/ic_home_24dp"
         android:title="@string/navbarHome" />
 
     <item
         android:id="@+id/navSubreddit"
-        android:icon="@drawable/ic_baseline_wrap_text_24"
+        android:icon="@drawable/ic_wrap_text_24dp"
         android:title="@string/navbarSubreddit" />
 
     <item
@@ -18,6 +18,6 @@
 
     <item
         android:id="@+id/navSettings"
-        android:icon="@drawable/ic_baseline_settings_24"
+        android:icon="@drawable/ic_settings_24dp"
         android:title="@string/navbarSettings" />
 </menu>

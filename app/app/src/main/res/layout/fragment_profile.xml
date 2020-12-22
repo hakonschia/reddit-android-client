@@ -176,7 +176,7 @@
             android:layout_height="wrap_content"
 
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_baseline_mail_24"
+            android:src="@drawable/ic_mail_24dp"
             android:foreground="@drawable/ripple_main_bg"
             android:visibility="@{loggedInUser ? View.VISIBLE : View.GONE}"
 

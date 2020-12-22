@@ -130,7 +130,7 @@
 
             android:contentDescription="@string/content_description_expand_or_collapse_post"
             android:foreground="@drawable/ripple_main_bg"
-            android:src="@drawable/ic_baseline_arrow_up_24"
+            android:src="@drawable/ic_expand_less_24dp"
 
             app:layout_constraintBottom_toBottomOf="@id/post"
             app:layout_constraintEnd_toEndOf="parent"
@@ -179,7 +179,7 @@
                 android:onClick="goToPreviousTopLevelComment"
                 android:padding="10dp"
 
-                android:src="@drawable/ic_baseline_arrow_up_24" />
+                android:src="@drawable/ic_expand_less_24dp" />
 
             <View
                 android:layout_width="1dp"
@@ -199,7 +199,7 @@
                 android:onClick="goToNextTopLevelComment"
                 android:padding="10dp"
 
-                android:src="@drawable/ic_baseline_arrow_down_24" />
+                android:src="@drawable/ic_expand_more_24dp" />
         </LinearLayout>
 
         <com.example.hakonsreader.views.LoadingIcon
