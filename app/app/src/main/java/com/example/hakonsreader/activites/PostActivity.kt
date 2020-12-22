@@ -217,16 +217,6 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         val collapsePostByDefault = App.get().collapsePostsByDefaultWhenScrollingComments()
         enableTransition(collapsePostByDefault, showSnackbar = false)
-/*
-        binding.expandOrCollapsePostBlock.visibility = if (collapsePostByDefault) {
-            // This should be the default for the transition, but might as well set it
-            transition.setEnable(true)
-            GONE
-        } else {
-            transition.setEnable(false)
-            VISIBLE
-        }
- */
     }
 
     /**

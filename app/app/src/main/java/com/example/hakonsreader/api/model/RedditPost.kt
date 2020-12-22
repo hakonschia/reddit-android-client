@@ -396,6 +396,21 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
     var liked: Boolean? = null
 
     /**
+     * The user reports on the post.
+     *
+     * This will be an array of reports where each report is an array where the first element is a string
+     * of the report text, and the second is which report number it is
+     */
+    @SerializedName("user_reports")
+    var userReports: Array<Array<Any>>? = null
+
+    /**
+     * The amount of reports the post has
+     */
+    @SerializedName("num_reports")
+    var numReports = 0
+
+    /**
      * The vote type the post has
      *
      * Setting this value will automatically update [score], and is idempotent

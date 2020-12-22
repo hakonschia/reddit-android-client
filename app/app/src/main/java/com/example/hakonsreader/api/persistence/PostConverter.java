@@ -79,12 +79,24 @@ public class PostConverter {
 
 
     @TypeConverter
-    public static ArrayList<RichtextFlair> rickTextFlairListFromString(String value) {
+    public static ArrayList<RichtextFlair> richTextFlairListFromString(String value) {
         Type listType = new TypeToken<ArrayList<RichtextFlair>>() {}.getType();
         return gson.fromJson(value, listType);
     }
     @TypeConverter
     public static String fromRichTextFlairList(List<RichtextFlair> images) {
         return gson.toJson(images);
+    }
+
+
+    @TypeConverter
+    public static Object[][] arrayFromString(String value) {
+        Type listType = new TypeToken<Object[][]>() {}.getType();
+        return gson.fromJson(value, listType);
+    }
+
+    @TypeConverter
+    public static String stringFromArray(Object[][] array) {
+        return gson.toJson(array);
     }
 }
