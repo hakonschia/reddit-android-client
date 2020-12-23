@@ -414,4 +414,10 @@
 
     <string name="postTransitionEnabled">Post collapse enabled</string>
     <string name="postTransitionDisabled">Post collapse disabled</string>
+
+    <plurals name="userReportsTitle">
+        <item quantity="one">%d user report</item>
+        <item quantity="other">%d user reports</item>
+    </plurals>
+
 </resources>

@@ -59,4 +59,8 @@
     <color name="locked">#EDB403</color>
     <color name="commentLockedWithAlpha">#26EDB403</color>
 
+    <color name="reports">#EDB403</color>
+    <color name="reportsIgnored">#202020</color>
+    <color name="reportsBackground">#37CF9E05</color>
+    <color name="reportsBackgroundIgnored">#26D3D3D3</color>
 </resources>

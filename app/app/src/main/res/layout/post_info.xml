@@ -26,11 +26,12 @@
 
         <!-- Group to control visibility of views that shouldn't show before the post is loaded -->
         <androidx.constraintlayout.widget.Group
+            android:id="@+id/group"
             android:layout_width="wrap_content"
+
             android:layout_height="wrap_content"
 
             android:visibility="@{post == null ? View.GONE : View.VISIBLE}"
-
             app:constraint_referenced_ids="postedIn, postedBy" />
 
         <TextView
@@ -172,7 +173,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@+id/postedBy"
-            tools:text="u/hakonschiaddddddddddddddddd" />
+            tools:text="u/hakonschiadddddddddd" />
 
         <com.example.hakonsreader.views.Tag
             android:id="@+id/authorFlair"
@@ -194,15 +195,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
             android:visibility="@{post.nsfw ? View.VISIBLE : View.GONE}"
 
-            app:text="@string/tagNSFW"
-            app:textColor="@color/tagNSFWText"
             app:fillColor="@color/tagNSFWFill"
-
             app:layout_constraintStart_toEndOf="@+id/domain"
-            app:layout_constraintTop_toTopOf="@+id/domain" />
+            app:layout_constraintTop_toTopOf="@+id/domain"
+
+            app:text="@string/tagNSFW"
+            app:textColor="@color/tagNSFWText" />
 
         <com.example.hakonsreader.views.Tag
             android:id="@+id/spoilerTag"
@@ -297,24 +298,47 @@
             tools:text="r/GlobalOffensive"/>
 
         <TextView
+            android:id="@+id/userReportsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:foreground="@drawable/ripple_main_bg"
+            android:background="@{post.ignoreReports ? @drawable/reports_background_ignored : @drawable/reports_background}"
+
+            android:paddingStart="0dp"
+            android:paddingTop="1dp"
+            android:paddingEnd="4dp"
+            android:textColor="@color/textColorTextPosts"
+            android:text="@{@plurals/userReportsTitle(post.numReports, post.numReports)}"
+            android:visibility="@{post.numReports != 0 ? View.VISIBLE : View.GONE, default=gone}"
+
+            app:drawableStartCompat="@drawable/ic_flag_24dp"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/age"
+
+            tools:background="@drawable/reports_background"
+            tools:text="5 user reports"
+            tools:visibility="visible" />
+
+        <TextView
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
             android:layout_marginBottom="5dp"
-
             android:text="@{post.title}"
             android:textColor="@color/text_color"
+
             android:textSize="15sp"
             android:textStyle="bold"
-
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/age"
-            app:layout_constraintVertical_bias="0.0"
 
+            app:layout_constraintTop_toBottomOf="@+id/userReportsTitle"
+            app:layout_constraintVertical_bias="0.0"
             tools:text="FaZe wins major /s. To show a long title I am adding a bunch of random text here Lorem ipsum etc etc" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

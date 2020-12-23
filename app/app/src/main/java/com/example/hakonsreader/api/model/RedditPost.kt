@@ -7,9 +7,11 @@ import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.interfaces.VoteableListing
+import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
 import com.example.hakonsreader.api.persistence.PostConverter
 import com.google.gson.Gson
+import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import com.google.gson.internal.LinkedTreeMap
 import java.util.function.BiConsumer
@@ -399,7 +401,7 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
      * The user reports on the post.
      *
      * This will be an array of reports where each report is an array where the first element is a string
-     * of the report text, and the second is which report number it is
+     * of the report text, and the second is a number which says something
      */
     @SerializedName("user_reports")
     var userReports: Array<Array<Any>>? = null
@@ -407,8 +409,16 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
     /**
      * The amount of reports the post has
      */
+    @JsonAdapter(NullAsIntAdapter::class)
     @SerializedName("num_reports")
     var numReports = 0
+
+    /**
+     * True if reports are set to be ignored on the post
+     */
+    @SerializedName("ignore_reports")
+    var ignoreReports = false
+
 
     /**
      * The vote type the post has
