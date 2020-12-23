@@ -11,13 +11,16 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.databinding.BindingAdapter;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostInfoBinding;
+import com.example.hakonsreader.fragments.ReportsBottomSheet;
 import com.example.hakonsreader.views.util.ViewUtil;
 import com.google.gson.Gson;
 
@@ -54,6 +57,7 @@ public class PostInfo extends ConstraintLayout {
     public void setPost(@NonNull RedditPost post) {
         binding.setPost(post);
         binding.setIsCrosspost(post.getPostType() == PostType.CROSSPOST);
+        binding.userReportsTitle.setOnClickListener(v -> openReportsBottomSheet(post));
 
         List<RedditPost> crossposts = post.getCrossposts();
         if (crossposts != null && crossposts.size() > 0) {
@@ -73,5 +77,22 @@ public class PostInfo extends ConstraintLayout {
         intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(post));
         Activity activity = (Activity)getContext();
         activity.startActivity(intent);
+    }
+
+    /**
+     * Opens a bottom sheet for the reports, if the post has any reports
+     *
+     * @param post The post to open reports for
+     */
+    private void openReportsBottomSheet(RedditPost post) {
+        if (post.getNumReports() == 0) {
+            return;
+        }
+        FragmentManager manager = ((AppCompatActivity)getContext()).getSupportFragmentManager();
+
+        ReportsBottomSheet bottomSheet = new ReportsBottomSheet();
+        bottomSheet.setPost(post);
+
+        bottomSheet.show(manager, "reportsBottomSheet");
     }
 }

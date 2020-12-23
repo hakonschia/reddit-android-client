@@ -60,7 +60,7 @@
     <color name="commentLockedWithAlpha">#26EDB403</color>
 
     <color name="reports">#EDB403</color>
-    <color name="reportsIgnored">#202020</color>
     <color name="reportsBackground">#37CF9E05</color>
-    <color name="reportsBackgroundIgnored">#26D3D3D3</color>
+    <color name="reportsIgnored">#6E6E6E</color>
+    <color name="reportsBackgroundIgnored">#26636363</color>
 </resources>

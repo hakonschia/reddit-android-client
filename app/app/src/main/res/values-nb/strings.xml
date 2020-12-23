@@ -280,4 +280,5 @@
         <item quantity="one">%d brukerrapportering</item>
         <item quantity="other">%d brukerrapporteringer</item>
     </plurals>
+    <string name="userReportsBottomSheetTitle">Brukerrapporteringer for \'%s\'</string>
 </resources>

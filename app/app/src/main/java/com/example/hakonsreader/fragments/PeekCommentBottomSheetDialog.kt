@@ -6,12 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.RedditComment
-import com.example.hakonsreader.databinding.PeekParentCommentBinding
+import com.example.hakonsreader.databinding.BottomSheetPeekParentCommentBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
+/**
+ * BottomSheet for peeking a comment
+ */
 class PeekCommentBottomSheetDialog : BottomSheetDialogFragment() {
 
-    private var _binding: PeekParentCommentBinding? = null
+    private var _binding: BottomSheetPeekParentCommentBinding? = null
     private val binding get() = _binding!!
 
     /**
@@ -20,7 +23,7 @@ class PeekCommentBottomSheetDialog : BottomSheetDialogFragment() {
     var comment: RedditComment? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = PeekParentCommentBinding.inflate(inflater)
+        _binding = BottomSheetPeekParentCommentBinding.inflate(inflater)
         binding.isByLoggedInUser = comment?.author == App.storedUser?.username
         binding.comment = comment
 
