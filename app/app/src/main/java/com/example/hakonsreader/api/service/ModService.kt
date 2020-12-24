@@ -76,4 +76,31 @@ interface ModService {
             @Field("state") sticky: Boolean,
             @Field("api_type") apiType: String
     ) : Response<JsonResponse<Void>>
+
+
+    /**
+     * Ignore reports on a post or comment
+     *
+     * @param fullname The fullname of the post or comment
+     * @return The response will not hold any data, but potential errors will be handled by the
+     * [JsonResponse]
+     */
+    @POST("api/ignore_reports")
+    @FormUrlEncoded
+    suspend fun ignoreReports(
+            @Field("id") fullname: String
+    ) : Response<JsonResponse<Void>>
+
+    /**
+     * Undo ignore reports on a post or comment
+     *
+     * @param fullname The fullname of the post or comment
+     * @return The response will not hold any data, but potential errors will be handled by the
+     * [JsonResponse]
+     */
+    @POST("api/ignore_reports")
+    @FormUrlEncoded
+    suspend fun unignoreReports(
+            @Field("id") fullname: String
+    ) : Response<JsonResponse<Void>>
 }

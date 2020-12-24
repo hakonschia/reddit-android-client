@@ -195,7 +195,7 @@ class PostRequest(
      * @return An [ApiResponse] with no success data
      * @see unsticky
      */
-    suspend fun sticky() : ApiResponse<Nothing?> {
+    suspend fun sticky() : ApiResponse<Any?> {
         return modRequest.stickyPost(postId, true)
     }
 
@@ -209,7 +209,7 @@ class PostRequest(
      * @return An [ApiResponse] with no success data
      * @see sticky
      */
-    suspend fun unsticky() : ApiResponse<Nothing?> {
+    suspend fun unsticky() : ApiResponse<Any?> {
         return modRequest.stickyPost(postId, false)
     }
 
@@ -244,5 +244,25 @@ class PostRequest(
         } catch (e: Exception) {
             ApiResponse.Error(GenericError(-1), e)
         }
+    }
+
+    /**
+     * Ignores reports on the post
+     *
+     * @return An [ApiResponse] with no success data
+     * @see unignoreReports
+     */
+    suspend fun ignoreReports() : ApiResponse<Any?> {
+        return modRequest.ignoreReports(Thing.POST, postId)
+    }
+
+    /**
+     * Unignores reports on the post
+     *
+     * @return An [ApiResponse] with no success data
+     * @see ignoreReports
+     */
+    suspend fun unignoreReports() : ApiResponse<Any?> {
+        return modRequest.unignoreReports(Thing.POST, postId)
     }
 }

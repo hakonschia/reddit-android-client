@@ -92,7 +92,7 @@ class ModRequestModel(
      *               a 409 Conflict error will occur
      * @return No data is returned
      */
-    suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Nothing?> {
+    suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Any?> {
         try {
             Util.verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -104,6 +104,60 @@ class ModRequestModel(
                     Util.createFullName(Thing.POST, id),
                     sticky,
                     RedditApi.API_TYPE
+            )
+
+            if (resp.isSuccessful) {
+                ApiResponse.Success(null)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Ignore reports on a post or comment
+     *
+     * @see unignoreReports
+     */
+    suspend fun ignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
+        try {
+            Util.verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Ignoring reports requires a valid access token for a logged in user", e))
+        }
+
+        return try {
+            val resp = api.ignoreReports(
+                    Util.createFullName(thing, id)
+            )
+
+            if (resp.isSuccessful) {
+                ApiResponse.Success(null)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Unignore reports on a post or comment
+     *
+     * @see ignoreReports
+     */
+    suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
+        try {
+            Util.verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Unignoring reports requires a valid access token for a logged in user", e))
+        }
+
+        return try {
+            val resp = api.unignoreReports(
+                    Util.createFullName(thing, id)
             )
 
             if (resp.isSuccessful) {
