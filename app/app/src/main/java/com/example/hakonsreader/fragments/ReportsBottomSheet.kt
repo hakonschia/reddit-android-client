@@ -11,12 +11,15 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.BottomSheetReportsBinding
+import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.ReportsAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * BottomSheet for displaying a list of reports
@@ -34,6 +37,11 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
      * The post to show reports for
      */
     var post: RedditPost? = null
+
+    /**
+     * The listener to call when the reports have been set to be ignored/unignored
+     */
+    var onIgnoreChange: OnReportsIgnoreChangeListener? = null
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -70,6 +78,9 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
                 //   color of the "User reports" button
                 it.ignoreReports = ignore
                 binding.ignored = ignore
+                withContext(Main) {
+                    onIgnoreChange?.onIgnoredChange(ignore)
+                }
 
                 val resp = if (ignore) {
                     api.post(it.id).ignoreReports()
@@ -81,14 +92,17 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
                     // We assume success, so nothing has to be done now
                     is ApiResponse.Success -> { }
                     is ApiResponse.Error -> {
-                        // Restore original
-                        it.ignoreReports = !ignore
+                        withContext(Main) {
+                            // Restore original
+                            it.ignoreReports = !ignore
+                            onIgnoreChange?.onIgnoredChange(!ignore)
 
-                        // Since this is a network response, binding might have been nulled by the time
-                        // the response comes through
-                        _binding?.let { bind ->
-                            bind.ignored = !ignore
-                            Util.handleGenericResponseErrors(bind.root, resp.error, resp.throwable)
+                            // Since this is a network response, binding might have been nulled by the time
+                            // the response comes through
+                            _binding?.let { bind ->
+                                bind.ignored = !ignore
+                                Util.handleGenericResponseErrors(bind.root, resp.error, resp.throwable)
+                            }
                         }
                     }
                 }

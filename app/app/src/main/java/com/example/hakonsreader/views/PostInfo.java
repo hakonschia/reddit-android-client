@@ -21,6 +21,7 @@ import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostInfoBinding;
 import com.example.hakonsreader.fragments.ReportsBottomSheet;
+import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener;
 import com.example.hakonsreader.views.util.ViewUtil;
 import com.google.gson.Gson;
 
@@ -35,6 +36,9 @@ public class PostInfo extends ConstraintLayout {
 
     private final PostInfoBinding binding;
 
+    @Nullable
+    private OnReportsIgnoreChangeListener onReportsIgnored;
+
     public PostInfo(@NonNull Context context) {
         this(context, null, 0, 0);
     }
@@ -47,6 +51,10 @@ public class PostInfo extends ConstraintLayout {
     public PostInfo(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
+    }
+
+    public void setOnReportsIgnored(@Nullable OnReportsIgnoreChangeListener onReportsIgnored) {
+        this.onReportsIgnored = onReportsIgnored;
     }
 
     /**
@@ -92,6 +100,12 @@ public class PostInfo extends ConstraintLayout {
 
         ReportsBottomSheet bottomSheet = new ReportsBottomSheet();
         bottomSheet.setPost(post);
+        bottomSheet.setOnIgnoreChange(ignored -> {
+            // TODO look into BaseObservable, or something, so that changing the values will automatically
+            //  reflect on the binding, so I don't have to set the post again like this
+            binding.setPost(post);
+            binding.executePendingBindings();
+        });
 
         bottomSheet.show(manager, "reportsBottomSheet");
     }
