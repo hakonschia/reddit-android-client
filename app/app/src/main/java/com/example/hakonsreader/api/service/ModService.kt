@@ -98,7 +98,7 @@ interface ModService {
      * @return The response will not hold any data, but potential errors will be handled by the
      * [JsonResponse]
      */
-    @POST("api/ignore_reports")
+    @POST("api/unignore_reports")
     @FormUrlEncoded
     suspend fun unignoreReports(
             @Field("id") fullname: String

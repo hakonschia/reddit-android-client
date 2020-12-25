@@ -281,4 +281,6 @@
         <item quantity="other">%d brukerrapporteringer</item>
     </plurals>
     <string name="userReportsBottomSheetTitle">Brukerrapporteringer for \'%s\'</string>
+    <string name="ignoreReportsButton">Ignorer</string>
+    <string name="restoreReportsButton">Gjenopprett</string>
 </resources>

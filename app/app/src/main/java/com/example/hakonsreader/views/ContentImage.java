@@ -142,6 +142,7 @@ public class ContentImage extends Content {
         //  Exception message: java.lang.RuntimeException: Canvas: trying to draw too large(107867520bytes) bitmap.
         //  Since it's hard to reproduce I'm not even sure if wrapping this section in a try catch works or not
         //  The issue at least happens with extremely large images (although it didn't happen with large images the first time)
+        //  https://www.reddit.com/r/dataisbeautiful/comments/kji3wx/oc_2020_electoral_map_if_only_voted_breakdown_by/
 
         try {
             RequestCreator creator;

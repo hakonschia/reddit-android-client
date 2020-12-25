@@ -421,5 +421,7 @@
         <item quantity="one">%d user report</item>
         <item quantity="other">%d user reports</item>
     </plurals>
+    <string name="ignoreReportsButton">Ignore</string>
+    <string name="restoreReportsButton">Restore</string>
 
 </resources>

@@ -34,7 +34,7 @@ class PostRequest(
     /**
      * Get comments for the post
      *
-     * OAuth scope required: *read*
+     * OAuth scope required: `read`
      *
      * @param sort How the comments should be sorted. Default to [SortingMethods.HOT]
      */
@@ -68,7 +68,7 @@ class PostRequest(
      *
      * If an access token is set comments are customized for the user (ie. vote status is set)
      *
-     * OAuth scope required: *read*
+     * OAuth scope required: `read`
      *
      * @param children The list of IDs of comments to get (retrieved via [RedditComment.getChildren])
      * @param parent Optional: The parent comment the new comments belong to. If this sets the new comments
@@ -110,7 +110,7 @@ class PostRequest(
     /**
      * Vote on the post
      *
-     * OAuth scope required: *vote*
+     * OAuth scope required: `vote`
      *
      * @param voteType The type of vote to cast
      * @return An [ApiResponse] with no success data
@@ -122,7 +122,7 @@ class PostRequest(
     /**
      * Submit a new comment as a reply to the post. For replies to other comments use {@link CommentRequest#reply(String, OnResponse, OnFailure)}
      *
-     * OAuth scope required: *submit*
+     * OAuth scope required: `submit`
      *
      * @param text The comment to submit, formatted as <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
      * @return An [ApiResponse] with the new comment
@@ -135,7 +135,7 @@ class PostRequest(
     /**
      * Save the post
      *
-     * OAuth scope required: *save*
+     * OAuth scope required: `save`
      *
      * @return An [ApiResponse] with no success data
      * @see unsave
@@ -147,7 +147,7 @@ class PostRequest(
     /**
      * Unsave the post
      *
-     * OAuth scope required: *save*
+     * OAuth scope required: `save`
      *
      * @return An [ApiResponse] with no success data
      * @see save
@@ -162,7 +162,7 @@ class PostRequest(
      *
      * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
      *
-     * OAuth scope required: *modposts*
+     * OAuth scope required: `modposts`
      *
      * @return An [ApiResponse] with the updated post
      * @see removeModDistinguish
@@ -176,7 +176,7 @@ class PostRequest(
      *
      * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
      *
-     * OAuth scope required: *modposts*
+     * OAuth scope required: `modposts`
      *
      * @return An [ApiResponse] with the updated post
      * @see removeModDistinguish
@@ -190,7 +190,7 @@ class PostRequest(
      *
      * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
      *
-     * OAuth scope required: *modposts*
+     * OAuth scope required: `modposts`
      *
      * @return An [ApiResponse] with no success data
      * @see unsticky
@@ -204,7 +204,7 @@ class PostRequest(
      *
      * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
      *
-     * OAuth scope required: *modposts*
+     * OAuth scope required: `modposts`
      *
      * @return An [ApiResponse] with no success data
      * @see sticky
@@ -219,7 +219,7 @@ class PostRequest(
      * Retrieving comments also retrieves the post information, only use this if you only want
      * the post information
      *
-     * OAuth scope required: *read*
+     * OAuth scope required: `read`
      *
      * @return The post will be returned in the response. If the post wasn't found, this will be *null*
      * @see comments
@@ -249,6 +249,8 @@ class PostRequest(
     /**
      * Ignores reports on the post
      *
+     * OAuth scope required: `modposts`
+     *
      * @return An [ApiResponse] with no success data
      * @see unignoreReports
      */
@@ -258,6 +260,8 @@ class PostRequest(
 
     /**
      * Unignores reports on the post
+     *
+     * OAuth scope required: `modposts`
      *
      * @return An [ApiResponse] with no success data
      * @see ignoreReports
