@@ -557,7 +557,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                         subreddit.set(sub)
                     }
                 }
-                is ApiResponse.Error -> handleErrors(response.error, response.throwable)
+                is ApiResponse.Error -> {
+                    withContext(Main) {
+                        handleErrors(response.error, response.throwable)
+                    }
+                }
             }
         }
     }
