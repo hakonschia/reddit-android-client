@@ -5,7 +5,7 @@ import com.example.hakonsreader.api.responses.ApiResponse
 /**
  * Interface for requests that offer functionality to save/unsave a post or comment
  */
-interface SaveableRequestKt {
+interface SaveableRequest {
 
     suspend fun save() : ApiResponse<Nothing?>
 

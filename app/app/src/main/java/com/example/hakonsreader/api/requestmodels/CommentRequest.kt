@@ -5,7 +5,8 @@ import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.interfaces.ReplyableRequest
-import com.example.hakonsreader.api.interfaces.SaveableRequestKt
+import com.example.hakonsreader.api.interfaces.ReportableRequest
+import com.example.hakonsreader.api.interfaces.SaveableRequest
 import com.example.hakonsreader.api.interfaces.VoteableRequest
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditComment
@@ -20,7 +21,7 @@ class CommentRequest(
         private val accessToken: AccessToken,
         private val api: CommentService,
         private val commentId: String
-) : VoteableRequest, ReplyableRequest, SaveableRequestKt {
+) : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest {
 
     private val voteRequest: VoteableRequestModel = VoteableRequestModel(accessToken, api)
     private val replyRequest: ReplyableRequestModel = ReplyableRequestModel(accessToken, api)
@@ -181,6 +182,30 @@ class CommentRequest(
     suspend fun unsticky() : ApiResponse<RedditComment>  {
         // Well this is identical to distinguishAsMod, but the function name makes sense so keep it
         return modRequest.distinguishAsModComment(commentId, distinguish =  true, sticky = false)
+    }
+
+    /**
+     * Ignores reports on the comment
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see unignoreReports
+     */
+    override suspend fun ignoreReports() : ApiResponse<Any?> {
+        return modRequest.ignoreReports(Thing.COMMENT, commentId)
+    }
+
+    /**
+     * Unignores reports on the comment
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see ignoreReports
+     */
+    override suspend fun unignoreReports() : ApiResponse<Any?> {
+        return modRequest.unignoreReports(Thing.COMMENT, commentId)
     }
 
 }

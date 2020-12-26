@@ -4,6 +4,10 @@ package com.example.hakonsreader.api.interfaces
  * Interface for listings that are reportable
  */
 interface ReportableListing {
+    /**
+     * The ID of the listing
+     */
+    var id: String
 
     /**
      * The user reports on the listing.

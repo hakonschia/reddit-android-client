@@ -1,13 +1,12 @@
 package com.example.hakonsreader.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
-import com.example.hakonsreader.R
+import com.example.hakonsreader.api.interfaces.ReportableListing
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.BottomSheetReportsBinding
@@ -36,7 +35,7 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
     /**
      * The post to show reports for
      */
-    var post: RedditPost? = null
+    var listing: ReportableListing? = null
 
     /**
      * The listener to call when the reports have been set to be ignored/unignored
@@ -47,11 +46,10 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = BottomSheetReportsBinding.inflate(inflater)
 
-        binding.post = post
-        binding.ignored = post?.ignoreReports == true
+        binding.ignored = listing?.ignoreReports == true
         binding.ignoreReports.setOnClickListener { ignoreOnClick() }
 
-        val reports = post?.userReports?.toList()
+        val reports = listing?.userReports?.toList()
         val adapter = ReportsAdapter().apply {
             if (reports != null) {
                 submitList(reports)
@@ -69,7 +67,7 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun ignoreOnClick() {
-        post?.let {
+        listing?.let {
             CoroutineScope(IO).launch {
                 val ignore = !it.ignoreReports
 
@@ -82,10 +80,16 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
                     onIgnoreChange?.onIgnoredChange(ignore)
                 }
 
-                val resp = if (ignore) {
-                    api.post(it.id).ignoreReports()
+                val request = if (listing is RedditPost) {
+                    api.post(it.id)
                 } else {
-                    api.post(it.id).unignoreReports()
+                    api.comment(it.id)
+                }
+
+                val resp = if (ignore) {
+                    request.ignoreReports()
+                } else {
+                    request.unignoreReports()
                 }
 
                 when (resp) {

@@ -5,15 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.databinding.BindingAdapter;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.hakonsreader.activites.PostActivity;
@@ -22,7 +18,6 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostInfoBinding;
 import com.example.hakonsreader.fragments.ReportsBottomSheet;
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener;
-import com.example.hakonsreader.views.util.ViewUtil;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -99,7 +94,7 @@ public class PostInfo extends ConstraintLayout {
         FragmentManager manager = ((AppCompatActivity)getContext()).getSupportFragmentManager();
 
         ReportsBottomSheet bottomSheet = new ReportsBottomSheet();
-        bottomSheet.setPost(post);
+        bottomSheet.setListing(post);
         bottomSheet.setOnIgnoreChange(ignored -> {
             // TODO look into BaseObservable, or something, so that changing the values will automatically
             //  reflect on the binding, so I don't have to set the post again like this

@@ -8,10 +8,6 @@
     <data>
 
         <variable
-            name="post"
-            type="com.example.hakonsreader.api.model.RedditPost" />
-
-        <variable
             name="ignored"
             type="boolean" />
 
@@ -34,15 +30,14 @@
             android:maxLines="1"
             android:textColor="@color/text_color"
             android:textSize="17sp"
-            android:text="@{@string/userReportsBottomSheetTitle(post.title)}"
+            android:text="@string/userReportsBottomSheetTitle"
 
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="@+id/ignoreReports"
             app:layout_constraintEnd_toStartOf="@+id/ignoreReports"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="User reports for 'FaZe wins major \s'" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/reports"
