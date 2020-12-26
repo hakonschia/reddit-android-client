@@ -2,14 +2,16 @@ package com.example.hakonsreader.api.model
 
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.ReplyableListing
+import com.example.hakonsreader.api.interfaces.ReportableListing
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter
+import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
 import com.example.hakonsreader.api.responses.ListingResponse
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 
-class RedditComment : RedditListing(), VoteableListing, ReplyableListing {
+class RedditComment : RedditListing(), VoteableListing, ReplyableListing, ReportableListing {
 
     /**
      * The body of comment in Markdown
@@ -258,6 +260,29 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing {
                 VoteType.NO_VOTE -> null
             }
         }
+
+
+    /**
+     * The user reports on the comment.
+     *
+     * This will be an array of reports where each report is an array where the first element is a string
+     * of the report text, and the second is a number which says something
+     */
+    @SerializedName("user_reports")
+    override var userReports: Array<Array<Any>>? = null
+
+    /**
+     * The amount of reports the comment has
+     */
+    @JsonAdapter(NullAsIntAdapter::class)
+    @SerializedName("num_reports")
+    override var numReports = 0
+
+    /**
+     * True if reports are set to be ignored on the comment
+     */
+    @SerializedName("ignore_reports")
+    override var ignoreReports = false
 
 
     @SerializedName("replies")

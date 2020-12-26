@@ -6,6 +6,7 @@ import androidx.room.TypeConverters
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.ReplyableListing
+import com.example.hakonsreader.api.interfaces.ReportableListing
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
@@ -19,7 +20,7 @@ import java.util.function.BiConsumer
 
 @Entity(tableName = "posts")
 @TypeConverters(PostConverter::class)
-class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
+class RedditPost : RedditListing(), VoteableListing, ReplyableListing, ReportableListing {
 
     /**
      * The title of the post
@@ -404,20 +405,20 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing {
      * of the report text, and the second is a number which says something
      */
     @SerializedName("user_reports")
-    var userReports: Array<Array<Any>>? = null
+    override var userReports: Array<Array<Any>>? = null
 
     /**
      * The amount of reports the post has
      */
     @JsonAdapter(NullAsIntAdapter::class)
     @SerializedName("num_reports")
-    var numReports = 0
+    override var numReports = 0
 
     /**
      * True if reports are set to be ignored on the post
      */
     @SerializedName("ignore_reports")
-    var ignoreReports = false
+    override var ignoreReports = false
 
 
     /**
