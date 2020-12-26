@@ -8,15 +8,20 @@ import android.widget.ImageView;
 import android.widget.Space;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.interfaces.ReportableListing;
 import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
+import com.example.hakonsreader.fragments.ReportsBottomSheet;
+import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener;
 import com.example.hakonsreader.views.Tag;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -237,5 +242,25 @@ public class ViewUtil {
         }
 
         return true;
+    }
+
+    /**
+     * Opens a BottomSheet with the user reports of a ReportableListing
+     *
+     * @param listing The listing to show user reports for
+     * @param context The context to open the BottomSheet in
+     * @param onReportsIgnoreChange The callback for when the reports have been ignored/unignored
+     */
+    public static void openReportsBottomSheet(ReportableListing listing, Context context, OnReportsIgnoreChangeListener onReportsIgnoreChange) {
+        if (listing.getNumReports() == 0) {
+            return;
+        }
+        FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
+
+        ReportsBottomSheet bottomSheet = new ReportsBottomSheet();
+        bottomSheet.setListing(listing);
+        bottomSheet.setOnIgnoreChange(onReportsIgnoreChange);
+
+        bottomSheet.show(manager, "reportsBottomSheet");
     }
 }

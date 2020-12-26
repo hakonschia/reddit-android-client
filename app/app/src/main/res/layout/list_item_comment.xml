@@ -8,6 +8,7 @@
         <import type="android.view.View" />
         <import type="android.graphics.Typeface" />
         <import type="com.example.hakonsreader.views.util.ClickHandler"/>
+        <import type="com.example.hakonsreader.views.util.ViewUtil"/>
         <import type="com.example.hakonsreader.views.util.MenuClickHandler"/>
         <import type="com.example.hakonsreader.App"/>
         <import type="com.example.hakonsreader.api.model.RedditUser"/>
@@ -32,6 +33,10 @@
         <variable
             name="adapter"
             type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
+
+        <variable
+            name="onReportsIgnoreChange"
+            type="com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -179,6 +184,31 @@
             tools:visibility="visible" />
 
         <TextView
+            android:id="@+id/userReportsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:foreground="@drawable/ripple_main_bg"
+            android:background="@{comment.ignoreReports ? @drawable/reports_background_ignored : @drawable/reports_background}"
+
+            android:paddingStart="0dp"
+            android:paddingTop="1dp"
+            android:paddingEnd="4dp"
+            android:textColor="@color/textColorTextPosts"
+            android:text="@{@plurals/userReportsTitle(comment.numReports, comment.numReports)}"
+            android:visibility="@{comment.numReports != 0 ? View.VISIBLE : View.GONE, default=gone}"
+
+            android:onClick="@{(view) -> ViewUtil.openReportsBottomSheet(comment, view.context, onReportsIgnoreChange)}"
+            app:drawableStartCompat="@drawable/ic_flag_24dp"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/commentAuthor"
+
+            tools:background="@drawable/reports_background"
+            tools:text="5 user reports"
+            tools:visibility="visible" />
+
+        <TextView
             android:id="@+id/commentContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -187,13 +217,13 @@
             android:textColor="@color/text_color"
             android:textColorLink="@color/link_color"
 
-            app:markdown="@{comment.body}"
-
             app:layout_constrainedWidth="true"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/commentAuthor"
-            app:layout_constraintTop_toBottomOf="@+id/commentAuthor"
+            app:layout_constraintTop_toBottomOf="@+id/userReportsTitle"
+            app:markdown="@{comment.body}"
 
             tools:text="@tools:sample/lorem[50]" />
 

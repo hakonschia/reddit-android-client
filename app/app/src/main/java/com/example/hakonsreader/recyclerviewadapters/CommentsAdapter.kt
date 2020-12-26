@@ -29,6 +29,7 @@ import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding
 import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.OnReplyListener
+import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForLoggedInUser
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForNonLoggedInUser
@@ -488,6 +489,11 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
                 val binding = ListItemCommentBinding.inflate(layoutInflater, parent, false)
                 binding.adapter = this
                 binding.post = post
+                binding.onReportsIgnoreChange = object : OnReportsIgnoreChangeListener {
+                    override fun onIgnoredChange(ignored: Boolean) {
+                        binding.invalidateAll()
+                    }
+                }
                 NormalCommentViewHolder(binding)
             }
         }

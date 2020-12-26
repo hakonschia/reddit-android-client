@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,7 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostInfoBinding;
 import com.example.hakonsreader.fragments.ReportsBottomSheet;
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener;
+import com.example.hakonsreader.views.util.ViewUtil;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -30,9 +32,6 @@ public class PostInfo extends ConstraintLayout {
     private static final String TAG = "PostInfo";
 
     private final PostInfoBinding binding;
-
-    @Nullable
-    private OnReportsIgnoreChangeListener onReportsIgnored;
 
     public PostInfo(@NonNull Context context) {
         this(context, null, 0, 0);
@@ -48,10 +47,6 @@ public class PostInfo extends ConstraintLayout {
         binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true);
     }
 
-    public void setOnReportsIgnored(@Nullable OnReportsIgnoreChangeListener onReportsIgnored) {
-        this.onReportsIgnored = onReportsIgnored;
-    }
-
     /**
      * Sets the post to use in this VoteBar and sets the initial state of the vote status
      *
@@ -60,7 +55,7 @@ public class PostInfo extends ConstraintLayout {
     public void setPost(@NonNull RedditPost post) {
         binding.setPost(post);
         binding.setIsCrosspost(post.getPostType() == PostType.CROSSPOST);
-        binding.userReportsTitle.setOnClickListener(v -> openReportsBottomSheet(post));
+        binding.userReportsTitle.setOnClickListener(v -> ViewUtil.openReportsBottomSheet(post, getContext(), ignored -> binding.invalidateAll()));
 
         List<RedditPost> crossposts = post.getCrossposts();
         if (crossposts != null && crossposts.size() > 0) {
@@ -80,28 +75,5 @@ public class PostInfo extends ConstraintLayout {
         intent.putExtra(PostActivity.POST_KEY, new Gson().toJson(post));
         Activity activity = (Activity)getContext();
         activity.startActivity(intent);
-    }
-
-    /**
-     * Opens a bottom sheet for the reports, if the post has any reports
-     *
-     * @param post The post to open reports for
-     */
-    private void openReportsBottomSheet(RedditPost post) {
-        if (post.getNumReports() == 0) {
-            return;
-        }
-        FragmentManager manager = ((AppCompatActivity)getContext()).getSupportFragmentManager();
-
-        ReportsBottomSheet bottomSheet = new ReportsBottomSheet();
-        bottomSheet.setListing(post);
-        bottomSheet.setOnIgnoreChange(ignored -> {
-            // TODO look into BaseObservable, or something, so that changing the values will automatically
-            //  reflect on the binding, so I don't have to set the post again like this
-            binding.setPost(post);
-            binding.executePendingBindings();
-        });
-
-        bottomSheet.show(manager, "reportsBottomSheet");
     }
 }
