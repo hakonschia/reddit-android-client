@@ -1,4 +1,4 @@
-package com.example.hakonsreader.fragments
+package com.example.hakonsreader.fragments.bottomsheets
 
 import android.os.Bundle
 import android.view.LayoutInflater

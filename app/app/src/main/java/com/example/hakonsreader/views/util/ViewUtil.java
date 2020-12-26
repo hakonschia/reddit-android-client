@@ -1,11 +1,8 @@
 package com.example.hakonsreader.views.util;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Space;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +17,7 @@ import com.example.hakonsreader.api.model.RedditComment;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
-import com.example.hakonsreader.fragments.ReportsBottomSheet;
+import com.example.hakonsreader.fragments.bottomsheets.ReportsBottomSheet;
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener;
 import com.example.hakonsreader.views.Tag;
 import com.squareup.picasso.Callback;

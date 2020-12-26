@@ -11,7 +11,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.fragments.PeekCommentBottomSheetDialog
+import com.example.hakonsreader.fragments.bottomsheets.PeekCommentBottomSheet
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -247,7 +247,7 @@ private fun copyCommentLinkOnClick(view: View, comment: RedditComment) {
 
 private fun peekParentOnClick(context: Context, comment: RedditComment) {
     context as AppCompatActivity
-    val bottomSheet = PeekCommentBottomSheetDialog()
+    val bottomSheet = PeekCommentBottomSheet()
     bottomSheet.comment = comment
     bottomSheet.show(context.supportFragmentManager, "peekParentBottomSheet")
 }

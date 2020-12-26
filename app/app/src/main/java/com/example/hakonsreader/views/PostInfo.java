@@ -5,20 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.FragmentManager;
 
 import com.example.hakonsreader.activites.PostActivity;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostInfoBinding;
-import com.example.hakonsreader.fragments.ReportsBottomSheet;
-import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener;
 import com.example.hakonsreader.views.util.ViewUtil;
 import com.google.gson.Gson;
 

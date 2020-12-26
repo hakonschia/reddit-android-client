@@ -1,4 +1,4 @@
-package com.example.hakonsreader.fragments
+package com.example.hakonsreader.fragments.bottomsheets
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 /**
  * BottomSheet for peeking a comment
  */
-class PeekCommentBottomSheetDialog : BottomSheetDialogFragment() {
+class PeekCommentBottomSheet : BottomSheetDialogFragment() {
 
     private var _binding: BottomSheetPeekParentCommentBinding? = null
     private val binding get() = _binding!!
