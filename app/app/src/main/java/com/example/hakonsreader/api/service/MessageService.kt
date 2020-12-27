@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.service
 
 import com.example.hakonsreader.api.model.RedditMessage
+import com.example.hakonsreader.api.responses.JsonResponse
 import com.example.hakonsreader.api.responses.ListingResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -44,4 +45,18 @@ interface MessageService {
     suspend fun markUnread(
             @Field("id") fullnames: String
     ) : Response<Void>
+
+    /**
+     * Send a new private message
+     *
+     * OAuth scope required: `privatemessages`
+     */
+    @POST("api/compose")
+    @FormUrlEncoded
+    suspend fun sendMessage(
+            @Field("to") recipient: String,
+            @Field("subject") subject: String,
+            @Field("text") text: String,
+            @Field("api_type") apiType: String = "json"
+    ) : Response<JsonResponse<Any>>
 }

@@ -6,11 +6,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.SubmitActivity
 import com.example.hakonsreader.databinding.BottomSheetSendPrivateMessageBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 
 /**
  * BottomSheet for sending a private message
@@ -58,6 +62,8 @@ class SendPrivateMessageBottomSheet : BottomSheetDialogFragment() {
             if (!verifyInputFieldsNotEmpty()) {
                 return@setOnClickListener
             }
+
+            sendMessage()
         }
 
         return binding.root
@@ -97,5 +103,17 @@ class SendPrivateMessageBottomSheet : BottomSheetDialogFragment() {
         }
 
         return returnValue
+    }
+
+    private fun sendMessage() {
+        val api = App.get().api
+
+        CoroutineScope(IO).launch {
+            val recipient = binding.recipientInput.text.toString()
+            val subject = binding.subjectInput.text.toString()
+            val message = binding.messageInput.inputText
+
+            api.messages().sendMessage(recipient, subject, message)
+        }
     }
 }

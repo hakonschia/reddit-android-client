@@ -155,4 +155,33 @@ class MessagesRequestModel(
             ApiResponse.Error(GenericError(-1), e)
         }
     }
+
+    /**
+     * Sends a new private message
+     *
+     * OAuth scope required: `privatemessages`
+     *
+     * @param recipient The recipient of the message
+     * @param subject The subject of the message
+     * @param message The message to send
+     */
+    suspend fun sendMessage(recipient: String, subject: String, message: String) : ApiResponse<Any?> {
+        try {
+            Util.verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot send messages without a logged in user", e))
+        }
+
+        return try {
+            val response = api.sendMessage(recipient, subject, message)
+
+            if (response.isSuccessful) {
+                ApiResponse.Success(null)
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
 }
