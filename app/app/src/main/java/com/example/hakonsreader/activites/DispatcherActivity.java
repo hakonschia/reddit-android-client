@@ -82,6 +82,13 @@ public class DispatcherActivity extends AppCompatActivity {
 
         // If the URL can be converted to a direct link (eg. as an image) ensure it is
         url = LinkUtils.convertToDirectUrl(url);
+
+        // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
+        // and add the full url so it doesn't have to be handled separately
+        if (!url.matches("^http(s)?")) {
+            url = "https://reddit.com" + (url.charAt(0) == '/' ? "" : "/") + url;
+        }
+
         Intent intent = createIntent(url);
 
         if (fadeTransition) {
