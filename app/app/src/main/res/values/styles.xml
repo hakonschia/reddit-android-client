@@ -72,7 +72,7 @@
 
         <!-- I want the hint ideally, but it has a background and I'm not sure how to set the
           background of the label so it doesn't look weird against the background color of the input layout
-          Like this: https://github.com/material-components/material-components-android/pull/1660-->
+          Like this: https://github.com/material-components/material-components-android/pull/1660 -->
         <item name="hintEnabled">false</item>
     </style>
 

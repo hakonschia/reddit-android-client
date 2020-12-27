@@ -429,5 +429,8 @@
     <string name="sendPrivateMessageRecipientHint">Recipient</string>
     <string name="sendPrivateMessageSubject">Subject</string>
     <string name="sendPrivateMessageMessage">Message</string>
+    <string name="sendPrivateMessageMissingRecipient">Please insert a recipient</string>
+    <string name="sendPrivateMessageMissingSubject">Please insert a subject</string>
+    <string name="sendPrivateMessageMissingMessage">Please insert a message</string>
 
 </resources>

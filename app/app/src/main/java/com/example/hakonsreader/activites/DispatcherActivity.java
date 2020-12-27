@@ -193,9 +193,13 @@ public class DispatcherActivity extends AppCompatActivity {
             SendPrivateMessageBottomSheet bottomSheet = new SendPrivateMessageBottomSheet();
             bottomSheet.setOnDismiss(this::finish);
 
-            bottomSheet.setRecipient("ArneRofinn");
-            bottomSheet.setSubject("BRUH HAVE U BRUH");
-            bottomSheet.setMessage("bruh");
+            String recipient = asUri.getQueryParameter("to");
+            String subject = asUri.getQueryParameter("subject");
+            String message = asUri.getQueryParameter("message");
+
+            bottomSheet.setRecipient(recipient);
+            bottomSheet.setSubject(subject);
+            bottomSheet.setMessage(message);
 
             bottomSheet.show(getSupportFragmentManager(), "private_message");
 
