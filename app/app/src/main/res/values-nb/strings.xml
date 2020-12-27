@@ -283,4 +283,9 @@
     <string name="userReportsBottomSheetTitle">Brukerrapporteringer for \'%s\'</string>
     <string name="ignoreReportsButton">Ignorer</string>
     <string name="restoreReportsButton">Gjenopprett</string>
+    <string name="sendPrivateMessageTitle">Send en privat melding</string>
+    <string name="sendPrivateMessageRecipient">Mottaker (prefiks med \"/r/\" for melding til en subreddits mods)</string>
+    <string name="sendPrivateMessageSubject">Emne</string>
+    <string name="sendPrivateMessageMessage">Melding</string>
+    <string name="sendPrivateMessageRecipientHint">Mottaker</string>
 </resources>

@@ -62,7 +62,7 @@
     <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeColor">@color/colorAccent</item>
-        <item name="boxBackgroundColor">@color/secondary_background</item>
+        <item name="boxBackgroundColor">@color/text_input_background</item>
         <item name="boxCornerRadiusTopStart">@dimen/buttonCornerRadius</item>
         <item name="boxCornerRadiusTopEnd">@dimen/buttonCornerRadius</item>
         <item name="boxCornerRadiusBottomStart">@dimen/buttonCornerRadius</item>

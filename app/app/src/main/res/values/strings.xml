@@ -424,4 +424,10 @@
     <string name="ignoreReportsButton">Ignore</string>
     <string name="restoreReportsButton">Restore</string>
 
+    <string name="sendPrivateMessageTitle">Send a private message</string>
+    <string name="sendPrivateMessageRecipient">Recipient (prefix with \"/r/\" for messages to a subreddits mods)</string>
+    <string name="sendPrivateMessageRecipientHint">Recipient</string>
+    <string name="sendPrivateMessageSubject">Subject</string>
+    <string name="sendPrivateMessageMessage">Message</string>
+
 </resources>

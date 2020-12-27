@@ -13,6 +13,8 @@
     <color name="background_with_alpha">#FF000000</color>
     <color name="dialogBackground">#202020</color>
 
+    <color name="text_input_background">#333333</color>
+
     <color name="text_color">#FFFFFF</color>
     <color name="textColorTextPosts">#DFDFDF</color>
     <color name="secondary_text_color">#BDBDBD</color>

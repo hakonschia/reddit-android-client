@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.utils.LinkUtils;
+import com.example.hakonsreader.fragments.bottomsheets.SendPrivateMessageBottomSheet;
 import com.jakewharton.processphoenix.ProcessPhoenix;
 
 import java.util.List;
@@ -85,23 +86,32 @@ public class DispatcherActivity extends AppCompatActivity {
 
         // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
         // and add the full url so it doesn't have to be handled separately
-        if (!url.matches("^http(s)?")) {
+        if (!url.matches("^http(s)?.*")) {
             url = "https://reddit.com" + (url.charAt(0) == '/' ? "" : "/") + url;
         }
 
         Intent intent = createIntent(url);
 
-        if (fadeTransition) {
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        }
+        if (intent != null) {
+            if (fadeTransition) {
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            }
 
-        startActivity(intent);
+            startActivity(intent);
+        }
     }
 
 
+    /**
+     * Creates an intent based on the passed URL
+     *
+     * @param url The URL to create an intent for
+     * @return An {@link Intent}. This can be null if no activity should be started from the URL
+     */
+    @Nullable
     public Intent createIntent(String url) {
         // The intent to start the new activity
-        Intent intent;
+        Intent intent = null;
 
         Uri asUri = Uri.parse(url);
         List<String> pathSegments = asUri.getPathSegments();
@@ -176,6 +186,18 @@ public class DispatcherActivity extends AppCompatActivity {
             // TODO for this to work I need to rewrite ContentVideo so there is an additional class
             //  that is only responsible for the video player which only needs the URL
             //  and then send that
+
+        } else if (url.matches("https://www.reddit.com/message/compose.*")) {
+            // For private messages we just show a bottom sheet, instead of opening a new activity
+            // This might be bad since it might be easy to accidentally dismiss it? Dunno
+            SendPrivateMessageBottomSheet bottomSheet = new SendPrivateMessageBottomSheet();
+            bottomSheet.setOnDismiss(this::finish);
+
+            bottomSheet.setRecipient("ArneRofinn");
+            bottomSheet.setSubject("BRUH HAVE U BRUH");
+            bottomSheet.setMessage("bruh");
+
+            bottomSheet.show(getSupportFragmentManager(), "private_message");
 
         } else {
             // Redirect to the corresponding application for the url, or WebViewActivity if no app is found
