@@ -196,6 +196,7 @@
     <string name="threadLockedError">The thread has been locked</string>
     <string name="unknownError">An unknown error occurred</string>
     <string name="badRequestError">Something went wrong</string>
+    <string name="listingArchivedError">The listing has been archived</string>
 
     <string name="log_in">Log in</string>
 

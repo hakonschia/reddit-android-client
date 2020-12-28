@@ -11,6 +11,7 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.LogInActivity;
 import com.example.hakonsreader.activites.MainActivity;
+import com.example.hakonsreader.api.exceptions.ArchivedException;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.RateLimitException;
 import com.example.hakonsreader.api.exceptions.ThreadLockedException;
@@ -51,10 +52,12 @@ public class Util {
             }
         } else if (t instanceof ThreadLockedException) {
             Util.showThreadLockedException(parent);
+        } else if (t instanceof ArchivedException) {
+            Util.showArchivedException(parent);
         } else if (code == 400) {
-          // 400 requests are "Bad request" which means something went wrong (Reddit are generally pretty
-          // "secretive" with their error responses, they only give a code)
-          Util.showBadRequestSnackbar(parent);
+            // 400 requests are "Bad request" which means something went wrong (Reddit are generally pretty
+            // "secretive" with their error responses, they only give a code)
+            Util.showBadRequestSnackbar(parent);
         } else if (code == 403) {
             Util.showForbiddenErrorSnackbar(parent);
         } else if (code == 429 || t instanceof RateLimitException) {
@@ -124,6 +127,15 @@ public class Util {
      */
     public static void showThreadLockedException(View parent) {
         Snackbar.make(parent, parent.getResources().getString(R.string.threadLockedError), LENGTH_SHORT).show();
+    }
+
+    /**
+     * Creates and shows a snackbar for errors caused by a listing being archived
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showArchivedException(View parent) {
+        Snackbar.make(parent, parent.getResources().getString(R.string.listingArchivedError), LENGTH_SHORT).show();
     }
 
     /**

@@ -12,7 +12,12 @@ public enum ResponseErrors {
     /**
      * Error for when an action has been repeated too many times in a short time span
      */
-    RATE_LIMIT("RATELIMIT");
+    RATE_LIMIT("RATELIMIT"),
+
+    /**
+     * Error for when an action has been done on an acrhived listing
+     */
+    ARCHIVED("TOO_OLD");
 
 
     private final String value;

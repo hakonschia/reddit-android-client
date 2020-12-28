@@ -10,6 +10,7 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.ReplyService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.apiListingErrors
 import java.lang.Exception
 
 class ReplyableRequestModel(
@@ -44,20 +45,24 @@ class ReplyableRequestModel(
                     RedditApi.API_TYPE,
                     false
             )
-            // TODO when this is used listing/http errors probably have to be separated as it is
-            //  in the java version (response.hasErrors() etc)
 
-            val comment = resp.body()?.getListings()?.get(0)
-            if (comment != null) {
-                comment.depth = if (thing == Thing.POST) {
-                    0
-                } else {
-                    -1
-                }
-
-                ApiResponse.Success(comment)
+            val body = resp.body()
+            if (body?.hasErrors() == true) {
+                val errors = body.errors()
+                apiListingErrors(errors as List<List<String>>)
             } else {
-                apiError(resp)
+                val comment = body?.getListings()?.get(0)
+                if (comment != null) {
+                    comment.depth = if (thing == Thing.POST) {
+                        0
+                    } else {
+                        -1
+                    }
+
+                    ApiResponse.Success(comment)
+                } else {
+                    apiError(resp)
+                }
             }
         } catch (e: Exception) {
             ApiResponse.Error(GenericError(-1), e)

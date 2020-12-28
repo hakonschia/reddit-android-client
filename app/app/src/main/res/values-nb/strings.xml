@@ -291,4 +291,5 @@
     <string name="sendPrivateMessageMissingRecipient">Vennligst angi en mottaker</string>
     <string name="sendPrivateMessageMissingSubject">Vennligst angi et emne</string>
     <string name="sendPrivateMessageMissingMessage">Vennligst angi en melding</string>
+    <string name="listingArchivedError">Listingen har blitt arkivert</string>
 </resources>

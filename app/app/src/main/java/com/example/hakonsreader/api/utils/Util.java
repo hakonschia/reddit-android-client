@@ -49,24 +49,6 @@ public class Util {
         return new Throwable("Error executing request: " + code);
     }
 
-    // TODO this should be tested against the kotlin version to see how this should be handled now
-    public static void handleListingErrors(List<List<String>> errors, OnFailure onFailure) {
-        // There can be more errors, not sure the best way to handle it other than returning the info for the first
-        String errorType = errors.get(0).get(0);
-        String errorMessage = errors.get(0).get(1);
-
-        // There isn't really a response code for these errors, as the HTTP code is still 200
-
-        if (ResponseErrors.THREAD_LOCKED.getValue().equals(errorType)) {
-            // TODO should find out if this is a comment or thread and return different exception/message
-            onFailure.onFailure(new GenericError(-1), new ThreadLockedException("The thread has been locked"));
-        } else if (ResponseErrors.RATE_LIMIT.getValue().equals(errorType)) {
-            onFailure.onFailure(new GenericError(-1), new RateLimitException("The action has been done too many times too fast"));
-        } else {
-            onFailure.onFailure(new GenericError(-1), new Exception(String.format("Unknown error posting comment: %s; %s", errorType, errorMessage)));
-        }
-    }
-
     public static <T> void handleHttpErrors(Response<T> response, OnFailure onFailure) {
         GenericError error;
 
