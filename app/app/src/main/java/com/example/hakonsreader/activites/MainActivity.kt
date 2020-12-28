@@ -1,6 +1,7 @@
 package com.example.hakonsreader.activites
 
 import android.app.AlertDialog
+import android.app.PendingIntent
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -472,13 +473,24 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
             getString(R.string.notificationInboxMessageTitle, message.author)
         }
 
-        // TODO set intent to open the comment
+        // Only open messages, we don't have anything to do for messages
+        val pendingIntent = if (message.wasComment) {
+            val intent = Intent(this, DispatcherActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                putExtra(DispatcherActivity.URL_KEY, message.context)
+            }
+            PendingIntent.getActivity(this, 0, intent, 0)
+        } else {
+            null
+        }
 
         val builder = NotificationCompat.Builder(this@MainActivity, App.NOTIFICATION_CHANNEL_INBOX_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
                 // TODO this should show the "raw" text, without any markdown formatting
                 .setContentText(message.body)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         with(NotificationManagerCompat.from(this@MainActivity)) {
