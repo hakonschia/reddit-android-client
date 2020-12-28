@@ -8,12 +8,15 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.constants.NetworkConstants
@@ -35,6 +38,7 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.concurrent.fixedRateTimer
 
 class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
@@ -67,6 +71,10 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
      * The amount of unread messages in the inbox
      */
     private var unreadMessages = 0
+
+    private var inboxNotificationCounter = 0
+
+    private val notifications = HashMap<String, Int>()
 
     // The fragments to show in the nav bar
     private var postsFragment: PostsContainerFragment? = null
@@ -410,7 +418,12 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                     counter++
 
                     when (response) {
-                        is ApiResponse.Success -> db.messages().insertAll(response.value)
+                        is ApiResponse.Success -> {
+                            // TODO this should also remove previous notifications if they are now seen
+                            //  Or possibly in observeUnreadMessages?
+                            response.value.filter { it.isNew }.forEach { createInboxNotification(it) }
+                            db.messages().insertAll(response.value)
+                        }
                         is ApiResponse.Error -> {}
                     }
                 }
@@ -426,7 +439,6 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         unread.observe(this, { m ->
             unreadMessages = m.size
 
-            // TODO add listener to settings fragment to update this when the setting changes
             if (App.get().showUnreadMessagesBadge()) {
                 val profileItemId = binding.bottomNav.menu.findItem(R.id.navProfile).itemId
 
@@ -441,6 +453,39 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                 }
             }
         })
+    }
+
+    /**
+     * Creates a notification for an inbox message
+     *
+     * @param message The message to show the notification for
+     */
+    private fun createInboxNotification(message: RedditMessage) {
+        // Only show if this message doesn't have a shown notification already
+        if (notifications[message.id] != null) {
+            return
+        }
+
+        val title = if (message.wasComment) {
+            getString(R.string.notificationInboxCommentReplyTitle, message.author)
+        } else {
+            getString(R.string.notificationInboxMessageTitle, message.author)
+        }
+
+        // TODO set intent to open the comment
+
+        val builder = NotificationCompat.Builder(this@MainActivity, App.NOTIFICATION_CHANNEL_INBOX_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                // TODO this should show the "raw" text, without any markdown formatting
+                .setContentText(message.body)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        with(NotificationManagerCompat.from(this@MainActivity)) {
+            val id = inboxNotificationCounter++
+            notify(id, builder.build())
+            notifications[message.id] = id
+        }
     }
 
     /**

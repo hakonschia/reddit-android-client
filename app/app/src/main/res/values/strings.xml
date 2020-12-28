@@ -434,4 +434,9 @@
     <string name="sendPrivateMessageMissingSubject">Please insert a subject</string>
     <string name="sendPrivateMessageMissingMessage">Please insert a message</string>
 
+    <string name="notificationChannelInbox">Inbox</string>
+    <string name="notificationChannelInboxDescription">Notifications for things such as comment replies</string>
+
+    <string name="notificationInboxMessageTitle">New message from %s</string>
+    <string name="notificationInboxCommentReplyTitle">New comment reply from %s</string>
 </resources>

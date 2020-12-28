@@ -1,11 +1,10 @@
 package com.example.hakonsreader
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.Application
+import android.app.*
 import android.content.*
 import android.net.NetworkInfo
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
@@ -52,6 +51,8 @@ class App : Application() {
          */
         private const val PRIVATELY_BROWSING_KEY = "privatelyBrowsing"
         private lateinit var app: App
+
+        const val NOTIFICATION_CHANNEL_INBOX_ID = "notificationChannelInbox"
 
         /**
          * Retrieve the instance of the application that can be used to access various methods
@@ -143,6 +144,7 @@ class App : Application() {
         super.onCreate()
         set()
         val dm = resources.displayMetrics
+        createInboxNotificationChannel()
 
         // Technically this could go outdated if the user changes their resolution while the app is running
         // but I highly doubt that would ever be a problem (worst case is posts wouldn't fit the screen)
@@ -176,6 +178,24 @@ class App : Application() {
         app = this
     }
 
+    private fun createInboxNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.notificationChannelInbox)
+            val descriptionText = getString(R.string.notificationChannelInboxDescription)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+
+            val channel = NotificationChannel(NOTIFICATION_CHANNEL_INBOX_ID, name, importance).apply {
+                description = descriptionText
+            }
+
+            // Register the channel with the system
+            val notificationManager =
+                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 
     /**
      * Unregisters any receivers that have been registered
