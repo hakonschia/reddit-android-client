@@ -170,14 +170,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 postsViewModel?.postIds = postIds
             }
         }
-
-        restoreViewHolderStates()
     }
 
-    override fun onPause() {
-        super.onPause()
-        saveViewHolderStates()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -192,15 +186,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             }
         }
 
-        // onDestroyView is called when a fragment is no longer visible. We store the list state of the fragment
-        // here and when onCreateView is called again we restore the state (the fragment object itself is not
-        // destroyed, so saveState will be the same)
-        if (saveState == null) {
-            saveState = Bundle()
-        }
-
-        saveState?.let { saveState(it) }
-
         _binding = null
     }
 
@@ -208,7 +193,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     /**
      * @return The name of the subreddit the fragment is for, or null if no subreddit is set
      */
-    public fun getSubredditName() : String? {
+    fun getSubredditName() : String? {
         return subreddit.get()?.name
     }
 
@@ -248,7 +233,9 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     fun restoreState(state: Bundle?) {
         // Might be asking for trouble by doing overriding saveState like this? This function
         // is meant to only be called when there is no saved state by the fragment
-        postIds = state?.getStringArrayList(saveKey(POST_IDS_KEY)) ?: ArrayList()
+        if (state != null) {
+            postIds = state.getStringArrayList(saveKey(POST_IDS_KEY)) ?: ArrayList()
+        }
         saveState = state
     }
 
@@ -416,10 +403,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     // We get here when the fragment/activity holding the fragment has been restarted
                     // so it usually looks odd if the toolbar now shows
                     binding.subredditAppBarLayout.setExpanded(false, false)
-
-                    // TODO should this be inside layoutState != null or can it be outside?
-                    // Resume videos etc etc
-                    restoreViewHolderStates()
                 }
             }
         })
@@ -427,66 +410,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         postsViewModel?.onLoadingCountChange()?.observe(viewLifecycleOwner, { up -> binding?.loadingIcon?.onCountChange(up) })
         postsViewModel?.getError()?.observe(viewLifecycleOwner, { error -> handleErrors(error.error, error.throwable) })
     }
-
-
-    /**
-     * Saves the state of the visible ViewHolders to [saveState]
-     *
-     * @see restoreViewHolderStates
-     */
-    private fun saveViewHolderStates() {
-        if (saveState == null) {
-            saveState = Bundle()
-        }
-
-        saveState?.let { saveBundle ->
-            // It's probably not necessary to loop through all, but ViewHolders are still active even when not visible
-            // so just getting firstVisible and lastVisible probably won't be enough
-            for (i in 0 until postsAdapter?.itemCount!!) {
-                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
-
-                if (viewHolder != null) {
-                    val extras = viewHolder.extras
-                    saveBundle.putBundle(saveKey(VIEW_STATE_STORED_KEY + i), extras)
-                    viewHolder.onUnselected()
-                }
-            }
-
-            postsLayoutManager?.let {
-                val firstVisible = it.findFirstVisibleItemPosition()
-                val lastVisible = it.findLastVisibleItemPosition()
-
-                saveBundle.putInt(saveKey(FIRST_VIEW_STATE_STORED_KEY), firstVisible)
-                saveBundle.putInt(saveKey(LAST_VIEW_STATE_STORED_KEY), lastVisible)
-            }
-        }
-    }
-
-    /**
-     * Restores the state of the visible ViewHolders based on [saveState]
-     *
-     * @see saveViewHolderStates
-     */
-    private fun restoreViewHolderStates() {
-        // TODO dont know if this even works, should check it out sometime
-        saveState?.let {
-            val firstVisible = it.getInt(saveKey(FIRST_VIEW_STATE_STORED_KEY))
-            val lastVisible = it.getInt(saveKey(LAST_VIEW_STATE_STORED_KEY))
-
-            for (i in firstVisible..lastVisible) {
-                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
-
-                if (viewHolder != null) {
-                    // If the view has been destroyed the ViewHolders haven't been created yet
-                    val extras = it.getBundle(saveKey(VIEW_STATE_STORED_KEY + i))
-                    if (extras != null) {
-                        viewHolder.extras = extras
-                    }
-                }
-            }
-        }
-    }
-
 
 
     /**

@@ -194,7 +194,9 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         // onSaveInstanceState is called for configuration changes (such as orientation)
         // so we need to store the animation state here and in saveState (for when the fragment has
         // been replaced but not destroyed)
-        outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.progress)
+        // TODO this should be fixed as this is called on occasions such as theme change, but the view
+        //  has been destroyed so _binding is nulled
+        _binding?.let {  outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, it.parentLayout.progress) }
         outState.putParcelable(LAYOUT_STATE_KEY, postsLayoutManager?.onSaveInstanceState())
         outState.putStringArrayList(POST_IDS_KEY, postsViewModel?.postIds as ArrayList<String>?)
     }

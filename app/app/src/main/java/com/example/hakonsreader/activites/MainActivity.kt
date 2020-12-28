@@ -158,7 +158,6 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
             supportFragmentManager.putFragment(outState, PROFILE_FRAGMENT, profileFragment!!)
         }
 
-        // TODO store state of settings so it knows where to scroll to? Can maybe do it inside the fragment
         // Login/settings fragments can just be recreated when needed as they don't store any specific state
 
         // Store state of navbar
@@ -180,6 +179,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
             supportFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainer, selectSubredditFragment!!)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                    .addToBackStack(null)
                     .commit()
         } else if (activeFragment is InboxFragment && lastShownFragment is ProfileFragment) {
             // In the inbox, and the last active was the profile, go back to the profile
@@ -193,6 +193,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
             supportFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainer, profileFragment!!)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                    .addToBackStack(null)
                     .commit()
         } else {
             binding.bottomNav.selectedItemId = R.id.navHome
@@ -212,6 +213,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, activeSubreddit!!)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
                 .commit()
     }
 
@@ -227,6 +229,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, inboxFragment!!)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
                 .commit()
     }
 
@@ -506,17 +509,23 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         activeSubreddit = supportFragmentManager.getFragment(restoredState, ACTIVE_SUBREDDIT_FRAGMENT) as SubredditFragment?
         selectSubredditFragment = supportFragmentManager.getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT) as SelectSubredditFragment?
         profileFragment = supportFragmentManager.getFragment(restoredState, PROFILE_FRAGMENT) as ProfileFragment?
+
         if (postsFragment == null) {
             postsFragment = PostsContainerFragment()
             postsFragment!!.restoreState(restoredState)
         }
 
-        // Active subreddit not restored directly, check if it should be restored manually
-        if (activeSubreddit == null) {
+        postsFragment!!.restoreState(restoredState)
+
+        if (activeSubreddit != null) {
+            activeSubreddit!!.restoreState(savedState)
+        } else {
+            // Active subreddit not restored directly, check if it should be restored manually
             val activeSubredditName = restoredState.getString(ACTIVE_SUBREDDIT_NAME)
             if (activeSubredditName != null) {
-                activeSubreddit = SubredditFragment.newInstance(activeSubredditName)
-                activeSubreddit?.restoreState(savedState)
+                activeSubreddit = SubredditFragment.newInstance(activeSubredditName).also {
+                    it.restoreState(savedState)
+                }
             }
         }
 
@@ -537,6 +546,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, postsFragment!!)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
                 .commit()
     }
 
@@ -565,6 +575,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                     supportFragmentManager.beginTransaction()
                             .replace(R.id.fragmentContainer, selectSubredditFragment!!)
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                            .addToBackStack(null)
                             .commit()
                 }
 
@@ -581,6 +592,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                     supportFragmentManager.beginTransaction()
                             .replace(R.id.fragmentContainer, profileFragment!!)
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                            .addToBackStack(null)
                             .commit()
                 }
             }
@@ -689,7 +701,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                     // With the use of a local database I can easily restore the state without the back stack
                     // Not sure whats best to use, with addToBackStack it's smoother as it doesn't have to load
                     // from db etc. (it doesn't take a long time) but it probably uses more ram to hold everything in memory?
-                    //.addToBackStack(null)
+                    .addToBackStack(null)
                     .commit()
         }
 
@@ -709,7 +721,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                     // With the use of a local database I can easily restore the state without the back stack
                     // Not sure whats best to use, with addToBackStack it's smoother as it doesn't have to load
                     // from db etc. (it doesn't take a long time) but it probably uses more ram to hold everything in memory?
-                    //.addToBackStack(null)
+                    .addToBackStack(null)
                     .commit()
         }
 
