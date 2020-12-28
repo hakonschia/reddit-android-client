@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -212,15 +213,17 @@ public class ContentGallery extends Content {
         }
     }
 
+    @NonNull
     @Override
     public Bundle getExtras() {
         Bundle extras = super.getExtras();
+
         extras.putInt(EXTRAS_ACTIVE_IMAGE, binding.galleryImages.getCurrentItem());
         return extras;
     }
 
     @Override
-    public void setExtras(Bundle extras) {
+    public void setExtras(@NonNull Bundle extras) {
         super.setExtras(extras);
 
         int activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, images.size());

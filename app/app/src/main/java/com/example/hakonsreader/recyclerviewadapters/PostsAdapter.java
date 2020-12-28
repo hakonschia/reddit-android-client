@@ -23,7 +23,9 @@ import com.example.hakonsreader.views.Post;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -33,6 +35,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private static final String TAG = "PostsAdapter";
     
     private List<RedditPost> posts = new ArrayList<>();
+    private Map<String, Bundle> postExtras = new HashMap<>();
 
     /**
      * The amount of minutes scores should be hidden (default to -1 means not specified)
@@ -106,6 +109,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return posts;
     }
 
+    private void saveExtras(@NonNull Post post) {
+        final RedditPost previousPost = post.getRedditPost();
+        if (previousPost != null) {
+            postExtras.put(previousPost.getId(), post.getExtras());
+        }
+    }
+
     /**
      * Formats the author text based on whether or not it is posted by a a mod or admin
      * If no match is found, the default author color is used
@@ -154,8 +164,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final RedditPost post = posts.get(position);
+        // Save the extras of the previous post so we can resume videos etc. at the point we left off
+        saveExtras(holder.post);
 
+        final RedditPost post = posts.get(position);
 
         // Disable ticker animation to avoid it updating when scrolling
         holder.post.enableTickerAnimation(false);
@@ -166,6 +178,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.post.setHideScore(hideScoreTime > between.toMinutes());
 
         holder.post.setRedditPost(post);
+        
+        final Bundle savedExtras = postExtras.get(post.getId());
+        if (savedExtras != null) {
+            holder.post.setExtras(savedExtras);
+        }
         holder.post.enableTickerAnimation(true);
     }
 

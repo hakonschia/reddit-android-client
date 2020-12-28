@@ -6,10 +6,13 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
 import com.example.hakonsreader.api.model.RedditPost;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +38,8 @@ public abstract class Content extends FrameLayout {
      * A bundle of extras. This will by default always be empty and it is up to subclasses
      * to provide data for this
      */
-    protected Bundle extras;
+    @NonNull
+    protected Bundle extras = new Bundle();
 
     public Content(Context context) {
         super(context);
@@ -56,10 +60,8 @@ public abstract class Content extends FrameLayout {
      *
      * @return A Bundle of extras. This might be empty
      */
+    @NonNull
     public Bundle getExtras() {
-        if (extras == null) {
-            extras = new Bundle();
-        }
         return extras;
     }
 
@@ -68,7 +70,7 @@ public abstract class Content extends FrameLayout {
      *
      * @param extras The extras to set
      */
-    public void setExtras(Bundle extras) {
+    public void setExtras(@NonNull Bundle extras) {
         this.extras = extras;
     }
 

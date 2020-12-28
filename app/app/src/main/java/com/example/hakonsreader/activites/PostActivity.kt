@@ -400,7 +400,9 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
                             // TODO the thumbnail is shown the entire time, make it so the frame the video
                             //  ended at is shown instead
-                            binding.post.extras = postExtras
+                            if (postExtras != null) {
+                                binding.post.extras = postExtras
+                            }
                         }
                     })
                 }

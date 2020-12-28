@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
@@ -20,6 +21,8 @@ import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused;
 import com.squareup.picasso.Callback;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -337,6 +340,7 @@ public class Post extends Content {
      *
      * @return A bundle that might include state variables
      */
+    @NotNull
     @Override
     public Bundle getExtras() {
         Content c = (Content) binding.content.getChildAt(0);
@@ -351,7 +355,7 @@ public class Post extends Content {
      * @param data The data to use for restoring the state
      */
     @Override
-    public void setExtras(@Nullable Bundle data) {
+    public void setExtras(@NonNull Bundle data) {
         Content c = (Content) binding.content.getChildAt(0);
 
         if (c != null) {
