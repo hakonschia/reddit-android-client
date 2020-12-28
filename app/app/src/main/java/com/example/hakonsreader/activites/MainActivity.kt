@@ -89,7 +89,6 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         setContentView(binding.root)
 
         checkAccessTokenScopes()
-        startInboxListener()
         attachFragmentChangeListener()
         setProfileNavbarTitle()
 
@@ -106,6 +105,9 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         } else {
             // Only setup the start fragment if we have no state to restore (as this is then a new activity)
             setupStartFragment()
+
+            // Only start the inbox listener once, or else every configuration change would start another timer
+            startInboxListener()
         }
 
         setupNavBar(savedInstanceState)
