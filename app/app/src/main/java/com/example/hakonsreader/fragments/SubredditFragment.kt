@@ -170,8 +170,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 postsViewModel?.postIds = postIds
             }
         }
+
+        restoreViewHolderStates()
     }
 
+    override fun onPause() {
+        super.onPause()
+        saveViewHolderStates()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -189,6 +195,64 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         _binding = null
     }
 
+    /**
+     * Saves the state of the visible ViewHolders to [saveState]
+     *
+     * @see restoreViewHolderStates
+     */
+    private fun saveViewHolderStates() {
+        if (saveState == null) {
+            saveState = Bundle()
+        }
+
+        // TODO this should make use of the states stored by the adapter as that will have state
+        //  for all previous posts, not just the visible ones (although we still have to call onUnselected to pause videos etc)
+        saveState?.let { saveBundle ->
+            // It's probably not necessary to loop through all, but ViewHolders are still active even when not visible
+            // so just getting firstVisible and lastVisible probably won't be enough
+            for (i in 0 until postsAdapter?.itemCount!!) {
+                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
+
+                if (viewHolder != null) {
+                    val extras = viewHolder.extras
+                    saveBundle.putBundle(saveKey(VIEW_STATE_STORED_KEY + i), extras)
+                    viewHolder.onUnselected()
+                }
+            }
+
+            postsLayoutManager?.let {
+                val firstVisible = it.findFirstVisibleItemPosition()
+                val lastVisible = it.findLastVisibleItemPosition()
+
+                saveBundle.putInt(saveKey(FIRST_VIEW_STATE_STORED_KEY), firstVisible)
+                saveBundle.putInt(saveKey(LAST_VIEW_STATE_STORED_KEY), lastVisible)
+            }
+        }
+    }
+
+    /**
+     * Restores the state of the visible ViewHolders based on [saveState]
+     *
+     * @see saveViewHolderStates
+     */
+    private fun restoreViewHolderStates() {
+        saveState?.let {
+            val firstVisible = it.getInt(saveKey(FIRST_VIEW_STATE_STORED_KEY))
+            val lastVisible = it.getInt(saveKey(LAST_VIEW_STATE_STORED_KEY))
+
+            for (i in firstVisible..lastVisible) {
+                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
+
+                if (viewHolder != null) {
+                    // If the view has been destroyed the ViewHolders haven't been created yet
+                    val extras = it.getBundle(saveKey(VIEW_STATE_STORED_KEY + i))
+                    if (extras != null) {
+                        viewHolder.extras = extras
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * @return The name of the subreddit the fragment is for, or null if no subreddit is set
