@@ -87,6 +87,7 @@ class ReplyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityReplyBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
         binding.showPreview.setOnClickListener { binding.markdownInput.showPreviewInPopupDialog() }
 
         if (savedInstanceState != null) {

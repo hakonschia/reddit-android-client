@@ -1,54 +1,58 @@
-package com.example.hakonsreader.fragments.bottomsheets
+package com.example.hakonsreader.activites
 
-import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.SubmitActivity
-import com.example.hakonsreader.databinding.BottomSheetSendPrivateMessageBinding
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
+import com.example.hakonsreader.databinding.ActivitySendPrivateMessageBinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- * BottomSheet for sending a private message
+ * Activity for sending a private message
  */
-class SendPrivateMessageBottomSheet : BottomSheetDialogFragment() {
+class SendPrivateMessageActivity : AppCompatActivity() {
     companion object {
-        private const val TAG = "SendPrivateMessageBottomSheet"
+        private const val TAG = "SendPrivateMessage"
+
+        /**
+         * The extras to pre-set the recipient of the message
+         *
+         * The value for this key should be a [String]
+         */
+        const val EXTRAS_RECIPIENT = "recipient"
+
+        /**
+         * The extras to pre-set the subject of the message
+         *
+         * The value for this key should be a [String]
+         */
+        const val EXTRAS_SUBJECT = "subject"
+
+        /**
+         * The extras to pre-set the message content of the message
+         *
+         * The value for this key should be a [String]
+         */
+        const val EXTRAS_MESSAGE = "message"
     }
 
-    private var _binding: BottomSheetSendPrivateMessageBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: ActivitySendPrivateMessageBinding
 
-    /**
-     * The recipient of the message. Set this before the BottomSheet is shown to pre-set a recipient
-     */
-    var recipient: String? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivitySendPrivateMessageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-    /**
-     * The subject of the message. Set this before the BottomSheet is shown to pre-set the subject
-     */
-    var subject: String? = null
+        val extras = intent.extras
 
-    /**
-     * The content of the message. Set this before the BottomSheet is shown to pre-set the content
-     */
-    var message: String? = null
-
-    /**
-     * The Runnable to run when the bottom sheet has been dismissed
-     */
-    var onDismiss: Runnable? = null
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = BottomSheetSendPrivateMessageBinding.inflate(layoutInflater)
+        val recipient = extras?.getString(EXTRAS_RECIPIENT) ?: ""
+        val subject = extras?.getString(EXTRAS_SUBJECT) ?: ""
+        val message = extras?.getString(EXTRAS_MESSAGE) ?: ""
 
         binding.recipientInput.setText(recipient)
         binding.subjectInput.setText(subject)
@@ -65,18 +69,6 @@ class SendPrivateMessageBottomSheet : BottomSheetDialogFragment() {
 
             sendMessage()
         }
-
-        return binding.root
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        onDismiss?.run()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     /**
@@ -108,7 +100,7 @@ class SendPrivateMessageBottomSheet : BottomSheetDialogFragment() {
     private fun sendMessage() {
         val api = App.get().api
 
-        CoroutineScope(IO).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val recipient = binding.recipientInput.text.toString()
             val subject = binding.subjectInput.text.toString()
             val message = binding.messageInput.inputText

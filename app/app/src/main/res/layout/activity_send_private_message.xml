@@ -4,20 +4,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/secondary_background">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/sendPrivateMessageTitle"
             android:textColor="@color/text_color"
             android:textSize="25sp"
@@ -32,9 +32,9 @@
             android:id="@+id/recipient"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
 
             android:text="@string/sendPrivateMessageRecipient"
             android:textColor="@color/secondary_text_color"
@@ -50,8 +50,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -75,8 +75,8 @@
             android:id="@+id/subject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:text="@string/sendPrivateMessageSubject"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recipientInputLayout" />
@@ -87,8 +87,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -112,8 +112,8 @@
             android:id="@+id/message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:text="@string/sendPrivateMessageMessage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/subjectInputLayout" />
@@ -122,9 +122,9 @@
             android:id="@+id/messageInput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
 
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="8dp"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -137,8 +137,8 @@
             android:layout_height="wrap_content"
 
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/showPreview"
 
             app:layout_constraintBottom_toBottomOf="parent"
@@ -152,7 +152,7 @@
             android:layout_width="50dp"
             android:layout_height="35dp"
 
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/image_button_background"
             android:src="@drawable/ic_send_24dp"
             android:tint="@color/text_color"

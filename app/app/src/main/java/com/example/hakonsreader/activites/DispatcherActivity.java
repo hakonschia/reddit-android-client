@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.utils.LinkUtils;
-import com.example.hakonsreader.fragments.bottomsheets.SendPrivateMessageBottomSheet;
 import com.jakewharton.processphoenix.ProcessPhoenix;
 
 import java.util.List;
@@ -92,13 +91,11 @@ public class DispatcherActivity extends AppCompatActivity {
 
         Intent intent = createIntent(url);
 
-        if (intent != null) {
-            if (fadeTransition) {
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-            }
-
-            startActivity(intent);
+        if (fadeTransition) {
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
+
+        startActivity(intent);
     }
 
 
@@ -106,12 +103,11 @@ public class DispatcherActivity extends AppCompatActivity {
      * Creates an intent based on the passed URL
      *
      * @param url The URL to create an intent for
-     * @return An {@link Intent}. This can be null if no activity should be started from the URL
+     * @return An {@link Intent}
      */
-    @Nullable
     public Intent createIntent(String url) {
         // The intent to start the new activity
-        Intent intent = null;
+        Intent intent;
 
         Uri asUri = Uri.parse(url);
         List<String> pathSegments = asUri.getPathSegments();
@@ -145,9 +141,6 @@ public class DispatcherActivity extends AppCompatActivity {
             intent.putExtra(ProfileActivity.USERNAME_KEY, username);
 
         } else if (url.matches(LinkUtils.POST_REGEX)) {
-            // TODO URLs like this failed, caused a 404 and when refreshing crashes the app since commetsAdapter is null
-            //  /r/dontdeadopeninside/comments/ib8rwp/if_you_were_in_a_car_would_you_know_what_accident/g1u9zot/
-
             // The URL will look like: reddit.com/r/<subreddit>/comments/<postId/...
             String postId = pathSegments.get(3);
 
@@ -188,21 +181,15 @@ public class DispatcherActivity extends AppCompatActivity {
             //  and then send that
 
         } else if (url.matches("https://www.reddit.com/message/compose.*")) {
-            // For private messages we just show a bottom sheet, instead of opening a new activity
-            // This might be bad since it might be easy to accidentally dismiss it? Dunno
-            SendPrivateMessageBottomSheet bottomSheet = new SendPrivateMessageBottomSheet();
-            bottomSheet.setOnDismiss(this::finish);
+            intent = new Intent(this, SendPrivateMessageActivity.class);
 
             String recipient = asUri.getQueryParameter("to");
             String subject = asUri.getQueryParameter("subject");
             String message = asUri.getQueryParameter("message");
 
-            bottomSheet.setRecipient(recipient);
-            bottomSheet.setSubject(subject);
-            bottomSheet.setMessage(message);
-
-            bottomSheet.show(getSupportFragmentManager(), "private_message");
-
+            intent.putExtra(SendPrivateMessageActivity.EXTRAS_RECIPIENT, recipient);
+            intent.putExtra(SendPrivateMessageActivity.EXTRAS_SUBJECT, subject);
+            intent.putExtra(SendPrivateMessageActivity.EXTRAS_MESSAGE, message);
         } else {
             // Redirect to the corresponding application for the url, or WebViewActivity if no app is found
 
