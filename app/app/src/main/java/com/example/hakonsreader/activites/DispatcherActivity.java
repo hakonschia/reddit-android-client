@@ -180,7 +180,7 @@ public class DispatcherActivity extends AppCompatActivity {
             //  that is only responsible for the video player which only needs the URL
             //  and then send that
 
-        } else if (url.matches("https://www.reddit.com/message/compose.*")) {
+        } else if (url.matches("https://(.*\\.)?reddit.com/message/compose.*")) {
             intent = new Intent(this, SendPrivateMessageActivity.class);
 
             String recipient = asUri.getQueryParameter("to");
