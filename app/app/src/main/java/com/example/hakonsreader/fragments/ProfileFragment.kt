@@ -1,5 +1,6 @@
 package com.example.hakonsreader.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
@@ -15,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activites.PostActivity
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentProfileBinding
@@ -25,6 +28,8 @@ import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
+import com.example.hakonsreader.views.Content
+import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -110,11 +115,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     private var user: RedditUser? = null
 
     /**
-     * Flag to check if the fragment has loaded user information
-     */
-    private var firstLoad = true
-
-    /**
      * Flag to set if the fragment is for the logged in user or not
      */
     private var isLoggedInUser = false
@@ -128,6 +128,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     private var postsViewModel: PostsViewModel? = null
     private var postsAdapter: PostsAdapter? = null
     private var postsLayoutManager: LinearLayoutManager? = null
+    private var postsScrollListener: PostScrollListener? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -288,7 +289,28 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
         binding.posts.adapter = postsAdapter
         binding.posts.layoutManager = postsLayoutManager
-        binding.posts.setOnScrollChangeListener(PostScrollListener(binding.posts) { postsViewModel?.loadPosts() })
+
+        postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }
+        binding.posts.setOnScrollChangeListener(postsScrollListener)
+
+        postsAdapter?.setOnPostClicked { post ->
+            // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
+            // autoplay the video
+            val redditPost = post.redditPost
+            postsScrollListener?.setPostToIgnore(redditPost.id)
+
+            val intent = Intent(context, PostActivity::class.java)
+            intent.putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))
+            intent.putExtra(Content.EXTRAS, post.extras)
+            intent.putExtra(PostActivity.HIDE_SCORE_KEY, post.hideScore)
+
+            // Only really applicable for videos, as they should be paused
+            post.viewUnselected()
+
+            val activity = requireActivity()
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())
+            activity.startActivity(intent, options.toBundle())
+        }
     }
 
     override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {

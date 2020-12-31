@@ -362,7 +362,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
             val activity = requireActivity()
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())
-            activity.startActivityForResult(intent, 2, options.toBundle())
+            activity.startActivity(intent, options.toBundle())
         }
     }
 
