@@ -33,7 +33,9 @@ import io.noties.markwon.ext.tables.TablePlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import okhttp3.Cache
 import okhttp3.logging.HttpLoggingInterceptor
+import java.io.File
 import java.security.SecureRandom
 import java.util.*
 import java.util.function.Consumer
@@ -263,6 +265,14 @@ class App : Application() {
      * with the key [App.PRIVATELY_BROWSING_KEY]
      */
     private fun createApi() : RedditApi {
+        // 25MB cache size for network requests to third party
+        val thirdPartyCacheSize = 25 * 1024 * 1024L
+        val thirdPartyCache = Cache(File(cacheDir, "third_party_http_cache"), thirdPartyCacheSize)
+
+        // 1 week cache size (this cache size could really be as long as time itself, the mutable ata
+        // in the requests aren't used anyways)
+        val thirdPartyCacheAge = 60 * 60 * 24 * 7L
+
         val api = RedditApi.Builder(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID)
                 .accessToken(TokenManager.getToken())
                 .onNewToken { newToken: AccessToken? -> TokenManager.saveToken(newToken) }
@@ -271,6 +281,7 @@ class App : Application() {
                 .callbackUrl(NetworkConstants.CALLBACK_URL)
                 .deviceId(UUID.randomUUID().toString())
                 .loadImgurAlbumsAsRedditGalleries(NetworkConstants.IMGUR_CLIENT_ID)
+                .thirdPartyCache(thirdPartyCache, thirdPartyCacheAge)
                 .build()
 
         val privatelyBrowsing = settings.getBoolean(PRIVATELY_BROWSING_KEY, false)

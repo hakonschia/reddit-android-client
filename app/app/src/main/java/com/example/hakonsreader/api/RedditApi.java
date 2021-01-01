@@ -41,6 +41,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
+import okhttp3.Cache;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -273,6 +274,28 @@ public class RedditApi {
      */
     private String imgurClientId;
 
+    /**
+     * The cache to use for network requests
+     */
+    @Nullable
+    private Cache cache;
+
+    /**
+     * The age of cache in {@link #cache}
+     */
+    private Long cacheAge;
+
+    /**
+     * The cache to use for network requests towards third-party services
+     */
+    @Nullable
+    private Cache thirdPartyCache;
+
+    /**
+     * The age of cache in {@link #thirdPartyCache}
+     */
+    private Long thirdPartyCacheAge;
+
 
     /* ----------------- Client specific variables ----------------- */
     /**
@@ -325,6 +348,8 @@ public class RedditApi {
                 .addInterceptor(new TokenInterceptor())
                 // Add stetho interceptor for enhanced network debugging in Android
                 .addNetworkInterceptor(stethoInterceptor)
+                .addNetworkInterceptor(cacheInterceptor)
+                .cache(cache)
                 // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(logger)
                 .build();
@@ -343,8 +368,6 @@ public class RedditApi {
         commentApi = apiRetrofit.create(CommentService.class);
         messageApi = apiRetrofit.create(MessageService.class);
 
-        // For Imgur we don't need any authentication, and adding it would cause issues
-        // as adding the access token for Reddit would break things for Imgur, so only add the logger
         if (imgurClientId != null && !imgurClientId.isEmpty()) {
             OkHttpClient imgurClient = new OkHttpClient.Builder()
                     .addInterceptor(chain -> {
@@ -355,6 +378,8 @@ public class RedditApi {
                         return chain.proceed(request);
                     })
                     .addNetworkInterceptor(stethoInterceptor)
+                    .addInterceptor(thirdPartyCacheInterceptor)
+                    .cache(thirdPartyCache)
                     .addInterceptor(logger)
                     .build();
 
@@ -368,6 +393,8 @@ public class RedditApi {
 
         OkHttpClient gfycatClient = new OkHttpClient.Builder()
                 .addNetworkInterceptor(stethoInterceptor)
+                .addInterceptor(thirdPartyCacheInterceptor)
+                .cache(thirdPartyCache)
                 .addInterceptor(logger)
                 .build();
         Retrofit gfycatRetrofit = new Retrofit.Builder()
@@ -376,7 +403,6 @@ public class RedditApi {
                 .client(gfycatClient)
                 .build();
         gfycatApi = gfycatRetrofit.create(GfycatService.class);
-
 
         // Http client for OAuth related API calls (such as retrieving access tokens)
         // The service created with this is for "RedditApi.accessToken()"
@@ -431,6 +457,10 @@ public class RedditApi {
         private String callbackUrl;
         private String deviceId;
         private String imgurClientId;
+        private Cache cache;
+        private long cacheAge = 0L;
+        private Cache thirdPartyCache;
+        private long thirdPartyCacheAge = 0L;
 
 
         /**
@@ -574,6 +604,34 @@ public class RedditApi {
         }
 
         /**
+         * Sets the cache to use for network requests. This cache will be used for requests sent to
+         * Reddit, for third party caching see {@link #thirdPartyCache}
+         *
+         * @param cache The cache to use
+         * @param cacheAge The max age for the cache
+         * @return This builder
+         */
+        public Builder cache(Cache cache, long cacheAge) {
+            this.cache = cache;
+            this.cacheAge = cacheAge;
+            return this;
+        }
+
+        /**
+         * Sets the cache to use for network requests to third party service, such as Gfycat and Imgur.
+         * For the cache for reddit requests, see {@link #cache}
+         *
+         * @param cache The cache to use
+         * @param cacheAge The max age for the cache
+         * @return This builder
+         */
+        public Builder thirdPartyCache(Cache cache, long cacheAge) {
+            this.thirdPartyCache = cache;
+            this.thirdPartyCacheAge = cacheAge;
+            return this;
+        }
+
+        /**
          * Builds the API
          *
          * @throws IllegalStateException if the builder has already been built
@@ -594,6 +652,10 @@ public class RedditApi {
             api.deviceId = deviceId;
             api.onInvalidToken = onInvalidToken;
             api.imgurClientId = imgurClientId;
+            api.cache = cache;
+            api.cacheAge = cacheAge;
+            api.thirdPartyCache = thirdPartyCache;
+            api.thirdPartyCacheAge = thirdPartyCacheAge;
 
             api.createServices();
 
@@ -856,6 +918,35 @@ public class RedditApi {
             return newToken;
         }
     }
+
+
+    /**
+     * Interceptor that handles headers for cache control of Reddit services
+     */
+    private final Interceptor cacheInterceptor = new Interceptor() {
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            Request request = chain.request().newBuilder()
+                    .header("Cache-Control", "public, max-age=" + cacheAge)
+                    .removeHeader("Pragma")
+                    .build();
+            return chain.proceed(request);
+        }
+    };
+
+    /**
+     * Interceptor that handles headers for cache control of third-party services
+     */
+    private final Interceptor thirdPartyCacheInterceptor = new Interceptor() {
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            Request request = chain.request().newBuilder()
+                    .header("Cache-Control", "public, max-age=" + thirdPartyCacheAge)
+                    .removeHeader("Pragma")
+                    .build();
+            return chain.proceed(request);
+        }
+    };
 
     /**
      * Interceptor that ensures that an access token is set and added as a request header.
