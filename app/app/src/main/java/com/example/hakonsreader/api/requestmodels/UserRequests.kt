@@ -21,8 +21,8 @@ class UserRequests(
         imgurApi: ImgurService?
 ) {
 
-    private val imgurRequest: ImgurRequest = ImgurRequest(imgurApi)
-    private val loadImgurAlbumsAsRedditGalleries: Boolean = imgurApi != null
+    private val imgurRequest = ThirdPartyRequest(imgurApi)
+    private val loadImgurAlbumsAsRedditGalleries = imgurApi != null
 
 
     /**
@@ -77,7 +77,7 @@ class UserRequests(
 
             if (posts != null) {
                 if (loadImgurAlbumsAsRedditGalleries) {
-                    imgurRequest.loadAlbums(posts)
+                    imgurRequest.loadImgurAlbums(posts)
                 }
 
                 ApiResponse.Success(posts)
