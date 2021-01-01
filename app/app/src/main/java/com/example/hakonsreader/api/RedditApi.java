@@ -21,6 +21,7 @@ import com.example.hakonsreader.api.requestmodels.UserRequests;
 import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUser;
 import com.example.hakonsreader.api.service.AccessTokenService;
 import com.example.hakonsreader.api.service.CommentService;
+import com.example.hakonsreader.api.service.GfycatService;
 import com.example.hakonsreader.api.service.ImgurService;
 import com.example.hakonsreader.api.service.MessageService;
 import com.example.hakonsreader.api.service.OAuthService;
@@ -166,6 +167,12 @@ public class RedditApi {
     public static final String IMGUR_API_URL = "https://api.imgur.com/";
 
     /**
+     * The URL to the Gfycat API
+     */
+    public static final String GFYCAT_API_URL = "https://api.gfycat.com/";
+
+
+    /**
      * The list of standard subs: front page (represented as an empty string), popular, all.
      *
      * <p>Note: The elements in this list are case sensitive and in this list are all lower case.
@@ -223,6 +230,8 @@ public class RedditApi {
      * The service object used to communicate with the Imgur API
      */
     private ImgurService imgurService;
+
+    private GfycatService gfycatApi;
 
 
     /**
@@ -305,6 +314,7 @@ public class RedditApi {
      * Creates the service objects used for API calls
      */
     private void createServices() {
+        StethoInterceptor stethoInterceptor = new StethoInterceptor();
         // Http client for API calls that use an access token as the authorization
         OkHttpClient apiClient = new OkHttpClient.Builder()
                 // Automatically refresh access token on authentication errors (401)
@@ -314,7 +324,7 @@ public class RedditApi {
                 // Ensure that an access token is always set before sending a request
                 .addInterceptor(new TokenInterceptor())
                 // Add stetho interceptor for enhanced network debugging in Android
-                .addNetworkInterceptor(new StethoInterceptor())
+                .addNetworkInterceptor(stethoInterceptor)
                 // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(logger)
                 .build();
@@ -344,6 +354,7 @@ public class RedditApi {
                                 .build();
                         return chain.proceed(request);
                     })
+                    .addNetworkInterceptor(stethoInterceptor)
                     .addInterceptor(logger)
                     .build();
 
@@ -354,6 +365,17 @@ public class RedditApi {
                     .build();
             imgurService = imgurRetrofit.create(ImgurService.class);
         }
+
+        OkHttpClient gfycatClient = new OkHttpClient.Builder()
+                .addNetworkInterceptor(stethoInterceptor)
+                .addInterceptor(logger)
+                .build();
+        Retrofit gfycatRetrofit = new Retrofit.Builder()
+                .baseUrl(GFYCAT_API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(gfycatClient)
+                .build();
+        gfycatApi = gfycatRetrofit.create(GfycatService.class);
 
 
         // Http client for OAuth related API calls (such as retrieving access tokens)
@@ -681,7 +703,7 @@ public class RedditApi {
      * @return An object that can perform various subreddit related API requests
      */
     public SubredditRequest subreddit(String subredditName) {
-        return new SubredditRequest(subredditName, accessToken, subredditApi, imgurService);
+        return new SubredditRequest(subredditName, accessToken, subredditApi, imgurService, gfycatApi);
     }
 
     /**
@@ -704,7 +726,7 @@ public class RedditApi {
      * @return An object that can perform various user related API requests for non-logged in users
      */
     public UserRequests user(@NonNull String username) {
-        return new UserRequests(username, accessToken, userApi, imgurService);
+        return new UserRequests(username, accessToken, userApi, imgurService, gfycatApi);
     }
 
     /**

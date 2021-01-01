@@ -14,6 +14,7 @@ import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.SubmissionFlair
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
+import com.example.hakonsreader.api.service.GfycatService
 import com.example.hakonsreader.api.service.ImgurService
 import com.example.hakonsreader.api.service.SubredditService
 import com.example.hakonsreader.api.utils.Util
@@ -23,11 +24,11 @@ class SubredditRequest(
         private val subredditName: String,
         private val accessToken: AccessToken,
         private val api: SubredditService,
-        imgurApi: ImgurService?
+        imgurApi: ImgurService?,
+        gfycatApi: GfycatService
 ) {
 
-    private val imgurRequest = ThirdPartyRequest(imgurApi)
-    private val loadImgurAlbumsAsRedditGalleries = imgurApi != null
+    private val imgurRequest = ThirdPartyRequest(imgurApi, gfycatApi)
 
     /**
      * Retrieve information about the subreddit
@@ -107,10 +108,7 @@ class SubredditRequest(
             val posts = resp.body()?.getListings()
 
             if (posts != null) {
-                if (loadImgurAlbumsAsRedditGalleries) {
-                    imgurRequest.loadImgurAlbums(posts)
-                }
-
+                imgurRequest.load(posts)
                 ApiResponse.Success(posts)
             } else {
                 apiError(resp)

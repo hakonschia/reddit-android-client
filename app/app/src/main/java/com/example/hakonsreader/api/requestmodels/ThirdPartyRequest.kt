@@ -2,17 +2,27 @@ package com.example.hakonsreader.api.requestmodels
 
 import com.example.hakonsreader.api.model.ImgurAlbum
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.service.GfycatService
 import com.example.hakonsreader.api.service.ImgurService
 import retrofit2.Response
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import java.util.stream.Collectors
 
 /**
  * Request model for communicating with third party services, such as Imgur and Gfycat
  */
-class ThirdPartyRequest(private val imgurApi: ImgurService?) {
+class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatApi: GfycatService) {
+
+    suspend fun load(posts: List<RedditPost>) {
+        val postsWithImgurAlbum = posts.filter { post -> post.url.matches("https://imgur.com/a/.+".toRegex()) }
+        val postsWithGfycat = posts.filter { post -> post.domain == "gfycat.com" }
+        val postsWithRedgif = posts.filter { post -> post.domain == "redgifs.com" }
+
+        loadImgurAlbums(postsWithImgurAlbum)
+        loadGfycatGifs(postsWithGfycat)
+        loadRedgifGifs(postsWithRedgif)
+    }
 
     /**
      * Looks for any posts that link to Imgur albums and loads the individual items so they're
@@ -25,11 +35,7 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?) {
             return
         }
 
-        val postsWithImgurAlbum = posts.stream()
-                .filter { post: RedditPost -> post.url.matches("https://imgur.com/a/.+".toRegex()) }
-                .collect(Collectors.toList())
-
-        for (postWithImgurAlbum in postsWithImgurAlbum) {
+        for (postWithImgurAlbum in posts) {
             try {
                 // android.Uri I miss you :(
                 val uri = URI(postWithImgurAlbum.url)
@@ -48,6 +54,46 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?) {
                 postWithImgurAlbum.galleryImages = images
             } catch (e: URISyntaxException) {
                 // This really should never happen but worst case is the album would be loaded as a link
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun loadGfycatGifs(posts: List<RedditPost>) {
+        posts.forEach {
+            try {
+                val uri = URI(it.url)
+                val paths = uri.path.split("/".toRegex()).toTypedArray()
+
+                // Example URL: https://gfycat.com/tartcrazybelugawhale-adventures-confused-chilling-sabrina-kiernan-idea
+                // "tartcrazybelugawhale" is the ID of the gif
+                val id = paths.last().split("-").first()
+
+                val gif = gfycatApi.gfycat(id).body()
+                it.thirdPartyObject = gif
+            } catch (e: URISyntaxException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun loadRedgifGifs(posts: List<RedditPost>) {
+        posts.forEach {
+            try {
+                val uri = URI(it.url)
+                val paths = uri.path.split("/".toRegex()).toTypedArray()
+
+                // Example URL: https://gfycat.com/tartcrazybelugawhale-adventures-confused-chilling-sabrina-kiernan-idea
+                // "tartcrazybelugawhale" is the ID of the gif
+                val id = paths.last().split("-").first()
+
+                val gif = gfycatApi.redgifs(id).body()
+                it.thirdPartyObject = gif
+            } catch (e: URISyntaxException) {
                 e.printStackTrace()
             } catch (e: IOException) {
                 e.printStackTrace()

@@ -43,27 +43,9 @@ abstract class RedditListing {
     open var fullname = ""
 
     /**
-     * The URL pointing to the listing
-     */
-    // TODO this isn't applicable for users
-    /*
-    @SerializedName("url")
-    var url: String = ""
-     */
-
-    /**
      * The UTC timestamp the listing was created
      */
     @SerializedName("created_utc")
     @JsonAdapter(FloatToLongDeserializer::class)
     var createdAt = -1L
-
-    /**
-     * True if the listing is marked as Not Safe For Work (18+)
-     */
-    // TODO this isn't applicable for all types of listings (like comments)
-    /*
-    @SerializedName(value = "over_18", alternate = ["over18"])
-    var isNsfw = false
-     */
 }

@@ -422,6 +422,11 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
 
 
     /**
+     * If the post has loaded information from a third party API, the data will be set on this variable
+     */
+    var thirdPartyObject: Any? = null
+
+    /**
      * The vote type the post has
      *
      * Setting this value will automatically update [score], and is idempotent

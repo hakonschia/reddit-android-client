@@ -8,6 +8,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
+import com.example.hakonsreader.api.service.GfycatService
 import com.example.hakonsreader.api.service.ImgurService
 import com.example.hakonsreader.api.service.UserService
 import com.example.hakonsreader.api.utils.Util
@@ -18,11 +19,11 @@ class UserRequests(
         private val username: String,
         private val accessToken: AccessToken,
         private val api: UserService,
-        imgurApi: ImgurService?
+        imgurApi: ImgurService?,
+        gfycatApi: GfycatService
 ) {
 
-    private val imgurRequest = ThirdPartyRequest(imgurApi)
-    private val loadImgurAlbumsAsRedditGalleries = imgurApi != null
+    private val imgurRequest = ThirdPartyRequest(imgurApi, gfycatApi)
 
 
     /**
@@ -76,10 +77,7 @@ class UserRequests(
             val posts = resp.body()?.getListings()
 
             if (posts != null) {
-                if (loadImgurAlbumsAsRedditGalleries) {
-                    imgurRequest.loadImgurAlbums(posts)
-                }
-
+                imgurRequest.load(posts)
                 ApiResponse.Success(posts)
             } else {
                 apiError(resp)

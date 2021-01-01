@@ -99,4 +99,16 @@ public class PostConverter {
     public static String stringFromArray(Object[][] array) {
         return gson.toJson(array);
     }
+
+
+    @TypeConverter
+    public static Object objectFromString(String value) {
+        Type listType = new TypeToken<Object>() {}.getType();
+        return gson.fromJson(value, listType);
+    }
+
+    @TypeConverter
+    public static String stringFromObject(Object array) {
+        return gson.toJson(array);
+    }
 }
