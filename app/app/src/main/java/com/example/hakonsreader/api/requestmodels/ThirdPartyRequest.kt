@@ -62,17 +62,28 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
     }
 
     suspend fun loadGfycatGifs(posts: List<RedditPost>) {
-        posts.forEach {
+        posts.forEach { post ->
             try {
-                val uri = URI(it.url)
+                val uri = URI(post.url)
                 val paths = uri.path.split("/".toRegex()).toTypedArray()
 
                 // Example URL: https://gfycat.com/tartcrazybelugawhale-adventures-confused-chilling-sabrina-kiernan-idea
                 // "tartcrazybelugawhale" is the ID of the gif
                 val id = paths.last().split("-").first()
 
-                val gif = gfycatApi.gfycat(id).body()
-                it.thirdPartyObject = gif
+                val gif = gfycatApi.gfycat(id).body()?.gif
+
+                // For some reason Gfycat sometimes give back a http url, which can cause issues
+                // when playing, since cleartext might not be allowed
+                gif?.let {
+                    var url = it.mp4Url
+                    if (url[4] != 's') {
+                        url = "https" + url.substring(4)
+                        it.mp4Url = url
+                    }
+                }
+
+                post.thirdPartyObject = gif
             } catch (e: URISyntaxException) {
                 e.printStackTrace()
             } catch (e: IOException) {
@@ -82,17 +93,25 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
     }
 
     suspend fun loadRedgifGifs(posts: List<RedditPost>) {
-        posts.forEach {
+        posts.forEach { post ->
             try {
-                val uri = URI(it.url)
+                val uri = URI(post.url)
                 val paths = uri.path.split("/".toRegex()).toTypedArray()
 
                 // Example URL: https://gfycat.com/tartcrazybelugawhale-adventures-confused-chilling-sabrina-kiernan-idea
                 // "tartcrazybelugawhale" is the ID of the gif
                 val id = paths.last().split("-").first()
 
-                val gif = gfycatApi.redgifs(id).body()
-                it.thirdPartyObject = gif
+                val gif = gfycatApi.redgifs(id).body()?.gif
+                gif?.let {
+                    var url = it.mp4Url
+                    if (url[4] != 's') {
+                        url = "https" + url.substring(4)
+                        it.mp4Url = url
+                    }
+                }
+
+                post.thirdPartyObject = gif
             } catch (e: URISyntaxException) {
                 e.printStackTrace()
             } catch (e: IOException) {

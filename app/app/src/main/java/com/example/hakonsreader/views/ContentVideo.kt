@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.util.Pair
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.model.GfycatGif
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentVideoBinding
 import com.example.hakonsreader.enums.ShowNsfwPreview
@@ -98,6 +99,14 @@ class ContentVideo : Content {
                 player.videoWidth = gif.width
                 player.videoHeight = gif.height
             }
+        }
+
+        val thirdParty = redditPost.thirdPartyObject
+        if (thirdParty is GfycatGif) {
+            url = thirdParty.mp4Url
+            player.mp4Video = true
+            player.dashVideo = false
+            player.hasAudio = thirdParty.hasAudio
         }
 
         if (url != null) {

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -21,6 +22,7 @@ import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.views.util.VideoCache
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.dash.DashMediaSource
@@ -150,11 +152,35 @@ class VideoPlayer : PlayerView {
     var dashVideo = false
 
     /**
+     * True if [url] points to a video that should be extracted as MP4. This must be set before an attempt to
+     * load the video is made
+     *
+     * Default to `false`
+     */
+    var mp4Video = false
+
+    /**
      * True if the video should be cached
      *
      * Default to `true`
      */
     var cacheVideo = true
+
+    /**
+     * True if it is known before the video loads if the video has audio. Setting this to false
+     * will remove the audio button
+     *
+     * Default to `true`
+     */
+    var hasAudio = true
+        set(value) {
+            field = value
+            findViewById<View>(R.id.volumeButton).visibility = if (value) {
+                VISIBLE
+            } else {
+                GONE
+            }
+        }
 
     /**
      * The width of the video. Setting this will automatically resize the view
@@ -298,15 +324,18 @@ class VideoPlayer : PlayerView {
             DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT)
         }
 
+        Log.d(TAG, "createMediaSource: loading $url")
         return if (dashVideo) {
             DashMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(url))
         } else {
-            // Progressive media sources won't have audio to play, so remove the volume button
-            findViewById<View>(R.id.volumeButton).visibility = GONE
-
-            ProgressiveMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(Uri.parse(url))
+            if (mp4Video) {
+                ProgressiveMediaSource.Factory(dataSourceFactory, Mp4Extractor.FACTORY)
+                        .createMediaSource(Uri.parse(url))
+            } else {
+                ProgressiveMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(Uri.parse(url))
+            }
         }
     }
 
