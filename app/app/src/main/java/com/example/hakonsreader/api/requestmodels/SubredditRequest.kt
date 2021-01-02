@@ -108,7 +108,7 @@ class SubredditRequest(
             val posts = resp.body()?.getListings()
 
             if (posts != null) {
-                imgurRequest.load(posts)
+                imgurRequest.loadAll(posts)
                 ApiResponse.Success(posts)
             } else {
                 apiError(resp)
