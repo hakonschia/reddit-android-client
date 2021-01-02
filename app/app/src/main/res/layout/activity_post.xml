@@ -136,6 +136,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <!-- This view is to remove the clicks for views "under" the navigation/reply buttons,
+         primarily so that when attempting to use the navigation buttons the user wont miss click
+         and vote on a comment they didn't intend to-->
+        <View
+            android:id="@+id/navigationButtonsBackView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clickable="true"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/replyPost"
+            app:layout_constraintTop_toTopOf="@+id/replyPost" />
+
         <!-- Archived posts can never be replied to, locked posts can only be replied to if the user is a mod -->
         <ImageButton
             android:id="@+id/replyPost"
