@@ -10,6 +10,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.thirdparty.GfycatGif
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.model.thirdparty.ImgurGif
 import com.example.hakonsreader.databinding.ContentVideoBinding
 import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
@@ -101,7 +102,13 @@ class ContentVideo : Content {
         }
 
         val thirdParty = redditPost.thirdPartyObject
+        // TODO I guess this can be made into an Interface to not have to duplicate this
         if (thirdParty is GfycatGif) {
+            url = thirdParty.mp4Url
+            player.mp4Video = true
+            player.dashVideo = false
+            player.hasAudio = thirdParty.hasAudio
+        } else if (thirdParty is ImgurGif) {
             url = thirdParty.mp4Url
             player.mp4Video = true
             player.dashVideo = false

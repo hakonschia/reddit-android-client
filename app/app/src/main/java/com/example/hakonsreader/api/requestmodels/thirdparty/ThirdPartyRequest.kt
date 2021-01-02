@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.requestmodels.thirdparty
 
-import android.util.Log
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
@@ -37,6 +36,7 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
                 post.domain == "gfycat.com" -> this::loadGfycatGif
                 post.domain == "redgifs.com" -> this::loadRedgifGif
                 post.url.matches("https://imgur.com/a/.+".toRegex()) -> this::loadImgurAlbum
+                post.url.matches("https://i\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
                 else -> null
             } ?: return@forEachIndexed
 
@@ -48,22 +48,22 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             // with many API calls. Eg. go to the subreddit "nsfwgif" which has a lot of posts from Redgifs, it
             // can cause an extra delay of 10+ seconds
             if (index >= indexToSpawnNewCoroutine) {
-                Log.d("ThirdPartyRequest", "loadAll: index = $index, launching new job")
                 CoroutineScope(IO).launch {
                     func.invoke(post)
                 }
             } else {
-                Log.d("ThirdPartyRequest", "loadAll: index = $index, continuing job")
                 func.invoke(post)
             }
         }
     }
 
-
+    /**
+     * Loads content for imgur albums
+     *
+     * @param post The post to load the album for
+     */
     suspend fun loadImgurAlbum(post: RedditPost) {
-        if (imgurApi == null) {
-            return
-        }
+        imgurApi ?: return
 
         try {
             // android.Uri I miss you :(
@@ -72,7 +72,7 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             val paths = uri.path.split("/".toRegex()).toTypedArray()
             val albumHash = paths[paths.size - 1]
 
-            val response = imgurApi.loadImgurAlbum(albumHash)
+            val response = imgurApi.getAlbum(albumHash)
             val album = response.body()
 
             if (!response.isSuccessful || album == null) {
@@ -92,6 +92,44 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
         }
     }
 
+    /**
+     * Loads content for Imgur gifs
+     *
+     * @param post The post to load the gif for
+     */
+    suspend fun loadImgurGif(post: RedditPost) {
+        imgurApi ?: return
+
+        try {
+            val uri = URI(post.url)
+
+            // Example url: https://i.imgur.com/cAu4x9y.gifv
+            // id = cAu4x9y
+            val paths = uri.path.split("/".toRegex()).toTypedArray()
+            val id = paths.last().split(".").first()
+
+            val gif = imgurApi.getImage(id).body()?.gif
+
+            post.thirdPartyObject = gif
+            post.crossposts?.get(0)?.thirdPartyObject = gif
+            post.crossposts?.forEach {
+                it.thirdPartyObject = gif
+            }
+        } catch (e: URISyntaxException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+
+    /**
+     * Loads content for Gfycat gifs. This will only work for gifs hosted on Gfycat, for Redgifs
+     * see [loadRedgifGif]
+     *
+     * @param post The post to load the gif for
+     * @see loadRedgifGif
+     */
     suspend fun loadGfycatGif(post: RedditPost) {
         try {
             val uri = URI(post.url)
@@ -124,6 +162,13 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
         }
     }
 
+    /**
+     * Loads content for Redgif gifs. This will only work for gifs hosted on Redgif, for Gfycat
+     * see [loadGfycatGif]
+     *
+     * @param post The post to load the gif for
+     * @see loadGfycatGif
+     */
     suspend fun loadRedgifGif(post: RedditPost) {
         try {
             val uri = URI(post.url)
