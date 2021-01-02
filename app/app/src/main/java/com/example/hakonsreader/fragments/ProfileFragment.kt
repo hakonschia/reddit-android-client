@@ -47,6 +47,10 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
         private const val POST_IDS_KEY = "post_ids_profile"
 
+        private const val FIRST_VIEW_STATE_STORED_KEY = "first_view_state_stored"
+        private const val LAST_VIEW_STATE_STORED_KEY = "last_view_state_stored"
+        private const val VIEW_STATE_STORED_KEY = "view_state_stored"
+
         private const val LAYOUT_STATE_KEY = "layout_state_profile"
 
         /**
@@ -187,6 +191,8 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         if (postsAdapter?.posts?.isEmpty() == true && postIds.isEmpty() && username != null) {
             postsViewModel?.loadPosts()
         }
+
+        restoreViewHolderStates()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -202,11 +208,24 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         outState.putStringArrayList(POST_IDS_KEY, postsViewModel?.postIds as ArrayList<String>?)
     }
 
+    override fun onPause() {
+        super.onPause()
+        saveViewHolderStates()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
 
         App.get().unregisterPrivateBrowsingObservable(this)
-        
+
+        postsAdapter?.let {
+            // Ensure that all videos are cleaned up
+            for (i in 0 until it.itemCount) {
+                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
+                viewHolder?.destroy()
+            }
+        }
+
         if (saveState == null) {
             saveState = Bundle()
         }
@@ -217,6 +236,66 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
         _binding = null
     }
+
+    /**
+     * Saves the state of the visible ViewHolders to [saveState]
+     *
+     * @see restoreViewHolderStates
+     */
+    private fun saveViewHolderStates() {
+        if (saveState == null) {
+            saveState = Bundle()
+        }
+
+        // TODO this should make use of the states stored by the adapter as that will have state
+        //  for all previous posts, not just the visible ones (although we still have to call onUnselected to pause videos etc)
+        saveState?.let { saveBundle ->
+            // It's probably not necessary to loop through all, but ViewHolders are still active even when not visible
+            // so just getting firstVisible and lastVisible probably won't be enough
+            for (i in 0 until postsAdapter?.itemCount!!) {
+                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
+
+                if (viewHolder != null) {
+                    val extras = viewHolder.extras
+                    saveBundle.putBundle(VIEW_STATE_STORED_KEY + i, extras)
+                    viewHolder.onUnselected()
+                }
+            }
+
+            postsLayoutManager?.let {
+                val firstVisible = it.findFirstVisibleItemPosition()
+                val lastVisible = it.findLastVisibleItemPosition()
+
+                saveBundle.putInt(FIRST_VIEW_STATE_STORED_KEY, firstVisible)
+                saveBundle.putInt(LAST_VIEW_STATE_STORED_KEY, lastVisible)
+            }
+        }
+    }
+
+    /**
+     * Restores the state of the visible ViewHolders based on [saveState]
+     *
+     * @see saveViewHolderStates
+     */
+    private fun restoreViewHolderStates() {
+        saveState?.let {
+            val firstVisible = it.getInt(FIRST_VIEW_STATE_STORED_KEY)
+            val lastVisible = it.getInt(LAST_VIEW_STATE_STORED_KEY)
+
+            for (i in firstVisible..lastVisible) {
+                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
+
+                if (viewHolder != null) {
+                    // If the view has been destroyed the ViewHolders haven't been created yet
+                    val extras = it.getBundle(VIEW_STATE_STORED_KEY + i)
+                    if (extras != null) {
+                        viewHolder.extras = extras
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Updates [binding] with new user information, if [user] isn't *null*
