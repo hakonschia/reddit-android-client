@@ -10,8 +10,8 @@ import com.example.hakonsreader.api.requestmodels.thirdparty.ThirdPartyRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
-import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import com.example.hakonsreader.api.service.UserService
+import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception

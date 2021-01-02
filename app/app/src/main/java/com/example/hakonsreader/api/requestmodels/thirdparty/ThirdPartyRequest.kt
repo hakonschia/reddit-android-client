@@ -1,14 +1,12 @@
 package com.example.hakonsreader.api.requestmodels.thirdparty
 
 import android.util.Log
-import com.example.hakonsreader.api.model.ImgurAlbum
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
@@ -74,7 +72,7 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             val paths = uri.path.split("/".toRegex()).toTypedArray()
             val albumHash = paths[paths.size - 1]
 
-            val response: Response<ImgurAlbum> = imgurApi.loadImgurAlbum(albumHash).execute()
+            val response = imgurApi.loadImgurAlbum(albumHash)
             val album = response.body()
 
             if (!response.isSuccessful || album == null) {

@@ -22,7 +22,6 @@ import com.example.hakonsreader.api.requestmodels.UserRequestsLoggedInUser;
 import com.example.hakonsreader.api.service.AccessTokenService;
 import com.example.hakonsreader.api.service.CommentService;
 import com.example.hakonsreader.api.service.thirdparty.GfycatService;
-import com.example.hakonsreader.api.service.thirdparty.ImgurService;
 import com.example.hakonsreader.api.service.MessageService;
 import com.example.hakonsreader.api.service.OAuthService;
 import com.example.hakonsreader.api.service.PostService;
@@ -30,6 +29,7 @@ import com.example.hakonsreader.api.service.SubredditService;
 import com.example.hakonsreader.api.service.SubredditsService;
 import com.example.hakonsreader.api.service.UserService;
 import com.example.hakonsreader.api.responses.GenericError;
+import com.example.hakonsreader.api.service.thirdparty.ImgurService;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import org.jetbrains.annotations.NotNull;
@@ -232,6 +232,9 @@ public class RedditApi {
      */
     private ImgurService imgurService;
 
+    /**
+     * The service object used to communicate with the Gfycat/Redgifs API
+     */
     private GfycatService gfycatApi;
 
 
