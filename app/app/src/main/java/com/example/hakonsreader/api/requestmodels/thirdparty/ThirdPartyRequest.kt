@@ -1,10 +1,10 @@
-package com.example.hakonsreader.api.requestmodels
+package com.example.hakonsreader.api.requestmodels.thirdparty
 
 import android.util.Log
 import com.example.hakonsreader.api.model.ImgurAlbum
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.service.GfycatService
-import com.example.hakonsreader.api.service.ImgurService
+import com.example.hakonsreader.api.service.thirdparty.GfycatService
+import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -12,7 +12,6 @@ import retrofit2.Response
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import kotlin.reflect.KSuspendFunction1
 
 /**
  * Request model for communicating with third party services, such as Imgur and Gfycat

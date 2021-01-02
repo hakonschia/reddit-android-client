@@ -6,10 +6,11 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.requestmodels.thirdparty.ThirdPartyRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.GfycatService
-import com.example.hakonsreader.api.service.ImgurService
+import com.example.hakonsreader.api.service.thirdparty.GfycatService
+import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import com.example.hakonsreader.api.service.UserService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError

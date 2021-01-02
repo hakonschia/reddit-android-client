@@ -1,4 +1,4 @@
-package com.example.hakonsreader.api.model
+package com.example.hakonsreader.api.model.thirdparty
 
 import com.google.gson.annotations.SerializedName
 

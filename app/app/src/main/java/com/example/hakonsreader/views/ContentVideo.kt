@@ -5,11 +5,10 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.util.Pair
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.api.model.GfycatGif
+import com.example.hakonsreader.api.model.thirdparty.GfycatGif
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentVideoBinding
 import com.example.hakonsreader.enums.ShowNsfwPreview

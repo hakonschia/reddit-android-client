@@ -1,4 +1,4 @@
-package com.example.hakonsreader.api.service;
+package com.example.hakonsreader.api.service.thirdparty;
 
 import com.example.hakonsreader.api.model.ImgurAlbum;
 

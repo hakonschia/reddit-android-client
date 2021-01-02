@@ -1,6 +1,6 @@
-package com.example.hakonsreader.api.service
+package com.example.hakonsreader.api.service.thirdparty
 
-import com.example.hakonsreader.api.model.GfycatGifOuter
+import com.example.hakonsreader.api.model.thirdparty.GfycatGifOuter
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
