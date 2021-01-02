@@ -84,6 +84,9 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
 
             val images = album.images
             post.galleryImages = images
+            post.crossposts?.forEach {
+                it.galleryImages = images
+            }
         } catch (e: URISyntaxException) {
             // This really should never happen but worst case is the album would be loaded as a link
             e.printStackTrace()
@@ -113,6 +116,10 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             }
 
             post.thirdPartyObject = gif
+            post.crossposts?.get(0)?.thirdPartyObject = gif
+            post.crossposts?.forEach {
+                it.thirdPartyObject = gif
+            }
         } catch (e: URISyntaxException) {
             e.printStackTrace()
         } catch (e: IOException) {
@@ -139,6 +146,9 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             }
 
             post.thirdPartyObject = gif
+            post.crossposts?.forEach {
+                it.thirdPartyObject = gif
+            }
         } catch (e: URISyntaxException) {
             e.printStackTrace()
         } catch (e: IOException) {
