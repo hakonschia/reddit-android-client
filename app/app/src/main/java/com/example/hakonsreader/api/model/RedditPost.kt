@@ -7,6 +7,7 @@ import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.interfaces.ReportableListing
+import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
@@ -472,7 +473,7 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
      */
     fun getPostType(): PostType? {
         // TODO make this less bad
-        if (isVideo || thirdPartyObject is ImgurGif || thirdPartyObject is GfycatGif) {
+        if (isVideo || thirdPartyObject is ThirdPartyGif) {
             return PostType.VIDEO
         } else if (isSelf) {
             return PostType.TEXT

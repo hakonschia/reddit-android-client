@@ -8,6 +8,7 @@ import android.view.View
 import androidx.core.util.Pair
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.example.hakonsreader.api.model.thirdparty.GfycatGif
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.thirdparty.ImgurGif
@@ -83,9 +84,17 @@ class ContentVideo : Content {
             video = redditPost.getVideoGif()
         }
 
+        val thirdParty = redditPost.thirdPartyObject
         var url: String? = null
 
-        if (video != null) {
+        if (thirdParty is ThirdPartyGif) {
+            url = thirdParty.mp4Url
+            player.mp4Video = true
+            player.hasAudio = thirdParty.hasAudio
+            player.videoSize = thirdParty.mp4Size
+            player.videoWidth = thirdParty.width
+            player.videoHeight = thirdParty.height
+        } else if (video != null) {
             url = video.dashUrl
 
             // If we have a "RedditVideo" we can set the duration now
@@ -100,22 +109,6 @@ class ContentVideo : Content {
                 player.videoWidth = gif.width
                 player.videoHeight = gif.height
             }
-        }
-
-        val thirdParty = redditPost.thirdPartyObject
-        // TODO I guess this can be made into an Interface to not have to duplicate this
-        if (thirdParty is GfycatGif) {
-            url = thirdParty.mp4Url
-            player.mp4Video = true
-            player.dashVideo = false
-            player.hasAudio = thirdParty.hasAudio
-            player.videoSize = thirdParty.mp4Size
-        } else if (thirdParty is ImgurGif) {
-            url = thirdParty.mp4Url
-            player.mp4Video = true
-            player.dashVideo = false
-            player.hasAudio = thirdParty.hasAudio
-            player.videoSize = thirdParty.mp4Size
         }
 
         if (url != null) {
