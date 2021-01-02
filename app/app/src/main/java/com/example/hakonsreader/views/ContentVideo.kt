@@ -108,11 +108,13 @@ class ContentVideo : Content {
             player.mp4Video = true
             player.dashVideo = false
             player.hasAudio = thirdParty.hasAudio
+            player.videoSize = thirdParty.mp4Size
         } else if (thirdParty is ImgurGif) {
             url = thirdParty.mp4Url
             player.mp4Video = true
             player.dashVideo = false
             player.hasAudio = thirdParty.hasAudio
+            player.videoSize = thirdParty.mp4Size
         }
 
         if (url != null) {

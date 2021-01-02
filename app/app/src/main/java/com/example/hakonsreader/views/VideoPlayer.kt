@@ -118,6 +118,13 @@ class VideoPlayer : PlayerView {
          * The value stored with this key will be a `boolean`
          */
         const val EXTRA_VOLUME = "volume"
+
+        /**
+         * The key used for extra information about the size of the video (in bytes)
+         *
+         * The value stored with this key will be an `int`
+         */
+        const val EXTRA_VIDEO_SIZE = "videoSize"
     }
 
     /**
@@ -215,6 +222,20 @@ class VideoPlayer : PlayerView {
             val duration = findViewById<TextView>(R.id.duration)
             duration.visibility = VISIBLE
             duration.text = Util.createVideoDuration(field)
+        }
+
+    /**
+     * The size of the video in Megabytes. This will show a text in the overlay with the size in MB
+     */
+    var videoSize = -1
+        set(value) {
+            field = value
+
+            if (value >= 0) {
+                val videoSizeView: TextView = findViewById(R.id.videoSize)
+                val sizeInMb = videoSize / (1024 * 1024f)
+                videoSizeView.text = context.getString(R.string.videoSize, sizeInMb)
+            }
         }
 
     /**
@@ -577,6 +598,7 @@ class VideoPlayer : PlayerView {
             // Probably have to pass thumbnail?
             it.putString(EXTRA_URL, url)
             it.putBoolean(EXTRA_IS_DASH, dashVideo)
+            it.putInt(EXTRA_VIDEO_SIZE, videoSize)
         }
     }
 
@@ -585,6 +607,8 @@ class VideoPlayer : PlayerView {
         val isPlaying = extras.getBoolean(EXTRA_IS_PLAYING)
         val showController = extras.getBoolean(EXTRA_SHOW_CONTROLS)
         val volumeOn = extras.getBoolean(EXTRA_VOLUME)
+
+        videoSize = extras.getInt(EXTRA_VIDEO_SIZE)
 
         toggleVolume(volumeOn)
 

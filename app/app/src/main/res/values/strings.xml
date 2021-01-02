@@ -439,4 +439,6 @@
 
     <string name="notificationInboxMessageTitle">New message from %s</string>
     <string name="notificationInboxCommentReplyTitle">New comment reply from %s</string>
+
+    <string name="videoSize" translatable="false">%.2f MB</string>
 </resources>

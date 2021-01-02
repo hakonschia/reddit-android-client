@@ -19,6 +19,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/videoSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:textColor="#FFF"
+        android:background="#000"
+        android:padding="2dp"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
+        tools:text="15.2 MB"/>
+
     <ProgressBar
         android:id="@+id/buffering"
         android:layout_width="25dp"
