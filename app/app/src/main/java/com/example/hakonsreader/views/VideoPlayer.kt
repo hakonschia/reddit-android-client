@@ -378,7 +378,7 @@ class VideoPlayer : PlayerView {
                     .load(thumbnailUrl)
                     // .resize(params.width, params.height)
                     .into(thumbnail)
-        } else {
+        } else if (thumbnailDrawable != -1) {
             Picasso.get()
                     .load(thumbnailDrawable)
                     .into(thumbnail)

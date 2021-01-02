@@ -10,6 +10,8 @@ import com.example.hakonsreader.api.interfaces.ReportableListing
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
+import com.example.hakonsreader.api.model.thirdparty.GfycatGif
+import com.example.hakonsreader.api.model.thirdparty.ImgurGif
 import com.example.hakonsreader.api.persistence.PostConverter
 import com.google.gson.Gson
 import com.google.gson.annotations.JsonAdapter
@@ -470,7 +472,7 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
      */
     fun getPostType(): PostType? {
         // TODO make this less bad
-        if (isVideo) {
+        if (isVideo || thirdPartyObject is ImgurGif || thirdPartyObject is GfycatGif) {
             return PostType.VIDEO
         } else if (isSelf) {
             return PostType.TEXT

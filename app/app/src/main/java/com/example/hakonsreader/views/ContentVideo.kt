@@ -30,6 +30,7 @@ class ContentVideo : Content {
         fun isRedditPostVideoPlayable(post: RedditPost): Boolean {
             // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
             return post.getVideo() != null || post.getVideoGif() != null || post.getMp4Source() != null
+                    || post.thirdPartyObject is ImgurGif || post.thirdPartyObject is GfycatGif
         }
     }
 
@@ -223,10 +224,11 @@ class ContentVideo : Content {
             }
         }
 
+        // noImageId is set, use the drawable instead
         if (noImageId != -1) {
             player.thumbnailDrawable = noImageId
         } else {
-            player.thumbnailUrl = obfuscatedUrl ?: imageUrl!!
+            player.thumbnailUrl = obfuscatedUrl ?: imageUrl ?: ""
         }
     }
 
