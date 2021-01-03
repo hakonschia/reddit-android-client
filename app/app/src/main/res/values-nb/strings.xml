@@ -296,4 +296,5 @@
     <string name="notificationChannelInboxDescription">Notifikasjoner for ting som kommentarsvar</string>
     <string name="notificationInboxMessageTitle">Ny melding fra %s</string>
     <string name="notificationInboxCommentReplyTitle">Nytt kommentarsvar fra %s</string>
+    <string name="postMenuViewOnRemoveddit">Vis på removeddit.com</string>
 </resources>

@@ -90,7 +90,7 @@ public final class LinkUtils {
     public static final String POST_REGEX = "http(s)://(.*)?reddit.com/" + BASE_SUBREDDIT_REGEX + "+/comments/.+/?(\\s|$)";
 
     /**
-     * Matches a post URL with only {@code /comments/<postId>}
+     * Matches a post URL with only {@code https://reddit.com/comments/<postId>}
      *
      * <p>Examples:
      * <ol>
@@ -99,7 +99,7 @@ public final class LinkUtils {
      * </ol>
      * </p>
      */
-    public static final String POST_REGEX_NO_SUBREDDIT = ".*/comments/.+";
+    public static final String POST_REGEX_NO_SUBREDDIT = "http(s)://(.*)?reddit.com/comments/.+";
 
     /**
      * Matches a shortened URL for a post.

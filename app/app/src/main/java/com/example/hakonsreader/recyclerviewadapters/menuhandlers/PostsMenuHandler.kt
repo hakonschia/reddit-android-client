@@ -3,11 +3,14 @@ package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.Util
@@ -95,6 +98,7 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
             R.id.menuBlockUser -> { blockUserOnClick(view, post); true }
             R.id.menuCopyPostLink -> { copyPostLinkOnClick(view, post); true }
             R.id.menuCopyPostContent -> { copyPostContentOnClick(view, post); true }
+            R.id.menuViewOnRemoveddit -> { viewOnRemoveddit(view.context, post); true }
             R.id.menuPostAddSubredditToFilter -> { filterSubredditOnClick(post.subreddit); true }
             else -> false
         }
@@ -118,6 +122,7 @@ fun showPopupForPostExtraForNonLoggedInUser(view: View, post: RedditPost) {
         return@setOnMenuItemClickListener when (item.itemId) {
             R.id.menuCopyPostLink -> { copyPostLinkOnClick(view, post); true }
             R.id.menuCopyPostContent -> { copyPostContentOnClick(view, post); true }
+            R.id.menuViewOnRemoveddit -> { viewOnRemoveddit(view.context, post); true }
             R.id.menuPostAddSubredditToFilter -> { filterSubredditOnClick(post.subreddit); true }
             else -> false
         }
@@ -224,6 +229,14 @@ private fun copyPostContentOnClick(view: View, post: RedditPost) {
     val clip = ClipData.newPlainText("Reddit post content link", post.url)
     clipboard.setPrimaryClip(clip)
     Snackbar.make(view, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
+}
+
+private fun viewOnRemoveddit(context: Context, post: RedditPost) {
+    val url = "https://removeddit.com" + post.permalink
+    val intent = Intent(context, DispatcherActivity::class.java).apply {
+        putExtra(DispatcherActivity.URL_KEY, url)
+    }
+    context.startActivity(intent)
 }
 
 private fun filterSubredditOnClick(subredditName: String) {

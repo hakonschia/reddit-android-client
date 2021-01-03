@@ -326,6 +326,7 @@
     <string name="copyPostLink">Copy post link</string>
     <string name="copyPostContentLink">Copy link to post content</string>
     <string name="postMenuAddSubredditToFilter">Filter posts from \'%s\'</string>
+    <string name="postMenuViewOnRemoveddit">View on removeddit.com</string>
 
     <string name="blockUser">Block user</string>
     <string name="userBlocked">User blocked</string>

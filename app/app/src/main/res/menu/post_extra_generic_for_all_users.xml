@@ -10,6 +10,10 @@
         android:title="@string/copyPostContentLink" />
 
     <item
+        android:id="@+id/menuViewOnRemoveddit"
+        android:title="@string/postMenuViewOnRemoveddit" />
+
+    <item
         android:id="@+id/menuPostAddSubredditToFilter"
         android:title="@string/postMenuAddSubredditToFilter" />
 </menu>
