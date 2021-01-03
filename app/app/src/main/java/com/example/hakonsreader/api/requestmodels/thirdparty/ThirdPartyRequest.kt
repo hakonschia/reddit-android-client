@@ -20,8 +20,9 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
      *
      * The following services will potentially be called:
      * 1. Imgur (for albums)
-     * 2. Gfycat (for gifs)
-     * 3. Redgifs (for gifs)
+     * 2. Imgur (for gifs/mp4s)
+     * 3. Gfycat (for gifs)
+     * 4. Redgifs (for gifs)
      *
      * @param posts The posts to load for
      * @param indexToSpawnNewCoroutine The index in [posts] at which to start spawning new Coroutine jobs

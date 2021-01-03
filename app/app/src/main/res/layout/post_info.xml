@@ -105,7 +105,7 @@
             app:createdAt="@{post != null ? post.createdAt : -1}"
             app:layout_constraintStart_toEndOf="@+id/lock"
             app:layout_constraintTop_toTopOf="@+id/stickied"
-            app:marginStart="@{post.stickied || post.locked || post.archived ? @dimen/defaultMargin : @dimen/noMargin}"
+            app:marginStart="@{post.stickied || post.locked || post.archived ? @dimen/defaultMarginHalf : @dimen/noMargin}"
             tools:text="2 hours ago" />
 
         <ImageView
@@ -150,8 +150,6 @@
             app:layout_constraintTop_toTopOf="@+id/stickied"
             tools:visibility="visible" />
 
-
-        <!-- TODO Author flair might be pushed outside of the screen -->
         <TextView
             android:id="@+id/author"
             android:layout_width="wrap_content"
@@ -199,40 +197,40 @@
             android:visibility="@{post.nsfw ? View.VISIBLE : View.GONE}"
 
             app:fillColor="@color/tagNSFWFill"
-            app:layout_constraintStart_toEndOf="@+id/domain"
-            app:layout_constraintTop_toTopOf="@+id/domain"
-
             app:text="@string/tagNSFW"
-            app:textColor="@color/tagNSFWText" />
+            app:textColor="@color/tagNSFWText"
+
+            app:layout_constraintStart_toEndOf="@+id/domain"
+            app:layout_constraintTop_toTopOf="@+id/domain" />
 
         <com.example.hakonsreader.views.Tag
             android:id="@+id/spoilerTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
             android:visibility="@{post.spoiler ? View.VISIBLE : View.GONE}"
 
-            app:text="@string/tagSpoiler"
-            app:textColor="@color/tagSpoilerText"
             app:fillColor="@color/tagSpoilerFill"
-
             app:layout_constraintStart_toEndOf="@+id/nsfwTag"
-            app:layout_constraintTop_toTopOf="@+id/nsfwTag" />
+            app:layout_constraintTop_toTopOf="@+id/nsfwTag"
+
+            app:text="@string/tagSpoiler"
+            app:textColor="@color/tagSpoilerText" />
 
         <com.example.hakonsreader.views.Tag
             android:id="@+id/linkFlair"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
 
-            app:linkFlair="@{post}"
+            app:layout_constrainedWidth="true"
 
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constrainedWidth="true"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/spoilerTag"
-            app:layout_constraintTop_toTopOf="@+id/spoilerTag" />
+            app:layout_constraintTop_toTopOf="@+id/spoilerTag"
+            app:linkFlair="@{post}" />
 
         <!-- Visibility group for the crosspost views -->
         <androidx.constraintlayout.widget.Group
@@ -271,8 +269,8 @@
 
         <TextView
             android:id="@+id/crosspostFrom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="38dp"
+            android:layout_height="24dp"
 
             android:text="@string/crosspostFrom"
             android:textSize="13sp"
