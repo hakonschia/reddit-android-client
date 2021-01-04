@@ -8,7 +8,7 @@ package com.example.hakonsreader.api.utils;
 public final class LinkUtils {
 
     /**
-     * Basic subreddit regex that only matches "{@code < r/<allowed_subreddit_characters>}". This
+     * Basic subreddit regex that only matches "{@code r/<allowed_subreddit_characters>}". This
      * does not match a preceding or trailing slash
      */
     public static final String BASE_SUBREDDIT_REGEX = "(r|R)/[A-Za-z0-9_]+";
@@ -25,8 +25,7 @@ public final class LinkUtils {
      * @see LinkUtils#SUBREDDIT_REGEX_NO_HTTPS
      * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
      */
-    // TODO instead of www. match anything (since it can be old.reddit.com etc.)
-    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "(^|\\s)https://(www.)?reddit.com/" + BASE_SUBREDDIT_REGEX + "+/?(\\s|$)";
+    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "(^|\\s)https://(.*)?reddit.com/" + BASE_SUBREDDIT_REGEX + "/?(\\s|$)";
 
     /**
      * Regex for matching a subreddit string with only the "/r/..." part (no https://reddit.com).
@@ -45,7 +44,7 @@ public final class LinkUtils {
      * @see LinkUtils#SUBREDDIT_REGEX_WITH_HTTPS
      * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
      */
-    public static final String SUBREDDIT_REGEX_NO_HTTPS = "(^|\\s)/?" + BASE_SUBREDDIT_REGEX + "+/?(\\s|$)";
+    public static final String SUBREDDIT_REGEX_NO_HTTPS = "(^|\\s)/?" + BASE_SUBREDDIT_REGEX + "/?(\\s|$)";
 
     /**
      * Regex that matches either {@link LinkUtils#SUBREDDIT_REGEX_WITH_HTTPS} or {@link LinkUtils#SUBREDDIT_REGEX_NO_HTTPS}
@@ -80,10 +79,10 @@ public final class LinkUtils {
      *
      * <p>Examples:
      * <ol>
-     *     <li>r/GlobalOffensive/comments/55ter</li>
-     *     <li>R/GlobalOffensive/comments/55ter/</li>
-     *     <li>/R/GlobalOffensive/comments/55ter/FaZe_Wins_major</li>
-     *     <li>/R/GlobalOffensive/comments/55ter/FaZe_Wins_major</li>
+     *     <li>https://reddit.com/r/GlobalOffensive/comments/55ter</li>
+     *     <li>>https://reddit.com/R/GlobalOffensive/comments/55ter/</li>
+     *     <li>>https://np.reddit.com/R/GlobalOffensive/comments/55ter/FaZe_Wins_major</li>
+     *     <li>>https://old.reddit.com/R/GlobalOffensive/comments/55ter/FaZe_Wins_major</li>
      * </ol>
      * </p>
      */
@@ -108,7 +107,7 @@ public final class LinkUtils {
      *
      * <p>Example: https://redd.it/jtpvml</p>
      */
-    public static final String POST_SHORTENED_URL_REGEX = "http(s)?://redd.it/.+";
+    public static final String POST_SHORTENED_URL_REGEX = "http(s)?://(.*)redd.it/.+";
 
     /**
      * Regex matching imgur image URLs

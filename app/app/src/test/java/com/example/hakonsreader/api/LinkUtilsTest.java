@@ -14,22 +14,24 @@ import static org.junit.Assert.*;
  */
 public class LinkUtilsTest {
 
+
+    /**
+     * Tests {@link LinkUtils#BASE_SUBREDDIT_REGEX}
+     *
+     * This is a fairly incomprehensive test as this regex is meant to be used by other regexs
+     * as a base, and will therefore not check for start/end characters, so it could match more than
+     * what is expected
+     */
     @Test
     public void testBaseSubredditRegex() {
         // Test cases that should match
         String[] matchingTests = {
                 // Standard
                 "r/GlobalOffensive/",
-                // No trailing slash
-                "/r/GlobalOffensive",
-                // No preceding slash
-                "r/GlobalOffensive/",
-                // No preceding or trailing slash
-                "r/GlobalOffensive",
                 // Capitalized R
-                "/R/GlobalOffensive/",
+                "R/GlobalOffensive",
                 // Allowed characters: A-Za-z, 0-9, "_"
-                "/r/aAbB03_439ger",
+                "r/aAbB03_439ger",
         };
 
         Pattern p = Pattern.compile(LinkUtils.BASE_SUBREDDIT_REGEX);
@@ -37,25 +39,6 @@ public class LinkUtilsTest {
             Matcher matcher = p.matcher(matchingTest);
             if (!matcher.find()) {
                 fail(String.format("'%s' doesn't match", matchingTest));
-            }
-        }
-
-        // Test cases that should NOT match
-        String[] notMatchingTests = {
-                // Duplicate r
-                "rr/GlobalOffensive/",
-                // Duplicate preceding slash
-                "//r/GlobalOffensive",
-                // Duplicate preceding slash
-                "r/GlobalOffensive//",
-                // Illegal characters
-                "/r/global---fre€€offensive"
-        };
-
-        for (String notMatchingTest : notMatchingTests) {
-            Matcher matcher = p.matcher(notMatchingTest);
-            if (matcher.find()) {
-                fail(String.format("'%s' matches", notMatchingTest));
             }
         }
     }
@@ -78,6 +61,12 @@ public class LinkUtilsTest {
                 "https://reddit.com/r/GlobalOffensive",
                 // Allowed characters: A-Za-z, 0-9, "_"
                 "https://www.reddit.com/r/aAbB03_439ger",
+
+                // Should match other subdomains
+                "https://old.reddit.com/r/aAbB03_439ger",
+
+                // Should match no subdomain
+                "https://reddit.com/r/aAbB03_439ger",
         };
 
         Pattern p = Pattern.compile(LinkUtils.SUBREDDIT_REGEX_WITH_HTTPS);
@@ -279,24 +268,24 @@ public class LinkUtilsTest {
 
     /**
      * Test {@link LinkUtils#POST_REGEX}. This should match strings like
-     * "r/comments/gjioer/FaZe_actually_wins_major/" that link to posts
+     * https://reddit.com/r/comments/gjioer/FaZe_actually_wins_major/" that link to posts
      */
     @Test
     public void testPostRegex() {
         // Test cases that should match
         String[] matchingTests = {
-                "r/hakonschia/comments/jtyz0e/cool_image/",
-                "/r/hakonschia/comments/jtyz0e/cool_image/",
-                "/r/hakonschia/comments/jtyz0e/cool_image",
-                "r/hakonschia/comments/jtyz0e/cool_image",
-                "R/hakonschia/comments/jtyz0e/cool_image",
+                "https://reddit.com/r/hakonschia/comments/jtyz0e/cool_image/",
+                "https://reddit.com/r/hakonschia/comments/jtyz0e/cool_image/",
+                "https://reddit.com/r/hakonschia/comments/jtyz0e/cool_image",
+                "https://reddit.com/r/hakonschia/comments/jtyz0e/cool_image",
+                "https://reddit.com/R/hakonschia/comments/jtyz0e/cool_image",
 
                 // The text at the end (which is part of the title of the post) isn't a requirement
-                "/r/hakonschia/comments/jtyz0e/",
-                "/r/hakonschia/comments/jtyz0e",
+                "https://reddit.com/r/hakonschia/comments/jtyz0e/",
+                "https://reddit.com/r/hakonschia/comments/jtyz0e",
 
-                "R/hakon_schia/comments/jtyz0e/cool_image",
-                "R/hakon_schia2/comments/jtyz0e/cool_image",
+                "https://reddit.com/R/hakon_schia/comments/jtyz0e/cool_image",
+                "https://reddit.com/R/hakon_schia2/comments/jtyz0e/cool_image",
 
                 "https://reddit.com/r/hakon_schia/comments/jtyz0e/cool_image",
                 "https://reddit.com/r/hakon_schia/comments/jtyz0e/",
@@ -381,7 +370,8 @@ public class LinkUtilsTest {
         // Test cases that should match
         String[] matchingTests = {
                 "https://redd.it/poerhg/",
-                "https://redd.it/poerhg"
+                "https://redd.it/poerhg",
+                "https://www.redd.it/poerhg"
         };
 
         Pattern p = Pattern.compile(LinkUtils.POST_SHORTENED_URL_REGEX);

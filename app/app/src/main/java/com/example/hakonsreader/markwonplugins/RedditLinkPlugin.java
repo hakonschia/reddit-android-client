@@ -26,9 +26,9 @@ import java.util.regex.Pattern;
 import io.noties.markwon.AbstractMarkwonPlugin;
 
 /**
- * Markwon plugin to linkify Reddit links
+ * Markwon plugin to linkify Reddit links. This plugin wraps the text in a {@link URLSpan}
  *
- * <p>Supported links are: r/subreddit, /r/subreddit, u/user and /u/user,</p>
+ * <p>Supported links are: r/subreddit and /r/subreddit, u/user and /u/user, user/user and /user/user</p>
  */
 public class RedditLinkPlugin extends AbstractMarkwonPlugin {
     private static final String TAG = "RedditLinkPlugin";
@@ -38,21 +38,9 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
             // Match whitespace, start of string, in a parenthesis, or not in a [] (ie. already a markdown link)
             "(^|\\s|\\(|(?=\\[))" +
             // Match either subreddit or user regex
-            "(/?" + LinkUtils.BASE_SUBREDDIT_REGEX + ")" +
-            "|(/?" + LinkUtils.BASE_USER_REGEX + ")"
-    );
-
-
-    private final Context context;
-
-    /**
-     * Creates a new reddit link plugin
-     *
-     * @param context The context to use for retrieving colors and starting activities
-     */
-    public RedditLinkPlugin(Context context) {
-        this.context = context;
-    }
+            // Slash at the beginning and end is optional
+            "/?((r/[a-z0-9_]+)|(u(ser)?/[a-z0-9_-]+))/?"
+    , Pattern.CASE_INSENSITIVE);
 
 
     @Override
@@ -82,14 +70,11 @@ public class RedditLinkPlugin extends AbstractMarkwonPlugin {
                 s++;
             }
 
-            final String link = textToSpan;
-
-            spannable.setSpan(new UnderlineSpan(), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.link_color)), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            final String link = textToSpan.trim();
 
             // By setting a URL span as well we can handle the link in InternalLinkMovementMethod which looks for
             // URLSpans, so we can get the highlight when touched
-            spannable.setSpan(new URLSpan(link.trim()), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new URLSpan(link), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 

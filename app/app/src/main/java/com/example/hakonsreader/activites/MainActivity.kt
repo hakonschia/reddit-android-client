@@ -448,9 +448,10 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                     binding.bottomNav.removeBadge(profileItemId)
                 } else {
                     // Add or create a badge and update the number
-                    val badge = binding.bottomNav.getOrCreateBadge(profileItemId)
-                    badge.isVisible = true
-                    badge.number = unreadMessages
+                    binding.bottomNav.getOrCreateBadge(profileItemId).apply {
+                        isVisible = true
+                        number = unreadMessages
+                    }
                 }
             }
         })

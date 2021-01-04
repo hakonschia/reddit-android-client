@@ -250,7 +250,7 @@ class App : Application() {
 
                 // Custom plugins
                 .usePlugin(RedditSpoilerPlugin())
-                .usePlugin(RedditLinkPlugin(this))
+                .usePlugin(RedditLinkPlugin())
                 .usePlugin(SuperscriptPlugin())
                 .usePlugin(LinkPlugin())
                 .usePlugin(EnlargeLinkPlugin())
