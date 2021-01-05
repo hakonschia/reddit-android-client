@@ -34,6 +34,9 @@ public class PostBar extends ConstraintLayout {
     public PostBar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         binding = PostBarBinding.inflate(LayoutInflater.from(context), this, true);
+
+        // TODO this should be a setting
+        binding.setShowUpvoteRatio(true);
     }
 
     /**

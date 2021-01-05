@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="android.view.View" />
         <import type="com.example.hakonsreader.views.util.MenuClickHandler" />
 
         <variable
@@ -50,15 +51,22 @@
 
             tools:text="123 comments" />
 
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:visibility="@{showUpvoteRatio ? View.VISIBLE : View.GONE}"
+            app:constraint_referenced_ids="upvoteRatio, upvoteRatioIcon"/>
+
         <ImageView
             android:id="@+id/upvoteRatioIcon"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
 
-            android:layout_marginEnd="2dp"
+            android:layout_marginEnd="8dp"
             android:src="@drawable/ic_upvote_ratio"
             app:layout_constraintBottom_toBottomOf="@+id/upvoteRatio"
-            app:layout_constraintEnd_toStartOf="@+id/upvoteRatio"
+            app:layout_constraintEnd_toStartOf="@+id/voteBar"
             app:layout_constraintTop_toTopOf="@+id/upvoteRatio"
             app:tint="@color/iconColor" />
 
@@ -66,16 +74,15 @@
             android:id="@+id/upvoteRatio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
 
             android:text="@{@string/percentage((int)(post.upvoteRatio * 100))}"
             android:textColor="@color/text_color"
 
             app:layout_constraintBottom_toBottomOf="@+id/voteBar"
-            app:layout_constraintEnd_toStartOf="@+id/voteBar"
+            app:layout_constraintEnd_toStartOf="@+id/upvoteRatioIcon"
             app:layout_constraintTop_toTopOf="@+id/voteBar"
 
-            tools:text="55 %"/>
+            tools:text="55 %" />
 
         <com.example.hakonsreader.views.VoteBar
             android:id="@+id/voteBar"
