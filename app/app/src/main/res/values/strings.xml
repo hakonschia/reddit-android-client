@@ -443,5 +443,5 @@
 
     <string name="videoSize" translatable="false">%.2f MB</string>
 
-    <string name="percentage" translatable="false">%d \%%</string>
+    <string name="percentage" translatable="false">%d\%%</string>
 </resources>

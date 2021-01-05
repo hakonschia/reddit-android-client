@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="com.example.hakonsreader.views.util.MenuClickHandler" />
-        <import type="com.example.hakonsreader.recyclerviewadapters.menuhandlers.PostsMenuHandlerKt" />
 
         <variable
             name="post"
@@ -50,22 +49,6 @@
             app:layout_constraintTop_toTopOf="@+id/postCommentsImg"
 
             tools:text="123 comments" />
-
-        <ImageButton
-            android:id="@+id/postPopupMenu"
-            android:layout_width="50dp"
-            android:layout_height="24dp"
-
-            android:background="@null"
-            android:foreground="@drawable/ripple_main_bg"
-            android:onClick="@{(view) -> PostsMenuHandlerKt.showPopupForPost(view, post)}"
-
-            android:src="@drawable/ic_baseline_more_horiz_24"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/upvoteRatioIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
 
         <ImageView
             android:id="@+id/upvoteRatioIcon"

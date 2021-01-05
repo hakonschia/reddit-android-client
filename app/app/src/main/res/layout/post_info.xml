@@ -7,6 +7,7 @@
     <data>
         <import type="android.view.View" />
         <import type="com.example.hakonsreader.views.util.ClickHandler"/>
+        <import type="com.example.hakonsreader.recyclerviewadapters.menuhandlers.PostsMenuHandlerKt" />
 
         <variable
             name="post"
@@ -177,16 +178,31 @@
             android:id="@+id/authorFlair"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:layout_marginStart="8dp"
 
             app:authorFlair="@{post}"
-
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="@+id/author"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/postPopupMenu"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/author"
             app:layout_constraintTop_toTopOf="@+id/author" />
+
+
+        <ImageButton
+            android:id="@+id/postPopupMenu"
+            android:layout_width="50dp"
+            android:layout_height="24dp"
+
+            android:background="@null"
+            android:foreground="@drawable/ripple_main_bg"
+
+            android:onClick="@{(view) -> PostsMenuHandlerKt.showPopupForPost(view, post)}"
+
+            android:src="@drawable/ic_baseline_more_horiz_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.example.hakonsreader.views.Tag
             android:id="@+id/nsfwTag"
