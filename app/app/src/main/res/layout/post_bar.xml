@@ -9,6 +9,10 @@
         <variable
             name="post"
             type="com.example.hakonsreader.api.model.RedditPost" />
+
+        <variable
+            name="showUpvoteRatio"
+            type="boolean" />
     </data>
 
     <!-- The height has to be match_parent, if it's wrap_content the elements that are
@@ -59,9 +63,36 @@
             android:src="@drawable/ic_baseline_more_horiz_24"
 
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/voteBar"
+            app:layout_constraintEnd_toStartOf="@+id/upvoteRatioIcon"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
+
+        <ImageView
+            android:id="@+id/upvoteRatioIcon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+
+            android:layout_marginEnd="2dp"
+            android:src="@drawable/ic_upvote_ratio"
+            app:layout_constraintBottom_toBottomOf="@+id/upvoteRatio"
+            app:layout_constraintEnd_toStartOf="@+id/upvoteRatio"
+            app:layout_constraintTop_toTopOf="@+id/upvoteRatio"
+            app:tint="@color/iconColor" />
+
+        <TextView
+            android:id="@+id/upvoteRatio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+
+            android:text="@{@string/percentage((int)(post.upvoteRatio * 100))}"
+            android:textColor="@color/text_color"
+
+            app:layout_constraintBottom_toBottomOf="@+id/voteBar"
+            app:layout_constraintEnd_toStartOf="@+id/voteBar"
+            app:layout_constraintTop_toTopOf="@+id/voteBar"
+
+            tools:text="55 %"/>
 
         <com.example.hakonsreader.views.VoteBar
             android:id="@+id/voteBar"
