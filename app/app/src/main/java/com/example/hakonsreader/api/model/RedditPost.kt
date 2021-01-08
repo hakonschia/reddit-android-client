@@ -396,12 +396,6 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
     override var isScoreHidden = false
 
     /**
-     * The upvote ratio of the post (0-1)
-     */
-    @SerializedName("upvote_ratio")
-    var upvoteRatio = 0f
-
-    /**
      * Don't use this directly, use [voteType]
      */
     @SerializedName("likes")
