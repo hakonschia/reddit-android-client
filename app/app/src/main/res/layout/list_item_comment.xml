@@ -145,12 +145,32 @@
 
             app:createdAtShortened="@{comment != null ? comment.createdAt : -1}"
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@+id/stickied"
+            app:layout_constraintEnd_toStartOf="@+id/commentAgeEdited"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/authorFlair"
             app:layout_constraintTop_toTopOf="@+id/commentAuthor"
 
             tools:text="2h" />
+
+        <TextView
+            android:id="@+id/commentAgeEdited"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="4dp"
+            android:maxLines="1"
+            android:textColor="@color/secondary_text_color"
+            android:textSize="10sp"
+            android:visibility="@{comment != null &amp;&amp; comment.edited != -1 ? View.VISIBLE : View.GONE}"
+
+            app:editedAtShortened="@{comment != null ? comment.edited : -1}"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@+id/stickied"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/commentAge"
+
+            app:layout_constraintTop_toTopOf="@+id/commentAuthor"
+            tools:text="*2h" />
 
         <!-- Stickied and locked icons
         These need default to GONE or else they will appear for a split second before
