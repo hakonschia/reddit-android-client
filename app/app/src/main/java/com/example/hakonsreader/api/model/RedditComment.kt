@@ -4,6 +4,7 @@ import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.interfaces.ReportableListing
 import com.example.hakonsreader.api.interfaces.VoteableListing
+import com.example.hakonsreader.api.jsonadapters.BooleanAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
@@ -283,6 +284,13 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing, Report
      */
     @SerializedName("ignore_reports")
     override var ignoreReports = false
+
+    /**
+     * The timestamp the post was edited. If this is negative the post hasn't been edited
+     */
+    @JsonAdapter(BooleanAsIntAdapter::class)
+    @SerializedName("edited")
+    var edited = -1
 
 
     @SerializedName("replies")

@@ -9,6 +9,7 @@ import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.interfaces.ReportableListing
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.example.hakonsreader.api.interfaces.VoteableListing
+import com.example.hakonsreader.api.jsonadapters.BooleanAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
 import com.example.hakonsreader.api.model.thirdparty.GfycatGif
@@ -428,6 +429,13 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
      */
     @SerializedName("ignore_reports")
     override var ignoreReports = false
+
+    /**
+     * The timestamp the post was edited. If this is negative the post hasn't been edited
+     */
+    @JsonAdapter(BooleanAsIntAdapter::class)
+    @SerializedName("edited")
+    var edited = -1
 
 
     /**
