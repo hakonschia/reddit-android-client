@@ -595,7 +595,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             spans.forEach { span ->
                 val start = fullText.getSpanStart(span)
                 val end = fullText.getSpanEnd(span)
-                val text = fullText.substring(start, end)
+                val text = fullText.substring(start, end).trim()
                 val url = span.url
 
                 // TODO "text" will actually include superscripts, since that text isn't actually removed
