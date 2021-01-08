@@ -107,7 +107,7 @@ public final class LinkUtils {
      *
      * <p>Example: https://redd.it/jtpvml</p>
      */
-    public static final String POST_SHORTENED_URL_REGEX = "http(s)?://(.*)redd.it/.+";
+    public static final String POST_SHORTENED_URL_REGEX = "http(s)?://(www.)?redd.it/.+";
 
     /**
      * Regex matching imgur image URLs
