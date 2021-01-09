@@ -243,6 +243,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         binding.expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
 
+        // TODO if it should collapse by default it should also update the height so that is set
+        //  which probably causes issues when we go back? Since it probably doesnt have the correct "previous" value set
         val collapsePostByDefault = App.get().collapsePostsByDefaultWhenScrollingComments()
         enableTransition(collapsePostByDefault, showSnackbar = false, updateHeight = false)
     }
@@ -556,6 +558,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         enableTransition(!transition.isEnabled)
     }
 
+    private var heightWhenCollapseDisabled = -3
     /**
      * Enables or disables the post collapse transition and optionally shows a snackbar to notify the
      * user of the change
@@ -569,14 +572,15 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         val stringId = if (enable) {
             if (updateHeight) {
-                Log.d(TAG, "setting to normal max height=$maxPostHeight")
-                binding.post.updateMaxHeight(maxPostHeight)
+                Log.d(TAG, "setting to normal max height=$heightWhenCollapseDisabled")
+                binding.post.contentHeight = heightWhenCollapseDisabled
             }
 
             binding.expandOrCollapsePostBlock.visibility = GONE
             R.string.postTransitionEnabled
         } else {
             if (updateHeight) {
+                heightWhenCollapseDisabled = binding.post.contentHeight
                 Log.d(TAG, "setting to limited max height=$maxPostHeightWhenCollapsedDisabled")
                 binding.post.updateMaxHeight(maxPostHeightWhenCollapsedDisabled)
             }

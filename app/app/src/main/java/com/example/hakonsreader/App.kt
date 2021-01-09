@@ -537,7 +537,7 @@ class App : Application() {
      * @return The percentage of the screen to take (0-100)
      */
     fun getMaxPostSizePercentageWhenCollapseDisabled(): Int {
-        return 15
+        return 25
     }
 
     /**

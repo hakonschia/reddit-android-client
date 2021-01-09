@@ -1,5 +1,8 @@
 package com.example.hakonsreader.views;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -51,6 +54,8 @@ public class Post extends Content {
     private Callback imageLoadedCallback;
     @Nullable
     private OnVideoManuallyPaused onVideoManuallyPaused;
+
+    private ViewTreeObserver.OnGlobalLayoutListener contentOnGlobalLayoutListener;
 
 
     public Post(Context context) {
@@ -133,6 +138,11 @@ public class Post extends Content {
         this.maxHeight = maxHeight;
     }
 
+    /**
+     * Updates the max height the post can have (post info + content + post bar)
+     *
+     * @param maxHeight The height limit
+     */
     public void updateMaxHeight(int maxHeight) {
         // Ensure that the layout listener is removed. If this is still present, it will cause an infinite
         // callback loop since the height will most likely be changed inside the listener
@@ -145,18 +155,54 @@ public class Post extends Content {
 
         int newContentHeight = maxHeight;
 
-        // Entire post is too large, set new content height
+        // Post too large, scale down
         if (totalHeight > maxHeight) {
-         //   newContentHeight = maxHeight - totalHeight + contentHeight;
+            newContentHeight = maxHeight - totalHeight + contentHeight;
         }
 
-        // We have to use the actual view, not just the content layout, since otherwise the content layout will be resized
-        // but the view inside might not (unless it is set to MATCH_PARENT) so the view will be cut off
-        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) binding.content.getChildAt(0).getLayoutParams();
-        params.height = newContentHeight;
-        binding.content.getChildAt(0).setLayoutParams(params);
+        setContentHeight(newContentHeight);
+    }
 
-        Log.d(TAG, "maxHeight=" + maxHeight + ", newContentHeight=" + newContentHeight);
+    /**
+     * Sets the height of only the content view of the post. The value will be animated for a duration
+     * of 250 milliseconds
+     *
+     * <p>This does not check the max height set</p>
+     *
+     * @param height The height to set
+     */
+    public void setContentHeight(int height) {
+        // TODO links dont correctly regain their previous view. The image isn't correctly put back and
+        //  the link text doesn't change position (might have to do something inside the class itself)
+        if (height < 0) {
+            return;
+        }
+
+        View content = binding.content.getChildAt(0);
+
+        ValueAnimator anim = ValueAnimator.ofInt(content.getMeasuredHeight(), height);
+        anim.addUpdateListener(valueAnimator -> {
+            int val = (Integer) valueAnimator.getAnimatedValue();
+            ViewGroup.LayoutParams layoutParams = content.getLayoutParams();
+            layoutParams.height = val;
+            content.setLayoutParams(layoutParams);
+        });
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                content.requestLayout();
+            }
+        });
+        anim.setDuration(250);
+        anim.start();
+    }
+
+    /**
+     * @return The height of only the content in the post
+     */
+    public int getContentHeight() {
+        return binding.content.getChildAt(0).getMeasuredHeight();
     }
 
 
@@ -197,8 +243,6 @@ public class Post extends Content {
         binding.postFullBar.enableTickerAnimation(enable);
     }
 
-    private ViewTreeObserver.OnGlobalLayoutListener contentOnGlobalLayoutListener;
-
     /**
      * Adds the post content
      *
@@ -217,7 +261,6 @@ public class Post extends Content {
 
             if (maxHeight != NO_MAX_HEIGHT) {
                 contentOnGlobalLayoutListener = () -> {
-                    Log.d(TAG, "addContent: bruh");
                     // Get height of the content and the total height of the entire post so we can resize the content correctly
                     int height = content.getMeasuredHeight();
                     int totalHeight = binding.postsParentLayout.getMeasuredHeight();
