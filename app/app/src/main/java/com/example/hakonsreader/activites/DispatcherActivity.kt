@@ -6,7 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.hakonsreader.App.Companion.get
+import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.jakewharton.processphoenix.ProcessPhoenix
@@ -223,9 +223,10 @@ class DispatcherActivity : AppCompatActivity() {
                 }
 
                 // If no activity found and user wants to open links in app, open in WebView (internal browser)
-                if (!appActivityFound && get().openLinksInApp()) {
-                    intent = Intent(this, WebViewActivity::class.java)
-                    intent.putExtra(WebViewActivity.URL, url)
+                if (!appActivityFound && App.get().openLinksInApp()) {
+                    Intent(this, WebViewActivity::class.java).apply {
+                        putExtra(WebViewActivity.URL, url)
+                    }
                 } else {
                     baseIntent
                 }

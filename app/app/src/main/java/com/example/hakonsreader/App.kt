@@ -531,6 +531,16 @@ class App : Application() {
     }
 
     /**
+     * Retrieve the percentage of the screen a post should at maximum take when opened and post
+     * collapse has been disabled
+     *
+     * @return The percentage of the screen to take (0-100)
+     */
+    fun getMaxPostSizePercentageWhenCollapseDisabled(): Int {
+        return 15
+    }
+
+    /**
      * Retrieve the setting for whether or not links should be opened in the app (WebView) or
      * in the external browser
      *

@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.transition.Transition
 import android.transition.TransitionListenerAdapter
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -114,10 +115,37 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      */
     private var videoPlayingWhenPaused = false
 
+    /**
+     * The max height the post can have. This is for the entire post, ie. post info, content, and post bar combined
+     */
+    private var maxPostHeight = -3
+
+    /**
+     * The max height the post can have when the post collapse has been disabled.
+     * This is for the entire post, ie. post info, content, and post bar combined
+     */
+    private var maxPostHeightWhenCollapsedDisabled = -3
+
+
+    private fun getHeight(forWhenCollapsed: Boolean) : Int {
+        // If we're in landscape the "height" is the width of the screen
+        val portrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val height = if (portrait) App.get().screenHeight else App.get().screenWidth
+
+        return if (forWhenCollapsed) {
+            (height * (App.get().getMaxPostSizePercentageWhenCollapseDisabled() / 100f)).toInt()
+        } else {
+            (height * (App.get().getMaxPostSizePercentage() / 100f)).toInt()
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         slidrInterface = Slidr.attach(this)
+
+        maxPostHeight = getHeight(false)
+        maxPostHeightWhenCollapsedDisabled = getHeight(true)
 
         setupBinding()
         setupCommentsViewModel()
@@ -130,7 +158,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
             binding.parentLayout.progress = savedInstanceState.getFloat(TRANSITION_STATE_KEY)
 
             val transitionEnabled = savedInstanceState.getBoolean(TRANSITION_ENABLED_KEY, App.get().collapsePostsByDefaultWhenScrollingComments())
-            enableTransition(transitionEnabled, showSnackbar = false)
+            enableTransition(transitionEnabled, showSnackbar = false, updateHeight = false)
         }
     }
 
@@ -216,7 +244,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         binding.expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
 
         val collapsePostByDefault = App.get().collapsePostsByDefaultWhenScrollingComments()
-        enableTransition(collapsePostByDefault, showSnackbar = false)
+        enableTransition(collapsePostByDefault, showSnackbar = false, updateHeight = false)
     }
 
     /**
@@ -294,12 +322,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      * Sets up [ActivityPostBinding.post]
      */
     private fun setupPost() {
-        // If we're in landscape the "height" is the width of the screen
-        val portrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        val height = if (portrait) App.get().screenHeight else App.get().screenWidth
-        val maxHeight = (height * (App.get().getMaxPostSizePercentage() / 100f)).toInt()
-
-        binding.post.setMaxHeight(maxHeight)
+        binding.post.setMaxHeight(maxPostHeight)
         binding.post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
     }
 
@@ -540,14 +563,24 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      * @param enable True to enable the transition, false to disable
      * @param showSnackbar True to show a snackbar. Default to `true`
      */
-    private fun enableTransition(enable: Boolean, showSnackbar: Boolean = true) {
+    private fun enableTransition(enable: Boolean, showSnackbar: Boolean = true, updateHeight: Boolean = true) {
         val transition = binding.parentLayout.getTransition(R.id.postTransition)
         transition.setEnable(enable)
 
         val stringId = if (enable) {
+            if (updateHeight) {
+                Log.d(TAG, "setting to normal max height=$maxPostHeight")
+                binding.post.updateMaxHeight(maxPostHeight)
+            }
+
             binding.expandOrCollapsePostBlock.visibility = GONE
             R.string.postTransitionEnabled
         } else {
+            if (updateHeight) {
+                Log.d(TAG, "setting to limited max height=$maxPostHeightWhenCollapsedDisabled")
+                binding.post.updateMaxHeight(maxPostHeightWhenCollapsedDisabled)
+            }
+
             binding.expandOrCollapsePostBlock.visibility = VISIBLE
             R.string.postTransitionDisabled
         }

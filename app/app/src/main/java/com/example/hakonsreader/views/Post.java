@@ -5,8 +5,13 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -37,6 +42,10 @@ public class Post extends Content {
 
     private final PostBinding binding;
     private boolean showTextContent = true;
+
+    /**
+     * The max height of the entire post (post info + content + post bar)
+     */
     private int maxHeight = NO_MAX_HEIGHT;
 
     private Callback imageLoadedCallback;
@@ -116,13 +125,40 @@ public class Post extends Content {
     }
 
     /**
-     * Sets the max height the post can have
+     * Sets the max height the post can have (post info + content + post bar)
      *
      * @param maxHeight The height limit
      */
     public void setMaxHeight(int maxHeight) {
         this.maxHeight = maxHeight;
     }
+
+    public void updateMaxHeight(int maxHeight) {
+        // Ensure that the layout listener is removed. If this is still present, it will cause an infinite
+        // callback loop since the height will most likely be changed inside the listener
+        binding.content.getViewTreeObserver().removeOnGlobalLayoutListener(contentOnGlobalLayoutListener);
+        this.maxHeight = maxHeight;
+
+        // Get height of the content and the total height of the entire post so we can resize the content correctly
+        int contentHeight = binding.content.getMeasuredHeight();
+        int totalHeight = binding.postsParentLayout.getMeasuredHeight();
+
+        int newContentHeight = maxHeight;
+
+        // Entire post is too large, set new content height
+        if (totalHeight > maxHeight) {
+         //   newContentHeight = maxHeight - totalHeight + contentHeight;
+        }
+
+        // We have to use the actual view, not just the content layout, since otherwise the content layout will be resized
+        // but the view inside might not (unless it is set to MATCH_PARENT) so the view will be cut off
+        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) binding.content.getChildAt(0).getLayoutParams();
+        params.height = newContentHeight;
+        binding.content.getChildAt(0).setLayoutParams(params);
+
+        Log.d(TAG, "maxHeight=" + maxHeight + ", newContentHeight=" + newContentHeight);
+    }
+
 
     /**
      * Updates the view
@@ -161,6 +197,7 @@ public class Post extends Content {
         binding.postFullBar.enableTickerAnimation(enable);
     }
 
+    private ViewTreeObserver.OnGlobalLayoutListener contentOnGlobalLayoutListener;
 
     /**
      * Adds the post content
@@ -179,7 +216,8 @@ public class Post extends Content {
             binding.content.addView(content);
 
             if (maxHeight != NO_MAX_HEIGHT) {
-                binding.content.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                contentOnGlobalLayoutListener = () -> {
+                    Log.d(TAG, "addContent: bruh");
                     // Get height of the content and the total height of the entire post so we can resize the content correctly
                     int height = content.getMeasuredHeight();
                     int totalHeight = binding.postsParentLayout.getMeasuredHeight();
@@ -193,7 +231,8 @@ public class Post extends Content {
                         params.height = maxHeight - totalHeight + height;
                         content.setLayoutParams(params);
                     }
-                });
+                };
+                binding.content.getViewTreeObserver().addOnGlobalLayoutListener(contentOnGlobalLayoutListener);
             }
         }
 
