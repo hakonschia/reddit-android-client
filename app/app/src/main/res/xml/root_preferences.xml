@@ -89,6 +89,17 @@
             app:showSeekBarValue="true"
             app:iconSpaceReserved="false" />
 
+        <!-- app:min but android:max, for some reason? -->
+        <SeekBarPreference
+            app:key="@string/prefs_key_max_post_size_percentage_when_collapsed"
+            android:title="@string/prefs_title_max_post_size_percentage_when_collapsed"
+            app:min="25"
+            android:max="80"
+            app:defaultValue="@integer/prefs_default_max_post_size_percentage_when_collapsed"
+            app:singleLineTitle="false"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
         <EditTextPreference
             app:key="@string/prefs_key_filter_posts_from_default_subreddits"
             android:title="@string/prefs_title_filter_posts_from_default_subreddits"

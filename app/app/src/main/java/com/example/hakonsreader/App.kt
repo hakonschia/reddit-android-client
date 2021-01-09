@@ -537,7 +537,10 @@ class App : Application() {
      * @return The percentage of the screen to take (0-100)
      */
     fun getMaxPostSizePercentageWhenCollapseDisabled(): Int {
-        return 25
+        return settings.getInt(
+                getString(R.string.prefs_key_max_post_size_percentage_when_collapsed),
+                resources.getInteger(R.integer.prefs_default_max_post_size_percentage_when_collapsed)
+        )
     }
 
     /**

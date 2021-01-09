@@ -84,6 +84,7 @@
     <string name="prefs_title_language_nb" translatable="false">Norsk (bokmål)</string>
     <string name="prefs_title_hide_comments_threshold">Automatically hide comments with score less than</string>
     <string name="prefs_title_max_post_size_percentage">Max percentage of the screen height posts will take</string>
+    <string name="prefs_title_max_post_size_percentage_when_collapsed">Max percentage of the screen height posts will take when collapse is disabled</string>
     <string name="prefs_title_opening_links_in_app">Open links in internal browser</string>
     <string name="prefs_title_data_saving">Data saving</string>
     <string name="prefs_title_data_saving_mobile_only">Only on mobile data</string>
@@ -132,6 +133,7 @@
     <string name="prefs_key_language_nb" translatable="false">nb</string>
     <string name="prefs_key_hide_comments_threshold" translatable="false">auto_hide_comments_threshold</string>
     <string name="prefs_key_max_post_size_percentage" translatable="false">max_post_size_percentage</string>
+    <string name="prefs_key_max_post_size_percentage_when_collapsed" translatable="false">max_post_size_percentage_when_collapsed</string>
     <string name="prefs_key_opening_links_in_app" translatable="false">open_links_in_app</string>
     <string name="prefs_key_data_saving" translatable="false">data_saving</string>
     <string name="prefs_key_data_saving_mobile_only" translatable="false">data_saving_mobile_only</string>
