@@ -57,6 +57,8 @@ public class Post extends Content {
 
     private ViewTreeObserver.OnGlobalLayoutListener contentOnGlobalLayoutListener;
 
+    private int postInfoHeight = 0;
+    private int postBarHeight = 0;
 
     public Post(Context context) {
         this(context, null, 0, 0);
@@ -138,6 +140,8 @@ public class Post extends Content {
         this.maxHeight = maxHeight;
     }
 
+    // Thank god this is a one person project, because I would feel really bad for anyone having
+    // to debug this abomination of a code for updating the height
     /**
      * Updates the max height the post can have (post info + content + post bar)
      *
@@ -149,16 +153,18 @@ public class Post extends Content {
         binding.content.getViewTreeObserver().removeOnGlobalLayoutListener(contentOnGlobalLayoutListener);
         this.maxHeight = maxHeight;
 
+        View content = binding.content.getChildAt(0);
+        if (content == null) {
+            return;
+        }
+
         // Get height of the content and the total height of the entire post so we can resize the content correctly
         int contentHeight = binding.content.getMeasuredHeight();
         int totalHeight = binding.postsParentLayout.getMeasuredHeight();
 
-        int newContentHeight = maxHeight;
-
-        // Post too large, scale down
-        if (totalHeight > maxHeight) {
-            newContentHeight = maxHeight - totalHeight + contentHeight;
-        }
+        // TODO this doesn't really work, since if the content is actually smaller the it will still resize
+        //  to the full height
+        int newContentHeight = maxHeight - totalHeight + contentHeight;
 
         setContentHeight(newContentHeight);
     }
@@ -187,13 +193,6 @@ public class Post extends Content {
             layoutParams.height = val;
             content.setLayoutParams(layoutParams);
         });
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                content.requestLayout();
-            }
-        });
         anim.setDuration(250);
         anim.start();
     }
@@ -201,8 +200,13 @@ public class Post extends Content {
     /**
      * @return The height of only the content in the post
      */
-    public int getContentHeight() {
-        return binding.content.getChildAt(0).getMeasuredHeight();
+    public Integer getContentHeight() {
+        View view = binding.content.getChildAt(0);
+        if (view != null) {
+            return view.getMeasuredHeight();
+        } else {
+            return null;
+        }
     }
 
 
@@ -217,8 +221,6 @@ public class Post extends Content {
         binding.postInfo.setPost(redditPost);
         this.addContent();
         binding.postFullBar.setPost(redditPost);
-
-        //setOnLongClickListener(v -> copyLinkToClipboard());
     }
 
     /**
@@ -379,20 +381,6 @@ public class Post extends Content {
             content.setTransitionName(context.getString(R.string.transition_post_content));
         }
         return content;
-    }
-
-    /**
-     * Copies the link of the post to the clipboard
-     *
-     * @return True (ie. event handled in a long click)
-     */
-    public boolean copyLinkToClipboard() {
-        ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("reddit post", getRedditPost().getUrl());
-        clipboard.setPrimaryClip(clip);
-
-        Toast.makeText(getContext(), R.string.linkCopied, Toast.LENGTH_SHORT).show();
-        return true;
     }
 
     /**

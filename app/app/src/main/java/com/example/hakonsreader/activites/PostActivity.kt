@@ -149,7 +149,6 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         setupBinding()
         setupCommentsViewModel()
-        setupPost()
 
         // No state saved means we have no comments, so load them
         if (savedInstanceState == null) {
@@ -226,6 +225,9 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         binding.noComments = false
         binding.commentChainShown = false
 
+        binding.post.setMaxHeight(maxPostHeight)
+        binding.post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
+
         // Go to first/last comment on long clicks on navigation buttons
         binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment)
         binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment)
@@ -245,8 +247,10 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         // TODO if it should collapse by default it should also update the height so that is set
         //  which probably causes issues when we go back? Since it probably doesnt have the correct "previous" value set
+        //  The solution now kind of works, but when we enable collapse again the size will always be the max, so
+        //  if the content doesn't need that much space it will still take that much space and be empty
         val collapsePostByDefault = App.get().collapsePostsByDefaultWhenScrollingComments()
-        enableTransition(collapsePostByDefault, showSnackbar = false, updateHeight = false)
+        enableTransition(collapsePostByDefault, showSnackbar = false, updateHeight = !collapsePostByDefault)
     }
 
     /**
@@ -319,15 +323,6 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
             }
         }
     }
-
-    /**
-     * Sets up [ActivityPostBinding.post]
-     */
-    private fun setupPost() {
-        binding.post.setMaxHeight(maxPostHeight)
-        binding.post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
-    }
-
 
     /**
      * Updates the post info without re-drawing the content
@@ -558,7 +553,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         enableTransition(!transition.isEnabled)
     }
 
-    private var heightWhenCollapseDisabled = -3
+    private var heightWhenCollapseDisabled: Int? = null
     /**
      * Enables or disables the post collapse transition and optionally shows a snackbar to notify the
      * user of the change
@@ -572,8 +567,11 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         val stringId = if (enable) {
             if (updateHeight) {
-                Log.d(TAG, "setting to normal max height=$heightWhenCollapseDisabled")
-                binding.post.contentHeight = heightWhenCollapseDisabled
+                if (heightWhenCollapseDisabled == null) {
+                    binding.post.updateMaxHeight(maxPostHeight)
+                } else {
+                    binding.post.contentHeight = heightWhenCollapseDisabled
+                }
             }
 
             binding.expandOrCollapsePostBlock.visibility = GONE
@@ -581,7 +579,6 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         } else {
             if (updateHeight) {
                 heightWhenCollapseDisabled = binding.post.contentHeight
-                Log.d(TAG, "setting to limited max height=$maxPostHeightWhenCollapsedDisabled")
                 binding.post.updateMaxHeight(maxPostHeightWhenCollapsedDisabled)
             }
 
