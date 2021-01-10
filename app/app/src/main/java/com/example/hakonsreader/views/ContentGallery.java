@@ -89,13 +89,14 @@ public class ContentGallery extends Content {
         float widthScale = screenWidth / (float)maxWidth;
         setLayoutParams(new ViewGroup.LayoutParams(screenWidth, (int) (maxHeight * widthScale)));
 
-        int imagesSize = images.size();
-
         ImageAdapter adapter = new ImageAdapter(getContext(), images);
         binding.galleryImages.setAdapter(adapter);
 
-        // Keep all images alive to not have to reload them
-        binding.galleryImages.setOffscreenPageLimit(imagesSize);
+        // Keep a maximum of 5 items at a time, or 2 when data saving is enabled. This should probably
+        // be enough to make large galleries not all load at once which potentially wastes data, and
+        // at the same time not have to load items when going through the gallery (unless data saving is on)
+        int offscreenLimit = App.Companion.get().dataSavingEnabled() ? 2 : 5;
+        binding.galleryImages.setOffscreenPageLimit(offscreenLimit);
 
         binding.galleryImages.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -118,59 +119,6 @@ public class ContentGallery extends Content {
                 // Not implemented
             }
         });
-
-        // If I can manage to lock the slidr only when the gallery is touched, and unlocked when not touched
-        // then I can add back the infinite paging. If I can't manage that then having a gallery will lock
-        // the slidr completely
-        /*
-        // The ViewPager will be an infinite scroller. The adapter returns a size 3 times images.size()
-        // so set the current item to the middle
-        //      Here
-        //        |
-        // 0 1    0 1    0 1
-        // Since imgur albums are loaded here, and they can be only 1 image, don't add scrolling functionality to it
-        binding.galleryImages.setCurrentItem(imagesSize == 1 ? 0 : images.size());
-
-        // Add listener to change the text saying which item we're on
-        binding.galleryImages.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            int currentPos;
-
-            @Override
-            public void onPageSelected(int position) {
-                currentPos = position;
-
-                // Update the active text to show which image we are now on
-                setActiveImageText(position % images.size());
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                if (state == ViewPager.SCROLL_STATE_IDLE) {
-                    // Here       Go here    Or here
-                    //   |          |          |
-                    // 0 1        0 1        0 1
-                    if (currentPos == images.size() - 1 || currentPos == adapter.getCount() - 1) {
-                        binding.galleryImages.setCurrentItem(images.size() * 2 - 1, false);
-                    } else if (currentPos == images.size() * 2 || currentPos == 0) {
-                        // Or here  Go here    Here
-                        // |          |          |
-                        // 0 1        0 1        0 1
-                        binding.galleryImages.setCurrentItem(images.size(), false);
-                    }
-                }
-            }
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                // Not implemented
-            }
-        });
-
-
-        // If the context of the gallery is attached to a Slidr make sure it's locked so
-        // swipes in the gallery won't slide the activity/fragment away
-        lockSlidr(true);
-         */
 
         // Set initial state
         setActiveImageText(0);
@@ -265,7 +213,6 @@ public class ContentGallery extends Content {
 
         @Override
         public int getCount() {
-           // return images.size() == 1 ? 1 : images.size() * 3;
             return images.size();
         }
 
@@ -297,7 +244,9 @@ public class ContentGallery extends Content {
             if (object instanceof ContentImage) {
                 container.removeView((ContentImage) object);
             } else {
-                container.removeView((VideoPlayer) object);
+                VideoPlayer player = (VideoPlayer) object;
+                player.release();
+                container.removeView(player);
             }
         }
 
