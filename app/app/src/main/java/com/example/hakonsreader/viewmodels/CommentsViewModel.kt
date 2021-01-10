@@ -34,9 +34,15 @@ class CommentsViewModel : ViewModel() {
     /**
      * Loads comments for the post. This will also fetch the post itself
      *
+     * @param loadThirdParty If true, third party requests (such as retrieving gifs from Gfycat directly)
+     * will be made. This is default to `false`. If only the comments of the post (and potentially updated
+     * post information) is needed, consider keeping this to `false` to not make unnecessary API calls.
+     * In other words, this should only be set to `true` if the post is loaded for the first time and
+     * the content of the post has to be drawn.
+     *
      * @throws IllegalStateException if [postId] is not set
      */
-    fun loadComments() {
+    fun loadComments(loadThirdParty: Boolean = false) {
         if (postId.isBlank()) {
             throw IllegalStateException("Post ID not set")
         }
@@ -44,7 +50,7 @@ class CommentsViewModel : ViewModel() {
         loadingChange.value = true
 
         CoroutineScope(IO).launch {
-            val resp = api.post(postId).comments()
+            val resp = api.post(postId).comments(loadThirdParty = loadThirdParty)
             loadingChange.postValue(false)
 
             when (resp) {

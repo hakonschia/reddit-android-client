@@ -19,10 +19,10 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
      * Loads all third party contents for a list of posts.
      *
      * The following services will potentially be called:
-     * 1. Imgur (for albums)
-     * 2. Imgur (for gifs/mp4s)
-     * 3. Gfycat (for gifs)
-     * 4. Redgifs (for gifs)
+     * - Imgur (for albums)
+     * - Imgur (for gifs/mp4s)
+     * - Gfycat (for gifs)
+     * - Redgifs (for gifs)
      *
      * @param posts The posts to load for
      * @param indexToSpawnNewCoroutine The index in [posts] at which to start spawning new Coroutine jobs
@@ -56,6 +56,29 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
                 func.invoke(post)
             }
         }
+    }
+
+    /**
+     * Loads all third party contents for a post. This will run on the current coroutine job
+     *
+     * The following services will potentially be called:
+     * - Imgur (for albums)
+     * - Imgur (for gifs/mp4s)
+     * - Gfycat (for gifs)
+     * - Redgifs (for gifs)
+     *
+     * @param post The post to load for
+     */
+    suspend fun loadAll(post: RedditPost) {
+        val func = when {
+            post.domain == "gfycat.com" -> this::loadGfycatGif
+            post.domain == "redgifs.com" -> this::loadRedgifGif
+            post.url.matches("https://imgur.com/a/.+".toRegex()) -> this::loadImgurAlbum
+            post.url.matches("https://i\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
+            else -> null
+        } ?: return
+
+        func.invoke(post)
     }
 
     /**

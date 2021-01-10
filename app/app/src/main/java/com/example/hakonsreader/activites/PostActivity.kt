@@ -359,8 +359,14 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
     private fun loadComments() {
         val postJson = intent.extras?.getString(POST_KEY)
 
+        // Load 3rd API calls if the post hasn't been loaded already, as we then have to draw
+        // the content of the post. If we have a post already the 3rd party calls should have been
+        // made already
+        var loadThirdParty = true
+
         // Started from inside the app (post already loaded from before)
         val postId = if (postJson != null) {
+            loadThirdParty = false
             setPostFromJson(postJson)
         } else {
             intent.extras?.getString(POST_ID_KEY)
@@ -369,7 +375,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         if (postId != null) {
             commentsViewModel?.let {
                 it.postId = postId
-                it.loadComments()
+                it.loadComments(loadThirdParty)
             }
         }
     }

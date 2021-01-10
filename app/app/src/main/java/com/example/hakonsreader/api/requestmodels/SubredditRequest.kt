@@ -29,7 +29,7 @@ class SubredditRequest(
         gfycatApi: GfycatService
 ) {
 
-    private val imgurRequest = ThirdPartyRequest(imgurApi, gfycatApi)
+    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
 
     /**
      * Retrieve information about the subreddit
@@ -109,7 +109,7 @@ class SubredditRequest(
             val posts = resp.body()?.getListings()
 
             if (posts != null) {
-                imgurRequest.loadAll(posts)
+                thirdPartyRequest.loadAll(posts)
                 ApiResponse.Success(posts)
             } else {
                 apiError(resp)

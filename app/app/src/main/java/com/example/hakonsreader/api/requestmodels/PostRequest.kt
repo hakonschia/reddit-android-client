@@ -11,9 +11,12 @@ import com.example.hakonsreader.api.interfaces.VoteableRequest
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.requestmodels.thirdparty.ThirdPartyRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.PostService
+import com.example.hakonsreader.api.service.thirdparty.GfycatService
+import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import java.lang.Exception
@@ -21,13 +24,16 @@ import java.lang.Exception
 class PostRequest(
         accessToken: AccessToken,
         private val api: PostService,
-        private val postId: String
+        private val postId: String,
+        imgurApi: ImgurService?,
+        gfycatApi: GfycatService
 ) : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest {
 
     private val voteRequest: VoteableRequestModel = VoteableRequestModel(accessToken, api)
     private val replyRequest: ReplyableRequestModel = ReplyableRequestModel(accessToken, api)
     private val saveRequest: SaveableRequestModel = SaveableRequestModel(accessToken, api)
     private val modRequest: ModRequestModel = ModRequestModel(accessToken, api)
+    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
 
 
     class CommentsResponse(val comments: List<RedditComment>, val post: RedditPost)
@@ -38,8 +44,13 @@ class PostRequest(
      * OAuth scope required: `read`
      *
      * @param sort How the comments should be sorted. Default to [SortingMethods.HOT]
+     * @param loadThirdParty If true, third party requests (such as retrieving gifs from Gfycat directly)
+     * will be made. This is default to `false`. If only the comments of the post (and potentially updated
+     * post information) is needed, consider keeping this to `false` to not make unnecessary API calls.
+     * In other words, this should only be set to `true` if the post is loaded for the first time and
+     * the content of the post has to be drawn.
      */
-    suspend fun comments(sort: SortingMethods = SortingMethods.HOT) : ApiResponse<CommentsResponse> {
+    suspend fun comments(sort: SortingMethods = SortingMethods.HOT, loadThirdParty: Boolean = false) : ApiResponse<CommentsResponse> {
         return try {
             val resp = api.getComments(postId, sort.value)
 
@@ -52,6 +63,10 @@ class PostRequest(
                 topLevelComments.forEach {
                     allComments.add(it)
                     allComments.addAll(it.replies)
+                }
+
+                if (loadThirdParty) {
+                    thirdPartyRequest.loadAll(post)
                 }
 
                 ApiResponse.Success(CommentsResponse(allComments, post))
@@ -230,12 +245,13 @@ class PostRequest(
             val response = api.getInfo(Util.createFullName(Thing.POST, postId))
             val body = response.body()
 
-            if (body != null){
+            if (body != null) {
                 val listings = body.getListings()
 
-                // TODO this should also check for imgur albums and make those API calls if necessary
                 if (listings?.isNotEmpty() == true) {
-                    ApiResponse.Success(listings[0])
+                    val post = listings[0]
+                    thirdPartyRequest.loadAll(post)
+                    ApiResponse.Success(post)
                 } else {
                     ApiResponse.Success(null)
                 }

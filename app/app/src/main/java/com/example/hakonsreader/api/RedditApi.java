@@ -235,7 +235,7 @@ public class RedditApi {
     /**
      * The service object used to communicate with the Gfycat/Redgifs API
      */
-    private GfycatService gfycatApi;
+    private GfycatService gfycatService;
 
 
     /**
@@ -405,7 +405,7 @@ public class RedditApi {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(gfycatClient)
                 .build();
-        gfycatApi = gfycatRetrofit.create(GfycatService.class);
+        gfycatService = gfycatRetrofit.create(GfycatService.class);
 
         // Http client for OAuth related API calls (such as retrieving access tokens)
         // The service created with this is for "RedditApi.accessToken()"
@@ -747,7 +747,7 @@ public class RedditApi {
      * @return An object that can perform various post related API requests
      */
     public PostRequest post(String postId) {
-        return new PostRequest(accessToken, postApi, postId);
+        return new PostRequest(accessToken, postApi, postId, imgurService, gfycatService);
     }
 
     /**
@@ -768,7 +768,7 @@ public class RedditApi {
      * @return An object that can perform various subreddit related API requests
      */
     public SubredditRequest subreddit(String subredditName) {
-        return new SubredditRequest(subredditName, accessToken, subredditApi, imgurService, gfycatApi);
+        return new SubredditRequest(subredditName, accessToken, subredditApi, imgurService, gfycatService);
     }
 
     /**
@@ -791,7 +791,7 @@ public class RedditApi {
      * @return An object that can perform various user related API requests for non-logged in users
      */
     public UserRequests user(@NonNull String username) {
-        return new UserRequests(username, accessToken, userApi, imgurService, gfycatApi);
+        return new UserRequests(username, accessToken, userApi, imgurService, gfycatService);
     }
 
     /**
