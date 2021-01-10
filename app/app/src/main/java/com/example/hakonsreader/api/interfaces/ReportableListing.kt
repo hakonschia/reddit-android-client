@@ -18,6 +18,14 @@ interface ReportableListing {
     var userReports: Array<Array<Any>>?
 
     /**
+     * The dismissed user reports on the listing.
+     *
+     * This will be an array of reports where each report is an array where the first element is a string
+     * of the report text, and the second is a number which says something
+     */
+    var userReportsDismissed: Array<Array<Any>>?
+
+    /**
      * The amount of reports the listing has
      */
     var numReports: Int

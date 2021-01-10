@@ -273,6 +273,15 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing, Report
     override var userReports: Array<Array<Any>>? = null
 
     /**
+     * The dismissed user reports on the comment.
+     *
+     * This will be an array of reports where each report is an array where the first element is a string
+     * of the report text, and the second is a number which says something
+     */
+    @SerializedName("user_reports_dismissed")
+    override var userReportsDismissed: Array<Array<Any>>? = null
+
+    /**
      * The amount of reports the comment has
      */
     @JsonAdapter(NullAsIntAdapter::class)

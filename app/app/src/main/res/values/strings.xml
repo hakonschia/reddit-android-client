@@ -420,6 +420,7 @@
     <string name="postTransitionDisabled">Post collapse disabled</string>
 
     <string name="userReportsBottomSheetTitle">User reports</string>
+    <string name="userReportsDismissedBottomSheetTitle">Dismissed user reports</string>
     <string name="userReportFormat" translatable="false">%d: %s</string>
     <plurals name="userReportsTitle">
         <item quantity="one">%d user report</item>

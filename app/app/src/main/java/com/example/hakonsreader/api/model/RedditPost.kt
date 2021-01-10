@@ -12,14 +12,11 @@ import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.jsonadapters.BooleanAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
-import com.example.hakonsreader.api.model.thirdparty.GfycatGif
-import com.example.hakonsreader.api.model.thirdparty.ImgurGif
 import com.example.hakonsreader.api.persistence.PostConverter
 import com.google.gson.Gson
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import com.google.gson.internal.LinkedTreeMap
-import java.util.function.BiConsumer
 
 
 @Entity(tableName = "posts")
@@ -416,6 +413,15 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
      */
     @SerializedName("user_reports")
     override var userReports: Array<Array<Any>>? = null
+
+    /**
+     * The dismissed user reports on the post.
+     *
+     * This will be an array of reports where each report is an array where the first element is a string
+     * of the report text, and the second is a number which says something
+     */
+    @SerializedName("user_reports_dismissed")
+    override var userReportsDismissed: Array<Array<Any>>? = null
 
     /**
      * The amount of reports the post has

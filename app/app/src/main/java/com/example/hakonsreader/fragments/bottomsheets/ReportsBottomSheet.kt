@@ -48,13 +48,20 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
 
         binding.ignored = listing?.ignoreReports == true
         binding.ignoreReports.setOnClickListener { ignoreOnClick() }
+        binding.dismissedReports = listing?.userReports?.isEmpty() == true
 
-        val reports = listing?.userReports?.toList()
+        val reports = if (listing?.userReports?.isNotEmpty() == true) {
+            listing?.userReports
+        } else {
+            listing?.userReportsDismissed
+        }?.toList()
+
         val adapter = ReportsAdapter().apply {
             if (reports != null) {
                 submitList(reports)
             }
         }
+
         binding.reports.layoutManager = LinearLayoutManager(context)
         binding.reports.adapter = adapter
 
@@ -72,8 +79,6 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
                 val ignore = !it.ignoreReports
 
                 // Assume success
-                // TODO this should notify the fragment/activity the post is in so it can update the
-                //   color of the "User reports" button
                 it.ignoreReports = ignore
                 binding.ignored = ignore
                 withContext(Main) {

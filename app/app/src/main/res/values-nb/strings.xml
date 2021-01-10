@@ -281,7 +281,7 @@
         <item quantity="one">%d brukerrapportering</item>
         <item quantity="other">%d brukerrapporteringer</item>
     </plurals>
-    <string name="userReportsBottomSheetTitle">Brukerrapporteringer for \'%s\'</string>
+    <string name="userReportsBottomSheetTitle">Brukerrapporteringer</string>
     <string name="ignoreReportsButton">Ignorer</string>
     <string name="restoreReportsButton">Gjenopprett</string>
     <string name="sendPrivateMessageTitle">Send en privat melding</string>
@@ -298,4 +298,5 @@
     <string name="notificationInboxMessageTitle">Ny melding fra %s</string>
     <string name="notificationInboxCommentReplyTitle">Nytt kommentarsvar fra %s</string>
     <string name="postMenuViewOnRemoveddit">Vis på removeddit.com</string>
+    <string name="userReportsDismissedBottomSheetTitle">Avviste brukerrapporteringer</string>
 </resources>
