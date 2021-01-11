@@ -227,11 +227,15 @@ class DispatcherActivity : AppCompatActivity() {
                 val defaultBrowserInfo = packageManager.resolveActivity(defaultBrowserIntent, PackageManager.MATCH_DEFAULT_ONLY)
 
                 var appActivityFound = false
+                val appPackageName = applicationContext.packageName
 
                 // Check if there are intents not leading to a browser
                 for (intentActivity in intentActivities) {
-                    // TODO check if it matches our app, if it does it shouldn't match as it just creates an infinite loop
-                    if (intentActivity.activityInfo.packageName != defaultBrowserInfo!!.activityInfo.packageName) {
+                    val packageName = intentActivity.activityInfo.packageName
+
+                    // Don't match our own app, as that would cause an infinite loop
+                    if (packageName != defaultBrowserInfo!!.activityInfo.packageName
+                            && packageName != appPackageName) {
                         appActivityFound = true
                         break
                     }
