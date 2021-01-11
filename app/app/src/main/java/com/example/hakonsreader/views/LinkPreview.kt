@@ -4,10 +4,16 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.DispatcherActivity
@@ -64,6 +70,30 @@ class LinkPreview : FrameLayout {
      */
     fun setLink(link: String) {
         binding.linkLink.text = link
+        setIcon(link)
+    }
+
+    /**
+     * Sets the link icon to the icon for the installed application the link resolves to
+     */
+    private fun setIcon(link: String) {
+        val asUri = Uri.parse(link)
+
+        val baseIntent = Intent(Intent.ACTION_VIEW, asUri)
+
+        // Find all activities this intent would resolve to
+        val intentActivities = context.packageManager.queryIntentActivities(baseIntent, PackageManager.MATCH_DEFAULT_ONLY)
+
+        // Could potentially check if this matches the default browser and not show icon for that, as
+        // it will always show something in that case
+        if (intentActivities.isNotEmpty()) {
+            val packageName = intentActivities[0].activityInfo.packageName
+            val icon = context.packageManager.getApplicationIcon(packageName)
+
+            // Kind of want this to be set to icon_color/gray, but setting the tint/colorFilter makes the entire
+            // drawable that color
+            binding.linkSymbol.setImageDrawable(icon)
+        }
     }
 
 
