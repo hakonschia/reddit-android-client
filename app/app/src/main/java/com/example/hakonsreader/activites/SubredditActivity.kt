@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.enums.PostTimeSort
+import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.fragments.SubredditFragment
 import com.example.hakonsreader.interfaces.LockableSlidr
 import com.r0adkll.slidr.Slidr
@@ -27,6 +29,20 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
          * The key used to transfer data about which subreddit the activity is for
          */
         const val SUBREDDIT_KEY = "subreddit"
+
+        /**
+         * The key used to send to this activity how to sort the posts when loading this subreddit
+         *
+         * The value with this key should be the value of corresponding enum value from [SortingMethods]
+         */
+        const val SORT = "sort"
+
+        /**
+         * The key used to send to this activity the time sort for the posts when loading this subreddit
+         *
+         * The value with this key should be the value of corresponding enum value from [PostTimeSort]
+         */
+        const val TIME_SORT = "time_sort"
     }
 
 
@@ -44,6 +60,9 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
             fragment = supportFragmentManager.findFragmentByTag(SAVED_SUBREDDIT) as SubredditFragment?
         } else {
             var subreddit = ""
+            var sort: SortingMethods? = null
+            var timeSort: PostTimeSort? = null
+
             val intent = intent
             val uri = intent.data
 
@@ -55,8 +74,12 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
             } else {
                 // Activity started from manual intent in app
                 val data = intent.extras
+
                 if (data != null) {
                     val sub = data.getString(SUBREDDIT_KEY)
+                    sort = data.getString(SORT)?.let { s -> SortingMethods.values().find { it.value == s } }
+                    timeSort = data.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value == s } }
+
                     if (sub != null) {
                         subreddit = sub
                     } else {
@@ -66,7 +89,7 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
                 }
             }
 
-            fragment = SubredditFragment.newInstance(subreddit)
+            fragment = SubredditFragment.newInstance(subreddit, sort, timeSort)
             supportFragmentManager.beginTransaction()
                     .add(R.id.subredditActivityFragment, fragment!!, SAVED_SUBREDDIT)
                     .commit()

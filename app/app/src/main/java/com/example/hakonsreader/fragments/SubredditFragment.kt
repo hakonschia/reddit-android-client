@@ -182,8 +182,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         if (postsAdapter?.itemCount == 0) {
             // Starting from scratch
             if (postIds.isEmpty()) {
-                val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value == s } }
-                val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value == s } }
+                val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
+                val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
 
                 postsViewModel?.loadPosts(sort, timeSort)
             } else {

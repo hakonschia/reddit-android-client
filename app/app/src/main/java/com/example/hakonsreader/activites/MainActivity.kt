@@ -20,6 +20,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityMainBinding
@@ -105,8 +106,8 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         val intent = Intent(this, DispatcherActivity::class.java)
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
-        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/hakonschia/comments/ki59m3/imgur_album/")
-        //startActivity(intent)
+        intent.putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/GlobalOffensive/top/?t=all")
+        startActivity(intent)
 
         if (savedInstanceState != null) {
             savedState = savedInstanceState

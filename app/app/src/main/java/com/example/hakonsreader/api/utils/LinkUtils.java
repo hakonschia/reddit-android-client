@@ -20,12 +20,13 @@ public final class LinkUtils {
      * <ol>
      * <li>https://www.reddit.com/r/test</li>
      * <li>https://reddit.com/r/test</li>
+     * <li>https://reddit.com/r/test/top/</li>
      * </ol>
      *
      * @see LinkUtils#SUBREDDIT_REGEX_NO_HTTPS
      * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
      */
-    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "(^|\\s)https://(.*)?reddit.com/" + BASE_SUBREDDIT_REGEX + "/?(\\s|$)";
+    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "(^|\\s)https://(.*)?reddit.com/" + BASE_SUBREDDIT_REGEX + ".*(\\s|$)";
 
     /**
      * Regex for matching a subreddit string with only the "/r/..." part (no https://reddit.com).

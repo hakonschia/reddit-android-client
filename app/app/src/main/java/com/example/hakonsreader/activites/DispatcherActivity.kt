@@ -130,8 +130,22 @@ class DispatcherActivity : AppCompatActivity() {
             url.matches(LinkUtils.SUBREDDIT_REGEX_COMBINED.toRegex()) -> {
                 // First is "r", second is the subreddit
                 val subreddit = pathSegments[1]
+
+                // Either "r/GlobalOffensive/top" or "r/GlobalOffensive?sort=top"
+                val sort = if (pathSegments.size >= 3) {
+                    pathSegments[2]
+                } else {
+                    asUri.getQueryParameter("sort")
+                }
+
+                val timeSort = asUri.getQueryParameter("t")
+
                 Intent(this, SubredditActivity::class.java).apply {
                     putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit)
+
+                    // These might be null, but that does not matter
+                    putExtra(SubredditActivity.SORT, sort)
+                    putExtra(SubredditActivity.TIME_SORT, timeSort)
                 }
             }
 
@@ -216,6 +230,7 @@ class DispatcherActivity : AppCompatActivity() {
 
                 // Check if there are intents not leading to a browser
                 for (intentActivity in intentActivities) {
+                    // TODO check if it matches our app, if it does it shouldn't match as it just creates an infinite loop
                     if (intentActivity.activityInfo.packageName != defaultBrowserInfo!!.activityInfo.packageName) {
                         appActivityFound = true
                         break
