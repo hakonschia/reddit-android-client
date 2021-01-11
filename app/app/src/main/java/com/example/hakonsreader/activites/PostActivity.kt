@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.transition.Transition
 import android.transition.TransitionListenerAdapter
-import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -15,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
-import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
@@ -126,26 +124,18 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      */
     private var maxPostHeightWhenCollapsedDisabled = -3
 
-
-    private fun getHeight(forWhenCollapsed: Boolean) : Int {
-        // If we're in landscape the "height" is the width of the screen
-        val portrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        val height = if (portrait) App.get().screenHeight else App.get().screenWidth
-
-        return if (forWhenCollapsed) {
-            (height * (App.get().getMaxPostSizePercentageWhenCollapseDisabled() / 100f)).toInt()
-        } else {
-            (height * (App.get().getMaxPostSizePercentage() / 100f)).toInt()
-        }
-    }
+    /**
+     * The height of the post content when the post collapse was disabled
+     */
+    private var heightWhenCollapseDisabled: Int? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         slidrInterface = Slidr.attach(this)
 
-        maxPostHeight = getHeight(false)
-        maxPostHeightWhenCollapsedDisabled = getHeight(true)
+        maxPostHeight = getHeightForPost(false)
+        maxPostHeightWhenCollapsedDisabled = getHeightForPost(true)
 
         setupBinding()
         setupCommentsViewModel()
@@ -179,8 +169,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        binding.parentLayout.progress.let { outState.putFloat(TRANSITION_STATE_KEY, it) }
 
+        outState.putFloat(TRANSITION_STATE_KEY, binding.parentLayout.progress)
         outState.putBoolean(TRANSITION_ENABLED_KEY, binding.parentLayout.getTransition(R.id.postTransition).isEnabled)
     }
 
@@ -503,7 +493,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      */
     private fun smoothScrollHelper(currentPos: Int, scrollPos: Int) {
         // Scrolling up
-        val gapSize: Int = if (currentPos > scrollPos) {
+        val gapSize = if (currentPos > scrollPos) {
             currentPos - scrollPos
         } else {
             // Scrolling down
@@ -513,12 +503,12 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
         binding.comments.stopScroll()
         if (App.get().commentSmoothScrollThreshold() >= gapSize) {
-            val smoothScroller: SmoothScroller = object : LinearSmoothScroller(this) {
+            val smoothScroller = object : LinearSmoothScroller(this) {
                 override fun getVerticalSnapPreference(): Int {
                     return SNAP_TO_START
                 }
-            }
-            smoothScroller.targetPosition = scrollPos
+            }.apply { targetPosition = scrollPos }
+
             commentsLayoutManager?.startSmoothScroll(smoothScroller)
         } else {
             commentsLayoutManager?.scrollToPositionWithOffset(scrollPos, 0)
@@ -533,9 +523,10 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
     override fun replyTo(listing: ReplyableListing) {
         replyingTo = listing
 
-        val intent = Intent(this, ReplyActivity::class.java)
-        intent.putExtra(ReplyActivity.LISTING_KIND_KEY, listing.kind)
-        intent.putExtra(ReplyActivity.LISTING_KEY, Gson().toJson(listing))
+        val intent = Intent(this, ReplyActivity::class.java).apply {
+            putExtra(ReplyActivity.LISTING_KIND_KEY, listing.kind)
+            putExtra(ReplyActivity.LISTING_KEY, Gson().toJson(listing))
+        }
 
         startActivityForResult(intent, REQUEST_REPLY)
         overridePendingTransition(R.anim.slide_up, R.anim.slide_down)
@@ -559,7 +550,6 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         enableTransition(!transition.isEnabled)
     }
 
-    private var heightWhenCollapseDisabled: Int? = null
     /**
      * Enables or disables the post collapse transition and optionally shows a snackbar to notify the
      * user of the change
@@ -594,6 +584,23 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         if (showSnackbar) {
             Snackbar.make(binding.parentLayout, stringId, LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Gets the height to use for the post
+     *
+     * @param forWhenCollapsedDisabled True if the height should be for when the post collapse is disabled
+     */
+    private fun getHeightForPost(forWhenCollapsedDisabled: Boolean) : Int {
+        // If we're in landscape the "height" is the width of the screen
+        val portrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val height = if (portrait) App.get().screenHeight else App.get().screenWidth
+
+        return if (forWhenCollapsedDisabled) {
+            (height * (App.get().getMaxPostSizePercentageWhenCollapseDisabled() / 100f)).toInt()
+        } else {
+            (height * (App.get().getMaxPostSizePercentage() / 100f)).toInt()
         }
     }
 

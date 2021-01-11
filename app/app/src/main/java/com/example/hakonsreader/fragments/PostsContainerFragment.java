@@ -12,6 +12,8 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.hakonsreader.R;
+import com.example.hakonsreader.api.enums.PostTimeSort;
+import com.example.hakonsreader.api.enums.SortingMethods;
 import com.example.hakonsreader.misc.SectionsPageAdapter;
 
 
@@ -39,9 +41,9 @@ public class PostsContainerFragment extends Fragment  {
     private void setupFragments() {
         if (this.fragments == null) {
             this.fragments = new SubredditFragment[]{
-                    SubredditFragment.Companion.newInstance(""),
-                    SubredditFragment.Companion.newInstance("Popular"),
-                    SubredditFragment.Companion.newInstance("All")
+                    SubredditFragment.Companion.newInstance("", SortingMethods.HOT, PostTimeSort.DAY),
+                    SubredditFragment.Companion.newInstance("Popular", SortingMethods.HOT, PostTimeSort.DAY),
+                    SubredditFragment.Companion.newInstance("All", SortingMethods.HOT, PostTimeSort.DAY)
             };
 
             for (SubredditFragment fragment : fragments) {

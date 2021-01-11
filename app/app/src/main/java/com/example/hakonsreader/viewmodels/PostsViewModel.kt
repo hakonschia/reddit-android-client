@@ -106,7 +106,17 @@ class PostsViewModel(
         restart()
     }
 
-    fun loadPosts() {
+    /**
+     * Loads posts continuing from the current posts, or starting from scratch if there are no
+     * posts loaded
+     *
+     * @param sort How to sort the posts. To change the sort after the first load, use [restart]
+     * @param timeSort How to sort the posts based on time. Only applicable for *top* and *controversial*.
+     * Default is [PostTimeSort.DAY]. To change the sort after the first load, use [restart]
+     */
+    fun loadPosts(sort: SortingMethods? = SortingMethods.HOT, timeSort: PostTimeSort? = PostTimeSort.DAY) {
+        sort?.let { this.sort = it }
+        timeSort?.let { this.timeSort = it }
         val count = postIds.size
 
         val after = if (count > 0) {

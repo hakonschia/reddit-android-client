@@ -79,14 +79,32 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
 
         /**
+         * The key used to send to this activity how to sort the posts when loading this subreddit
+         *
+         * The value with this key should be the value of corresponding enum value from [SortingMethods]
+         */
+        const val SORT = "sort"
+
+        /**
+         * The key used to send to this activity the time sort for the posts when loading this subreddit
+         *
+         * The value with this key should be the value of corresponding enum value from [PostTimeSort]
+         */
+        const val TIME_SORT = "time_sort"
+
+
+        /**
          * Creates a new instance of the fragment
          *
          * @param subredditName The name of the subreddit to instantiate
          * @return The newly created fragment
          */
-        fun newInstance(subredditName: String) : SubredditFragment {
-            val args = Bundle()
-            args.putString(SUBREDDIT_NAME_KEY, subredditName)
+        fun newInstance(subredditName: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) : SubredditFragment {
+            val args = Bundle().apply {
+                putString(SUBREDDIT_NAME_KEY, subredditName)
+                sort?.let { putString(SORT, it.value) }
+                timeSort?.let { putString(TIME_SORT, it.value) }
+            }
 
             val fragment = SubredditFragment()
             fragment.arguments = args
@@ -164,7 +182,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         if (postsAdapter?.itemCount == 0) {
             // Starting from scratch
             if (postIds.isEmpty()) {
-                postsViewModel?.loadPosts()
+                val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value == s } }
+                val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value == s } }
+
+                postsViewModel?.loadPosts(sort, timeSort)
             } else {
                 // Post IDs restored, set those
                 postsViewModel?.postIds = postIds

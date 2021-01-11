@@ -26,7 +26,6 @@ public enum SortingMethods {
      *
      * @see PostTimeSort
      */
-
     CONTROVERSIAL("controversial");
 
     private final String value;
