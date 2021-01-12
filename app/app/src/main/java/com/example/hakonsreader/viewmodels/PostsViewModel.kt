@@ -85,12 +85,12 @@ class PostsViewModel(
 
 
     /**
-     * Restarts posts from start based
+     * Restarts posts from start based on the previous sorting
      */
     fun restart() {
         postIds.clear()
         posts.value = ArrayList<RedditPost>()
-        loadPosts()
+        loadPosts(sort, timeSort)
     }
 
     /**
