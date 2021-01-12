@@ -1,10 +1,12 @@
 package com.example.hakonsreader.api.service
 
 import com.example.hakonsreader.api.model.Subreddit
+import com.example.hakonsreader.api.model.TrendingSubreddits
 import com.example.hakonsreader.api.responses.ListingResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface SubredditsService {
 
@@ -51,4 +53,16 @@ interface SubredditsService {
             @Query("q") query: String,
             @Query("include_over_18") includeNsfw: Boolean
     ) : Response<ListingResponse<Subreddit>>
+
+
+    /**
+     * Retrieves a list of the trending subreddits for the day
+     * The value for trending subreddits is updated once per day
+     */
+    // For some reason, using the normal authenticated url with oauth.reddit.com gives
+    // 400 errors, so this is the workaround
+    @GET("")
+    suspend fun getTrendingSubreddits(
+            @Url url: String = "https://reddit.com/api/trending_subreddits.json"
+    ) : Response<TrendingSubreddits>
 }

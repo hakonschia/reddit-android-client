@@ -3,6 +3,7 @@ package com.example.hakonsreader.api.requestmodels
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.Subreddit
+import com.example.hakonsreader.api.model.TrendingSubreddits
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.SubredditsService
@@ -117,6 +118,25 @@ class SubredditsRequest(
 
             if (subreddits != null) {
                 ApiResponse.Success(subreddits)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+
+    /**
+     * Gets todays trending subreddits
+     */
+    suspend fun trending() : ApiResponse<TrendingSubreddits> {
+        return try {
+            val resp = api.getTrendingSubreddits()
+            val body = resp.body()
+
+            if (body != null) {
+                ApiResponse.Success(body)
             } else {
                 apiError(resp)
             }
