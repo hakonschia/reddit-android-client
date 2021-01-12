@@ -493,7 +493,13 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         })
 
         postsViewModel?.onLoadingCountChange()?.observe(viewLifecycleOwner, { up -> binding?.loadingIcon?.onCountChange(up) })
-        postsViewModel?.getError()?.observe(viewLifecycleOwner, { error -> handleErrors(error.error, error.throwable) })
+        postsViewModel?.getError()?.observe(viewLifecycleOwner, { error ->
+            run {
+                // Error loading posts, reset onEndOfList so it tries again when scrolled
+                postsScrollListener?.resetOnEndOfList()
+                handleErrors(error.error, error.throwable)
+            }
+        })
     }
 
 

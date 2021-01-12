@@ -109,6 +109,14 @@ public class PostScrollListener implements View.OnScrollChangeListener {
         this.postToIgnore = postToIgnore;
     }
 
+    /**
+     * Resets the onEndOfList runnable to be called again. This should be used to re-call the runnable
+     * passed to the constructor
+     */
+    public void resetOnEndOfList() {
+        lastLoadAttemptCount = -1;
+    }
+
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldX, int oldY) {
         // Find the positions of first and last visible items to find all visible items

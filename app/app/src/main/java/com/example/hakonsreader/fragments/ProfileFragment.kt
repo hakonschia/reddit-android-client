@@ -354,7 +354,11 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             }
         })
         postsViewModel?.getError()?.observe(viewLifecycleOwner, { e ->
-            Util.handleGenericResponseErrors(binding?.parentLayout, e.error, e.throwable)
+            run {
+                // Error loading posts, reset onEndOfList so it tries again when scrolled
+                postsScrollListener?.resetOnEndOfList()
+                Util.handleGenericResponseErrors(binding?.parentLayout, e.error, e.throwable)
+            }
         })
         postsViewModel?.onLoadingCountChange()?.observe(viewLifecycleOwner, { up -> binding?.loadingIcon?.onCountChange(up) })
     }
