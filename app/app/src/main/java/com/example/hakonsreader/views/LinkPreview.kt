@@ -77,9 +77,13 @@ class LinkPreview : FrameLayout {
      * Sets the link icon to the icon for the installed application the link resolves to
      */
     private fun setIcon(link: String) {
-        val asUri = Uri.parse(link)
+        // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
+        // and add the full url so that links that our app resolves will be shown correctly
+        val url = if (!link.matches("^http(s)?.*".toRegex())) {
+            "https://reddit.com" + (if (link[0] == '/') "" else "/") + link
+        } else link
 
-        val baseIntent = Intent(Intent.ACTION_VIEW, asUri)
+        val baseIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
 
         // Find all activities this intent would resolve to
         val intentActivities = context.packageManager.queryIntentActivities(baseIntent, PackageManager.MATCH_DEFAULT_ONLY)
