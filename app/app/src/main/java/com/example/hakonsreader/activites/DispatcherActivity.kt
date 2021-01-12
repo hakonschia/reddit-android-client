@@ -32,7 +32,7 @@ class DispatcherActivity : AppCompatActivity() {
          * - .com
          * - .com/
          */
-        private const val REDDIT_HOME_PAGE_URL = "^http(s)?://(\\*.)?reddit\\.com(/)?$"
+        private const val REDDIT_HOME_PAGE_URL = "^http(s)?://(.*)?reddit\\.com(/)?$"
 
         /**
          * Matches variants of "https://redd.it"
