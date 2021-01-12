@@ -115,15 +115,10 @@ class DispatcherActivity : AppCompatActivity() {
         } else ""
 
         return when {
-            // When the app is started from a "reddit.com" intent we could load the front page as
-            // its own subreddit activity, but it makes more sense that this actually loads the application
-            // Since this activity is started without MainActivity being created we can just recreate the
-            // application from scratch, which makes it so the application starts as clicking on the app icon
-            // Alternatively this could probably just resolve to MainActivity directly
+            // "reddit.com", which is in a sense front page, but it makes more sense to treat this
+            // as a "start the app" intent
             url.matches(REDDIT_HOME_PAGE_URL.toRegex()) || url.matches(REDDIT_HOME_PAGE_SHORTENED_URL.toRegex()) -> {
-                ProcessPhoenix.triggerRebirth(this)
-                // We can safely do this as the application will be restarted when this happens
-                null!!
+                Intent(this, MainActivity::class.java)
             }
 
             // Subreddits: https://reddit.com/r/GlobalOffensive
