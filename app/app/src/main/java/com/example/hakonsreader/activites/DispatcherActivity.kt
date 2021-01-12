@@ -127,7 +127,17 @@ class DispatcherActivity : AppCompatActivity() {
             }
 
             // Subreddits: https://reddit.com/r/GlobalOffensive
-            url.matches(LinkUtils.SUBREDDIT_REGEX_COMBINED.toRegex()) -> {
+            url.matches(LinkUtils.SUBREDDIT_REGEX_COMBINED.toRegex(RegexOption.IGNORE_CASE)) -> {
+                // First is "r", second is the subreddit
+                val subreddit = pathSegments[1]
+
+                Intent(this, SubredditActivity::class.java).apply {
+                    putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit)
+                }
+            }
+
+            // Subreddits with sort: https://reddit.com/r/GlobalOffensive/top?t=all
+            url.matches(LinkUtils.SUBREDDIT_SORT_REGEX_WITH_HTTPS.toRegex()) -> {
                 // First is "r", second is the subreddit
                 val subreddit = pathSegments[1]
 

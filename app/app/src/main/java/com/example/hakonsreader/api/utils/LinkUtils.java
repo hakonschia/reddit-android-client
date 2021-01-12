@@ -14,19 +14,35 @@ public final class LinkUtils {
     public static final String BASE_SUBREDDIT_REGEX = "(r|R)/[A-Za-z0-9_]+";
 
     /**
-     * Regex for matching a subreddit URL. Matches either a full URL (only https, www optional) or only "r/...."
+     * Regex for matching a subreddit URL. Matches a full URL (https or http, www optional)
      *
      * <p>Examples:</p>
      * <ol>
+     * <li>http://www.reddit.com/r/test</li>
      * <li>https://www.reddit.com/r/test</li>
-     * <li>https://reddit.com/r/test</li>
-     * <li>https://reddit.com/r/test/top/</li>
+     * <li>https://old.reddit.com/r/test</li>
      * </ol>
      *
      * @see LinkUtils#SUBREDDIT_REGEX_NO_HTTPS
      * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
      */
-    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "(^|\\s)https://(.*)?reddit.com/" + BASE_SUBREDDIT_REGEX + ".*(\\s|$)";
+    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://(.*)?reddit.com/" + BASE_SUBREDDIT_REGEX + "/?(\\s|$)";
+
+    /**
+     * Regex for matching a subreddit URL with sorting. This will match with subpaths "hot", "new", "top", and "controversial"
+     * with query parameter support
+     *
+     * <p>Examples:</p>
+     * <ol>
+     * <li>http://www.reddit.com/r/test</li>
+     * <li>https://www.reddit.com/r/test</li>
+     * <li>https://old.reddit.com/r/test</li>
+     * </ol>
+     *
+     * @see LinkUtils#SUBREDDIT_REGEX_NO_HTTPS
+     * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
+     */
+    public static final String SUBREDDIT_SORT_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://(.*)?reddit.com/(r|R)/[A-Za-z0-9_]+/(hot|top|new|controversial)(/)?(\\?([A-Za-z0-9&=])*)?(\\s|$)";
 
     /**
      * Regex for matching a subreddit string with only the "/r/..." part (no https://reddit.com).
