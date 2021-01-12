@@ -137,9 +137,19 @@
 
 
             <!-- Subreddits with sorting -->
+            <!-- Kind of weird to add all these manually, but it's only 4, and it ensures we
+            don't accidentally match any other URLs -->
             <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/new" />
+            <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/new/" />
+            <tools:validation testUrl="http://reddit.com/r/GlobalOffensive/new/" />
             <tools:validation testUrl="https://old.reddit.com/r/GlobalOffensive/top" />
             <tools:validation testUrl="http://reddit.com/r/GlobalOffensive/top/" />
+            <tools:validation testUrl="https://reddit.com/r/GlobalOffensive/hot" />
+            <tools:validation testUrl="http://reddit.com/r/GlobalOffensive/hot" />
+            <tools:validation testUrl="http://reddit.com/r/GlobalOffensive/hot/" />
+            <tools:validation testUrl="https://reddit.com/r/GlobalOffensive/controversial" />
+            <tools:validation testUrl="http://reddit.com/r/GlobalOffensive/controversial" />
+            <tools:validation testUrl="http://reddit.com/r/GlobalOffensive/controversial/" />
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -149,11 +159,50 @@
 
                 <data
                     android:host="*.reddit.com"
-                    android:pathPattern="/r/.*/.*"
+                    android:pathPattern="/r/.*/new"
+                    android:scheme="https" />
+                <data
+                    android:host="*.reddit.com"
+                    android:pathPattern="/r/.*/new/"
+                    android:scheme="https" />
+
+                <data
+                    android:host="reddit.com"
+                    android:pathPattern="/r/.*/top/"
+                    android:scheme="https" />
+                <data
+                    android:host="*.reddit.com"
+                    android:pathPattern="/r/.*/top"
                     android:scheme="https" />
                 <data
                     android:host="reddit.com"
-                    android:pathPattern="/r/.*/"
+                    android:pathPattern="/r/.*/top"
+                    android:scheme="http" />
+
+                <data
+                    android:host="reddit.com"
+                    android:pathPattern="/r/.*/hot/"
+                    android:scheme="https" />
+                <data
+                    android:host="*.reddit.com"
+                    android:pathPattern="/r/.*/hot"
+                    android:scheme="https" />
+                <data
+                    android:host="reddit.com"
+                    android:pathPattern="/r/.*/hot"
+                    android:scheme="http" />
+
+                <data
+                    android:host="reddit.com"
+                    android:pathPattern="/r/.*/controversial/"
+                    android:scheme="https" />
+                <data
+                    android:host="*.reddit.com"
+                    android:pathPattern="/r/.*/controversial"
+                    android:scheme="https" />
+                <data
+                    android:host="reddit.com"
+                    android:pathPattern="/r/.*/controversial"
                     android:scheme="http" />
             </intent-filter>
 
