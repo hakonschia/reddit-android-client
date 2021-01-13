@@ -1,4 +1,4 @@
-app/secrets.properties
+secrets.properties
 
 # Built application files
 *.apk
