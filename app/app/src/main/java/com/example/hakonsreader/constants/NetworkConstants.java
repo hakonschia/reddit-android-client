@@ -1,5 +1,7 @@
 package com.example.hakonsreader.constants;
 
+import com.example.hakonsreader.BuildConfig;
+
 public class NetworkConstants {
 
     /**
@@ -10,7 +12,7 @@ public class NetworkConstants {
     /**
      * Client ID for OAuth
      */
-    public static final String CLIENT_ID = "UZ37q9US0H2EoQ";
+    public static final String CLIENT_ID = BuildConfig.REDDIT_CLIENT_ID;
 
     /**
      * The callback URL used for OAuth authorization
@@ -20,7 +22,7 @@ public class NetworkConstants {
     /**
      * Client ID for Imgur OAuth application
      */
-    public static final String IMGUR_CLIENT_ID = "d8c4185962cf694";
+    public static final String IMGUR_CLIENT_ID = BuildConfig.IMGUR_CLIENT_ID;
 
 
 

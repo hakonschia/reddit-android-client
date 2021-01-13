@@ -2,13 +2,19 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
+static def getSecret(key) {
+    Properties props = new Properties()
+    props.load(new FileInputStream(new File('secrets.properties')))
+    return props[key]
+}
+
 android {
     signingConfigs {
         sign {
-            storeFile file('C:\\Users\\hakon\\keystores\\key.jks')
-            storePassword 'eNNts[;Y[Fm6asUP'
-            keyAlias 'key0'
-            keyPassword ';)DtmafzZa3ng4`n'
+            storeFile file(getSecret("FILE_PATH"))
+            storePassword getSecret("STORE_PASSWORD")
+            keyAlias getSecret("KEY_ALIAS")
+            keyPassword getSecret("KEY_PASSWORD")
         }
     }
     compileSdkVersion 30
@@ -30,7 +36,15 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        // This wont protect the keys from decompilation (and the reddit client ID isn't really secret
+        // anyways), but it's something?
+        applicationVariants.all { variant ->
+            variant.buildConfigField "String", "REDDIT_CLIENT_ID", "\"" + getSecret("REDDIT_CLIENT_ID") + "\""
+            variant.buildConfigField "String", "IMGUR_CLIENT_ID", "\"" + getSecret("IMGUR_CLIENT_ID") + "\""
+        }
     }
+
 
     buildFeatures {
         viewBinding true
