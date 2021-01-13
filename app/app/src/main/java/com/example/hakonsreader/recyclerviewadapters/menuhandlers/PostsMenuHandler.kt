@@ -4,10 +4,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.view.MenuItem
 import android.view.View
-import android.widget.PopupMenu
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
+import androidx.appcompat.widget.PopupMenu
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.DispatcherActivity
@@ -103,7 +104,10 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
             else -> false
         }
     }
-    menu.show()
+
+    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
+    menuHelper.setForceShowIcon(true)
+    menuHelper.show()
 }
 
 /**
@@ -127,7 +131,10 @@ fun showPopupForPostExtraForNonLoggedInUser(view: View, post: RedditPost) {
             else -> false
         }
     }
-    menu.show()
+
+    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
+    menuHelper.setForceShowIcon(true)
+    menuHelper.show()
 }
 
 

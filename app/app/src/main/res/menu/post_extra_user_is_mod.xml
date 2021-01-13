@@ -5,9 +5,11 @@
 
     <item
         android:id="@+id/menuDistinguishPostAsMod"
+        android:icon="@drawable/ic_admin_24px"
         android:title="@string/postDistinguishAsMod" />
 
     <item
         android:id="@+id/menuStickyPost"
+        android:icon="@drawable/ic_pin_icon_color_24dp"
         android:title="@string/postSticky" />
 </menu>
