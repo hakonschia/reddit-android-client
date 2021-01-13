@@ -5,8 +5,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.view.MenuItem
 import android.view.View
-import android.widget.PopupMenu
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditComment
@@ -90,7 +92,9 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
         }
     }
 
-    menu.show()
+    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
+    menuHelper.setForceShowIcon(true)
+    menuHelper.show()
 }
 
 /**
@@ -118,7 +122,10 @@ fun showPopupForCommentExtraForNonLoggedInUser(view: View, comment: RedditCommen
             else -> false
         }
     }
-    menu.show()
+
+    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
+    menuHelper.setForceShowIcon(true)
+    menuHelper.show()
 }
 
 /**

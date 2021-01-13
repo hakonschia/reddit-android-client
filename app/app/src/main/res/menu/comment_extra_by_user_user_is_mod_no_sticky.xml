@@ -5,5 +5,6 @@
      is only possible on top level comments, it's not included here-->
     <item
         android:id="@+id/menuDistinguishCommentAsMod"
-        android:title="@string/commentDistinguishAsMod" />
+        android:title="@string/commentDistinguishAsMod"
+        android:icon="@drawable/ic_admin_24px"/>
 </menu>

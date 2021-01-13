@@ -3,5 +3,6 @@
     <!-- Menu for extras for comments posted by the logged in user -->
     <item
         android:id="@+id/menuDeleteComment"
-        android:title="@string/menuDeleteComment" />
+        android:title="@string/menuDeleteComment"
+        android:icon="@drawable/ic_delete_24dp"/>
 </menu>

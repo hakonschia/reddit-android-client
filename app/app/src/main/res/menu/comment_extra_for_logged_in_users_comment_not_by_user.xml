@@ -2,5 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menuBlockUser"
-        android:title="@string/blockUser"/>
+        android:title="@string/blockUser"
+        android:icon="@drawable/ic_baseline_block_24"/>
 </menu>

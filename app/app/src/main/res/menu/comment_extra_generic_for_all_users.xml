@@ -5,13 +5,16 @@
 
     <item
         android:id="@+id/menuPeekParentComment"
-        android:title="@string/menuCommentPeekParent" />
+        android:title="@string/menuCommentPeekParent"
+        android:icon="@drawable/ic_visibility_24dp" />
 
     <item
         android:id="@+id/menuShowCommentChain"
-        android:title="@string/commentShowChain"/>
+        android:title="@string/commentShowChain"
+        android:icon="@drawable/ic_chain"/>
 
     <item
         android:id="@+id/menuCopyCommentLink"
-        android:title="@string/commentCopyLink"/>
+        android:title="@string/commentCopyLink"
+        android:icon="@drawable/ic_baseline_link_24"/>
 </menu>
