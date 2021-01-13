@@ -3,5 +3,6 @@
 
     <item
         android:id="@+id/menuInboxMarkUnread"
-        android:title="@string/inboxMenuMarkUnread"/>
+        android:title="@string/inboxMenuMarkUnread"
+        android:icon="@drawable/ic_markunread_mailbox_24dp" />
 </menu>

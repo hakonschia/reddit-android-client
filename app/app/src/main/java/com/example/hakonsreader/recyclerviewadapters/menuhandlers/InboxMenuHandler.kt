@@ -1,7 +1,9 @@
 package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 
 import android.view.View
-import android.widget.PopupMenu
+import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditMessage
@@ -32,7 +34,9 @@ fun showInboxMenu(view: View, redditMessage: RedditMessage?) {
         }
     }
 
-    menu.show()
+    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
+    menuHelper.setForceShowIcon(true)
+    menuHelper.show()
 }
 
 private fun markUnreadOnClick(view: View, message: RedditMessage) {
