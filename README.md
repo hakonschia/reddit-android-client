@@ -22,8 +22,6 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 
 The downloadable [APK](apk/app-release.apk) contains the application at commit `b92bcbd12aae24a809b8a45ed043bd152216c6e1` (#1114). To install the app via the APK download the APK, open it on your phone, and follow the steps shown.
 
-To retrieve the latest version clone the repository and install manually via Android Studio (this will be a debug version).
-
 
 ## Features
 - **Posts**
@@ -31,7 +29,6 @@ To retrieve the latest version clone the repository and install manually via And
   - [Expand post](images/expand-post-content.gif) content at any time when scrolling through the comments.
   - [Disable post from being collapsed](images/disable-post-collapse.gif) when scrolling in comments, with an independent size compared to when it can be collapsed.
     - This can be set as the default for all posts
-  - [Easily view](images/view-on-removeddit.png) a post on [removeddit.com](https://removeddit.com)
   - [Filter posts](images/filter-posts.png) from subreddits from appearing in front page/popular/all
 
 - **Comments**
@@ -45,7 +42,7 @@ To retrieve the latest version clone the repository and install manually via And
     - Optionally: don't show preview when the link is identical to the text
   - [Highlight comments](images/highlight-new-comments.png) added since the last time a post was viewed (can be toggled).
 
-- **Private browsing** - While logged in, [enable private browsing](images/enable-private-browsing.png) to temporarly act as an anonymous, non-logged in user. [Disable at any time](images/disable-private-browsing.png) when attempting to do an action that requires you to log in.
+- **Private browsing** - While logged in, [enable private browsing](images/enable-private-browsing.png) to temporarily act as an anonymous, non-logged in user. [Disable at any time](images/disable-private-browsing.png) when attempting to do an action that requires you to log in.
 
 - **Mod support**
   - Sticky posts and comments

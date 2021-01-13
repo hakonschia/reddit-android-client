@@ -13,11 +13,6 @@
         android:title="@string/copyPostContentLink" />
 
     <item
-        android:id="@+id/menuViewOnRemoveddit"
-        android:icon="@drawable/ic_visibility_off_24px"
-        android:title="@string/postMenuViewOnRemoveddit" />
-
-    <item
         android:id="@+id/menuPostAddSubredditToFilter"
         android:icon="@drawable/ic_filter_24px"
         android:title="@string/postMenuAddSubredditToFilter" />
