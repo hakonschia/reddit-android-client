@@ -3,13 +3,18 @@
 
     <item
         android:id="@+id/menuLogOut"
-        android:title="@string/logOut" />
+        android:title="@string/logOut"
+        android:icon="@drawable/ic_signout"/>
 
     <item
         android:id="@+id/menuBrowsePrivately"
-        android:title="@string/menuPrivateBrowsingEnable" />
+        android:title="@string/menuPrivateBrowsingEnable"
+        android:icon="@drawable/ic_incognito" />
 
+    <!-- TODO find a better icon for this. The idea for a list icon is "this is a list of
+     what the app can do". Not sure what a "privileges" icon would even be -->
     <item
         android:id="@+id/menuApplicationPrivileges"
-        android:title="@string/menuShowApplicationAccessExplanations" />
+        android:title="@string/menuShowApplicationAccessExplanations"
+        android:icon="@drawable/ic_format_list_bulleted_24dp"/>
 </menu>
