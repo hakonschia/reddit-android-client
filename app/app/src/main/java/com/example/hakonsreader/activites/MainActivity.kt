@@ -20,7 +20,6 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityMainBinding
@@ -731,7 +730,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                     if (settingsFragment == null) {
                         settingsFragment = SettingsFragment()
                     }
-                    settingsFragment!!.setUnreadMessagesBadgeSettingChanged(this@MainActivity)
+                    settingsFragment!!.unreadMessagesBadgeSettingChanged = this@MainActivity
                     selected = settingsFragment!!
                 }
                 else -> return false
