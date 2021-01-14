@@ -299,4 +299,5 @@
     <string name="notificationInboxCommentReplyTitle">Nytt kommentarsvar fra %s</string>
     <string name="postMenuViewOnRemoveddit">Vis på removeddit.com</string>
     <string name="userReportsDismissedBottomSheetTitle">Avviste brukerrapporteringer</string>
+    <string name="prefs_title_play_youtube_videos_in_app">Åpne YouTube videoer i appen</string>
 </resources>

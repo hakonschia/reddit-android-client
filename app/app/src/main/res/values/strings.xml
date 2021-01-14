@@ -111,6 +111,7 @@
     <string name="prefs_title_comment_link_preview_show_entire_link">Show entire link in link previews</string>
     <string name="prefs_title_comment_link_preview_show_identical_links">Show preview for links with identical text</string>
     <string name="prefs_title_post_collapse_by_default">Collapse posts when scrolling comments by default</string>
+    <string name="prefs_title_play_youtube_videos_in_app">Open YouTube videos in app</string>
 
 
     <!-- Preferences keys -->
@@ -159,6 +160,7 @@
     <string name="prefs_key_comment_link_preview_show_entire_link" translatable="false">comment_link_preview_show_entire_link</string>
     <string name="prefs_key_comment_link_preview_show_identical_links" translatable="false">comment_link_preview_show_identical_links</string>
     <string name="prefs_key_post_collapse_by_default" translatable="false">post_collapse_post_by_default</string>
+    <string name="prefs_key_play_youtube_videos_in_app" translatable="false">play_youtube_videos_in_app</string>
 
     <plurals name="filteredSubredditsSummary">
         <item quantity="zero">No subreddits filtered</item>

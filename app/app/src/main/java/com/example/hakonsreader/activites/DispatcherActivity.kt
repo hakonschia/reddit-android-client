@@ -114,6 +114,8 @@ class DispatcherActivity : AppCompatActivity() {
             pathSegments.last()
         } else ""
 
+        val youtubeVideoId = asUri.getQueryParameter("v")
+
         return when {
             // "reddit.com", which is in a sense front page, but it makes more sense to treat this
             // as a "start the app" intent
@@ -216,6 +218,21 @@ class DispatcherActivity : AppCompatActivity() {
                 fadeTransition = true
                 Intent(this, ImageActivity::class.java).apply {
                     putExtra(ImageActivity.IMAGE_URL, url)
+                }
+            }
+
+            // YouTube links, open in activity if user wants to
+            App.get().openYouTubeVideosInApp() &&
+                    (!youtubeVideoId.isNullOrEmpty() || url.matches(".*youtu.be.*".toRegex())) -> {
+
+                // https://www.youtube.com/watch?v=90X5NJleYJQ or
+                // https://youtu.be/90X5NJleYJQ
+
+                val videoId = youtubeVideoId ?: pathSegments.first()
+
+                Intent(this, VideoYoutubeActivity::class.java).apply {
+                    putExtra(VideoYoutubeActivity.VIDEO_ID, videoId)
+                    putExtra(VideoYoutubeActivity.TIMESTAMP, asUri.getQueryParameter("t")?.toFloat())
                 }
             }
 

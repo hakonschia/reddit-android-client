@@ -740,6 +740,17 @@ class App : Application() {
         )
     }
 
+    /**
+     * @return True if YouTube videos should be opened directly in the app, false to open in YouTube
+     * app/browser
+     */
+    fun openYouTubeVideosInApp() : Boolean {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_play_youtube_videos_in_app),
+                resources.getBoolean(R.bool.prefs_default_play_youtube_videos_in_app)
+        )
+    }
+
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that

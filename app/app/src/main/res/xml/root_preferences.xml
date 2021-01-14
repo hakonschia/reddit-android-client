@@ -228,6 +228,13 @@
         app:title="@string/prefs_group_videos"
         app:iconSpaceReserved="false">
 
+        <SwitchPreference
+            app:key="@string/prefs_key_play_youtube_videos_in_app"
+            app:title="@string/prefs_title_play_youtube_videos_in_app"
+            app:defaultValue="@bool/prefs_default_play_youtube_videos_in_app"
+            app:singleLineTitle="false"
+            app:iconSpaceReserved="false" />
+
         <ListPreference
             app:key="@string/prefs_key_auto_play_videos"
             app:title="@string/prefs_title_auto_play_videos"

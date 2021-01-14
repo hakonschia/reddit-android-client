@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
@@ -334,7 +335,8 @@ public class Post extends Content {
                 if (ContentVideo.Companion.isRedditPostVideoPlayable(post)) {
                     content = new ContentVideo(context);
                     ((ContentVideo)content).setOnVideoManuallyPaused(onVideoManuallyPaused);
-                } else if (redditPost.getDomain().equals("youtu.be") || redditPost.getDomain().equals("youtube.com")) {
+                } else if (App.Companion.get().openYouTubeVideosInApp()
+                        && (redditPost.getDomain().equals("youtu.be") || redditPost.getDomain().equals("youtube.com"))) {
                     content = new ContentYoutubeVideo(context);
                 } else {
                     content = new ContentLink(context);
