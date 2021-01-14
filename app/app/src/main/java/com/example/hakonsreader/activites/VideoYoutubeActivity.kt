@@ -91,4 +91,9 @@ class VideoYoutubeActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         outState.putFloat(SAVED_TIMESTAMP, currentTimestamp)
     }
+
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+    }
 }

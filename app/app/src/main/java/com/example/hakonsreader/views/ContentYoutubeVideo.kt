@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.VideoYoutubeActivity
 import com.example.hakonsreader.api.model.Image
@@ -62,6 +63,7 @@ class ContentYoutubeVideo : Content {
                 putExtra(VideoYoutubeActivity.VIDEO_ID, getVideoId())
                 putExtra(VideoYoutubeActivity.TIMESTAMP, getTimestamp())
             }
+            (context as AppCompatActivity).overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             context.startActivity(intent)
         }
     }
