@@ -46,6 +46,9 @@
         <activity
             android:name=".activites.VideoActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
+        <activity
+            android:name=".activites.VideoYoutubeActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme" />
 
         <activity
             android:name=".activites.ReplyActivity"

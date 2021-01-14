@@ -65,6 +65,7 @@ Thank you to Reddit for making this project possible by providing an open API.
 * [Slidr](https://github.com/r0adkll/Slidr) - To easily create swipeable activities
 * [Markwon](https://github.com/noties/Markwon) - Markdown text rendering in TextViews
 * [ExoPlayer](https://github.com/google/ExoPlayer) - Used for playing videos
+* [android-youtube-player](https://github.com/PierfrancescoSoffritti/android-youtube-player) - Used for playing YouTube videos
 * [Ticker](https://github.com/robinhood/ticker) - A ticker style TextView that smoothly animates changes (by sliding characters up/down)
 * [ProcessPhoenix](https://github.com/JakeWharton/ProcessPhoenix) - Used to restart the application
 * [Stetho](https://github.com/facebook/stetho) - For network debugging

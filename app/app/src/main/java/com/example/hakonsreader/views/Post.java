@@ -6,6 +6,7 @@ import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -328,16 +329,17 @@ public class Post extends Content {
             // Links such as youtube, gfycat etc are rich video posts
             case RICH_VIDEO:
                 // Ensure we know how to handle a video, otherwise it might not load
-                // TODO check that there actually is a video, link below doesnt have a video which causes a NPE when trying
-                //  to get the source preview, create static function in ContentVideo: isRedditPostVideoPlayable() : Boolean
-                //  that checks if redditVideo, redditVideoGif, sourcePreview is all not null
-                //  https://www.reddit.com/r/reallifedoodles/comments/72cdtz/hey/
+                // Show as link content if we can't show it as a video
+
                 if (ContentVideo.Companion.isRedditPostVideoPlayable(post)) {
                     content = new ContentVideo(context);
                     ((ContentVideo)content).setOnVideoManuallyPaused(onVideoManuallyPaused);
+                } else if (redditPost.getDomain().equals("youtu.be") || redditPost.getDomain().equals("youtube.com")) {
+                    content = new ContentYoutubeVideo(context);
                 } else {
                     content = new ContentLink(context);
                 }
+
                 content.setRedditPost(post);
 
                 break;
