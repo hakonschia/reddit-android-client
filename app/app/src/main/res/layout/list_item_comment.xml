@@ -209,7 +209,7 @@
             android:layout_width="wrap_content"
             android:layout_height="24dp"
             android:visibility="@{comment != null &amp;&amp; comment.awardings.size() > 0 ? View.VISIBLE : View.GONE}"
-
+            app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
             android:layout_marginTop="2dp"
 
             app:layout_constrainedWidth="true"
