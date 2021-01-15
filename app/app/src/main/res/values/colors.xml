@@ -67,4 +67,5 @@
     <color name="reportsBackgroundIgnored">#26636363</color>
 
     <color name="awardsLayoutBackground">#D5D5D5</color>
+    <color name="awardsBottomSheetDivider">#D5D5D5</color>
 </resources>

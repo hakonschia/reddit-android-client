@@ -38,6 +38,12 @@ class RedditAward {
     var reward = 0
 
     /**
+     * The amount of Reddit coins the subreddit the post is in is awarded when this is awarded
+     */
+    @SerializedName("subreddit_coin_reward")
+    var subredditReward = 0
+
+    /**
      * A list of resized icons for the award
      */
     @SerializedName("resized_icons")

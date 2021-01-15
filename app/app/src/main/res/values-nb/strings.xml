@@ -301,4 +301,7 @@
     <string name="userReportsDismissedBottomSheetTitle">Avviste brukerrapporteringer</string>
     <string name="prefs_title_play_youtube_videos_in_app">Åpne YouTube videoer i appen</string>
     <string name="awardsCount">%d priser</string>
+    <string name="awardPrice">Denne prisen koster %d Reddit coins</string>
+    <string name="awardReward">Mottakeren blir belønnet %d Reddit coins</string>
+    <string name="awardSubredditReward">Subredditen blir belønnet %d Reddit coins</string>
 </resources>

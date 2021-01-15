@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.interfaces.AwardableListing
 import com.example.hakonsreader.api.model.RedditAward
 import com.example.hakonsreader.databinding.AwardLayoutBinding
+import com.example.hakonsreader.fragments.bottomsheets.ShowAwardBottomSheet
 import com.example.hakonsreader.misc.Util
 import com.squareup.picasso.Picasso
 
@@ -91,7 +93,6 @@ class AwardLayout : FrameLayout {
             }
         }
 
-        Log.d(TAG, "updateView: awardsCount=$count")
         binding.amountOfAwards = count
     }
 
@@ -101,7 +102,14 @@ class AwardLayout : FrameLayout {
         return count
     }
 
+    /**
+     * Shows a bottom sheet displaying information about an award
+     *
+     * @param award The award to display
+     */
     private fun showAwardDescription(award: RedditAward) {
-
+        val awardBottomSheet = ShowAwardBottomSheet()
+        awardBottomSheet.award = award
+        awardBottomSheet.show((context as AppCompatActivity).supportFragmentManager, "Award bottom sheet")
     }
 }
