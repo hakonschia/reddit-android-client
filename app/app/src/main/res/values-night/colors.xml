@@ -37,4 +37,6 @@
 
     <color name="reportsIgnored">#6E6E6E</color>
     <color name="reportsBackgroundIgnored">#26D3D3D3</color>
+
+    <color name="awardsLayoutBackground">#353535</color>
 </resources>

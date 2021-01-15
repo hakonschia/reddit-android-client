@@ -48,4 +48,10 @@ class RedditAward {
      */
     @SerializedName("is_new")
     var isNew = false
+
+    /**
+     * The amount of days of Reddit premium the receiver of this award gets
+     */
+    @SerializedName("")
+    var daysOfPremium = 0
 }

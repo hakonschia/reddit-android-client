@@ -203,6 +203,21 @@
 
             tools:visibility="visible" />
 
+
+        <com.example.hakonsreader.views.AwardLayout
+            android:id="@+id/awards"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:visibility="@{comment != null &amp;&amp; comment.awardings.size() > 0 ? View.VISIBLE : View.GONE}"
+
+            android:layout_marginTop="2dp"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/commentAuthor"
+            app:layout_constraintTop_toBottomOf="@+id/commentAuthor" />
+
         <TextView
             android:id="@+id/userReportsTitle"
             android:layout_width="wrap_content"
@@ -221,8 +236,8 @@
             android:onClick="@{(view) -> ViewUtil.openReportsBottomSheet(comment, view.context, onReportsIgnoreChange)}"
             app:drawableStartCompat="@drawable/ic_flag_24dp"
 
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/commentAuthor"
+            app:layout_constraintStart_toStartOf="@+id/commentAuthor"
+            app:layout_constraintTop_toBottomOf="@+id/awards"
 
             tools:background="@drawable/reports_background"
             tools:text="5 user reports"

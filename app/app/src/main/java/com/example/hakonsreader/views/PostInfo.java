@@ -50,6 +50,7 @@ public class PostInfo extends ConstraintLayout {
     public void setPost(@NonNull RedditPost post) {
         binding.setPost(post);
         binding.setIsCrosspost(post.getPostType() == PostType.CROSSPOST);
+        binding.awards.setListing(post);
         binding.userReportsTitle.setOnClickListener(v -> ViewUtil.openReportsBottomSheet(post, getContext(), ignored -> binding.invalidateAll()));
 
         List<RedditPost> crossposts = post.getCrossposts();

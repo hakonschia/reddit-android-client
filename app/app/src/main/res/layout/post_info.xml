@@ -295,6 +295,20 @@
 
             tools:text="r/GlobalOffensive"/>
 
+        <com.example.hakonsreader.views.AwardLayout
+            android:id="@+id/awards"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:visibility="@{post != null &amp;&amp; post.awardings.size() > 0 ? View.VISIBLE : View.GONE}"
+
+            android:layout_marginTop="2dp"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/age" />
+
         <TextView
             android:id="@+id/userReportsTitle"
             android:layout_width="wrap_content"
@@ -313,7 +327,7 @@
             app:drawableStartCompat="@drawable/ic_flag_24dp"
 
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/age"
+            app:layout_constraintTop_toBottomOf="@+id/awards"
 
             tools:background="@drawable/reports_background"
             tools:text="5 user reports"
@@ -324,7 +338,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="4dp"
             android:text="@{post.title}"
             android:textColor="@color/text_color"
 

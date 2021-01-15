@@ -537,6 +537,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
             binding.comment = comment
             binding.highlight = highlight
             binding.isByLoggedInUser = byLoggedInUser
+            binding.awards.listing = comment
 
             // If the ticker has animation enabled it will animate from the previous comment to this one
             // which is very weird behaviour, so disable the animation and enable it again when we have set the comment

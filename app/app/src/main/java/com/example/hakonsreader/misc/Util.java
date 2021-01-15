@@ -3,6 +3,7 @@ package com.example.hakonsreader.misc;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.util.TypedValue;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
@@ -262,5 +263,19 @@ public class Util {
      */
     public static String createVideoDuration(int seconds) {
         return String.format("%02d:%02d", (seconds % 3600) / 60, seconds % 60);
+    }
+
+    /**
+     * Converts dp to pixels
+     * @param dp The amount of dp to convert
+     * @param res The resources
+     * @return The pixel amount of *dp*
+     */
+    public static int dpToPixels(float dp, Resources res) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                res.getDisplayMetrics()
+        );
     }
 }
