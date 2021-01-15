@@ -30,10 +30,7 @@ import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.databinding.FragmentSubredditBinding
-import com.example.hakonsreader.databinding.SubredditBannedBinding
-import com.example.hakonsreader.databinding.SubredditNotFoundBinding
-import com.example.hakonsreader.databinding.SubredditPrivateBinding
+import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.interfaces.SortableWithTime
@@ -613,32 +610,47 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         // Duplication of code here but idk how to generify the bindings?
         // These should also be in the center of the bottom parent/appbar or have margin to the bottom of the appbar
         // since now it might go over the appbar
-        if (GenericError.SUBREDDIT_BANNED == errorReason) {
-            val layout: SubredditBannedBinding = SubredditBannedBinding.inflate(layoutInflater, binding.parentLayout, true)
-            layout.subreddit = getSubredditName()
-
-            (layout.root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
-            layout.root.requestLayout()
-        } else if (GenericError.SUBREDDIT_PRIVATE == errorReason) {
-            val layout: SubredditPrivateBinding = SubredditPrivateBinding.inflate(layoutInflater, binding.parentLayout, true)
-            layout.subreddit = getSubredditName()
-
-            (layout.root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
-            layout.root.requestLayout()
-        } else {
-            // NoSubredditInfoException is retrieved when trying to get info from front page, popular, or all
-            // and we don't need to show anything of this to the user
-            if (throwable is NoSubredditInfoException) {
-                return
-            } else if (throwable is SubredditNotFoundException) {
-                val layout: SubredditNotFoundBinding = SubredditNotFoundBinding.inflate(layoutInflater, binding.parentLayout, true)
-                layout.subreddit = getSubredditName()
-
-                (layout.root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
-                layout.root.requestLayout()
-                return
+        when (errorReason) {
+            GenericError.SUBREDDIT_BANNED -> {
+                SubredditBannedBinding.inflate(layoutInflater, binding.parentLayout, true).apply {
+                    subreddit = getSubredditName()
+                    (root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
+                    root.requestLayout()
+                }
             }
-            Util.handleGenericResponseErrors(binding.parentLayout, error, throwable)
+
+            GenericError.SUBREDDIT_PRIVATE -> {
+                SubredditPrivateBinding.inflate(layoutInflater, binding.parentLayout, true).apply {
+                    subreddit = getSubredditName()
+                    (root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
+                    root.requestLayout()
+                }
+            }
+
+            // For instance accessing r/lounge without Reddit premium
+            GenericError.REQUIRES_REDDIT_PREMIUM -> {
+                SubredditRequiresPremiumBinding.inflate(layoutInflater, binding.parentLayout, true).apply {
+                    subreddit = getSubredditName()
+                    (root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
+                    root.requestLayout()
+                }
+            }
+
+            else -> {
+                // NoSubredditInfoException is retrieved when trying to get info from front page, popular, or all
+                // and we don't need to show anything of this to the user
+                if (throwable is NoSubredditInfoException) {
+                    return
+                } else if (throwable is SubredditNotFoundException) {
+                    val layout = SubredditNotFoundBinding.inflate(layoutInflater, binding.parentLayout, true)
+                    layout.subreddit = getSubredditName()
+
+                    (layout.root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
+                    layout.root.requestLayout()
+                    return
+                }
+                Util.handleGenericResponseErrors(binding.parentLayout, error, throwable)
+            }
         }
     }
 

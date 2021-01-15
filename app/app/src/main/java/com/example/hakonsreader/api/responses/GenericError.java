@@ -24,6 +24,12 @@ public class GenericError {
      */
     public static final String SUBREDDIT_BANNED = "banned";
 
+    /**
+     * Possible value for {@link GenericError#getReason()} that represents that an action is attempted
+     * that requires the user to have Reddit premium
+     */
+    public static final String REQUIRES_REDDIT_PREMIUM = "gold_only";
+
 
     @SerializedName("error")
     private int code;

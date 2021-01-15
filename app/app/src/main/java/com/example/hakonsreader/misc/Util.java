@@ -41,6 +41,7 @@ public class Util {
      */
     public static void handleGenericResponseErrors(View parent, GenericError error, Throwable t) {
         int code = error.getCode();
+        String reason = error.getReason();
         t.printStackTrace();
 
         if (t instanceof IOException) {
@@ -55,6 +56,8 @@ public class Util {
             Util.showThreadLockedException(parent);
         } else if (t instanceof ArchivedException) {
             Util.showArchivedException(parent);
+        } else if (GenericError.REQUIRES_REDDIT_PREMIUM.equals(reason)) {
+            Util.showRequiresRedditPremiumSnackbar(parent);
         } else if (code == 400) {
             // 400 requests are "Bad request" which means something went wrong (Reddit are generally pretty
             // "secretive" with their error responses, they only give a code)
@@ -193,6 +196,16 @@ public class Util {
      */
     public static void showUnknownError(View parent) {
         Snackbar.make(parent, parent.getResources().getString(R.string.unknownError), LENGTH_SHORT).show();
+    }
+
+    /**
+     * Creates and shows a snackbar for errors caused by an action being attempted that requires
+     * Reddit premium
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showRequiresRedditPremiumSnackbar(View parent) {
+        Snackbar.make(parent, parent.getResources().getString(R.string.requiresRedditPremium), LENGTH_SHORT).show();
     }
 
 

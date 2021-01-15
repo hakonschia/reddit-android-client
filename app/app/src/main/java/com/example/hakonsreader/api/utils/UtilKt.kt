@@ -32,7 +32,6 @@ fun apiListingErrors(errors: List<List<String>>)  : ApiResponse.Error {
     val errorType: String = errors[0][0]
     val errorMessage: String = errors[0][1]
 
-    // TODO when accessing r/lounge (requires premium): {"reason": "gold_only", "message": "Forbidden", "error": 403}
     // There isn't really a response code for these errors, as the HTTP code is still 200
     return when {
         // TODO should find out if this is a comment or thread and return different exception/message

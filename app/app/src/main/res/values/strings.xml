@@ -201,6 +201,7 @@
     <string name="unknownError">An unknown error occurred</string>
     <string name="badRequestError">Something went wrong</string>
     <string name="listingArchivedError">The listing has been archived</string>
+    <string name="requiresRedditPremium">That action requires Reddit premium</string>
 
     <string name="log_in">Log in</string>
 
@@ -243,6 +244,7 @@
     <string name="subredditPrivate">r/%s is private</string>
     <string name="subredditPrivateDescription">You must be invited to access this community</string>
     <string name="subredditNotFound">r/%s doesn\'t exist</string>
+    <string name="subredditRequiresPremium">You need a Reddit premium subscription to access r/%s</string>
 
     <string name="replyingTo">Replying to <b>%s</b></string>
     <string name="replyHint">Say something nice</string>

@@ -304,4 +304,5 @@
     <string name="awardPrice">Denne prisen koster %d Reddit coins</string>
     <string name="awardReward">Mottakeren blir belønnet %d Reddit coins</string>
     <string name="awardSubredditReward">Subredditen blir belønnet %d Reddit coins</string>
+    <string name="requiresRedditPremium">Handlingen krever Reddit premium</string>
 </resources>
