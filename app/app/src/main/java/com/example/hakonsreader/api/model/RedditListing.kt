@@ -13,7 +13,7 @@ import com.google.gson.annotations.JsonAdapter
 abstract class RedditListing {
 
     /**
-     * The timestamp the listing was created at (ie. inserted into the local database)
+     * The timestamp the listing was created at locally (ie. inserted into the local database)
      */
     var insertedAt = System.currentTimeMillis() / 1000
 

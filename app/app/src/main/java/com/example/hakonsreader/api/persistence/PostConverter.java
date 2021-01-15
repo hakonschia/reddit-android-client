@@ -3,6 +3,7 @@ package com.example.hakonsreader.api.persistence;
 import androidx.room.TypeConverter;
 
 import com.example.hakonsreader.api.model.Image;
+import com.example.hakonsreader.api.model.RedditAward;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.google.gson.Gson;
@@ -87,6 +88,18 @@ public class PostConverter {
     public static String fromRichTextFlairList(List<RichtextFlair> images) {
         return gson.toJson(images);
     }
+
+
+    @TypeConverter
+    public static List<RedditAward> redditAwardListFromString(String value) {
+        Type listType = new TypeToken<List<RedditAward>>() {}.getType();
+        return gson.fromJson(value, listType);
+    }
+    @TypeConverter
+    public static String fromRedditAwardList(List<RedditAward> images) {
+        return gson.toJson(images);
+    }
+
 
 
     @TypeConverter

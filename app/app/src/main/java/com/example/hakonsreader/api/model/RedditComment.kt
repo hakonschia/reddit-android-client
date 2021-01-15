@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.model
 
 import com.example.hakonsreader.api.enums.VoteType
+import com.example.hakonsreader.api.interfaces.AwardableListing
 import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.interfaces.ReportableListing
 import com.example.hakonsreader.api.interfaces.VoteableListing
@@ -12,7 +13,7 @@ import com.example.hakonsreader.api.responses.ListingResponse
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 
-class RedditComment : RedditListing(), VoteableListing, ReplyableListing, ReportableListing {
+class RedditComment : RedditListing(), VoteableListing, ReplyableListing, ReportableListing, AwardableListing {
 
     /**
      * The body of comment in Markdown
@@ -223,6 +224,9 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing, Report
      */
     @SerializedName("likes")
     private var liked: Boolean? = null
+
+    @SerializedName("all_awardings")
+    override var awardings: List<RedditAward>? = null
 
     /**
      * The vote type the post has

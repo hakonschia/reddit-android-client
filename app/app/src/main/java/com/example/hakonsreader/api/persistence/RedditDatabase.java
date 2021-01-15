@@ -13,7 +13,7 @@ import com.example.hakonsreader.api.model.Subreddit;
 /**
  * The global database for the application, holds {@link RedditPost} and {@link Subreddit} entities
  */
-@Database(entities = {RedditPost.class, Subreddit.class, RedditMessage.class}, version = 12)
+@Database(entities = {RedditPost.class, Subreddit.class, RedditMessage.class}, version = 13)
 public abstract class RedditDatabase extends RoomDatabase {
 
     private static RedditDatabase instance;

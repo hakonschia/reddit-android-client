@@ -5,10 +5,7 @@ import androidx.room.Ignore
 import androidx.room.TypeConverters
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.VoteType
-import com.example.hakonsreader.api.interfaces.ReplyableListing
-import com.example.hakonsreader.api.interfaces.ReportableListing
-import com.example.hakonsreader.api.interfaces.ThirdPartyGif
-import com.example.hakonsreader.api.interfaces.VoteableListing
+import com.example.hakonsreader.api.interfaces.*
 import com.example.hakonsreader.api.jsonadapters.BooleanAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
@@ -21,7 +18,7 @@ import com.google.gson.internal.LinkedTreeMap
 
 @Entity(tableName = "posts")
 @TypeConverters(PostConverter::class)
-class RedditPost : RedditListing(), VoteableListing, ReplyableListing, ReportableListing {
+class RedditPost : RedditListing(), VoteableListing, ReplyableListing, ReportableListing, AwardableListing {
 
     /**
      * The title of the post
@@ -442,6 +439,10 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
     @JsonAdapter(BooleanAsIntAdapter::class)
     @SerializedName("edited")
     var edited = -1
+
+
+    @SerializedName("all_awardings")
+    override var awardings: List<RedditAward>? = null
 
 
     /**
