@@ -37,7 +37,7 @@ class LinkPreview : FrameLayout {
         setOnLongClickListener { copyLink(); return@setOnLongClickListener true }
 
         if (!App.get().showEntireLinkInLinkPreview()) {
-            it.linkLink.maxLines = 2
+            it.linkLink.maxLines = 1
         }
     }
 
