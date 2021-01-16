@@ -7,7 +7,7 @@ public class NetworkConstants {
     /**
      * User-Agent header sent to Reddit
      */
-    public static final String USER_AGENT = "android:com.example.hakonsreader.v0.0.0 (by /u/hakonschia)";
+    public static final String USER_AGENT = BuildConfig.REDDIT_USER_AGENT;
 
     /**
      * Client ID for OAuth
@@ -17,7 +17,7 @@ public class NetworkConstants {
     /**
      * The callback URL used for OAuth authorization
      */
-    public static final String CALLBACK_URL = "hakonreader://callback";
+    public static final String CALLBACK_URL = BuildConfig.REDDIT_CALLBACK_URL;
 
     /**
      * Client ID for Imgur OAuth application

@@ -38,11 +38,12 @@ android {
         }
 
         // This wont protect the keys from decompilation (and the reddit client ID isn't really secret
-        // anyways), but it's something?
+        // anyways), but it's something? In addition, this decouples the application from a specific Reddit application
         applicationVariants.all { variant ->
             variant.buildConfigField "String", "REDDIT_CLIENT_ID", "\"" + getSecret("REDDIT_CLIENT_ID") + "\""
+            variant.buildConfigField "String", "REDDIT_CALLBACK_URL", "\"" + getSecret("REDDIT_CALLBACK_URL") + "\""
+            variant.buildConfigField "String", "REDDIT_USER_AGENT", "\"" + getSecret("REDDIT_USER_AGENT") + "\""
             variant.buildConfigField "String", "IMGUR_CLIENT_ID", "\"" + getSecret("IMGUR_CLIENT_ID") + "\""
-            variant.buildConfigField "String", "YOUTUBE_API_KEY", "\"" + getSecret("YOUTUBE_API_KEY") + "\""
         }
     }
 

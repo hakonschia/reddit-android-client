@@ -44,6 +44,8 @@ class LogInFragment : Fragment() {
                 .appendQueryParameter("state", state)
                 .build()
 
+        val assstring = uri.toString()
+
         startActivity(Intent(Intent.ACTION_VIEW, uri))
     }
 }
