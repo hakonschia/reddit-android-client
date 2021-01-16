@@ -17,6 +17,13 @@ import io.noties.markwon.Markwon
  * BottomSheet for displaying information about a [RedditAward]
  */
 class ShowAwardBottomSheet : BottomSheetDialogFragment() {
+    companion object {
+        /**
+         * The size of the images of the awards the bottom sheet will load
+         */
+        const val IMAGE_SIZE = 128
+    }
+
     private var _binding: BottomSheetShowAwardBinding? = null
     private val binding get() = _binding!!
 
@@ -39,7 +46,7 @@ class ShowAwardBottomSheet : BottomSheetDialogFragment() {
             setMarkdown(binding.description, desc)
         }
 
-        val imageUrl = award?.resizedIcons?.find { image -> image.height == 128 }?.url
+        val imageUrl = award?.resizedIcons?.find { image -> image.height == IMAGE_SIZE }?.url
         Picasso.get().load(imageUrl).into(binding.icon)
 
         return binding.root
