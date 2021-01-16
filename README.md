@@ -64,7 +64,7 @@ Note: The signing values cannot be omitted. If you are not building a release ve
   - Show [all](images/sidebars-all.png) sidebars, or [only](images/sidebars-only-one.png) one
   - [Enlarge links](images/enlarge-links.png) to make them easier to click (up to 2.5x the size)
   - [Show preview of links](images/show-link-previews.png)
-    - Optionally: show entire link (or only 2 lines)
+    - Optionally: show entire link (or only 1 line)
     - Optionally: don't show preview when the link is identical to the text
   - [Highlight comments](images/highlight-new-comments.png) added since the last time a post was viewed (can be toggled).
 
