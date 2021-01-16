@@ -10,6 +10,8 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.jakewharton.processphoenix.ProcessPhoenix
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DispatcherActivity : AppCompatActivity() {
     companion object {
@@ -46,6 +48,8 @@ class DispatcherActivity : AppCompatActivity() {
          * - redd.it/
          */
         private const val REDDIT_HOME_PAGE_SHORTENED_URL = "^http(s)?://(www.)?redd.it(/)?$"
+
+        private val IMAGE_FORMATS = Collections.unmodifiableList(listOf("png", "jpg", "jpeg"))
     }
 
 
@@ -214,7 +218,10 @@ class DispatcherActivity : AppCompatActivity() {
             }
 
             // Images, load directly in the app
-            lastSegment.matches(".+(.png|.jpeg|.jpg)$".toRegex()) -> {
+            lastSegment.matches(".+(.png|.jpeg|.jpg)$".toRegex())
+                    // Some links (like twitter images) don't end in ".png" but have "?format=png" so
+                    // if the format parameter is an image format assume this is an image
+                    || IMAGE_FORMATS.contains(asUri.getQueryParameter("format")) -> {
                 fadeTransition = true
                 Intent(this, ImageActivity::class.java).apply {
                     putExtra(ImageActivity.IMAGE_URL, url)
