@@ -273,6 +273,11 @@ class App : Application() {
         // in the requests aren't used anyways)
         val thirdPartyCacheAge = 60 * 60 * 24 * 7L
 
+        // If the Imgur client ID is omitted from secrets.properties it is parsed as a string with the value "null"
+        val imgurClientId = if (NetworkConstants.IMGUR_CLIENT_ID != "null") {
+            NetworkConstants.IMGUR_CLIENT_ID
+        } else null
+
         val api = RedditApi.Builder(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID)
                 .accessToken(TokenManager.getToken())
                 .onNewToken { newToken: AccessToken? -> TokenManager.saveToken(newToken) }
@@ -280,7 +285,7 @@ class App : Application() {
                 .loggerLevel(HttpLoggingInterceptor.Level.BODY)
                 .callbackUrl(NetworkConstants.CALLBACK_URL)
                 .deviceId(UUID.randomUUID().toString())
-                .loadImgurAlbumsAsRedditGalleries(NetworkConstants.IMGUR_CLIENT_ID)
+                .loadImgurAlbumsAsRedditGalleries(imgurClientId)
                 .thirdPartyCache(thirdPartyCache, thirdPartyCacheAge)
                 .build()
 

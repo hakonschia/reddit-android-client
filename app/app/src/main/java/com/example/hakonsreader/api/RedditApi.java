@@ -601,7 +601,7 @@ public class RedditApi {
          *                      <a href="https://api.imgur.com/oauth2/addclient">Imgur.com</a>
          * @return This builder
          */
-        public Builder loadImgurAlbumsAsRedditGalleries(String imgurClientId) {
+        public Builder loadImgurAlbumsAsRedditGalleries(@Nullable String imgurClientId) {
             this.imgurClientId = imgurClientId;
             return this;
         }
