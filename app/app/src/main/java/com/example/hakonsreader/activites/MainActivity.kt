@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
     private val notifications = HashMap<String, Int>()
 
     // The fragments to show in the nav bar
-    private var postsFragment: PostsContainerFragment? = null
+    private var standardSubFragment: StandardSubContainerFragment? = null
     private var activeSubreddit: SubredditFragment? = null
     private var selectSubredditFragment: SelectSubredditFragment? = null
     private var profileFragment: ProfileFragment? = null
@@ -146,10 +146,10 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         // If fragments aren't null, save them
         // Save which fragment is the active one as well
 
-        postsFragment?.let {
+        standardSubFragment?.let {
             it.saveState(outState)
             if (it.isAdded) {
-                supportFragmentManager.putFragment(outState, POSTS_FRAGMENT, postsFragment!!)
+                supportFragmentManager.putFragment(outState, POSTS_FRAGMENT, standardSubFragment!!)
             }
         }
 
@@ -287,7 +287,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                     // Re-create the start fragment as it now should load posts for the logged in user
                     // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
                     withContext(Main) {
-                        postsFragment = null
+                        standardSubFragment = null
                         setupStartFragment()
                         Snackbar.make(binding.parentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT).show()
                     }
@@ -565,17 +565,17 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
      * @param restoredState The bundle with the state of the fragments
      */
     private fun restoreFragmentStates(restoredState: Bundle) {
-        postsFragment = supportFragmentManager.getFragment(restoredState, POSTS_FRAGMENT) as PostsContainerFragment?
+        standardSubFragment = supportFragmentManager.getFragment(restoredState, POSTS_FRAGMENT) as StandardSubContainerFragment?
         activeSubreddit = supportFragmentManager.getFragment(restoredState, ACTIVE_SUBREDDIT_FRAGMENT) as SubredditFragment?
         selectSubredditFragment = supportFragmentManager.getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT) as SelectSubredditFragment?
         profileFragment = supportFragmentManager.getFragment(restoredState, PROFILE_FRAGMENT) as ProfileFragment?
 
-        if (postsFragment == null) {
-            postsFragment = PostsContainerFragment()
-            postsFragment!!.restoreState(restoredState)
+        if (standardSubFragment == null) {
+            standardSubFragment = StandardSubContainerFragment()
+            standardSubFragment!!.restoreState(restoredState)
         }
 
-        postsFragment!!.restoreState(restoredState)
+        standardSubFragment!!.restoreState(restoredState)
 
         if (activeSubreddit != null) {
             activeSubreddit!!.restoreState(savedState)
@@ -598,11 +598,11 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
      * Creates the posts fragment and replaces it in the container view
      */
     private fun setupStartFragment() {
-        if (postsFragment == null) {
-            postsFragment = PostsContainerFragment()
+        if (standardSubFragment == null) {
+            standardSubFragment = StandardSubContainerFragment()
         }
 
-        postsFragment?.let {
+        standardSubFragment?.let {
             // Use an open transition since we're calling this when the app has been started
             supportFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainer, it)
@@ -714,10 +714,10 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
             when (item.itemId) {
                 R.id.navHome -> {
                     navBarPos = 1
-                    if (postsFragment == null) {
-                        postsFragment = PostsContainerFragment()
+                    if (standardSubFragment == null) {
+                        standardSubFragment = StandardSubContainerFragment()
                     }
-                    selected = postsFragment as PostsContainerFragment
+                    selected = standardSubFragment as StandardSubContainerFragment
                 }
                 R.id.navSubreddit -> {
                     navBarPos = 2

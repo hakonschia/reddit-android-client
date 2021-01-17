@@ -12,7 +12,7 @@ import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.misc.SectionsPageAdapter
 
-class PostsContainerFragment : Fragment() {
+class StandardSubContainerFragment : Fragment() {
 
     companion object {
         /**
