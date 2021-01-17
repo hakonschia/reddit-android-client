@@ -28,7 +28,7 @@ interface CommentService : VoteService, ReplyService, SaveService, ModService {
     suspend fun edit(
             @Field("thing_id") fullname: String,
             @Field("text") text: String,
-            @Field("api_type") apiType: String
+            @Field("api_type") apiType: String = "json"
     ) : Response<JsonResponse<RedditComment>>
 
     /**

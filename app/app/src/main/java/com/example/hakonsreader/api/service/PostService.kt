@@ -42,8 +42,8 @@ interface PostService : VoteService, ReplyService, SaveService, ModService {
     suspend fun getMoreComments(
             @Field("children") children: String,
             @Field("link_id") linkId: String,
-            @Field("api_type") apiType: String,
-            @Field("raw_json") rawJson: Int
+            @Field("api_type") apiType: String = "json",
+            @Field("raw_json") rawJson: Int = 1
     ) : Response<JsonResponse<RedditComment>>
 
     /**

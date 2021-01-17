@@ -339,6 +339,7 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
         if (token == null || token.refreshToken == null) {
             return
         }
+
         val requiredScopesAsArray = NetworkConstants.SCOPE.split(" ").toTypedArray()
         val storedScopesAsArray = listOf(*token.scopesAsArray)
 

@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.requestmodels
 
-import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
@@ -65,8 +64,7 @@ class CommentRequest(
         return try {
             val resp = api.edit(
                     Util.createFullName(Thing.COMMENT, commentId),
-                    editedText,
-                    RedditApi.API_TYPE
+                    editedText
             )
 
             val comment = resp.body()?.getListings()?.get(0)

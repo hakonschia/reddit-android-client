@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.requestmodels
 
-import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.model.AccessToken
@@ -38,7 +37,6 @@ class ModRequestModel(
                     Util.createFullName(Thing.COMMENT, id),
                     if (distinguish) "yes" else "no",
                     sticky,
-                    RedditApi.API_TYPE
             )
 
             val comment = resp.body()?.getListings()?.get(0)
@@ -68,8 +66,7 @@ class ModRequestModel(
         return try {
             val resp = api.distinguishAsModPost(
                     Util.createFullName(Thing.POST, id),
-                    if (distinguish) "yes" else "no",
-                    RedditApi.API_TYPE
+                    if (distinguish) "yes" else "no"
             )
 
             val post = resp.body()?.getListings()?.get(0)
@@ -102,8 +99,7 @@ class ModRequestModel(
         return try {
             val resp = api.stickyPost(
                     Util.createFullName(Thing.POST, id),
-                    sticky,
-                    RedditApi.API_TYPE
+                    sticky
             )
 
             if (resp.isSuccessful) {

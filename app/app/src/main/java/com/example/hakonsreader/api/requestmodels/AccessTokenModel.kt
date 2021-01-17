@@ -35,8 +35,8 @@ class AccessTokenModel(
      * registered token listener
      */
     suspend fun get(code: String) : ApiResponse<Any?> {
-        if (callbackUrl.isEmpty()) {
-            throw IllegalStateException("Callback URL is not set. Use RedditApi.Builder.callbackUrl()")
+        if (callbackUrl.isBlank()) {
+            throw IllegalStateException("Callback URL is not set. Use RedditApi.callbackUrl")
         }
 
         return try {

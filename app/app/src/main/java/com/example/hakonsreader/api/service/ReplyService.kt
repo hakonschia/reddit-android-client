@@ -26,8 +26,8 @@ interface ReplyService {
     suspend fun postComment(
             @Field("text") comment: String,
             @Field("thing_id") parentId: String,
-            @Field("api_type") apiType: String,
-            @Field("return_rtjson") returnJson: Boolean
+            @Field("api_type") apiType: String = "json",
+            @Field("return_rtjson") returnJson: Boolean = false
     ) : Response<JsonResponse<RedditComment>>
 
 }

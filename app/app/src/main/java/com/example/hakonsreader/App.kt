@@ -278,21 +278,27 @@ class App : Application() {
             NetworkConstants.IMGUR_CLIENT_ID
         } else null
 
-        val api = RedditApi.Builder(NetworkConstants.USER_AGENT, NetworkConstants.CLIENT_ID)
-                .accessToken(TokenManager.getToken())
-                .onNewToken { newToken: AccessToken? -> TokenManager.saveToken(newToken) }
-                .onInvalidToken { error: GenericError, throwable: Throwable -> onInvalidAccessToken(error, throwable) }
-                .loggerLevel(HttpLoggingInterceptor.Level.BODY)
-                .callbackUrl(NetworkConstants.CALLBACK_URL)
-                .deviceId(UUID.randomUUID().toString())
-                .loadImgurAlbumsAsRedditGalleries(imgurClientId)
-                .thirdPartyCache(thirdPartyCache, thirdPartyCacheAge)
-                .build()
-
         val privatelyBrowsing = settings.getBoolean(PRIVATELY_BROWSING_KEY, false)
-        api.enablePrivateBrowsing(privatelyBrowsing)
 
-        return api
+        return RedditApi(
+                userAgent = NetworkConstants.USER_AGENT,
+                clientId = NetworkConstants.CLIENT_ID,
+
+                accessToken = TokenManager.getToken(),
+                onNewToken = { newToken: AccessToken? -> TokenManager.saveToken(newToken) },
+                onInvalidToken = { error: GenericError, throwable: Throwable -> onInvalidAccessToken(error, throwable) },
+
+                loggerLevel = HttpLoggingInterceptor.Level.BODY,
+
+                callbackUrl = NetworkConstants.CALLBACK_URL,
+                deviceId = UUID.randomUUID().toString(),
+                imgurClientId = imgurClientId,
+
+                thirdPartyCache = thirdPartyCache,
+                thirdPartyCacheAge = thirdPartyCacheAge
+        ).apply {
+            enablePrivateBrowsing(privatelyBrowsing)
+        }
     }
 
     /**
@@ -359,7 +365,7 @@ class App : Application() {
      * @see App.isUserLoggedIn
      */
     fun isUserLoggedInPrivatelyBrowsing(): Boolean {
-        return isUserLoggedIn() && api.isPrivatelyBrowsing
+        return isUserLoggedIn() && api.isPrivatelyBrowsing()
     }
 
     /**

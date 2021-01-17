@@ -5,7 +5,9 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
 import com.example.hakonsreader.api.model.AccessToken
+import retrofit2.Call
 import retrofit2.Response
+import retrofit2.http.Header
 
 /**
  * The endpoint to use for access token calls (retrieval, refresh)
@@ -38,7 +40,6 @@ interface AccessTokenService {
      * Note: The request must be made with an "Authorization: Basic " header attached to it
      *
      * @param deviceId A random ID for the current device (can be "DO_NOT_TRACK_THIS_DEVICE")
-     * @param grantType The grant_type. This has a default value and shouldn't be modified
      */
     @POST(ACCESS_TOKEN_PATH)
     @FormUrlEncoded
@@ -46,6 +47,20 @@ interface AccessTokenService {
             @Field("device_id") deviceId: String,
             @Field("grant_type") grantType: String = "https://oauth.reddit.com/grants/installed_client"
     ) : Response<AccessToken>
+
+    /**
+     * Gets a new access token for a non-logged in user. This is not suspended, and will block the current thread
+     *
+     * Note: The request must be made with an "Authorization: Basic " header attached to it
+     *
+     * @param deviceId A random ID for the current device (can be "DO_NOT_TRACK_THIS_DEVICE")
+     */
+    @POST(ACCESS_TOKEN_PATH)
+    @FormUrlEncoded
+    fun getAccessTokenNoUserNoSuspend(
+            @Field("device_id") deviceId: String,
+            @Field("grant_type") grantType: String = "https://oauth.reddit.com/grants/installed_client"
+    ) : Call<AccessToken>
 
 
     /**
@@ -58,9 +73,25 @@ interface AccessTokenService {
     @POST(ACCESS_TOKEN_PATH)
     @FormUrlEncoded
     suspend fun refreshToken(
+            @Header("Authorization") basicAuth: String,
             @Field("refresh_token") refreshToken: String,
             @Field("grant_type") grantType: String = "refresh_token"
     ) : Response<AccessToken>
+
+    /**
+     * Refreshes an access token token. This is not suspended, and will block the current thread
+     *
+     * Note: The request must be made with an "Authorization: Basic " header attached to it
+     *
+     * @param refreshToken The refresh token (as retrieved from [AccessToken.refreshToken])
+     */
+    @POST(ACCESS_TOKEN_PATH)
+    @FormUrlEncoded
+    fun refreshTokenNoSuspend(
+            @Header("Authorization") basicAuth: String,
+            @Field("refresh_token") refreshToken: String,
+            @Field("grant_type") grantType: String = "refresh_token"
+    ) : Call<AccessToken>
 
 
     /**

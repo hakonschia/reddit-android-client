@@ -36,7 +36,7 @@ interface ModService {
             @Field("id") fullname: String,
             @Field("how") how: String,
             @Field("sticky") sticky: Boolean,
-            @Field("api_type") apiType: String
+            @Field("api_type") apiType: String = "json"
     ) : Response<JsonResponse<RedditComment>>
 
 
@@ -55,7 +55,7 @@ interface ModService {
     suspend fun distinguishAsModPost(
             @Field("id") fullname: String,
             @Field("how") how: String,
-            @Field("api_type") apiType: String
+            @Field("api_type") apiType: String = "json"
     ) : Response<JsonResponse<RedditPost>>
 
     /**
@@ -74,7 +74,7 @@ interface ModService {
     suspend fun stickyPost(
             @Field("id") fullname: String,
             @Field("state") sticky: Boolean,
-            @Field("api_type") apiType: String
+            @Field("api_type") apiType: String = "json"
     ) : Response<JsonResponse<Void>>
 
 

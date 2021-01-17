@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.requestmodels
 
-import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.model.AccessToken
@@ -41,9 +40,7 @@ class ReplyableRequestModel(
         return try {
             val resp = api.postComment(
                     commentText,
-                    Util.createFullName(thing, id),
-                    RedditApi.API_TYPE,
-                    false
+                    Util.createFullName(thing, id)
             )
 
             val body = resp.body()

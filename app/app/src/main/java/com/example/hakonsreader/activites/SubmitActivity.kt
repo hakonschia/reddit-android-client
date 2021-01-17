@@ -14,7 +14,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.SubmissionFlair
@@ -362,7 +361,7 @@ class SubmitActivity : AppCompatActivity() {
 
     class SubmissionCrosspostFragment : Fragment() {
         var binding: SubmissionCrosspostBinding? = null
-        val api: RedditApi = App.get().api
+        val api = App.get().api
         val timer = Timer()
         var timerTask: TimerTask? = null
 

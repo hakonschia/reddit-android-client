@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.requestmodels
 
-import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.enums.VoteType
@@ -104,9 +103,7 @@ class PostRequest(
         return try {
             val resp = api.getMoreComments(
                     childrenJoined,
-                    Util.createFullName(Thing.POST, postId),
-                    RedditApi.API_TYPE,
-                    RedditApi.RAW_JSON
+                    Util.createFullName(Thing.POST, postId)
             )
 
             val comments = resp.body()?.getListings() as List<RedditComment>?

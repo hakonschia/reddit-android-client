@@ -90,6 +90,9 @@ public class AccessToken {
      * @see #getScope()
      */
     public String[] getScopesAsArray() {
+        if (scope == null) {
+            return new String[]{};
+        }
         return scope.split(" ");
     }
 
