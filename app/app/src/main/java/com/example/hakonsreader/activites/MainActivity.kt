@@ -602,12 +602,14 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
             postsFragment = PostsContainerFragment()
         }
 
-        // Use an open transition since we're calling this when the app has been started
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, postsFragment!!)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit()
+        postsFragment?.let {
+            // Use an open transition since we're calling this when the app has been started
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, it)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .addToBackStack(null)
+                    .commit()
+        }
     }
 
     /**
