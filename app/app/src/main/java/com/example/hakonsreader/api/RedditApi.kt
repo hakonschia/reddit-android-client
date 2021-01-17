@@ -186,11 +186,13 @@ class RedditApi constructor(
          *
          * Note: This is an unmodifiable list. Attempting to change it will throw an exception
          */
-        val STANDARD_SUBS = Collections.unmodifiableList(listOf("", "popular", "all"))
+        val STANDARD_SUBS: List<String> = Collections.unmodifiableList(listOf("", "popular", "all"))
     }
 
 
     init {
+        check(userAgent.isNotBlank()) { "User-Agent must not be empty" }
+        check(clientId.isNotBlank()) { "Client ID must not be empty" }
         createServices()
     }
 
