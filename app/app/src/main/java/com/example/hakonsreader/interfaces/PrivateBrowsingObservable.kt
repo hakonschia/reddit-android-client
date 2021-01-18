@@ -3,7 +3,7 @@ package com.example.hakonsreader.interfaces
 /**
  * Interface that classes that wants to be notified about private browsing changes will implement
  */
-interface PrivateBrowsingObservable {
+fun interface PrivateBrowsingObservable {
 
     /**
      * Called when the private browsing state has changed

@@ -356,12 +356,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }
         binding.posts.setOnScrollChangeListener(postsScrollListener)
 
-        postsAdapter?.setOnVideoManuallyPaused(object : OnVideoManuallyPaused {
-            override fun postPaused(contentVideo: ContentVideo) {
-                // Ignore post when scrolling if manually paused
-                postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
-            }
-        })
+        postsAdapter?.setOnVideoManuallyPaused { contentVideo ->
+            // Ignore post when scrolling if manually paused
+            postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
+        }
 
         postsAdapter?.setOnPostClicked { post ->
             // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't

@@ -5,8 +5,7 @@ import com.example.hakonsreader.views.ContentVideo
 /**
  * Interface for when a video has paused playback manually by the user
  */
-@FunctionalInterface
-interface OnVideoManuallyPaused {
+fun interface OnVideoManuallyPaused {
     /**
      * Called when the post has been manually paused
      *

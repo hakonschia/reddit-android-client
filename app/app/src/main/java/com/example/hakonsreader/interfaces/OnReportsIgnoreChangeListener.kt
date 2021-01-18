@@ -3,7 +3,7 @@ package com.example.hakonsreader.interfaces
 /**
  * Interface for classes listening to reports being set to ignored/unignored
  */
-interface OnReportsIgnoreChangeListener {
+fun interface OnReportsIgnoreChangeListener {
 
     /**
      * Called when reports ignored status has been updated

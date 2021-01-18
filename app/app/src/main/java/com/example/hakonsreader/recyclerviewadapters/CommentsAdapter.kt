@@ -489,11 +489,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
                 val binding = ListItemCommentBinding.inflate(layoutInflater, parent, false)
                 binding.adapter = this
                 binding.post = post
-                binding.onReportsIgnoreChange = object : OnReportsIgnoreChangeListener {
-                    override fun onIgnoredChange(ignored: Boolean) {
-                        binding.invalidateAll()
-                    }
-                }
+                binding.onReportsIgnoreChange = OnReportsIgnoreChangeListener { binding.invalidateAll() }
                 NormalCommentViewHolder(binding)
             }
         }
