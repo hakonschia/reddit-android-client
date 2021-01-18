@@ -1,10 +1,12 @@
 package com.example.hakonsreader.api.model
 
+import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 
 /**
  * Class representing a subreddit rule
  */
+@Entity(tableName = "subreddit_rules", primaryKeys = ["subreddit", "name"])
 class SubredditRule {
 
     /**

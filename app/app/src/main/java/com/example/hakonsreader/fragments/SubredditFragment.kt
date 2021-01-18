@@ -121,6 +121,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var postsLayoutManager: LinearLayoutManager? = null
     private var postsScrollListener: PostScrollListener? = null
 
+    private val rulesAdapter = SubredditRulesAdapter()
+    private val rulesLayoutManager = LinearLayoutManager(context)
+    /**
+     * True if the rules for the subreddit has been loaded during this fragment
+     */
+    private var rulesLoaded = false
+
+
     private val subreddit: ObservableField<Subreddit> = object : ObservableField<Subreddit>() {
         override fun set(value: Subreddit) {
             // If there is no subscribers previously the ticker animation looks very weird
@@ -148,6 +156,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         setupSubredditObservable()
         setupSubmitPostFab()
         setupPostsViewModel()
+        setupRulesList()
+        observeRules()
 
         App.get().registerPrivateBrowsingObservable(this)
 
@@ -344,8 +354,9 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             openDrawer.setOnClickListener { drawer.openDrawer(GravityCompat.END) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
-                    // If no rules: Load from local DB, then API
-                    getSubredditName()?.let { retrieveSubredditRules(it) }
+                    if (!rulesLoaded) {
+                        getSubredditName()?.let { retrieveSubredditRules(it) }
+                    }
                 }
                 override fun onDrawerSlide(drawerView: View, slideOffset: Float) { /* Not implemented */ }
                 override fun onDrawerClosed(drawerView: View) { /* Not implemented */ }
@@ -359,38 +370,49 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * Sets up [FragmentSubredditBinding.posts] and [postsAdapter]/[postsLayoutManager]
      */
     private fun setupPostsList() {
-        postsAdapter = PostsAdapter().apply { binding.posts.adapter = this }
+        postsAdapter = PostsAdapter().apply {
+            binding.posts.adapter = this
+            setOnVideoManuallyPaused { contentVideo ->
+                // Ignore post when scrolling if manually paused
+                postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
+            }
+
+            setVideoFullscreenListener { contentVideo ->
+                // Ignore post when scrolling if it has been fullscreened
+                postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
+            }
+
+            setOnPostClicked { post ->
+                // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
+                // autoplay the video
+                val redditPost = post.redditPost
+                postsScrollListener?.setPostToIgnore(redditPost.id)
+
+                val intent = Intent(context, PostActivity::class.java).apply {
+                    putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))
+                    putExtra(Content.EXTRAS, post.extras)
+                    putExtra(PostActivity.HIDE_SCORE_KEY, post.hideScore)
+                }
+
+                // Only really applicable for videos, as they should be paused
+                post.viewUnselected()
+
+                val activity = requireActivity()
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())
+                activity.startActivity(intent, options.toBundle())
+            }
+        }
+
         postsLayoutManager = LinearLayoutManager(context).apply { binding.posts.layoutManager = this }
 
         postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }
         binding.posts.setOnScrollChangeListener(postsScrollListener)
+    }
 
-        postsAdapter?.setOnVideoManuallyPaused { contentVideo ->
-            // Ignore post when scrolling if manually paused
-            postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
-        }
-        postsAdapter?.setVideoFullscreenListener { contentVideo ->
-            // Ignore post when scrolling if it has been fullscreened
-            postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
-        }
-
-        postsAdapter?.setOnPostClicked { post ->
-            // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
-            // autoplay the video
-            val redditPost = post.redditPost
-            postsScrollListener?.setPostToIgnore(redditPost.id)
-
-            val intent = Intent(context, PostActivity::class.java)
-            intent.putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))
-            intent.putExtra(Content.EXTRAS, post.extras)
-            intent.putExtra(PostActivity.HIDE_SCORE_KEY, post.hideScore)
-
-            // Only really applicable for videos, as they should be paused
-            post.viewUnselected()
-
-            val activity = requireActivity()
-            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())
-            activity.startActivity(intent, options.toBundle())
+    private fun setupRulesList() {
+        with(binding){
+            subredditInfo.rules.adapter = rulesAdapter
+            subredditInfo.rules.layoutManager = rulesLayoutManager
         }
     }
 
@@ -470,43 +492,44 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 context,
                 getSubredditName(),
                 false
-        )).get(PostsViewModel::class.java)
+        )).get(PostsViewModel::class.java).apply {
+            getPosts().observe(viewLifecycleOwner, { posts ->
+                // Store the updated post IDs right away
+                postIds = postIds as ArrayList<String>
 
-        postsViewModel?.getPosts()?.observe(viewLifecycleOwner, { posts ->
-            // Store the updated post IDs right away
-            postIds = postsViewModel?.postIds as ArrayList<String>
-
-            // Posts have been cleared, clear the adapter and clear the layout manager state
-            if (posts.isEmpty()) {
-                postsAdapter?.clearPosts()
-                postsLayoutManager = LinearLayoutManager(context)
-                return@observe
-            }
-
-            val previousSize = postsAdapter?.itemCount
-            postsAdapter?.submitList(filterPosts(posts))
-
-            if (saveState != null && previousSize == 0) {
-                val layoutState: Parcelable? = saveState?.getParcelable(saveKey(LAYOUT_STATE_KEY))
-                if (layoutState != null) {
-                    postsLayoutManager?.onRestoreInstanceState(layoutState)
-
-                    // If we're at this point we probably don't want the toolbar expanded
-                    // We get here when the fragment/activity holding the fragment has been restarted
-                    // so it usually looks odd if the toolbar now shows
-                    binding.subredditAppBarLayout.setExpanded(false, false)
+                // Posts have been cleared, clear the adapter and clear the layout manager state
+                if (posts.isEmpty()) {
+                    postsAdapter?.clearPosts()
+                    postsLayoutManager = LinearLayoutManager(context)
+                    return@observe
                 }
-            }
-        })
 
-        postsViewModel?.onLoadingCountChange()?.observe(viewLifecycleOwner, { up -> binding?.loadingIcon?.onCountChange(up) })
-        postsViewModel?.getError()?.observe(viewLifecycleOwner, { error ->
-            run {
-                // Error loading posts, reset onEndOfList so it tries again when scrolled
-                postsScrollListener?.resetOnEndOfList()
-                handleErrors(error.error, error.throwable)
-            }
-        })
+                val previousSize = postsAdapter?.itemCount
+                postsAdapter?.submitList(filterPosts(posts))
+
+                if (saveState != null && previousSize == 0) {
+                    val layoutState: Parcelable? = saveState?.getParcelable(saveKey(LAYOUT_STATE_KEY))
+
+                    if (layoutState != null) {
+                        postsLayoutManager?.onRestoreInstanceState(layoutState)
+
+                        // If we're at this point we probably don't want the toolbar expanded
+                        // We get here when the fragment/activity holding the fragment has been restarted
+                        // so it usually looks odd if the toolbar now shows
+                        binding.subredditAppBarLayout.setExpanded(false, false)
+                    }
+                }
+            })
+
+            onLoadingCountChange().observe(viewLifecycleOwner, { up -> _binding?.loadingIcon?.onCountChange(up) })
+            getError().observe(viewLifecycleOwner, { error ->
+                run {
+                    // Error loading posts, reset onEndOfList so it tries again when scrolled
+                    postsScrollListener?.resetOnEndOfList()
+                    handleErrors(error.error, error.throwable)
+                }
+            })
+        }
     }
 
 
@@ -597,13 +620,18 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         CoroutineScope(IO).launch {
             when (val response = api.subreddit(subredditName).rules()) {
                 is ApiResponse.Success -> {
+                    rulesLoaded = true
+                    val rules = response.value.sortedBy { it.priority }
+
+                    database.rules().insertAll(rules)
+
                     withContext(Main) {
                         binding.subredditInfo.rulesloadingIcon.onCountChange(false)
 
                         // Update drawer
                         _binding?.let {
                             // It seems like rules are always sorted by the priority, but just to be sure
-                            updateRules(response.value.sortedBy { it.priority })
+                          //  updateRules(response.value.sortedBy { it.priority })
                         }
                     }
                 }
@@ -618,17 +646,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     }
 
     /**
-     * Updates the subreddit rules in the drawer
+     * Observes the subreddits rules from the local database
      */
-    private fun updateRules(rules: List<SubredditRule>) {
-        with(binding) {
-            val rulesAdapter = SubredditRulesAdapter().apply { submitList(rules) }
-            val layoutManager = LinearLayoutManager(context)
-
-            subredditInfo.rules.adapter = rulesAdapter
-            subredditInfo.rules.layoutManager = layoutManager
-
-        //    rulesAdapter.submitList(rules)
+    private fun observeRules() {
+        database.rules().getAllRules(getSubredditName()).observe(viewLifecycleOwner) {
+            rulesAdapter.submitList(it)
         }
     }
 

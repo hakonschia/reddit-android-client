@@ -9,17 +9,19 @@ import androidx.room.RoomDatabase;
 import com.example.hakonsreader.api.model.RedditMessage;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
+import com.example.hakonsreader.api.model.SubredditRule;
 
 /**
  * The global database for the application, holds {@link RedditPost} and {@link Subreddit} entities
  */
-@Database(entities = {RedditPost.class, Subreddit.class, RedditMessage.class}, version = 14)
+@Database(entities = {RedditPost.class, Subreddit.class, SubredditRule.class, RedditMessage.class}, version = 15)
 public abstract class RedditDatabase extends RoomDatabase {
 
     private static RedditDatabase instance;
     public abstract RedditPostsDao posts();
     public abstract RedditSubredditsDao subreddits();
     public abstract RedditMessagesDao messages();
+    public abstract RedditSubredditRulesDao rules();
 
 
     /**

@@ -3,10 +3,13 @@ package com.example.hakonsreader.recyclerviewadapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.SubredditRule
 import com.example.hakonsreader.databinding.ListItemSubredditRuleBinding
+import com.example.hakonsreader.recyclerviewadapters.diffutils.SubredditRulesDiffCallback
+import com.example.hakonsreader.recyclerviewadapters.diffutils.SubredditsDiffCallback
 import com.example.hakonsreader.views.ListDivider
 
 /**
@@ -16,9 +19,16 @@ class SubredditRulesAdapter : RecyclerView.Adapter<SubredditRulesAdapter.ViewHol
 
     private var rules: List<SubredditRule> = ArrayList()
 
-    fun submitList(rules: List<SubredditRule>) {
-        this.rules = rules
-        notifyDataSetChanged()
+    fun submitList(list: List<SubredditRule>) {
+        val previous = rules
+
+        val diffResults = DiffUtil.calculateDiff(
+                SubredditRulesDiffCallback(previous, list),
+                true
+        )
+
+        rules = list
+        diffResults.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
