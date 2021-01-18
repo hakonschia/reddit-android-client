@@ -121,8 +121,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var postsLayoutManager: LinearLayoutManager? = null
     private var postsScrollListener: PostScrollListener? = null
 
-    private val rulesAdapter = SubredditRulesAdapter()
-    private val rulesLayoutManager = LinearLayoutManager(context)
+    private var rulesAdapter: SubredditRulesAdapter? = null
+    private var rulesLayoutManager: LinearLayoutManager? = null
     /**
      * True if the rules for the subreddit has been loaded during this fragment
      */
@@ -410,10 +410,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     }
 
     private fun setupRulesList() {
-        with(binding){
-            subredditInfo.rules.adapter = rulesAdapter
-            subredditInfo.rules.layoutManager = rulesLayoutManager
-        }
+        rulesAdapter = SubredditRulesAdapter().apply { binding.subredditInfo.rules.adapter = this }
+        rulesLayoutManager = LinearLayoutManager(context).apply { binding.subredditInfo.rules.layoutManager = this }
     }
 
     /**
@@ -650,7 +648,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     private fun observeRules() {
         database.rules().getAllRules(getSubredditName()).observe(viewLifecycleOwner) {
-            rulesAdapter.submitList(it)
+            rulesAdapter?.submitList(it)
         }
     }
 
