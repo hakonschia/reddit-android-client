@@ -210,30 +210,32 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // This is kinda hacky, but it looks weird if the "No comments yet" appears before the comments
-        // have had a chance to load
-        binding.noComments = false
-        binding.commentChainShown = false
+        with(binding) {
+            // This is kinda hacky, but it looks weird if the "No comments yet" appears before the comments
+            // have had a chance to load
+            noComments = false
+            commentChainShown = false
 
-        binding.post.setMaxHeight(maxPostHeight)
-        binding.post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
+            post.setMaxHeight(maxPostHeight)
+            post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
 
-        // Go to first/last comment on long clicks on navigation buttons
-        binding.goToNextTopLevelComment.setOnLongClickListener(this::goToLastComment)
-        binding.goToPreviousTopLevelComment.setOnLongClickListener(this::goToFirstComment)
+            // Go to first/last comment on long clicks on navigation buttons
+            goToNextTopLevelComment.setOnLongClickListener(this@PostActivity::goToLastComment)
+            goToPreviousTopLevelComment.setOnLongClickListener(this@PostActivity::goToFirstComment)
 
-        binding.commentsSwipeRefresh.setOnRefreshListener {
-            // We're using our own loading icon, so remove this
-            binding.commentsSwipeRefresh.isRefreshing = false
-            commentsViewModel?.restart()
+            commentsSwipeRefresh.setOnRefreshListener {
+                // We're using our own loading icon, so remove this
+                commentsSwipeRefresh.isRefreshing = false
+                commentsViewModel?.restart()
+            }
+            commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(
+                    ContextCompat.getColor(this@PostActivity, R.color.colorAccent)
+            )
+
+            parentLayout.setTransitionListener(transitionListener)
+
+            expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
         }
-        binding.commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(
-                ContextCompat.getColor(this, R.color.colorAccent)
-        )
-
-        binding.parentLayout.setTransitionListener(transitionListener)
-
-        binding.expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
 
         // TODO if it should collapse by default it should also update the height so that is set
         //  which probably causes issues when we go back? Since it probably doesnt have the correct "previous" value set
@@ -247,10 +249,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      * Sets up [commentsViewModel]
      */
     private fun setupCommentsViewModel() {
-        commentsViewModel = ViewModelProvider(this).get(CommentsViewModel::class.java)
-
-        commentsViewModel?.let {
-            it.getPost().observe(this, { newPost ->
+        commentsViewModel = ViewModelProvider(this).get(CommentsViewModel::class.java).apply {
+            getPost().observe(this@PostActivity, { newPost ->
                 val postPreviouslySet = binding.post.redditPost != null
                 post = newPost
 
@@ -262,7 +262,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
                 }
             })
 
-            it.getComments().observe(this, { comments ->
+            getComments().observe(this@PostActivity, { comments ->
                 // New comments are empty, previous comments are not, clear the previous comments
                 if (comments.isEmpty() && commentsAdapter?.itemCount != 0) {
                     commentsAdapter?.clearComments()
@@ -284,11 +284,12 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
                 binding.noComments = comments.isEmpty()
             })
 
-            it.onLoadingCountChange().observe(this, { up -> binding.loadingIcon.onCountChange(up) })
-            it.getError().observe(this, { error ->
+            onLoadingCountChange().observe(this@PostActivity, { up -> binding.loadingIcon.onCountChange(up) })
+            getError().observe(this@PostActivity, { error ->
                 Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
             })
         }
+
     }
 
     /**

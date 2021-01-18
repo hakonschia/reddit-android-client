@@ -32,13 +32,13 @@ class ImageActivity : AppCompatActivity() {
     }
 
     private var slidrInterface: SlidrInterface? = null
-    private var binding: ActivityImageBinding? = null
+    private lateinit var binding: ActivityImageBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityImageBinding.inflate(layoutInflater)
-        setContentView(binding?.root)
+        setContentView(binding.root)
 
         // The color retrieved is "0x<alpha><red><green><blue>" (each one byte, 8 bits)
         val color = getColor(R.color.imageVideoActivityBackground)
@@ -64,23 +64,23 @@ class ImageActivity : AppCompatActivity() {
             }
             var imageUrl = data.getString(IMAGE_URL)
 
-            val attacher: PhotoViewAttacher = binding?.image?.attacher!!
+            val attacher: PhotoViewAttacher = binding.image.attacher
             attacher.maximumScale = 7f
 
-            binding?.image?.setOnDoubleTapListener(PhotoViewDoubleTapListener(attacher, slidrInterface))
+            binding.image.setOnDoubleTapListener(PhotoViewDoubleTapListener(attacher, slidrInterface))
             imageUrl = LinkUtils.convertToDirectUrl(imageUrl)
-            binding?.loadingIcon?.onCountChange(true)
+            binding.loadingIcon.onCountChange(true)
 
             Picasso.get()
                     .load(imageUrl)
                     .resize(App.get().screenWidth, 0)
-                    .into(binding?.image, object : Callback {
+                    .into(binding.image, object : Callback {
                         override fun onSuccess() {
-                            binding?.loadingIcon?.onCountChange(false)
+                            binding.loadingIcon.onCountChange(false)
                         }
 
                         override fun onError(e: Exception) {
-                            binding?.loadingIcon?.onCountChange(false)
+                            binding.loadingIcon.onCountChange(false)
                             e.printStackTrace()
                             AlertDialog.Builder(this@ImageActivity)
                                     .setTitle(R.string.imageLoadFailedDialogTitle)
@@ -92,11 +92,6 @@ class ImageActivity : AppCompatActivity() {
         } else {
             finish()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
     }
 
     override fun finish() {

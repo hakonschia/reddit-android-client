@@ -42,11 +42,9 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
      *
      * @param list The list of items to display
      * @param sort If set to true the list will be sorted in the following order:
-     *          <ol>
-     *              <li>Favorites (for logged in users)</li>
-     *               <li>The rest of the subreddits</li>
-     *               <li>Users the user is following</li>
-     *          </ol>
+     * - Favorites (for logged in users)
+     * - The rest of the subreddits
+     * - Users the user is following
      */
     fun submitList(list: MutableList<Subreddit>, sort: Boolean) {
         val previous = subreddits
@@ -106,12 +104,12 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
         sorted.removeAll(favorites)
         sorted.removeAll(users)
 
-        val combined = ArrayList<Subreddit>()
-        combined.addAll(favorites)
-        combined.addAll(sorted)
-        combined.addAll(users)
-
-        return combined
+        // Return all combined in the correct order
+        return ArrayList<Subreddit>().apply {
+            addAll(favorites)
+            addAll(sorted)
+            addAll(users)
+        }
     }
 
     /**
@@ -184,22 +182,24 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val sub = subreddits[position]
 
-        holder.binding.name.text = sub.name
-        App.get().markwon.setMarkdown(holder.binding.subredditDescription, sub.publicDescription)
-        ViewUtil.setSubredditIcon(holder.binding.icon, sub)
+        with(holder.binding) {
+            name.text = sub.name
+            App.get().markwon.setMarkdown(subredditDescription, sub.publicDescription)
+            ViewUtil.setSubredditIcon(icon, sub)
 
-        // You can only favorite subs you are subscribed to
-        holder.binding.favoriteSub.visibility = if (sub.isSubscribed) {
-            holder.updateFavorited(sub.isFavorited)
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+            // You can only favorite subs you are subscribed to
+            favoriteSub.visibility = if (sub.isSubscribed) {
+                holder.updateFavorited(sub.isFavorited)
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
 
-        holder.binding.nsfwTag.visibility = if (sub.isNsfw) {
-            View.VISIBLE
-        } else {
-            View.GONE
+            nsfwTag.visibility = if (sub.isNsfw) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
         }
     }
 
@@ -213,36 +213,39 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
         return ViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = subreddits.size
+    override fun getItemCount() = subreddits.size
 
 
     inner class ViewHolder(val binding: ListItemSubredditBinding) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            // The listener must be set on both the root view and the description since the description
-            // has movement method and we have to check if the description is clicked on a link
-            binding.root.setOnClickListener {
-                val pos = adapterPosition
+            with(binding) {
+                // The listener must be set on both the root view and the description since the description
+                // has movement method and we have to check if the description is clicked on a link
+                root.setOnClickListener {
+                    val pos = adapterPosition
 
-                if (pos != RecyclerView.NO_POSITION) {
-                    subredditSelected?.subredditSelected(subreddits[pos].name)
+                    if (pos != RecyclerView.NO_POSITION) {
+                        subredditSelected?.subredditSelected(subreddits[pos].name)
+                    }
                 }
-            }
-            binding.subredditDescription.setOnClickListener {
-                val pos = adapterPosition
 
-                if (pos != RecyclerView.NO_POSITION &&
-                        binding.subredditDescription.selectionStart == -1 &&
-                        binding.subredditDescription.selectionEnd == -1
-                ) {
-                    subredditSelected?.subredditSelected(subreddits[pos].name)
+                subredditDescription.setOnClickListener {
+                    val pos = adapterPosition
+                    if (pos != RecyclerView.NO_POSITION &&
+                            subredditDescription.selectionStart == -1 &&
+                            subredditDescription.selectionEnd == -1
+                    ) {
+                        subredditSelected?.subredditSelected(subreddits[pos].name)
+                    }
                 }
-            }
-            binding.favoriteSub.setOnClickListener {
-                val pos = adapterPosition
 
-                if (pos != RecyclerView.NO_POSITION) {
-                    favoriteClicked?.onClick(subreddits[pos])
+                favoriteSub.setOnClickListener {
+                    val pos = adapterPosition
+
+                    if (pos != RecyclerView.NO_POSITION) {
+                        favoriteClicked?.onClick(subreddits[pos])
+                    }
                 }
             }
         }

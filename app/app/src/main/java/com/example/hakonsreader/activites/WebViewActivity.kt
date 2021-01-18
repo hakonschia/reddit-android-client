@@ -47,58 +47,62 @@ class WebViewActivity : AppCompatActivity() {
             return
         }
 
-        binding.webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                val uri = request.url
-                binding.webViewUrl.text = uri.toString()
-                return super.shouldOverrideUrlLoading(view, request)
-            }
-        }
-        binding.webView.webChromeClient = object : WebChromeClient() {
-            override fun onProgressChanged(view: WebView, newProgress: Int) {
-                super.onProgressChanged(view, newProgress)
-
-                // Animate the progress change
-                val oldProgress = binding.progressBar.progress
-                binding.progressBar.progress = newProgress
-
-                // If the old progress is 100 don't animate the change, as it would go from completely full
-                // to whatever the new progress is, which makes it go backwards which looks weird
-                if (oldProgress != 100) {
-                    val animation = ObjectAnimator.ofInt(binding.progressBar, "progress", oldProgress, newProgress)
-                    animation.duration = 150
-                    animation.interpolator = LinearInterpolator()
-                    animation.start()
-                }
-
-                // Finished loading, fade the progress bar out so that it's visible that it finishes
-                if (newProgress == 100) {
-                    binding.progressBar.animate().setDuration(500).alpha(0f).start()
-                } else {
-                    binding.progressBar.alpha = 1f
-                    binding.progressBar.visibility = View.VISIBLE
+        with (binding) {
+            webView.webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                    val uri = request.url
+                    webViewUrl.text = uri.toString()
+                    return super.shouldOverrideUrlLoading(view, request)
                 }
             }
-        }
-        val webViewSettings = binding?.webView?.settings!!
-        webViewSettings.javaScriptEnabled = true
-        // Some websites wont load without this enabled (such as imgur albums)
-        webViewSettings.domStorageEnabled = true
-        webViewSettings.displayZoomControls = false
-        webViewSettings.builtInZoomControls = true
+            webView.webChromeClient = object : WebChromeClient() {
+                override fun onProgressChanged(view: WebView, newProgress: Int) {
+                    super.onProgressChanged(view, newProgress)
 
-        binding.webView.loadUrl(url)
-        binding.webViewUrl.text = url
+                    // Animate the progress change
+                    val oldProgress = progressBar.progress
+                    progressBar.progress = newProgress
 
-        // Close the web view (ie. finish the activity) with the button in the toolbar
-        binding.webViewClose.setOnClickListener { v -> finish() }
-        binding.webViewMenu.setOnClickListener { view: View -> openMenu(view) }
+                    // If the old progress is 100 don't animate the change, as it would go from completely full
+                    // to whatever the new progress is, which makes it go backwards which looks weird
+                    if (oldProgress != 100) {
+                        val animation = ObjectAnimator.ofInt(progressBar, "progress", oldProgress, newProgress)
+                        animation.duration = 150
+                        animation.interpolator = LinearInterpolator()
+                        animation.start()
+                    }
 
-        binding.refreshWebView.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this, R.color.colorAccent))
-        binding.refreshWebView.setOnRefreshListener {
-            binding.webView.reload()
-            // The progress bar will show the progress so we don't need the refresh icon
-            binding.refreshWebView.isRefreshing = false
+                    // Finished loading, fade the progress bar out so that it's visible that it finishes
+                    if (newProgress == 100) {
+                        progressBar.animate().setDuration(500).alpha(0f).start()
+                    } else {
+                        progressBar.alpha = 1f
+                        progressBar.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            webView.settings.run {
+                javaScriptEnabled = true
+                // Some websites wont load without this enabled (such as imgur albums)
+                domStorageEnabled = true
+                displayZoomControls = false
+                builtInZoomControls = true
+            }
+
+            webView.loadUrl(url)
+            webViewUrl.text = url
+
+            // Close the web view (ie. finish the activity) with the button in the toolbar
+            webViewClose.setOnClickListener { v -> finish() }
+            webViewMenu.setOnClickListener { view: View -> openMenu(view) }
+
+            refreshWebView.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this@WebViewActivity, R.color.colorAccent))
+            refreshWebView.setOnRefreshListener {
+                webView.reload()
+                // The progress bar will show the progress so we don't need the refresh icon
+                refreshWebView.isRefreshing = false
+            }
         }
     }
 

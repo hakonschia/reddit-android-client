@@ -434,7 +434,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
         }
 
         // Could be null, but that's something we would want to discover when debugging
-        loadMoreCommentsListener!!.loadMoreComments(comment, parent)
+        loadMoreCommentsListener?.loadMoreComments(comment, parent)
     }
 
     /**
@@ -476,25 +476,22 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
 
         return when (viewType) {
             MORE_COMMENTS_TYPE -> {
-                val binding = ListItemMoreCommentBinding.inflate(layoutInflater, parent, false).apply {
+                MoreCommentsViewHolder(ListItemMoreCommentBinding.inflate(layoutInflater, parent, false).apply {
                     adapter = this@CommentsAdapter
-                }
-                MoreCommentsViewHolder(binding)
+                })
             }
             HIDDEN_COMMENT_TYPE -> {
-                val binding = ListItemHiddenCommentBinding.inflate(layoutInflater, parent, false).apply {
+                HiddenCommentViewHolder(ListItemHiddenCommentBinding.inflate(layoutInflater, parent, false).apply {
                     adapter = this@CommentsAdapter
-                }
-                HiddenCommentViewHolder(binding)
+                })
             }
             else -> {
-                val binding = ListItemCommentBinding.inflate(layoutInflater, parent, false).apply {
+                NormalCommentViewHolder(ListItemCommentBinding.inflate(layoutInflater, parent, false).apply {
                     adapter = this@CommentsAdapter
                     post = post
                     onReportsIgnoreChange =  OnReportsIgnoreChangeListener { invalidateAll() }
                     showPeekParentButton = App.get().showPeekParentButtonInComments()
-                }
-                NormalCommentViewHolder(binding)
+                })
             }
         }
     }
@@ -534,26 +531,28 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
          * @param highlight True if the comment should have a slight highlight around it
          */
         fun bind(comment: RedditComment, highlight: Boolean, byLoggedInUser: Boolean) {
-            binding.comment = comment
-            binding.highlight = highlight
-            binding.isByLoggedInUser = byLoggedInUser
-            binding.awards.listing = comment
+            with(binding) {
+                this.comment = comment
+                this.highlight = highlight
+                isByLoggedInUser = byLoggedInUser
+                awards.listing = comment
 
-            // If the ticker has animation enabled it will animate from the previous comment to this one
-            // which is very weird behaviour, so disable the animation and enable it again when we have set the comment
-            binding.commentVoteBar.enableTickerAnimation(false)
-            binding.commentVoteBar.listing = comment
-            binding.commentVoteBar.enableTickerAnimation(true)
+                // If the ticker has animation enabled it will animate from the previous comment to this one
+                // which is very weird behaviour, so disable the animation and enable it again when we have set the comment
+                commentVoteBar.enableTickerAnimation(false)
+                commentVoteBar.listing = comment
+                commentVoteBar.enableTickerAnimation(true)
 
-            // Execute all the bindings now, or else scrolling/changes to the dataset will have a
-            // small, but noticeable delay, causing the old comment to still appear
-            // This needs to be called before the link previews are added, since the previews use
-            // the spans set with Markwon, and it might not (and probably wont) be set before the previews are added
-            binding.executePendingBindings()
+                // Execute all the bindings now, or else scrolling/changes to the dataset will have a
+                // small, but noticeable delay, causing the old comment to still appear
+                // This needs to be called before the link previews are added, since the previews use
+                // the spans set with Markwon, and it might not (and probably wont) be set before the previews are added
+                executePendingBindings()
 
-            if (App.get().showLinkPreview()) {
-                showLinkPreviews()
-                binding.executePendingBindings()
+                if (App.get().showLinkPreview()) {
+                    showLinkPreviews()
+                    executePendingBindings()
+                }
             }
         }
 
@@ -610,13 +609,13 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
                     return@forEach
                 }
 
-                val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                val linkPreview = LinkPreview(binding.root.context)
-                linkPreview.layoutParams = layoutParams
-                linkPreview.setText(text)
-                linkPreview.setLink(url)
+                LinkPreview(binding.root.context).run {
+                    layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    setText(text)
+                    setLink(url)
 
-                binding.linkPreviews.addView(linkPreview)
+                    binding.linkPreviews.addView(this)
+                }
             }
         }
     }
@@ -626,14 +625,15 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
      */
     inner class HiddenCommentViewHolder(private val binding: ListItemHiddenCommentBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(comment: RedditComment, highlight: Boolean, byLoggedInUser: Boolean) {
-            binding.root.setOnClickListener {
-                showComments(comment)
+            with(binding) {
+                root.setOnClickListener {
+                    showComments(comment)
+                }
+                this.comment = comment
+                this.highlight = highlight
+                isByLoggedInUser = byLoggedInUser
+                executePendingBindings()
             }
-
-            binding.comment = comment
-            binding.highlight = highlight
-            binding.isByLoggedInUser = byLoggedInUser
-            binding.executePendingBindings()
         }
     }
 
@@ -643,8 +643,10 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
      */
     inner class MoreCommentsViewHolder(private val binding: ListItemMoreCommentBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(comment: RedditComment?) {
-            binding.comment = comment
-            binding.executePendingBindings()
+            with(binding) {
+                this.comment = comment
+                executePendingBindings()
+            }
         }
     }
 }
@@ -751,39 +753,38 @@ private fun addOneColoredSidebar(barrier: Barrier, depth: Int) {
         previousSidebars[0]
     } else {
         // Create the view
-        val id = View.generateViewId()
-        val v = View(barrier.context)
-        v.id = id
-        v.contentDescription = contentDescription
-        // Use a drawable for rounded corners, although this makes the sidebars of same depth
-        // with a tiny gap
-        v.background = ContextCompat.getDrawable(barrier.context, R.drawable.comment_sidebar_one_sidebar_background)
-        parent.addView(v)
-
-        v
+        View(barrier.context).apply {
+            id = View.generateViewId()
+            this.contentDescription = contentDescription
+            // Use a drawable for rounded corners, although this makes the sidebars of same depth
+            // with a tiny gap
+            background = ContextCompat.getDrawable(barrier.context, R.drawable.comment_sidebar_one_sidebar_background)
+            parent.addView(this)
+        }
     }
 
     // Set constraints
-    val constraintSet = ConstraintSet()
-    constraintSet.clone(parent)
+    ConstraintSet().apply {
+        clone(parent)
 
-    // Set width of the view
-    constraintSet.constrainWidth(view.id, barWidth)
-    constraintSet.constrainHeight(view.id, 0)
+        // Set width of the view
+        constrainWidth(view.id, barWidth)
+        constrainHeight(view.id, 0)
 
-    // start_toStartOf=parent, margin_start = indent*depth
-    constraintSet.connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, indent * depth)
+        // start_toStartOf=parent, margin_start = indent*depth
+        connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, indent * depth)
 
-    // end_toEndOf=barrier
-    constraintSet.connect(view.id, ConstraintSet.END, barrier.id, ConstraintSet.END, barMargin)
+        // end_toEndOf=barrier
+        connect(view.id, ConstraintSet.END, barrier.id, ConstraintSet.END, barMargin)
 
-    // bottom_toBottomOf=parent
-    constraintSet.connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-    // top_toTopOf=parent
-    constraintSet.connect(view.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+        // bottom_toBottomOf=parent
+        connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+        // top_toTopOf=parent
+        connect(view.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
 
-    // Apply all the constraints
-    constraintSet.applyTo(parent)
+        // Apply all the constraints
+        applyTo(parent)
+    }
 
     val referencedIds = IntArray(1)
     referencedIds[0] = view.id
@@ -814,7 +815,7 @@ private fun addAllSidebars(barrier: Barrier, depth: Int) {
     when {
         // Top level comments don't have sidebars, remove all previous
         depth == 0 -> {
-            previousSidebars.forEach{ view: View -> parent.removeView(view) }
+            previousSidebars.forEach{ parent.removeView(it) }
             // If the barrier doesn't have any views referenced to it hidden comments will
             // expand out from the right side, so ensure it has something referenced
             barrier.referencedIds = intArrayOf(R.id.emptyView)
@@ -937,8 +938,9 @@ private fun removeSidebarsOverflow(sideBars: MutableList<View>, parent: Constrai
     val lastSideBar = sideBars[sideBars.size - 1]
 
     // Set constraints
-    val constraintSet = ConstraintSet()
-    constraintSet.clone(parent)
-    constraintSet.connect(lastSideBar.id, ConstraintSet.END, barrier.id, ConstraintSet.END, indent)
-    constraintSet.applyTo(parent)
+    ConstraintSet().run {
+        clone(parent)
+        connect(lastSideBar.id, ConstraintSet.END, barrier.id, ConstraintSet.END, indent)
+        applyTo(parent)
+    }
 }

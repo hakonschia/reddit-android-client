@@ -49,13 +49,13 @@ class ProfileActivity : AppCompatActivity(), LockableSlidr {
             supportFragmentManager.getFragment(savedInstanceState, SAVED_FRAGMENT) as ProfileFragment?
         } else {
             ProfileFragment.newInstance(username)
+        }?.apply {
+            retainInstance = true
+
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.profileContainer, this)
+                    .commit()
         }
-
-        fragment?.retainInstance = true
-
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.profileContainer, fragment!!)
-                .commit()
 
         slidrInterface = Slidr.attach(this)
     }

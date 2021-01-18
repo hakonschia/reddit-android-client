@@ -70,42 +70,20 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
 
         /**
-         * Creates a new ProfileFragment for logged in users
-         *
-         * @return A new ProfileFragment for logged in users
-         */
-        fun newInstance() : ProfileFragment {
-            val args = Bundle()
-            args.putBoolean(IS_LOGGED_IN_USER_KEY, true)
-
-            val fragment = ProfileFragment()
-            fragment.arguments = args
-
-            return fragment
-        }
-
-        /**
          * Create a new ProfileFragment for a user by their username
          *
-         * @param username The username to create the fragment for. If this is equal to "me" or the username
-         *                 stored in SharedPreferences, the fragment will be for the logged in user
-         * @return A ProfileFragment for a user
+         * @param username The username to create the fragment for. If this is null, equal to "me", or the username
+         * stored in SharedPreferences, the fragment will be for the logged in user. Default is `null` (ie. for
+         * the logged in user)
+         * @return A ProfileFragment
          */
-        fun newInstance(username: String) : ProfileFragment {
-            val user = App.storedUser
-            Log.d(TAG, "newInstance: Creating new ProfileFragment for $username")
-
-            if (username == "me" || username.equals(user?.username, ignoreCase = true)) {
-                return newInstance()
+        fun newInstance(username: String? = null) = ProfileFragment().apply {
+            arguments = Bundle().apply {
+                if (username == null || username == "me" || username.equals(App.storedUser?.username, ignoreCase = true)) {
+                    putBoolean(IS_LOGGED_IN_USER_KEY, true)
+                }
+                putString(USERNAME_KEY, username)
             }
-
-            val args = Bundle()
-            args.putString(USERNAME_KEY, username)
-
-            val fragment = ProfileFragment()
-            fragment.arguments = args
-
-            return fragment
         }
     }
 
@@ -340,41 +318,41 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
                 requireContext(),
                 username,
                 true
-        )).get(PostsViewModel::class.java)
+        )).get(PostsViewModel::class.java).apply {
+            getPosts().observe(viewLifecycleOwner, { posts ->
+                postsAdapter?.submitList(posts)
 
-        postsViewModel?.getPosts()?.observe(viewLifecycleOwner, { posts ->
-            postsAdapter?.submitList(posts)
-
-            // Restore state of layout manager if possible
-            if (saveState != null) {
-                val layoutState: Parcelable? = saveState?.getParcelable(LAYOUT_STATE_KEY)
-                if (layoutState != null) {
-                    postsLayoutManager?.onRestoreInstanceState(layoutState)
+                // Restore state of layout manager if possible
+                if (saveState != null) {
+                    val layoutState: Parcelable? = saveState?.getParcelable(LAYOUT_STATE_KEY)
+                    if (layoutState != null) {
+                        postsLayoutManager?.onRestoreInstanceState(layoutState)
+                    }
                 }
-            }
-        })
-        postsViewModel?.getError()?.observe(viewLifecycleOwner, { e ->
-            run {
-                // Error loading posts, reset onEndOfList so it tries again when scrolled
-                postsScrollListener?.resetOnEndOfList()
-                Util.handleGenericResponseErrors(binding?.parentLayout, e.error, e.throwable)
-            }
-        })
-        postsViewModel?.onLoadingCountChange()?.observe(viewLifecycleOwner, { up -> binding?.loadingIcon?.onCountChange(up) })
+            })
+
+            getError().observe(viewLifecycleOwner, { e ->
+                run {
+                    // Error loading posts, reset onEndOfList so it tries again when scrolled
+                    postsScrollListener?.resetOnEndOfList()
+                    Util.handleGenericResponseErrors(binding?.parentLayout, e.error, e.throwable)
+                }
+            })
+
+            onLoadingCountChange().observe(viewLifecycleOwner, { up -> binding?.loadingIcon?.onCountChange(up) })
+        }
     }
 
     /**
      * Sets up [FragmentProfileBinding.posts] and related variables it uses
      */
     private fun setupPostsList() {
-        postsAdapter = PostsAdapter()
-        postsLayoutManager = LinearLayoutManager(requireContext())
+        postsAdapter = PostsAdapter().apply { binding.posts.adapter = this }
+        postsLayoutManager = LinearLayoutManager(requireContext()).apply { binding.posts.layoutManager = this }
 
-        binding.posts.adapter = postsAdapter
-        binding.posts.layoutManager = postsLayoutManager
-
-        postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }
-        binding.posts.setOnScrollChangeListener(postsScrollListener)
+        postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }.apply {
+            binding.posts.setOnScrollChangeListener(this)
+        }
 
         postsAdapter?.setOnPostClicked { post ->
             // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
@@ -422,13 +400,13 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
             withContext(Main) {
                 // In case the view has been destroyed before we get a response
-                if (_binding != null) {
-                    binding.loadingIcon.onCountChange(false)
+                _binding?.let {
+                    it.loadingIcon.onCountChange(false)
 
                     when (userResponse) {
                         is ApiResponse.Success -> onUserResponse(userResponse.value)
                         is ApiResponse.Error -> {
-                            Util.handleGenericResponseErrors(binding.parentLayout, userResponse.error, userResponse.throwable)
+                            Util.handleGenericResponseErrors(it.parentLayout, userResponse.error, userResponse.throwable)
                         }
                     }
                 }

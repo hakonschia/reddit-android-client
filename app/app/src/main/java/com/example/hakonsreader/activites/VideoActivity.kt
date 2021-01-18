@@ -35,8 +35,6 @@ class VideoActivity : AppCompatActivity() {
         const val EXTRAS = "extras"
     }
 
-    private var content: ContentVideo? = null
-
     private lateinit var videoPlayer: VideoPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +53,7 @@ class VideoActivity : AppCompatActivity() {
             }
 
             // Restore from the saved state if possible
-            val extras: Bundle = if (savedInstanceState != null) {
+            val extras = if (savedInstanceState != null) {
                 savedInstanceState.getBundle(EXTRAS)
             } else {
                 data.getBundle(EXTRAS)
@@ -65,12 +63,14 @@ class VideoActivity : AppCompatActivity() {
                 extras.putBoolean(VideoPlayer.EXTRA_VOLUME, true)
             }
 
-            videoPlayer.dashVideo = extras.getBoolean(VideoPlayer.EXTRA_IS_DASH)
-            videoPlayer.url = extras.getString(VideoPlayer.EXTRA_URL) ?: ""
-            videoPlayer.setExtras(extras)
+            videoPlayer.run {
+                dashVideo = extras.getBoolean(VideoPlayer.EXTRA_IS_DASH)
+                url = extras.getString(VideoPlayer.EXTRA_URL) ?: ""
+                setExtras(extras)
 
-            videoPlayer.fitScreen()
-            videoPlayer.play()
+                fitScreen()
+                play()
+            }
         } else {
             finish()
         }
