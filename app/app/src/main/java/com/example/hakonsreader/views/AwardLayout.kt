@@ -26,7 +26,7 @@ class AwardLayout : FrameLayout {
         private const val TAG = "AwardLayout"
     }
 
-    private val binding: AwardLayoutBinding = AwardLayoutBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding = AwardLayoutBinding.inflate(LayoutInflater.from(context), this, true)
 
     /**
      * The awardable listing to display in this layout

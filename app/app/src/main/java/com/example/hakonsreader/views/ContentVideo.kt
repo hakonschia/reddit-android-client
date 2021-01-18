@@ -35,20 +35,12 @@ class ContentVideo : Content {
         }
     }
 
-    private val player: VideoPlayer
+    private val player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
 
-    constructor(context: Context?) : super(context) {
-        player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
-    }
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
-    }
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
-    }
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
-    }
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun updateView() {
         setThumbnailUrl()

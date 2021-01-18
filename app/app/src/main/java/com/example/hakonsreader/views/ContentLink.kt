@@ -22,20 +22,12 @@ import com.squareup.picasso.Picasso
 
 class ContentLink : Content {
 
-    val binding: ViewBinding
+    val binding: ViewBinding = getCorrectBinding()
 
-    constructor(context: Context?) : super(context) {
-        binding = getCorrectBinding()
-    }
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        binding = getCorrectBinding()
-    }
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        binding = getCorrectBinding()
-    }
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-         binding = getCorrectBinding()
-    }
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     /**
      * Retrieves and inflates the correct binding to use for the layout based on the users

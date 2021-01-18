@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.VideoYoutubeActivity
 import com.example.hakonsreader.api.model.Image
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentYoutubeVideoBinding
 import com.squareup.picasso.Picasso
 
@@ -18,20 +19,12 @@ class ContentYoutubeVideo : Content {
     // The Youtube player library uses a WebView, which when used in a RecyclerView with many views
     // makes it extremely laggy
 
-    private val binding: ContentYoutubeVideoBinding
+    private val binding: ContentYoutubeVideoBinding = ContentYoutubeVideoBinding.inflate(LayoutInflater.from(context), this, true)
 
-    constructor(context: Context?) : super(context) {
-        binding = ContentYoutubeVideoBinding.inflate(LayoutInflater.from(context), this, true)
-    }
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        binding = ContentYoutubeVideoBinding.inflate(LayoutInflater.from(context), this, true)
-    }
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        binding = ContentYoutubeVideoBinding.inflate(LayoutInflater.from(context), this, true)
-    }
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        binding = ContentYoutubeVideoBinding.inflate(LayoutInflater.from(context), this, true)
-    }
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun updateView() {
         // The previews will (I believe) never be above 1080p, and that should be fine for most devices
@@ -69,7 +62,7 @@ class ContentYoutubeVideo : Content {
     }
 
     /**
-     * Returns the video ID of the post
+     * Returns the video ID of the post based on [RedditPost.url]
      */
     private fun getVideoId() : String? {
         val asUri = Uri.parse(redditPost.url)
@@ -84,7 +77,7 @@ class ContentYoutubeVideo : Content {
     }
 
     /**
-     * Returns the video ID of the post
+     * Returns the timestamp of the video based on [RedditPost.url]
      */
     private fun getTimestamp() : Float {
         val asUri = Uri.parse(redditPost.url)

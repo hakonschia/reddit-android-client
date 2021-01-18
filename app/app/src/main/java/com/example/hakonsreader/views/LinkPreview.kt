@@ -32,12 +32,12 @@ class LinkPreview : FrameLayout {
         private const val TAG = "LinkPreview"
     }
 
-    private val binding: LinkPreviewBinding = LinkPreviewBinding.inflate(LayoutInflater.from(context), this, true).also {
+    private val binding = LinkPreviewBinding.inflate(LayoutInflater.from(context), this, true).apply {
         setOnClickListener { openLink() }
         setOnLongClickListener { copyLink(); return@setOnLongClickListener true }
 
         if (!App.get().showEntireLinkInLinkPreview()) {
-            it.linkLink.maxLines = 1
+            linkLink.maxLines = 1
         }
     }
 

@@ -29,7 +29,13 @@ class VoteBar : FrameLayout {
     //  and cast another vote it will be unsynced since it doesn't update the post in the list of posts
     //  Not really relevant to this class, but putting it here as a reminder
 
-    private lateinit var binding: VoteBarBinding
+    private val binding = VoteBarBinding.inflate(LayoutInflater.from(context), this, true).apply {
+        upvote.setOnClickListener { vote(VoteType.UPVOTE) }
+        downvote.setOnClickListener { vote(VoteType.DOWNVOTE) }
+        score.setCharacterLists(TickerUtils.provideAlphabeticalList(), TickerUtils.provideNumberList())
+    }
+
+
     var hideScore = false
     var listing: VoteableListing? = null
         set(value) {
@@ -37,28 +43,11 @@ class VoteBar : FrameLayout {
             updateVoteStatus()
         }
 
-    constructor(context: Context) : super(context) {
-        this.setupBinding()
-    }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        this.setupBinding()
-    }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        this.setupBinding()
-    }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        this.setupBinding()
-    }
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    private fun setupBinding() {
-        binding = VoteBarBinding.inflate(LayoutInflater.from(context), this, true)
-
-        binding.upvote.setOnClickListener { this.vote(VoteType.UPVOTE) }
-        binding.downvote.setOnClickListener { this.vote(VoteType.DOWNVOTE) }
-
-        // Include both in case it goes from "9999" to "10K"
-        binding.score.setCharacterLists(TickerUtils.provideAlphabeticalList(), TickerUtils.provideNumberList())
-    }
 
     /**
      * Sends a request to vote on the listing

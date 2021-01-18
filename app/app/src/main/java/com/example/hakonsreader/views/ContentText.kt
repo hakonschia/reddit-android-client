@@ -14,17 +14,11 @@ import com.example.hakonsreader.misc.InternalLinkMovementMethod
  */
 class ContentText : Content {
 
-    val binding: ContentTextBinding
+    val binding = ContentTextBinding.inflate(LayoutInflater.from(context), this, true)
 
-    constructor(ctx: Context) : super(ctx) {
-        binding = ContentTextBinding.inflate(LayoutInflater.from(ctx), this, true)
-    }
-    constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs) {
-        binding = ContentTextBinding.inflate(LayoutInflater.from(ctx), this, true)
-    }
-    constructor(ctx: Context, attrs: AttributeSet, defStyleAttr: Int) : super(ctx, attrs, defStyleAttr) {
-        binding = ContentTextBinding.inflate(LayoutInflater.from(ctx), this, true)
-    }
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     override fun updateView() {
         var markdown: String = redditPost.selftext
