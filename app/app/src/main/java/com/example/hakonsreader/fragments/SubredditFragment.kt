@@ -360,6 +360,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             // Ignore post when scrolling if manually paused
             postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
         }
+        postsAdapter?.setVideoFullscreenListener { contentVideo ->
+            // Ignore post when scrolling if it has been fullscreened
+            postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
+        }
 
         postsAdapter?.setOnPostClicked { post ->
             // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't

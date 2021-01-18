@@ -29,6 +29,7 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.enums.PostType;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.PostBinding;
+import com.example.hakonsreader.interfaces.OnVideoFullscreenListener;
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused;
 import com.squareup.picasso.Callback;
 
@@ -56,6 +57,8 @@ public class Post extends Content {
     private Callback imageLoadedCallback;
     @Nullable
     private OnVideoManuallyPaused onVideoManuallyPaused;
+    @Nullable
+    private OnVideoFullscreenListener videoFullscreenListener;
 
     private ViewTreeObserver.OnGlobalLayoutListener contentOnGlobalLayoutListener;
 
@@ -83,6 +86,15 @@ public class Post extends Content {
      */
     public void setOnVideoPostPaused(@Nullable OnVideoManuallyPaused onVideoManuallyPaused) {
         this.onVideoManuallyPaused = onVideoManuallyPaused;
+    }
+
+    /**
+     * Sets the callback for when a video post has been manually paused
+     *
+     * @param videoFullscreenListener The callback
+     */
+    public void setVideoFullscreenListener(@Nullable OnVideoFullscreenListener videoFullscreenListener) {
+        this.videoFullscreenListener = videoFullscreenListener;
     }
 
     /**
@@ -335,6 +347,7 @@ public class Post extends Content {
                 if (ContentVideo.Companion.isRedditPostVideoPlayable(post)) {
                     content = new ContentVideo(context);
                     ((ContentVideo)content).setOnVideoManuallyPaused(onVideoManuallyPaused);
+                    ((ContentVideo)content).setOnVideoFullscreenListener(videoFullscreenListener);
                 } else if (App.Companion.get().openYouTubeVideosInApp()
                         && (redditPost.getDomain().equals("youtu.be") || redditPost.getDomain().equals("youtube.com"))) {
                     content = new ContentYoutubeVideo(context);

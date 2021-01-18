@@ -246,6 +246,12 @@ class VideoPlayer : PlayerView {
     var onManuallyPaused: Runnable? = null
 
     /**
+     * Callback for when a video has entered fullscreen
+     */
+    var fullScreenListener: Runnable? = null
+
+
+    /**
      * The ExoPlayer displaying the video
      */
     private var exoPlayer = createExoPlayer()
@@ -438,6 +444,8 @@ class VideoPlayer : PlayerView {
         // Open video if we are not in a video activity
         if (context !is VideoActivity) {
             fullscreen.setOnClickListener {
+                fullScreenListener?.run()
+
                 val intent = Intent(context, VideoActivity::class.java)
                 intent.putExtra(VideoActivity.EXTRAS, getExtras())
 

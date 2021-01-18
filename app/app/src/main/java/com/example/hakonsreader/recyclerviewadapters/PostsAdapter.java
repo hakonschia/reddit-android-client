@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.interfaces.OnVideoFullscreenListener;
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused;
 import com.example.hakonsreader.recyclerviewadapters.diffutils.PostsDiffCallback;
 import com.example.hakonsreader.views.ListDivider;
@@ -46,6 +47,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private OnPostClicked onPostClicked;
     @Nullable
     private OnVideoManuallyPaused onVideoManuallyPaused;
+    @Nullable
+    private OnVideoFullscreenListener videoFullscreenListener;
 
     /**
      * Sets the callback for when a video post in the list has been clicked
@@ -63,6 +66,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      */
     public void setOnVideoManuallyPaused(@Nullable OnVideoManuallyPaused onVideoManuallyPaused) {
         this.onVideoManuallyPaused = onVideoManuallyPaused;
+    }
+
+    /**
+     * Sets the callback for when a video post has been manually paused
+     *
+     * @param videoFullscreenListener The callback
+     */
+    public void setVideoFullscreenListener(@Nullable OnVideoFullscreenListener videoFullscreenListener) {
+        this.videoFullscreenListener = videoFullscreenListener;
     }
 
     /**
@@ -205,6 +217,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             post = itemView.findViewById(R.id.post);
 
             post.setOnVideoPostPaused(onVideoManuallyPaused);
+            post.setVideoFullscreenListener(videoFullscreenListener);
 
             // Text posts shouldn't be shown in lists of posts
             post.setShowTextContent(false);

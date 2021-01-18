@@ -14,6 +14,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.thirdparty.ImgurGif
 import com.example.hakonsreader.databinding.ContentVideoBinding
 import com.example.hakonsreader.enums.ShowNsfwPreview
+import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 
 class ContentVideo : Content {
@@ -165,9 +166,21 @@ class ContentVideo : Content {
      */
     fun setOnVideoManuallyPaused(onVideoManuallyPaused: OnVideoManuallyPaused?) {
         player.onManuallyPaused = Runnable {
-            onVideoManuallyPaused?.postPaused(this@ContentVideo)
+            onVideoManuallyPaused?.postPaused(this)
         }
     }
+
+    /**
+     * Sets the callback for when the video post has entered fullscreen
+     *
+     * @param onVideoFullscreenListener The callback
+     */
+    fun setOnVideoFullscreenListener(onVideoFullscreenListener: OnVideoFullscreenListener?) {
+        player.fullScreenListener = Runnable {
+            onVideoFullscreenListener?.onFullscreen(this)
+        }
+    }
+
 
     /**
      * Releases the video to free up its resources
