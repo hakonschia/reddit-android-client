@@ -18,7 +18,8 @@
         app:cardElevation="0dp"
         app:cardCornerRadius="8dp">
 
-        <!-- The award text should always be visible, so this is in a -->
+        <!-- The award text should always be visible, so this is in a ConstraintLayout with
+         the text separate from the awards -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -30,12 +31,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="@{@string/awardsCount(amountOfAwards)}"
+                android:text="@{@plurals/awardsCount(amountOfAwards, amountOfAwards)}"
 
                 android:textColor="@color/secondary_text_color"
                 android:textStyle="bold"
 
-                android:visibility="@{amountOfAwards > 1 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="23 awards" />
@@ -47,6 +47,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constrainedWidth="true"
+                android:scrollbars="none"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp">
 

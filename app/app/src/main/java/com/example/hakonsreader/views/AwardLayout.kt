@@ -83,8 +83,7 @@ class AwardLayout : FrameLayout {
                 binding.container.addView(this)
             }
 
-            // Only show "2 awards" text if there are more than 1 award
-            // It feels kind of weird to have it with only 1, and then I don't have to bother with string plurals :)
+            // Only show "2" text if there are more than 1 award
             if (award.count > 1) {
                 TextView(context).apply {
                     text = award.count.toString()

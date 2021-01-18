@@ -452,7 +452,10 @@
 
     <string name="videoSize" translatable="false">%.2f MB</string>
 
-    <string name="awardsCount">%d awards</string>
+    <plurals name="awardsCount">
+        <item quantity="one">%d award</item>
+        <item quantity="other">%d awards</item>
+    </plurals>
     <string name="awardPrice">This award costs %d Reddit coins</string>
     <string name="awardReward">The receiver is awarded %d Reddit coins</string>
     <string name="awardSubredditReward">The subreddit is awarded %d Reddit coins</string>
