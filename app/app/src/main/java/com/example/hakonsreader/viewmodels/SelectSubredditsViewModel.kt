@@ -84,7 +84,6 @@ class SelectSubredditsViewModel(context: Context) : ViewModel() {
 
                     // Although NSFW subs might be inserted with this, it's fine as if the user
                     // has subscribed to them it's fine (for non-logged in users, default subs don't include NSFW)
-                    // TODO fix subreddits database
                      database.subreddits().insertAll(subs)
                 }
                 is ApiResponse.Error -> {

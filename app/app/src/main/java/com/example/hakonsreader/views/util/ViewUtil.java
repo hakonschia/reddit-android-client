@@ -110,7 +110,7 @@ public class ViewUtil {
     }
 
     /**
-     * Adds the authors flair to the comment. If the author has no flair the view is set to [View.GONE]
+     * Adds the authors flair to the comment. If the author has no flair the view is set to {@link View#GONE}
      *
      * @param tag The tag to set the flair on
      * @param comment The comment
@@ -137,7 +137,7 @@ public class ViewUtil {
     }
 
     /**
-     * Adds the authors flair to the comment. If the author has no flair the view is set to [View.GONE]
+     * Adds the authors flair to the comment. If the author has no flair the view is set to {@link View#GONE}
      *
      * @param tag The tag to set the flair on
      * @param post The post
@@ -164,7 +164,7 @@ public class ViewUtil {
     }
 
     /**
-     * Adds the authors flair to the comment. If the author has no flair the view is set to [View.GONE]
+     * Adds the authors flair to the comment. If the author has no flair the view is set to {@link View#GONE}
      *
      * @param tag The tag to set the flair on
      * @param post The post
@@ -189,6 +189,35 @@ public class ViewUtil {
             tag.setVisibility(View.GONE);
         }
     }
+
+    /**
+     * Adds the users flair in a subreddit. The the user has no flair is the subreddit this view is
+     * set to {@link View#GONE}
+     *
+     * @param tag The tag to set the flair on
+     * @param subreddit The subreddit
+     */
+    @BindingAdapter("subredditUserFlair")
+    public static void setLinkFlair(Tag tag, Subreddit subreddit) {
+        if (subreddit == null) {
+            return;
+        }
+
+        boolean tagAdded = ViewUtil.setFlair(
+                tag,
+                subreddit.getUserFlairRichText(),
+                subreddit.getUserFlairText(),
+                subreddit.getUserFlairTextColor(),
+                subreddit.getUserFlairBackgroundColor()
+        );
+
+        if (tagAdded) {
+            tag.setVisibility(View.VISIBLE);
+        } else {
+            tag.setVisibility(View.GONE);
+        }
+    }
+
 
     /**
      * Sets the flairs from a Reddit post or comment on a Tag

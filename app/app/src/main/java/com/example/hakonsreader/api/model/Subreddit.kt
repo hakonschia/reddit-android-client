@@ -1,6 +1,9 @@
 package com.example.hakonsreader.api.model
 
 import androidx.room.Entity
+import androidx.room.TypeConverters
+import com.example.hakonsreader.api.model.flairs.RichtextFlair
+import com.example.hakonsreader.api.persistence.PostConverter
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -9,6 +12,7 @@ import com.google.gson.annotations.SerializedName
  * This class has local database support with Room
  */
 @Entity(tableName = "subreddits")
+@TypeConverters(PostConverter::class)
 class Subreddit : RedditListing() {
 
     /**
@@ -185,4 +189,35 @@ class Subreddit : RedditListing() {
      */
     @SerializedName("comment_score_hide_mins")
     var hideScoreTime = 0
+
+
+    /**
+     * True if users can assign flairs on the subreddit
+     */
+    @SerializedName("can_assign_user_flair")
+    var canAssignUserFlair = false
+
+    /**
+     * The text color for the users flair (if there is a logged in user with a flair)
+     */
+    @SerializedName("user_flair_text_color")
+    var userFlairTextColor: String? = null
+
+    /**
+     * The background color of the user flair (if there is a logged in user with a flair)
+     */
+    @SerializedName("user_flair_background_color")
+    var userFlairBackgroundColor: String? = null
+
+    /**
+     * The list of [RichtextFlair] the users flair is combined of (if there is a logged in user with a flair)
+     */
+    @SerializedName("user_flair_richtext")
+    var userFlairRichText: ArrayList<RichtextFlair>? = null
+
+    /**
+     * The raw text of the user flair (if there is a logged in user with a flair)
+     */
+    @SerializedName("user_flair_text")
+    var userFlairText: String? = null
 }
