@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+
+        <variable
+            name="subreddit"
+            type="com.example.hakonsreader.api.model.Subreddit" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+
+            app:subredditIcon="@{subreddit}"
+
+            app:layout_constraintBottom_toBottomOf="@+id/name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/name"
+
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@{subreddit.title}"
+            android:textColor="@color/text_color"
+            android:textSize="25sp"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/icon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Counter-Strike: Global Offensive" />
+
+        <TextView
+            android:id="@+id/subredditSubscribers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+
+            android:text="@{@plurals/amountOfSubscribers(subreddit.subscribers, subreddit.subscribers)}"
+            android:textColor="@color/secondary_text_color"
+
+            android:maxLines="1"
+            android:ellipsize="end"
+
+            app:layout_constraintEnd_toStartOf="@id/subscribe"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/name"
+            tools:text="523 123 subscribers" />
+
+        <TextView
+            android:id="@+id/subscribe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="8dp"
+            android:background="@drawable/border_opposite_bg"
+            android:text="@{subreddit.subscribed ? @string/btnSubscrubeUnsubscribe : @string/btnSubscribeSubscribe}"
+            android:textColor="@color/text_color"
+            android:textSize="12sp"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/subredditSubscribers"
+            app:layout_constraintTop_toTopOf="@+id/subredditSubscribers"
+            tools:text="@string/btnSubscribeSubscribe" />
+
+        <TextView
+            android:id="@+id/activeUsers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+
+            android:text="@{@string/subredditActiveUsers(subreddit.activeUsers)}"
+            android:textColor="@color/secondary_text_color"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/subredditSubscribers"
+            tools:text="123 users online" />
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+
+            android:layout_marginEnd="16dp"
+            android:textColor="@color/text_color"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/activeUsers"
+            app:markdown="@{subreddit.publicDescription}"
+            tools:text="@tools:sample/lorem[50]" />
+
+        <!-- TODO select flair -->
+
+        <TextView
+            android:id="@+id/rulesHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+
+            android:text="@string/subredditRules"
+            android:textColor="@color/text_color"
+            android:textSize="20sp"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/description" />
+
+        <com.example.hakonsreader.views.LoadingIcon
+            android:id="@+id/rulesloadingIcon"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+
+            android:indeterminateOnly="true"
+            android:paddingTop="4dp"
+            android:visibility="gone"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rulesHeader"
+
+            tools:visibility="visible" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

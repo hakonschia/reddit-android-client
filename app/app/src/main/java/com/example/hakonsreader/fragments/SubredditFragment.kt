@@ -10,7 +10,9 @@ import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.databinding.ObservableField
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -321,20 +323,33 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private fun setupBinding() {
         _binding = FragmentSubredditBinding.inflate(layoutInflater)
 
-        binding.subredditRefresh.setOnClickListener { refreshPosts() }
-        binding.subscribe.setOnClickListener { subscribeOnclick() }
+        with (binding) {
+            subredditRefresh.setOnClickListener { refreshPosts() }
+            subscribe.setOnClickListener { subscribeOnclick() }
 
-        binding.subredditSubscribers.setCharacterLists(TickerUtils.provideNumberList())
+            subredditSubscribers.setCharacterLists(TickerUtils.provideNumberList())
 
-        binding.postsRefreshLayout.setOnRefreshListener {
-            refreshPosts()
+            postsRefreshLayout.setOnRefreshListener {
+                refreshPosts()
 
-            // The refreshing will be visible with our own progress bar
-            binding.postsRefreshLayout.isRefreshing = false
+                // The refreshing will be visible with our own progress bar
+                postsRefreshLayout.isRefreshing = false
+            }
+            postsRefreshLayout.setProgressBackgroundColorSchemeColor(
+                    ContextCompat.getColor(requireContext(), R.color.colorAccent)
+            )
+
+            openDrawer.setOnClickListener { drawer.openDrawer(GravityCompat.END) }
+            drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
+                override fun onDrawerOpened(drawerView: View) {
+                    // If no rules: Load from local DB, then API
+                }
+                override fun onDrawerSlide(drawerView: View, slideOffset: Float) { /* Not implemented */ }
+                override fun onDrawerClosed(drawerView: View) { /* Not implemented */ }
+                override fun onDrawerStateChanged(newState: Int) { /* Not implemented */ }
+            })
         }
-        binding.postsRefreshLayout.setProgressBackgroundColorSchemeColor(
-                ContextCompat.getColor(requireContext(), R.color.colorAccent)
-        )
+
     }
 
     /**

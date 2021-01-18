@@ -21,202 +21,235 @@
             type="boolean" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/parentLayout"
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background">
+        android:layout_height="match_parent">
 
-        <!-- TODO this way of using AppBarLayout is weird probably? Should probably be fixed -->
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/subredditAppBarLayout"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/parentLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/secondary_background"
-            android:fitsSystemWindows="true">
+            android:layout_height="match_parent"
+            android:background="@color/background">
 
-            <com.google.android.material.appbar.CollapsingToolbarLayout
+            <!-- TODO this way of using AppBarLayout is weird probably? Should probably be fixed -->
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/subredditAppBarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fitsSystemWindows="true"
-                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+                android:background="@color/secondary_background"
+                android:fitsSystemWindows="true">
 
-                <!-- On a scale from 1-10 how hacky is this? This is just here so part
-                 of the ConstraintLayout with the actual information is shown a little -->
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/subredditToolbar"
+                <com.google.android.material.appbar.CollapsingToolbarLayout
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:minHeight="?attr/actionBarSize"
-                    app:layout_collapseMode="pin" />
+                    android:layout_height="wrap_content"
+                    android:fitsSystemWindows="true"
+                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                    <!-- On a scale from 1-10 how hacky is this? This is just here so part
+                     of the ConstraintLayout with the actual information is shown a little -->
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/subredditToolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:minHeight="?attr/actionBarSize"
+                        app:layout_collapseMode="pin" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/userAndSubredditTopLayoutMarginPreAnimWithCornerRadius"
+
+                            android:scaleType="centerCrop"
+
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+
+                            app:subredditBanner="@{subreddit}"
+
+                            tools:src="@tools:sample/avatars"/>
+
+                        <ImageView
+                            android:id="@+id/topLayout"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_marginTop="@dimen/userAndSubredditTopLayoutMarginPreAnim"
+                            android:background="@{privatelyBrowsing ? @drawable/rounded_square_main_bg_gradient_private_browsing : @drawable/rounded_square_main_bg_gradient}"
+
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/subredditIcon"
+                            android:layout_width="@dimen/userAndSubredditIconSizePreAnim"
+                            android:layout_height="@dimen/userAndSubredditIconSizePreAnim"
+
+                            app:civ_circle_background_color="@color/background"
+                            app:civ_border_color="@color/opposite_background"
+                            app:civ_border_width="2dp"
+                            android:src="@drawable/ic_emoji_emotions_200dp"
+
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/topLayout"
+                            app:layout_constraintBottom_toTopOf="@+id/topLayout"
+
+                            app:subredditIcon="@{subreddit}" />
+
+                        <TextView
+                            android:id="@+id/subredditName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="@{subreddit.name.empty ? @string/front_page : subreddit.name}"
+                            android:textColor="@color/text_color"
+                            android:textSize="25sp"
+
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/subredditIcon"
+
+                            tools:text="GlobalOffensive" />
+
+                        <com.robinhood.ticker.TickerView
+                            android:id="@+id/subredditSubscribers"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+
+                            android:gravity="center"
+                            android:text="@{@plurals/amountOfSubscribers(subreddit.subscribers, subreddit.subscribers)}"
+                            android:textColor="@color/secondary_text_color"
+
+                            android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
+
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/subredditName"
+                            app:ticker_animationDuration="@integer/tickerAnimationDefault"
+                            tools:text="523 123 subscribers" />
+
+                        <TextView
+                            android:id="@+id/subscribe"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+
+                            android:background="@drawable/border_opposite_bg"
+                            android:text="@{subreddit.subscribed ? @string/btnSubscrubeUnsubscribe : @string/btnSubscribeSubscribe}"
+                            android:textColor="@color/text_color"
+                            android:textSize="12sp"
+                            android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
+
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/subredditName"
+
+                            tools:text="@string/btnSubscribeSubscribe" />
+
+                        <!-- Button to open the drawer with subreddit info (standard subs have no info= -->
+                        <ImageButton
+                            android:id="@+id/openDrawer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:rotation="270"
+                            android:layout_marginEnd="8dp"
+                            android:background="?android:selectableItemBackground"
+                            android:src="@drawable/ic_expand_less_24dp"
+                            android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
+
+                            app:layout_constraintBottom_toTopOf="@+id/subredditSort"
+                            app:layout_constraintEnd_toEndOf="parent" />
+
+                        <ImageButton
+                            android:id="@+id/subredditRefresh"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginEnd="8dp"
+                            android:background="?android:selectableItemBackground"
+                            android:src="@drawable/ic_refresh_24dp"
+                            app:layout_constraintBottom_toBottomOf="@+id/subredditSort"
+                            app:layout_constraintEnd_toStartOf="@+id/subredditSort" />
+
+                        <ImageButton
+                            android:id="@+id/subredditSort"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+
+                            android:background="?android:selectableItemBackground"
+                            android:src="@drawable/ic_sort_24dp"
+                            android:onClick="@{view -> MenuClickHandler.showPopupSortWithTime(view)}"
+
+                            app:layout_constraintBottom_toBottomOf="@+id/subredditSubscribers"
+                            app:layout_constraintEnd_toEndOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.appbar.CollapsingToolbarLayout>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/postsRefreshLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/posts"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent"
 
-                    <ImageView
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/userAndSubredditTopLayoutMarginPreAnimWithCornerRadius"
+                    tools:listitem="@layout/list_item_post" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-                        android:scaleType="centerCrop"
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/submitPostFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
 
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="bottom|end"
+                app:backgroundTint="@color/colorAccent"
+                app:borderWidth="0dp"
+                android:src="@drawable/ic_create_24dp"
 
-                        app:subredditBanner="@{subreddit}"
+                android:visibility="@{standardSub ? View.GONE : View.VISIBLE, default=gone}"
+                tools:visibility="visible" />
 
-                        tools:src="@tools:sample/avatars"/>
-
-                    <ImageView
-                        android:id="@+id/topLayout"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_marginTop="@dimen/userAndSubredditTopLayoutMarginPreAnim"
-                        android:background="@{privatelyBrowsing ? @drawable/rounded_square_main_bg_gradient_private_browsing : @drawable/rounded_square_main_bg_gradient}"
-
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/subredditIcon"
-                        android:layout_width="@dimen/userAndSubredditIconSizePreAnim"
-                        android:layout_height="@dimen/userAndSubredditIconSizePreAnim"
-
-                        app:civ_circle_background_color="@color/background"
-                        app:civ_border_color="@color/opposite_background"
-                        app:civ_border_width="2dp"
-                        android:src="@drawable/ic_emoji_emotions_200dp"
-
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/topLayout"
-                        app:layout_constraintBottom_toTopOf="@+id/topLayout"
-
-                        app:subredditIcon="@{subreddit}" />
-
-                    <TextView
-                        android:id="@+id/subredditName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:text="@{subreddit.name.empty ? @string/front_page : subreddit.name}"
-                        android:textColor="@color/text_color"
-                        android:textSize="25sp"
-
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/subredditIcon"
-
-                        tools:text="GlobalOffensive" />
-
-                    <com.robinhood.ticker.TickerView
-                        android:id="@+id/subredditSubscribers"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-
-                        android:gravity="center"
-                        android:text="@{@plurals/amountOfSubscribers(subreddit.subscribers, subreddit.subscribers)}"
-                        android:textColor="@color/secondary_text_color"
-
-                        android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
-
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/subredditName"
-                        app:ticker_animationDuration="@integer/tickerAnimationDefault"
-                        tools:text="523 123 subscribers" />
-
-                    <TextView
-                        android:id="@+id/subscribe"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-
-                        android:background="@drawable/border_opposite_bg"
-                        android:text="@{subreddit.subscribed ? @string/btnSubscrubeUnsubscribe : @string/btnSubscribeSubscribe}"
-                        android:textColor="@color/text_color"
-                        android:textSize="12sp"
-                        android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
-
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/subredditName"
-
-                        tools:text="@string/btnSubscribeSubscribe" />
-
-                    <ImageButton
-                        android:id="@+id/subredditRefresh"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:layout_marginEnd="8dp"
-                        android:background="?android:selectableItemBackground"
-                        android:src="@drawable/ic_refresh_24dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/subredditSort"
-                        app:layout_constraintEnd_toStartOf="@+id/subredditSort" />
-
-                    <ImageButton
-                        android:id="@+id/subredditSort"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-
-                        android:background="?android:selectableItemBackground"
-                        android:src="@drawable/ic_sort_24dp"
-                        android:onClick="@{view -> MenuClickHandler.showPopupSortWithTime(view)}"
-
-                        app:layout_constraintBottom_toBottomOf="@+id/subredditSubscribers"
-                        app:layout_constraintEnd_toEndOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.appbar.CollapsingToolbarLayout>
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/postsRefreshLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/posts"
+            <!-- TODO figure out a way to remove the padding in this, it looks like it's below the top of the screen -->
+            <com.example.hakonsreader.views.LoadingIcon
+                android:id="@+id/loadingIcon"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
 
-                tools:listitem="@layout/list_item_post" />
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                app:layout_anchor="@id/postsRefreshLayout"
+                style="?android:attr/progressBarStyleHorizontal"
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/submitPostFab"
+                android:indeterminateOnly="true"
+                android:visibility="gone"
+
+                tools:visibility="visible" />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/subredditInfoNavigationView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:visibility="@{standardSub ? View.GONE : View.VISIBLE}">
 
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_gravity="bottom|end"
-            app:backgroundTint="@color/colorAccent"
-            app:borderWidth="0dp"
-            android:src="@drawable/ic_create_24dp"
+            <include layout="@layout/subreddit_info"
+                app:subreddit="@{subreddit}" />
 
-            android:visibility="@{standardSub ? View.GONE : View.VISIBLE, default=gone}"
-            tools:visibility="visible" />
-
-        <!-- TODO figure out a way to remove the padding in this, it looks like it's below the top of the screen -->
-        <com.example.hakonsreader.views.LoadingIcon
-            android:id="@+id/loadingIcon"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="4dp"
-
-            app:layout_anchor="@id/postsRefreshLayout"
-            style="?android:attr/progressBarStyleHorizontal"
-
-            android:indeterminateOnly="true"
-            android:visibility="gone"
-
-            tools:visibility="visible" />
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </com.google.android.material.navigation.NavigationView>
+    </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

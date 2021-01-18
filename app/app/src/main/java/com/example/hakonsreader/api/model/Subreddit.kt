@@ -29,6 +29,12 @@ class Subreddit : RedditListing() {
     @SerializedName("subscribers")
     var subscribers = 0
 
+    /**
+     * The amount of active users at the time the information was retrieved from the API
+     */
+    @SerializedName("accounts_active")
+    var activeUsers = 0
+
 
     /**
      * The description for the Subreddit in Markdown

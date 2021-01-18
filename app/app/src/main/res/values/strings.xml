@@ -459,4 +459,7 @@
     <string name="awardPrice">This award costs %d Reddit coins</string>
     <string name="awardReward">The receiver is awarded %d Reddit coins</string>
     <string name="awardSubredditReward">The subreddit is awarded %d Reddit coins</string>
+
+    <string name="subredditActiveUsers">%d users online</string>
+    <string name="subredditRules">Rules</string>
 </resources>
