@@ -252,7 +252,7 @@ private fun copyCommentLinkOnClick(view: View, comment: RedditComment) {
     Snackbar.make(view, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
 }
 
-private fun peekParentOnClick(context: Context, comment: RedditComment) {
+fun peekParentOnClick(context: Context, comment: RedditComment) {
     context as AppCompatActivity
     val bottomSheet = PeekCommentBottomSheet()
     bottomSheet.comment = comment

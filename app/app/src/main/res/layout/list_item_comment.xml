@@ -13,6 +13,7 @@
         <import type="com.example.hakonsreader.App"/>
         <import type="com.example.hakonsreader.api.model.RedditUser"/>
         <import type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
+        <import type="com.example.hakonsreader.recyclerviewadapters.menuhandlers.CommentsMenuHandlerKt" />
 
         <variable
             name="post"
@@ -37,6 +38,10 @@
         <variable
             name="onReportsIgnoreChange"
             type="com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener" />
+
+        <variable
+            name="showPeekParentButton"
+            type="boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -273,12 +278,26 @@
             android:src="@drawable/ic_baseline_more_horiz_24"
 
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/reply"
+            app:layout_constraintEnd_toStartOf="@+id/peekParent"
             app:layout_constraintTop_toBottomOf="@+id/linkPreviews" />
 
         <!-- We have to add commentHidden to the visibility here instead of adding reply to the
         moreComments group, since it would take precedence over post.locked/comment.locked and
         always be shown-->
+        <ImageButton
+            android:id="@+id/peekParent"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+
+            android:background="@null"
+            android:foreground="@drawable/ripple_main_bg"
+            android:onClick="@{(view) -> CommentsMenuHandlerKt.peekParentOnClick(view.context, comment)}"
+            android:src="@drawable/ic_visibility_24dp"
+            android:visibility="@{showPeekParentButton &amp;&amp; comment.depth != 0 ? View.VISIBLE : View.GONE}"
+
+            app:layout_constraintEnd_toStartOf="@+id/reply"
+            app:layout_constraintTop_toTopOf="@+id/popupMenu" />
+
         <ImageButton
             android:id="@+id/reply"
             android:layout_width="36dp"

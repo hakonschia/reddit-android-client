@@ -305,4 +305,6 @@
     <string name="awardReward">Mottakeren blir belønnet %d Reddit coins</string>
     <string name="awardSubredditReward">Subredditen blir belønnet %d Reddit coins</string>
     <string name="requiresRedditPremium">Handlingen krever Reddit premium</string>
+    <string name="subredditRequiresPremium">Du trenger Reddit premium for å aksessere r/%s</string>
+    <string name="prefs_title_show_peek_parent_button_in_comments">Vis knapp for å vise foreldrekommentar i kommentarbar</string>
 </resources>

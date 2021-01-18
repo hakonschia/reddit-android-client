@@ -476,20 +476,24 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
 
         return when (viewType) {
             MORE_COMMENTS_TYPE -> {
-                val binding = ListItemMoreCommentBinding.inflate(layoutInflater, parent, false)
-                binding.adapter = this
+                val binding = ListItemMoreCommentBinding.inflate(layoutInflater, parent, false).apply {
+                    adapter = this@CommentsAdapter
+                }
                 MoreCommentsViewHolder(binding)
             }
             HIDDEN_COMMENT_TYPE -> {
-                val binding = ListItemHiddenCommentBinding.inflate(layoutInflater, parent, false)
-                binding.adapter = this
+                val binding = ListItemHiddenCommentBinding.inflate(layoutInflater, parent, false).apply {
+                    adapter = this@CommentsAdapter
+                }
                 HiddenCommentViewHolder(binding)
             }
             else -> {
-                val binding = ListItemCommentBinding.inflate(layoutInflater, parent, false)
-                binding.adapter = this
-                binding.post = post
-                binding.onReportsIgnoreChange = OnReportsIgnoreChangeListener { binding.invalidateAll() }
+                val binding = ListItemCommentBinding.inflate(layoutInflater, parent, false).apply {
+                    adapter = this@CommentsAdapter
+                    post = post
+                    onReportsIgnoreChange =  OnReportsIgnoreChangeListener { invalidateAll() }
+                    showPeekParentButton = App.get().showPeekParentButtonInComments()
+                }
                 NormalCommentViewHolder(binding)
             }
         }

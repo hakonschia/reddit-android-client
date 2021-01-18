@@ -762,6 +762,16 @@ class App : Application() {
         )
     }
 
+    /**
+     * @return True if comments should show a button directly in the layout that peeks the parent comment
+     */
+    fun showPeekParentButtonInComments() : Boolean {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_show_peek_parent_button_in_comments),
+                resources.getBoolean(R.bool.prefs_default_show_peek_parent_button_in_comments)
+        )
+    }
+
 
     /**
      * Sets the activity currently active. This is used to show a dialog on the rare occasion that

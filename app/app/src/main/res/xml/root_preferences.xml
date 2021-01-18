@@ -220,6 +220,13 @@
             app:singleLineTitle="false"
             app:iconSpaceReserved="false" />
 
+        <SwitchPreference
+            app:key="@string/prefs_key_show_peek_parent_button_in_comments"
+            android:title="@string/prefs_title_show_peek_parent_button_in_comments"
+            app:defaultValue="@bool/prefs_default_show_peek_parent_button_in_comments"
+            app:singleLineTitle="false"
+            app:iconSpaceReserved="false" />
+
         <!-- TODO hide comments from users ("This will also remove their child comments") -->
     </PreferenceCategory>
 

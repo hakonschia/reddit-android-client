@@ -26,5 +26,6 @@
     <bool name="prefs_default_comment_link_preview_show_identical_links">false</bool>
     <bool name="prefs_default_post_collapse_by_default">true</bool>
     <bool name="prefs_default_play_youtube_videos_in_app">true</bool>
+    <bool name="prefs_default_show_peek_parent_button_in_comments">false</bool>
 
 </resources>
