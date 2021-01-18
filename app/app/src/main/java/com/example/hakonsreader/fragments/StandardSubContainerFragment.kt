@@ -11,6 +11,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.misc.SectionsPageAdapter
+import java.util.ArrayList
 
 class StandardSubContainerFragment : Fragment() {
 
@@ -35,19 +36,12 @@ class StandardSubContainerFragment : Fragment() {
 
     private var saveState: Bundle? = null
     private var viewPager: ViewPager? = null
-    private val fragments = Array(size = 3) { pos ->
-         when (pos) {
-             1 -> SubredditFragment.newInstance(StandarSub.POPULAR.value, SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) }
-             2 -> SubredditFragment.newInstance(StandarSub.ALL.value, SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) }
-
-             // Have front page as the else just in case something goes wrong as this should be the default
-             else -> SubredditFragment.newInstance(StandarSub.FRONT_PAGE.value, SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) }
-        }
-    }
-
+    private val fragments = ArrayList<SubredditFragment>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_posts_container, container, false)
+
+        setupFragments()
 
         viewPager = view.findViewById<ViewPager>(R.id.postsContainer).apply { setupViewPager(this) }
 
@@ -74,15 +68,22 @@ class StandardSubContainerFragment : Fragment() {
     }
 
     /**
-     * Gets the array position in [fragments] based on [defaultSub]
+     * Sets up [fragments], if it is empty
      */
-    private fun getDefaultSubPosition(): Int {
-        return when (defaultSub) {
-            StandarSub.FRONT_PAGE -> 0
-            StandarSub.POPULAR -> 1
-            StandarSub.ALL -> 2
+    private fun setupFragments() {
+        if (fragments.isEmpty()) {
+            fragments.apply {
+                add(SubredditFragment.newInstance(StandarSub.FRONT_PAGE.value, SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
+                add(SubredditFragment.newInstance(StandarSub.POPULAR.value, SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
+                add(SubredditFragment.newInstance(StandarSub.ALL.value, SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
+            }
         }
     }
+
+    /**
+     * Gets the array position in [fragments] based on [defaultSub]
+     */
+    private fun getDefaultSubPosition() = defaultSub.ordinal
 
     /**
      * Restores the state stored for when the activity holding the fragment has been recreated in a
