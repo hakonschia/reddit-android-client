@@ -154,25 +154,26 @@ class SelectSubredditFragment : Fragment() {
      * Sets up the list of subreddits (the "default" list shown with subscribed/default subreddits)
      */
     private fun setupSubredditsList() {
-        subredditsAdapter = SubredditsAdapter()
-        subredditsAdapter?.subredditSelected = subredditSelected
-        subredditsAdapter?.favoriteClicked = OnClickListener { subreddit -> favoriteClicked(subreddit) }
-        subredditsLayoutManager = LinearLayoutManager(context)
+        subredditsAdapter = SubredditsAdapter().apply {
+            this.subredditSelected = this@SelectSubredditFragment.subredditSelected
+            favoriteClicked = OnClickListener { subreddit -> favoriteClicked(subreddit) }
 
-        binding.subreddits.adapter = subredditsAdapter
-        binding.subreddits.layoutManager = subredditsLayoutManager
+            binding.subreddits.adapter = this
+        }
+
+        subredditsLayoutManager = LinearLayoutManager(context).apply { binding.subreddits.layoutManager = this }
     }
 
     /**
      * Sets up the list of subreddits from search results
      */
     private fun setupSearchSubredditsList() {
-        searchSubredditsAdapter = SubredditsAdapter()
-        searchSubredditsAdapter?.subredditSelected = subredditSelected
-        searchSubredditsLayoutManager = LinearLayoutManager(context)
+        searchSubredditsAdapter = SubredditsAdapter().apply {
+            this.subredditSelected = this@SelectSubredditFragment.subredditSelected
+            binding.searchedSubreddits.adapter = this
+        }
 
-        binding.searchedSubreddits.adapter = searchSubredditsAdapter
-        binding.searchedSubreddits.layoutManager = searchSubredditsLayoutManager
+        searchSubredditsLayoutManager = LinearLayoutManager(context).apply { binding.searchedSubreddits.layoutManager = this }
     }
 
     /**
@@ -180,50 +181,50 @@ class SelectSubredditFragment : Fragment() {
      */
     private fun setupSubredditsViewModel() {
         subredditsViewModel = ViewModelProvider(this, SelectSubredditsFactory(context))
-                .get(SelectSubredditsViewModel::class.java)
+                .get(SelectSubredditsViewModel::class.java).apply {
+                    getSubreddits().observe(viewLifecycleOwner, { subreddits ->
+                        subredditsLoaded = true
+                        subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
+                        subredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY))
+                    })
 
-        subredditsViewModel!!.getSubreddits().observe(viewLifecycleOwner, { subreddits ->
-            subredditsLoaded = true
-            subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
-            subredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY))
-        })
+                    getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
+                        binding.loadingIcon.onCountChange(onCountChange)
+                    })
 
-        subredditsViewModel!!.getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
-            binding.loadingIcon.onCountChange(onCountChange)
-        })
-
-        subredditsViewModel!!.getError().observe(viewLifecycleOwner, { error ->
-            Util.handleGenericResponseErrors(view, error.error, error.throwable)
-        })
+                    getError().observe(viewLifecycleOwner, { error ->
+                        Util.handleGenericResponseErrors(view, error.error, error.throwable)
+                    })
+                }
     }
 
     /**
      * Initializes [searchSubredditsViewModel] and observes all its values
      */
     private fun setupSearchViewModel() {
-        searchSubredditsViewModel = ViewModelProvider(this).get(SearchForSubredditsViewModel::class.java)
+        searchSubredditsViewModel = ViewModelProvider(this).get(SearchForSubredditsViewModel::class.java).apply {
+            getSearchResults().observe(viewLifecycleOwner, { subreddits ->
+                binding.searchedSubredditsCount = subreddits.size
 
-        searchSubredditsViewModel!!.getSearchResults().observe(viewLifecycleOwner, { subreddits ->
-            binding.searchedSubredditsCount = subreddits.size
+                // TODO make some sort of animation for this
+                if (subreddits.isEmpty()) {
+                    searchSubredditsAdapter?.clear()
+                } else {
+                    searchSubredditsAdapter?.submitList(subreddits.toMutableList(), false)
+                    searchSubredditsLayoutManager?.scrollToPosition(0)
+                }
 
-            // TODO make some sort of animation for this
-            if (subreddits.isEmpty()) {
-                searchSubredditsAdapter?.clear()
-            } else {
-                searchSubredditsAdapter?.submitList(subreddits.toMutableList(), false)
-                searchSubredditsLayoutManager?.scrollToPosition(0)
-            }
+                searchSubredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(SEARCH_LIST_STATE_KEY))
+            })
 
-            searchSubredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(SEARCH_LIST_STATE_KEY))
-        })
+            getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
+                binding.loadingIcon.onCountChange(onCountChange)
+            })
 
-        searchSubredditsViewModel!!.getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
-            binding.loadingIcon.onCountChange(onCountChange)
-        })
-
-        searchSubredditsViewModel!!.getError().observe(viewLifecycleOwner, { error ->
-            Util.handleGenericResponseErrors(view, error.error, error.throwable)
-        })
+            getError().observe(viewLifecycleOwner, { error ->
+                Util.handleGenericResponseErrors(view, error.error, error.throwable)
+            })
+        }
     }
 
 
@@ -261,7 +262,7 @@ class SelectSubredditFragment : Fragment() {
      * If the subreddit name input isn't in the range 3..21 then a Snackbar is shown, as this is the
      * length requirement for a subreddit
      */
-    private val actionDoneListener: TextView.OnEditorActionListener = TextView.OnEditorActionListener { v, actionId, event ->
+    private val actionDoneListener = TextView.OnEditorActionListener { v, actionId, event ->
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             val subredditName = v.text.toString().trim()
 

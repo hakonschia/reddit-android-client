@@ -32,18 +32,15 @@ class InboxGroupFragment : Fragment() {
         private const val INBOX_TYPE_KEY = "inboxType"
 
         
-        fun newInstance(type: InboxFragment.InboxGroupTypes) : InboxGroupFragment {
+        fun newInstance(type: InboxFragment.InboxGroupTypes) = InboxGroupFragment().apply {
             // Should probably use arguments for this, but it doesn't get set before the tablayout
             // using the value runs, so ¯\_(ツ)_/¯
-            val fragment = InboxGroupFragment()
-            fragment.inboxType = type
-            return fragment
+            inboxType = type
         }
     }
 
     private var _binding: FragmentInboxGroupBinding? = null
     private val binding get() = _binding!!
-    private val api = App.get().api
     private val db by lazy {
         RedditDatabase.getInstance(requireContext())
     }

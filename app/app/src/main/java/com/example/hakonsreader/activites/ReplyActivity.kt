@@ -112,7 +112,7 @@ class ReplyActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        outState.putString(REPLY_TEXT, binding?.markdownInput?.inputText)
+        outState.putString(REPLY_TEXT, binding.markdownInput.inputText)
 
         if (binding.markdownInput.isLinkDialogShown) {
             outState.putBoolean(LINK_DIALOG_SHOWN, true)

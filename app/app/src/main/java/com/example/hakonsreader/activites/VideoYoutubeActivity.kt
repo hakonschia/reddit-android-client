@@ -43,7 +43,6 @@ class VideoYoutubeActivity : AppCompatActivity() {
         private const val SAVED_TIMESTAMP = "savedVideoTimestamp"
     }
 
-    private lateinit var youtubePlayer: YouTubePlayerView
     private var currentTimestamp = 0F
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,20 +59,21 @@ class VideoYoutubeActivity : AppCompatActivity() {
             return
         }
 
-        youtubePlayer = findViewById(R.id.youtubePlayer)
-        lifecycle.addObserver(youtubePlayer)
+        findViewById<YouTubePlayerView>(R.id.youtubePlayer).run {
+            lifecycle.addObserver(this)
 
-        youtubePlayer.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-            override fun onReady(youTubePlayer: YouTubePlayer) {
-                youTubePlayer.loadVideo(videoId, startSeconds)
-            }
+            addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                override fun onReady(youTubePlayer: YouTubePlayer) {
+                    youTubePlayer.loadVideo(videoId, startSeconds)
+                }
 
-            override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
-                super.onCurrentSecond(youTubePlayer, second)
-                currentTimestamp = second
-            }
-        })
-        
+                override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                    super.onCurrentSecond(youTubePlayer, second)
+                    currentTimestamp = second
+                }
+            })
+        }
+
         val color = getColor(R.color.imageVideoActivityBackground)
         val alpha = color shr 24 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF

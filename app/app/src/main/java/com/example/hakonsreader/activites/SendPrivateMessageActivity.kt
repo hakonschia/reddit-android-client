@@ -54,20 +54,22 @@ class SendPrivateMessageActivity : AppCompatActivity() {
         val subject = extras?.getString(EXTRAS_SUBJECT) ?: ""
         val message = extras?.getString(EXTRAS_MESSAGE) ?: ""
 
-        binding.recipientInput.setText(recipient)
-        binding.subjectInput.setText(subject)
-        binding.messageInput.setText(message)
+        with(binding){
+            recipientInput.setText(recipient)
+            subjectInput.setText(subject)
+            messageInput.setText(message)
 
-        binding.showPreview.setOnClickListener {
-            binding.messageInput.showPreviewInPopupDialog()
-        }
-
-        binding.sendMessage.setOnClickListener {
-            if (!verifyInputFieldsNotEmpty()) {
-                return@setOnClickListener
+            showPreview.setOnClickListener {
+                messageInput.showPreviewInPopupDialog()
             }
 
-            sendMessage()
+            sendMessage.setOnClickListener {
+                if (!verifyInputFieldsNotEmpty()) {
+                    return@setOnClickListener
+                }
+
+                sendMessage()
+            }
         }
     }
 
@@ -101,11 +103,13 @@ class SendPrivateMessageActivity : AppCompatActivity() {
         val api = App.get().api
 
         CoroutineScope(Dispatchers.IO).launch {
-            val recipient = binding.recipientInput.text.toString()
-            val subject = binding.subjectInput.text.toString()
-            val message = binding.messageInput.inputText
+            with(binding) {
+                val recipient = recipientInput.text.toString()
+                val subject = subjectInput.text.toString()
+                val message = messageInput.inputText
 
-            api.messages().sendMessage(recipient, subject, message)
+                api.messages().sendMessage(recipient, subject, message)
+            }
         }
     }
 }

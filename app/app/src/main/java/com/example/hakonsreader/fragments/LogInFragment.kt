@@ -18,11 +18,9 @@ import com.example.hakonsreader.constants.NetworkConstants
 class LogInFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_log_in, container, false)
-
-        view.findViewById<Button>(R.id.btnLogIn).setOnClickListener { openOAuthAuthIntent() }
-
-        return view
+        return inflater.inflate(R.layout.fragment_log_in, container, false).apply {
+            findViewById<Button>(R.id.btnLogIn).setOnClickListener { openOAuthAuthIntent() }
+        }
     }
 
     /**
@@ -43,8 +41,6 @@ class LogInFragment : Fragment() {
                 .appendQueryParameter("scope", NetworkConstants.SCOPE)
                 .appendQueryParameter("state", state)
                 .build()
-
-        val assstring = uri.toString()
 
         startActivity(Intent(Intent.ACTION_VIEW, uri))
     }

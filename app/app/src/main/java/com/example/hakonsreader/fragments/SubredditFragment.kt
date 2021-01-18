@@ -88,24 +88,18 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
          */
         const val TIME_SORT = "time_sort"
 
-
         /**
          * Creates a new instance of the fragment
          *
          * @param subredditName The name of the subreddit to instantiate
          * @return The newly created fragment
          */
-        fun newInstance(subredditName: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) : SubredditFragment {
-            val args = Bundle().apply {
+        fun newInstance(subredditName: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = SubredditFragment().apply {
+            arguments = Bundle().apply {
                 putString(SUBREDDIT_NAME_KEY, subredditName)
                 sort?.let { putString(SORT, it.value) }
                 timeSort?.let { putString(TIME_SORT, it.value) }
             }
-
-            val fragment = SubredditFragment()
-            fragment.arguments = args
-
-            return fragment
         }
     }
 
@@ -347,11 +341,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * Sets up [FragmentSubredditBinding.posts] and [postsAdapter]/[postsLayoutManager]
      */
     private fun setupPostsList() {
-        postsAdapter = PostsAdapter()
-        postsLayoutManager = LinearLayoutManager(context)
-
-        binding.posts.adapter = postsAdapter
-        binding.posts.layoutManager = postsLayoutManager
+        postsAdapter = PostsAdapter().apply { binding.posts.adapter = this }
+        postsLayoutManager = LinearLayoutManager(context).apply { binding.posts.layoutManager = this }
 
         postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }
         binding.posts.setOnScrollChangeListener(postsScrollListener)
