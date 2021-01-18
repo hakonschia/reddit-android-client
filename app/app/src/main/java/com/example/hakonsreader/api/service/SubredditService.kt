@@ -3,10 +3,7 @@ package com.example.hakonsreader.api.service
 import com.example.hakonsreader.api.responses.ListingResponse
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
-import com.example.hakonsreader.api.model.RedditListing
-import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.model.Submission
+import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.model.flairs.SubmissionFlair
 import com.example.hakonsreader.api.responses.JsonResponse
 import retrofit2.Response
@@ -133,4 +130,13 @@ interface SubredditService {
      */
     @GET("r/{subreddit}/api/link_flair_v2?raw_json=1")
     suspend fun getLinkFlairs(@Path("subreddit") subredditName: String) : Response<List<SubmissionFlair>>
+
+
+    /**
+     * Gets the rules of a subreddit
+     *
+     * @param subredditName The name of the subreddit to get rules for
+     */
+    @GET("r/{subreddit}/about/rules?raw_json=1")
+    suspend fun getRules(@Path("subreddit") subredditName: String) : Response<SubredditRuleInternal>
 }

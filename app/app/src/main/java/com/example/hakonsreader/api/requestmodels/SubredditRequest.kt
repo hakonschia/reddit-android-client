@@ -7,10 +7,7 @@ import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
-import com.example.hakonsreader.api.model.AccessToken
-import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.model.Submission
-import com.example.hakonsreader.api.model.Subreddit
+import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.model.flairs.SubmissionFlair
 import com.example.hakonsreader.api.requestmodels.thirdparty.ThirdPartyRequest
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -46,6 +43,29 @@ class SubredditRequest(
 
             if (sub != null) {
                 ApiResponse.Success(sub as Subreddit)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Retrieve subreddit rules
+     *
+     * OAuth scope required: *read*
+     */
+    suspend fun rules() : ApiResponse<List<SubredditRule>>  {
+        return try {
+            val resp = api.getRules(subredditName)
+            val rules = resp.body()?.rules
+
+            if (rules != null) {
+                // Rules aren't connected automatically to its subreddit
+                rules.forEach { it.subreddit = subredditName }
+
+                ApiResponse.Success(rules)
             } else {
                 apiError(resp)
             }

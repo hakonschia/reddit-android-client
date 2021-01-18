@@ -28,6 +28,7 @@ import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
+import com.example.hakonsreader.api.model.SubredditRule
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -37,6 +38,7 @@ import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
+import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
@@ -343,6 +345,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
                     // If no rules: Load from local DB, then API
+                    getSubredditName()?.let { retrieveSubredditRules(it) }
                 }
                 override fun onDrawerSlide(drawerView: View, slideOffset: Float) { /* Not implemented */ }
                 override fun onDrawerClosed(drawerView: View) { /* Not implemented */ }
@@ -581,6 +584,51 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Retrieves rules for a subreddit
+     *
+     * @param subredditName The name of the subreddit to get rules for
+     */
+    private fun retrieveSubredditRules(subredditName: String) {
+        binding.subredditInfo.rulesloadingIcon.onCountChange(true)
+        CoroutineScope(IO).launch {
+            when (val response = api.subreddit(subredditName).rules()) {
+                is ApiResponse.Success -> {
+                    withContext(Main) {
+                        binding.subredditInfo.rulesloadingIcon.onCountChange(false)
+
+                        // Update drawer
+                        _binding?.let {
+                            // It seems like rules are always sorted by the priority, but just to be sure
+                            updateRules(response.value.sortedBy { it.priority })
+                        }
+                    }
+                }
+                is ApiResponse.Error -> {
+                    withContext(Main) {
+                        binding.subredditInfo.rulesloadingIcon.onCountChange(false)
+                        handleErrors(response.error, response.throwable)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the subreddit rules in the drawer
+     */
+    private fun updateRules(rules: List<SubredditRule>) {
+        with(binding) {
+            val rulesAdapter = SubredditRulesAdapter().apply { submitList(rules) }
+            val layoutManager = LinearLayoutManager(context)
+
+            subredditInfo.rules.adapter = rulesAdapter
+            subredditInfo.rules.layoutManager = layoutManager
+
+        //    rulesAdapter.submitList(rules)
         }
     }
 

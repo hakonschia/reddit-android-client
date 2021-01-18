@@ -248,6 +248,7 @@
             android:visibility="@{standardSub ? View.GONE : View.VISIBLE}">
 
             <include layout="@layout/subreddit_info"
+                android:id="@+id/subredditInfo"
                 app:subreddit="@{subreddit}" />
 
         </com.google.android.material.navigation.NavigationView>

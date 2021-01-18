@@ -462,4 +462,5 @@
 
     <string name="subredditActiveUsers">%d users online</string>
     <string name="subredditRules">Rules</string>
+    <string name="subredditRuleNumberAndName" translatable="false">%d. %s</string>
 </resources>
