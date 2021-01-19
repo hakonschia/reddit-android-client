@@ -11,6 +11,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.VoteBarBinding
 import com.example.hakonsreader.misc.Util
@@ -74,14 +75,17 @@ class VoteBar : FrameLayout {
 
             // Assume it's successful as it feels like the buttons aren't pressed when you have to wait
             // until the colors are updated
+            val db = RedditDatabase.getInstance(context)
             it.voteType = actualVote
             updateVoteStatus()
 
             val id = it.id
 
             val api = App.get().api
+
             CoroutineScope(IO).launch {
-                val resp = if (listing is RedditPost) {
+                val resp = if (it is RedditPost) {
+                    db.posts().update(it)
                     api.post(id)
                 } else {
                     api.comment(id)
@@ -92,6 +96,10 @@ class VoteBar : FrameLayout {
                     is ApiResponse.Error -> {
                         // Request failed, set back to default
                         it.voteType = currentVote
+                        if (it is RedditPost) {
+                            db.posts().update(it)
+                        }
+
                         withContext(Main) {
                             updateVoteStatus()
                             resp.throwable.printStackTrace()

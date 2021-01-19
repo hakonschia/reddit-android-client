@@ -13,6 +13,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.Util
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -164,17 +165,23 @@ private fun savePostOnClick(view: View, post: RedditPost) {
 
 private fun distinguishAsModOnClick(view: View, post: RedditPost) {
     val api = App.get().api
+    val db = RedditDatabase.getInstance(view.context)
 
     // TODO this should update the UI (need to notify either PostActivity or the adapter)
     CoroutineScope(IO).launch {
         val response = if (post.isMod()) {
+            post.distinguished = null
+            db.posts().update(post)
             api.post(post.id).removeModDistinguish()
         } else {
+            post.distinguished = "moderator"
+            db.posts().update(post)
             api.post(post.id).distinguishAsMod()
         }
 
         when (response) {
             is ApiResponse.Success -> {
+                response.value
             }
             is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
         }
@@ -183,19 +190,28 @@ private fun distinguishAsModOnClick(view: View, post: RedditPost) {
 
 private fun stickyOnClick(view: View, post: RedditPost) {
     val api = App.get().api
+    val db = RedditDatabase.getInstance(view.context)
 
     // TODO this should update the UI (need to notify either PostActivity or the adapter)
     CoroutineScope(IO).launch {
-        val response = if (post.isStickied) {
-            api.post(post.id).unsticky()
-        } else {
+        val newSticky = !post.isStickied
+        post.isStickied = newSticky
+        db.posts().update(post)
+
+        val response = if (newSticky) {
             api.post(post.id).sticky()
+        } else {
+            api.post(post.id).unsticky()
         }
 
         when (response) {
-            is ApiResponse.Success -> {
+            is ApiResponse.Success -> { }
+            is ApiResponse.Error -> {
+                // Revert back
+                post.isStickied = !post.isStickied
+                db.posts().update(post)
+                Util.handleGenericResponseErrors(view, response.error, response.throwable)
             }
-            is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
         }
     }
 }

@@ -6,6 +6,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.hakonsreader.api.model.RedditPost;
 
@@ -43,13 +44,18 @@ public interface RedditPostsDao {
     /**
      * Deletes a post from the database.
      *
-     * <p>The post ID provided by Reddit ({@link RedditPost#getId()} is used as the primary key.
-     * If a record already exists with this ID it is replaced</p>
-     *
      * @param post The post to delete
      */
     @Delete
     void delete(RedditPost post);
+
+    /**
+     * Updates a post in the database
+     *
+     * @param post The post to update
+     */
+    @Update
+    void update(RedditPost post);
 
     /**
      * Deletes all posts from the database
