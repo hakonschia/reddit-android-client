@@ -11,16 +11,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
-class CommentsViewModel : ViewModel() {
+class CommentsViewModel: ViewModel() {
 
     private val api = App.get().api
+    private val database = App.get().database
 
-    private val post = MutableLiveData<RedditPost>()
     private val comments = MutableLiveData<List<RedditComment>>()
     private val loadingChange = MutableLiveData<Boolean>()
     private val error = MutableLiveData<ErrorWrapper>()
 
-    fun getPost() : LiveData<RedditPost> = post
     fun getComments() : LiveData<List<RedditComment>> = comments
     fun onLoadingCountChange() : LiveData<Boolean> = loadingChange
     fun getError() : LiveData<ErrorWrapper> = error
@@ -32,7 +31,10 @@ class CommentsViewModel : ViewModel() {
 
 
     /**
-     * Loads comments for the post. This will also fetch the post itself
+     * Loads comments for the post.
+     *
+     * This will also fetch the post itself. The post will be updated in [RedditDatabase] and must
+     * be observed from there to receieve changes
      *
      * @param loadThirdParty If true, third party requests (such as retrieving gifs from Gfycat directly)
      * will be made. This is default to `false`. If only the comments of the post (and potentially updated
@@ -55,7 +57,7 @@ class CommentsViewModel : ViewModel() {
 
             when (resp) {
                 is ApiResponse.Success -> {
-                    post.postValue(resp.value.post)
+                    database.posts().insert(resp.value.post)
                     comments.postValue(resp.value.comments)
                 }
                 is ApiResponse.Error -> error.postValue(ErrorWrapper(resp.error, resp.throwable))

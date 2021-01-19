@@ -250,18 +250,6 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      */
     private fun setupCommentsViewModel() {
         commentsViewModel = ViewModelProvider(this).get(CommentsViewModel::class.java).apply {
-            getPost().observe(this@PostActivity, { newPost ->
-                val postPreviouslySet = binding.post.redditPost != null
-                post = newPost
-
-                // If we have a post already just update the info so the content isn't reloaded
-                if (postPreviouslySet) {
-                    updatePostInfo()
-                } else {
-                    onPostLoaded()
-                }
-            })
-
             getComments().observe(this@PostActivity, { comments ->
                 // New comments are empty, previous comments are not, clear the previous comments
                 if (comments.isEmpty() && commentsAdapter?.itemCount != 0) {
@@ -364,6 +352,18 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
         }
 
         if (postId != null) {
+            App.get().database.posts().getPostById(postId).observe(this) {
+                val postPreviouslySet = binding.post.redditPost != null
+                post = it
+
+                // If we have a post already just update the info so the content isn't reloaded
+                if (postPreviouslySet) {
+                    updatePostInfo()
+                } else {
+                    onPostLoaded()
+                }
+            }
+
             commentsViewModel?.let {
                 it.postId = postId
                 it.loadComments(loadThirdParty)

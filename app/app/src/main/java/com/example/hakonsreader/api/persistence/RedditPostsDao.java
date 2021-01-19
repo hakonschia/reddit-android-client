@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.persistence;
 
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -107,6 +108,15 @@ public interface RedditPostsDao {
      */
     @Query("SELECT * FROM posts WHERE id IN (:ids)")
     List<RedditPost> getPostsById(List<String> ids);
+
+    /**
+     * Retrieves a post by ID
+     *
+     * @param id The ID of the post to retrieve
+     * @return A LiveData that can be observed for the post
+     */
+    @Query("SELECT * FROM posts WHERE id=:id")
+    LiveData<RedditPost> getPostById(String id);
 
 
     /**

@@ -132,6 +132,13 @@ class App : Application() {
     }
 
     /**
+     * A [RedditDatabase] instance
+     */
+    val database: RedditDatabase by lazy {
+        RedditDatabase.getInstance(this)
+    }
+
+    /**
      * An instance of a [MarkdownAdjuster]. This instance checks the following:
      * * Header spaces
      * * URL encoding in Markdown links
