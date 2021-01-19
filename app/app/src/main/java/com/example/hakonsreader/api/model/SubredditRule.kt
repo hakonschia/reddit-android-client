@@ -15,7 +15,8 @@ class SubredditRule {
     var subreddit = ""
 
     /**
-     * What kind of rule this is
+     * What kind of rule this is. For rules about posts, this will be "link", for posts and comments
+     * this will be "all"
      */
     @SerializedName("kind")
     var kind = ""

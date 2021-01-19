@@ -65,6 +65,8 @@ class SubmitActivity : AppCompatActivity() {
 
         val subredditName = intent?.extras?.getString(SUBREDDIT_KEY) ?: return
 
+        observerSubreddit(subredditName)
+
         // Setup with all tabs initially until we know which submissions are supported on the subreddit
         setupTabs()
 
@@ -114,7 +116,24 @@ class SubmitActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Updates subreddit info from the local database and updates the views on changes
+     */
+    private fun observerSubreddit(subredditName: String) {
+        database.subreddits().get(subredditName).observe(this) {
+            if (it == null) {
+                return@observe
+            }
+
+            subreddit = it
+            updateViews()
+            checkSubmissionTypes(subreddit)
+        }
+    }
+
     private fun getSubredditInfo(subredditName: String) {
+        // TODO get from API
+        /*
         CoroutineScope(IO).launch {
             val sub: Subreddit? = database.subreddits().get(subredditName)
 
@@ -128,6 +147,7 @@ class SubmitActivity : AppCompatActivity() {
                 // TODO Get from API
             }
         }
+         */
     }
 
     /**

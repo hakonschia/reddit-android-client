@@ -338,6 +338,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         with (binding) {
             subredditRefresh.setOnClickListener { refreshPosts() }
             subscribe.setOnClickListener { subscribeOnclick() }
+            subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }
 
             subredditSubscribers.setCharacterLists(TickerUtils.provideNumberList())
 
@@ -439,12 +440,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
         // Not a standard sub, get info from local database if previously stored
         if (!isDefaultSubreddit) {
-            CoroutineScope(IO).launch {
-                val s = database.subreddits().get(subredditName)
-                if (s != null) {
-                    withContext(Main) {
-                        subreddit.set(s)
-                    }
+            database.subreddits().get(subredditName).observe(viewLifecycleOwner) {
+                // If the subreddit hasn't been previously loaded it will be null
+                if (it != null) {
+                    subreddit.set(it)
                 }
             }
 
@@ -551,24 +550,33 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private fun subscribeOnclick() {
         val sub = subreddit.get()
 
-        // TODO should this also assume that it succeeds like with voting?
         sub?.let {
+            // Assume success
             val newSubscription = !it.isSubscribed
 
             CoroutineScope(IO).launch {
+                sub.isSubscribed = newSubscription
+                sub.subscribers += if (newSubscription) 1 else -1
+
+                database.subreddits().update(sub)
+
                 val response = api.subreddit(sub.name).subscribe(newSubscription)
 
                 withContext(Main) {
                     when (response) {
-                        is ApiResponse.Success -> {
-                            it.isSubscribed = newSubscription
-                            subreddit.set(it)
+                        is ApiResponse.Success -> { }
+                        is ApiResponse.Error -> {
+                            // Revert back
+                            sub.isSubscribed = !newSubscription
+                            sub.subscribers += if (!newSubscription) 1 else -1
+                            database.subreddits().update(sub)
+
+                            Util.handleGenericResponseErrors(
+                                    binding.parentLayout,
+                                    response.error,
+                                    response.throwable
+                            )
                         }
-                        is ApiResponse.Error -> Util.handleGenericResponseErrors(
-                                binding.parentLayout,
-                                response.error,
-                                response.throwable
-                        )
                     }
                 }
             }
@@ -587,17 +595,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         CoroutineScope(IO).launch {
             when (val response = api.subreddit(subredditName).info()) {
                 is ApiResponse.Success -> {
-                    val sub = response.value
-
-                    // Lets assume the user doesn't want to store NSFW. We could use the setting for caching
-                    // images/videos but it's somewhat going beyond the intent of the setting
-                    if (sub.isNsfw) {
-                        database.subreddits().insert(sub)
-                    }
-
-                    withContext(Main) {
-                        subreddit.set(sub)
-                    }
+                    database.subreddits().insert(response.value)
                 }
                 is ApiResponse.Error -> {
                     withContext(Main) {
@@ -619,18 +617,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             when (val response = api.subreddit(subredditName).rules()) {
                 is ApiResponse.Success -> {
                     rulesLoaded = true
-                    val rules = response.value.sortedBy { it.priority }
 
-                    database.rules().insertAll(rules)
+                    database.rules().insertAll(response.value)
 
                     withContext(Main) {
                         binding.subredditInfo.rulesloadingIcon.onCountChange(false)
-
-                        // Update drawer
-                        _binding?.let {
-                            // It seems like rules are always sorted by the priority, but just to be sure
-                          //  updateRules(response.value.sortedBy { it.priority })
-                        }
                     }
                 }
                 is ApiResponse.Error -> {
@@ -644,7 +635,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     }
 
     /**
-     * Observes the subreddits rules from the local database
+     * Observes the subreddits rules from the local database and updates [rulesAdapter] on changes
      */
     private fun observeRules() {
         database.rules().getAllRules(getSubredditName()).observe(viewLifecycleOwner) {

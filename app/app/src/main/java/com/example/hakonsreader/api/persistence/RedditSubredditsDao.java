@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.persistence;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -63,10 +64,10 @@ public interface RedditSubredditsDao {
      *
      * @param subredditName The name of the subreddit (as equal to {@link Subreddit#getName()}).
      *                      Not this is NOT case sensitive
-     * @return The subreddit, or null if not found
+     * @return A LiveData with the subreddit, or null if not found
      */
     @Query("SELECT * FROM subreddits WHERE name=:subredditName COLLATE NOCASE")
-    Subreddit get(String subredditName);
+    LiveData<Subreddit> get(String subredditName);
 
 
     /**

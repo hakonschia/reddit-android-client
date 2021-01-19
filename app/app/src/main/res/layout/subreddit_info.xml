@@ -50,7 +50,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Counter-Strike: Global Offensive" />
 
-            <TextView
+            <com.robinhood.ticker.TickerView
                 android:id="@+id/subredditSubscribers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,6 +63,8 @@
 
                 android:maxLines="1"
                 android:ellipsize="end"
+
+                app:ticker_defaultCharacterList="number"
 
                 app:layout_constraintEnd_toStartOf="@id/subscribe"
                 app:layout_constraintHorizontal_bias="0.0"
