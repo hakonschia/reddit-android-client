@@ -487,7 +487,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     private fun setupPostsViewModel() {
         postsViewModel = ViewModelProvider(this, PostsFactory(
-                context,
                 getSubredditName(),
                 false
         )).get(PostsViewModel::class.java).apply {

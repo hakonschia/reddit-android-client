@@ -1,6 +1,5 @@
 package com.example.hakonsreader.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +8,6 @@ import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -19,19 +17,17 @@ import java.util.*
 /**
  * ViewModel for retrieving Reddit posts from a user or subreddit
  *
- * @param context An Android context used to create the local database if needed
  * @param userOrSubredditName The name of the user or subreddit to retrieve posts from. This is
  * mutable, but be aware that if changed it has to match the previous user or subreddit type (ie.
  * it shouldn't go from a user to a subreddit)
  * @param isUser True if the ViewModel is loading posts for a user, false for a subreddit
  */
 class PostsViewModel(
-        val context: Context,
         var userOrSubredditName: String,
         private val isUser: Boolean
 ) : ViewModel() {
 
-    private val database = RedditDatabase.getInstance(context)
+    private val database = App.get().database
     private val api = App.get().api
 
     private val posts = MutableLiveData<List<RedditPost>>()

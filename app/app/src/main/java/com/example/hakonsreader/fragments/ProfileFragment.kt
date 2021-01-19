@@ -315,7 +315,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         }
 
         postsViewModel = ViewModelProvider(this, PostsFactory(
-                requireContext(),
                 username,
                 true
         )).get(PostsViewModel::class.java).apply {
