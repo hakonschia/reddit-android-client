@@ -3,6 +3,7 @@ package com.example.hakonsreader.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -491,8 +492,9 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 false
         )).get(PostsViewModel::class.java).apply {
             getPosts().observe(viewLifecycleOwner, { posts ->
+                Log.d(TAG, "setupPostsViewModel: observing posts")
                 // Store the updated post IDs right away
-                postIds = postIds as ArrayList<String>
+                this@SubredditFragment.postIds = postIds as ArrayList<String>
 
                 // Posts have been cleared, clear the adapter and clear the layout manager state
                 if (posts.isEmpty()) {
