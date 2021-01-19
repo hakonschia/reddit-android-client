@@ -41,10 +41,5 @@ public enum PostType {
     /**
      * Gif post. This can be hosted on Reddit or externally
      */
-    GIF,
-
-    /**
-     * The post is a crosspost of another post on Reddit
-     */
-    CROSSPOST;
+    GIF
 }

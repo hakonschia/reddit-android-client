@@ -501,8 +501,6 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
         } else if (isGallery || !galleryImages.isNullOrEmpty()) {
             // If the gallery images are set from imgurRequest isGallery would be false
             return PostType.GALLERY
-        } else if (crosspostParentId != null) {
-            return PostType.CROSSPOST
         }
 
         // Usually no hint means it's a text post, but sometimes it means it's a link post
