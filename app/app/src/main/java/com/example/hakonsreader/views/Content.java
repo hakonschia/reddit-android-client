@@ -78,6 +78,7 @@ public abstract class Content extends FrameLayout {
     /**
      * @return The post this view is displaying
      */
+    @Nullable
     public RedditPost getRedditPost() {
         return redditPost;
     }

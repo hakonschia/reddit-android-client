@@ -10,6 +10,8 @@ import com.example.hakonsreader.App;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.views.Content;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Scroll listener for RecyclerView of Reddit posts. This will automatically "select" a post
  * when it is the main content on the screen. The behaviour of being "selected" and "unselected"
@@ -105,8 +107,12 @@ public class PostScrollListener implements View.OnScrollChangeListener {
      *
      * @param postToIgnore The ID of the post to ignore
      */
-    public void setPostToIgnore(String postToIgnore) {
-        this.postToIgnore = postToIgnore;
+    public void setPostToIgnore(@Nullable String postToIgnore) {
+        if (postToIgnore == null) {
+            postToIgnore = "";
+        } else {
+            this.postToIgnore = postToIgnore;
+        }
     }
 
     /**

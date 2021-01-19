@@ -33,6 +33,7 @@ import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
+import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.interfaces.SortableWithTime
@@ -146,7 +147,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
             ViewUtil.setSubredditIcon(binding.subredditIcon, value)
             binding.subreddit = value
-            postsAdapter?.setHideScoreTime(value.hideScoreTime)
+            postsAdapter?.hideScoreTime = value.hideScoreTime
         }
     }
 
@@ -239,7 +240,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
 
                 if (viewHolder != null) {
-                    val extras = viewHolder.extras
+                    val extras = viewHolder.getExtras()
                     saveBundle.putBundle(saveKey(VIEW_STATE_STORED_KEY + i), extras)
                     viewHolder.onUnselected()
                 }
@@ -272,7 +273,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     // If the view has been destroyed the ViewHolders haven't been created yet
                     val extras = it.getBundle(saveKey(VIEW_STATE_STORED_KEY + i))
                     if (extras != null) {
-                        viewHolder.extras = extras
+                        viewHolder.setExtras(extras)
                     }
                 }
             }
@@ -373,21 +374,21 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private fun setupPostsList() {
         postsAdapter = PostsAdapter().apply {
             binding.posts.adapter = this
-            setOnVideoManuallyPaused { contentVideo ->
+            onVideoManuallyPaused = OnVideoManuallyPaused { contentVideo ->
                 // Ignore post when scrolling if manually paused
-                postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
+                postsScrollListener?.setPostToIgnore(contentVideo.redditPost?.id)
             }
 
-            setVideoFullscreenListener { contentVideo ->
+            onVideoFullscreenListener = OnVideoFullscreenListener { contentVideo ->
                 // Ignore post when scrolling if it has been fullscreened
-                postsScrollListener?.setPostToIgnore(contentVideo.redditPost.id)
+                postsScrollListener?.setPostToIgnore(contentVideo.redditPost?.id)
             }
 
-            setOnPostClicked { post ->
+            onPostClicked = PostsAdapter.OnPostClicked { post ->
                 // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
                 // autoplay the video
                 val redditPost = post.redditPost
-                postsScrollListener?.setPostToIgnore(redditPost.id)
+                postsScrollListener?.setPostToIgnore(redditPost?.id)
 
                 val intent = Intent(context, PostActivity::class.java).apply {
                     putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))

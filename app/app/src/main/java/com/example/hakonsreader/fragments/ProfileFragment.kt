@@ -166,7 +166,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
         // If we have no username we can't get posts (we can't ask for posts for the logged in user without
         // their username). The posts are retrieved automatically when the user information loads
-        if (postsAdapter?.posts?.isEmpty() == true && postIds.isEmpty() && username != null) {
+        if (postsAdapter?.getPosts()?.isEmpty() == true && postIds.isEmpty() && username != null) {
             postsViewModel?.loadPosts()
         }
 
@@ -234,7 +234,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
                 val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
 
                 if (viewHolder != null) {
-                    val extras = viewHolder.extras
+                    val extras = viewHolder.getExtras()
                     saveBundle.putBundle(VIEW_STATE_STORED_KEY + i, extras)
                     viewHolder.onUnselected()
                 }
@@ -267,7 +267,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
                     // If the view has been destroyed the ViewHolders haven't been created yet
                     val extras = it.getBundle(VIEW_STATE_STORED_KEY + i)
                     if (extras != null) {
-                        viewHolder.extras = extras
+                        viewHolder.setExtras(extras)
                     }
                 }
             }
@@ -354,11 +354,11 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             binding.posts.setOnScrollChangeListener(this)
         }
 
-        postsAdapter?.setOnPostClicked { post ->
+        postsAdapter?.onPostClicked = PostsAdapter.OnPostClicked { post ->
             // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
             // autoplay the video
             val redditPost = post.redditPost
-            postsScrollListener?.setPostToIgnore(redditPost.id)
+            postsScrollListener?.setPostToIgnore(redditPost?.id)
 
             val intent = Intent(context, PostActivity::class.java)
             intent.putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))
