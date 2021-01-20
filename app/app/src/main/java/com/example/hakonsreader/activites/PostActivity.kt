@@ -179,6 +179,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         // Ensure resources are freed when the activity exits
         binding.post.cleanUpContent()
+        binding.post.lifecycleOwner = null
     }
 
     /**
@@ -215,6 +216,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
             // have had a chance to load
             noComments = false
             commentChainShown = false
+
+            post.lifecycleOwner = this@PostActivity
 
             post.maxHeight = maxPostHeight
             post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true

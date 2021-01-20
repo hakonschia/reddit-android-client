@@ -222,6 +222,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
                 viewHolder?.destroy()
             }
+
+            it.lifecycleOwner = null
         }
 
         _binding = null
@@ -380,6 +382,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     private fun setupPostsList() {
         postsAdapter = PostsAdapter().apply {
+            lifecycleOwner = viewLifecycleOwner
+
             binding.posts.adapter = this
             onVideoManuallyPaused = OnVideoManuallyPaused { contentVideo ->
                 // Ignore post when scrolling if manually paused

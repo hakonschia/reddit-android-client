@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
@@ -46,6 +47,17 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
      * Listener for when a video has entered fullscreen
      */
     var onVideoFullscreenListener: OnVideoFullscreenListener? = null
+
+    /**
+     * The lifecycle owner of the adapter. If this is set the posts in the adapter will observe
+     * the local database for updates to the posts, which will update the post information without
+     * redrawing the ViewHolder
+     *
+     * When the view is destroyed, this must be set to `null` to avoid a leak, as well as setting the
+     * ViewHolders of the adapter to null (with [Post.lifecycleOwner])
+     */
+    var lifecycleOwner: LifecycleOwner? = null
+
 
     /**
      * Submits the list of posts to show in the RecyclerView
@@ -136,6 +148,8 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
                 }
             }
 
+            lifecycleOwner = this@PostsAdapter.lifecycleOwner
+
             onVideoManuallyPaused = this@PostsAdapter.onVideoManuallyPaused
             onVideoFullscreenListener = this@PostsAdapter.onVideoFullscreenListener
 
@@ -212,10 +226,12 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
         }
 
         /**
-         * Call when the ViewHolder should be destroyed. Any resources are freed up
+         * Call when the ViewHolder should be destroyed. Any resources are freed up, this includes
+         * nulling [Post.lifecycleOwner]
          */
         fun destroy() {
             post.cleanUpContent()
+            post.lifecycleOwner = null
         }
     }
 

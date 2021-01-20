@@ -4,12 +4,16 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.RelativeLayout
 import androidx.core.util.Pair
-import com.example.hakonsreader.App.Companion.get
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
@@ -23,6 +27,8 @@ import java.util.*
 class Post : Content {
 
     companion object {
+        private const val TAG = "Post"
+
         /**
          * Flag used for when the [Post.maxHeight] isn't set
          */
@@ -63,7 +69,49 @@ class Post : Content {
         get() = binding.postFullBar.getHideScore()
         set(value) = binding.postFullBar.setHideScore(value)
 
+
+    // It is probably quite bad to use LiveData to observe the changes inside here? But it makes it
+    // very easy to update the information without redrawing the content, and I can also add animations
+    // on the changes fairly easy this way. The dangerous pitfall is to forget to remove observers and such
+    // which can probably cause memory leaks and possibly cause performance issues
+    /**
+     * The lifecycle owner of the post
+     *
+     * If this is set then the view will observe changes in the local database
+     * to the post set with [setRedditPost]
+     *
+     * Note: This should be set to `null` when the lifecycle owner is destroyed to avoid a memory leak.
+     * Setting this to null will remove the current LiveData observer
+     */
+    var lifecycleOwner: LifecycleOwner? = null
+        set(value) {
+            field = value
+            if (value == null) {
+                postLiveData?.removeObserver(postObserver)
+                postLiveData = null
+            }
+        }
+
+    /**
+     * The LiveData that is currently being observed
+     */
+    private var postLiveData: LiveData<RedditPost>? = null
+
+    /**
+     * The observer [postLiveData] uses
+     */
+    private var postObserver = Observer<RedditPost> {
+        if (it != null) {
+            updatePostInfo(it)
+        }
+    }
+
+    /**
+     * Listener for layout changes for the content of the post, which is used to resize the content
+     * based on [maxHeight]
+     */
     private lateinit var contentOnGlobalLayoutListener: OnGlobalLayoutListener
+
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -98,7 +146,6 @@ class Post : Content {
     /**
      * Sets the height of only the content view of the post. The value will be animated for a duration
      * of 250 milliseconds
-     *
      *
      * This does not check the max height set
      *
@@ -234,7 +281,7 @@ class Post : Content {
                         setOnVideoManuallyPaused(this@Post.onVideoManuallyPaused)
                         setOnVideoFullscreenListener(this@Post.onVideoFullscreenListener)
                     }
-                } else if (get().openYouTubeVideosInApp()
+                } else if (App.get().openYouTubeVideosInApp()
                         && (redditPost.domain == "youtu.be" || redditPost.domain == "youtube.com")) {
                     ContentYoutubeVideo(context)
                 } else {
@@ -328,6 +375,20 @@ class Post : Content {
         binding.postInfo.setPost(redditPost, updateAwards = true)
         addContent()
         binding.postFullBar.post = redditPost
+    }
+
+    override fun setRedditPost(redditPost: RedditPost?) {
+        super.setRedditPost(redditPost)
+
+        if (redditPost == null) {
+            return
+        }
+
+        // New post set, remove observer on previous LiveData and get a new one from the database to observe
+        lifecycleOwner?.let {
+            postLiveData?.removeObserver(postObserver)
+            postLiveData = App.get().database.posts().getPostById(redditPost.id).apply { observe(it, postObserver) }
+        }
     }
 
     /**

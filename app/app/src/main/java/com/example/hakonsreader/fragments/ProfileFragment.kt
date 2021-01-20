@@ -202,6 +202,8 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
                 val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
                 viewHolder?.destroy()
             }
+
+            it.lifecycleOwner = null
         }
 
         if (saveState == null) {
@@ -346,7 +348,11 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
      * Sets up [FragmentProfileBinding.posts] and related variables it uses
      */
     private fun setupPostsList() {
-        postsAdapter = PostsAdapter().apply { binding.posts.adapter = this }
+        postsAdapter = PostsAdapter().apply {
+            binding.posts.adapter = this
+            lifecycleOwner = viewLifecycleOwner
+        }
+
         postsLayoutManager = LinearLayoutManager(requireContext()).apply { binding.posts.layoutManager = this }
 
         postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }.apply {
