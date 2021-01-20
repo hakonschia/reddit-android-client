@@ -308,7 +308,7 @@ class VideoPlayer : PlayerView {
 
         // Add listener for buffering changes, playback changes etc.
         player.addListener(object : Player.EventListener {
-            var loader: ProgressBar = findViewById(R.id.buffering)
+            val loader: ProgressBar = findViewById(R.id.buffering)
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 // Ensure the thumbnail isn't visible when the video is playing

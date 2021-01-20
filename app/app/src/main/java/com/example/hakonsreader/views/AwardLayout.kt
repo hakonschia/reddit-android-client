@@ -12,10 +12,12 @@ import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.interfaces.AwardableListing
 import com.example.hakonsreader.api.model.RedditAward
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.AwardLayoutBinding
 import com.example.hakonsreader.fragments.bottomsheets.ShowAwardBottomSheet
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.misc.loadIf
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 
 /**
@@ -26,7 +28,9 @@ class AwardLayout : FrameLayout {
         private const val TAG = "AwardLayout"
     }
 
-    private val binding = AwardLayoutBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding = AwardLayoutBinding.inflate(LayoutInflater.from(context), this, true).apply {
+        awardCount.setOnClickListener { showTotalCoinPrice() }
+    }
 
     /**
      * The awardable listing to display in this layout
@@ -98,6 +102,31 @@ class AwardLayout : FrameLayout {
         binding.amountOfAwards = count
     }
 
+    /**
+     * Shows a snackbar with the total amount of Reddit coins the listing has received
+     */
+    private fun showTotalCoinPrice() {
+        listing?.let {
+            var totalPrice = 0
+            it.awardings?.forEach { award ->
+                totalPrice += award.price
+            }
+
+            val isPost = if (listing is RedditPost) {
+                context.getString(R.string.awardTotalCoinPricePost)
+            } else {
+                context.getString(R.string.awardTotalCoinPricecomment)
+            }
+
+            // No listing will ever have 1 coin, so we don't have to care for plurals
+            val text = context.getString(R.string.awardTotalCoinPrice, isPost, totalPrice)
+            Snackbar.make(binding.root, text, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    /**
+     * Gets the total amount of awards on the listing
+     */
     private fun getTotalAwardsCount() : Int {
         var count = 0
         listing?.awardings?.forEach { count += it.count }
