@@ -91,7 +91,6 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         saveExtras(holder.post)
         val post = posts[position]
-        val previousId = holder.getPostId()
 
         // Disable ticker animation to avoid it updating when scrolling
         holder.post.enableTickerAnimation(false)
@@ -101,12 +100,7 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
         val between = Duration.between(created, now)
         holder.post.hideScore = hideScoreTime > between.toMinutes()
 
-        // Only update, don't recreate post content
-        if (post.id == previousId) {
-            holder.post.updatePostInfo(post)
-        } else {
-            holder.post.redditPost = post
-        }
+        holder.post.redditPost = post
 
         val savedExtras = postExtras[post.id]
         if (savedExtras != null) {
@@ -142,11 +136,11 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
                 }
             }
 
-            setOnVideoPostPaused(onVideoManuallyPaused)
-            setVideoFullscreenListener(onVideoFullscreenListener)
+            onVideoManuallyPaused = this@PostsAdapter.onVideoManuallyPaused
+            onVideoFullscreenListener = this@PostsAdapter.onVideoFullscreenListener
 
             // Text posts shouldn't be shown in lists of posts
-            setShowTextContent(false)
+            showTextContent = false
         }
 
         /**
@@ -181,7 +175,7 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
          * @return The Y position of the content
          */
         fun getContentY(): Int {
-            return post.contentY
+            return post.getContentY()
         }
 
         /**
@@ -193,7 +187,7 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
          * @return The Y position of the bottom of the content
          */
         fun getContentBottomY(): Int {
-            return post.contentBottomY
+            return post.getContentBottomY()
         }
 
         /**

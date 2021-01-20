@@ -216,7 +216,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
             noComments = false
             commentChainShown = false
 
-            post.setMaxHeight(maxPostHeight)
+            post.maxHeight = maxPostHeight
             post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
 
             // Go to first/last comment on long clicks on navigation buttons
@@ -310,7 +310,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
      */
     private fun updatePostInfo() {
         binding.setPost(post)
-        binding.post.updatePostInfo(post)
+        post?.let { binding.post.updatePostInfo(it) }
     }
 
     /**
@@ -391,14 +391,14 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
                 // TODO this doesn't work perfectly as the "loading" image is still shown sometimes for a split second
                 PostType.IMAGE -> {
                     postponeEnterTransition()
-                    binding.post.setImageLoadedCallback(object : Callback {
+                    binding.post.imageLoadedCallback = object : Callback {
                         override fun onSuccess() {
                             startPostponedEnterTransition()
                         }
                         override fun onError(e: Exception) {
                             startPostponedEnterTransition()
                         }
-                    })
+                    }
 
                     onPostLoaded(postExtras)
                 }
@@ -567,7 +567,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
                 if (heightWhenCollapseDisabled == null) {
                     binding.post.updateMaxHeight(maxPostHeight)
                 } else {
-                    binding.post.contentHeight = heightWhenCollapseDisabled
+                    binding.post.setContentHeight(heightWhenCollapseDisabled!!)
                 }
             }
 
@@ -575,7 +575,7 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
             R.string.postTransitionEnabled
         } else {
             if (updateHeight) {
-                heightWhenCollapseDisabled = binding.post.contentHeight
+                heightWhenCollapseDisabled = binding.post.getContentHeight()
                 binding.post.updateMaxHeight(maxPostHeightWhenCollapsedDisabled)
             }
 
