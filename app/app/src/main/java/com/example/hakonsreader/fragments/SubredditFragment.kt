@@ -130,6 +130,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     private var rulesLoaded = false
 
+    /**
+     * A DrawerListener for the drawer with subreddit info
+     */
+    var drawerListener: DrawerLayout.DrawerListener? = null
+
 
     private val subreddit: ObservableField<Subreddit> = object : ObservableField<Subreddit>() {
         override fun set(value: Subreddit) {
@@ -355,6 +360,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             )
 
             openDrawer.setOnClickListener { drawer.openDrawer(GravityCompat.END) }
+            drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
                     if (!rulesLoaded) {
@@ -719,6 +725,20 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 }
                 Util.handleGenericResponseErrors(binding.parentLayout, error, throwable)
             }
+        }
+    }
+
+    /**
+     * Closes the drawer if it is open
+     *
+     * @return True if the drawer was opened and is now closed, false if the drawer wasn't opened
+     */
+    fun closeDrawerIfOpen() : Boolean {
+        return if (_binding?.drawer?.isDrawerOpen(GravityCompat.END) == true) {
+            _binding?.drawer?.closeDrawer(GravityCompat.END)
+            true
+        } else {
+            false
         }
     }
 

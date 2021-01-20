@@ -2,7 +2,9 @@ package com.example.hakonsreader.activites
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -89,10 +91,33 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
                 }
             }
 
-            fragment = SubredditFragment.newInstance(subreddit, sort, timeSort)
-            supportFragmentManager.beginTransaction()
-                    .add(R.id.subredditActivityFragment, fragment!!, SAVED_SUBREDDIT)
-                    .commit()
+            // The slidr has to be locked when the drawer is open, otherwise swiping the drawer
+            // away will also swipe the activity away
+            val drawerListener = object : DrawerLayout.DrawerListener {
+                override fun onDrawerOpened(drawerView: View) {
+                    lock(true)
+                }
+
+                override fun onDrawerClosed(drawerView: View) {
+                    lock(false)
+                }
+
+                override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+                override fun onDrawerStateChanged(newState: Int) {}
+            }
+
+            fragment = SubredditFragment.newInstance(subreddit, sort, timeSort).apply {
+                this.drawerListener = drawerListener
+                supportFragmentManager.beginTransaction()
+                        .add(R.id.subredditActivityFragment, this, SAVED_SUBREDDIT)
+                        .commit()
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (fragment?.closeDrawerIfOpen() == false) {
+            super.onBackPressed()
         }
     }
 
