@@ -1,5 +1,6 @@
 package com.example.hakonsreader.views
 
+import android.animation.LayoutTransition
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -46,6 +47,20 @@ class PostInfo : FrameLayout {
             binding.crosspost = crosspost
             binding.crosspostText.setOnClickListener { openPost(crosspost) }
         }
+    }
+
+    /**
+     * Enables or disables layout animation
+     *
+     * @param enable If set to true, layout animations will be enabled
+     */
+    fun enableLayoutAnimations(enable: Boolean) {
+        binding.parentLayout.layoutTransition = if (enable) {
+            LayoutTransition()
+        } else {
+            null
+        }
+        binding.executePendingBindings()
     }
 
     /**

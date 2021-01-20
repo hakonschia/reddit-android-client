@@ -104,8 +104,9 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
         saveExtras(holder.post)
         val post = posts[position]
 
-        // Disable ticker animation to avoid it updating when scrolling
-        holder.post.enableTickerAnimation(false)
+        // Disable any animation to avoid it updating when scrolling, as this would animate changes from
+        // one post to another
+        holder.post.enableLayoutAnimations(false)
 
         val created = Instant.ofEpochSecond(post.createdAt)
         val now = Instant.now()
@@ -118,7 +119,7 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
         if (savedExtras != null) {
             holder.post.extras = savedExtras
         }
-        holder.post.enableTickerAnimation(true)
+        holder.post.enableLayoutAnimations(true)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

@@ -35,7 +35,7 @@ class Post : Content {
         private const val NO_MAX_HEIGHT = -1
     }
 
-    val binding = PostBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding = PostBinding.inflate(LayoutInflater.from(context), this, true)
 
     /**
      * If set to false, text posts will not show the content of the post, only the post info/post bar
@@ -177,14 +177,16 @@ class Post : Content {
      */
     fun getContentHeight() = binding.content.getChildAt(0)?.measuredHeight
 
-    /**
-     * Enables or disables the animation for any [com.robinhood.ticker.TickerView] found
-     * in this view
-     *
-     * @param enable True to enable
-     */
-    fun enableTickerAnimation(enable: Boolean) = binding.postFullBar.enableTickerAnimation(enable)
 
+    /**
+     * Enables or disables layout animation for various views in the layout
+     *
+     * @param enable If set to true, layout animations will be enabled
+     */
+    fun enableLayoutAnimations(enable: Boolean) {
+        binding.postInfo.enableLayoutAnimations(enable)
+        binding.postFullBar.enableTickerAnimation(enable)
+    }
 
     /**
      * Updates the information in the post without re-creating the content
