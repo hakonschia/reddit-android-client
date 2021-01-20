@@ -7,16 +7,16 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.ReplyService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
 import com.example.hakonsreader.api.utils.apiListingErrors
+import com.example.hakonsreader.api.utils.createFullName
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 class ReplyableRequestModel(
         private val accessToken: AccessToken,
         private val api: ReplyService
 ) {
-
 
     /**
      * Submit a new comment as a reply to another comment. Note: The depth of the new comment for replies is not
@@ -32,7 +32,7 @@ class ReplyableRequestModel(
      */
     suspend fun postComment(thing: Thing, id: String, commentText: String) : ApiResponse<RedditComment> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Posting a comment requires a valid access token for a logged in user", e))
         }
@@ -40,7 +40,7 @@ class ReplyableRequestModel(
         return try {
             val resp = api.postComment(
                     commentText,
-                    Util.createFullName(thing, id)
+                    createFullName(thing, id)
             )
 
             val body = resp.body()

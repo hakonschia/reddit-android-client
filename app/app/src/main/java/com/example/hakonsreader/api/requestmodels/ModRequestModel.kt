@@ -8,8 +8,9 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.ModService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.createFullName
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 class ModRequestModel(
@@ -27,14 +28,14 @@ class ModRequestModel(
      */
     suspend fun distinguishAsModComment(id: String, distinguish: Boolean, sticky: Boolean) : ApiResponse<RedditComment> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Distinguishing/stickying a comment requires a valid access token for a logged in user", e))
         }
 
         return try {
             val resp = api.distinguishAsModComment(
-                    Util.createFullName(Thing.COMMENT, id),
+                    createFullName(Thing.COMMENT, id),
                     if (distinguish) "yes" else "no",
                     sticky,
             )
@@ -58,14 +59,14 @@ class ModRequestModel(
      */
     suspend fun distinguishAsModPost(id: String, distinguish: Boolean) : ApiResponse<RedditPost> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Distinguishing a post requires a valid access token for a logged in user", e))
         }
 
         return try {
             val resp = api.distinguishAsModPost(
-                    Util.createFullName(Thing.POST, id),
+                    createFullName(Thing.POST, id),
                     if (distinguish) "yes" else "no"
             )
 
@@ -91,14 +92,14 @@ class ModRequestModel(
      */
     suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Any?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Stickying a post requires a valid access token for a logged in user", e))
         }
 
         return try {
             val resp = api.stickyPost(
-                    Util.createFullName(Thing.POST, id),
+                    createFullName(Thing.POST, id),
                     sticky
             )
 
@@ -119,14 +120,14 @@ class ModRequestModel(
      */
     suspend fun ignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Ignoring reports requires a valid access token for a logged in user", e))
         }
 
         return try {
             val resp = api.ignoreReports(
-                    Util.createFullName(thing, id)
+                    createFullName(thing, id)
             )
 
             if (resp.isSuccessful) {
@@ -146,14 +147,14 @@ class ModRequestModel(
      */
     suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Unignoring reports requires a valid access token for a logged in user", e))
         }
 
         return try {
             val resp = api.unignoreReports(
-                    Util.createFullName(thing, id)
+                    createFullName(thing, id)
             )
 
             if (resp.isSuccessful) {

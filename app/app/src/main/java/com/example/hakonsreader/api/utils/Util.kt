@@ -1,13 +1,17 @@
 package com.example.hakonsreader.api.utils
 
 import com.example.hakonsreader.api.enums.ResponseErrors
+import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.exceptions.ArchivedException
+import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.exceptions.RateLimitException
 import com.example.hakonsreader.api.exceptions.ThreadLockedException
+import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.google.gson.Gson
 import retrofit2.Response
+
 
 /**
  * Convenience method for returning an [ApiResponse.Error]. This takes in a [Response] and
@@ -40,4 +44,30 @@ fun apiListingErrors(errors: List<List<String>>)  : ApiResponse.Error {
         ResponseErrors.ARCHIVED.value == errorType -> ApiResponse.Error(GenericError(-1), ArchivedException("The listing has been archived"))
         else -> ApiResponse.Error(GenericError(-1), Exception(String.format("Unknown error: %s; %s", errorType, errorMessage)))
     }
+}
+
+/**
+ * Ensures that a given access token is valid for a user that is logged in.
+ * Access tokens for non-logged in users do not count.
+ *
+ * @param accessToken The access token to check
+ *
+ * @throws InvalidAccessTokenException If the access token has no refresh token (ie. not an actually logged in user)
+ */
+@Throws(InvalidAccessTokenException::class)
+fun verifyLoggedInToken(accessToken: AccessToken) {
+    if (accessToken.refreshToken == null) {
+        throw InvalidAccessTokenException("Valid access token was not found")
+    }
+}
+
+/**
+ * Creates the fullname for a thing
+ *
+ * @param thing The type of thing
+ * @param thingId The ID of the thing
+ * @return The fullname for the thing
+ */
+fun createFullName(thing: Thing, thingId: String): String {
+    return thing.value + "_" + thingId
 }

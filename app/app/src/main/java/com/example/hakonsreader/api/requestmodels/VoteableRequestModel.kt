@@ -7,8 +7,9 @@ import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.VoteService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.createFullName
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 
@@ -33,13 +34,13 @@ internal class VoteableRequestModel(
      */
     suspend fun vote(thing: Thing, id: String, type: VoteType) : ApiResponse<Nothing?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Voting requires a valid access token for a logged in user", e))
         }
 
         return try {
-            val resp = api.vote(Util.createFullName(thing, id), type.value)
+            val resp = api.vote(createFullName(thing, id), type.value)
 
             if (resp.isSuccessful) {
                 ApiResponse.Success(null)

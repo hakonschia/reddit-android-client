@@ -15,8 +15,9 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.SubredditService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.createFullName
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 
 class SubredditRequest(
         private val subredditName: String,
@@ -150,7 +151,7 @@ class SubredditRequest(
      */
     suspend fun subscribe(subscribe: Boolean) : ApiResponse<Nothing?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), e)
         }
@@ -182,7 +183,7 @@ class SubredditRequest(
      */
     suspend fun favorite(favorite: Boolean) : ApiResponse<Nothing?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), e)
         }
@@ -351,7 +352,7 @@ class SubredditRequest(
 
         // kind = crosspost
         // "crosspost_fullname"
-        val fullname = Util.createFullName(Thing.POST, crosspostId)
+        val fullname = createFullName(Thing.POST, crosspostId)
 
         return try {
             val resp = api.submit(
@@ -389,7 +390,7 @@ class SubredditRequest(
      */
     private fun verifyGenericSubmission(title: String) : ApiResponse.Error? {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Submitting a post requires a valid access token for a logged in user", e))
         }
@@ -412,7 +413,7 @@ class SubredditRequest(
      */
     suspend fun submissionFlairs() : ApiResponse<List<SubmissionFlair>> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Retrieving submission flairs requires a valid access token for a logged in user", e))
         }

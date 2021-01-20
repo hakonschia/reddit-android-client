@@ -1,16 +1,15 @@
-package com.example.hakonsreader.api.interfaces;
+package com.example.hakonsreader.api.interfaces
 
-import com.example.hakonsreader.api.model.AccessToken;
+import com.example.hakonsreader.api.model.AccessToken
 
 /**
  * Interface used to notify when a new token is received by the API
  */
-public interface OnNewToken {
-
+fun interface OnNewToken {
     /**
      * Called when a new token is received
      *
      * @param newToken The new token
      */
-    void newToken(AccessToken newToken);
+    fun newToken(newToken: AccessToken?)
 }

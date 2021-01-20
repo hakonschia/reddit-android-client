@@ -7,8 +7,9 @@ import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.MessageService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.createFullName
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 import java.lang.StringBuilder
 
@@ -58,7 +59,7 @@ class MessagesRequestModel(
      */
     private suspend fun getInboxMessagesInternal(where: String, after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot get messages without a logged in user", e))
         }
@@ -119,7 +120,7 @@ class MessagesRequestModel(
         }
 
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot mark messages as read without a logged in user", e))
         }
@@ -136,7 +137,7 @@ class MessagesRequestModel(
                     Thing.MESSAGE
                 }
 
-                fullnames.append(Util.createFullName(thing, it.id))
+                fullnames.append(createFullName(thing, it.id))
                 fullnames.append(",")
             }
 
@@ -167,7 +168,7 @@ class MessagesRequestModel(
      */
     suspend fun sendMessage(recipient: String, subject: String, message: String) : ApiResponse<Any?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot send messages without a logged in user", e))
         }

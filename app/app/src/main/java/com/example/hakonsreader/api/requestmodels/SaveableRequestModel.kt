@@ -6,8 +6,9 @@ import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.SaveService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.createFullName
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 class SaveableRequestModel(
@@ -26,13 +27,13 @@ class SaveableRequestModel(
      */
     suspend fun save(thing: Thing, id: String) : ApiResponse<Nothing?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Saving a comment or post requires a valid access token for a logged in user", e))
         }
 
         return try {
-            val resp = api.save(Util.createFullName(thing, id))
+            val resp = api.save(createFullName(thing, id))
 
             if (resp.isSuccessful) {
                 ApiResponse.Success(null)
@@ -56,13 +57,13 @@ class SaveableRequestModel(
      */
     suspend fun unsave(thing: Thing, id: String) : ApiResponse<Nothing?>  {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Unsaving a comment or post requires a valid access token for a logged in user", e))
         }
 
         return try {
-            val resp = api.unsave(Util.createFullName(thing, id))
+            val resp = api.unsave(createFullName(thing, id))
 
             if (resp.isSuccessful) {
                 ApiResponse.Success(null)

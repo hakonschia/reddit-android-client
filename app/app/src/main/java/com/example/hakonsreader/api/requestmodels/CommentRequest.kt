@@ -12,8 +12,9 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.CommentService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.createFullName
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 class CommentRequest(
@@ -36,13 +37,13 @@ class CommentRequest(
      */
     suspend fun delete() : ApiResponse<Any?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot delete comments without an access token for a logged in user", e))
         }
 
         return try {
-            val response = api.delete(Util.createFullName(Thing.COMMENT, commentId))
+            val response = api.delete(createFullName(Thing.COMMENT, commentId))
             if (response.isSuccessful) {
                 ApiResponse.Success(null)
             } else {
@@ -56,14 +57,14 @@ class CommentRequest(
     suspend fun edit(editedText: String) : ApiResponse<RedditComment> {
         // TODO this isn't tested
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot edit comments without an access token for a logged in user", e))
         }
 
         return try {
             val resp = api.edit(
-                    Util.createFullName(Thing.COMMENT, commentId),
+                    createFullName(Thing.COMMENT, commentId),
                     editedText
             )
 

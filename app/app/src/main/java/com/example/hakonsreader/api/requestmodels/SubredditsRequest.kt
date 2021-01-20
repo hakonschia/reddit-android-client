@@ -8,7 +8,7 @@ import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.SubredditsService
 import com.example.hakonsreader.api.utils.apiError
-import com.example.hakonsreader.api.utils.Util
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 class SubredditsRequest(
@@ -56,7 +56,7 @@ class SubredditsRequest(
      */
     suspend fun subscribedSubreddits(after: String = "", count: Int = 0) : ApiResponse<List<Subreddit>> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Getting subscribed subreddits requires a valid access token for a logged in user", e))
         }

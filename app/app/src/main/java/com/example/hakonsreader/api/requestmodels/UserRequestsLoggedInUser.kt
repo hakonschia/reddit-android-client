@@ -6,8 +6,8 @@ import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.UserService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 /**
@@ -29,7 +29,7 @@ class UserRequestsLoggedInUser(
      */
     suspend fun info() : ApiResponse<RedditUser> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't get user information without access token for a logged in user", e))
         }

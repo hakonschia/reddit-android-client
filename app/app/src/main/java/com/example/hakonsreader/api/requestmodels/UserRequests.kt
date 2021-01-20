@@ -12,8 +12,8 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.UserService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 class UserRequests(
@@ -98,7 +98,7 @@ class UserRequests(
      */
     suspend fun block() : ApiResponse<Nothing?> {
         try {
-            Util.verifyLoggedInToken(accessToken)
+            verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
             return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't get user information without access token for a logged in user", e))
         }

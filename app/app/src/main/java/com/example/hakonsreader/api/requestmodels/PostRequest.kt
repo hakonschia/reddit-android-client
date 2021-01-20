@@ -16,8 +16,8 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.PostService
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
-import com.example.hakonsreader.api.utils.Util
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.createFullName
 import java.lang.Exception
 
 class PostRequest(
@@ -103,7 +103,7 @@ class PostRequest(
         return try {
             val resp = api.getMoreComments(
                     childrenJoined,
-                    Util.createFullName(Thing.POST, postId)
+                    createFullName(Thing.POST, postId)
             )
 
             val comments = resp.body()?.getListings() as List<RedditComment>?
@@ -239,7 +239,7 @@ class PostRequest(
      */
     suspend fun info() : ApiResponse<RedditPost?> {
         return try {
-            val response = api.getInfo(Util.createFullName(Thing.POST, postId))
+            val response = api.getInfo(createFullName(Thing.POST, postId))
             val body = response.body()
 
             if (body != null) {

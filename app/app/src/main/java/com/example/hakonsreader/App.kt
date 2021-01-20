@@ -293,7 +293,7 @@ class App : Application() {
 
                 accessToken = TokenManager.getToken(),
                 onNewToken = { newToken: AccessToken? -> TokenManager.saveToken(newToken) },
-                onInvalidToken = { error: GenericError, throwable: Throwable -> onInvalidAccessToken(error, throwable) },
+                onInvalidToken = { _: GenericError?, _: Throwable? -> onInvalidAccessToken() },
 
                 loggerLevel = HttpLoggingInterceptor.Level.BODY,
 
@@ -793,11 +793,8 @@ class App : Application() {
     /**
      * Handles when the API notifies that the access token is no longer valid, and the user should
      * be logged out and prompted to log back in.
-     *
-     * @param error The GenericError received
-     * @param throwable The throwable received
      */
-    private fun onInvalidAccessToken(error: GenericError, throwable: Throwable) {
+    private fun onInvalidAccessToken() {
         get().clearUserInfo()
 
         // Should we also recreate the app? We could have posts for the user, be in the profile etc
