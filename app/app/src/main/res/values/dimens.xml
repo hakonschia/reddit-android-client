@@ -72,4 +72,6 @@
     <integer name="submissionTitleMaxLength">300</integer>
 
     <dimen name="linkPreviewTopMargin">4dp</dimen>
+
+    <dimen name="postBarHeight">24dp</dimen>
 </resources>
