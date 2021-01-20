@@ -217,6 +217,8 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
             noComments = false
             commentChainShown = false
 
+            post.enableLayoutAnimations(true)
+
             post.lifecycleOwner = this@PostActivity
 
             post.maxHeight = maxPostHeight
