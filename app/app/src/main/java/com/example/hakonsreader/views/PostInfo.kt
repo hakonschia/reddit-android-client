@@ -30,11 +30,14 @@ class PostInfo : FrameLayout {
      * Sets the post to use in this VoteBar and sets the initial state of the vote status
      *
      * @param post The post to set
+     * @param updateAwards True to update the awards in the awards layout, default is false
      */
-    fun setPost(post: RedditPost) {
+    fun setPost(post: RedditPost, updateAwards: Boolean = false) {
         binding.post = post
         binding.isCrosspost = post.crosspostParentId != null
-        binding.awards.listing = post
+        if (updateAwards) {
+            binding.awards.listing = post
+        }
         binding.userReportsTitle.setOnClickListener { ViewUtil.openReportsBottomSheet(post, context) { binding.invalidateAll() } }
 
         val crossposts = post.crossposts

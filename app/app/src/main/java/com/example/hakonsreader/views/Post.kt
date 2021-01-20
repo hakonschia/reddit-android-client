@@ -325,7 +325,7 @@ class Post : Content {
         // Ensure view is fresh if used in a RecyclerView
         cleanUpContent()
 
-        binding.postInfo.setPost(redditPost)
+        binding.postInfo.setPost(redditPost, updateAwards = true)
         addContent()
         binding.postFullBar.post = redditPost
     }
