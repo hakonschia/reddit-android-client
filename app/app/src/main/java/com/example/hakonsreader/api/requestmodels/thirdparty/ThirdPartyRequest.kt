@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.requestmodels.thirdparty
 
+import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
@@ -104,7 +105,7 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             }
 
             val images = album.images
-            post.galleryImages = images
+            post.galleryImages = images as MutableList<Image>?
             post.crossposts?.forEach {
                 it.galleryImages = images
             }

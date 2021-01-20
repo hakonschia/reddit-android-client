@@ -40,7 +40,7 @@ class ContentYoutubeVideo : Content {
         if (!previews.isNullOrEmpty()) {
             val preview: Image = previews.last()
 
-            if (preview.url.isNotBlank()) {
+            if (preview.url?.isNotBlank() == true) {
                 Picasso.get()
                         .load(preview.url)
                         .into(binding.thumbnail)

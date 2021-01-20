@@ -1,34 +1,31 @@
-package com.example.hakonsreader.api.model;
+package com.example.hakonsreader.api.model
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
+import com.google.gson.annotations.SerializedName
 
 /**
  * Wrapper class for "preview.images" in JSON posts responses
  */
-public class ImagesWrapper {
+class ImagesWrapper {
     @SerializedName("source")
-    Image source;
+    var source: Image? = null
 
     @SerializedName("resolutions")
-    List<Image> resolutions;
-
+    var resolutions: List<Image>? = null
 
     /**
      * For posts such as gifs there is a object called "variants" with links to mp4 and gif URLs
      */
     @SerializedName("variants")
-    PreviewImageVariants variants;
+    var variants: PreviewImageVariants? = null
 
-    public static class PreviewImageVariants {
+    class PreviewImageVariants {
         @SerializedName("gif")
-        ImagesWrapper gif;
+        var gif: ImagesWrapper? = null
 
         @SerializedName("mp4")
-        ImagesWrapper mp4;
+        var mp4: ImagesWrapper? = null
 
         @SerializedName("obfuscated")
-        ImagesWrapper obfuscated;
+        var obfuscated: ImagesWrapper? = null
     }
 }
