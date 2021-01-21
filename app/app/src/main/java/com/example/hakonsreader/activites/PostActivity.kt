@@ -358,6 +358,9 @@ class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
 
         if (postId != null) {
             App.get().database.posts().getPostById(postId).observe(this) {
+                if (it == null) {
+                    return@observe
+                }
                 val postPreviouslySet = binding.post.redditPost != null
                 post = it
 
