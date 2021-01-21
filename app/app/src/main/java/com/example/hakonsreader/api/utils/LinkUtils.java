@@ -38,11 +38,20 @@ public final class LinkUtils {
      * <li>https://www.reddit.com/r/test</li>
      * <li>https://old.reddit.com/r/test</li>
      * </ol>
-     *
-     * @see LinkUtils#SUBREDDIT_REGEX_NO_HTTPS
-     * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
      */
     public static final String SUBREDDIT_SORT_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://(.*)?reddit.com/(r|R)/[A-Za-z0-9_]+/(hot|top|new|controversial)(/)?(\\?([A-Za-z0-9&=])*)?(\\s|$)";
+
+    /**
+     * Regex for matching a subreddit URL linking to the subreddit rules
+     *
+     * <p>Examples:</p>
+     * <ol>
+     * <li>http://www.reddit.com/r/test/about/rules</li>
+     * <li>https://www.reddit.com/r/test/about/rules/</li>
+     * <li>https://old.reddit.com/r/test/about/rules</li>
+     * </ol>
+     */
+    public static final String SUBREDDIT_RULES_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://(.*)?reddit.com/(r|R)/[A-Za-z0-9_]+/about/rules(\\/)?(\\s|$)";
 
     /**
      * Regex for matching a subreddit string with only the "/r/..." part (no https://reddit.com).

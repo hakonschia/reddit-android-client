@@ -45,6 +45,14 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
          * The value with this key should be the value of corresponding enum value from [PostTimeSort]
          */
         const val TIME_SORT = "time_sort"
+
+        /**
+         * The key used to send to this activity if the subreddit rules should automatically be shown
+         * when entering the subreddit (does not apply for standard subs)
+         *
+         * The value with this key should be a [Boolean]
+         */
+        const val SHOW_RULES = "show_rules"
     }
 
 
@@ -64,6 +72,7 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
             var subreddit = ""
             var sort: SortingMethods? = null
             var timeSort: PostTimeSort? = null
+            var showRules = false
 
             val intent = intent
             val uri = intent.data
@@ -81,6 +90,7 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
                     val sub = data.getString(SUBREDDIT_KEY)
                     sort = data.getString(SORT)?.let { s -> SortingMethods.values().find { it.value == s } }
                     timeSort = data.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value == s } }
+                    showRules = data.getBoolean(SHOW_RULES)
 
                     if (sub != null) {
                         subreddit = sub
@@ -106,7 +116,7 @@ class SubredditActivity : AppCompatActivity(), LockableSlidr {
                 override fun onDrawerStateChanged(newState: Int) {}
             }
 
-            fragment = SubredditFragment.newInstance(subreddit, sort, timeSort).apply {
+            fragment = SubredditFragment.newInstance(subreddit, sort, timeSort, showRules).apply {
                 this.drawerListener = drawerListener
                 supportFragmentManager.beginTransaction()
                         .add(R.id.subredditActivityFragment, this, SAVED_SUBREDDIT)

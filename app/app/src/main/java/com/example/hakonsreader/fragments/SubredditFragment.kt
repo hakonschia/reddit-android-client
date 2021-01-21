@@ -1,6 +1,7 @@
 package com.example.hakonsreader.fragments
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -19,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
+import com.example.hakonsreader.BuildConfig
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.PostActivity
 import com.example.hakonsreader.activites.SubmitActivity
@@ -81,18 +83,26 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
 
         /**
-         * The key used to send to this activity how to sort the posts when loading this subreddit
+         * The key used in [getArguments] for how to sort the posts when loading this subreddit
          *
          * The value with this key should be the value of corresponding enum value from [SortingMethods]
          */
-        const val SORT = "sort"
+        private const val SORT = "sort"
 
         /**
-         * The key used to send to this activity the time sort for the posts when loading this subreddit
+         * The key used in [getArguments] for the time sort for the posts when loading this subreddit
          *
          * The value with this key should be the value of corresponding enum value from [PostTimeSort]
          */
-        const val TIME_SORT = "time_sort"
+        private const val TIME_SORT = "time_sort"
+
+        /**
+         * The key used to [getArguments] if the subreddit rules should automatically be shown
+         * when entering the subreddit (does not apply for standard subs)
+         *
+         * The value with this key should be a [Boolean]
+         */
+        private const val SHOW_RULES = "show_rules"
 
         /**
          * Creates a new instance of the fragment
@@ -100,11 +110,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
          * @param subredditName The name of the subreddit to instantiate
          * @return The newly created fragment
          */
-        fun newInstance(subredditName: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = SubredditFragment().apply {
+        fun newInstance(subredditName: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null, showRules: Boolean = false) = SubredditFragment().apply {
             arguments = Bundle().apply {
                 putString(SUBREDDIT_NAME_KEY, subredditName)
                 sort?.let { putString(SORT, it.value) }
                 timeSort?.let { putString(TIME_SORT, it.value) }
+                putBoolean(SHOW_RULES, showRules)
             }
         }
     }
@@ -165,6 +176,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         setupPostsViewModel()
         setupRulesList()
         observeRules()
+        automaticallyOpenDrawerIfSet()
 
         App.get().registerPrivateBrowsingObservable(this)
 
@@ -743,6 +755,17 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             true
         } else {
             false
+        }
+    }
+
+    /**
+     * Automatically opens the drawer if [SHOW_RULES] in [getArguments] is set to `true`
+     */
+    private fun automaticallyOpenDrawerIfSet() {
+        arguments?.getBoolean(SHOW_RULES)?.let {
+            if (it) {
+                binding.drawer.openDrawer(GravityCompat.END)
+            }
         }
     }
 

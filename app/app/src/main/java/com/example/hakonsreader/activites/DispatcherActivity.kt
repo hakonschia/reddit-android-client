@@ -160,6 +160,18 @@ class DispatcherActivity : AppCompatActivity() {
                 }
             }
 
+            // Subreddits with rules: https://reddit.com/r/GlobalOffensive/about/rules
+            url.matches(LinkUtils.SUBREDDIT_RULES_REGEX_WITH_HTTPS.toRegex()) -> {
+                // First is "r", second is the subreddit
+                val subreddit = pathSegments[1]
+
+                Intent(this, SubredditActivity::class.java).apply {
+                    putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit)
+                    putExtra(SubredditActivity.SHOW_RULES, true)
+                }
+            }
+
+
             // Users: https://reddit.com/user/hakonschia OR https://reddit.com/u/hakonschia
             url.matches(LinkUtils.USER_REGEX.toRegex()) -> {
                 // Same as with subreddits, first is "u", second is the username
