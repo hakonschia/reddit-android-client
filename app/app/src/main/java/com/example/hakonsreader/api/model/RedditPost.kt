@@ -300,26 +300,27 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
 
     var galleryImages: MutableList<Image>? = null
         get() {
-            mediaMetadata?.let {
-                field = java.util.ArrayList(it.size)
+            mediaMetadata?.let { meta ->
+                field = java.util.ArrayList(meta.size)
 
                 val gson = Gson()
-                it.forEach { (mediaId: String?, obj: Any) ->
-                    // The source is found in the "s" object, which can be converted to a PreviewImage
-                    val converted = obj as LinkedTreeMap<String, Any>
+
+                galleryData?.data?.forEach {
+                    val metaData = meta[it.mediaId]
+
+                    val converted = metaData as LinkedTreeMap<String, Any>
+                    // TODO this always gets the source, we should redo this so a GalleryItem
+                    //  class exposes all the possible resolutions (which is basically a wrapper for a list of Image)
                     val asJson = gson.toJson(converted["s"])
 
                     val image = gson.fromJson(asJson, Image::class.java)
 
-                    val data = galleryData?.data?.find { d -> d.mediaId == mediaId }
-                    image.caption = data?.caption
-                    image.outboundUrl = data?.outboundUrl
+                    image.caption = it.caption
+                    image.outboundUrl = it.outboundUrl
 
                     (field as java.util.ArrayList<Image>).add(image)
                 }
             }
-
-            // TODO sort field based on galleryData so it's in the correct order (now it's seemingly randomized)
 
             return field
         }
