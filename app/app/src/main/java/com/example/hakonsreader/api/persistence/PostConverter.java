@@ -50,11 +50,21 @@ public class PostConverter {
     // an unknown amount of anonymous objects (these objects can be converted to a LinkedTreeMap)
     @TypeConverter
     public static LinkedTreeMap<String, Object> linkedTreeMapFromString(String value) {
-        return gson.fromJson(value, LinkedTreeMap.class);
+        Type listType = new TypeToken<LinkedTreeMap<String, Object>>() {}.getType();
+        return gson.fromJson(value, listType);
     }
     @TypeConverter
     public static String fromLinkedTreeMap(LinkedTreeMap<String, Object> map) {
         return gson.toJson(map);
+    }
+
+    @TypeConverter
+    public static RedditPost.GalleryDataOuter galleryDataFromString(String value) {
+        return gson.fromJson(value, RedditPost.GalleryDataOuter.class);
+    }
+    @TypeConverter
+    public static String fromGalleryData(RedditPost.GalleryDataOuter data) {
+        return gson.toJson(data);
     }
 
 

@@ -49,4 +49,17 @@ class Image {
 
     val isGif: Boolean
         get() = gifUrl != null
+
+
+    /**
+     * The optional caption for a Reddit gallery image
+     */
+    @SerializedName("caption")
+    var caption: String? = null
+
+    /**
+     * The optional outbound URL for a Reddit gallery image
+     */
+    @SerializedName("outbound_url")
+    var outboundUrl: String? = null
 }

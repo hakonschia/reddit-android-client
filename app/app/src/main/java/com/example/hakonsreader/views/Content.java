@@ -88,9 +88,11 @@ public abstract class Content extends FrameLayout {
      *
      * @param redditPost The post to use in the view
      */
-    public void setRedditPost(RedditPost redditPost) {
+    public void setRedditPost(@Nullable RedditPost redditPost) {
         this.redditPost = redditPost;
-        this.updateView();
+        if (redditPost != null) {
+            this.updateView();
+        }
     }
 
     /**

@@ -290,25 +290,63 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
     @SerializedName("media_metadata")
     var mediaMetadata: LinkedTreeMap<String, Any>? = null
 
+    /**
+     * Don't use this directly, use [galleryImages]
+     *
+     * Internal gallery data
+     */
+    @SerializedName("gallery_data")
+    var galleryData: GalleryDataOuter? = null
+
     var galleryImages: MutableList<Image>? = null
         get() {
-            if (mediaMetadata != null) {
-                field = java.util.ArrayList(mediaMetadata!!.size)
+            mediaMetadata?.let {
+                field = java.util.ArrayList(it.size)
+
                 val gson = Gson()
-                mediaMetadata!!.forEach { (_: String?, obj: Any) ->
+                it.forEach { (mediaId: String?, obj: Any) ->
                     // The source is found in the "s" object, which can be converted to a PreviewImage
                     val converted = obj as LinkedTreeMap<String, Any>
                     val asJson = gson.toJson(converted["s"])
-                    (field as java.util.ArrayList<Image>).add(gson.fromJson(asJson, Image::class.java))
+
+                    val image = gson.fromJson(asJson, Image::class.java)
+
+                    val data = galleryData?.data?.find { d -> d.mediaId == mediaId }
+                    image.caption = data?.caption
+                    image.outboundUrl = data?.outboundUrl
+
+                    (field as java.util.ArrayList<Image>).add(image)
                 }
             }
+
+            // TODO sort field based on galleryData so it's in the correct order (now it's seemingly randomized)
+
             return field
         }
+
+    class GalleryDataOuter {
+        @SerializedName("items")
+        var data: List<GalleryData>? = null
+    }
+
+    class GalleryData {
+        @SerializedName("media_id")
+        var mediaId = ""
+
+        @SerializedName("id")
+        var id = 0
+
+        @SerializedName("caption")
+        var caption: String? = null
+
+        @SerializedName("outbound_url")
+        var outboundUrl: String? = null
+    }
 
     @SerializedName("preview")
     var preview: Preview? = null
 
-    public class Preview {
+    class Preview {
         @SerializedName("images")
         var images: List<ImagesWrapper>? = null
 

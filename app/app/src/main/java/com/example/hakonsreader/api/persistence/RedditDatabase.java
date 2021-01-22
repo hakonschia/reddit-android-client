@@ -14,7 +14,7 @@ import com.example.hakonsreader.api.model.SubredditRule;
 /**
  * The global database for the application, holds {@link RedditPost} and {@link Subreddit} entities
  */
-@Database(entities = {RedditPost.class, Subreddit.class, SubredditRule.class, RedditMessage.class}, version = 17)
+@Database(entities = {RedditPost.class, Subreddit.class, SubredditRule.class, RedditMessage.class}, version = 19)
 public abstract class RedditDatabase extends RoomDatabase {
 
     private static RedditDatabase instance;

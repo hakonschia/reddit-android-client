@@ -3,6 +3,7 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -222,12 +223,9 @@ public class ContentGallery extends Content {
             //Image image = images.get(position % images.size());
             Image image = images.get(position);
 
-            View view;
-            if (image.isGif()) {
-                view = getAsVideo(image);
-            } else {
-                view = getAsImage(image);
-            }
+            ContentGalleryImage view = new ContentGalleryImage(context);
+            view.setPost(redditPost);
+            view.setImage(image);
 
             container.addView(view);
 
@@ -241,32 +239,9 @@ public class ContentGallery extends Content {
 
         @Override
         public void destroyItem(@NotNull ViewGroup container, int position, @NotNull Object object) {
-            if (object instanceof ContentImage) {
-                container.removeView((ContentImage) object);
-            } else {
-                VideoPlayer player = (VideoPlayer) object;
-                player.release();
-                container.removeView(player);
-            }
-        }
-
-        public View getAsImage(Image image) {
-            // Use ContentImage as that already has listeners, NSFW caching etc already
-            ContentImage contentImage = new ContentImage(context);
-            contentImage.setWithImageUrl(redditPost, image.getUrl());
-            return contentImage;
-        }
-
-        public View getAsVideo(Image image) {
-            VideoPlayer videoPlayer = new VideoPlayer(context);
-
-            videoPlayer.setVideoHeight(image.getHeight());
-            videoPlayer.setVideoWidth(image.getWidth());
-            videoPlayer.setUrl(image.getMp4Url());
-
-            // TODO set thumbnail
-
-            return videoPlayer;
+            ContentGalleryImage view = (ContentGalleryImage) object;
+            view.destroy();
+            container.removeView(view);
         }
     }
 }
