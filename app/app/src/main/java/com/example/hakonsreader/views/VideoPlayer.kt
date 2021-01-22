@@ -231,10 +231,14 @@ class VideoPlayer : PlayerView {
         set(value) {
             field = value
 
-            if (value >= 0) {
-                val videoSizeView: TextView = findViewById(R.id.videoSize)
+            val videoSizeView: TextView = findViewById(R.id.videoSize)
+
+            videoSizeView.visibility = if (value >= 0) {
                 val sizeInMb = videoSize / (1024 * 1024f)
                 videoSizeView.text = context.getString(R.string.videoSize, sizeInMb)
+                VISIBLE
+            } else {
+                GONE
             }
         }
 
@@ -306,9 +310,9 @@ class VideoPlayer : PlayerView {
             player.repeatMode = Player.REPEAT_MODE_ALL
         }
 
+        val loader: ProgressBar = findViewById(R.id.buffering)
         // Add listener for buffering changes, playback changes etc.
         player.addListener(object : Player.EventListener {
-            val loader: ProgressBar = findViewById(R.id.buffering)
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 // Ensure the thumbnail isn't visible when the video is playing

@@ -27,11 +27,13 @@
         android:textColor="#FFF"
         android:background="#000"
         android:padding="2dp"
+        android:visibility="gone"
 
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
 
-        tools:text="15.2 MB"/>
+        tools:text="15.2 MB"
+        tools:visibility="visible"/>
 
     <ProgressBar
         android:id="@+id/buffering"
