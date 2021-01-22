@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 static def getSecret(key) {
     Properties props = new Properties()
@@ -116,6 +118,10 @@ dependencies {
     implementation 'com.jakewharton:process-phoenix:2.0.0'
     implementation 'com.robinhood.ticker:ticker:2.0.2'
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5'
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:26.3.0')
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
     // Stetho
     final def stetho_version = '1.5.1'
