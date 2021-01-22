@@ -113,7 +113,7 @@
     <string name="prefs_title_post_collapse_by_default">Collapse posts when scrolling comments by default</string>
     <string name="prefs_title_play_youtube_videos_in_app">Open YouTube videos in app</string>
     <string name="prefs_title_show_peek_parent_button_in_comments">Show button to peek parent in comments bar</string>
-    <string name="prefs_title_send_crash_reports">Automatically send crash reports</string>
+    <string name="prefs_title_send_crash_reports">Send crash reports</string>
 
 
     <!-- Preferences keys -->

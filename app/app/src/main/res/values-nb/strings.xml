@@ -315,5 +315,5 @@
     <string name="awardTotalCoinPrice">%s har totalt %d Reddit coins</string>
     <string name="awardTotalCoinPricePost">Posten</string>
     <string name="awardTotalCoinPricecomment">Kommentaren</string>
-    <string name="prefs_title_send_crash_reports">Automatisk send krasj logger</string>
+    <string name="prefs_title_send_crash_reports">Send krasj logger</string>
 </resources>
