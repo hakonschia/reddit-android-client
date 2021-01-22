@@ -64,6 +64,13 @@
             app:singleLineTitle="false"
             app:defaultValue="@string/prefs_default_data_saving" />
 
+        <SwitchPreference
+            app:key="@string/prefs_key_send_crash_reports"
+            android:title="@string/prefs_title_send_crash_reports"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_send_crash_reports" />
+
     </PreferenceCategory>
 
 

@@ -113,6 +113,7 @@
     <string name="prefs_title_post_collapse_by_default">Collapse posts when scrolling comments by default</string>
     <string name="prefs_title_play_youtube_videos_in_app">Open YouTube videos in app</string>
     <string name="prefs_title_show_peek_parent_button_in_comments">Show button to peek parent in comments bar</string>
+    <string name="prefs_title_send_crash_reports">Automatically send crash reports</string>
 
 
     <!-- Preferences keys -->
@@ -163,6 +164,8 @@
     <string name="prefs_key_post_collapse_by_default" translatable="false">post_collapse_post_by_default</string>
     <string name="prefs_key_play_youtube_videos_in_app" translatable="false">play_youtube_videos_in_app</string>
     <string name="prefs_key_show_peek_parent_button_in_comments" translatable="false">show_peek_parent_button_in_comments</string>
+    <string name="prefs_key_send_crash_reports" translatable="false">send_crash_reports</string>
+
 
     <plurals name="filteredSubredditsSummary">
         <item quantity="zero">No subreddits filtered</item>

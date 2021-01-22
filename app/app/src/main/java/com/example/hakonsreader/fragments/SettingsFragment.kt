@@ -9,6 +9,7 @@ import com.example.hakonsreader.App.Companion.get
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.MainActivity
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class SettingsFragment : PreferenceFragmentCompat() {
     companion object {
@@ -67,6 +68,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
         unreadMessagesBadgePreference?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue: Any? ->
             unreadMessagesBadgeSettingChanged?.showUnreadMessagesBadge(newValue as Boolean)
             true
+        }
+
+        val crashReportPreference: SwitchPreference? = findPreference(getString(R.string.prefs_key_send_crash_reports))
+        crashReportPreference?.let {
+            it.onPreferenceChangeListener = crashReportsChangeListener
         }
     }
 
@@ -132,7 +138,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
      *
      * If normal auto play is set to "Never", NSFW auto play should be disabled as well
      */
-    private val autoPlayVideosChangeListener = Preference.OnPreferenceChangeListener { preference: Preference?, newValue: Any ->
+    private val autoPlayVideosChangeListener = Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
         val asString = newValue as String
         val autoPlayNsfw: SwitchPreference = findPreference(getString(R.string.prefs_key_auto_play_nsfw_videos))
                 ?: return@OnPreferenceChangeListener true
@@ -162,6 +168,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val value = newValue as Int
         val actualValue = value / 100f
         preference.summary = String.format(LINK_SCALE_SUMMARY_FORMAT, actualValue)
+        true
+    }
+
+    /**
+     * Listener that updates if Firebase crashlytics is enabled or disabled
+     */
+    private val crashReportsChangeListener = Preference.OnPreferenceChangeListener { _: Preference, newValue: Any ->
+        // This will just disbable crash reports from being automatically sent. If it's enabled again the
+        // crash reports that are previously stored will be sent
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(newValue as Boolean)
         true
     }
 
