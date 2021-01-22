@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
@@ -69,8 +70,10 @@ class ContentGalleryImage : FrameLayout {
 
     private fun asGif(image: Image) : VideoPlayer {
         return VideoPlayer(context).apply {
-            videoHeight = image.height
-            videoWidth = image.width
+            // The height will resize accordingly as long as the width matches the screen
+            // I think, I'm pretty lost on this, haven't tested if width of the video is larger
+            // than the screen, but I imagine it would scale down
+            videoWidth = App.get().screenWidth
 
             // Not sure what to do if this is null
             url = image.mp4Url ?: ""
