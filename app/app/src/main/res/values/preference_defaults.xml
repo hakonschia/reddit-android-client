@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <bool name="prefs_default_theme">false</bool>
-    <bool name="prefs_default_value_cache_nsfw">false</bool>
-    <string name="prefs_default_value_auto_play_videos" translatable="false">@string/prefs_key_auto_play_videos_never</string>
+    <bool name="prefs_default_theme">true</bool>
+    <bool name="prefs_default_value_cache_nsfw">true</bool>
+    <string name="prefs_default_value_auto_play_videos" translatable="false">@string/prefs_key_auto_play_videos_wifi_only</string>
     <bool name="prefs_default_play_muted_videos">true</bool>
     <bool name="prefs_default_play_muted_videos_fullscreen">true</bool>
     <bool name="prefs_default_loop_videos">false</bool>
@@ -11,9 +11,9 @@
     <string name="prefs_default_language" translatable="false">@string/prefs_key_language_en</string>
     <integer name="prefs_default_hide_comments_threshold">-5</integer>
     <integer name="prefs_default_max_post_size_percentage">65</integer>
-    <integer name="prefs_default_max_post_size_percentage_when_collapsed">65</integer>
+    <integer name="prefs_default_max_post_size_percentage_when_collapsed">45</integer>
     <bool name="prefs_default_opening_links_in_app">true</bool>
-    <string name="prefs_default_data_saving" translatable="false">@string/prefs_key_data_saving_never</string>
+    <string name="prefs_default_data_saving" translatable="false">@string/prefs_key_data_saving_mobile_only</string>
     <string name="prefs_default_show_nsfw" translatable="false">@string/prefs_key_show_nsfw_preview_blur</string>
     <bool name="prefs_default_highlight_new_comments" translatable="false">true</bool>
     <integer name="prefs_default_comment_smooth_scroll_threshold">75</integer>
@@ -21,12 +21,12 @@
     <integer name="prefs_default_link_scale">100</integer>
     <bool name="prefs_default_inbox_show_badge">true</bool>
     <string name="prefs_default_inbox_update_frequency" translatable="false">@string/prefs_key_inbox_update_frequency_30_min</string>
-    <bool name="prefs_default_comment_show_link_preview">false</bool>
+    <bool name="prefs_default_comment_show_link_preview">true</bool>
     <bool name="prefs_default_comment_link_preview_show_entire_link">false</bool>
     <bool name="prefs_default_comment_link_preview_show_identical_links">false</bool>
     <bool name="prefs_default_post_collapse_by_default">true</bool>
     <bool name="prefs_default_play_youtube_videos_in_app">true</bool>
     <bool name="prefs_default_show_peek_parent_button_in_comments">false</bool>
-    <bool name="prefs_default_send_crash_reports">true</bool>
+    <bool name="prefs_default_send_crash_reports">false</bool>
 
 </resources>
