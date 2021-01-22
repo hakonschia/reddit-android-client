@@ -40,6 +40,23 @@ class ContentGalleryImage : FrameLayout {
         }
     }
 
+    fun viewSelected() {
+        val view = binding.content.getChildAt(0)
+
+        if (view is VideoPlayer && App.get().autoPlayVideos()) {
+            view.play()
+        }
+    }
+
+    fun viewUnselected() {
+        val view = binding.content.getChildAt(0)
+
+        if (view is VideoPlayer && App.get().autoPlayVideos()) {
+            view.pause()
+        }
+    }
+
+
     private fun updateView() {
         binding.content.removeAllViews()
 

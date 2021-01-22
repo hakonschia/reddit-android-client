@@ -100,6 +100,8 @@ public class ContentGallery extends Content {
         binding.galleryImages.setOffscreenPageLimit(offscreenLimit);
 
         binding.galleryImages.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            ContentGalleryImage currentView;
+
             @Override
             public void onPageSelected(int position) {
                 setActiveImageText(position);
@@ -108,7 +110,12 @@ public class ContentGallery extends Content {
                 // swipe on the gallery, not remove the activity
                 lockSlidr(position != 0);
 
-                // TODO if image is gif, autoplay if user wants to autoplay videos
+                // Unselect the previous and set new and select that
+                if (currentView != null) {
+                    currentView.viewUnselected();
+                }
+                currentView = findViewWithTag(position);
+                currentView.viewSelected();
             }
 
             @Override
@@ -226,6 +233,7 @@ public class ContentGallery extends Content {
             ContentGalleryImage view = new ContentGalleryImage(context);
             view.setPost(redditPost);
             view.setImage(image);
+            view.setTag(position);
 
             container.addView(view);
 
@@ -240,6 +248,8 @@ public class ContentGallery extends Content {
         @Override
         public void destroyItem(@NotNull ViewGroup container, int position, @NotNull Object object) {
             ContentGalleryImage view = (ContentGalleryImage) object;
+            // TODO this isn't called when the actual view (ContentGallery) is destroyed, so this
+            //  ExoPlayer's won't be released
             view.destroy();
             container.removeView(view);
         }
