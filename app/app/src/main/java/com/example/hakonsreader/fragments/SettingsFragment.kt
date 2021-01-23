@@ -223,8 +223,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         } else {
             // https://firebase.google.com/docs/projects/manage-installations#delete-fid
             FirebaseInstallations.getInstance().delete()
-
-            // TODO look into https://firebase.google.com/docs/projects/manage-installations#delete-fid for when the setting is disabled
             Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
         }
 

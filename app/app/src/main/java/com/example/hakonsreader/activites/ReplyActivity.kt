@@ -219,10 +219,15 @@ class ReplyActivity : AppCompatActivity() {
         // Because using match_parent in the layout file doesn't actually match the parent (screen width)
         // This looks weird on horizontal orientation though
         confirmDiscardDialog!!.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        val discard = confirmDiscardDialog!!.findViewById<Button>(R.id.btnDiscard)
-        val cancel = confirmDiscardDialog!!.findViewById<Button>(R.id.btnCancel)
-        discard.setOnClickListener { super.finish() }
-        cancel.setOnClickListener { confirmDiscardDialog!!.dismiss() }
+
+        // Discard the input
+        confirmDiscardDialog!!.findViewById<Button>(R.id.btnDiscard).setOnClickListener {
+            super.finish()
+        }
+        // Cancel (don't discard, stay in the activity)
+        confirmDiscardDialog!!.findViewById<Button>(R.id.btnCancel).setOnClickListener {
+            confirmDiscardDialog!!.dismiss()
+        }
 
         // TODO add button for "discard and save" that saves the text and whats being responded to so we can resume later
     }
@@ -232,12 +237,27 @@ class ReplyActivity : AppCompatActivity() {
      * they are not logged in and won't be able to send a reply
      */
     private fun showNotLoggedInDialogIfNotLoggedIn() {
-        // TODO private browsing
         if (!App.get().isUserLoggedIn()) {
             AlertDialog.Builder(this)
                     .setTitle(getString(R.string.dialogReplyNotLoggedInTitle))
                     .setMessage(getString(R.string.dialogReplyNotLoggedInContent))
                     .show()
+        } else if (App.get().isUserLoggedInPrivatelyBrowsing()) {
+            Dialog(this).apply {
+                setContentView(R.layout.dialog_send_reply_privately_browsing)
+                window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+                findViewById<Button>(R.id.btnDisable).setOnClickListener {
+                    App.get().enablePrivateBrowsing(false)
+                    dismiss()
+                }
+
+                findViewById<Button>(R.id.btnCancel).setOnClickListener {
+                    dismiss()
+                }
+
+                show()
+            }
         }
     }
 
