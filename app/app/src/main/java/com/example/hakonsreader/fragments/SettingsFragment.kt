@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.DialogCompat
 import androidx.preference.*
 import com.example.hakonsreader.App.Companion.get
@@ -220,6 +221,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 show()
             }
         } else {
+            // https://firebase.google.com/docs/projects/manage-installations#delete-fid
+            FirebaseInstallations.getInstance().delete()
+
             // TODO look into https://firebase.google.com/docs/projects/manage-installations#delete-fid for when the setting is disabled
             Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
         }
