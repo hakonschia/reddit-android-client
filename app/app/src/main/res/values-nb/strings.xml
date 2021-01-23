@@ -319,10 +319,9 @@
     <string name="enable">Skru på</string>
     <string name="dialogHeaderEnableCrashlytics">Skru på krasj logging</string>
     <string name="dialogContentEnableCrashlytics">Krasj logger er identifisert med en identifikator koblet til app installasjonen. Identifikatoren er ikke personlig identifiserbar, men den indikerer telefonmodellen din (eks. Samsung Galaxy S7). Denne identifikatoren blir slettet hvis du skrur av innstillingen. \n\nDenne innstilligen kan skrus av når som helst, og usendte logger vil bli slettet når den skrus på igjen. \n\n Krasj loggene lagres i Firebase (en Google tjeneste). Applikasjonen samler ikke inn noe annen informasjon.</string>
-    <string name="dialogHeaderDisableCrashlytics">Sku av krasj logging</string>
-    <string name="dialogBtnDeleteDisableCrashlytics">Slett</string>
-    <string name="dialogBtnDontDeleteDisableCrashlytics">Ikke slett</string>
-    <string name="dialogContentDisableCrashlytics">Krasj logger er linket til app installasjonen (som inkluderer telefonmodellen din). \n\nVil du slette denne identifikatoren?</string>
     <string name="dialogReplyPrivatelyBrowsingInTitle">Du surfer privat</string>
     <string name="dialogReplyPrivatelyBrowsingInContent">Du surfer privat og vil ikke kunne sende svar hvis ikke du deaktiverer dette</string>
+    <string name="delete">Slett</string>
+    <string name="dialogHeaderDeleteComment">Slett kommentar</string>
+    <string name="dialogContentDeleteComment">Dette kan ikke omgjøres</string>
 </resources>

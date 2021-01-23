@@ -1,10 +1,13 @@
 package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
@@ -132,16 +135,29 @@ fun showPopupForCommentExtraForNonLoggedInUser(view: View, comment: RedditCommen
  * Listener for delete comment clicks
  */
 private fun deleteCommentOnClick(view: View, comment: RedditComment) {
-    val api = App.get().api
+    Dialog(view.context).apply {
+        setContentView(R.layout.dialog_confirm_delete_comment)
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-    CoroutineScope(IO).launch {
-        val response = api.comment(comment.id).delete()
-        withContext(Main) {
-            when (response) {
-                is ApiResponse.Success -> Snackbar.make(view, R.string.commentDeleted, BaseTransientBottomBar.LENGTH_SHORT).show()
-                is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+        findViewById<Button>(R.id.btnDelete).setOnClickListener {
+            val api = App.get().api
+
+            CoroutineScope(IO).launch {
+                val response = api.comment(comment.id).delete()
+                withContext(Main) {
+                    when (response) {
+                        is ApiResponse.Success -> Snackbar.make(view, R.string.commentDeleted, BaseTransientBottomBar.LENGTH_SHORT).show()
+                        is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+                    }
+                }
             }
+
+            dismiss()
         }
+
+        findViewById<Button>(R.id.btnCancel).setOnClickListener { dismiss() }
+        
+        show()
     }
 }
 
