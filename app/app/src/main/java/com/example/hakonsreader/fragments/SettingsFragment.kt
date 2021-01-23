@@ -1,15 +1,23 @@
 package com.example.hakonsreader.fragments
 
+import android.app.Dialog
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
+import androidx.core.app.DialogCompat
 import androidx.preference.*
 import com.example.hakonsreader.App.Companion.get
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.MainActivity
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.installations.FirebaseInstallations
+import com.google.firebase.ktx.Firebase
 
 class SettingsFragment : PreferenceFragmentCompat() {
     companion object {
@@ -174,10 +182,48 @@ class SettingsFragment : PreferenceFragmentCompat() {
     /**
      * Listener that updates if Firebase crashlytics is enabled or disabled
      */
-    private val crashReportsChangeListener = Preference.OnPreferenceChangeListener { _: Preference, newValue: Any ->
-        // This will just disbable crash reports from being automatically sent. If it's enabled again the
-        // crash reports that are previously stored will be sent
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(newValue as Boolean)
+    private val crashReportsChangeListener = Preference.OnPreferenceChangeListener { preference: Preference, newValue: Any ->
+        newValue as Boolean
+        preference as SwitchPreference
+
+        // Delete unsent reports. If this goes from true to false it makes sense to delete them, if it goes from false to true
+        // it also makes sense as the user might not want the previous reports to be sent
+        Firebase.crashlytics.deleteUnsentReports()
+
+        if (newValue) {
+            Dialog(requireContext()).apply {
+                setContentView(R.layout.dialog_enable_crashlytics)
+                window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+                setCancelable(false)
+                setCanceledOnTouchOutside(false)
+
+                findViewById<Button>(R.id.btnEnable).setOnClickListener {
+                    Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
+                    dismiss()
+                }
+
+                findViewById<Button>(R.id.btnCancel).setOnClickListener {
+                    // This should already be false, but just to be sure
+                    Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
+
+                    // The preference listener always returns true, but if this is called then it was
+                    // canceled by the user afterwards, so the setting has to be set to false again
+                    preference.sharedPreferences.edit()
+                            .putBoolean(preference.key, false)
+                            .apply()
+                    preference.isChecked = false
+
+                    dismiss()
+                }
+
+                show()
+            }
+        } else {
+            // TODO look into https://firebase.google.com/docs/projects/manage-installations#delete-fid for when the setting is disabled
+            Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
+        }
+
         true
     }
 

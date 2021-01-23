@@ -11,7 +11,7 @@
     <color name="opposite_background">#FFFFFF</color>
     <color name="opposite_secondaryBackground">#EAEAEA</color>
     <color name="background_with_alpha">#FF000000</color>
-    <color name="dialogBackground">#202020</color>
+    <color name="dialogBackground">#292929</color>
 
     <color name="text_input_background">#333333</color>
 

@@ -311,6 +311,7 @@
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="discard">Discard</string>
+    <string name="enable">Enable</string>
 
     <string name="dialogReplyNotLoggedInTitle">Not logged in</string>
     <string name="dialogReplyNotLoggedInContent">You are not logged in and won\'t be able to send a reply</string>
@@ -469,4 +470,7 @@
     <string name="subredditActiveUsers">%d users online</string>
     <string name="subredditRules">Rules</string>
     <string name="subredditRuleNumberAndName" translatable="false">%d. %s</string>
+
+    <string name="dialogHeaderEnableCrashlytics">Enable crash reports</string>
+    <string name="dialogContentEnableCrashlytics">Crash reports are identified with an identifier which links to the app installation. This identifier is not personally identifiable, but it does indicate your phone model (eg. Samsung Galaxy S7).\n\nThis setting can be disabled at any time, and any unsent reports will be deleted when enabled again.  \n\nCrash reports are stored for 90 days and are stored in Firebase (a Google service). The application does not collect any other information.</string>
 </resources>

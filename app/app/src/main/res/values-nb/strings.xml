@@ -316,4 +316,8 @@
     <string name="awardTotalCoinPricePost">Posten</string>
     <string name="awardTotalCoinPricecomment">Kommentaren</string>
     <string name="prefs_title_send_crash_reports">Send krasj logger</string>
+    <string name="enable">Skru på</string>
+    <string name="prefs_default_fullscreen_swipe_direction" translatable="false">Sk</string>
+    <string name="dialogHeaderEnableCrashlytics">Skru på krasj logging</string>
+    <string name="dialogContentEnableCrashlytics">Krasj logger er identifisert med en identifikator koblet til app installasjonen. Identifikatoren er ikke personlig identifiserbar, men den indikerer telefonmodellen din (eks. Samsung Galaxy S7). \n\nDenne innstilligen kan skrus av når som helst, og usendte logger vil bli slettet når den skrus på igjen. \n\n Krasj loggene lagres i Firebase (en Google tjeneste). Applikasjonen samler ikke inn noe annen informasjon.</string>
 </resources>
