@@ -40,7 +40,7 @@ import com.squareup.picasso.Callback
 /**
  * Activity to show a Reddit post with its comments
  */
-class PostActivity : AppCompatActivity(), OnReplyListener, LockableSlidr {
+class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
 
     companion object {
         private const val TAG = "PostActivity"

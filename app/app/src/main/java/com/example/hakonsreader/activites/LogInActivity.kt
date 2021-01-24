@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.R
 import com.example.hakonsreader.fragments.LogInFragment
 
-class LogInActivity : AppCompatActivity() {
+class LogInActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

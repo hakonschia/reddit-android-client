@@ -22,7 +22,7 @@ import com.squareup.picasso.Picasso
  *
  * The URL to the image should be passed to the activity with the key [IMAGE_URL]
  */
-class ImageActivity : AppCompatActivity() {
+class ImageActivity : BaseActivity() {
 
     companion object {
         /**

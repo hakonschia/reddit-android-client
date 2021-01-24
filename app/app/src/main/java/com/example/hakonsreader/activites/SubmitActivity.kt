@@ -39,7 +39,7 @@ import kotlin.collections.HashMap
 /**
  * Activity for submitting a post to a subreddit
  */
-class SubmitActivity : AppCompatActivity() {
+class SubmitActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "SubmitActivity"

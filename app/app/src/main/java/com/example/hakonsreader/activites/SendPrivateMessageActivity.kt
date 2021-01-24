@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 /**
  * Activity for sending a private message
  */
-class SendPrivateMessageActivity : AppCompatActivity() {
+class SendPrivateMessageActivity : BaseActivity() {
     companion object {
         private const val TAG = "SendPrivateMessage"
 

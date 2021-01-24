@@ -128,7 +128,9 @@ class Post : Content {
     fun updateMaxHeight(maxHeight: Int) {
         // Ensure that the layout listener is removed. If this is still present, it will cause an infinite
         // callback loop since the height will most likely be changed inside the listener
-        binding.content.viewTreeObserver.removeOnGlobalLayoutListener(contentOnGlobalLayoutListener)
+        if (this::contentOnGlobalLayoutListener.isInitialized) {
+            binding.content.viewTreeObserver.removeOnGlobalLayoutListener(contentOnGlobalLayoutListener)
+        }
         this.maxHeight = maxHeight
 
         binding.content.getChildAt(0) ?: return

@@ -17,7 +17,7 @@ import com.r0adkll.slidr.model.SlidrInterface
 /**
  * Activity for a subreddit (used when a subreddit is clicked from a post)
  */
-class SubredditActivity : AppCompatActivity(), LockableSlidr {
+class SubredditActivity : BaseActivity(), LockableSlidr {
 
     companion object {
         private const val TAG = "SubredditActivity"

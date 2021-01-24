@@ -4,18 +4,15 @@ import android.app.Dialog
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
-import androidx.core.app.DialogCompat
 import androidx.preference.*
 import com.example.hakonsreader.App.Companion.get
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.MainActivity
+import com.example.hakonsreader.interfaces.LanguageListener
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.ktx.Firebase
@@ -31,6 +28,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var settings: SharedPreferences
 
     var unreadMessagesBadgeSettingChanged: OnUnreadMessagesBadgeSettingChanged? = null
+    var languageListener: LanguageListener? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -130,14 +128,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
      * Listener for language changes. Language is updated automatically
      */
     private val languageChangeListener = Preference.OnPreferenceChangeListener { _, newValue: Any ->
-        // Changing the language is seemingly not possible from an Application class, so do it in MainActivity instead
-        // This won't cause an issue as the settings fragment is always a fragment in MainActivity (although if this is changed
-        // this will also have to be changed, so if I ever change it lets hope I actually remember it)
-        val activity = activity as MainActivity?
+        newValue as String
 
         // We have to pass the language here since the value stored in SharedPreferences isn't updated until
         // this function returns true, so trying to retrieve the value in updateLanguage() would retrieve the old value
-        activity?.updateLanguage(newValue.toString())
+        languageListener?.updateLanguage(newValue)
         true
     }
 

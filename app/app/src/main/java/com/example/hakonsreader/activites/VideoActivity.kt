@@ -18,7 +18,7 @@ import com.r0adkll.slidr.Slidr
 /**
  * Activity displaying a video from a reddit post, allowing for fullscreen
  */
-class VideoActivity : AppCompatActivity() {
+class VideoActivity : BaseActivity() {
 
     companion object {
         /**

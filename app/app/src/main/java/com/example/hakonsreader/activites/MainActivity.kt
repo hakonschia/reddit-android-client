@@ -25,6 +25,7 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityMainBinding
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.*
+import com.example.hakonsreader.interfaces.LanguageListener
 import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.interfaces.OnSubredditSelected
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
@@ -42,7 +43,7 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.concurrent.fixedRateTimer
 
-class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
+class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
 
     companion object {
         private const val TAG = "MainActivity"
@@ -547,16 +548,26 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
     }
 
     /**
-     * Updates the language
+     * Updates the language for the application
      *
      * @param language The language to switch to. If this is `null` the language found in
-     * SharedPreferences will be used
+     * SharedPreferences will be used. Default is `null`
+     * @param recreate True if the activity should be recreated. This should only be set to true
+     * if the language is updated while the application is running. If this is true during the
+     * activity setup, it will cause an infinite loop. Default is `false`
      */
-    fun updateLanguage(language: String?) {
+    fun updateLanguage(language: String? = null, recreate: Boolean = false) {
         val settings = PreferenceManager.getDefaultSharedPreferences(this)
-        var lang = language ?: settings.getString(getString(R.string.prefs_key_language), getString(R.string.prefs_default_language))
-        // TODO this
-        //updateLocale(new Locale(language));
+        val lang = language ?: settings.getString(getString(R.string.prefs_key_language), getString(R.string.prefs_default_language))
+           ?: return
+
+        val config = resources.configuration
+        config.setLocale(Locale(lang))
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        if (recreate) {
+            recreate()
+        }
     }
 
     /**
@@ -737,9 +748,14 @@ class MainActivity : AppCompatActivity(), OnSubredditSelected, OnInboxClicked, O
                 R.id.navSettings -> {
                     navBarPos = 4
                     if (settingsFragment == null) {
-                        settingsFragment = SettingsFragment()
+                        settingsFragment = SettingsFragment().apply {
+                            languageListener
+                        }
                     }
                     settingsFragment!!.unreadMessagesBadgeSettingChanged = this@MainActivity
+                    settingsFragment!!.languageListener = LanguageListener {
+                        updateLanguage(it, recreate = true)
+                    }
                     selected = settingsFragment!!
                 }
                 else -> return false

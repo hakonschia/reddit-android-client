@@ -33,13 +33,13 @@ import kotlinx.coroutines.withContext
  * The post/comment should be passed to the activity with the key [LISTING_KEY] and the
  * what kind of listing it is with [LISTING_KIND_KEY]
  */
-class ReplyActivity : AppCompatActivity() {
+class ReplyActivity : BaseActivity() {
     private val TAG = "ReplyActivity"
 
     companion object {
-        public const val LISTING_KEY = "replyingToListing"
+        const val LISTING_KEY = "replyingToListing"
 
-        public const val LISTING_KIND_KEY = "replyingToListingKind"
+        const val LISTING_KIND_KEY = "replyingToListingKind"
 
         /**
          * The key used used to store if the confirm discard dialog is shown

@@ -23,7 +23,7 @@ import com.example.hakonsreader.databinding.ActivityWebViewBinding
  *
  * Use [URL] to send the URL to load
  */
-class WebViewActivity : AppCompatActivity() {
+class WebViewActivity : BaseActivity() {
     companion object {
         const val URL = "url"
     }

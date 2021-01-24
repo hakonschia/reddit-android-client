@@ -156,7 +156,7 @@ class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<Recyc
     /**
      * Gets a comment by an ID
      *
-     * @param id The ID of the comment to get
+     * @param fullname The fullname of the comment to get
      * @return The comment, or null if not found in the adapter
      */
     fun getCommentById(fullname: String) : RedditComment? {

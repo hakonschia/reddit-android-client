@@ -14,7 +14,7 @@ import com.r0adkll.slidr.model.SlidrInterface
 /**
  * Activity to show a users profile.
  */
-class ProfileActivity : AppCompatActivity(), LockableSlidr {
+class ProfileActivity : BaseActivity(), LockableSlidr {
 
     companion object {
         private const val TAG = "ProfileActivity"

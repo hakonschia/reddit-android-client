@@ -15,7 +15,7 @@ import com.r0adkll.slidr.Slidr
 /**
  * Activity for displaying a YouTube video in fullscreen
  */
-class VideoYoutubeActivity : AppCompatActivity() {
+class VideoYoutubeActivity : BaseActivity() {
     companion object {
         private const val TAG = "VideoYoutubeActivity"
 
