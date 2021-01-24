@@ -49,6 +49,11 @@ KEY_PASSWORD = <The key password>
 Note: The signing values cannot be omitted. If you are not building a release version assign empty strings to these values (ie. `FILE_PATH = ""`)
 
 
+### Crashlytics
+
+The application uses [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/get-started?platform=android) for crash reporting. Set up your Firebase projects and add the `google-services.json` file to [/app/app](/app/app)
+
+
 ## Features
 - **Appearance**
   - Light and true black dark mode
