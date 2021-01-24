@@ -300,6 +300,11 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
 
     var galleryImages: MutableList<Image>? = null
         get() {
+            // Return the field directly if it already has been created
+            if (field != null) {
+                return field
+            }
+
             mediaMetadata?.let { meta ->
                 field = java.util.ArrayList(meta.size)
 
