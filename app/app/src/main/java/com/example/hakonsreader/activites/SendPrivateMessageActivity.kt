@@ -1,10 +1,8 @@
 package com.example.hakonsreader.activites
 
+import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
+import android.view.inputmethod.InputMethodManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.databinding.ActivitySendPrivateMessageBinding
@@ -54,10 +52,17 @@ class SendPrivateMessageActivity : BaseActivity() {
         val subject = extras?.getString(EXTRAS_SUBJECT) ?: ""
         val message = extras?.getString(EXTRAS_MESSAGE) ?: ""
 
-        with(binding){
+        with(binding) {
             recipientInput.setText(recipient)
             subjectInput.setText(subject)
             messageInput.setText(message)
+
+            // Set focus to the input field after the last pre-filled field
+            when {
+                recipient.isNotEmpty() -> subjectInput.requestFocusFromTouch()
+                subject.isNotEmpty() -> messageInput.requestFocusFromTouch()
+                else -> recipientInput.requestFocusFromTouch()
+            }
 
             showPreview.setOnClickListener {
                 messageInput.showPreviewInPopupDialog()
