@@ -59,6 +59,7 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
         menu.inflate(R.menu.post_extra_by_user)
     } else {
         menu.inflate(R.menu.post_extra_not_by_user)
+        menu.menu.findItem(R.id.menuBlockUser).title = view.context.getString(R.string.blockUser, post.author)
     }
 
     if (post.isUserMod) {
@@ -89,7 +90,6 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
     }
 
     menu.menu.findItem(R.id.menuPostAddSubredditToFilter).title = view.context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
-    menu.menu.findItem(R.id.menuBlockUser).title = view.context.getString(R.string.blockUser, post.author)
 
     menu.setOnMenuItemClickListener { item: MenuItem ->
         // TODO add delete post, edit post (if selftext and logged in user is poster)

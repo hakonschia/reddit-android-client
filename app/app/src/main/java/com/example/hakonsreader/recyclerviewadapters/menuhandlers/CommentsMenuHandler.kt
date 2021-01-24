@@ -46,6 +46,7 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
         menu.inflate(R.menu.comment_extra_by_user)
     } else {
         menu.inflate(R.menu.comment_extra_for_logged_in_users_comment_not_by_user)
+        menu.menu.findItem(R.id.menuBlockUser).title = view.context.getString(R.string.blockUser, comment.author)
     }
 
     // Add mod specific if user is a mod in the subreddit the post is in
@@ -81,8 +82,6 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
         // No parent comment, remove the "Peek parent" option
         menu.menu.removeItem(R.id.menuPeekParentComment)
     }
-
-    menu.menu.findItem(R.id.menuBlockUser).title = view.context.getString(R.string.blockUser, comment.author)
 
     menu.setOnMenuItemClickListener { item: MenuItem ->
         return@setOnMenuItemClickListener when (item.itemId) {
