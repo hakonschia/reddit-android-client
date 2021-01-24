@@ -50,6 +50,10 @@ Note: The signing values cannot be omitted. If you are not building a release ve
 
 
 ## Features
+- **Appearance**
+  - Light and true black dark mode
+  - Translated to English and Norwegian (bokmål)
+
 - **Posts**
   - [Control the size](images/control-size-of-post.png) of post content when opened, based on a percentage of the screen size.
   - [Expand post](images/expand-post-content.gif) content at any time when scrolling through the comments.
