@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/deletePost"
+        android:id="@+id/menuDeletePost"
         android:title="@string/deletePost"
         android:icon="@drawable/ic_delete_24dp"/>
 </menu>

@@ -56,4 +56,16 @@ interface PostService : VoteService, ReplyService, SaveService, ModService {
     suspend fun getInfo(
             @Query("id") fullname: String
     ) : Response<ListingResponse<RedditPost>>
+
+    /**
+     * Delete a post
+     *
+     * OAuth scope required: *edit*
+     *
+     * @param fullname The fullname of the post to delete
+     * @return The response returns no data
+     */
+    @POST("api/del")
+    @FormUrlEncoded
+    suspend fun delete(@Field("id") fullname: String) : Response<Any>
 }

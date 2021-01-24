@@ -1,10 +1,13 @@
 package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
@@ -17,8 +20,11 @@ import com.example.hakonsreader.misc.Util
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Shows the extra popup for posts. Based on the user status, a different popup is shown
@@ -92,12 +98,13 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
     menu.menu.findItem(R.id.menuPostAddSubredditToFilter).title = view.context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
 
     menu.setOnMenuItemClickListener { item: MenuItem ->
-        // TODO add delete post, edit post (if selftext and logged in user is poster)
+        // TODO add edit post (if post is selftext)
         return@setOnMenuItemClickListener when (item.itemId) {
             R.id.menuSaveOrUnsavePost -> { savePostOnClick(view, post); true }
             R.id.menuDistinguishPostAsMod -> { distinguishAsModOnClick(view, post); true }
             R.id.menuStickyPost -> { stickyOnClick(view, post); true }
             R.id.menuBlockUser -> { blockUserOnClick(view, post.author); true }
+            R.id.menuDeletePost -> { deletePostOnClick(view, post); true }
             R.id.menuCopyPostLink -> { copyPostLinkOnClick(view, post); true }
             R.id.menuCopyPostContent -> { copyPostContentOnClick(view, post); true }
             R.id.menuPostAddSubredditToFilter -> { filterSubredditOnClick(post.subreddit); true }
@@ -244,4 +251,39 @@ private fun copyPostContentOnClick(view: View, post: RedditPost) {
 
 private fun filterSubredditOnClick(subredditName: String) {
     App.get().addSubredditToPostFilters(subredditName)
+}
+
+/**
+ * OnClick for deleting a post
+ *
+ * A Dialog is shown to confirm the user wants to delete the post
+ *
+ * @param view The view to attach the snackbar to
+ * @param post The post to delete
+ */
+private fun deletePostOnClick(view: View, post: RedditPost) {
+    Dialog(view.context).apply {
+        setContentView(R.layout.dialog_confirm_delete_post)
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        findViewById<Button>(R.id.btnDelete).setOnClickListener {
+            val api = App.get().api
+
+            CoroutineScope(IO).launch {
+                val response = api.post(post.id).delete()
+                withContext(Main) {
+                    when (response) {
+                        is ApiResponse.Success -> Snackbar.make(view, R.string.postDeleted, BaseTransientBottomBar.LENGTH_SHORT).show()
+                        is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+                    }
+                }
+            }
+
+            dismiss()
+        }
+
+        findViewById<Button>(R.id.btnCancel).setOnClickListener { dismiss() }
+
+        show()
+    }
 }

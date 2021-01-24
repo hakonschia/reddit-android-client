@@ -323,7 +323,8 @@
     <string name="dialogReplyPrivatelyBrowsingInContent">Du surfer privat og vil ikke kunne sende svar hvis ikke du deaktiverer dette</string>
     <string name="delete">Slett</string>
     <string name="dialogHeaderDeleteComment">Slett kommentar</string>
-    <string name="dialogContentDeleteComment">Dette kan ikke omgjøres</string>
+    <string name="dialogContentDeleteCommentOrPost">Dette kan ikke omgjøres</string>
     <string name="unblockUser">Angre</string>
     <string name="userUnblocked">Blokkering av \'%s\' opphevet</string>
+    <string name="dialogHeaderDeletePost">Slett post</string>
 </resources>

@@ -3,6 +3,7 @@ package com.example.hakonsreader.api.requestmodels
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.enums.VoteType
+import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.interfaces.ReplyableRequest
 import com.example.hakonsreader.api.interfaces.ReportableRequest
 import com.example.hakonsreader.api.interfaces.SaveableRequest
@@ -18,10 +19,11 @@ import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import com.example.hakonsreader.api.utils.apiError
 import com.example.hakonsreader.api.utils.createFullName
+import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 class PostRequest(
-        accessToken: AccessToken,
+        private val accessToken: AccessToken,
         private val api: PostService,
         private val postId: String,
         imgurApi: ImgurService?,
@@ -282,5 +284,24 @@ class PostRequest(
      */
     override suspend fun unignoreReports() : ApiResponse<Any?> {
         return modRequest.unignoreReports(Thing.POST, postId)
+    }
+
+    suspend fun delete() : ApiResponse<Any?> {
+        try {
+            verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot delete posts without an access token for a logged in user", e))
+        }
+
+        return try {
+            val response = api.delete(createFullName(Thing.POST, postId))
+            if (response.isSuccessful) {
+                ApiResponse.Success(null)
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
     }
 }

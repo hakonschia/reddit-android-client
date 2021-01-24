@@ -480,6 +480,7 @@
     <string name="dialogContentEnableCrashlytics">Crash reports are identified with an identifier which links to the app installation. This identifier is not personally identifiable, but it does indicate your phone model (eg. Samsung Galaxy S7). This identifier will be deleted when the setting is disabled. \n\nThis setting can be disabled at any time, and any unsent reports will be deleted when enabled again.  \n\nCrash reports are stored for 90 days and are stored in Firebase (a Google service). The application does not collect any other information.</string>
 
     <string name="dialogHeaderDeleteComment">Delete comment</string>
-    <string name="dialogContentDeleteComment">This action cannot be undone</string>
+    <string name="dialogHeaderDeletePost">Delete post</string>
+    <string name="dialogContentDeleteCommentOrPost">This action cannot be undone</string>
 
 </resources>

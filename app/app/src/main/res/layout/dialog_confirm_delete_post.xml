@@ -15,7 +15,7 @@
 
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/dialogHeaderDeleteComment"
+        android:text="@string/dialogHeaderDeletePost"
         android:textColor="@color/text_color"
 
         android:textSize="20sp"
