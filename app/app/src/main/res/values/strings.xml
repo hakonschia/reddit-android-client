@@ -343,8 +343,10 @@
     <string name="postMenuAddSubredditToFilter">Filter posts from \'%s\'</string>
     <string name="postMenuViewOnRemoveddit">View on removeddit.com</string>
 
-    <string name="blockUser">Block user</string>
-    <string name="userBlocked">User blocked</string>
+    <string name="blockUser">Block \'%s\'</string>
+    <string name="unblockUser">Unblock</string>
+    <string name="userBlocked">\'%s\' blocked</string>
+    <string name="userUnblocked">\'%s\' unblocked</string>
 
     <string name="sortNew">New</string>
     <string name="sortHot">Hot</string>

@@ -34,6 +34,7 @@ import kotlinx.coroutines.withContext
  * @param comment The comment the popup is for
  * @param adapter The RecyclerView adapter the comment is in
  */
+@SuppressWarnings("RestrictedApi")
 fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, adapter: CommentsAdapter) {
     val user = App.storedUser
     val menu = PopupMenu(view.context, view)
@@ -81,13 +82,15 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
         menu.menu.removeItem(R.id.menuPeekParentComment)
     }
 
+    menu.menu.findItem(R.id.menuBlockUser).title = view.context.getString(R.string.blockUser, comment.author)
+
     menu.setOnMenuItemClickListener { item: MenuItem ->
         return@setOnMenuItemClickListener when (item.itemId) {
             R.id.menuDeleteComment -> { deleteCommentOnClick(view, comment); true }
             R.id.menuSaveOrUnsaveComment -> { saveCommentOnClick(view, comment); true }
             R.id.menuDistinguishCommentAsMod -> { distinguishAsModOnclick(view, comment, adapter); true }
             R.id.menuStickyComment -> { stickyOnClick(view, comment, adapter); true }
-            R.id.menuBlockUser -> { blockUserOnClick(view, comment); true }
+            R.id.menuBlockUser -> { blockUserOnClick(view, comment.author); true }
             R.id.menuShowCommentChain -> { adapter.commentIdChain = comment.id; true }
             R.id.menuCopyCommentLink -> { copyCommentLinkOnClick(view, comment); true }
             R.id.menuPeekParentComment -> { peekParentOnClick(view.context, parentComment!!); true }
@@ -107,6 +110,7 @@ fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, 
  * @param comment The comment the popup is for
  * @param adapter The RecyclerView adapter the comment is in
  */
+@SuppressWarnings("RestrictedApi")
 fun showPopupForCommentExtraForNonLoggedInUser(view: View, comment: RedditComment, adapter: CommentsAdapter) {
     val menu = PopupMenu(view.context, view)
     menu.inflate(R.menu.comment_extra_generic_for_all_users)
@@ -156,7 +160,7 @@ private fun deleteCommentOnClick(view: View, comment: RedditComment) {
         }
 
         findViewById<Button>(R.id.btnCancel).setOnClickListener { dismiss() }
-        
+
         show()
     }
 }
@@ -244,21 +248,6 @@ private fun stickyOnClick(view: View, comment: RedditComment, adapter: CommentsA
         }
     }
 }
-
-/**
- * OnClick for blocking the author of a comment
- */
-private fun blockUserOnClick(view: View, comment: RedditComment) {
-    val api = App.get().api
-
-    CoroutineScope(IO).launch {
-        when (val response = api.user(comment.author).block()) {
-            is ApiResponse.Success -> Snackbar.make(view, R.string.userBlocked, BaseTransientBottomBar.LENGTH_SHORT).show()
-            is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
-        }
-    }
-}
-
 
 private fun copyCommentLinkOnClick(view: View, comment: RedditComment) {
     val url = "https://reddit.com" + comment.permalink

@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
+@SuppressWarnings("RestrictedApi")
 fun showInboxMenu(view: View, redditMessage: RedditMessage?) {
     if (redditMessage == null) {
         return

@@ -3,7 +3,6 @@ package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.view.menu.MenuBuilder
@@ -11,7 +10,6 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.appcompat.widget.PopupMenu
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -49,6 +47,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
  * @param view The view clicked (where the popup will be attached)
  * @param post The post the popup is for
  */
+@SuppressWarnings("RestrictedApi")
 private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
     val user = App.storedUser
     val menu = PopupMenu(view.context, view)
@@ -90,6 +89,7 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
     }
 
     menu.menu.findItem(R.id.menuPostAddSubredditToFilter).title = view.context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
+    menu.menu.findItem(R.id.menuBlockUser).title = view.context.getString(R.string.blockUser, post.author)
 
     menu.setOnMenuItemClickListener { item: MenuItem ->
         // TODO add delete post, edit post (if selftext and logged in user is poster)
@@ -97,7 +97,7 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
             R.id.menuSaveOrUnsavePost -> { savePostOnClick(view, post); true }
             R.id.menuDistinguishPostAsMod -> { distinguishAsModOnClick(view, post); true }
             R.id.menuStickyPost -> { stickyOnClick(view, post); true }
-            R.id.menuBlockUser -> { blockUserOnClick(view, post); true }
+            R.id.menuBlockUser -> { blockUserOnClick(view, post.author); true }
             R.id.menuCopyPostLink -> { copyPostLinkOnClick(view, post); true }
             R.id.menuCopyPostContent -> { copyPostContentOnClick(view, post); true }
             R.id.menuPostAddSubredditToFilter -> { filterSubredditOnClick(post.subreddit); true }
@@ -116,6 +116,7 @@ private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
  * @param view The view clicked (where the popup will be attached)
  * @param post The post the popup is for
  */
+@SuppressWarnings("RestrictedApi")
 fun showPopupForPostExtraForNonLoggedInUser(view: View, post: RedditPost) {
     val menu = PopupMenu(view.context, view)
     menu.inflate(R.menu.post_extra_generic_for_all_users)
@@ -212,17 +213,6 @@ private fun stickyOnClick(view: View, post: RedditPost) {
                 db.posts().update(post)
                 Util.handleGenericResponseErrors(view, response.error, response.throwable)
             }
-        }
-    }
-}
-
-private fun blockUserOnClick(view: View, post: RedditPost) {
-    val api = App.get().api
-
-    CoroutineScope(IO).launch {
-        when (val response = api.user(post.author).block()) {
-            is ApiResponse.Success -> Snackbar.make(view, R.string.userBlocked, BaseTransientBottomBar.LENGTH_SHORT).show()
-            is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
         }
     }
 }

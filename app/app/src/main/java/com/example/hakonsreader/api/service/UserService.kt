@@ -77,5 +77,20 @@ interface UserService {
      */
     @POST("api/block_user")
     @FormUrlEncoded
-    suspend fun blockUser(@Field("name") username: String) : Response<Nothing>
+    suspend fun blockUser(@Field("name") username: String) : Response<Void>
+
+
+    /**
+     * Unblock a user
+     *
+     * @param name The name of the user to block
+     * @param fullname The fullname of the logged in user (the user blocking [name])
+     */
+    @POST("api/unfriend")
+    @FormUrlEncoded
+    suspend fun unblockUser(
+            @Field("name") name: String,
+            @Field("container") fullname: String,
+            @Field("type") type: String = "enemy"
+    ) : Response<Void>
 }

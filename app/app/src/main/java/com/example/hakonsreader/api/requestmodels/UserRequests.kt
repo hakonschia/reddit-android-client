@@ -2,6 +2,7 @@ package com.example.hakonsreader.api.requestmodels
 
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
+import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditPost
@@ -13,6 +14,7 @@ import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.UserService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
@@ -100,11 +102,42 @@ class UserRequests(
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
-            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't get user information without access token for a logged in user", e))
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't block user without access token for a logged in user", e))
         }
 
         return try {
             val resp = api.blockUser(username)
+
+            if (resp.isSuccessful) {
+                ApiResponse.Success(null)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Unblocks a user
+     *
+     * No specific OAuth scope is required
+     *
+     * @param loggedInUserId The ID of the user currently logged in (the user who is blocked another user)
+     * @return Successful requests return no data
+     */
+    suspend fun unblock(loggedInUserId: String) : ApiResponse<Nothing?> {
+        try {
+            verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't unblock user without access token for a logged in user", e))
+        }
+
+        return try {
+            val resp = api.unblockUser(
+                    username,
+                    createFullName(Thing.ACCOUNT, loggedInUserId)
+            )
 
             if (resp.isSuccessful) {
                 ApiResponse.Success(null)

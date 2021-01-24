@@ -147,7 +147,8 @@
     <string name="scoreHiddenText">Poengsum gjemt</string>
     <string name="saveComment">Lagre kommentar</string>
     <string name="unsaveComment">Glem kommentar</string>
-    <string name="blockUser">Blokker bruker</string>
+    <string name="blockUser">Blokker \'%s\'</string>
+    <string name="userBlocked">\'%s\' blokkert</string>
     <string name="badRequestError">Noe gikk galt</string>
     <string name="savePost">Lagre post</string>
     <string name="unsavePost">Glem post</string>
@@ -157,7 +158,6 @@
     <string name="commentUnsaved">Kommentar glemt</string>
     <string name="postSaved">Post lagret</string>
     <string name="postUnsaved">Post glemt</string>
-    <string name="userBlocked">Bruker blokkert</string>
     <string name="applicationAccessRevokedHeader">Applikasjonstilgang opphevet</string>
     <string name="applicationAccessRevokedContent">Applikasjonens tilgang til brukeren din har blitt opphevet.\n\nDu må logge inn igjen.</string>
     <string name="webViewOpenInBrowser">Åpne i nettleser</string>
@@ -324,4 +324,6 @@
     <string name="delete">Slett</string>
     <string name="dialogHeaderDeleteComment">Slett kommentar</string>
     <string name="dialogContentDeleteComment">Dette kan ikke omgjøres</string>
+    <string name="unblockUser">Angre</string>
+    <string name="userUnblocked">Blokkering av \'%s\' opphevet</string>
 </resources>
