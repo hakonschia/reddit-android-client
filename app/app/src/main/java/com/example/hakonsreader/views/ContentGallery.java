@@ -114,8 +114,11 @@ public class ContentGallery extends Content {
                 if (currentView != null) {
                     currentView.viewUnselected();
                 }
+
                 currentView = findViewWithTag(position);
-                currentView.viewSelected();
+                if (currentView != null) {
+                    currentView.viewSelected();
+                }
             }
 
             @Override
