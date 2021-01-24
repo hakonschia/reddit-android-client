@@ -217,7 +217,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
             noComments = false
             commentChainShown = false
 
-            post.enableLayoutAnimations(true)
+            post.enableLayoutAnimations(false)
 
             post.lifecycleOwner = this@PostActivity
 
@@ -314,6 +314,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      * @see onPostLoaded
      */
     private fun updatePostInfo() {
+        binding.post.enableLayoutAnimations(true)
         binding.setPost(post)
         post?.let { binding.post.updatePostInfo(it) }
     }
