@@ -107,7 +107,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
         Intent(this, DispatcherActivity::class.java).run {
             putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/GlobalOffensive/comments/kul6ye/ww2_plane_inspired_skin_for_awp/")
-            startActivity(this)
+            //startActivity(this)
         }
 
         if (savedInstanceState != null) {

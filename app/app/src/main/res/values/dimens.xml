@@ -74,4 +74,6 @@
     <dimen name="linkPreviewTopMargin">4dp</dimen>
 
     <dimen name="postBarHeight">24dp</dimen>
+
+    <dimen name="awardIconSize">14dp</dimen>
 </resources>

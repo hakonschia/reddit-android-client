@@ -53,6 +53,7 @@ class AwardLayout : FrameLayout {
         val awardImageTopBottomMargin = Util.dpToPixels(2f, resources)
         val awardImageStartMargin = Util.dpToPixels(6f, resources)
         val count = getTotalAwardsCount()
+        val awardIconSize = resources.getDimension(R.dimen.awardIconSize).toInt()
 
         // If the listing is updated the old views will still be there
         binding.container.removeAllViews()
@@ -69,7 +70,7 @@ class AwardLayout : FrameLayout {
             // TODO some images are animated gifs, which would be cool to have (although as a setting)
             //  Although I don't know how to check if it's animated before loading the image
             ImageView(context).apply {
-                layoutParams = MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
+                layoutParams = MarginLayoutParams(awardIconSize, awardIconSize).apply {
                     // If we only have 1 award we don't want to margin at the start as it looks weird
                     // since there won't be a "2 awards" text to the left of it
                     marginStart = if (count != 1) {
