@@ -101,7 +101,7 @@ class AwardLayout : FrameLayout {
 
         // For some reason, the layout won't render in the editor if this is set in the XML directly
         // which messes up the other views that depend on this layout, so set it here instead
-        val awardsCountText = context.resources.getQuantityText(R.plurals.awardsCount, count)
+        val awardsCountText = context.resources.getQuantityString(R.plurals.awardsCount, count, count)
         binding.awardCount.text = awardsCountText
     }
 
