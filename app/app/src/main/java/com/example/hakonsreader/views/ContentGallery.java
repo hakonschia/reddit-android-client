@@ -20,6 +20,7 @@ import com.example.hakonsreader.interfaces.LockableSlidr;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -42,6 +43,7 @@ public class ContentGallery extends Content {
 
     private final ContentGalleryBinding binding;
     private List<Image> images;
+    private List<ContentGalleryImage> galleryViews = new ArrayList<>();
 
     /**
      * The current Slidr lock this view has called. This should be checked to make sure duplicate calls
@@ -209,6 +211,14 @@ public class ContentGallery extends Content {
         }
     }
 
+    /**
+     * Releases all views in the gallery
+     */
+    public void release() {
+        galleryViews.forEach(ContentGalleryImage::destroy);
+        galleryViews.clear();
+    }
+
 
     /**
      * The pager adapter responsible for handling the images in the post
@@ -239,6 +249,7 @@ public class ContentGallery extends Content {
             view.setTag(position);
 
             container.addView(view);
+            galleryViews.add(position, view);
 
             return view;
         }
@@ -251,8 +262,7 @@ public class ContentGallery extends Content {
         @Override
         public void destroyItem(@NotNull ViewGroup container, int position, @NotNull Object object) {
             ContentGalleryImage view = (ContentGalleryImage) object;
-            // TODO this isn't called when the actual view (ContentGallery) is destroyed, so this
-            //  ExoPlayer's won't be released
+            galleryViews.remove(view);
             view.destroy();
             container.removeView(view);
         }

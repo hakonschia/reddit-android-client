@@ -30,9 +30,8 @@ class ContentVideo : Content {
          * @return True if the post can be played as a video, false otherwise
          */
         fun isRedditPostVideoPlayable(post: RedditPost): Boolean {
-            // TODO YouTube videos can be loaded with the YouTube Android Player API (https://developers.google.com/youtube/android/player)
             return post.getVideo() != null || post.getVideoGif() != null || post.getMp4Source() != null
-                    || post.thirdPartyObject is ImgurGif || post.thirdPartyObject is GfycatGif
+                    || post.thirdPartyObject is ThirdPartyGif
         }
     }
 

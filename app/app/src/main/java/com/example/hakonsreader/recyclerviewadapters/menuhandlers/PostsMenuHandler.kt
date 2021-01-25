@@ -175,7 +175,6 @@ private fun distinguishAsModOnClick(view: View, post: RedditPost) {
     val api = App.get().api
     val db = RedditDatabase.getInstance(view.context)
 
-    // TODO this should update the UI (need to notify either PostActivity or the adapter)
     CoroutineScope(IO).launch {
         val response = if (post.isMod()) {
             post.distinguished = null
@@ -200,7 +199,6 @@ private fun stickyOnClick(view: View, post: RedditPost) {
     val api = App.get().api
     val db = RedditDatabase.getInstance(view.context)
 
-    // TODO this should update the UI (need to notify either PostActivity or the adapter)
     CoroutineScope(IO).launch {
         val newSticky = !post.isStickied
         post.isStickied = newSticky

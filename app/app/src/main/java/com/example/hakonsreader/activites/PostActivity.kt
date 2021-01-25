@@ -438,8 +438,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                         override fun onTransitionEnd(transition: Transition?) {
                             super.onTransitionEnd(transition)
 
-                            // TODO the thumbnail is shown the entire time, make it so the frame the video
-                            //  ended at is shown instead
                             if (postExtras != null) {
                                 binding.post.extras = postExtras
                             }

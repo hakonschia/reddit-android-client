@@ -226,9 +226,6 @@ class Post : Content {
                     val height = content.measuredHeight
                     val totalHeight = binding.postsParentLayout.measuredHeight
 
-                    // TODO this sometimes fires multiple times and updates the height multiple times, causing
-                    //  the view to jump a tiny bit after it has done the initial transition
-
                     // Entire post is too large, set new content height
                     if (totalHeight > maxHeight) {
                         val params = content.layoutParams as LayoutParams
@@ -331,8 +328,9 @@ class Post : Content {
         val v = binding.content.getChildAt(0)
 
         // Release the exo player from video posts
-        // TODO if gallery, release videos in gallery (this might be done already from the class?)
         if (v is ContentVideo) {
+            v.release()
+        } else if (v is ContentGallery) {
             v.release()
         }
 
