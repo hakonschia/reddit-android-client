@@ -267,6 +267,13 @@ class Post : Content {
             return c
         }
 
+        // Generate the content based on the crosspost. Videos hosted on reddit aren't sent to the "child"
+        // post (this post) but it is in the parent
+        val crosspost = post.crossposts?.firstOrNull()
+        if (crosspost != null) {
+            return generatePostContent(crosspost, context)
+        }
+
         return when (post.getPostType()) {
             PostType.IMAGE -> {
                 ContentImage(context).apply {
