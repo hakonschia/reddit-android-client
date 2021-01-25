@@ -1,13 +1,16 @@
 package com.example.hakonsreader.views
 
 import android.content.Context
+import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.example.hakonsreader.App
+import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
+import com.example.hakonsreader.misc.InternalLinkMovementMethod
 
 class ContentGalleryImage : FrameLayout {
     companion object {
@@ -67,14 +70,30 @@ class ContentGalleryImage : FrameLayout {
                 asImage(it)
             }
 
-            binding.caption.text = it.caption
-            binding.caption.visibility = if (it.caption != null) {
-                VISIBLE
-            } else {
-                GONE
-            }
+            with (binding) {
+                caption.text = it.caption
+                caption.visibility = if (it.caption != null) {
+                    VISIBLE
+                } else {
+                    GONE
+                }
 
-            binding.content.addView(view)
+                // Setting the movement method to InternalLinkMovementMethod doesn't work for some reason
+                outboundUrl.setOnClickListener { _ ->
+                    Intent(context, DispatcherActivity::class.java).apply {
+                        putExtra(DispatcherActivity.URL_KEY, it.outboundUrl)
+                        context.startActivity(this)
+                    }
+                }
+                outboundUrl.text = it.outboundUrl
+                outboundUrl.visibility = if (it.outboundUrl != null) {
+                    VISIBLE
+                } else {
+                    GONE
+                }
+
+                content.addView(view)
+            }
         }
     }
 

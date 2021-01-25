@@ -18,23 +18,55 @@
 
             tools:layout_height="250dp" />
 
+        <View
+            android:id="@+id/captionAndUrlBackground"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:background="#BF000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/caption"/>
+
         <TextView
             android:id="@+id/caption"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
             android:layout_alignParentBottom="true"
-            android:background="@drawable/black_transparent_rounded_corners"
-
             android:padding="8dp"
             android:textColor="@android:color/white"
-
             android:visibility="gone"
+
+            app:layout_constraintBottom_toTopOf="@+id/outboundUrl"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="This text is an optional text for one specific gallery item lorem lorem lorem lorem"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/outboundUrl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+
+            android:textColor="@color/link_color"
+            android:visibility="gone"
+            android:maxLines="2"
+            android:ellipsize="end"
+
+            app:drawableStartCompat="@drawable/ic_launch_24dp"
+            app:drawableTint="@color/link_color"
+            android:drawablePadding="8dp"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="This text is an optional text for one specific gallery item lorem lorem lorem lorem"
+
+            tools:text="https://github.com/hakonschia"
             tools:visibility="visible" />
 
 
