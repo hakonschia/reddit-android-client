@@ -231,7 +231,14 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
             commentsSwipeRefresh.setOnRefreshListener {
                 // We're using our own loading icon, so remove this
                 commentsSwipeRefresh.isRefreshing = false
-                commentsViewModel?.restart()
+
+                // If the app has been idled the post ID and such might be killed and the system will
+                // try to restore the activity, so this would throw an excpetion since the post ID isn't set
+                try {
+                    commentsViewModel?.restart()
+                } catch (e: IllegalStateException) {
+                    finish()
+                }
             }
             commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(
                     ContextCompat.getColor(this@PostActivity, R.color.colorAccent)
@@ -390,7 +397,12 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
 
             commentsViewModel?.let {
                 it.postId = postId
-                it.loadComments(loadThirdParty)
+
+                try {
+                    it.loadComments(loadThirdParty)
+                } catch (e: IllegalStateException) {
+                    finish()
+                }
             }
         }
     }

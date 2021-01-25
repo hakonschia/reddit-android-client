@@ -46,6 +46,7 @@ class CommentsViewModel: ViewModel() {
      *
      * @throws IllegalStateException if [postId] is not set
      */
+    @Throws(IllegalStateException::class)
     fun loadComments(loadThirdParty: Boolean = false) {
         if (postId.isBlank()) {
             throw IllegalStateException("Post ID not set")
@@ -105,7 +106,10 @@ class CommentsViewModel: ViewModel() {
 
     /**
      * Loads comments from scratch
+     *
+     * @throws IllegalStateException If [postId] is not set
      */
+    @Throws(IllegalStateException::class)
     fun restart() {
         comments.value = ArrayList()
         loadComments()
