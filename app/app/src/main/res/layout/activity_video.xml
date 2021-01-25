@@ -9,6 +9,8 @@
         android:id="@+id/videoPlayer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:transitionName="video_player_transition"/>
+        android:transitionName="video_player_transition"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

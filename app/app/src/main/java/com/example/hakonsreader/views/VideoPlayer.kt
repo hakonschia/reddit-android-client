@@ -591,12 +591,9 @@ class VideoPlayer : PlayerView {
     }
 
     fun fitScreen() {
-        // TODO this is a pretty bad way of doing it as the controls get pushed to the bottom of the screen even
-        //  if the video itself isn't
-        // Can probably use videoWidth to the width the screen width?
         val params = layoutParams
         params.width = ViewGroup.LayoutParams.MATCH_PARENT
-        params.height = ViewGroup.LayoutParams.MATCH_PARENT
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT
         layoutParams = params
     }
 
