@@ -8,7 +8,6 @@ import android.transition.TransitionListenerAdapter
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -139,6 +138,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
 
         setupBinding()
         setupCommentsViewModel()
+        setupCommentsList()
 
         // No state saved means we have no comments, so load them
         if (savedInstanceState == null) {
@@ -255,7 +255,13 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      */
     private fun setupCommentsViewModel() {
         commentsViewModel = ViewModelProvider(this).get(CommentsViewModel::class.java).apply {
-            getComments().observe(this@PostActivity, { comments ->
+            getPost().observe(this@PostActivity) {
+                if (it != null) {
+                    onNewPostInfo(it)
+                }
+            }
+
+            getComments().observe(this@PostActivity) { comments ->
                 // New comments are empty, previous comments are not, clear the previous comments
                 if (comments.isEmpty() && commentsAdapter?.itemCount != 0) {
                     commentsAdapter?.clearComments()
@@ -275,7 +281,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                 commentsAdapter?.submitList(comments)
 
                 binding.noComments = comments.isEmpty()
-            })
+            }
 
             onLoadingCountChange().observe(this@PostActivity, { up -> binding.loadingIcon.onCountChange(up) })
             getError().observe(this@PostActivity, { error ->
@@ -286,25 +292,43 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
     }
 
     /**
-     * Sets up [ActivityPostBinding.comments], if [post] isn't `null`
+     * Sets up [ActivityPostBinding.comments]
      */
     private fun setupCommentsList() {
-        post?.let { post ->
-            commentsLayoutManager = LinearLayoutManager(this)
+        commentsLayoutManager = LinearLayoutManager(this)
 
-            commentsAdapter = CommentsAdapter(post).apply {
-                replyListener = this@PostActivity
-                commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
-                loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel?.loadMoreComments(comment, parent) }
-                onChainShown = Runnable { binding.commentChainShown = true }
-            }
+        commentsAdapter = CommentsAdapter().apply {
+            replyListener = this@PostActivity
+            commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
+            loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel?.loadMoreComments(comment, parent) }
+            onChainShown = Runnable { binding.commentChainShown = true }
+        }
 
-            binding.comments.adapter = commentsAdapter
-            binding.comments.layoutManager = commentsLayoutManager
-            binding.showAllComments.setOnClickListener {
+        with (binding) {
+            comments.adapter = commentsAdapter
+            comments.layoutManager = commentsLayoutManager
+            showAllComments.setOnClickListener {
                 commentsAdapter?.commentIdChain = ""
-                binding.commentChainShown = false
+                commentChainShown = false
             }
+        }
+    }
+
+    /**
+     * Called when post info has been retrieved, either if when first loading or when it has
+     * updated
+     *
+     * Calls [updatePostInfo] or [onPostLoaded] accordingly and sets [post]
+     */
+    private fun onNewPostInfo(newPost: RedditPost) {
+        val postPreviouslySet = binding.post.redditPost != null
+        post = newPost
+
+        // If we have a post already just update the info so the content isn't reloaded
+        if (postPreviouslySet) {
+            updatePostInfo(newPost)
+        } else {
+            onPostLoaded(newPost)
         }
     }
 
@@ -313,10 +337,10 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      *
      * @see onPostLoaded
      */
-    private fun updatePostInfo() {
+    private fun updatePostInfo(newPost: RedditPost) {
         binding.post.enableLayoutAnimations(true)
-        binding.setPost(post)
-        post?.let { binding.post.updatePostInfo(it) }
+        binding.setPost(newPost)
+        binding.post.updatePostInfo(newPost)
     }
 
     /**
@@ -326,15 +350,13 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      *
      * @see updatePostInfo
      */
-    private fun onPostLoaded(extras: Bundle? = null) {
-        binding.setPost(post)
-        binding.post.redditPost = post
+    private fun onPostLoaded(newPost: RedditPost, extras: Bundle? = null) {
+        binding.setPost(newPost)
+        binding.post.redditPost = newPost
 
         if (extras != null) {
             binding.post.extras = extras
         }
-
-        setupCommentsList()
     }
 
     /**
@@ -362,15 +384,8 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                 if (it == null) {
                     return@observe
                 }
-                val postPreviouslySet = binding.post.redditPost != null
-                post = it
 
-                // If we have a post already just update the info so the content isn't reloaded
-                if (postPreviouslySet) {
-                    updatePostInfo()
-                } else {
-                    onPostLoaded()
-                }
+                onNewPostInfo(it)
             }
 
             commentsViewModel?.let {
@@ -392,7 +407,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         val redditPost = Gson().fromJson(json, RedditPost::class.java)
 
         return if (redditPost != null) {
-            post = redditPost
             val postExtras: Bundle? = intent.extras?.getBundle(Content.EXTRAS)
 
             when (redditPost.getPostType()) {
@@ -409,14 +423,14 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                         }
                     }
 
-                    onPostLoaded(postExtras)
+                    onPostLoaded(redditPost, postExtras)
                 }
 
                 // Add a transition listener that sets the extras for videos after the enter transition is done,
                 // so that the video doesn't play during the transition (which looks odd since it's very choppy)
                 PostType.VIDEO -> {
                     // Load the post, but don't set extras yet
-                    onPostLoaded()
+                    onPostLoaded(redditPost)
 
                     // For videos we don't want to set the extras right away. If a video is playing during the
                     // animation the animation looks very choppy, so it should only be played at the end
@@ -434,7 +448,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                 }
 
                 // Nothing special for the post, set the extras
-                else -> onPostLoaded(postExtras)
+                else -> onPostLoaded(redditPost, postExtras)
             }
 
             redditPost.id

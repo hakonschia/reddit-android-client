@@ -170,9 +170,9 @@ class App : Application() {
         }
 
         val db = RedditDatabase.getInstance(this)
-        // Remove records that are older than 12 hours, as they likely won't be used again
+        // Remove records that are older than 2 days, as they likely won't be used again
         CoroutineScope(IO).launch {
-            val maxAge = 60.toLong() * 60 * 12
+            val maxAge = 60L * 60 * 24 * 2
             val count = db.posts().count
             val deleted = db.posts().deleteOld(maxAge)
 

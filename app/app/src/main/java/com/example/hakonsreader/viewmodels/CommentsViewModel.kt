@@ -16,10 +16,12 @@ class CommentsViewModel: ViewModel() {
     private val api = App.get().api
     private val database = App.get().database
 
+    private val post = MutableLiveData<RedditPost>()
     private val comments = MutableLiveData<List<RedditComment>>()
     private val loadingChange = MutableLiveData<Boolean>()
     private val error = MutableLiveData<ErrorWrapper>()
 
+    fun getPost() : LiveData<RedditPost> = post
     fun getComments() : LiveData<List<RedditComment>> = comments
     fun onLoadingCountChange() : LiveData<Boolean> = loadingChange
     fun getError() : LiveData<ErrorWrapper> = error
@@ -57,8 +59,9 @@ class CommentsViewModel: ViewModel() {
 
             when (resp) {
                 is ApiResponse.Success -> {
-                    database.posts().insert(resp.value.post)
+                    post.postValue(resp.value.post)
                     comments.postValue(resp.value.comments)
+                    database.posts().insert(resp.value.post)
                 }
                 is ApiResponse.Error -> error.postValue(ErrorWrapper(resp.error, resp.throwable))
             }

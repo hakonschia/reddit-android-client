@@ -15,7 +15,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
-import androidx.core.view.children
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +22,6 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditComment
-import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ListItemCommentBinding
 import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding
@@ -42,7 +40,7 @@ import com.example.hakonsreader.views.LinkPreview
  * * Hidden comments
  * * "More" comments (eg. "2 more comments")
  */
-class CommentsAdapter(private val post: RedditPost) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         private const val TAG = "CommentsAdapter"
 
