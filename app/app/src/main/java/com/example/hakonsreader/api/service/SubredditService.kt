@@ -153,6 +153,22 @@ interface SubredditService {
             @Path("subreddit") subredditName: String,
             @Field("name") username: String,
             @Field("flair_template_id") flairId: String,
+
+            @Field("api_type") apiType: String = "json"
+    ) : Response<JsonResponse<Any?>>
+
+    /**
+     * Enables or disables user flairs on a subreddit
+     *
+     * @param subredditName The name of the subreddit to enable or disable flairs on
+     * @param enable True to enable flairs, false to disable
+     */
+    @POST("r/{subreddit}/api/setflairenabled?raw_json=1")
+    @FormUrlEncoded
+    suspend fun enableUserFlair(
+            @Path("subreddit") subredditName: String,
+            @Field("flair_enabled") enable: Boolean,
+
             @Field("api_type") apiType: String = "json"
     ) : Response<JsonResponse<Any?>>
 

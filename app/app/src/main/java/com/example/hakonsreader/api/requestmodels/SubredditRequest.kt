@@ -474,11 +474,41 @@ class SubredditRequest(
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
-            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Retrieving submission flairs requires a valid access token for a logged in user", e))
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Setting a flair requires a valid access token for a logged in user", e))
         }
 
         return try {
             val response = api.selectFlair(subredditName, username, flairId)
+            val body = response.body()
+
+            if (body != null) {
+                if (!body.hasErrors()) {
+                    ApiResponse.Success(null)
+                } else {
+                    apiListingErrors(body.errors() as List<List<String>>)
+                }
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Enables or disables user flairs on the subreddit
+     *
+     * @param enable True to enable flairs, false to disable
+     */
+    suspend fun enableUserFlair(enable: Boolean) : ApiResponse<Any?> {
+        try {
+            verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Enabling flairs requires a valid access token for a logged in user", e))
+        }
+
+        return try {
+            val response = api.enableUserFlair(subredditName, enable)
             val body = response.body()
 
             if (body != null) {
