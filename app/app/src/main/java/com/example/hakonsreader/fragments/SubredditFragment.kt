@@ -23,6 +23,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.PostActivity
 import com.example.hakonsreader.activites.SubmitActivity
 import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.enums.FlairType
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
@@ -141,6 +142,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var rulesLoaded = false
 
     /**
+     * True if the user flairs for the subreddit has been loaded during this fragment
+     */
+    private var flairsLoaded = false
+
+
+    /**
      * A DrawerListener for the drawer with subreddit info
      */
     var drawerListener: DrawerLayout.DrawerListener? = null
@@ -173,9 +180,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         setupSubredditObservable()
         setupSubmitPostFab()
         setupPostsViewModel()
-        setupRulesList()
-        observeRules()
-        automaticallyOpenDrawerIfSet()
+
+        if (!isDefaultSubreddit) {
+            setupRulesList()
+            observeRules()
+            observeUserFlairs()
+            automaticallyOpenDrawerIfSet()
+        }
+
 
         App.get().registerPrivateBrowsingObservable(this)
 
@@ -376,9 +388,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
-                    if (!rulesLoaded) {
-                        getSubredditName()?.let {
+                    getSubredditName()?.let {
+                        if (!rulesLoaded) {
                             retrieveSubredditRules(it)
+                        }
+                        if (!flairsLoaded) {
                             getSubmissionFlairs(it)
                         }
                     }
@@ -670,6 +684,26 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     }
 
     /**
+     * Observes the subreddits user flairs from the local database and updates the spinner in the
+     * subreddit info
+     */
+    private fun observeUserFlairs() {
+        database.flairs().getFlairsBySubredditAndType(getSubredditName(), FlairType.USER.name).observe(viewLifecycleOwner) {
+            if (it == null) {
+                return@observe
+            }
+
+            val adapter = RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
+                onFlairClicked = RedditFlairAdapter.OnFlairClicked { flair ->
+                    updateUserFlair(flair)
+                }
+            }
+
+            binding.subredditInfo.selectFlairSpinner.adapter = adapter
+        }
+    }
+
+    /**
      * Calls the API to get the submission flairs for this subreddit
      */
     private fun getSubmissionFlairs(subredditName: String) {
@@ -679,6 +713,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             withContext(Main) {
                 when (response) {
                     is ApiResponse.Success -> {
+                        flairsLoaded = true
                         onUserFlairResponse(response.value)
                     }
                     is ApiResponse.Error -> {
@@ -707,13 +742,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             return
         }
 
-        val adapter = RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, flairs).apply {
-            onFlairClicked = RedditFlairAdapter.OnFlairClicked {
-                updateUserFlair(it)
-            }
-        }
-        binding.subredditInfo.selectFlairSpinner.adapter = adapter
         binding.subredditInfo.selectFlairLoadingIcon.visibility = View.GONE
+
+        CoroutineScope(IO).launch {
+            database.flairs().insert(flairs)
+        }
     }
 
     /**

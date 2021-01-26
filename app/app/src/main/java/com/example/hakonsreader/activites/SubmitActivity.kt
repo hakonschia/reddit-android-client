@@ -14,6 +14,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.enums.FlairType
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
@@ -74,6 +75,7 @@ class SubmitActivity : BaseActivity() {
         // the api
         getSubredditInfo(subredditName)
         getSubmissionFlairs(subredditName)
+        observeSubmissionFlairs(subredditName)
 
         binding.subredditName = subredditName
 
@@ -190,9 +192,25 @@ class SubmitActivity : BaseActivity() {
             return
         }
 
-        val adapter = RedditFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, submissionFlairs)
-        binding.flairSpinner.adapter = adapter
         binding.submissionFlairLoadingIcon.visibility = GONE
+
+        CoroutineScope(IO).launch {
+            database.flairs().insert(flairs)
+        }
+    }
+
+    /**
+     * Observes the subreddits rules from the local database and updates [rulesAdapter] on changes
+     */
+    private fun observeSubmissionFlairs(subredditName: String) {
+        database.flairs().getFlairsBySubredditAndType(subredditName, FlairType.SUBMISSION.name).observe(this) {
+            if (it == null) {
+                return@observe
+            }
+
+            val adapter = RedditFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, submissionFlairs)
+            binding.flairSpinner.adapter = adapter
+        }
     }
 
     /**

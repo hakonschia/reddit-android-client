@@ -1,17 +1,22 @@
 package com.example.hakonsreader.api.model.flairs
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.hakonsreader.api.enums.FlairType
 import com.google.gson.annotations.SerializedName
 
 /**
  * Class representing a flair type for post submissions or user flairs on a subreddit
  */
+@Entity(tableName = "flairs")
 class RedditFlair {
 
     /**
      * The ID of the flair
      */
     @SerializedName("id")
-    val id = ""
+    @PrimaryKey
+    var id = ""
 
     /**
      * What type of flair this is (richtext or text)
@@ -29,7 +34,7 @@ class RedditFlair {
      * When [type] is "richtext", this will hold the list of richtext flairs for the flair
      */
     @SerializedName("richtext")
-    var richtextFlairs: List<RichtextFlair>? = null
+    var richtextFlairs = ArrayList<RichtextFlair>()
 
     /**
      * The text color for the flair
@@ -42,4 +47,15 @@ class RedditFlair {
      */
     @SerializedName("background_color")
     var backgroundColor = ""
+
+
+    /**
+     * The type of flair this is
+     */
+    var flairType: FlairType = FlairType.USER
+
+    /**
+     * The subreddit the flair is in
+     */
+    var subreddit = ""
 }

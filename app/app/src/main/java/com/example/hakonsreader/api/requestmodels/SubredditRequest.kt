@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.requestmodels
 
 import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.enums.FlairType
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
@@ -424,6 +425,10 @@ class SubredditRequest(
             val flairs = response.body()
 
             if (flairs != null) {
+                flairs.forEach {
+                    it.subreddit = subredditName
+                    it.flairType = FlairType.SUBMISSION
+                }
                 ApiResponse.Success(flairs)
             } else {
                 apiError(response)
@@ -452,6 +457,10 @@ class SubredditRequest(
             val flairs = response.body()
 
             if (flairs != null) {
+                flairs.forEach {
+                    it.subreddit = subredditName
+                    it.flairType = FlairType.USER
+                }
                 ApiResponse.Success(flairs)
             } else {
                 apiError(response)

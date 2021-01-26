@@ -5,16 +5,20 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
 
 import com.example.hakonsreader.api.model.RedditMessage;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.Subreddit;
 import com.example.hakonsreader.api.model.SubredditRule;
+import com.example.hakonsreader.api.model.flairs.RedditFlair;
 
 /**
  * The global database for the application, holds {@link RedditPost} and {@link Subreddit} entities
  */
-@Database(entities = {RedditPost.class, Subreddit.class, SubredditRule.class, RedditMessage.class}, version = 19)
+@Database(entities = {RedditPost.class, Subreddit.class, SubredditRule.class, RedditMessage.class, RedditFlair.class}, version = 20)
+@TypeConverters({PostConverter.class, EnumConverters.class})
 public abstract class RedditDatabase extends RoomDatabase {
 
     private static RedditDatabase instance;
@@ -22,6 +26,7 @@ public abstract class RedditDatabase extends RoomDatabase {
     public abstract RedditSubredditsDao subreddits();
     public abstract RedditMessagesDao messages();
     public abstract RedditSubredditRulesDao rules();
+    public abstract RedditFlairsDao flairs();
 
 
     /**
