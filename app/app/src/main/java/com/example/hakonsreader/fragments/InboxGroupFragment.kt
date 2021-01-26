@@ -1,16 +1,12 @@
 package com.example.hakonsreader.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
-import com.example.hakonsreader.R
-import com.example.hakonsreader.api.persistence.RedditDatabase
-import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentInboxGroupBinding
 import com.example.hakonsreader.recyclerviewadapters.InboxAdapter
 import kotlinx.coroutines.CoroutineScope
@@ -41,9 +37,7 @@ class InboxGroupFragment : Fragment() {
 
     private var _binding: FragmentInboxGroupBinding? = null
     private val binding get() = _binding!!
-    private val db by lazy {
-        RedditDatabase.getInstance(requireContext())
-    }
+    private val db = App.get().database
 
     private var messageAdapter: InboxAdapter? = null
     private var messageLayoutManager: LinearLayoutManager? = null

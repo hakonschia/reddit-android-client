@@ -7,7 +7,6 @@ import androidx.appcompat.view.menu.MenuPopupHelper
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditMessage
-import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.Util
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +41,7 @@ fun showInboxMenu(view: View, redditMessage: RedditMessage?) {
 
 private fun markUnreadOnClick(view: View, message: RedditMessage) {
     val api = App.get().api
-    val db = RedditDatabase.getInstance(view.context)
+    val db = App.get().database
 
     CoroutineScope(IO).launch {
         val markRead = message.isNew

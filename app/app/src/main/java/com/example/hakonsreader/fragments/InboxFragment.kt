@@ -9,8 +9,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.api.persistence.RedditDatabase
-import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentInboxBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +41,7 @@ class InboxFragment : Fragment() {
         super.onDestroyView()
 
         // Send API request to mark messages as unread when the view is destroyed
-        val db = RedditDatabase.getInstance(requireContext())
+        val db = App.get().database
         val api = App.get().api
 
         CoroutineScope(IO).launch {

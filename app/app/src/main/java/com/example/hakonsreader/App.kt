@@ -169,12 +169,11 @@ class App : Application() {
             Stetho.initializeWithDefaults(this)
         }
 
-        val db = RedditDatabase.getInstance(this)
         // Remove records that are older than 2 days, as they likely won't be used again
         CoroutineScope(IO).launch {
             val maxAge = 60L * 60 * 24 * 2
-            val count = db.posts().count
-            val deleted = db.posts().deleteOld(maxAge)
+            val count = database.posts().count
+            val deleted = database.posts().deleteOld(maxAge)
 
             Log.d(TAG, "onCreate: # of records=$count; # of deleted=$deleted")
         }
@@ -795,7 +794,7 @@ class App : Application() {
      * be logged out and prompted to log back in.
      */
     private fun onInvalidAccessToken() {
-        get().clearUserInfo()
+        clearUserInfo()
 
         // Should we also recreate the app? We could have posts for the user, be in the profile etc
 
@@ -822,7 +821,7 @@ class App : Application() {
             TokenManager.getToken()?.let { api.accessToken().revoke(it) }
 
             // Clear any user specific state from database records (such as vote status on posts)
-            RedditDatabase.getInstance(this@App).clearUserState()
+            database.clearUserState()
 
             // Might be bad to just restart the app? Easiest way to ensure everything is reset though
             ProcessPhoenix.triggerRebirth(this@App)

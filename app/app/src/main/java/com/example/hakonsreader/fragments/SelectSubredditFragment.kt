@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentSelectSubredditBinding
 import com.example.hakonsreader.interfaces.OnClickListener
@@ -63,7 +62,7 @@ class SelectSubredditFragment : Fragment() {
     private var _binding: FragmentSelectSubredditBinding? = null
     private val binding get() = _binding!!
     private val api = App.get().api
-    private val database = RedditDatabase.getInstance(context)
+    private val database = App.get().database
 
     private val saveState: Bundle = Bundle()
 

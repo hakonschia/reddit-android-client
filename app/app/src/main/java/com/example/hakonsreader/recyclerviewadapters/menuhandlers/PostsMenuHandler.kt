@@ -14,13 +14,11 @@ import androidx.appcompat.widget.PopupMenu
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.Util
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -173,7 +171,7 @@ private fun savePostOnClick(view: View, post: RedditPost) {
 
 private fun distinguishAsModOnClick(view: View, post: RedditPost) {
     val api = App.get().api
-    val db = RedditDatabase.getInstance(view.context)
+    val db = App.get().database
 
     CoroutineScope(IO).launch {
         val response = if (post.isMod()) {
@@ -197,7 +195,7 @@ private fun distinguishAsModOnClick(view: View, post: RedditPost) {
 
 private fun stickyOnClick(view: View, post: RedditPost) {
     val api = App.get().api
-    val db = RedditDatabase.getInstance(view.context)
+    val db = App.get().database
 
     CoroutineScope(IO).launch {
         val newSticky = !post.isStickied

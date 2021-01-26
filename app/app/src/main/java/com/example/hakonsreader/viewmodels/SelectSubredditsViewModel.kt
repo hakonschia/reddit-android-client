@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.SharedPreferencesManager
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +27,7 @@ class SelectSubredditsViewModel(context: Context) : ViewModel() {
         const val SUBSCRIBED_SUBREDDITS_KEY = "subscribedSubreddits"
     }
 
-    private val database: RedditDatabase = RedditDatabase.getInstance(context)
+    private val database = App.get().database
     private val api = App.get().api
 
     private val subreddits: MutableLiveData<List<Subreddit>> by lazy {

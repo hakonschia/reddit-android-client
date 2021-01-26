@@ -31,7 +31,6 @@ import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
-import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
@@ -120,7 +119,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         }
     }
 
-    private val database = RedditDatabase.getInstance(context)
+    private val database = App.get().database
     private val api = App.get().api
 
     private var _binding: FragmentSubredditBinding? = null
