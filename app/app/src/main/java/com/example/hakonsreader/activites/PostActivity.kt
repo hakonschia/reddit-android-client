@@ -345,15 +345,12 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      * @see onPostLoaded
      */
     private fun updatePostInfo(newPost: RedditPost) {
-        binding.post.enableLayoutAnimations(true)
         binding.setPost(newPost)
         binding.post.updatePostInfo(newPost)
     }
 
     /**
      * This should be called when [post] has been set and should generate the view for the post
-     *
-     * [setupCommentsList] is automatically called
      *
      * @see updatePostInfo
      */
@@ -363,6 +360,12 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
 
         if (extras != null) {
             binding.post.extras = extras
+        }
+
+        // Enable animation after first time the post has loaded (it looks weird if animates when it goes
+        // from nothing to something)
+        binding.post.post {
+            binding.post.enableLayoutAnimations(true)
         }
     }
 
@@ -387,14 +390,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         }
 
         if (postId != null) {
-            App.get().database.posts().getPostById(postId).observe(this) {
-                if (it == null) {
-                    return@observe
-                }
-
-                onNewPostInfo(it)
-            }
-
             commentsViewModel?.let {
                 it.postId = postId
 
