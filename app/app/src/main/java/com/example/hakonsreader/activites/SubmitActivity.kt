@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.asLiveData
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.App
@@ -202,7 +203,7 @@ class SubmitActivity : BaseActivity() {
      * Observes the subreddits rules from the local database and updates [rulesAdapter] on changes
      */
     private fun observeSubmissionFlairs(subredditName: String) {
-        database.flairs().getFlairsBySubredditAndType(subredditName, FlairType.SUBMISSION.name).observe(this) {
+        database.flairs().getFlairsBySubredditAndType(subredditName, FlairType.SUBMISSION.name).asLiveData().observe(this) {
             if (it == null) {
                 return@observe
             }

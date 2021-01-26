@@ -1,31 +1,21 @@
-package com.example.hakonsreader.api.persistence;
+package com.example.hakonsreader.api.persistence
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import com.example.hakonsreader.api.model.Subreddit;
-
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.example.hakonsreader.api.model.Subreddit
 
 /**
  * Interface to store subreddits in a persistent Room database
  */
 @Dao
-public interface RedditSubredditsDao {
-
+interface RedditSubredditsDao {
     /**
      * Inserts a subreddit into the database. If there is a conflict the subreddit is updated
      *
      * @param subreddit The subreddit to insert
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(@Nullable Subreddit subreddit);
+    fun insert(subreddit: Subreddit)
 
     /**
      * Inserts a list of subreddits into the database. If there is a conflict the subreddit is updated
@@ -33,7 +23,7 @@ public interface RedditSubredditsDao {
      * @param subreddits The subreddits to insert
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<Subreddit> subreddits);
+    fun insertAll(subreddits: List<Subreddit>)
 
     /**
      * Updates the subreddit
@@ -41,14 +31,13 @@ public interface RedditSubredditsDao {
      * @param subreddit The subreddit with new information
      */
     @Update
-    void update(Subreddit subreddit);
+    fun update(subreddit: Subreddit)
 
     /**
      * @return A list of all subreddits stored
      */
     @Query("SELECT * FROM subreddits")
-    List<Subreddit> getAll();
-
+    fun getAll(): List<Subreddit>
 
     /**
      * Retrieves a list of subreddits based on an array of IDs
@@ -57,23 +46,22 @@ public interface RedditSubredditsDao {
      * @return A list of subreddits based on the IDs
      */
     @Query("SELECT * FROM subreddits WHERE id IN (:ids)")
-    List<Subreddit> getSubsById(String[] ids);
+    fun getSubsById(ids: Array<String>): List<Subreddit>
 
     /**
      * Get the subreddit object from its name
      *
-     * @param subredditName The name of the subreddit (as equal to {@link Subreddit#getName()}).
-     *                      Not this is NOT case sensitive
+     * @param subredditName The name of the subreddit (as equal to [Subreddit.getName]).
+     * Not this is NOT case sensitive
      * @return A LiveData with the subreddit, or null if not found
      */
     @Query("SELECT * FROM subreddits WHERE name=:subredditName COLLATE NOCASE")
-    LiveData<Subreddit> get(String subredditName);
-
+    operator fun get(subredditName: String): LiveData<Subreddit>
 
     /**
      * Clears user specific information from all posts. Sets to the values that the Reddit API
      * would return for non-logged in users
      */
     @Query("UPDATE subreddits SET isSubscribed=0")
-    void clearUserState();
+    fun clearUserState()
 }

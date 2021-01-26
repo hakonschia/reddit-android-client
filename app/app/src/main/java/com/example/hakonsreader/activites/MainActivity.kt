@@ -443,7 +443,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * Observes the unread messages in the local database and updates the profile navbar accordingly
      */
     private fun observeUnreadMessages() {
-        val unread = db.messages().unreadMessages
+        val unread = db.messages().getUnreadMessages()
         unread.observe(this, { m ->
             unreadMessages = m.size
 

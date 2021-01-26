@@ -91,8 +91,8 @@ class InboxGroupFragment : Fragment() {
     private fun loadMessagesFromDb() {
         CoroutineScope(IO).launch {
             val messages = when (inboxType) {
-                InboxFragment.InboxGroupTypes.ALL -> db.messages().allMessages
-                InboxFragment.InboxGroupTypes.UNREAD -> db.messages().unreadMessages
+                InboxFragment.InboxGroupTypes.ALL -> db.messages().getAllMessages()
+                InboxFragment.InboxGroupTypes.UNREAD -> db.messages().getUnreadMessages()
             }
 
             withContext(Main) {

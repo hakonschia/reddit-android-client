@@ -16,6 +16,7 @@ import androidx.databinding.ObservableField
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
@@ -677,7 +678,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * Observes the subreddits rules from the local database and updates [rulesAdapter] on changes
      */
     private fun observeRules() {
-        database.rules().getAllRules(getSubredditName()).observe(viewLifecycleOwner) {
+        database.rules().getAllRules(getSubredditName()!!).observe(viewLifecycleOwner) {
             rulesAdapter?.submitList(it)
         }
     }
@@ -687,7 +688,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * subreddit info
      */
     private fun observeUserFlairs() {
-        database.flairs().getFlairsBySubredditAndType(getSubredditName(), FlairType.USER.name).observe(viewLifecycleOwner) {
+        database.flairs().getFlairsBySubredditAndType(getSubredditName()!!, FlairType.USER.name).asLiveData().observe(viewLifecycleOwner) {
             if (it == null) {
                 return@observe
             }

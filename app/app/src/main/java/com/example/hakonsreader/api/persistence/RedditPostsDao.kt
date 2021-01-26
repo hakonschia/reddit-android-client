@@ -1,45 +1,35 @@
-package com.example.hakonsreader.api.persistence;
+package com.example.hakonsreader.api.persistence
 
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.example.hakonsreader.api.model.RedditPost
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import com.example.hakonsreader.api.model.RedditPost;
-
-import java.util.List;
-
-/**
- * Interface to store posts in a persistent Room database
- */
 @Dao
-public interface RedditPostsDao {
+interface RedditPostsDao {
 
     /**
      * Inserts a post into the database.
      *
-     * <p>The post ID provided by Reddit ({@link RedditPost#getId()} is used as the primary key.
-     * If a record already exists with this ID it is replaced</p>
+     *
+     * The post ID provided by Reddit ([RedditPost.getId] is used as the primary key.
+     * If a record already exists with this ID it is replaced
      *
      * @param post The post to insert
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(RedditPost post);
+    fun insert(post: RedditPost)
 
     /**
      * Inserts a list of posts into th e database
      *
-     * <p>The post ID provided by Reddit ({@link RedditPost#getId()} is used as the primary key.
-     * If a record already exists with this ID it is replaced</p>
+     *
+     * The post ID provided by Reddit ([RedditPost.getId] is used as the primary key.
+     * If a record already exists with this ID it is replaced
      *
      * @param posts The posts to insert
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<RedditPost> posts);
+    fun insertAll(posts: List<RedditPost>)
 
 
     /**
@@ -48,7 +38,7 @@ public interface RedditPostsDao {
      * @param post The post to delete
      */
     @Delete
-    void delete(RedditPost post);
+    fun delete(post: RedditPost)
 
     /**
      * Updates a post in the database
@@ -56,7 +46,7 @@ public interface RedditPostsDao {
      * @param post The post to update
      */
     @Update
-    void update(RedditPost post);
+    fun update(post: RedditPost)
 
     /**
      * Deletes all posts from the database
@@ -64,7 +54,7 @@ public interface RedditPostsDao {
      * @return The amount of posts delete
      */
     @Query("DELETE FROM posts")
-    int deleteAll();
+    fun deleteAll(): Int
 
     /**
      * Delete posts from the database that are older than the given age
@@ -72,7 +62,7 @@ public interface RedditPostsDao {
      * @return The amount of posts deleted
      */
     @Query("DELETE FROM posts WHERE insertedAt + :maxAge - strftime('%s', 'now') < 0")
-    int deleteOld(long maxAge);
+    fun deleteOld(maxAge: Long): Int
 
 
     /**
@@ -81,33 +71,35 @@ public interface RedditPostsDao {
      * @return The total amount of posts in the database
      */
     @Query("SELECT COUNT() FROM POSTS")
-    int getCount();
+    fun getCount(): Int
 
 
     /**
      * Retrieve all posts from the database
      *
-     * <p>Note: If a post has crossposts the crossposts will NOT be returned here. The database
-     * stores the list of IDs of the crossposts. To retrieve the crossposts use {@link RedditPost#getCrosspostIds()}
-     * and then use {@link RedditPostsDao#getPostsById(List)} to retrieve the posts</p>
+     *
+     * Note: If a post has crossposts the crossposts will NOT be returned here. The database
+     * stores the list of IDs of the crossposts. To retrieve the crossposts use [RedditPost.getCrosspostIds]
+     * and then use [RedditPostsDao.getPostsById] to retrieve the posts
      *
      * @return A list of all the posts in the database
      */
     @Query("SELECT * FROM posts")
-    List<RedditPost> getPosts();
+    fun getPosts(): List<RedditPost>
 
     /**
      * Retrieve a list of posts from the database, based on a list of IDs
      *
-     * <p>Note: If a post has crossposts the crossposts will NOT be returned here. The database
-     * stores the list of IDs of the crossposts. To retrieve the crossposts use {@link RedditPost#getCrosspostIds()}
-     * and then use this function to retrieve the posts</p>
+     *
+     * Note: If a post has crossposts the crossposts will NOT be returned here. The database
+     * stores the list of IDs of the crossposts. To retrieve the crossposts use [RedditPost.getCrosspostIds]
+     * and then use this function to retrieve the posts
      *
      * @param ids The IDs of the posts to retrieve
      * @return A list of posts matching the IDs
      */
     @Query("SELECT * FROM posts WHERE id IN (:ids)")
-    List<RedditPost> getPostsById(List<String> ids);
+    fun getPostsById(ids: List<String>): List<RedditPost>
 
     /**
      * Retrieves a post by ID
@@ -116,7 +108,7 @@ public interface RedditPostsDao {
      * @return A LiveData that can be observed for the post
      */
     @Query("SELECT * FROM posts WHERE id=:id")
-    LiveData<RedditPost> getPostById(String id);
+    fun getPostById(id: String): LiveData<RedditPost>
 
 
     /**
@@ -124,5 +116,5 @@ public interface RedditPostsDao {
      * would return for non-logged in users
      */
     @Query("UPDATE posts SET liked=null")
-    void clearUserState();
+    fun clearUserState()
 }

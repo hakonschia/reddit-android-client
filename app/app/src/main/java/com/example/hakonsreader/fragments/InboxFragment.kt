@@ -45,8 +45,8 @@ class InboxFragment : Fragment() {
         val api = App.get().api
 
         CoroutineScope(IO).launch {
-            val unread = db.messages().unreadMessagesNoObservable
-            unread?.let { api.messages().markRead(*it.toTypedArray()) }
+            val unread = db.messages().getUnreadMessagesNoObservable()
+            unread.let { api.messages().markRead(*it.toTypedArray()) }
             db.messages().markRead()
         }
 

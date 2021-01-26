@@ -1,18 +1,11 @@
-package com.example.hakonsreader.api.persistence;
+package com.example.hakonsreader.api.persistence
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-
-import com.example.hakonsreader.api.model.RedditMessage;
-
-import java.util.List;
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.example.hakonsreader.api.model.RedditMessage
 
 @Dao
-public interface RedditMessagesDao {
+interface RedditMessagesDao {
 
     /**
      * Inserts a new message into the database
@@ -20,10 +13,10 @@ public interface RedditMessagesDao {
      * The conflict strategy is to replace the record (ie. update it)
      *
      * @param message The message to insert
-     * @see #insertAll
+     * @see insertAll
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insert(RedditMessage message);
+    fun insert(message: RedditMessage)
 
     /**
      * Inserts a list of messages into the database
@@ -31,59 +24,57 @@ public interface RedditMessagesDao {
      * The conflict strategy is to replace the records (ie. update them)
      *
      * @param messages The messages to insert
-     * @see #insert
+     * @see insert
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertAll(List<RedditMessage> messages);
-
+    fun insertAll(messages: List<RedditMessage>)
 
     /**
      * Deletes a message from the database
      *
      * @param message The message to delete
-     * @see #deleteAll
+     * @see deleteAll
      */
     @Delete
-    public void delete(RedditMessage message);
+    fun delete(message: RedditMessage)
 
     /**
      * Deletes all messages from the database
-     * 
+     *
      * @return The amount of messages deleted
-     * @see #delete(RedditMessage) 
+     * @see delete
      */
     @Query("DELETE FROM messages")
-    public int deleteAll();
-
+    fun deleteAll(): Int
 
     /**
      * @return A list of all messages stored in the database
-     * @see #getUnreadMessages()
+     * @see getUnreadMessages
      */
     @Query("SELECT * FROM messages ORDER BY createdAt DESC")
-    public LiveData<List<RedditMessage>> getAllMessages();
+    fun getAllMessages() : LiveData<List<RedditMessage>>
 
     /**
      * @return A list of messages marked as "new", ie. not seen be the user
-     * @see #getAllMessages()
+     * @see getAllMessages
      */
     @Query("SELECT * FROM messages WHERE isNew=1 ORDER BY createdAt DESC")
-    public LiveData<List<RedditMessage>> getUnreadMessages();
+    fun getUnreadMessages(): LiveData<List<RedditMessage>>
 
     /**
-     * Gets the direct list of message marked as new. For an observable version of this using {@link LiveData}
-     * use {@link #getUnreadMessages()}
+     * Gets the direct list of message marked as new. For an observable version of this using [LiveData]
+     * use [.getUnreadMessages]
      *
      * @return A list of messages marked as "new", ie. not seen be the user
-     * @see #getUnreadMessages()
+     * @see .getUnreadMessages
      */
     @Query("SELECT * FROM messages WHERE isNew=1 ORDER BY createdAt DESC")
-    public List<RedditMessage> getUnreadMessagesNoObservable();
+    fun getUnreadMessagesNoObservable(): List<RedditMessage>
 
     // TODO this should take a List<RedditMessage> ?
     /**
      * Marks all messages in the database as read
      */
     @Query("UPDATE messages SET isNew=0")
-    public void markRead();
+    fun markRead()
 }

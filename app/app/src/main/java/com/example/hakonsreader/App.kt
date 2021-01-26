@@ -172,7 +172,7 @@ class App : Application() {
         // Remove records that are older than 2 days, as they likely won't be used again
         CoroutineScope(IO).launch {
             val maxAge = 60L * 60 * 24 * 2
-            val count = database.posts().count
+            val count = database.posts().getCount()
             val deleted = database.posts().deleteOld(maxAge)
 
             Log.d(TAG, "onCreate: # of records=$count; # of deleted=$deleted")
