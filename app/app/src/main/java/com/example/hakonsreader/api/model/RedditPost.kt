@@ -8,6 +8,7 @@ import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.*
 import com.example.hakonsreader.api.jsonadapters.BooleanAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
+import com.example.hakonsreader.api.jsonadapters.ThirdPartyObjectAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
 import com.example.hakonsreader.api.persistence.PostConverter
 import com.google.gson.Gson
@@ -492,6 +493,7 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
     /**
      * If the post has loaded information from a third party API, the data will be set on this variable
      */
+    @JsonAdapter(ThirdPartyObjectAdapter::class)
     var thirdPartyObject: Any? = null
 
     /**

@@ -327,7 +327,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      *
      * Calls [updatePostInfo] or [onPostLoaded] accordingly and sets [post]
      */
-    private fun onNewPostInfo(newPost: RedditPost) {
+    private fun onNewPostInfo(newPost: RedditPost, extras: Bundle? = null) {
         val postPreviouslySet = binding.post.redditPost != null
         post = newPost
 
@@ -335,7 +335,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         if (postPreviouslySet) {
             updatePostInfo(newPost)
         } else {
-            onPostLoaded(newPost)
+            onPostLoaded(newPost, extras)
         }
     }
 
@@ -435,14 +435,14 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                         }
                     }
 
-                    onPostLoaded(redditPost, postExtras)
+                    onNewPostInfo(redditPost, postExtras)
                 }
 
                 // Add a transition listener that sets the extras for videos after the enter transition is done,
                 // so that the video doesn't play during the transition (which looks odd since it's very choppy)
                 PostType.VIDEO -> {
                     // Load the post, but don't set extras yet
-                    onPostLoaded(redditPost)
+                    onNewPostInfo(redditPost)
 
                     // For videos we don't want to set the extras right away. If a video is playing during the
                     // animation the animation looks very choppy, so it should only be played at the end
@@ -458,7 +458,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                 }
 
                 // Nothing special for the post, set the extras
-                else -> onPostLoaded(redditPost, postExtras)
+                else -> onNewPostInfo(redditPost, postExtras)
             }
 
             redditPost.id
