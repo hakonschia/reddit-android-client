@@ -3,9 +3,9 @@ package com.example.hakonsreader.api.model.flairs
 import com.google.gson.annotations.SerializedName
 
 /**
- * Class representing a flair type for post submissions
+ * Class representing a flair type for post submissions or user flairs on a subreddit
  */
-class SubmissionFlair {
+class RedditFlair {
 
     /**
      * The ID of the flair

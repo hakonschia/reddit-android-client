@@ -150,14 +150,55 @@
 
             <com.example.hakonsreader.views.Tag
                 android:id="@+id/userFlair"
+                subredditUserFlair="@{subreddit}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:layout_constrainedWidth="true"
+
+                app:layout_constraintBottom_toBottomOf="@+id/flairHeader"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/flairHeader"
+                app:layout_constraintTop_toTopOf="@+id/flairHeader" />
+
+            <TextView
+                android:id="@+id/selectFlairHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/updateFlair"
+                android:textColor="@color/text_color"
 
-                subredditUserFlair="@{subreddit}"
-
+                android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/flairHeader" />
+                app:layout_constraintTop_toBottomOf="@+id/userFlair" />
+
+            <Spinner
+                android:id="@+id/selectFlairSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:prompt="@string/submitFlairSpinner"
+                app:layout_constraintStart_toStartOf="@+id/selectFlairHeader"
+                app:layout_constraintTop_toBottomOf="@+id/selectFlairHeader" />
+
+            <ProgressBar
+                android:id="@+id/selectFlairLoadingIcon"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:indeterminateOnly="true"
+
+                android:visibility="gone"
+
+                app:layout_constraintBottom_toBottomOf="@+id/selectFlairSpinner"
+                app:layout_constraintEnd_toEndOf="@+id/selectFlairSpinner"
+                app:layout_constraintStart_toStartOf="@+id/selectFlairSpinner"
+                app:layout_constraintTop_toBottomOf="@+id/selectFlairSpinner"
+                tools:visibility="visible" />
 
             <View
                 android:id="@+id/divider2"
@@ -169,7 +210,7 @@
                 android:background="@color/awardsBottomSheetDivider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/userFlair" />
+                app:layout_constraintTop_toBottomOf="@id/selectFlairLoadingIcon" />
 
             <TextView
                 android:id="@+id/rulesHeader"

@@ -483,4 +483,7 @@
     <string name="dialogHeaderDeletePost">Delete post</string>
     <string name="dialogContentDeleteCommentOrPost">This action cannot be undone</string>
 
+    <string name="updateFlair">Update flair</string>
+    <string name="flairUpdated">Flair updated</string>
+
 </resources>

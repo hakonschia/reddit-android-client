@@ -327,4 +327,6 @@
     <string name="unblockUser">Angre</string>
     <string name="userUnblocked">Blokkering av \'%s\' opphevet</string>
     <string name="dialogHeaderDeletePost">Slett post</string>
+    <string name="flairUpdated">Flair oppdatert</string>
+    <string name="updateFlair">Oppdater flair</string>
 </resources>

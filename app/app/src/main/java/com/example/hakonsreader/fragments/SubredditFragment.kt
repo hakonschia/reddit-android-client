@@ -1,7 +1,6 @@
 package com.example.hakonsreader.fragments
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -20,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
-import com.example.hakonsreader.BuildConfig
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.PostActivity
 import com.example.hakonsreader.activites.SubmitActivity
@@ -31,11 +29,12 @@ import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.model.SubredditRule
+import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
+import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
@@ -47,8 +46,8 @@ import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListene
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.views.Content
-import com.example.hakonsreader.views.ContentVideo
 import com.example.hakonsreader.views.util.ViewUtil
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.robinhood.ticker.TickerUtils
 import kotlinx.coroutines.CoroutineScope
@@ -378,7 +377,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
                     if (!rulesLoaded) {
-                        getSubredditName()?.let { retrieveSubredditRules(it) }
+                        getSubredditName()?.let {
+                            retrieveSubredditRules(it)
+                            getSubmissionFlairs(it)
+                        }
                     }
                 }
                 override fun onDrawerSlide(drawerView: View, slideOffset: Float) { /* Not implemented */ }
@@ -664,6 +666,95 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private fun observeRules() {
         database.rules().getAllRules(getSubredditName()).observe(viewLifecycleOwner) {
             rulesAdapter?.submitList(it)
+        }
+    }
+
+    /**
+     * Calls the API to get the submission flairs for this subreddit
+     */
+    private fun getSubmissionFlairs(subredditName: String) {
+        binding.subredditInfo.selectFlairLoadingIcon.visibility = View.VISIBLE
+        CoroutineScope(IO).launch {
+            val response = api.subreddit(subredditName).userFlairs()
+            withContext(Main) {
+                when (response) {
+                    is ApiResponse.Success -> {
+                        onUserFlairResponse(response.value)
+                    }
+                    is ApiResponse.Error -> {
+                        // If the sub doesn't allow flairs, a 403 is returned
+                        binding.subredditInfo.selectFlairLoadingIcon.visibility = View.GONE
+                        binding.subredditInfo.selectFlairSpinner.visibility = View.GONE
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Handles successful responses for submission flairs. The loading icon is removed and
+     * [ActivitySubmitBinding.flairSpinner] is updated with the flairs.
+     *
+     * If no flairs are returned, then the spinner view is removed
+     *
+     * @param flairs The flairs retrieved
+     */
+    private fun onUserFlairResponse(flairs: List<RedditFlair>) {
+        flairs as ArrayList<RedditFlair>
+
+        if (flairs.isEmpty()) {
+            binding.subredditInfo.selectFlairSpinner.visibility = View.GONE
+            return
+        }
+
+        val adapter = RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, flairs).apply {
+            onFlairClicked = RedditFlairAdapter.OnFlairClicked {
+                updateUserFlair(it)
+            }
+        }
+        binding.subredditInfo.selectFlairSpinner.adapter = adapter
+        binding.subredditInfo.selectFlairLoadingIcon.visibility = View.GONE
+    }
+
+    /**
+     * Updates the users flair on the subreddit
+     *
+     * If the subreddit name ([getSubredditName]) or the username ([App.storedUser]) is `null` then
+     * this will return
+     *
+     * @param flair The flair to update, or `null` to disable the flair on the subreddit
+     */
+    private fun updateUserFlair(flair: RedditFlair?) {
+        val subredditName = getSubredditName() ?: return
+        val username = App.storedUser?.username ?: return
+
+        if (flair != null) {
+            CoroutineScope(IO).launch {
+                when (val resp = api.subreddit(subredditName).selectFlair(username, flair.id)) {
+                    is ApiResponse.Success -> {
+                        _binding?.let {
+                            withContext(Main) {
+                                ViewUtil.setFlair(
+                                        it.subredditInfo.userFlair,
+                                        flair.richtextFlairs,
+                                        flair.text,
+                                        flair.textColor,
+                                        flair.backgroundColor,
+                                )
+                            }
+
+                            Snackbar.make(it.root, R.string.flairUpdated, Snackbar.LENGTH_SHORT).show()
+                        }
+                    }
+                    is ApiResponse.Error -> {
+                        if (_binding != null) {
+                            handleErrors(resp.error, resp.throwable)
+                        }
+                    }
+                }
+            }
+        } else {
+            // TODO "dont show flair on subreddit"
         }
     }
 

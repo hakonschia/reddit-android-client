@@ -16,7 +16,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.model.flairs.SubmissionFlair
+import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.ActivitySubmitBinding
@@ -24,7 +24,7 @@ import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
 import com.example.hakonsreader.databinding.SubmissionLinkBinding
 import com.example.hakonsreader.databinding.SubmissionTextBinding
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
-import com.example.hakonsreader.dialogadapters.SubmissionFlairAdapter
+import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
@@ -56,7 +56,7 @@ class SubmitActivity : BaseActivity() {
     private lateinit var binding: ActivitySubmitBinding
     private lateinit var subreddit: Subreddit
     private val submissionFragments = ArrayList<Fragment>()
-    private var submissionFlairs = ArrayList<SubmissionFlair>()
+    private var submissionFlairs = ArrayList<RedditFlair>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -182,15 +182,15 @@ class SubmitActivity : BaseActivity() {
      *
      * @param flairs The flairs retrieved
      */
-    private fun onSubmissionFlairResponse(flairs: List<SubmissionFlair>) {
-        submissionFlairs = flairs as ArrayList<SubmissionFlair>
+    private fun onSubmissionFlairResponse(flairs: List<RedditFlair>) {
+        submissionFlairs = flairs as ArrayList<RedditFlair>
 
         if (submissionFlairs.isEmpty()) {
             binding.flairSpinner.visibility = GONE
             return
         }
 
-        val adapter = SubmissionFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, submissionFlairs)
+        val adapter = RedditFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, submissionFlairs)
         binding.flairSpinner.adapter = adapter
         binding.submissionFlairLoadingIcon.visibility = GONE
     }

@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:textColor="@color/text_color"
+            android:textColor="@color/secondary_text_color"
             android:textSize="13sp"
             app:layout_constrainedWidth="true"
 

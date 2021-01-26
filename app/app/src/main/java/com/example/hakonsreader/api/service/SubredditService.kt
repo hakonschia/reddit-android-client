@@ -4,7 +4,7 @@ import com.example.hakonsreader.api.responses.ListingResponse
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.*
-import com.example.hakonsreader.api.model.flairs.SubmissionFlair
+import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.responses.JsonResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -126,11 +126,35 @@ interface SubredditService {
      * Gets submission/link flairs for a subreddit
      *
      * @param subredditName The name of the subreddit to get flairs for
-     * @return A list of [SubmissionFlair]
+     * @return A list of [RedditFlair]
      */
     @GET("r/{subreddit}/api/link_flair_v2?raw_json=1")
-    suspend fun getLinkFlairs(@Path("subreddit") subredditName: String) : Response<List<SubmissionFlair>>
+    suspend fun getLinkFlairs(@Path("subreddit") subredditName: String) : Response<List<RedditFlair>>
 
+    /**
+     * Gets user flairs for a subreddit
+     *
+     * @param subredditName The name of the subreddit to get flairs for
+     * @return A list of [RedditFlair]
+     */
+    @GET("r/{subreddit}/api/user_flair_v2?raw_json=1")
+    suspend fun getUserFlairs(@Path("subreddit") subredditName: String) : Response<List<RedditFlair>>
+
+    /**
+     * Select a new flair for a user on a subreddit
+     *
+     * @param subredditName The name of the subreddit to select a flair on
+     * @param username The username to select flair for
+     * @param flairId The ID of the flair to select
+     */
+    @POST("r/{subreddit}/api/selectflair?raw_json=1")
+    @FormUrlEncoded
+    suspend fun selectFlair(
+            @Path("subreddit") subredditName: String,
+            @Field("name") username: String,
+            @Field("flair_template_id") flairId: String,
+            @Field("api_type") apiType: String = "json"
+    ) : Response<JsonResponse<Any?>>
 
     /**
      * Gets the rules of a subreddit

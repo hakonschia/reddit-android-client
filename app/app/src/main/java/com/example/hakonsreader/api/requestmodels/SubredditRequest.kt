@@ -8,7 +8,7 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.*
-import com.example.hakonsreader.api.model.flairs.SubmissionFlair
+import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.requestmodels.thirdparty.ThirdPartyRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -16,6 +16,7 @@ import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.SubredditService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import com.example.hakonsreader.api.utils.apiError
+import com.example.hakonsreader.api.utils.apiListingErrors
 import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 
@@ -219,7 +220,7 @@ class SubredditRequest(
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
      * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
      * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
-     * retrieved with [SubmissionFlair.id]. Default is an empty string (ie. no flair)
+     * retrieved with [RedditFlair.id]. Default is an empty string (ie. no flair)
      *
      * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
@@ -273,7 +274,7 @@ class SubredditRequest(
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
      * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
      * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
-     * retrieved with [SubmissionFlair.id]. Default is an empty string (ie. no flair)
+     * retrieved with [RedditFlair.id]. Default is an empty string (ie. no flair)
      *
      * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
@@ -328,7 +329,7 @@ class SubredditRequest(
      * @param spoiler True if the post should be marked as a spoiler. Default to *false*
      * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
      * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
-     * retrieved with [SubmissionFlair.id]. Default is an empty string (ie. no flair)
+     * retrieved with [RedditFlair.id]. Default is an empty string (ie. no flair)
      *
      * @return An [ApiResponse] holding a [Submission] of the newly created post
      */
@@ -411,7 +412,7 @@ class SubredditRequest(
      *
      * If the subreddit doesn't allow submission flairs, a 403 Forbidden error is returned
      */
-    suspend fun submissionFlairs() : ApiResponse<List<SubmissionFlair>> {
+    suspend fun submissionFlairs() : ApiResponse<List<RedditFlair>> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -424,6 +425,68 @@ class SubredditRequest(
 
             if (flairs != null) {
                 ApiResponse.Success(flairs)
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Gets the user flairs for the subreddit
+     *
+     * OAuth scope required: *flair*
+     *
+     * If the subreddit doesn't allow submission flairs, a 403 Forbidden error is returned
+     */
+    suspend fun userFlairs() : ApiResponse<List<RedditFlair>> {
+        try {
+            verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Retrieving user flairs requires a valid access token for a logged in user", e))
+        }
+
+        return try {
+            val response = api.getUserFlairs(subredditName)
+            val flairs = response.body()
+
+            if (flairs != null) {
+                ApiResponse.Success(flairs)
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+
+    /**
+     * Select a flair for a user on the subreddit
+     *
+     * OAuth scope required: *flair*
+     *
+     * @param username The username to select a flair for
+     * @param flairId The ID of the flair to select (as from [RedditFlair.id])
+     */
+    suspend fun selectFlair(username: String, flairId: String) : ApiResponse<Any?> {
+        try {
+            verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Retrieving submission flairs requires a valid access token for a logged in user", e))
+        }
+
+        return try {
+            val response = api.selectFlair(subredditName, username, flairId)
+            val body = response.body()
+
+            if (body != null) {
+                if (!body.hasErrors()) {
+                    ApiResponse.Success(null)
+                } else {
+                    apiListingErrors(body.errors() as List<List<String>>)
+                }
             } else {
                 apiError(response)
             }
