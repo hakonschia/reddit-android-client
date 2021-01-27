@@ -48,6 +48,9 @@ interface RedditPostsDao {
     @Update
     fun update(post: RedditPost)
 
+    @Update
+    fun updateAll(posts: List<RedditPost>)
+
     /**
      * Deletes all posts from the database
      *
@@ -117,4 +120,7 @@ interface RedditPostsDao {
      */
     @Query("UPDATE posts SET liked=null")
     fun clearUserState()
+
+    @Query("SELECT * FROM posts WHERE author=:username")
+    fun getPostsByUser(username: String) : List<RedditPost>
 }

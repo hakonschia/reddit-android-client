@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.persistence
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.hakonsreader.api.model.Subreddit
 import kotlinx.coroutines.flow.Flow
@@ -57,7 +56,7 @@ interface RedditSubredditsDao {
      * @return A LiveData with the subreddit, or null if not found
      */
     @Query("SELECT * FROM subreddits WHERE name=:subredditName COLLATE NOCASE")
-    operator fun get(subredditName: String): LiveData<Subreddit>
+    fun get(subredditName: String): Subreddit?
 
     /**
      * Get the subreddit object from its name

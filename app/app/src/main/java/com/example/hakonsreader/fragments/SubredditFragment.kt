@@ -396,6 +396,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         }
     }
 
+    /**
+     * Sets up [subredditViewModel], assuming [isDefaultSubreddit] is false. If [isDefaultSubreddit]
+     * is true, then a base subreddit is set on [binding] with [subredditName]
+     */
     private fun setupSubredditViewModel() {
         binding.standardSub = isDefaultSubreddit
         if (isDefaultSubreddit) {
@@ -409,7 +413,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         subredditViewModel = ViewModelProvider(this, SubredditFactory(
                 subredditName,
                 api.subreddit(subredditName),
-                database.subreddits()
+                database.subreddits(),
+                database.posts()
         )).get(SubredditViewModel::class.java).apply {
             subreddit.observe(viewLifecycleOwner) {
                 val old = this@SubredditFragment.subreddit
@@ -571,9 +576,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 })
 
                 it.submitPostFab.setOnClickListener {
-                    val intent = Intent(context, SubmitActivity::class.java)
-                    intent.putExtra(SubmitActivity.SUBREDDIT_KEY, subredditName)
-                    startActivity(intent)
+                    Intent(context, SubmitActivity::class.java).apply {
+                        putExtra(SubmitActivity.SUBREDDIT_KEY, subredditName)
+                        startActivity(this)
+                    }
                 }
             }
         }
@@ -647,36 +653,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * Sends an API request to Reddit to subscribe/unsubscribe
      */
     private fun subscribeOnclick() {
-        subreddit?.let {
-            // Assume success
-            val newSubscription = !it.isSubscribed
-
-            CoroutineScope(IO).launch {
-                it.isSubscribed = newSubscription
-                it.subscribers += if (newSubscription) 1 else -1
-
-                database.subreddits().update(it)
-
-                val response = api.subreddit(it.name).subscribe(newSubscription)
-
-                withContext(Main) {
-                    when (response) {
-                        is ApiResponse.Success -> { }
-                        is ApiResponse.Error -> {
-                            // Revert back
-                            it.isSubscribed = !newSubscription
-                            it.subscribers += if (!newSubscription) 1 else -1
-                            database.subreddits().update(it)
-
-                            Util.handleGenericResponseErrors(
-                                    binding.parentLayout,
-                                    response.error,
-                                    response.throwable
-                            )
-                        }
-                    }
-                }
-            }
+        CoroutineScope(IO).launch {
+            subredditViewModel?.subscribe()
         }
     }
 
@@ -690,33 +668,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private fun updateUserFlair(flair: RedditFlair?) {
         val username = App.storedUser?.username ?: return
 
-        if (flair != null) {
-            CoroutineScope(IO).launch {
-                when (val resp = api.subreddit(subredditName).selectFlair(username, flair.id)) {
-                    is ApiResponse.Success -> {
-                        _binding?.let {
-                            withContext(Main) {
-                                ViewUtil.setFlair(
-                                        it.subredditInfo.userFlair,
-                                        flair.richtextFlairs,
-                                        flair.text,
-                                        flair.textColor,
-                                        flair.backgroundColor,
-                                )
-                            }
-
-                            Snackbar.make(it.root, R.string.flairUpdated, Snackbar.LENGTH_SHORT).show()
-                        }
-                    }
-                    is ApiResponse.Error -> {
-                        if (_binding != null) {
-                            handleErrors(resp.error, resp.throwable)
-                        }
-                    }
-                }
-            }
-        } else {
-            // TODO "dont show flair on subreddit"
+        CoroutineScope(IO).launch {
+            subredditViewModel?.updateFlair(username, flair)
         }
     }
 

@@ -137,7 +137,8 @@ class SubmitActivity : BaseActivity() {
         subredditViewModel = ViewModelProvider(this, SubredditFactory(
                 subredditName,
                 api.subreddit(subredditName),
-                database.subreddits()
+                database.subreddits(),
+                database.posts()
         )).get(SubredditViewModel::class.java).apply {
             subreddit.observe(this@SubmitActivity) {
                 // If this is null then it should probably be reflected on the subreddit field in the fragment?
