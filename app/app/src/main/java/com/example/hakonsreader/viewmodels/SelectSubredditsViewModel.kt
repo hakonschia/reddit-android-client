@@ -1,6 +1,5 @@
 package com.example.hakonsreader.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,16 +12,10 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
 /**
- * The key used to store the list of subreddit IDs the user is subscribed to
- */
-private const val TAG = "SelectSubredditsViewModelK"
-
-
-/**
  * ViewModel for retrieving subreddits. The subreddits retrieved are automatically chosen for
  * a logged in users subscribed subreddits, or for default subreddits for non-logged in users
  */
-class SelectSubredditsViewModel(context: Context) : ViewModel() {
+class SelectSubredditsViewModel : ViewModel() {
     companion object {
         const val SUBSCRIBED_SUBREDDITS_KEY = "subscribedSubreddits"
     }

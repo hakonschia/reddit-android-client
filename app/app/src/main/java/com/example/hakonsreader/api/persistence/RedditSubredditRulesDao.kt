@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.hakonsreader.api.model.SubredditRule
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RedditSubredditRulesDao {
@@ -31,5 +32,5 @@ interface RedditSubredditRulesDao {
      * @param subreddit The name of the subreddit to retrieve rules for
      */
     @Query("SELECT * FROM subreddit_rules WHERE subreddit=:subreddit COLLATE NOCASE ORDER BY priority ASC")
-    fun getAllRules(subreddit: String): LiveData<List<SubredditRule>>
+    fun getAllRules(subreddit: String): Flow<List<SubredditRule>>
 }

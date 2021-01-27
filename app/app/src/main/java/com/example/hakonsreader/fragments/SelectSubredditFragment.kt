@@ -24,7 +24,6 @@ import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.viewmodels.SearchForSubredditsViewModel
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
-import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -179,22 +178,21 @@ class SelectSubredditFragment : Fragment() {
      * Initializes [subredditsViewModel] and observes all its values
      */
     private fun setupSubredditsViewModel() {
-        subredditsViewModel = ViewModelProvider(this, SelectSubredditsFactory(context))
-                .get(SelectSubredditsViewModel::class.java).apply {
-                    getSubreddits().observe(viewLifecycleOwner, { subreddits ->
-                        subredditsLoaded = true
-                        subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
-                        subredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY))
-                    })
+        subredditsViewModel = ViewModelProvider(this).get(SelectSubredditsViewModel::class.java).apply {
+            getSubreddits().observe(viewLifecycleOwner, { subreddits ->
+                subredditsLoaded = true
+                subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
+                subredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY))
+            })
 
-                    getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
-                        binding.loadingIcon.onCountChange(onCountChange)
-                    })
+            getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
+                binding.loadingIcon.onCountChange(onCountChange)
+            })
 
-                    getError().observe(viewLifecycleOwner, { error ->
-                        Util.handleGenericResponseErrors(view, error.error, error.throwable)
-                    })
-                }
+            getError().observe(viewLifecycleOwner, { error ->
+                Util.handleGenericResponseErrors(view, error.error, error.throwable)
+            })
+        }
     }
 
     /**

@@ -3,7 +3,6 @@ package com.example.hakonsreader.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -45,7 +44,9 @@ import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
+import com.example.hakonsreader.viewmodels.SubredditRulesViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
+import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.util.ViewUtil
 import com.google.android.material.snackbar.Snackbar
@@ -134,12 +135,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var postsLayoutManager: LinearLayoutManager? = null
     private var postsScrollListener: PostScrollListener? = null
 
+    private var rulesViewModel: SubredditRulesViewModel? = null
     private var rulesAdapter: SubredditRulesAdapter? = null
     private var rulesLayoutManager: LinearLayoutManager? = null
-    /**
-     * True if the rules for the subreddit has been loaded during this fragment
-     */
-    private var rulesLoaded = false
+
 
     /**
      * True if the user flairs for the subreddit has been loaded during this fragment
@@ -181,9 +180,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         setupSubmitPostFab()
         setupPostsViewModel()
 
+        // Default subs don't have rules/flairs/info in drawers (could potentially add a tiny description
+        // of the different default subs in the info)
         if (!isDefaultSubreddit) {
             setupRulesList()
-            observeRules()
+            setupRulesViewModel()
             observeUserFlairs()
             automaticallyOpenDrawerIfSet()
         }
@@ -388,12 +389,18 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
-                    getSubredditName()?.let {
-                        if (!rulesLoaded) {
-                            retrieveSubredditRules(it)
+                    this@SubredditFragment.subreddit.get()?.let {
+                        val rulesCount = rulesAdapter?.itemCount ?: 0
+                        // No rules, or we have rules and data saving is not on
+                        // Ie. only load rules again from API if we're not on data saving
+                        if (rulesCount == 0 || (rulesCount != 0 && !App.get().dataSavingEnabled())) {
+                            CoroutineScope(IO).launch {
+                                rulesViewModel?.refresh()
+                            }
                         }
-                        if (!flairsLoaded) {
-                            getSubmissionFlairs(it)
+
+                        if (it.canAssignUserFlair && !flairsLoaded) {
+                            getSubmissionFlairs(it.name)
                         }
                     }
                 }
@@ -453,6 +460,29 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private fun setupRulesList() {
         rulesAdapter = SubredditRulesAdapter().apply { binding.subredditInfo.rules.adapter = this }
         rulesLayoutManager = LinearLayoutManager(context).apply { binding.subredditInfo.rules.layoutManager = this }
+    }
+
+    /**
+     * Sets up [rulesViewModel], as long as [getSubredditName] does not return `null`
+     */
+    private fun setupRulesViewModel() {
+        val name = getSubredditName() ?: return
+        rulesViewModel = ViewModelProvider(this, SubredditRulesFactory(
+                name,
+                App.get().api.subreddit(name),
+                App.get().database.rules()
+        )).get(SubredditRulesViewModel::class.java).apply {
+            rules.observe(viewLifecycleOwner) {
+                rulesAdapter?.submitList(it)
+            }
+            errors.observe(viewLifecycleOwner) {
+                handleErrors(it.error, it.throwable)
+            }
+            // There won't be anything else causing this to loader to load so this is safe
+            loading.observe(viewLifecycleOwner) {
+                binding.subredditInfo.rulesloadingIcon.setItemsLoading(if (it) 1 else 0)
+            }
+        }
     }
 
     /**
@@ -530,7 +560,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 false
         )).get(PostsViewModel::class.java).apply {
             getPosts().observe(viewLifecycleOwner, { posts ->
-                Log.d(TAG, "setupPostsViewModel: observing posts")
                 // Store the updated post IDs right away
                 this@SubredditFragment.postIds = postIds as ArrayList<String>
 
@@ -643,43 +672,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Retrieves rules for a subreddit
-     *
-     * @param subredditName The name of the subreddit to get rules for
-     */
-    private fun retrieveSubredditRules(subredditName: String) {
-        binding.subredditInfo.rulesloadingIcon.onCountChange(true)
-        CoroutineScope(IO).launch {
-            when (val response = api.subreddit(subredditName).rules()) {
-                is ApiResponse.Success -> {
-                    rulesLoaded = true
-
-                    database.rules().insertAll(response.value)
-
-                    withContext(Main) {
-                        binding.subredditInfo.rulesloadingIcon.onCountChange(false)
-                    }
-                }
-                is ApiResponse.Error -> {
-                    withContext(Main) {
-                        binding.subredditInfo.rulesloadingIcon.onCountChange(false)
-                        handleErrors(response.error, response.throwable)
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Observes the subreddits rules from the local database and updates [rulesAdapter] on changes
-     */
-    private fun observeRules() {
-        database.rules().getAllRules(getSubredditName()!!).observe(viewLifecycleOwner) {
-            rulesAdapter?.submitList(it)
         }
     }
 
