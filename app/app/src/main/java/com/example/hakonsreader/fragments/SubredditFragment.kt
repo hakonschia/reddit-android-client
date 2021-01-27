@@ -380,8 +380,9 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                             }
                         }
 
-                        val flairsCount = flairsAdapter?.count ?: 0
-                        if (it.canAssignUserFlair && (flairsCount == 0 || (flairsCount != 0 && !App.get().dataSavingEnabled()))) {
+                        // The adapter will always have one more (for the "Select flair")
+                        val flairsCount = flairsAdapter?.count?.minus(1) ?: 0
+                        if ((it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !App.get().dataSavingEnabled()))) {
                             CoroutineScope(IO).launch {
                                 flairsViewModel?.refresh()
                             }
@@ -393,7 +394,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 override fun onDrawerStateChanged(newState: Int) { /* Not implemented */ }
             })
         }
-
     }
 
     private fun setupSubredditViewModel() {
@@ -493,8 +493,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private fun setupRulesViewModel() {
         rulesViewModel = ViewModelProvider(this, SubredditRulesFactory(
                 subredditName,
-                App.get().api.subreddit(subredditName),
-                App.get().database.rules()
+                api.subreddit(subredditName),
+                database.rules()
         )).get(SubredditRulesViewModel::class.java).apply {
             rules.observe(viewLifecycleOwner) {
                 rulesAdapter?.submitList(it)
@@ -514,14 +514,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     }
 
     /**
-     * Sets up [flairsViewModel], as long as [getSubredditName] does not return `null`
+     * Sets up [flairsViewModel]
      */
     private fun setupFlairsViewModel() {
         flairsViewModel = ViewModelProvider(this, SubredditFlairsFactory(
                 subredditName,
                 FlairType.USER,
-                App.get().api.subreddit(subredditName),
-                App.get().database.flairs()
+                api.subreddit(subredditName),
+                database.flairs()
         )).get(SubredditFlairsViewModel::class.java).apply {
             flairs.observe(viewLifecycleOwner) {
                 flairsAdapter = RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
@@ -674,29 +674,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                                     response.throwable
                             )
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Retrieves information for a subreddit from the Reddit API
-     *
-     * [subreddit] is updated with the information retrieved from the API and is inserted into
-     * the local DB (if it is not a NSFW sub)
-     *
-     * @param subredditName The name of the subreddit to get information for
-     */
-    private fun retrieveSubredditInfo(subredditName: String) {
-        CoroutineScope(IO).launch {
-            when (val response = api.subreddit(subredditName).info()) {
-                is ApiResponse.Success -> {
-                    database.subreddits().insert(response.value)
-                }
-                is ApiResponse.Error -> {
-                    withContext(Main) {
-                        handleErrors(response.error, response.throwable)
                     }
                 }
             }

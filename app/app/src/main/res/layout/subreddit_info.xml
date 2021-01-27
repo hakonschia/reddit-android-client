@@ -141,7 +141,7 @@
 
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:text="Flair"
+                android:text="@string/flair"
                 android:textColor="@color/text_color"
                 android:textSize="20sp"
 
@@ -168,19 +168,23 @@
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:text="@string/updateFlair"
-                android:textColor="@color/text_color"
 
+                android:layout_marginTop="4dp"
+                android:text="@{subreddit.canAssignUserFlair || subreddit.moderator ? @string/updateFlair : @string/flairsNotAllowedOnSubreddit}"
+
+                android:textColor="@color/text_color"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/userFlair" />
+
+                app:layout_constraintTop_toBottomOf="@+id/flairHeader"
+                tools:text="@string/updateFlair" />
 
             <Spinner
                 android:id="@+id/selectFlairSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:prompt="@string/submitFlairSpinner"
+                android:visibility="@{subreddit.canAssignUserFlair || subreddit.moderator ? View.VISIBLE : View.GONE}"
                 app:layout_constraintStart_toStartOf="@+id/selectFlairHeader"
                 app:layout_constraintTop_toBottomOf="@+id/selectFlairHeader" />
 

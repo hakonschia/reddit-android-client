@@ -329,4 +329,6 @@
     <string name="dialogHeaderDeletePost">Slett post</string>
     <string name="flairUpdated">Flair oppdatert</string>
     <string name="updateFlair">Oppdater flair</string>
+    <string name="flair">Flair</string>
+    <string name="flairsNotAllowedOnSubreddit">Denne subredditen tillater ikke brukere å sette flairs</string>
 </resources>

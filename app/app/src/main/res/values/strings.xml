@@ -483,7 +483,9 @@
     <string name="dialogHeaderDeletePost">Delete post</string>
     <string name="dialogContentDeleteCommentOrPost">This action cannot be undone</string>
 
+    <string name="flair">Flair</string>
     <string name="updateFlair">Update flair</string>
     <string name="flairUpdated">Flair updated</string>
+    <string name="flairsNotAllowedOnSubreddit">This subreddit doesn\'t allow users to assign flairs</string>
 
 </resources>
