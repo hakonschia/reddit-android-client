@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -26,6 +27,9 @@ import com.example.hakonsreader.databinding.SubmissionLinkBinding
 import com.example.hakonsreader.databinding.SubmissionTextBinding
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
+import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
+import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
@@ -56,6 +60,10 @@ class SubmitActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySubmitBinding
     private lateinit var subreddit: Subreddit
+
+    private var flairsViewModel: SubredditFlairsViewModel? = null
+    private var flairsAdapter: RedditFlairAdapter? = null
+
     private val submissionFragments = ArrayList<Fragment>()
     private var submissionFlairs = ArrayList<RedditFlair>()
 
@@ -70,12 +78,12 @@ class SubmitActivity : BaseActivity() {
 
         // Setup with all tabs initially until we know which submissions are supported on the subreddit
         setupTabs()
+        // Force updates if data saving isn't enabled
+        setupFlairsViewModel(subredditName)
 
         // We need information about the subreddit, try to get it from the local database and if it doesn't exist, get it from
         // the api
         getSubredditInfo(subredditName)
-        getSubmissionFlairs(subredditName)
-        observeSubmissionFlairs(subredditName)
 
         binding.subredditName = subredditName
 
@@ -153,67 +161,6 @@ class SubmitActivity : BaseActivity() {
     }
 
     /**
-     * Calls the API to get the submission flairs for this subreddit
-     */
-    private fun getSubmissionFlairs(subredditName: String) {
-        binding.submissionFlairLoadingIcon.visibility = VISIBLE
-        CoroutineScope(IO).launch {
-            val response = api.subreddit(subredditName).submissionFlairs()
-            withContext(Main) {
-                when (response) {
-                    is ApiResponse.Success -> {
-                        onSubmissionFlairResponse(response.value)
-                    }
-                    // Not sure what makes sense to do on these errors, if flairs are required then
-                    // it matters, if not then it's not critical if it fails
-                    is ApiResponse.Error -> {
-                        // If the sub doesn't allow flairs, a 403 is returned
-                        binding.submissionFlairLoadingIcon.visibility = GONE
-                        binding.flairSpinner.visibility = GONE
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Handles successful responses for submission flairs. The loading icon is removed and
-     * [ActivitySubmitBinding.flairSpinner] is updated with the flairs.
-     *
-     * If no flairs are returned, then the spinner view is removed
-     *
-     * @param flairs The flairs retrieved
-     */
-    private fun onSubmissionFlairResponse(flairs: List<RedditFlair>) {
-        submissionFlairs = flairs as ArrayList<RedditFlair>
-
-        if (submissionFlairs.isEmpty()) {
-            binding.flairSpinner.visibility = GONE
-            return
-        }
-
-        binding.submissionFlairLoadingIcon.visibility = GONE
-
-        CoroutineScope(IO).launch {
-            database.flairs().insert(flairs)
-        }
-    }
-
-    /**
-     * Observes the subreddits rules from the local database and updates [rulesAdapter] on changes
-     */
-    private fun observeSubmissionFlairs(subredditName: String) {
-        database.flairs().getFlairsBySubredditAndType(subredditName, FlairType.SUBMISSION.name).asLiveData().observe(this) {
-            if (it == null) {
-                return@observe
-            }
-
-            val adapter = RedditFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, submissionFlairs)
-            binding.flairSpinner.adapter = adapter
-        }
-    }
-
-    /**
      * Updates the views in the activity based on [subreddit]
      */
     private fun updateViews() {
@@ -239,6 +186,49 @@ class SubmitActivity : BaseActivity() {
                 }
             }
         }.attach()
+    }
+
+    private fun setupFlairsViewModel(subredditName: String) {
+        flairsViewModel = ViewModelProvider(this, SubredditFlairsFactory(
+                subredditName,
+                FlairType.SUBMISSION,
+                App.get().api.subreddit(subredditName),
+                App.get().database.flairs()
+        )).get(SubredditFlairsViewModel::class.java).apply {
+            flairs.observe(this@SubmitActivity) {
+                // If we get an empty list back, load from API if data saving isn't on
+                // Ie. don't
+                if (it.isEmpty()) {
+                    CoroutineScope(IO).launch {
+                        refresh()
+                    }
+                }
+
+                flairsAdapter = RedditFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
+                    binding.flairSpinner.adapter = this
+                }
+            }
+
+            errors.observe(this@SubmitActivity) {
+                Util.handleGenericResponseErrors(binding.root, it.error, it.throwable)
+            }
+            // There won't be anything else causing this to loader to load so this is safe
+            loading.observe(this@SubmitActivity) {
+                binding.submissionFlairLoadingIcon.visibility = if (it) {
+                    VISIBLE
+                } else {
+                    INVISIBLE
+                }
+            }
+
+            // Load flairs right away if data saving isn't enabled. If the list from the ViewModel
+            // is empty, the observer will also trigger a load even if data saving is on
+            if (!App.get().dataSavingEnabled()) {
+                CoroutineScope(IO).launch {
+                    refresh()
+                }
+            }
+        }
     }
 
     private fun checkSubmissionTypes(subreddit: Subreddit) {

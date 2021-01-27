@@ -37,7 +37,7 @@ class SubredditRulesRepository(
      * loaded from the API
      */
     suspend fun refresh(force: Boolean = false) {
-        if (!rulesLoaded && !force) {
+        if (!rulesLoaded || force) {
             _loading.postValue(true)
 
             when (val resp = api.rules()) {

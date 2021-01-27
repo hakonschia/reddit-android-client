@@ -44,8 +44,10 @@ import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
+import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
 import com.example.hakonsreader.viewmodels.SubredditRulesViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
+import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.util.ViewUtil
@@ -139,12 +141,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var rulesAdapter: SubredditRulesAdapter? = null
     private var rulesLayoutManager: LinearLayoutManager? = null
 
-
-    /**
-     * True if the user flairs for the subreddit has been loaded during this fragment
-     */
-    private var flairsLoaded = false
-
+    private var flairsViewModel: SubredditFlairsViewModel? = null
+    private var flairsAdapter: RedditFlairAdapter? = null
 
     /**
      * A DrawerListener for the drawer with subreddit info
@@ -185,7 +183,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         if (!isDefaultSubreddit) {
             setupRulesList()
             setupRulesViewModel()
-            observeUserFlairs()
+
+            setupFlairsViewModel()
             automaticallyOpenDrawerIfSet()
         }
 
@@ -399,8 +398,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                             }
                         }
 
-                        if (it.canAssignUserFlair && !flairsLoaded) {
-                            getSubmissionFlairs(it.name)
+                        val flairsCount = flairsAdapter?.count ?: 0
+                        if (it.canAssignUserFlair && (flairsCount == 0 || (flairsCount != 0 && !App.get().dataSavingEnabled()))) {
+                            CoroutineScope(IO).launch {
+                                flairsViewModel?.refresh()
+                            }
                         }
                     }
                 }
@@ -480,7 +482,45 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             }
             // There won't be anything else causing this to loader to load so this is safe
             loading.observe(viewLifecycleOwner) {
-                binding.subredditInfo.rulesloadingIcon.setItemsLoading(if (it) 1 else 0)
+                binding.subredditInfo.rulesloadingIcon.visibility = if (it) {
+                    View.VISIBLE
+                } else {
+                    View.INVISIBLE
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets up [flairsViewModel], as long as [getSubredditName] does not return `null`
+     */
+    private fun setupFlairsViewModel() {
+        val name = getSubredditName() ?: return
+        flairsViewModel = ViewModelProvider(this, SubredditFlairsFactory(
+                name,
+                FlairType.USER,
+                App.get().api.subreddit(name),
+                App.get().database.flairs()
+        )).get(SubredditFlairsViewModel::class.java).apply {
+            flairs.observe(viewLifecycleOwner) {
+                flairsAdapter = RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
+                    onFlairClicked = RedditFlairAdapter.OnFlairClicked { flair ->
+                        updateUserFlair(flair)
+                    }
+                    binding.subredditInfo.selectFlairSpinner.adapter = this
+                }
+            }
+
+            errors.observe(viewLifecycleOwner) {
+                handleErrors(it.error, it.throwable)
+            }
+            // There won't be anything else causing this to loader to load so this is safe
+            loading.observe(viewLifecycleOwner) {
+                binding.subredditInfo.selectFlairLoadingIcon.visibility = if (it) {
+                    View.VISIBLE
+                } else {
+                    View.INVISIBLE
+                }
             }
         }
     }
@@ -705,7 +745,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             withContext(Main) {
                 when (response) {
                     is ApiResponse.Success -> {
-                        flairsLoaded = true
                         onUserFlairResponse(response.value)
                     }
                     is ApiResponse.Error -> {
