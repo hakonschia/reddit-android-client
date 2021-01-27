@@ -156,7 +156,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         activeSubreddit?.let {
             // If there is an active subreddit it won't be null, store the state of it even if it isn't
             // currently added (shown on screen)
-            outState.putString(ACTIVE_SUBREDDIT_NAME, it.getSubredditName())
+            outState.putString(ACTIVE_SUBREDDIT_NAME, it.subredditName)
             it.saveState(outState)
             if (it.isAdded) {
                 supportFragmentManager.putFragment(outState, ACTIVE_SUBREDDIT_FRAGMENT, activeSubreddit!!)

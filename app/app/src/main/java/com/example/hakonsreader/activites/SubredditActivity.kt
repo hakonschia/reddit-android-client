@@ -172,6 +172,6 @@ class SubredditActivity : BaseActivity(), LockableSlidr {
      * @return The name of the subreddit the activity is displaying
      */
     fun getSubredditName(): String? {
-        return fragment?.getSubredditName()
+        return fragment?.subredditName
     }
 }

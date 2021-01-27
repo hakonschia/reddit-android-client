@@ -1,6 +1,5 @@
 package com.example.hakonsreader.viewmodels.repositories
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.hakonsreader.api.enums.FlairType
@@ -11,6 +10,9 @@ import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.viewmodels.ErrorWrapper
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Repository for a list of [RedditFlair]
+ */
 class SubredditFlairsRepository(
         private val subredditName: String,
         private val flairType: FlairType,

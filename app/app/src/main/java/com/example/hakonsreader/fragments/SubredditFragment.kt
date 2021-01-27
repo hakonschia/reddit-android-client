@@ -47,7 +47,9 @@ import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListene
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
 import com.example.hakonsreader.viewmodels.SubredditRulesViewModel
+import com.example.hakonsreader.viewmodels.SubredditViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
+import com.example.hakonsreader.viewmodels.factories.SubredditFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.views.Content
@@ -133,6 +135,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var postIds = ArrayList<String>()
     private var isDefaultSubreddit = false
 
+    val subredditName by lazy {
+        arguments?.getString(SUBREDDIT_NAME_KEY) ?: ""
+    }
+    private var subreddit: Subreddit? = null
+    private var subredditViewModel: SubredditViewModel? = null
+
     private var postsViewModel: PostsViewModel? = null
     private var postsAdapter: PostsAdapter? = null
     private var postsLayoutManager: LinearLayoutManager? = null
@@ -150,32 +158,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     var drawerListener: DrawerLayout.DrawerListener? = null
 
-
-    private val subreddit: ObservableField<Subreddit> = object : ObservableField<Subreddit>() {
-        override fun set(value: Subreddit) {
-            // If there is no subscribers previously the ticker animation looks very weird
-            // so disable it if it would like weird
-            val old = this.get()
-            val enableTickerAnimation = old != null && old.subscribers != 0
-            binding.subredditSubscribers.animationDuration = (if (enableTickerAnimation) {
-                resources.getInteger(R.integer.tickerAnimationDefault)
-            } else {
-                0
-            }).toLong()
-
-            // Probably not how ObservableField is supposed to be used? Works though
-            super.set(value)
-
-            ViewUtil.setSubredditIcon(binding.subredditIcon, value)
-            binding.subreddit = value
-            postsAdapter?.hideScoreTime = value.hideScoreTime
-        }
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        isDefaultSubreddit = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
+
         setupBinding()
         setupPostsList()
-        setupSubredditObservable()
+        setupSubredditViewModel()
         setupSubmitPostFab()
         setupPostsViewModel()
 
@@ -188,7 +176,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             setupFlairsViewModel()
             automaticallyOpenDrawerIfSet()
         }
-
 
         App.get().registerPrivateBrowsingObservable(this)
 
@@ -312,12 +299,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         }
     }
 
-    /**
-     * @return The name of the subreddit the fragment is for, or null if no subreddit is set
-     */
-    fun getSubredditName() : String? {
-        return subreddit.get()?.name
-    }
 
     /**
      * Converts a base key into a unique key for this subreddit, so that the subreddit state can be
@@ -327,7 +308,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * @return A key unique to this subreddit
      */
     private fun saveKey(baseKey: String) : String {
-        return baseKey + "_" + getSubredditName()
+        return baseKey + "_" + subredditName
     }
 
     /**
@@ -389,7 +370,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
-                    this@SubredditFragment.subreddit.get()?.let {
+                    this@SubredditFragment.subreddit?.let {
                         val rulesCount = rulesAdapter?.itemCount ?: 0
                         // No rules, or we have rules and data saving is not on
                         // Ie. only load rules again from API if we're not on data saving
@@ -413,6 +394,47 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             })
         }
 
+    }
+
+    private fun setupSubredditViewModel() {
+        binding.standardSub = isDefaultSubreddit
+        if (isDefaultSubreddit) {
+            binding.subreddit = Subreddit().apply {
+                name = subredditName
+            }
+
+            return
+        }
+
+        subredditViewModel = ViewModelProvider(this, SubredditFactory(
+                subredditName,
+                api.subreddit(subredditName),
+                database.subreddits()
+        )).get(SubredditViewModel::class.java).apply {
+            subreddit.observe(viewLifecycleOwner) {
+                val old = this@SubredditFragment.subreddit
+                this@SubredditFragment.subreddit = it
+
+                // If this is null then it should probably be reflected on the subreddit field in the fragment?
+                // Probably won't ever happen though
+                if (it == null) {
+                    return@observe
+                }
+
+                // If there is no subscribers previously the ticker animation looks very weird
+                // so disable it if it would like weird
+                val enableTickerAnimation = old != null && old.subscribers != 0
+                binding.subredditSubscribers.animationDuration = (if (enableTickerAnimation) {
+                    resources.getInteger(R.integer.tickerAnimationDefault)
+                } else {
+                    0
+                }).toLong()
+
+                ViewUtil.setSubredditIcon(binding.subredditIcon, it)
+                binding.subreddit = it
+                postsAdapter?.hideScoreTime = it.hideScoreTime
+            }
+        }
     }
 
     /**
@@ -466,13 +488,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     }
 
     /**
-     * Sets up [rulesViewModel], as long as [getSubredditName] does not return `null`
+     * Sets up [rulesViewModel]
      */
     private fun setupRulesViewModel() {
-        val name = getSubredditName() ?: return
         rulesViewModel = ViewModelProvider(this, SubredditRulesFactory(
-                name,
-                App.get().api.subreddit(name),
+                subredditName,
+                App.get().api.subreddit(subredditName),
                 App.get().database.rules()
         )).get(SubredditRulesViewModel::class.java).apply {
             rules.observe(viewLifecycleOwner) {
@@ -496,11 +517,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * Sets up [flairsViewModel], as long as [getSubredditName] does not return `null`
      */
     private fun setupFlairsViewModel() {
-        val name = getSubredditName() ?: return
         flairsViewModel = ViewModelProvider(this, SubredditFlairsFactory(
-                name,
+                subredditName,
                 FlairType.USER,
-                App.get().api.subreddit(name),
+                App.get().api.subreddit(subredditName),
                 App.get().database.flairs()
         )).get(SubredditFlairsViewModel::class.java).apply {
             flairs.observe(viewLifecycleOwner) {
@@ -532,48 +552,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     }
 
     /**
-     * Sets [subreddit] based on the subreddit name found in [getArguments]. If the subreddit
-     * is not a standard subreddit [retrieveSubredditInfo] is called automatically.
-     *
-     * If no subreddit is found and empty string (ie. Front page) is used as a default.
-     *
-     * [binding] will be called for various bindings throughout this call
-     */
-    private fun setupSubredditObservable() {
-        val args = arguments
-        val subredditName = if (args != null) {
-            args.getString(SUBREDDIT_NAME_KEY, "")
-        } else {
-            ""
-        }
-        isDefaultSubreddit = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
-
-        val sub = Subreddit()
-        sub.name = subredditName
-        subreddit.set(sub)
-
-        binding.standardSub = isDefaultSubreddit
-
-        // Not a standard sub, get info from local database if previously stored
-        if (!isDefaultSubreddit) {
-            database.subreddits().get(subredditName).observe(viewLifecycleOwner) {
-                // If the subreddit hasn't been previously loaded it will be null
-                if (it != null) {
-                    subreddit.set(it)
-                }
-            }
-
-            retrieveSubredditInfo(subredditName)
-        }
-    }
-
-    /**
      * Sets up [FragmentSubredditBinding.submitPostFab]. If the current fragment isn't a standard sub,
      * then a scroll listener is added to [FragmentSubredditBinding.posts] to automatically show/hide the FAB
      * when scrolling, and an onClickListener is set to the fab to open a [SubmitActivity]
      */
     private fun setupSubmitPostFab() {
-        if (!RedditApi.STANDARD_SUBS.contains(getSubredditName()?.toLowerCase())) {
+        if (!RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())) {
             binding.let {
                 it.posts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -588,7 +572,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
                 it.submitPostFab.setOnClickListener {
                     val intent = Intent(context, SubmitActivity::class.java)
-                    intent.putExtra(SubmitActivity.SUBREDDIT_KEY, getSubredditName())
+                    intent.putExtra(SubmitActivity.SUBREDDIT_KEY, subredditName)
                     startActivity(intent)
                 }
             }
@@ -602,7 +586,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     private fun setupPostsViewModel() {
         postsViewModel = ViewModelProvider(this, PostsFactory(
-                getSubredditName(),
+                subredditName,
                 false
         )).get(PostsViewModel::class.java).apply {
             getPosts().observe(viewLifecycleOwner, { posts ->
@@ -663,28 +647,26 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * Sends an API request to Reddit to subscribe/unsubscribe
      */
     private fun subscribeOnclick() {
-        val sub = subreddit.get()
-
-        sub?.let {
+        subreddit?.let {
             // Assume success
             val newSubscription = !it.isSubscribed
 
             CoroutineScope(IO).launch {
-                sub.isSubscribed = newSubscription
-                sub.subscribers += if (newSubscription) 1 else -1
+                it.isSubscribed = newSubscription
+                it.subscribers += if (newSubscription) 1 else -1
 
-                database.subreddits().update(sub)
+                database.subreddits().update(it)
 
-                val response = api.subreddit(sub.name).subscribe(newSubscription)
+                val response = api.subreddit(it.name).subscribe(newSubscription)
 
                 withContext(Main) {
                     when (response) {
                         is ApiResponse.Success -> { }
                         is ApiResponse.Error -> {
                             // Revert back
-                            sub.isSubscribed = !newSubscription
-                            sub.subscribers += if (!newSubscription) 1 else -1
-                            database.subreddits().update(sub)
+                            it.isSubscribed = !newSubscription
+                            it.subscribers += if (!newSubscription) 1 else -1
+                            database.subreddits().update(it)
 
                             Util.handleGenericResponseErrors(
                                     binding.parentLayout,
@@ -724,13 +706,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     /**
      * Updates the users flair on the subreddit
      *
-     * If the subreddit name ([getSubredditName]) or the username ([App.storedUser]) is `null` then
-     * this will return
+     * If the username ([App.storedUser]) is `null` then this will return
      *
      * @param flair The flair to update, or `null` to disable the flair on the subreddit
      */
     private fun updateUserFlair(flair: RedditFlair?) {
-        val subredditName = getSubredditName() ?: return
         val username = App.storedUser?.username ?: return
 
         if (flair != null) {
@@ -799,7 +779,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         when (errorReason) {
             GenericError.SUBREDDIT_BANNED -> {
                 SubredditBannedBinding.inflate(layoutInflater, binding.parentLayout, true).apply {
-                    subreddit = getSubredditName()
+                    subreddit = subredditName
                     (root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
                     root.requestLayout()
                 }
@@ -807,7 +787,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
             GenericError.SUBREDDIT_PRIVATE -> {
                 SubredditPrivateBinding.inflate(layoutInflater, binding.parentLayout, true).apply {
-                    subreddit = getSubredditName()
+                    subreddit = subredditName
                     (root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
                     root.requestLayout()
                 }
@@ -816,7 +796,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             // For instance accessing r/lounge without Reddit premium
             GenericError.REQUIRES_REDDIT_PREMIUM -> {
                 SubredditRequiresPremiumBinding.inflate(layoutInflater, binding.parentLayout, true).apply {
-                    subreddit = getSubredditName()
+                    subreddit = subredditName
                     (root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
                     root.requestLayout()
                 }
@@ -829,7 +809,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     return
                 } else if (throwable is SubredditNotFoundException) {
                     val layout = SubredditNotFoundBinding.inflate(layoutInflater, binding.parentLayout, true)
-                    layout.subreddit = getSubredditName()
+                    layout.subreddit = subredditName
 
                     (layout.root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
                     layout.root.requestLayout()

@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class ViewUtil {
     private static final String TAG = "ViewUtil";
-    
+
     private ViewUtil() { }
 
 
@@ -44,6 +44,9 @@ public class ViewUtil {
      */
     @BindingAdapter("subredditIcon")
     public static void setSubredditIcon(ImageView imageView, Subreddit subreddit) {
+        if (subreddit == null) {
+            return;
+        }
         String iconURL = subreddit.getIcon();
         String communityURL = subreddit.getCommunityIcon();
         int size = (int) imageView.getResources().getDimension(R.dimen.subredditIconSizeInList);
@@ -80,6 +83,9 @@ public class ViewUtil {
      */
     @BindingAdapter("subredditBanner")
     public static void setSubredditBannerImage(ImageView imageView, Subreddit subreddit) {
+        if (subreddit == null) {
+            return;
+        }
         String bannerURL = subreddit.getBannerBackgroundImage();
         if (bannerURL != null && !bannerURL.isEmpty()) {
             // Data saving on, only load if the image is already cached

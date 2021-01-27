@@ -8,6 +8,10 @@
         <variable
             name="subredditName"
             type="String" />
+
+        <variable
+            name="subreddit"
+            type="com.example.hakonsreader.api.model.Subreddit" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -31,7 +35,7 @@
 
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="@{@string/submittingTo(subredditName)}"
+                android:text="@{@string/submittingTo(subreddit != null ? subreddit.name : subredditName)}"
                 android:textColor="@color/text_color"
                 android:textSize="20sp"
 
@@ -42,7 +46,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Submitting to GlobalOffensive" />
 
-            <!-- TODO the submit text is markdown text (that needs to be adjusted) -->
             <TextView
                 android:id="@+id/subredditSubmitText"
                 android:layout_width="0dp"
@@ -52,6 +55,7 @@
                 android:layout_marginEnd="8dp"
 
                 android:textColor="@color/secondary_text_color"
+                app:markdown="@{subreddit.submitText}"
 
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"

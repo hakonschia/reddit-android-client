@@ -29,7 +29,10 @@ import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
+import com.example.hakonsreader.viewmodels.SubredditViewModel
+import com.example.hakonsreader.viewmodels.factories.SubredditFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
+import com.example.hakonsreader.views.util.ViewUtil
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +62,10 @@ class SubmitActivity : BaseActivity() {
     private val database = App.get().database
 
     private lateinit var binding: ActivitySubmitBinding
+
     private lateinit var subreddit: Subreddit
+    private lateinit var subredditName: String
+    private var subredditViewModel: SubredditViewModel? = null
 
     private var flairsViewModel: SubredditFlairsViewModel? = null
     private var flairsAdapter: RedditFlairAdapter? = null
@@ -69,105 +75,82 @@ class SubmitActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySubmitBinding.inflate(LayoutInflater.from(this))
-        setContentView(binding.root)
+        setupBinding()
 
-        val subredditName = intent?.extras?.getString(SUBREDDIT_KEY) ?: return
+        subredditName = intent?.extras?.getString(SUBREDDIT_KEY) ?: return
+        binding.subredditName = subredditName
 
-        observerSubreddit(subredditName)
+        setupSubredditViewModel(subredditName)
 
         // Setup with all tabs initially until we know which submissions are supported on the subreddit
         setupTabs()
         // Force updates if data saving isn't enabled
         setupFlairsViewModel(subredditName)
+    }
 
-        // We need information about the subreddit, try to get it from the local database and if it doesn't exist, get it from
-        // the api
-        getSubredditInfo(subredditName)
+    private fun setupBinding() {
+        binding = ActivitySubmitBinding.inflate(LayoutInflater.from(this))
+        with (binding) {
+            setContentView(root)
 
-        binding.subredditName = subredditName
+            binding.showPreview.setOnClickListener {
+                val textFragment = submissionFragments[0] as SubmissionTextFragment
+                textFragment.binding?.markdownInput?.showPreviewInPopupDialog()
+            }
 
-        binding.showPreview.setOnClickListener {
-            val textFragment = submissionFragments[0] as SubmissionTextFragment
-            textFragment.binding?.markdownInput?.showPreviewInPopupDialog()
-        }
+            submissionTypes.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    showPreview.visibility = if (submissionFragments[position] is SubmissionTextFragment) {
+                        VISIBLE
+                    } else {
+                        // Use INVISIBLE instead of GONE since the "Submit post" button relies on the position of the preview
+                        INVISIBLE
+                    }
+                }
+            })
 
-        binding.submissionTypes.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                binding.showPreview.visibility = if (submissionFragments[position] is SubmissionTextFragment) {
-                    VISIBLE
-                } else {
-                    // Use INVISIBLE instead of GONE since the "Submit post" button relies on the position of the preview
-                    INVISIBLE
+            submitPost.setOnClickListener {
+                if (title.text?.length == 0) {
+                    // Too short
+                    Snackbar.make(root, R.string.submittingNoTitle, Snackbar.LENGTH_LONG).show()
+
+                    return@setOnClickListener
+                } else if (title.text?.length!! > resources.getInteger(R.integer.submissionTitleMaxLength)) {
+                    // Too long
+                    Snackbar.make(binding.root, R.string.submittingTitleTooLong, Snackbar.LENGTH_LONG).show()
+
+                    return@setOnClickListener
+                }
+
+                // Check which page is active, submit based on that
+                when (val fragment = submissionFragments[submissionTypes.currentItem]) {
+                    is SubmissionTextFragment -> submitText(fragment)
+                    is SubmissionLinkFragment -> submitLink(fragment)
+                    is SubmissionCrosspostFragment -> submitCrosspost(fragment)
                 }
             }
-        })
-
-        binding.submitPost.setOnClickListener {
-            if (binding.title.text?.length == 0) {
-                // Too short
-                Snackbar.make(binding.root, R.string.submittingNoTitle, Snackbar.LENGTH_LONG).show()
-
-                return@setOnClickListener
-            } else if (binding.title.text?.length!! > resources.getInteger(R.integer.submissionTitleMaxLength)) {
-                // Too long
-                Snackbar.make(binding.root, R.string.submittingTitleTooLong, Snackbar.LENGTH_LONG).show()
-
-                return@setOnClickListener
-            }
-
-            // Check which page is active, submit based on that
-            when (val fragment = submissionFragments[binding.submissionTypes.currentItem]) {
-                is SubmissionTextFragment -> submitText(fragment)
-                is SubmissionLinkFragment -> submitLink(fragment)
-                is SubmissionCrosspostFragment -> submitCrosspost(fragment)
-            }
         }
     }
 
-    /**
-     * Updates subreddit info from the local database and updates the views on changes
-     */
-    private fun observerSubreddit(subredditName: String) {
-        database.subreddits().get(subredditName).observe(this) {
-            if (it == null) {
-                return@observe
-            }
-
-            subreddit = it
-            updateViews()
-            checkSubmissionTypes(subreddit)
-        }
-    }
-
-    private fun getSubredditInfo(subredditName: String) {
-        // TODO get from API
-        /*
-        CoroutineScope(IO).launch {
-            val sub: Subreddit? = database.subreddits().get(subredditName)
-
-            if (sub != null) {
-                subreddit = sub
-                withContext(Main) {
-                    updateViews()
-                    checkSubmissionTypes(subreddit)
+    private fun setupSubredditViewModel(subredditName: String) {
+        subredditViewModel = ViewModelProvider(this, SubredditFactory(
+                subredditName,
+                api.subreddit(subredditName),
+                database.subreddits()
+        )).get(SubredditViewModel::class.java).apply {
+            subreddit.observe(this@SubmitActivity) {
+                // If this is null then it should probably be reflected on the subreddit field in the fragment?
+                // Probably won't ever happen though
+                if (it == null) {
+                    return@observe
                 }
-            }  else {
-                // TODO Get from API
+
+                this@SubmitActivity.subreddit = it
+                checkSubmissionTypes(it)
+                binding.subreddit = it
             }
         }
-         */
-    }
-
-    /**
-     * Updates the views in the activity based on [subreddit]
-     */
-    private fun updateViews() {
-        binding.subredditSubmitText.movementMethod = InternalLinkMovementMethod.getInstance(this)
-
-        val submitTextAdjusted = App.get().adjuster.adjust(subreddit.submitText)
-        App.get().markwon.setMarkdown(binding.subredditSubmitText, submitTextAdjusted)
     }
 
     private fun setupTabs() {
@@ -181,9 +164,7 @@ class SubmitActivity : BaseActivity() {
             tab.text = when (submissionFragments[position]) {
                 is SubmissionLinkFragment -> getString(R.string.submittingLinkHint)
                 is SubmissionCrosspostFragment -> getString(R.string.submittingCrosspostTitle)
-                else -> {
-                    getString(R.string.submittingTextHint)
-                }
+                else -> getString(R.string.submittingTextHint)
             }
         }.attach()
     }
@@ -196,8 +177,8 @@ class SubmitActivity : BaseActivity() {
                 App.get().database.flairs()
         )).get(SubredditFlairsViewModel::class.java).apply {
             flairs.observe(this@SubmitActivity) {
-                // If we get an empty list back, load from API if data saving isn't on
-                // Ie. don't
+                // If we get back an empty list always check again (this will happen if we don't already have
+                // flairs in the db already)
                 if (it.isEmpty()) {
                     CoroutineScope(IO).launch {
                         refresh()
@@ -210,7 +191,13 @@ class SubmitActivity : BaseActivity() {
             }
 
             errors.observe(this@SubmitActivity) {
-                Util.handleGenericResponseErrors(binding.root, it.error, it.throwable)
+                // 403 errors occur when the subreddit doesn't allow flairs, so don't show those errors
+                // since it's not really an "error" that the user should care about
+                if (it.error.code == 403) {
+                    binding.flairSpinner.visibility = GONE
+                } else {
+                    Util.handleGenericResponseErrors(binding.root, it.error, it.throwable)
+                }
             }
             // There won't be anything else causing this to loader to load so this is safe
             loading.observe(this@SubmitActivity) {
@@ -257,7 +244,7 @@ class SubmitActivity : BaseActivity() {
                     nsfw,
                     spoiler,
                     receiveNotifications,
-                    flairId =  getFlairId()
+                    flairId = getFlairId()
             )
         }
     }
@@ -285,7 +272,7 @@ class SubmitActivity : BaseActivity() {
                     nsfw,
                     spoiler,
                     receiveNotifications,
-                    flairId =  getFlairId()
+                    flairId = getFlairId()
             )
         }
 
@@ -314,7 +301,7 @@ class SubmitActivity : BaseActivity() {
                     nsfw,
                     spoiler,
                     receiveNotifications,
-                    flairId =  getFlairId()
+                    flairId = getFlairId()
             )
         }
     }
