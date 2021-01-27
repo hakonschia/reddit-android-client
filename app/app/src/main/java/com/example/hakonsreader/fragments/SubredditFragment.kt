@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
@@ -504,8 +505,13 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         )).get(SubredditFlairsViewModel::class.java).apply {
             flairs.observe(viewLifecycleOwner) {
                 flairsAdapter = RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
-                    onFlairClicked = RedditFlairAdapter.OnFlairClicked { flair ->
-                        updateUserFlair(flair)
+                    binding.subredditInfo.selectFlairSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            updateUserFlair(flairsAdapter?.getFlairAt(position))
+                        }
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
+                            // Not implemented
+                        }
                     }
                     binding.subredditInfo.selectFlairSpinner.adapter = this
                 }
@@ -712,71 +718,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Observes the subreddits user flairs from the local database and updates the spinner in the
-     * subreddit info
-     */
-    private fun observeUserFlairs() {
-        database.flairs().getFlairsBySubredditAndType(getSubredditName()!!, FlairType.USER.name).asLiveData().observe(viewLifecycleOwner) {
-            if (it == null) {
-                return@observe
-            }
-
-            val adapter = RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
-                onFlairClicked = RedditFlairAdapter.OnFlairClicked { flair ->
-                    updateUserFlair(flair)
-                }
-            }
-
-            binding.subredditInfo.selectFlairSpinner.adapter = adapter
-        }
-    }
-
-    /**
-     * Calls the API to get the submission flairs for this subreddit
-     */
-    private fun getSubmissionFlairs(subredditName: String) {
-        binding.subredditInfo.selectFlairLoadingIcon.visibility = View.VISIBLE
-        CoroutineScope(IO).launch {
-            val response = api.subreddit(subredditName).userFlairs()
-            withContext(Main) {
-                when (response) {
-                    is ApiResponse.Success -> {
-                        onUserFlairResponse(response.value)
-                    }
-                    is ApiResponse.Error -> {
-                        // If the sub doesn't allow flairs, a 403 is returned
-                        binding.subredditInfo.selectFlairLoadingIcon.visibility = View.GONE
-                        binding.subredditInfo.selectFlairSpinner.visibility = View.GONE
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Handles successful responses for submission flairs. The loading icon is removed and
-     * [ActivitySubmitBinding.flairSpinner] is updated with the flairs.
-     *
-     * If no flairs are returned, then the spinner view is removed
-     *
-     * @param flairs The flairs retrieved
-     */
-    private fun onUserFlairResponse(flairs: List<RedditFlair>) {
-        flairs as ArrayList<RedditFlair>
-
-        if (flairs.isEmpty()) {
-            binding.subredditInfo.selectFlairSpinner.visibility = View.GONE
-            return
-        }
-
-        binding.subredditInfo.selectFlairLoadingIcon.visibility = View.GONE
-
-        CoroutineScope(IO).launch {
-            database.flairs().insert(flairs)
         }
     }
 

@@ -28,7 +28,20 @@ class RedditFlairAdapter(
         private const val TAG = "SubmissionFlairAdapter"
     }
 
-    var onFlairClicked: OnFlairClicked? = null
+    /**
+     * Gets the flair by a position
+     *
+     * @param position The position to get the flair from
+     * @return The RedditFlair at [position], or `null` if the position is 0 as this is the "Select flair"
+     * item
+     */
+    fun getFlairAt(position: Int): RedditFlair? {
+        return if (position != 0) {
+            flairs[position - 1]
+        } else {
+            null
+        }
+    }
 
     override fun getCount(): Int {
         // The first item is a "Select flair" item
@@ -57,20 +70,12 @@ class RedditFlairAdapter(
             text = context.getString(R.string.submitFlairSpinner)
             setPadding(padding, padding, padding, padding)
             setTextColor(ContextCompat.getColor(context, R.color.text_color))
-
-            setOnClickListener {
-                onFlairClicked?.flairClicked(null)
-            }
         }
     }
 
     private fun getCustomView(position: Int, viewGroup: ViewGroup) : View {
         val submissionFlair = flairs[position]
-        val view = LayoutInflater.from(context).inflate(R.layout.spinner_submission_flair_view, viewGroup, false).apply {
-            setOnClickListener {
-                onFlairClicked?.flairClicked(submissionFlair)
-            }
-        }
+        val view = LayoutInflater.from(context).inflate(R.layout.spinner_submission_flair_view, viewGroup, false)
 
         val parentLayout = view.findViewById<LinearLayout>(R.id.parentLayout)
         val tag = Tag(context)
@@ -85,16 +90,4 @@ class RedditFlairAdapter(
 
         return view
     }
-
-
-    fun interface OnFlairClicked {
-        /**
-         * Listener for when a flair in the adapter has been clicked
-         *
-         * @param flair The flair clicked. If the first item is clicked ("Select flair") then this
-         * will be `null`
-         */
-        fun flairClicked(flair: RedditFlair?)
-    }
-
 }
