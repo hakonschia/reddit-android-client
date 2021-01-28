@@ -41,7 +41,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
-        <!-- TODO make this clickable to add a reply? -->
         <TextView
             android:id="@+id/noCommentsContent"
             android:layout_width="wrap_content"

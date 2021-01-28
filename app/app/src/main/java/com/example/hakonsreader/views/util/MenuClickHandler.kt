@@ -108,6 +108,9 @@ fun showPopupSortWithTime(view: View) {
 
     val finalTitle = sortText + if (timeSortText != null) " - $timeSortText" else ""
 
+    // The submenu sizes look weird if they are too small, so set to fixed 40 % of screen width
+    val submenuSize = App.get().screenWidth * 0.4f
+
     popupMenu {
         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
 
@@ -130,6 +133,7 @@ fun showPopupSortWithTime(view: View) {
                     // Show menu
                     popupMenu {
                         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
+                        fixedContentWidthInPx = submenuSize.toInt()
 
                         section {
                             title = context.getString(R.string.sortTop)
@@ -169,6 +173,7 @@ fun showPopupSortWithTime(view: View) {
                 callback = {
                     popupMenu {
                         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
+                        fixedContentWidthInPx = submenuSize.toInt()
 
                         section {
                             title = context.getString(R.string.sortControversial)

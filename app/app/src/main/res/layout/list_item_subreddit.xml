@@ -71,7 +71,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- TODO Ellipsize isn't showing during runtime, something to do with Markwon -->
     <TextView
         android:id="@+id/subredditDescription"
         android:layout_width="0dp"
