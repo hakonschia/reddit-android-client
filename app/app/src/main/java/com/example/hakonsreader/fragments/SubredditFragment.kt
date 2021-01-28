@@ -775,7 +775,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         }
     }
 
-    override fun newSort() {
+    override fun new() {
         postsViewModel?.restart(SortingMethods.NEW)
     }
 

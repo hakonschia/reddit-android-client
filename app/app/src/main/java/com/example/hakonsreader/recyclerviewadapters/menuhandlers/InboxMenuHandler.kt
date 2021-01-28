@@ -9,34 +9,34 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.Util
+import com.github.zawadz88.materialpopupmenu.popupMenu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
-@SuppressWarnings("RestrictedApi")
 fun showInboxMenu(view: View, redditMessage: RedditMessage?) {
     if (redditMessage == null) {
         return
     }
 
-    val menu = PopupMenu(view.context, view)
-    menu.inflate(R.menu.inbox_menu)
+    val context = view.context
 
-    // Set as "Mark read"
-    if (redditMessage.isNew) {
-        menu.menu.findItem(R.id.menuInboxMarkUnread).title = view.context.getString(R.string.inboxMenuMarkRead)
-    }
+    popupMenu {
+        style = R.style.Widget_MPM_Menu_Dark_CustomBackground
 
-    menu.setOnMenuItemClickListener {
-        return@setOnMenuItemClickListener when (it.itemId) {
-            R.id.menuInboxMarkUnread -> { markUnreadOnClick(view, redditMessage); true }
-            else -> false
+        section {
+            item {
+                labelRes = if (redditMessage.isNew) {
+                    R.string.inboxMenuMarkRead
+                } else {
+                    R.string.inboxMenuMarkUnread
+                }
+
+                icon = R.drawable.ic_markunread_mailbox_24dp
+                callback = { markUnreadOnClick(view, redditMessage) }
+            }
         }
-    }
-
-    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
-    menuHelper.setForceShowIcon(true)
-    menuHelper.show()
+    }.show(context, view)
 }
 
 private fun markUnreadOnClick(view: View, message: RedditMessage) {

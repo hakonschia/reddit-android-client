@@ -29,8 +29,7 @@ import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
-import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForLoggedInUser
-import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForCommentExtraForNonLoggedInUser
+import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForComments
 import com.example.hakonsreader.views.LinkPreview
 
 /**
@@ -444,13 +443,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             return
         }
 
-        // We could check if privately browsing. Mod/save etc. won't appear anyways, only delete comment
-        // since we only have the user, the API doesn't send back that data since the access token is anonymous
-        if (App.get().isUserLoggedIn()) {
-            showPopupForCommentExtraForLoggedInUser(view, comment, this)
-        } else {
-            showPopupForCommentExtraForNonLoggedInUser(view, comment, this)
-        }
+        showPopupForComments(view, comment, this)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {

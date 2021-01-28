@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="com.example.hakonsreader.views.util.MenuClickHandler" />
         <import type="com.example.hakonsreader.recyclerviewadapters.menuhandlers.PostsMenuHandlerKt" />
 
         <variable

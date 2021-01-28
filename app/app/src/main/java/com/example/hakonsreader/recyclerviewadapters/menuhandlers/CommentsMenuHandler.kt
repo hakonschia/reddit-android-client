@@ -19,6 +19,7 @@ import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.fragments.bottomsheets.PeekCommentBottomSheet
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
+import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -28,110 +29,100 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Shows the popup for comments for when the comment is posted by the user currently logged in
+ * Shows a popup for comments
  *
  * @param view The view clicked (where the popup will be attached)
  * @param comment The comment the popup is for
  * @param adapter The RecyclerView adapter the comment is in
  */
-@SuppressWarnings("RestrictedApi")
-fun showPopupForCommentExtraForLoggedInUser(view: View, comment: RedditComment, adapter: CommentsAdapter) {
+fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAdapter) {
     val user = App.storedUser
-    val menu = PopupMenu(view.context, view)
-    menu.inflate(R.menu.comment_extra_generic_for_all_users)
-    menu.inflate(R.menu.comment_extra_for_logged_in_users)
-
-    // Add menus depending on if the logged in user is the poster of the comment
-    if (comment.author == user?.username) {
-        menu.inflate(R.menu.comment_extra_by_user)
-    } else {
-        menu.inflate(R.menu.comment_extra_for_logged_in_users_comment_not_by_user)
-        menu.menu.findItem(R.id.menuBlockUser).title = view.context.getString(R.string.blockUser, comment.author)
-    }
-
-    // Add mod specific if user is a mod in the subreddit the post is in
-    if (comment.isUserMod) {
-        // Only top level comments can be stickied
-        val stickyMenu = if (comment.depth == 0) {
-            R.menu.comment_extra_by_user_user_is_mod
-        } else {
-            R.menu.comment_extra_by_user_user_is_mod_no_sticky
-        }
-        menu.inflate(stickyMenu)
-
-        // Set text to "Undistinguish"
-        if (comment.isMod()) {
-            val modItem = menu.menu.findItem(R.id.menuDistinguishCommentAsMod)
-            modItem.setTitle(R.string.commentRemoveModDistinguish)
-        }
-
-        // Set text to "Remove sticky"
-        if (comment.depth == 0 && comment.isStickied) {
-            menu.menu.findItem(R.id.menuStickyComment)?.setTitle(R.string.commentRemoveSticky)
-        }
-    }
-
-    // Default is "Save comment", if comment already is saved, change the text
-    if (comment.isSaved) {
-        val savedItem = menu.menu.findItem(R.id.menuSaveOrUnsaveComment)
-        savedItem.title = view.context.getString(R.string.unsaveComment)
-    }
-
+    val context = view.context
     val parentComment = adapter.getCommentById(comment.parentId)
-    if (parentComment == null) {
-        // No parent comment, remove the "Peek parent" option
-        menu.menu.removeItem(R.id.menuPeekParentComment)
-    }
 
-    menu.setOnMenuItemClickListener { item: MenuItem ->
-        return@setOnMenuItemClickListener when (item.itemId) {
-            R.id.menuDeleteComment -> { deleteCommentOnClick(view, comment); true }
-            R.id.menuSaveOrUnsaveComment -> { saveCommentOnClick(view, comment); true }
-            R.id.menuDistinguishCommentAsMod -> { distinguishAsModOnclick(view, comment, adapter); true }
-            R.id.menuStickyComment -> { stickyOnClick(view, comment, adapter); true }
-            R.id.menuBlockUser -> { blockUserOnClick(view, comment.author); true }
-            R.id.menuShowCommentChain -> { adapter.commentIdChain = comment.id; true }
-            R.id.menuCopyCommentLink -> { copyCommentLinkOnClick(view, comment); true }
-            R.id.menuPeekParentComment -> { peekParentOnClick(view.context, parentComment!!); true }
-            else -> false
+    popupMenu {
+        style = R.style.Widget_MPM_Menu_Dark_CustomBackground
+
+        section {
+            if (parentComment != null) {
+                item {
+                    labelRes = R.string.menuCommentPeekParent
+                    icon = R.drawable.ic_visibility_24dp
+                    callback = { peekCommentOnClick(context, parentComment) }
+                }
+            }
+
+            item {
+                labelRes = R.string.commentShowChain
+                icon = R.drawable.ic_chain
+                callback = { adapter.commentIdChain = comment.id }
+            }
+
+            item {
+                labelRes = R.string.commentCopyLink
+                icon = R.drawable.ic_baseline_link_24
+                callback = { copyCommentLinkOnClick(view, comment) }
+            }
         }
-    }
 
-    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
-    menuHelper.setForceShowIcon(true)
-    menuHelper.show()
-}
+        // Logged in user section
+        if (App.get().isUserLoggedIn()) {
+            section {
+                item {
+                    labelRes = if (comment.isSaved) {
+                        R.string.unsaveComment
+                    } else {
+                        R.string.saveComment
+                    }
+                    icon = R.drawable.ic_bookmark_24dp
+                    callback = { saveCommentOnClick(view, comment) }
+                }
 
-/**
- * Shows the popup for comments for when the comment is NOT posted by the user currently logged in
- *
- * @param view The view clicked (where the popup will be attached)
- * @param comment The comment the popup is for
- * @param adapter The RecyclerView adapter the comment is in
- */
-@SuppressWarnings("RestrictedApi")
-fun showPopupForCommentExtraForNonLoggedInUser(view: View, comment: RedditComment, adapter: CommentsAdapter) {
-    val menu = PopupMenu(view.context, view)
-    menu.inflate(R.menu.comment_extra_generic_for_all_users)
-
-    val parentComment = adapter.getCommentById(comment.parentId)
-    if (parentComment == null) {
-        // No parent comment, remove the "Peek parent" option
-        menu.menu.removeItem(R.id.menuPeekParentComment)
-    }
-
-    menu.setOnMenuItemClickListener { item: MenuItem ->
-        return@setOnMenuItemClickListener when (item.itemId) {
-            R.id.menuShowCommentChain -> { adapter.commentIdChain = comment.id; true }
-            R.id.menuCopyCommentLink -> { copyCommentLinkOnClick(view, comment); true }
-            R.id.menuPeekParentComment -> { peekParentOnClick(view.context, parentComment!!); true }
-            else -> false
+                if (comment.author == user?.username) {
+                    item {
+                        labelRes = R.string.menuDeleteComment
+                        icon = R.drawable.ic_delete_24dp
+                        callback = { deleteCommentOnClick(view, comment) }
+                    }
+                } else {
+                    item {
+                        label = context.getString(R.string.blockUser, comment.author)
+                        icon = R.drawable.ic_baseline_block_24
+                        callback = { blockUserOnClick(view, comment.author) }
+                    }
+                }
+            }
         }
-    }
 
-    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
-    menuHelper.setForceShowIcon(true)
-    menuHelper.show()
+        if (comment.isUserMod) {
+            section {
+                title = context.getString(R.string.commentMenuSectionModeration)
+                item {
+                    labelRes = if (comment.isMod()) {
+                        R.string.postRemoveModDistinguish
+                    } else {
+                        R.string.postDistinguishAsMod
+                    }
+                    icon = R.drawable.ic_admin_24px
+                    callback = { distinguishAsModOnclick(view, comment, adapter) }
+                }
+
+                if (comment.depth == 0) {
+                    item {
+                        labelRes = if (comment.isStickied) {
+                            R.string.commentRemoveSticky
+                        } else {
+                            R.string.commentSticky
+                        }
+
+                        icon = R.drawable.ic_pin_icon_color_24dp
+                        callback = { stickyOnClick(view, comment, adapter) }
+                    }
+                }
+            }
+        }
+
+    }.show(context, view)
 }
 
 /**
@@ -256,11 +247,18 @@ private fun copyCommentLinkOnClick(view: View, comment: RedditComment) {
     Snackbar.make(view, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
 }
 
-fun peekParentOnClick(context: Context, comment: RedditComment) {
+/**
+ * Shows a BottomSheet with a comment
+ *
+ * @param context The context to create the BottomSheet with
+ * @param comment The comment to peek
+ */
+fun peekCommentOnClick(context: Context, comment: RedditComment) {
     context as AppCompatActivity
-    val bottomSheet = PeekCommentBottomSheet()
-    bottomSheet.comment = comment
-    bottomSheet.show(context.supportFragmentManager, "peekParentBottomSheet")
+    PeekCommentBottomSheet().run {
+        this.comment = comment
+        show(context.supportFragmentManager, "peekParentBottomSheet")
+    }
 }
 
 /**

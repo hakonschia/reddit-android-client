@@ -82,14 +82,6 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing, Report
     var isUserMod = false
 
     /**
-     * True if the comment has been edited after it was posted
-     */
-    // TODO when the comment isn't edited, this is a boolean "false", when it is edited it's a float
-    //  timestamp of when it was edited
-    //@SerializedName("edited")
-    //var isEdited = false
-
-    /**
      * True if the comment is locked and cannot be replied to
      */
     @SerializedName("locked")

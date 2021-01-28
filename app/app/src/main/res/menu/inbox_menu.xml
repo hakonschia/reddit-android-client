@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:id="@+id/menuInboxMarkUnread"
-        android:title="@string/inboxMenuMarkUnread"
-        android:icon="@drawable/ic_markunread_mailbox_24dp" />
-</menu>

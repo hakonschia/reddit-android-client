@@ -6,7 +6,7 @@
     <data>
         <import type="android.view.View"/>
         <import type="com.example.hakonsreader.views.util.ClickHandler"/>
-        <import type="com.example.hakonsreader.views.util.MenuClickHandler"/>
+        <import type="com.example.hakonsreader.views.util.MenuClickHandlerKt"/>
 
         <variable
             name="standardSub"
@@ -186,7 +186,7 @@
 
                             android:background="?android:selectableItemBackground"
                             android:src="@drawable/ic_sort_24dp"
-                            android:onClick="@{view -> MenuClickHandler.showPopupSortWithTime(view)}"
+                            android:onClick="@{view -> MenuClickHandlerKt.showPopupSortWithTime(view)}"
 
                             app:layout_constraintBottom_toBottomOf="@+id/subredditSubscribers"
                             app:layout_constraintEnd_toEndOf="parent" />

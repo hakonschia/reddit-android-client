@@ -324,6 +324,7 @@
         <item quantity="other">%d replies</item>
     </plurals>
 
+    <string name="commentMenuSectionModeration">Moderation</string>
     <string name="menuDeleteComment">Delete comment</string>
     <string name="commentDeleted">Comment deleted</string>
     <string name="saveComment">Save comment</string>
@@ -332,6 +333,7 @@
     <string name="commentUnsaved">Comment unsaved</string>
     <string name="menuCommentPeekParent">Peek parent</string>
 
+    <string name="postMenuSectionModeration">Moderation</string>
     <string name="deletePost">Delete post</string>
     <string name="postDeleted">Post deleted</string>
     <string name="savePost">Save post</string>

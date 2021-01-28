@@ -6,7 +6,7 @@
     <data>
         <import type="android.view.View" />
         <import type="com.example.hakonsreader.views.util.ClickHandler"/>
-        <import type="com.example.hakonsreader.views.util.MenuClickHandler"/>
+        <import type="com.example.hakonsreader.views.util.MenuClickHandlerKt"/>
 
         <variable
             name="loggedInUser"
@@ -191,7 +191,7 @@
             android:layout_marginEnd="16dp"
 
             android:foreground="@drawable/ripple_main_bg"
-            android:onClick="@{(view) -> MenuClickHandler.showPopupForProfile(view, loggedInUser)}"
+            android:onClick="@{(view) -> MenuClickHandlerKt.showPopupForProfile(view)}"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/topLayout"

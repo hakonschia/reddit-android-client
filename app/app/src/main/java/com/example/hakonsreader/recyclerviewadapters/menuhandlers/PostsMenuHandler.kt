@@ -16,6 +16,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.Util
+import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -37,109 +38,96 @@ fun showPopupForPost(view: View, post: RedditPost?) {
         return
     }
 
-    if (App.get().isUserLoggedIn()) {
-        showPopupForPostExtraForLoggedInUser(view, post)
-    } else {
-        showPopupForPostExtraForNonLoggedInUser(view, post)
-    }
-}
-
-
-/**
- * Shows the extra popup for posts for when the post is by the logged in user
- *
- * @param view The view clicked (where the popup will be attached)
- * @param post The post the popup is for
- */
-@SuppressWarnings("RestrictedApi")
-private fun showPopupForPostExtraForLoggedInUser(view: View, post: RedditPost) {
     val user = App.storedUser
-    val menu = PopupMenu(view.context, view)
-    menu.inflate(R.menu.post_extra_generic_for_all_users)
-    menu.inflate(R.menu.post_extra_for_logged_in_users)
+    val context = view.context
 
-    // Add menus depending on if the logged in user is the poster of the post
-    if (post.author.equals(user?.username, ignoreCase = true)) {
-        menu.inflate(R.menu.post_extra_by_user)
-    } else {
-        menu.inflate(R.menu.post_extra_not_by_user)
-        menu.menu.findItem(R.id.menuBlockUser).title = view.context.getString(R.string.blockUser, post.author)
-    }
+    popupMenu {
+        style = R.style.Widget_MPM_Menu_Dark_CustomBackground
 
-    if (post.isUserMod) {
-        menu.inflate(R.menu.post_extra_user_is_mod)
+        // Generic for all users
+        section {
+            item {
+                labelRes = R.string.copyPostLink
+                icon = R.drawable.ic_baseline_link_24
+                callback = { copyPostLinkOnClick(view, post) }
+            }
 
-        // Set text to "Undistinguish"
-        if (post.isMod()) {
-            val modItem = menu.menu.findItem(R.id.menuDistinguishPostAsMod)
-            modItem.setTitle(R.string.postRemoveModDistinguish)
+            item {
+                labelRes = R.string.copyPostContentLink
+                icon = R.drawable.ic_content_copy_24
+                callback = { copyPostContentOnClick(view, post) }
+            }
+
+            item {
+                label = context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
+                icon = R.drawable.ic_filter_24px
+                callback = { filterSubredditOnClick(post.subreddit) }
+            }
         }
 
-        // Set text to "Unsticky"
-        if (post.isStickied) {
-            val modItem = menu.menu.findItem(R.id.menuStickyPost)
-            modItem.setTitle(R.string.postRemoveSticky)
+        // There is a logged in user, show actions that require logged in users
+        // Technically this could be null even if there is
+        if (App.get().isUserLoggedIn()) {
+            section {
+                item {
+                    labelRes = if (post.isSaved) {
+                        R.string.unsavePost
+                    } else {
+                        R.string.savePost
+                    }
+                    icon = R.drawable.ic_bookmark_24dp
+                    callback = { savePostOnClick(view, post) }
+                }
+
+                // Post by the logged in user (technically if we failed to get user information this
+                // could be wrong as a post could have been by a user but we don't know it is)
+                if (post.author.equals(user?.username, ignoreCase = true)) {
+                    // TODO add edit post (if post is selftext)
+                    item {
+                        labelRes = R.string.deletePost
+                        icon = R.drawable.ic_delete_24dp
+                        callback = { deletePostOnClick(view, post) }
+                    }
+                } else {
+                    // Post NOT be logged in user
+                    item {
+                        label = context.getString(R.string.blockUser, post.author)
+                        icon = R.drawable.ic_baseline_block_24
+                        callback = { blockUserOnClick(view, post.author) }
+                    }
+                }
+            }
         }
-    }
 
-    // Default is "Save post", if post already is saved, change the text
-    if (post.isSaved) {
-        val savedItem = menu.menu.findItem(R.id.menuSaveOrUnsavePost)
-        savedItem.title = view.context.getString(R.string.unsavePost)
-    }
+        // Logged in user is mod in the subreddit the post is in
+        // (this could be in the if above, but this will just be false if there is no user
+        if (post.isUserMod) {
+            section {
+                title = context.getString(R.string.postMenuSectionModeration)
 
-    // For self posts it doesn't make sense to have both the copy links, as they point to the same thing
-    if (post.isSelf || post.crossposts?.get(0)?.isSelf == true) {
-        menu.menu.removeItem(R.id.menuCopyPostContent)
-    }
+                item {
+                    labelRes = if (post.isMod()) {
+                        R.string.postRemoveModDistinguish
+                    } else {
+                        R.string.postDistinguishAsMod
+                    }
+                    icon = R.drawable.ic_admin_24px
+                    callback = { distinguishAsModOnClick(view, post) }
+                }
 
-    menu.menu.findItem(R.id.menuPostAddSubredditToFilter).title = view.context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
+                item {
+                    labelRes = if (post.isStickied) {
+                        R.string.postRemoveSticky
+                    } else {
+                        R.string.postSticky
+                    }
 
-    menu.setOnMenuItemClickListener { item: MenuItem ->
-        // TODO add edit post (if post is selftext)
-        return@setOnMenuItemClickListener when (item.itemId) {
-            R.id.menuSaveOrUnsavePost -> { savePostOnClick(view, post); true }
-            R.id.menuDistinguishPostAsMod -> { distinguishAsModOnClick(view, post); true }
-            R.id.menuStickyPost -> { stickyOnClick(view, post); true }
-            R.id.menuBlockUser -> { blockUserOnClick(view, post.author); true }
-            R.id.menuDeletePost -> { deletePostOnClick(view, post); true }
-            R.id.menuCopyPostLink -> { copyPostLinkOnClick(view, post); true }
-            R.id.menuCopyPostContent -> { copyPostContentOnClick(view, post); true }
-            R.id.menuPostAddSubredditToFilter -> { filterSubredditOnClick(post.subreddit); true }
-            else -> false
+                    icon = R.drawable.ic_pin_icon_color_24dp
+                    callback = { stickyOnClick(view, post) }
+                }
+            }
         }
-    }
-
-    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
-    menuHelper.setForceShowIcon(true)
-    menuHelper.show()
-}
-
-/**
- * Shows the extra popup for posts for when the post is NOT by the logged in user
- *
- * @param view The view clicked (where the popup will be attached)
- * @param post The post the popup is for
- */
-@SuppressWarnings("RestrictedApi")
-fun showPopupForPostExtraForNonLoggedInUser(view: View, post: RedditPost) {
-    val menu = PopupMenu(view.context, view)
-    menu.inflate(R.menu.post_extra_generic_for_all_users)
-
-    menu.menu.findItem(R.id.menuPostAddSubredditToFilter).title = view.context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
-
-    menu.setOnMenuItemClickListener { item: MenuItem ->
-        return@setOnMenuItemClickListener when (item.itemId) {
-            R.id.menuCopyPostLink -> { copyPostLinkOnClick(view, post); true }
-            R.id.menuCopyPostContent -> { copyPostContentOnClick(view, post); true }
-            R.id.menuPostAddSubredditToFilter -> { filterSubredditOnClick(post.subreddit); true }
-            else -> false
-        }
-    }
-
-    val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
-    menuHelper.setForceShowIcon(true)
-    menuHelper.show()
+    }.show(context, view)
 }
 
 

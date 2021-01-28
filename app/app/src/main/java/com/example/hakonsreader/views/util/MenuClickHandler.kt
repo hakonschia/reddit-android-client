@@ -1,0 +1,187 @@
+package com.example.hakonsreader.views.util
+
+import android.app.AlertDialog
+import android.content.Context
+import android.view.*
+import androidx.annotation.IdRes
+import androidx.appcompat.widget.PopupMenu
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.example.hakonsreader.App
+import com.example.hakonsreader.R
+import com.example.hakonsreader.api.enums.PostTimeSort
+import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
+import com.example.hakonsreader.interfaces.SortableWithTime
+import com.example.hakonsreader.misc.TokenManager
+import com.github.zawadz88.materialpopupmenu.popupMenu
+import java.util.*
+
+/**
+ * Shows the popup menu for profiles for logged in users
+ *
+ * @param view The view clicked (where the menu will be attached)
+ */
+fun showPopupForProfile(view: View) {
+    val context = view.context
+    val privatelyBrowsing = App.get().isUserLoggedInPrivatelyBrowsing()
+
+    popupMenu {
+        style = R.style.Widget_MPM_Menu_Dark_CustomBackground
+
+        section {
+            item {
+                labelRes = R.string.logOut
+                icon = R.drawable.ic_signout
+                callback = { App.get().logOut() }
+            }
+
+            item {
+                labelRes = if (privatelyBrowsing) {
+                    R.string.menuPrivateBrowsingDisable
+                } else {
+                    R.string.menuPrivateBrowsingEnable
+                }
+                icon = R.drawable.ic_incognito
+                callback = { App.get().enablePrivateBrowsing(!privatelyBrowsing) }
+            }
+
+            // TODO find a better icon for this. The idea for a list icon is "this is a list of
+            //  what the app can do". Not sure what a "privileges" icon would even be
+            item {
+                labelRes = R.string.menuShowApplicationAccessExplanations
+                icon = R.drawable.ic_format_list_bulleted_24dp
+                callback = { showApplicationPrivileges(context, view.parent) }
+            }
+        }
+    }.show(context, view)
+}
+
+/**
+ * Shows a popup of the applications OAuth privileges
+ */
+private fun showApplicationPrivileges(context: Context, parent: ViewParent) {
+    // TODO if scopes have been added to the application that isn't in the stored token, show which are missing as well
+    val scopes = ArrayList(Arrays.asList(*TokenManager.getToken()!!.scopesAsArray))
+    val adapter = OAuthScopeAdapter(context, R.layout.list_item_oauth_explanation, scopes)
+    val title = LayoutInflater.from(context).inflate(R.layout.dialog_title_oauth_explanation, parent as ViewGroup, false)
+    AlertDialog.Builder(context)
+            .setCustomTitle(title)
+            .setAdapter(adapter, null)
+            .show()
+}
+
+/**
+ * Shows a popup menu to allow a list to change how it should be sorted. The menu shown here
+ * includes time sorts for sorts such as top and controversial
+ *
+ * @param view The view clicked. If this view is not a child of a fragment or activity implementing
+ * [SortableWithTime] nothing is done
+ */
+fun showPopupSortWithTime(view: View) {
+    val f = FragmentManager.findFragment<Fragment>(view)
+    val context = view.context
+    val sortable: SortableWithTime = if (f is SortableWithTime) {
+        f
+    } else if (context is SortableWithTime) {
+        context
+    } else {
+        return
+    }
+
+    popupMenu {
+        style = R.style.Widget_MPM_Menu_Dark_CustomBackground
+
+        section {
+            // TODO title = current sort
+
+            item {
+                labelRes = R.string.sortNew
+                callback = { sortable.new() }
+            }
+            item {
+                labelRes = R.string.sortHot
+                callback = { sortable.hot() }
+            }
+
+            item {
+                labelRes = R.string.sortTop
+                hasNestedItems = true
+                callback = {
+                    // Show menu
+                    popupMenu {
+                        style = R.style.Widget_MPM_Menu_Dark_CustomBackground
+
+                        section {
+                            title = context.getString(R.string.sortTop)
+
+                            item {
+                                labelRes = R.string.sortNow
+                                callback = { sortable.top(PostTimeSort.HOUR) }
+                            }
+                            item {
+                                labelRes = R.string.sortToday
+                                callback = { sortable.top(PostTimeSort.DAY) }
+                            }
+                            item {
+                                labelRes = R.string.sortWeek
+                                callback = { sortable.top(PostTimeSort.WEEK) }
+                            }
+                            item {
+                                labelRes = R.string.sortMonth
+                                callback = { sortable.top(PostTimeSort.MONTH) }
+                            }
+                            item {
+                                labelRes = R.string.sortYear
+                                callback = { sortable.top(PostTimeSort.YEAR) }
+                            }
+                            item {
+                                labelRes = R.string.sortAllTime
+                                callback = { sortable.top(PostTimeSort.ALL_TIME) }
+                            }
+                        }
+                    }.show(context, view)
+                }
+            }
+
+            item {
+                labelRes = R.string.sortControversial
+                hasNestedItems = true
+                callback = {
+                    popupMenu {
+                        style = R.style.Widget_MPM_Menu_Dark_CustomBackground
+
+                        section {
+                            title = context.getString(R.string.sortControversial)
+
+                            item {
+                                labelRes = R.string.sortNow
+                                callback = { sortable.controversial(PostTimeSort.HOUR) }
+                            }
+                            item {
+                                labelRes = R.string.sortToday
+                                callback = { sortable.controversial(PostTimeSort.DAY) }
+                            }
+                            item {
+                                labelRes = R.string.sortWeek
+                                callback = { sortable.controversial(PostTimeSort.WEEK) }
+                            }
+                            item {
+                                labelRes = R.string.sortMonth
+                                callback = { sortable.controversial(PostTimeSort.MONTH) }
+                            }
+                            item {
+                                labelRes = R.string.sortYear
+                                callback = { sortable.controversial(PostTimeSort.YEAR) }
+                            }
+                            item {
+                                labelRes = R.string.sortAllTime
+                                callback = { sortable.controversial(PostTimeSort.ALL_TIME) }
+                            }
+                        }
+                    }.show(context, view)
+                }
+            }
+        }
+
+    }.show(context, view)
+}

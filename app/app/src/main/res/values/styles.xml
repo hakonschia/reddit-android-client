@@ -82,4 +82,8 @@
     <style name="SnackbarTextStyle" parent="Widget.MaterialComponents.Snackbar.TextView">
         <item name="android:textColor">@color/text_color</item>
     </style>
+
+    <style name="Widget.MPM.Menu.Dark.CustomBackground">
+        <item name="android:colorBackground">@color/dialogBackground</item>
+    </style>
 </resources>

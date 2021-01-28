@@ -56,7 +56,7 @@ The application uses [Firebase Crashlytics](https://firebase.google.com/docs/cra
 
 ## Features
 - **Appearance**
-  - Light and true black dark mode
+  - Light and (true black) dark mode
   - Translated to English and Norwegian (bokmål)
 
 - **Posts**
@@ -102,6 +102,7 @@ Thank you to Reddit for making this project possible by providing an open API.
 * [ExoPlayer](https://github.com/google/ExoPlayer) - Used for playing videos
 * [android-youtube-player](https://github.com/PierfrancescoSoffritti/android-youtube-player) - Used for playing YouTube videos
 * [Ticker](https://github.com/robinhood/ticker) - A ticker style TextView that smoothly animates changes (by sliding characters up/down)
+* [Material Popup Menu](https://github.com/zawadz88/MaterialPopupMenu) - For popup menus
 * [ProcessPhoenix](https://github.com/JakeWharton/ProcessPhoenix) - Used to restart the application
 * [Stetho](https://github.com/facebook/stetho) - For network debugging
 

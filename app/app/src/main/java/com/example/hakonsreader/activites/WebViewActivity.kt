@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.WebViewActivity.Companion.URL
 import com.example.hakonsreader.databinding.ActivityWebViewBinding
+import com.github.zawadz88.materialpopupmenu.popupMenu
 
 /**
  * Activity that displays a WebView with a given URL
@@ -94,8 +95,8 @@ class WebViewActivity : BaseActivity() {
             webViewUrl.text = url
 
             // Close the web view (ie. finish the activity) with the button in the toolbar
-            webViewClose.setOnClickListener { v -> finish() }
-            webViewMenu.setOnClickListener { view: View -> openMenu(view) }
+            webViewClose.setOnClickListener { finish() }
+            webViewMenu.setOnClickListener { view -> openMenu(view) }
 
             refreshWebView.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(this@WebViewActivity, R.color.colorAccent))
             refreshWebView.setOnRefreshListener {
@@ -126,25 +127,27 @@ class WebViewActivity : BaseActivity() {
      * @param view The view to attach the menu to
      */
     private fun openMenu(view: View) {
-        val menu = PopupMenu(this, view)
-        menu.inflate(R.menu.web_view_more)
-        menu.setOnMenuItemClickListener { item: MenuItem ->
-            val itemId = item.itemId
-            if (itemId == R.id.webViewMenuRefresh) {
-                binding.webView.reload()
+        popupMenu {
+            style = R.style.Widget_MPM_Menu_Dark_CustomBackground
 
-                return@setOnMenuItemClickListener true
-            } else if (itemId == R.id.webViewMenuOpenInBrowser) {
-                val i = Intent(Intent.ACTION_VIEW, Uri.parse(binding.webView.url))
-                startActivity(i)
+            section {
+                item {
+                    labelRes = R.string.webViewRefresh
+                    icon = R.drawable.ic_refresh_24dp
 
-                return@setOnMenuItemClickListener true
+                    callback = { binding.webView.reload() }
+                }
+
+                item {
+                    labelRes = R.string.webViewOpenInBrowser
+                    icon = R.drawable.ic_launch_24dp
+                    callback = {
+                        Intent(Intent.ACTION_VIEW, Uri.parse(binding.webView.url)).run {
+                            startActivity(this)
+                        }
+                    }
+                }
             }
-            false
-        }
-
-        val menuHelper = MenuPopupHelper(view.context, menu.menu as MenuBuilder, view)
-        menuHelper.setForceShowIcon(true)
-        menuHelper.show()
+        }.show(this, view)
     }
 }

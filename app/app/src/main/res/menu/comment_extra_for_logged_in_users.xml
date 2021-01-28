@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/menuSaveOrUnsaveComment"
-        android:title="@string/saveComment"
-        android:icon="@drawable/ic_bookmark_24dp"/>
-</menu>

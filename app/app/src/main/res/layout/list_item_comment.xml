@@ -9,7 +9,6 @@
         <import type="android.graphics.Typeface" />
         <import type="com.example.hakonsreader.views.util.ClickHandler"/>
         <import type="com.example.hakonsreader.views.util.ViewUtil"/>
-        <import type="com.example.hakonsreader.views.util.MenuClickHandler"/>
         <import type="com.example.hakonsreader.App"/>
         <import type="com.example.hakonsreader.api.model.RedditUser"/>
         <import type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
@@ -291,7 +290,7 @@
 
             android:background="@null"
             android:foreground="@drawable/ripple_main_bg"
-            android:onClick="@{(view) -> CommentsMenuHandlerKt.peekParentOnClick(view.context, comment)}"
+            android:onClick="@{(view) -> CommentsMenuHandlerKt.peekCommentOnClick(view.context, adapter.getCommentById(comment.parentId))}"
             android:src="@drawable/ic_visibility_24dp"
             android:visibility="@{showPeekParentButton &amp;&amp; comment.depth != 0 ? View.VISIBLE : View.GONE}"
 

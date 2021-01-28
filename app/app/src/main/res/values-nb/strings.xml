@@ -331,4 +331,6 @@
     <string name="updateFlair">Oppdater flair</string>
     <string name="flair">Flair</string>
     <string name="flairsNotAllowedOnSubreddit">Denne subredditen tillater ikke brukere å sette flairs</string>
+    <string name="postMenuSectionModeration">Moderasjon</string>
+    <string name="commentMenuSectionModeration">Moderasjon</string>
 </resources>
