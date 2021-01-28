@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
+import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.TokenManager
@@ -88,11 +89,30 @@ fun showPopupSortWithTime(view: View) {
         return
     }
 
+    val sortText = when (sortable.currentSort()) {
+        SortingMethods.NEW -> context.getString(R.string.sortNew)
+        SortingMethods.HOT -> context.getString(R.string.sortHot)
+        SortingMethods.TOP -> context.getString(R.string.sortTop)
+        SortingMethods.CONTROVERSIAL -> context.getString(R.string.sortControversial)
+    }
+
+    val timeSortText = when (sortable.currentTimeSort()) {
+        PostTimeSort.HOUR -> context.getString(R.string.sortNow)
+        PostTimeSort.DAY -> context.getString(R.string.sortToday)
+        PostTimeSort.WEEK -> context.getString(R.string.sortWeek)
+        PostTimeSort.MONTH -> context.getString(R.string.sortMonth)
+        PostTimeSort.YEAR -> context.getString(R.string.sortYear)
+        PostTimeSort.ALL_TIME -> context.getString(R.string.sortAllTime)
+        else -> null
+    }
+
+    val finalTitle = sortText + if (timeSortText != null) " - $timeSortText" else ""
+
     popupMenu {
         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
 
         section {
-            // TODO title = current sort
+            title = finalTitle
 
             item {
                 labelRes = R.string.sortNew

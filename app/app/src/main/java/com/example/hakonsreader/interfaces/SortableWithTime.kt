@@ -1,6 +1,7 @@
 package com.example.hakonsreader.interfaces
 
 import com.example.hakonsreader.api.enums.PostTimeSort
+import com.example.hakonsreader.api.enums.SortingMethods
 
 /**
  * Interface for fragments/activities that have some sort of sorting (eg. posts that can be sorted
@@ -30,4 +31,16 @@ interface SortableWithTime {
      * @param timeSort The time sort to sort by
      */
     fun controversial(timeSort: PostTimeSort)
+
+    /**
+     * Gets the current sort
+     */
+    fun currentSort() : SortingMethods
+
+    /**
+     * Gets the current time sort
+     *
+     * @return A PostTimeSort, or null if the current sort doesn't have a time sort
+     */
+    fun currentTimeSort() : PostTimeSort?
 }

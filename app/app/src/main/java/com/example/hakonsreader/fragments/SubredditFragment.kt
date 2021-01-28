@@ -791,6 +791,17 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         postsViewModel?.restart(SortingMethods.CONTROVERSIAL, timeSort)
     }
 
+    override fun currentSort(): SortingMethods {
+        return postsViewModel?.sort ?: SortingMethods.HOT
+    }
+
+    override fun currentTimeSort(): PostTimeSort? {
+        return when (postsViewModel?.sort) {
+            SortingMethods.TOP, SortingMethods.CONTROVERSIAL -> postsViewModel?.timeSort
+            else -> null
+        }
+    }
+
     override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
         binding.privatelyBrowsing = privatelyBrowsing
         binding.subredditIcon.borderColor = ContextCompat.getColor(

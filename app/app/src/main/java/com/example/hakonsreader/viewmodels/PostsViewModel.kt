@@ -34,8 +34,10 @@ class PostsViewModel(
     private val loadingChange = MutableLiveData<Boolean>()
     private val error = MutableLiveData<ErrorWrapper>()
 
-    private var sort: SortingMethods = SortingMethods.HOT
-    private var timeSort: PostTimeSort = PostTimeSort.DAY
+    var sort: SortingMethods = SortingMethods.HOT
+        private set
+    var timeSort: PostTimeSort = PostTimeSort.DAY
+        private set
 
     /**
      * The post IDs refer to the IDs of the posts this ViewModel is currently tracking.
