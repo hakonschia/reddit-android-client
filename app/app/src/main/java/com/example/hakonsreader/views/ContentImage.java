@@ -14,7 +14,7 @@ import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentImageBinding;
 import com.example.hakonsreader.enums.ShowNsfwPreview;
-import com.example.hakonsreader.views.util.ClickHandler;
+import com.example.hakonsreader.views.util.ClickHandlerKt;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -101,7 +101,7 @@ public class ContentImage extends Content {
             }
         }
 
-        setOnClickListener(v -> ClickHandler.openImageInFullscreen(binding.image, imageUrl));
+        setOnClickListener(v -> ClickHandlerKt.openImageInFullscreen(binding.image, imageUrl));
 
         String obfuscatedUrl = null;
         int noImageId = -1;

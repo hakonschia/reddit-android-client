@@ -6,7 +6,7 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.example.hakonsreader.views.util.ClickHandler"/>
+        <import type="com.example.hakonsreader.views.util.ClickHandlerKt"/>
         <import type="com.example.hakonsreader.recyclerviewadapters.InboxAdapterKt"/>
         <import type="com.example.hakonsreader.recyclerviewadapters.menuhandlers.InboxMenuHandlerKt"/>
 
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, message.author)}"
+            android:onClick="@{(view) -> ClickHandlerKt.openProfileInActivity(view, message.author)}"
             android:text='@{message != null ? @string/author_prefixed(message.author) : "" }'
             android:textStyle="bold"
             textColorFromRedditDistinguish="@{message.distinguished}"
@@ -69,7 +69,7 @@
 
             android:ellipsize="end"
             android:maxLines="1"
-            android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, message.subreddit)}"
+            android:onClick="@{(view) -> ClickHandlerKt.openSubredditInActivity(view, message.subreddit)}"
             android:text='@{message.subreddit != null ? @string/subreddit_prefixed(message.subreddit) : ""}'
             android:textColor="@color/link_color"
             android:textStyle="bold"

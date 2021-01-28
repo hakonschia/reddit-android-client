@@ -6,7 +6,7 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.example.hakonsreader.views.util.ClickHandler"/>
+        <import type="com.example.hakonsreader.views.util.ClickHandlerKt"/>
 
         <variable
             name="post"
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, post.subreddit)}"
+            android:onClick="@{(view) -> ClickHandlerKt.openSubredditInActivity(view, post.subreddit)}"
             android:text='@{post.subreddit != null ? @string/subreddit_prefixed(post.subreddit) : ""}'
             android:textColor="@color/link_color"
             android:textStyle="bold"
@@ -158,7 +158,7 @@
             android:ellipsize="end"
             android:maxLines="1"
 
-            android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, post.author)}"
+            android:onClick="@{(view) -> ClickHandlerKt.openProfileInActivity(view, post.author)}"
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
             android:text='@{post != null ? @string/author_prefixed(post.author) : "" }'
@@ -288,7 +288,7 @@
             android:textColor="@color/link_color"
             android:textSize="13sp"
 
-            android:onClick="@{(view) -> ClickHandler.openSubredditInActivity(view, crosspost.subreddit)}"
+            android:onClick="@{(view) -> ClickHandlerKt.openSubredditInActivity(view, crosspost.subreddit)}"
             android:text='@{post.subreddit != null ? @string/subreddit_prefixed(crosspost.subreddit) : ""}'
 
             app:layout_constraintStart_toEndOf="@+id/crosspostFrom"

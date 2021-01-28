@@ -7,7 +7,7 @@
     <data>
         <import type="android.view.View" />
         <import type="android.graphics.Typeface" />
-        <import type="com.example.hakonsreader.views.util.ClickHandler"/>
+        <import type="com.example.hakonsreader.views.util.ClickHandlerKt"/>
         <import type="com.example.hakonsreader.views.util.ViewUtil"/>
         <import type="com.example.hakonsreader.App"/>
         <import type="com.example.hakonsreader.api.model.RedditUser"/>
@@ -88,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:onClick="@{(view) -> ClickHandler.openProfileInActivity(view, comment.author)}"
+            android:onClick="@{(view) -> ClickHandlerKt.openProfileInActivity(view, comment.author)}"
             android:onLongClick="@{view -> adapter.hideCommentsLongClick(view, comment)}"
             android:text='@{comment != null ? @string/author_prefixed(comment.author) : "" }'
 

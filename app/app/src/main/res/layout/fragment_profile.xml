@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="android.view.View" />
-        <import type="com.example.hakonsreader.views.util.ClickHandler"/>
+        <import type="com.example.hakonsreader.views.util.ClickHandlerKt"/>
         <import type="com.example.hakonsreader.views.util.MenuClickHandlerKt"/>
 
         <variable
@@ -45,7 +45,7 @@
             android:id="@+id/profilePicture"
             android:layout_width="@dimen/userAndSubredditIconSizePreAnim"
             android:layout_height="@dimen/userAndSubredditIconSizePreAnim"
-            android:onClick="@{view -> ClickHandler.openImageInFullscreen(view, user.profilePicture)}"
+            android:onClick="@{view -> ClickHandlerKt.openImageInFullscreen(view, user.profilePicture)}"
 
             android:src="@drawable/ic_baseline_person_100"
             app:profilePicture='@{user != null ? user.profilePicture : ""}'

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="com.example.hakonsreader.views.util.ClickHandler" />
+        <import type="com.example.hakonsreader.views.util.ClickHandlerKt" />
 
         <variable
             name="listing"
@@ -93,7 +93,7 @@
             android:contentDescription="@string/btnAddComment"
             android:enabled="false"
             android:onClick="sendReply"
-            android:onLongClick="@{(view) -> ClickHandler.showToastWithContentDescription(view)}"
+            android:onLongClick="@{(view) -> ClickHandlerKt.showToastWithContentDescription(view)}"
 
             android:background="@drawable/image_button_background"
             android:tint="@color/text_color"
