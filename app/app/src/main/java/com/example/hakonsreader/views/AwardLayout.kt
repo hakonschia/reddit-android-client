@@ -113,7 +113,7 @@ class AwardLayout : FrameLayout {
         listing?.let {
             var totalPrice = 0
             it.awardings?.forEach { award ->
-                totalPrice += award.price
+                totalPrice += award.price * award.count
             }
 
             val isPost = if (listing is RedditPost) {
