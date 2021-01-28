@@ -50,7 +50,7 @@ class SubredditRepository(
         when (val resp = api.info()) {
             is ApiResponse.Success -> {
                 infoLoaded = true
-                dao.update(resp.value)
+                dao.insert(resp.value)
             }
             is ApiResponse.Error -> {
                 _errors.postValue(ErrorWrapper(resp.error, resp.throwable))
