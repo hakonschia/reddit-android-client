@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.model.Image;
@@ -43,7 +45,7 @@ public class ContentGallery extends Content {
 
     private final ContentGalleryBinding binding;
     private List<Image> images;
-    private List<ContentGalleryImage> galleryViews = new ArrayList<>();
+    private final List<ContentGalleryImage> galleryViews = new ArrayList<>();
 
     /**
      * The current Slidr lock this view has called. This should be checked to make sure duplicate calls
@@ -92,7 +94,7 @@ public class ContentGallery extends Content {
         float widthScale = screenWidth / (float)maxWidth;
         setLayoutParams(new ViewGroup.LayoutParams(screenWidth, (int) (maxHeight * widthScale)));
 
-        ImageAdapter adapter = new ImageAdapter(getContext(), images);
+        Adapter adapter = new Adapter(images);
         binding.galleryImages.setAdapter(adapter);
 
         // Keep a maximum of 5 items at a time, or 2 when data saving is enabled. This should probably
@@ -101,15 +103,16 @@ public class ContentGallery extends Content {
         int offscreenLimit = App.Companion.get().dataSavingEnabled() ? 2 : 5;
         binding.galleryImages.setOffscreenPageLimit(offscreenLimit);
 
-        binding.galleryImages.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            ContentGalleryImage currentView;
+        binding.galleryImages.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            ContentGalleryImage currentView = null;
 
             @Override
             public void onPageSelected(int position) {
+                super.onPageSelected(position);
                 setActiveImageText(position);
 
                 // Make sure the slidr is locked when not on the first item, so that swiping right will
-                // swipe on the gallery, not remove the activity
+                // swipe on the gallery, not remove the activity (this would probably be wrong for RTL layouts?)
                 lockSlidr(position != 0);
 
                 // Unselect the previous and set new and select that
@@ -121,15 +124,6 @@ public class ContentGallery extends Content {
                 if (currentView != null) {
                     currentView.viewSelected();
                 }
-            }
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                // Not implemented
-            }
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                // Not implemented
             }
         });
 
@@ -220,51 +214,46 @@ public class ContentGallery extends Content {
     }
 
 
-    /**
-     * The pager adapter responsible for handling the images in the post
-     */
-    public class ImageAdapter extends PagerAdapter {
-        Context context;
-        List<Image> images;
+    private class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
+        private final List<Image> images;
 
-        public ImageAdapter(Context context, List<Image> images) {
-            this.context = context;
+        public Adapter(List<Image> images) {
             this.images = images;
         }
 
         @Override
-        public int getCount() {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            // Destroy previous image
+            holder.image.destroy();
+
+            Image image = images.get(position);
+            holder.image.setImage(image);
+            holder.image.setTag(position);
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            ContentGalleryImage view = new ContentGalleryImage(parent.getContext());
+            view.setPost(redditPost);
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            view.setLayoutParams(params);
+
+            galleryViews.add(view);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public int getItemCount() {
             return images.size();
         }
 
-        @NotNull
-        @Override
-        public Object instantiateItem(@NotNull ViewGroup container, final int position) {
-            //Image image = images.get(position % images.size());
-            Image image = images.get(position);
-
-            ContentGalleryImage view = new ContentGalleryImage(context);
-            view.setPost(redditPost);
-            view.setImage(image);
-            view.setTag(position);
-
-            container.addView(view);
-            galleryViews.add(position, view);
-
-            return view;
-        }
-
-        @Override
-        public boolean isViewFromObject(@NotNull View view, @NotNull Object object) {
-            return view == object;
-        }
-
-        @Override
-        public void destroyItem(@NotNull ViewGroup container, int position, @NotNull Object object) {
-            ContentGalleryImage view = (ContentGalleryImage) object;
-            galleryViews.remove(view);
-            view.destroy();
-            container.removeView(view);
+        private class ViewHolder extends RecyclerView.ViewHolder {
+            private final ContentGalleryImage image;
+            public ViewHolder(ContentGalleryImage image) {
+                super(image);
+                this.image = image;
+            }
         }
     }
 }
