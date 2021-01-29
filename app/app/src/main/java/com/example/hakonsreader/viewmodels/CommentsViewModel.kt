@@ -62,7 +62,7 @@ class CommentsViewModel: ViewModel() {
                 is ApiResponse.Success -> {
                     post.postValue(resp.value.post)
                     comments.postValue(resp.value.comments)
-                    database.posts().insert(resp.value.post)
+                    insertPostIntoDb(resp.value.post)
                 }
                 is ApiResponse.Error -> error.postValue(ErrorWrapper(resp.error, resp.throwable))
             }
@@ -134,5 +134,28 @@ class CommentsViewModel: ViewModel() {
 
         dataSet.add(posToInsert, newComment)
         comments.value = dataSet
+    }
+
+    private fun insertPostIntoDb(post: RedditPost) {
+        val crossposts = post.crossposts
+        val postsToInsertIntoDb = java.util.ArrayList<RedditPost>().apply {
+            add(post)
+        }
+
+        if (!crossposts.isNullOrEmpty()) {
+            val crosspostIds = java.util.ArrayList<String>()
+
+            // Insert all crossposts and copy the IDs and set that list on the post itself
+            // We have to store the crossposts by ID this way since room doesn't like it
+            // when there are RedditPost objects inside a RedditPost (or I just don't know how to)
+            for (crosspost in crossposts) {
+                postsToInsertIntoDb.add(crosspost)
+                crosspostIds.add(crosspost.id)
+            }
+
+            post.crosspostIds = crosspostIds
+        }
+
+        database.posts().insertAll(postsToInsertIntoDb)
     }
 }

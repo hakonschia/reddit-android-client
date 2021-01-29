@@ -17,11 +17,18 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.utils.thirdPartyJsonConverter
 import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
+import com.google.gson.internal.LinkedTreeMap
 import com.squareup.picasso.Callback
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class Post : Content {
@@ -102,7 +109,22 @@ class Post : Content {
      */
     private var postObserver = Observer<RedditPost> {
         if (it != null) {
-            updatePostInfo(it)
+            // Since crossposts aren't stored directly in the database we have to manually retrieve the
+            // crossposts again, otherwise when opening the post the crosspost won't be passed along
+            // which makes the crosspost subreddit say "r/null" until the post is loaded from the api again
+            // as well as failing to load some content
+            val crosspostIds = it.crosspostIds
+
+            if (crosspostIds?.isNotEmpty() == true) {
+                CoroutineScope(IO).launch {
+                    it.crossposts = App.get().database.posts().getPostsById(crosspostIds)
+                    withContext(Main) {
+                        updatePostInfo(it)
+                    }
+                }
+            } else {
+                updatePostInfo(it)
+            }
         }
     }
 
