@@ -50,6 +50,21 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Counter-Strike: Global Offensive" />
 
+            <TextView
+                android:id="@+id/createdAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+
+                android:layout_marginTop="4dp"
+                android:textColor="@color/secondary_text_color"
+
+                app:createdAtFullText="@{subreddit.createdAt}"
+                app:layout_constraintStart_toStartOf="parent"
+
+                app:layout_constraintTop_toBottomOf="@+id/name"
+                tools:text="Created 12. august 1997" />
+
             <com.robinhood.ticker.TickerView
                 android:id="@+id/subredditSubscribers"
                 android:layout_width="wrap_content"
@@ -70,7 +85,7 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/name"
+                app:layout_constraintTop_toBottomOf="@id/createdAt"
                 tools:text="523 123 subscribers" />
 
             <TextView

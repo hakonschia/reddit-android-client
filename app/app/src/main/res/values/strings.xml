@@ -489,5 +489,5 @@
     <string name="updateFlair">Update flair</string>
     <string name="flairUpdated">Flair updated</string>
     <string name="flairsNotAllowedOnSubreddit">This subreddit doesn\'t allow users to assign flairs</string>
-
+    <string name="subredditInfoCreatedAt">Created %s</string>
 </resources>

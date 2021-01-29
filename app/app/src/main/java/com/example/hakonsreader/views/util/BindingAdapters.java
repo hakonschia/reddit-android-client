@@ -11,8 +11,11 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
 import com.example.hakonsreader.misc.Util;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.annotation.Nullable;
 
@@ -39,6 +42,25 @@ public class BindingAdapters {
             Duration between = Duration.between(created, now);
 
             textView.setText(Util.createAgeText(textView.getResources(), between));
+        }
+    }
+
+    /**
+     * Binding adapter for setting a text for when something was created. The text is formatted as
+     * "Created 1. january 1970"
+     *
+     * @param textView The textView to set the text on
+     * @param createdAt The timestamp (seconds) the post was created at. If this is negative nothing is done
+     */
+    @BindingAdapter({"createdAtFullText"})
+    public static void setCreatedAtFullText(TextView textView, long createdAt) {
+        if (createdAt >= 0) {
+            SimpleDateFormat format = new SimpleDateFormat("d. MMMM y", Locale.getDefault());
+            // Seconds is given, milliseconds is expected
+            Date date = new Date(createdAt * 1000L);
+
+            String full = textView.getResources().getString(R.string.subredditInfoCreatedAt, format.format(date));
+            textView.setText(full);
         }
     }
 
