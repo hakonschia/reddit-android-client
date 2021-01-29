@@ -122,11 +122,6 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:26.3.0')
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
-    // Stetho
-    final def stetho_version = '1.5.1'
-    implementation "com.facebook.stetho:stetho:$stetho_version"
-    implementation "com.facebook.stetho:stetho-okhttp3:$stetho_version"
-
     // Lifecycle
     final def lifecycle_version = '2.2.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"

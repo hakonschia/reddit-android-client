@@ -13,7 +13,6 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.*
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -279,7 +278,6 @@ class RedditApi constructor(
         val logger = HttpLoggingInterceptor().apply {
             level = loggerLevel ?: HttpLoggingInterceptor.Level.NONE
         }
-        val stethoInterceptor = StethoInterceptor()
 
         val cacheInterceptor = Interceptor { chain ->
             val request = chain.request().newBuilder()
@@ -290,13 +288,16 @@ class RedditApi constructor(
         }
 
         // Http client for API calls that use an access token as the authorization
-        val apiClient = OkHttpClient.Builder() // Automatically refresh access token on authentication errors (401)
-                .authenticator(Authenticator()) // Add User-Agent header to every request
-                .addInterceptor(UserAgentInterceptor(userAgent)) // Ensure that an access token is always set before sending a request
-                .addInterceptor(TokenInterceptor()) // Add stetho interceptor for enhanced network debugging in Android
-                .addNetworkInterceptor(stethoInterceptor)
+        val apiClient = OkHttpClient.Builder()
+                // Automatically refresh access token on authentication errors (401)
+                .authenticator(Authenticator())
+                // Add User-Agent header to every request
+                .addInterceptor(UserAgentInterceptor(userAgent))
+                // Ensure that an access token is always set before sending a request
+                .addInterceptor(TokenInterceptor())
                 .addNetworkInterceptor(cacheInterceptor)
-                .cache(cache) // Logger has to be at the end or else it won't log what has been added before
+                .cache(cache)
+                // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(logger)
                 .build()
 
@@ -332,7 +333,6 @@ class RedditApi constructor(
                                 .build()
                         chain.proceed(request)
                     }
-                    .addNetworkInterceptor(stethoInterceptor)
                     .addInterceptor(thirdPartyCacheInterceptor)
                     .cache(thirdPartyCache)
                     .addInterceptor(logger)
@@ -348,7 +348,6 @@ class RedditApi constructor(
         }
 
         val gfycatClient = OkHttpClient.Builder()
-                .addNetworkInterceptor(stethoInterceptor)
                 .addInterceptor(thirdPartyCacheInterceptor)
                 .cache(thirdPartyCache)
                 .addInterceptor(logger)
@@ -366,8 +365,8 @@ class RedditApi constructor(
         // Http client for OAuth related API calls (such as retrieving access tokens)
         // The service created with this is for "RedditApi.accessToken()"
         val oauthClient = OkHttpClient.Builder()
-                .addInterceptor(BasicAuthInterceptor()) // Add stetho interceptor for enhanced network debugging in Android
-                .addNetworkInterceptor(StethoInterceptor()) // Logger has to be at the end or else it won't log what has been added before
+                .addInterceptor(BasicAuthInterceptor())
+                // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(logger)
                 .build()
 

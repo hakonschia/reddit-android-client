@@ -3,6 +3,7 @@ package com.example.hakonsreader.views.util;
 import android.content.Context;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 
@@ -16,8 +17,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Locale;
-
-import javax.annotation.Nullable;
 
 
 /**

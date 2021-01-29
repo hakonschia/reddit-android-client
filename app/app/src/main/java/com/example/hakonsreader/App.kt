@@ -22,7 +22,6 @@ import com.example.hakonsreader.markwonplugins.*
 import com.example.hakonsreader.misc.SharedPreferencesManager
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
-import com.facebook.stetho.Stetho
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
@@ -152,9 +151,9 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         set()
-        val dm = resources.displayMetrics
         createInboxNotificationChannel()
 
+        val dm = resources.displayMetrics
         // Technically this could go outdated if the user changes their resolution while the app is running
         // but I highly doubt that would ever be a problem (worst case is posts wouldn't fit the screen)
         screenWidth = dm.widthPixels
@@ -164,10 +163,6 @@ class App : Application() {
         SharedPreferencesManager.create(prefs)
 
         updateTheme()
-
-        if (BuildConfig.DEBUG) {
-            Stetho.initializeWithDefaults(this)
-        }
 
         // Remove records that are older than 2 days, as they likely won't be used again
         CoroutineScope(IO).launch {

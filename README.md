@@ -104,6 +104,5 @@ Thank you to Reddit for making this project possible by providing an open API.
 * [Ticker](https://github.com/robinhood/ticker) - A ticker style TextView that smoothly animates changes (by sliding characters up/down)
 * [Material Popup Menu](https://github.com/zawadz88/MaterialPopupMenu) - For popup menus
 * [ProcessPhoenix](https://github.com/JakeWharton/ProcessPhoenix) - Used to restart the application
-* [Stetho](https://github.com/facebook/stetho) - For network debugging
 
 As well as various code snippets acknowledged throughout the code.
