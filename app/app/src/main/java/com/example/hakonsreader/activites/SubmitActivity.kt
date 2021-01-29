@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.App
@@ -25,14 +24,12 @@ import com.example.hakonsreader.databinding.ActivitySubmitBinding
 import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
 import com.example.hakonsreader.databinding.SubmissionLinkBinding
 import com.example.hakonsreader.databinding.SubmissionTextBinding
-import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
 import com.example.hakonsreader.viewmodels.SubredditViewModel
 import com.example.hakonsreader.viewmodels.factories.SubredditFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
-import com.example.hakonsreader.views.util.ViewUtil
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope

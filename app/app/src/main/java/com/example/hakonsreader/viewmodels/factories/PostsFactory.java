@@ -1,7 +1,5 @@
 package com.example.hakonsreader.viewmodels.factories;
 
-import android.content.Context;
-
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 

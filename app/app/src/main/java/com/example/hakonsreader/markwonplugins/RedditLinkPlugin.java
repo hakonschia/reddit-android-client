@@ -1,24 +1,11 @@
 package com.example.hakonsreader.markwonplugins;
 
-import android.content.Context;
-import android.content.Intent;
 import android.text.Spannable;
 import android.text.Spanned;
-import android.text.TextPaint;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
 import android.text.style.URLSpan;
-import android.text.style.UnderlineSpan;
-import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-
-import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.DispatcherActivity;
-import com.example.hakonsreader.api.utils.LinkUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

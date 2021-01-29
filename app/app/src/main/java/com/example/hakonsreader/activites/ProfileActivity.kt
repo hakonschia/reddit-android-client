@@ -1,12 +1,8 @@
 package com.example.hakonsreader.activites
 
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.R
 import com.example.hakonsreader.fragments.ProfileFragment
-import com.example.hakonsreader.fragments.SubredditFragment
 import com.example.hakonsreader.interfaces.LockableSlidr
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface

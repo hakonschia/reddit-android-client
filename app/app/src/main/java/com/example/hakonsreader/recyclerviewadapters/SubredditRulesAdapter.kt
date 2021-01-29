@@ -9,7 +9,6 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.SubredditRule
 import com.example.hakonsreader.databinding.ListItemSubredditRuleBinding
 import com.example.hakonsreader.recyclerviewadapters.diffutils.SubredditRulesDiffCallback
-import com.example.hakonsreader.recyclerviewadapters.diffutils.SubredditsDiffCallback
 import com.example.hakonsreader.views.ListDivider
 
 /**

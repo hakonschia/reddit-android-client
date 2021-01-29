@@ -9,9 +9,7 @@ import androidx.core.util.Pair
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
-import com.example.hakonsreader.api.model.thirdparty.GfycatGif
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.model.thirdparty.ImgurGif
 import com.example.hakonsreader.databinding.ContentVideoBinding
 import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.interfaces.OnVideoFullscreenListener

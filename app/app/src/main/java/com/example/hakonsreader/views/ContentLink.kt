@@ -9,13 +9,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
-import androidx.databinding.DataBindingUtil
 import androidx.viewbinding.ViewBinding
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.api.model.Image
-import com.example.hakonsreader.databinding.ContentGalleryBinding
 import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
 import com.squareup.picasso.Picasso

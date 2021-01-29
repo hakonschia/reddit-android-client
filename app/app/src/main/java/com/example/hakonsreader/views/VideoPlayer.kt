@@ -13,7 +13,6 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R

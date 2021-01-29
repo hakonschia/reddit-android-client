@@ -5,14 +5,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.webkit.*
-import androidx.appcompat.widget.PopupMenu
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.view.menu.MenuPopupHelper
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.WebViewActivity.Companion.URL

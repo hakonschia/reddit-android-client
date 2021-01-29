@@ -3,17 +3,13 @@ package com.example.hakonsreader.misc;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcel;
 import android.text.Layout;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.URLSpan;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activites.DispatcherActivity;

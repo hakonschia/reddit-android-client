@@ -1,9 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 
 import android.view.View
-import androidx.appcompat.widget.PopupMenu
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.view.menu.MenuPopupHelper
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditMessage

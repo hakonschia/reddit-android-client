@@ -10,7 +10,6 @@ import android.widget.EditText
 import androidx.preference.*
 import com.example.hakonsreader.App.Companion.get
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.MainActivity
 import com.example.hakonsreader.interfaces.LanguageListener
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
 import com.google.firebase.crashlytics.ktx.crashlytics

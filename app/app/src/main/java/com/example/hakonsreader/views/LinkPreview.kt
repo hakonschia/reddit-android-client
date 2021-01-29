@@ -5,15 +5,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.net.Uri
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.DispatcherActivity

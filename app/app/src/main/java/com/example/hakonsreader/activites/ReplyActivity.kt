@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.ReplyActivity.Companion.LISTING_KEY

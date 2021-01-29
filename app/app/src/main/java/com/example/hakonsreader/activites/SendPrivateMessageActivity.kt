@@ -1,8 +1,6 @@
 package com.example.hakonsreader.activites
 
-import android.content.Context
 import android.os.Bundle
-import android.view.inputmethod.InputMethodManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.databinding.ActivitySendPrivateMessageBinding

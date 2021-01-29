@@ -12,11 +12,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.databinding.ObservableField
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
@@ -32,7 +30,6 @@ import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
-import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
@@ -54,14 +51,11 @@ import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.util.ViewUtil
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.robinhood.ticker.TickerUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservable {
 

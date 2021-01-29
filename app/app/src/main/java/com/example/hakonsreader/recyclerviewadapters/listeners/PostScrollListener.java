@@ -1,6 +1,5 @@
 package com.example.hakonsreader.recyclerviewadapters.listeners;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;

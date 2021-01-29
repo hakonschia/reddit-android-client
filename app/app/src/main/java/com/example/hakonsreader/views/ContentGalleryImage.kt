@@ -10,7 +10,6 @@ import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
-import com.example.hakonsreader.misc.InternalLinkMovementMethod
 
 class ContentGalleryImage : FrameLayout {
     companion object {

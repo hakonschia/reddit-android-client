@@ -4,15 +4,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowInsets
 import android.view.WindowManager
-import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.views.Content
-import com.example.hakonsreader.views.ContentVideo
 import com.example.hakonsreader.views.VideoPlayer
-import com.google.gson.Gson
 import com.r0adkll.slidr.Slidr
 
 /**

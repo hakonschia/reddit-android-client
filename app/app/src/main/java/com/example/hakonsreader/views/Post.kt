@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
@@ -17,12 +16,10 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.utils.thirdPartyJsonConverter
 import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
-import com.google.gson.internal.LinkedTreeMap
 import com.squareup.picasso.Callback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO

@@ -6,9 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.FrameLayout
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.hakonsreader.activites.PostActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.PostInfoBinding

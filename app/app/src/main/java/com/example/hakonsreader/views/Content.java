@@ -12,8 +12,6 @@ import androidx.core.util.Pair;
 
 import com.example.hakonsreader.api.model.RedditPost;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 

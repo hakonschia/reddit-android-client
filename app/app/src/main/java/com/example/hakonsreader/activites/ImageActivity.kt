@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils

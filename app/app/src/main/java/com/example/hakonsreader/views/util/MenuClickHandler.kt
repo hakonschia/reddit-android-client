@@ -3,8 +3,6 @@ package com.example.hakonsreader.views.util
 import android.app.AlertDialog
 import android.content.Context
 import android.view.*
-import androidx.annotation.IdRes
-import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.hakonsreader.App

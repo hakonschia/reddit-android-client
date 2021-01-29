@@ -2,23 +2,17 @@ package com.example.hakonsreader.viewmodels.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.requestmodels.SubredditRequest
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.viewmodels.ErrorWrapper
-import com.example.hakonsreader.views.util.ViewUtil
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SubredditRepository(
         private val subredditName: String,

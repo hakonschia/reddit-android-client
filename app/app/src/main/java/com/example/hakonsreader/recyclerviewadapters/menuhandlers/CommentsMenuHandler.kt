@@ -4,14 +4,10 @@ import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.view.menu.MenuPopupHelper
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditComment
