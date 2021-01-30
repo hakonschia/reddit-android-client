@@ -4,10 +4,7 @@ import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
-import com.example.hakonsreader.api.interfaces.ReplyableRequest
-import com.example.hakonsreader.api.interfaces.ReportableRequest
-import com.example.hakonsreader.api.interfaces.SaveableRequest
-import com.example.hakonsreader.api.interfaces.VoteableRequest
+import com.example.hakonsreader.api.interfaces.*
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
@@ -28,7 +25,7 @@ class PostRequest(
         private val postId: String,
         imgurApi: ImgurService?,
         gfycatApi: GfycatService
-) : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest {
+) : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest, LockableRequest {
 
     private val voteRequest: VoteableRequestModel = VoteableRequestModel(accessToken, api)
     private val replyRequest: ReplyableRequestModel = ReplyableRequestModel(accessToken, api)
@@ -407,7 +404,7 @@ class PostRequest(
      * @return No response data is returned
      * @see unlock
      */
-    suspend fun lock() : ApiResponse<Any?> {
+    override suspend fun lock() : ApiResponse<Any?> {
         return modRequest.lock(postId, true)
     }
 
@@ -419,7 +416,7 @@ class PostRequest(
      * @return No response data is returned
      * @see lock
      */
-    suspend fun unlock() : ApiResponse<Any?> {
+    override suspend fun unlock() : ApiResponse<Any?> {
         return modRequest.unlock(postId, true)
     }
 

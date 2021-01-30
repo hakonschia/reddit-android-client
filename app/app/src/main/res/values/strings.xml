@@ -385,6 +385,10 @@
     <string name="menuPostUnmarkNsfw">Unmark as NSFW</string>
     <string name="menuPostMarkSpoiler">Mark as spoiler</string>
     <string name="menuPostUnmarkSpoiler">Unmark as spoiler</string>
+    <string name="menuPostLock">Lock</string>
+    <string name="menuPostUnlock">Unlock</string>
+    <string name="menuCommentLock">Lock</string>
+    <string name="menuCommentUnlock">Unlock</string>
 
     <string name="lockComment">Lock</string>
 

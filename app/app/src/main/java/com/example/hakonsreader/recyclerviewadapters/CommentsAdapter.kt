@@ -10,6 +10,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.UiThread
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -170,6 +171,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      *
      * @param comment The comment updated
      */
+    @UiThread
     fun notifyItemChanged(comment: RedditComment) {
         val pos = comments.indexOf(comment)
         if (pos != -1) {

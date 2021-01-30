@@ -19,7 +19,7 @@ import com.google.gson.internal.LinkedTreeMap
 
 @Entity(tableName = "posts")
 @TypeConverters(PostConverter::class)
-class RedditPost : RedditListing(), VoteableListing, ReplyableListing, ReportableListing, AwardableListing {
+class RedditPost : RedditListing(), VoteableListing, ReplyableListing, ReportableListing, AwardableListing, LockableListing {
 
     /**
      * The title of the post
@@ -94,7 +94,7 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
      * Locked posts cannot be commented on
      */
     @SerializedName("locked")
-    var isLocked = false
+    override var isLocked = false
 
     /**
      * True if the post is stickied

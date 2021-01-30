@@ -30,6 +30,7 @@ class ContentYoutubeVideo : Content {
         // The previews will (I believe) never be above 1080p, and that should be fine for most devices
         var previews: List<Image>? = redditPost.getPreviewImages()
 
+        // TODO spoiler
         if (redditPost.isNsfw) {
             val obfuscatedPreviews: List<Image>? = redditPost.getObfuscatedPreviewImages()
             if (!obfuscatedPreviews.isNullOrEmpty()) {

@@ -148,6 +148,18 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                     callback = { stickyOnClick(view, post) }
                 }
 
+                item {
+                    if (post.isLocked) {
+                        labelRes = R.string.menuPostUnlock
+                        icon = R.drawable.ic_baseline_lock_open_24
+                    } else {
+                        labelRes = R.string.menuPostLock
+                        icon = R.drawable.ic_lock_24dp
+                    }
+
+                    callback = { lockListingOnClick(view, post) }
+                }
+
                 // Don't create the nsfw/spoiler items if the user is also the poster, as they will
                 // have it under the section above already
                 // I don't know how to create and return an "item" from a function, so I'll have to just

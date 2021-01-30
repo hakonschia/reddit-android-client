@@ -334,4 +334,12 @@
     <string name="postMenuSectionModeration">Moderasjon</string>
     <string name="commentMenuSectionModeration">Moderasjon</string>
     <string name="subredditInfoCreatedAt">Opprettet %s</string>
+    <string name="menuPostMarkNsfw">Vis som NSFW</string>
+    <string name="menuPostMarkSpoiler">Vis som spoiler</string>
+    <string name="menuPostUnmarkNsfw">Ikke vis som NSFW</string>
+    <string name="menuPostUnmarkSpoiler">Ikke vis som spoiler</string>
+    <string name="menuPostLock">Lås</string>
+    <string name="menuCommentLock">Lås</string>
+    <string name="menuCommentUnlock">Lås opp</string>
+    <string name="menuPostUnlock">Lås opp</string>
 </resources>

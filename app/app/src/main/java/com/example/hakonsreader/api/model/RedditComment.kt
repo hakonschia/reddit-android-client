@@ -1,10 +1,7 @@
 package com.example.hakonsreader.api.model
 
 import com.example.hakonsreader.api.enums.VoteType
-import com.example.hakonsreader.api.interfaces.AwardableListing
-import com.example.hakonsreader.api.interfaces.ReplyableListing
-import com.example.hakonsreader.api.interfaces.ReportableListing
-import com.example.hakonsreader.api.interfaces.VoteableListing
+import com.example.hakonsreader.api.interfaces.*
 import com.example.hakonsreader.api.jsonadapters.BooleanAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
@@ -13,7 +10,7 @@ import com.example.hakonsreader.api.responses.ListingResponse
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 
-class RedditComment : RedditListing(), VoteableListing, ReplyableListing, ReportableListing, AwardableListing {
+class RedditComment : RedditListing(), VoteableListing, ReplyableListing, ReportableListing, AwardableListing, LockableListing {
 
     /**
      * The body of comment in Markdown
@@ -85,7 +82,7 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing, Report
      * True if the comment is locked and cannot be replied to
      */
     @SerializedName("locked")
-    var isLocked = false
+    override var isLocked = false
 
     /**
      * True if the comment is stickied

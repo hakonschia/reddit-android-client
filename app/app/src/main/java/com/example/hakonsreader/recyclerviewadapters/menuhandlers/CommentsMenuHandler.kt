@@ -115,6 +115,18 @@ fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAd
                         callback = { stickyOnClick(view, comment, adapter) }
                     }
                 }
+
+                item {
+                    if (comment.isLocked) {
+                        labelRes = R.string.menuPostUnlock
+                        icon = R.drawable.ic_baseline_lock_open_24
+                    } else {
+                        labelRes = R.string.menuPostLock
+                        icon = R.drawable.ic_lock_24dp
+                    }
+
+                    callback = { lockListingOnClick(view, comment, adapter) }
+                }
             }
         }
 
