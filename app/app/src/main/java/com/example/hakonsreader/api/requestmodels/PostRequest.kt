@@ -286,6 +286,119 @@ class PostRequest(
         return modRequest.unignoreReports(Thing.POST, postId)
     }
 
+    /**
+     * Mark the post as NSFW
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see unmarkNsfw
+     */
+    suspend fun markNsfw() : ApiResponse<Any?> {
+        return markNsfwInternal(true)
+    }
+
+    /**
+     * Unmark the post as NSFW
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see markNsfw
+     */
+    suspend fun unmarkNsfw() : ApiResponse<Any?> {
+        return markNsfwInternal(false)
+    }
+
+    /**
+     * Internal function to mark/unmark the post as NSFW
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     */
+    private suspend fun markNsfwInternal(markNsfw: Boolean) : ApiResponse<Any?> {
+        try {
+            verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot adjust NSFW marks on posts without an access token for a logged in user", e))
+        }
+        val fullname = createFullName(Thing.POST, postId)
+
+        return try {
+            val response = if (markNsfw) {
+                api.markNsfw(fullname)
+            } else {
+                api.unmarkNsfw(fullname)
+            }
+
+            if (response.isSuccessful) {
+                ApiResponse.Success(null)
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Mark the post as a spoiler
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see unmarkSpoiler
+     */
+    suspend fun markSpoiler() : ApiResponse<Any?> {
+        return markSpoilerInternal(true)
+    }
+
+    /**
+     * Unmark the post as a spoiler
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see markSpoiler
+     */
+    suspend fun unmarkSpoiler() : ApiResponse<Any?> {
+        return markSpoilerInternal(false)
+    }
+
+    /**
+     * Internal function to mark/unmark the post as NSFW
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @param markSpoiler True to mark as spoiler, false to unmark
+     * @return An [ApiResponse] with no success data
+     */
+    private suspend fun markSpoilerInternal(markSpoiler: Boolean) : ApiResponse<Any?> {
+        try {
+            verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot adjust spoiler on posts without an access token for a logged in user", e))
+        }
+        val fullname = createFullName(Thing.POST, postId)
+
+        return try {
+            val response = if (markSpoiler) {
+                api.markSpoiler(fullname)
+            } else {
+                api.unmarkSpoiler(fullname)
+            }
+
+            if (response.isSuccessful) {
+                ApiResponse.Success(null)
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
     suspend fun delete() : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)

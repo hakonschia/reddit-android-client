@@ -68,4 +68,53 @@ interface PostService : VoteService, ReplyService, SaveService, ModService {
     @POST("api/del")
     @FormUrlEncoded
     suspend fun delete(@Field("id") fullname: String) : Response<Any>
+
+
+    /**
+     * Mark a post as NSFW
+     *
+     * OAuth scope required: *modposts*
+     *
+     * @param fullname The fullname of the post
+     * @return The response returns no data
+     */
+    @POST("api/marknsfw")
+    @FormUrlEncoded
+    suspend fun markNsfw(@Field("id") fullname: String) : Response<Void>
+
+    /**
+     * Unmark a post as NSFW
+     *
+     * OAuth scope required: *modposts*
+     *
+     * @param fullname The fullname of the post
+     * @return The response returns no data
+     */
+    @POST("api/unmarknsfw")
+    @FormUrlEncoded
+    suspend fun unmarkNsfw(@Field("id") fullname: String) : Response<Void>
+
+    /**
+     * Mark a post as a spoiler
+     *
+     * OAuth scope required: *modposts*
+     *
+     * @param fullname The fullname of the post
+     * @return The response returns no data
+     */
+    @POST("api/spoiler")
+    @FormUrlEncoded
+    suspend fun markSpoiler(@Field("id") fullname: String) : Response<Void>
+
+    /**
+     * Unmark a post as a spoiler
+     *
+     * OAuth scope required: *modposts*
+     *
+     * @param fullname The fullname of the post
+     * @return The response returns no data
+     */
+    @POST("api/unspoiler")
+    @FormUrlEncoded
+    suspend fun unmarkSpoiler(@Field("id") fullname: String) : Response<Void>
 }
