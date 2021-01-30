@@ -143,6 +143,7 @@ class ModRequestModel(
     /**
      * Unignore reports on a post or comment
      *
+     * @return No response data is returned
      * @see ignoreReports
      */
     suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
@@ -167,4 +168,53 @@ class ModRequestModel(
         }
     }
 
+    /**
+     * Lock a post or comment
+     *
+     * @param id The id of the post/comment
+     * @param isPost True if a post is being locked, false if a comment is being locked
+     * @return No response data is returned
+     * @see unlock
+     */
+    suspend fun lock(id: String, isPost: Boolean) : ApiResponse<Any?> {
+        return lockInternal(if (isPost) Thing.POST else Thing.COMMENT, id, true)
+    }
+
+    /**
+     * Unlock a post or comment
+     *
+     * @param id The id of the post/comment
+     * @param isPost True if a post is being unlocked, false if a comment is being unlocked
+     * @return No response data is returned
+     * @see lock
+     */
+    suspend fun unlock(id: String, isPost: Boolean) : ApiResponse<Any?> {
+        return lockInternal(if (isPost) Thing.POST else Thing.COMMENT, id, false)
+    }
+
+    private suspend fun lockInternal(thing: Thing, id: String, lock: Boolean) : ApiResponse<Any?> {
+        try {
+            verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Cannot lock/unlock without a valid access token for a logged in user", e))
+        }
+
+        val fullname = createFullName(thing, id)
+
+        return try {
+            val resp = if (lock) {
+                api.lock(fullname)
+            } else {
+                api.unlock(fullname)
+            }
+
+            if (resp.isSuccessful) {
+                ApiResponse.Success(null)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
 }

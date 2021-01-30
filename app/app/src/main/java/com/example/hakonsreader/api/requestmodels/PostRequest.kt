@@ -399,6 +399,37 @@ class PostRequest(
         }
     }
 
+    /**
+     * Lock the post
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return No response data is returned
+     * @see unlock
+     */
+    suspend fun lock() : ApiResponse<Any?> {
+        return modRequest.lock(postId, true)
+    }
+
+    /**
+     * Unlock the post
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return No response data is returned
+     * @see lock
+     */
+    suspend fun unlock() : ApiResponse<Any?> {
+        return modRequest.unlock(postId, true)
+    }
+
+    /**
+     * Delete the post
+     *
+     * OAuth scope required: `edit`
+     *
+     * @return No response data is returned
+     */
     suspend fun delete() : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)

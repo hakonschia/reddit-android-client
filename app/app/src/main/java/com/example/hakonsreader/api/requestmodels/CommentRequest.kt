@@ -207,4 +207,28 @@ class CommentRequest(
         return modRequest.unignoreReports(Thing.COMMENT, commentId)
     }
 
+    /**
+     * Lock the comment
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return No response data is returned
+     * @see unlock
+     */
+    suspend fun lock() : ApiResponse<Any?> {
+        return modRequest.lock(commentId, false)
+    }
+
+    /**
+     * Unlock the comment
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return No response data is returned
+     * @see lock
+     */
+    suspend fun unlock() : ApiResponse<Any?> {
+        return modRequest.unlock(commentId, false)
+    }
+
 }

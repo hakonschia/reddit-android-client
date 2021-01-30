@@ -103,4 +103,28 @@ interface ModService {
     suspend fun unignoreReports(
             @Field("id") fullname: String
     ) : Response<JsonResponse<Void>>
+
+    /**
+     * Lock a post or comment
+     *
+     * OAuth scope required: *modposts*
+     *
+     * @param fullname The fullname of the post or comment
+     * @return The response returns no data
+     */
+    @POST("api/lock")
+    @FormUrlEncoded
+    suspend fun lock(@Field("id") fullname: String) : Response<Void>
+
+    /**
+     * Unlock a post or comment
+     *
+     * OAuth scope required: *modposts*
+     *
+     * @param fullname The fullname of the post or comment
+     * @return The response returns no data
+     */
+    @POST("api/unlock")
+    @FormUrlEncoded
+    suspend fun unlock(@Field("id") fullname: String) : Response<Void>
 }
