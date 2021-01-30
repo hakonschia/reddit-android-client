@@ -381,6 +381,10 @@
     <string name="postSticky">Sticky</string>
     <string name="postRemoveModDistinguish">Remove mod distinguish</string>
     <string name="postRemoveSticky">Remove sticky</string>
+    <string name="menuPostMarkNsfw">Mark as NSFW</string>
+    <string name="menuPostUnmarkNsfw">Unmark as NSFW</string>
+    <string name="menuPostMarkSpoiler">Mark as spoiler</string>
+    <string name="menuPostUnmarkSpoiler">Unmark as spoiler</string>
 
     <string name="lockComment">Lock</string>
 

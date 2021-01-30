@@ -12,6 +12,8 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.Util
+import com.github.zawadz88.materialpopupmenu.MaterialPopupMenu
+import com.github.zawadz88.materialpopupmenu.MaterialPopupMenuBuilder
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -84,6 +86,30 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                         icon = R.drawable.ic_delete_24dp
                         callback = { deletePostOnClick(view, post) }
                     }
+
+                    item {
+                        labelRes = if (post.isSpoiler) {
+                            R.string.menuPostUnmarkSpoiler
+                        } else {
+                            R.string.menuPostMarkSpoiler
+                        }
+
+                        // This would be kind of fun to have a car spoiler, but I'm definitely not going
+                        // to create that myself
+                        icon = R.drawable.ic_help_24dp
+                        callback = { markSpoilerOnClick(view, post) }
+                    }
+
+                    item {
+                        labelRes = if (post.isNsfw) {
+                            R.string.menuPostUnmarkNsfw
+                        } else {
+                            R.string.menuPostMarkNsfw
+                        }
+
+                        icon = R.drawable.ic_pin_icon_color_24dp
+                        callback = { markNsfwOnClick(view, post) }
+                    }
                 } else {
                     // Post NOT be logged in user
                     item {
@@ -120,6 +146,36 @@ fun showPopupForPost(view: View, post: RedditPost?) {
 
                     icon = R.drawable.ic_pin_icon_color_24dp
                     callback = { stickyOnClick(view, post) }
+                }
+
+                // Don't create the nsfw/spoiler items if the user is also the poster, as they will
+                // have it under the section above already
+                // I don't know how to create and return an "item" from a function, so I'll have to just
+                // copy the code from above
+                if (!post.author.equals(user?.username, ignoreCase = true)) {
+                    item {
+                        labelRes = if (post.isSpoiler) {
+                            R.string.menuPostUnmarkSpoiler
+                        } else {
+                            R.string.menuPostMarkSpoiler
+                        }
+
+                        // This would be kind of fun to have a car spoiler, but I'm definitely not going
+                        // to create that myself
+                        icon = R.drawable.ic_help_24dp
+                        callback = { markSpoilerOnClick(view, post) }
+                    }
+
+                    item {
+                        labelRes = if (post.isNsfw) {
+                            R.string.menuPostUnmarkNsfw
+                        } else {
+                            R.string.menuPostMarkNsfw
+                        }
+
+                        icon = R.drawable.ic_pin_icon_color_24dp
+                        callback = { markNsfwOnClick(view, post) }
+                    }
                 }
             }
         }
@@ -197,6 +253,60 @@ private fun stickyOnClick(view: View, post: RedditPost) {
             is ApiResponse.Error -> {
                 // Revert back
                 post.isStickied = !post.isStickied
+                db.posts().update(post)
+                Util.handleGenericResponseErrors(view, response.error, response.throwable)
+            }
+        }
+    }
+}
+
+private fun markNsfwOnClick(view: View, post: RedditPost) {
+    val api = App.get().api
+    val db = App.get().database
+
+    CoroutineScope(IO).launch {
+        val newNsfw = !post.isNsfw
+        post.isNsfw = newNsfw
+        db.posts().update(post)
+
+        val response = if (newNsfw) {
+            api.post(post.id).markNsfw()
+        } else {
+            api.post(post.id).unmarkNsfw()
+        }
+
+        when (response) {
+            is ApiResponse.Success -> { }
+            is ApiResponse.Error -> {
+                // Revert back
+                post.isNsfw = !post.isNsfw
+                db.posts().update(post)
+                Util.handleGenericResponseErrors(view, response.error, response.throwable)
+            }
+        }
+    }
+}
+
+private fun markSpoilerOnClick(view: View, post: RedditPost) {
+    val api = App.get().api
+    val db = App.get().database
+
+    CoroutineScope(IO).launch {
+        val newSpoiler = !post.isSpoiler
+        post.isSpoiler = newSpoiler
+        db.posts().update(post)
+
+        val response = if (newSpoiler) {
+            api.post(post.id).markSpoiler()
+        } else {
+            api.post(post.id).unmarkSpoiler()
+        }
+
+        when (response) {
+            is ApiResponse.Success -> { }
+            is ApiResponse.Error -> {
+                // Revert back
+                post.isSpoiler = !post.isSpoiler
                 db.posts().update(post)
                 Util.handleGenericResponseErrors(view, response.error, response.throwable)
             }
