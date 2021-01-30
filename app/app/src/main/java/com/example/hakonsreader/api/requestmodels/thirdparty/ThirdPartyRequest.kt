@@ -34,14 +34,6 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
      */
     suspend fun loadAll(posts: List<RedditPost>, indexToSpawnNewCoroutine: Int = 5) {
         posts.forEachIndexed { index, post ->
-            val func = when {
-                post.domain == "gfycat.com" -> this::loadGfycatGif
-                post.domain == "redgifs.com" -> this::loadRedgifGif
-                post.url.matches("https://(m\\.)?imgur\\.com/a/.+".toRegex()) -> this::loadImgurAlbum
-                post.url.matches("https://([im])\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
-                else -> null
-            } ?: return@forEachIndexed
-
             // If we are at the start of the list, we want to call the third party API calls immediately
             // Otherwise, the posts might be shown to the user and have the content generated before
             // the API call is done, which causes the Reddit content to be shown, instead of the third party content
@@ -51,10 +43,10 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             // can cause an extra delay of 10+ seconds
             if (index >= indexToSpawnNewCoroutine) {
                 CoroutineScope(IO).launch {
-                    func.invoke(post)
+                    loadAll(post)
                 }
             } else {
-                func.invoke(post)
+                loadAll(post)
             }
         }
     }
@@ -74,8 +66,8 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
         val func = when {
             post.domain == "gfycat.com" -> this::loadGfycatGif
             post.domain == "redgifs.com" -> this::loadRedgifGif
-            post.url.matches("https://imgur.com/a/.+".toRegex()) -> this::loadImgurAlbum
-            post.url.matches("https://i\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
+            post.url.matches("https://(m\\.)?imgur\\.com/a/.+".toRegex()) -> this::loadImgurAlbum
+            post.url.matches("https://([im])\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
             else -> null
         } ?: return
 
