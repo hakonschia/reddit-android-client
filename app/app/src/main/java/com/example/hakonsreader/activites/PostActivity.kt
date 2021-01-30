@@ -379,19 +379,15 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         // Load 3rd API calls if the post hasn't been loaded already, as we then have to draw
         // the content of the post. If we have a post already the 3rd party calls should have been
         // made already
+        var loadThirdParty = true
 
         // Started from inside the app (post already loaded from before)
         val postId = if (postJson != null) {
+            loadThirdParty = false
             setPostFromJson(postJson)
         } else {
             intent.extras?.getString(POST_ID_KEY)
         }
-
-        // The thirdPartyObject sometimes just doesn't want to come along with the json, so if it
-        // isn't there just load it again. If the post doesn't have 3rd party to load nothing happens anyways
-        // Terrible solution tbh, should figure out why it doesn't always come instead (this will waste data if it
-        // has to load again)
-        val loadThirdParty = post?.thirdPartyObject == null
 
         if (postId != null) {
             commentsViewModel?.let {

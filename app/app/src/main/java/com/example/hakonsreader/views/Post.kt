@@ -106,22 +106,16 @@ class Post : Content {
      */
     private var postObserver = Observer<RedditPost> {
         if (it != null) {
-            // Since crossposts aren't stored directly in the database we have to manually retrieve the
-            // crossposts again, otherwise when opening the post the crosspost won't be passed along
-            // which makes the crosspost subreddit say "r/null" until the post is loaded from the api again
-            // as well as failing to load some content
-            val crosspostIds = it.crosspostIds
-
-            if (crosspostIds?.isNotEmpty() == true) {
-                CoroutineScope(IO).launch {
-                    it.crossposts = App.get().database.posts().getPostsById(crosspostIds)
-                    withContext(Main) {
-                        updatePostInfo(it)
-                    }
-                }
-            } else {
-                updatePostInfo(it)
+            // Crossposts aren't stored in the database, and the new post is from the database
+            // so copy the old ones, if possible.
+            // Same with third party objects, as they are stored as a raw string it's faster to just
+            // copy it instead of bothering with the json parsing
+            redditPost?.let { old ->
+                it.crossposts = old.crossposts
+                it.thirdPartyObject = old.thirdPartyObject
             }
+
+            updatePostInfo(it)
         }
     }
 

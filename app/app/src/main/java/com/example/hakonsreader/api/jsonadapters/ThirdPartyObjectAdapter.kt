@@ -17,34 +17,44 @@ class ThirdPartyObjectAdapter : TypeAdapter<Any>() {
     override fun write(out: JsonWriter?, value: Any?) {
         value ?: return
 
-        val treeName = LinkedTreeMap<String, Any>()::class.java.typeName
-        val actualName = value::class.java.typeName
-        if (treeName != actualName) {
-            return
-        }
+        val jsonObj = Gson().toJsonTree(value).asJsonObject
 
-        // The code above will not check for generics, so we either have this unchecked cast warning, or
-        // cast it as LinkedTreeMap<*, *>
-        value as LinkedTreeMap<String, Any>
-
-        val t = when {
-            // Imgur uses "mp4"
-            value.containsKey("mp4") -> {
+        val typeName = value::class.java.typeName
+        val type = when {
+            value is ImgurGif -> {
                 ImgurGif::class.java.typeName
             }
 
-            // Gfycat/redgifs uses "mp4Url"
-            value.containsKey("mp4Url") -> {
+            value is GfycatGif -> {
                 GfycatGif::class.java.typeName
             }
 
-            else -> return
+            typeName == LinkedTreeMap<String, Any>()::class.java.typeName -> {
+                value as LinkedTreeMap<String, Any>
+                // The code above will not check for generics, so we either have this unchecked cast warning, or
+                // cast it as LinkedTreeMap<*, *>
+                when {
+                    // Imgur uses "mp4"
+                    value.containsKey("mp4") -> {
+                        ImgurGif::class.java.typeName
+                    }
+
+                    // Gfycat/redgifs uses "mp4Url"
+                    value.containsKey("mp4Url") -> {
+                        GfycatGif::class.java.typeName
+                    }
+
+                    else -> null
+                }
+            }
+
+            else -> null
         }
 
-        value.put("type", t)
-        val asJsonString = Gson().toJsonTree(value).asJsonObject.toString()
-
-        out?.value(asJsonString)
+        if (type != null) {
+            jsonObj.addProperty("type", type)
+        }
+        out?.value(jsonObj.toString())
     }
 
     override fun read(reader: JsonReader?): Any? {
