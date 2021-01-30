@@ -37,8 +37,8 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             val func = when {
                 post.domain == "gfycat.com" -> this::loadGfycatGif
                 post.domain == "redgifs.com" -> this::loadRedgifGif
-                post.url.matches("https://imgur.com/a/.+".toRegex()) -> this::loadImgurAlbum
-                post.url.matches("https://i\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
+                post.url.matches("https://(m\\.)?imgur\\.com/a/.+".toRegex()) -> this::loadImgurAlbum
+                post.url.matches("https://([im])\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
                 else -> null
             } ?: return@forEachIndexed
 
