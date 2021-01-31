@@ -9,7 +9,7 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 ## Screenshots
 
 <div>
-  <img src="/images/subreddit.png" alt="Subreddit" width="275"/>
+  <img src="/images/subreddit.gif" alt="Subreddit" width="275"/>
   <img src="/images/scrolling-in-posts.png" alt="Scrolling posts" width="275"/>
   <img src="/images/in-post.gif" alt="In post" width="275"/>
   <img src="/images/profile.png" alt="User profile" width="275"/>
