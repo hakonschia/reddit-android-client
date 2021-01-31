@@ -1,5 +1,6 @@
 package com.example.hakonsreader.misc
 
+import android.util.Log
 import android.widget.ImageView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Image
@@ -35,14 +36,14 @@ fun Picasso.loadIf(preferredUrl: String?, backupUrl: String?, into: ImageView) {
  * Enable or disable cache when loading images with Picasso
  *
  * @param cache If true the image will be cached
- * @return A RequestCreator that will set the [RequestCreator.networkPolicy] with [NetworkPolicy.NO_CACHE]
- * and [NetworkPolicy.NO_STORE] if [cache] is false. Otherwise, the creator is returned as is
+ * @return A RequestCreator that will set the [RequestCreator.networkPolicy] with [NetworkPolicy.NO_STORE]
+ * if [cache] is false. Otherwise, the creator is returned as is
  */
 fun RequestCreator.cache(cache: Boolean) : RequestCreator {
     return if (cache) {
         this
     } else {
-        this.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
+        this.networkPolicy(NetworkPolicy.NO_STORE)
     }
 }
 

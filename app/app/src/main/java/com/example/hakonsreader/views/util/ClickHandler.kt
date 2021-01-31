@@ -55,14 +55,16 @@ fun openProfileInActivity(view: View, username: String?) {
  *
  * @param view The view itself is ignored, but this cannot be null as the context is needed
  * @param imageUrl The URL to the image
+ * @param cache True to cache the image once opened
  */
-fun openImageInFullscreen(view: View, imageUrl: String?) {
+fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean) {
     val context = view.context
     val activity = context as Activity
 
     // Send some data like what sub it is etc etc so it knows what to load
     Intent(context, ImageActivity::class.java).run {
         putExtra(ImageActivity.IMAGE_URL, imageUrl)
+        putExtra(ImageActivity.CACHE_IMAGE, cache)
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image")
         activity.startActivity(this, options.toBundle())
     }

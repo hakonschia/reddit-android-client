@@ -9,6 +9,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.databinding.ActivityImageBinding
+import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.r0adkll.slidr.Slidr
@@ -26,8 +27,17 @@ class ImageActivity : BaseActivity() {
     companion object {
         /**
          * The key used for the URL of the image to display
+         *
+         * The value with this key should be a [String]
          */
         const val IMAGE_URL = "imageUrl"
+
+        /**
+         * The key used for to tell if the image being loaded should be cached
+         *
+         * The value with this key should be a [Boolean]
+         */
+        const val CACHE_IMAGE = "cacheImage"
     }
 
     private var slidrInterface: SlidrInterface? = null
@@ -52,6 +62,7 @@ class ImageActivity : BaseActivity() {
                 .scrimColor(color)
                 .build()
         slidrInterface = Slidr.attach(this, config)
+
         val data = intent.extras
         if (data != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -70,9 +81,12 @@ class ImageActivity : BaseActivity() {
             imageUrl = LinkUtils.convertToDirectUrl(imageUrl)
             binding.loadingIcon.onCountChange(true)
 
+            val cache = data.getBoolean(CACHE_IMAGE, true)
+
             Picasso.get()
                     .load(imageUrl)
                     .resize(App.get().screenWidth, 0)
+                    .cache(cache)
                     .into(binding.image, object : Callback {
                         override fun onSuccess() {
                             binding.loadingIcon.onCountChange(false)
