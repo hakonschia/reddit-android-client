@@ -13,7 +13,8 @@ import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.databinding.ContentImageBinding;
-import com.example.hakonsreader.enums.ShowNsfwPreview;
+import com.example.hakonsreader.misc.PostImageVariants;
+import com.example.hakonsreader.misc.UtilKtKt;
 import com.example.hakonsreader.views.util.ClickHandlerKt;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -75,63 +76,22 @@ public class ContentImage extends Content {
      */
     @Override
     protected void updateView() {
-        int screenWidth = App.Companion.get().getScreenWidth();
+        PostImageVariants variants = UtilKtKt.getImageVariantsForRedditPost(redditPost);
+        String url;
+        if (imageUrl != null) {
+            url = imageUrl;
+        } else {
+            if (redditPost.isNsfw()) {
+                url = variants.getNsfw();
+            } else if (redditPost.isSpoiler()) {
+                url = variants.getSpoiler();
+            } else {
+                url = variants.getNormal();
+                if (url == null) {
 
-        // Set with setPost() not setWithImageUrl()
-        if (imageUrl == null) {
-            List<Image> images = redditPost.getPreviewImages();
-
-            // Since ContentImage is used in ContentGallery, and that might contain gifs, this might be null
-            // Otherwise it typically shouldn't be
-            if (images != null) {
-                // This should be improved and is a pretty poor way of doing it, but this will reduce some
-                // unnecessary loading as it will get some lower resolution images (it will be scaled down to
-                // the same size later by Picasso, so it won't give loss of image quality)
-                for (int i = 0; i < images.size(); i++) {
-                    Image image = images.get(i);
-                    if (image.getWidth() <= screenWidth) {
-                        imageUrl = image.getUrl();
-                    }
+                    // Use the post URL as a fallback (since this is an image it will point to an image)
+                    url = redditPost.getUrl();
                 }
-            }
-
-            // No image found in the previews, use the standard url
-            if (imageUrl == null) {
-                imageUrl = redditPost.getUrl();
-            }
-        }
-
-        setOnClickListener(v -> ClickHandlerKt.openImageInFullscreen(binding.image, imageUrl));
-
-        String obfuscatedUrl = null;
-        int noImageId = -1;
-        if (redditPost.isNsfw() ) {
-            ShowNsfwPreview show = App.Companion.get().showNsfwPreview();
-
-            switch (show) {
-                case NORMAL:
-                    // Do nothing, load imageUrl as is
-                    break;
-
-                case BLURRED:
-                    obfuscatedUrl = getObfuscatedUrl();
-                    // If we don't have a URL to show then show the NSFW drawable instead as a fallback
-                    if (obfuscatedUrl == null) {
-                        noImageId = R.drawable.ic_image_not_supported_200dp;
-                    }
-                    break;
-
-                case NO_IMAGE:
-                    noImageId = R.drawable.ic_image_not_supported_200dp;
-                    break;
-            }
-        } else if (redditPost.isSpoiler()) {
-            // Always blur spoilers (if possible)
-
-            obfuscatedUrl = getObfuscatedUrl();
-            // If we don't have a URL to show then show the NSFW drawable instead as a fallback
-            if (obfuscatedUrl == null) {
-                noImageId = R.drawable.ic_image_not_supported_200dp;
             }
         }
 
@@ -145,13 +105,16 @@ public class ContentImage extends Content {
         //  https://www.reddit.com/r/dataisbeautiful/comments/kji3wx/oc_2020_electoral_map_if_only_voted_breakdown_by/
 
         try {
-            RequestCreator creator;
             // No image to load, set image drawable directly
-            if (noImageId != -1) {
-                binding.image.setImageDrawable(ContextCompat.getDrawable(getContext(), noImageId));
+            if (url == null) {
+                binding.image.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_image_not_supported_200dp));
             } else {
+                // When opening the image we always want to open the normal
+                setOnClickListener(v -> ClickHandlerKt.openImageInFullscreen(binding.image, variants.getNormal()));
+
                 // If we have an obfuscated image, load that here instead
-                creator = Picasso.get().load(obfuscatedUrl != null ? obfuscatedUrl : imageUrl)
+                RequestCreator creator = Picasso.get()
+                        .load(url)
                         .placeholder(R.drawable.ic_wifi_tethering_150dp)
                         .error(R.drawable.ic_wifi_tethering_150dp)
                         // Scale so the image fits the width of the screen
@@ -164,6 +127,7 @@ public class ContentImage extends Content {
                     // Don't store in cache and don't look in cache as this image will never be there
                     creator = creator.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
                 }
+
                 creator.into(binding.image, imageLoadedCallback);
             }
         } catch (RuntimeException e) {
@@ -172,23 +136,4 @@ public class ContentImage extends Content {
                     "\n\n " + redditPost.getSubreddit() + ", " + redditPost.getTitle() + " ---------------------------\n\n\n\n");
         }
     }
-
-
-    /**
-     * Retrieves the obfuscated image URL to use
-     *
-     * @return An URL pointing to an image, or {@code null} of no obfuscated images were found
-     */
-    private String getObfuscatedUrl() {
-        List<Image> obfuscatedPreviews = redditPost.getObfuscatedPreviewImages();
-
-        if (obfuscatedPreviews != null && !obfuscatedPreviews.isEmpty()) {
-            // Obfuscated previews that are high res are still fairly showing sometimes, so
-            // get the lowest quality one as that will not be very easy to tell what it is
-            return obfuscatedPreviews.get(0).getUrl();
-        }
-
-        return null;
-    }
 }
-

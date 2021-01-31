@@ -13,10 +13,10 @@ import androidx.viewbinding.ViewBinding
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.DispatcherActivity
-import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
+import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import com.squareup.picasso.Picasso
 
 /**
@@ -66,24 +66,18 @@ class ContentLink : Content {
     private fun updateViewNormal() {
         binding as ContentLinkBinding
 
-        // The previews will (I believe) never be above 1080p, and that should be fine for most devices
-        var previews: List<Image>? = redditPost.getPreviewImages()
+        val variants = getImageVariantsForRedditPost(redditPost)
 
-        if (redditPost.isNsfw) {
-            val obfuscatedPreviews: List<Image>? = redditPost.getObfuscatedPreviewImages()
-            if (!obfuscatedPreviews.isNullOrEmpty()) {
-                previews = obfuscatedPreviews
-            }
+        val url = when {
+            redditPost.isNsfw -> variants.nsfw
+            redditPost.isSpoiler -> variants.spoiler
+            else -> variants.normal
         }
 
-        if (!previews.isNullOrEmpty()) {
-            val preview: Image = previews.last()
-
-            if (preview.url?.isNotBlank() == true) {
-                Picasso.get()
-                        .load(preview.url)
-                        .into(binding.thumbnail)
-            }
+        if (url != null) {
+            Picasso.get()
+                    .load(url)
+                    .into(binding.thumbnail)
         } else {
             val params: ViewGroup.LayoutParams = binding.thumbnail.layoutParams
             params.height = resources.getDimension(R.dimen.contentLinkNoThumbnailSize).toInt()

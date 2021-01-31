@@ -11,9 +11,9 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentVideoBinding
-import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
+import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 
 /**
  * View for displaying videos from a [RedditPost]
@@ -181,7 +181,6 @@ class ContentVideo : Content {
         }
     }
 
-
     /**
      * Releases the video to free up its resources
      */
@@ -190,57 +189,18 @@ class ContentVideo : Content {
     }
 
     private fun setThumbnailUrl() {
-        // Loading the blurred/no image etc. is very copied from ContentImage and should be
-        // generified so it's not duplicated, but cba to fix that right now
+        val variants = getImageVariantsForRedditPost(redditPost)
 
-        // post.getThumbnail() returns an image which is very low quality, the source preview
-        // has the same dimensions as the video itself
-        val image = redditPost.getSourcePreview()
-        val imageUrl = image?.url
-
-        // Don't show thumbnail for NSFW posts
-        var obfuscatedUrl: String? = null
-        var noImageId = -1
-
-        if (redditPost.isNsfw) {
-            when (App.get().showNsfwPreview()) {
-                ShowNsfwPreview.NORMAL -> { }
-                ShowNsfwPreview.BLURRED -> {
-                    obfuscatedUrl = getObfuscatedUrl()
-                    // If we don't have a URL to show then show the NSFW drawable instead as a fallback
-                    if (obfuscatedUrl == null) {
-                        noImageId = R.drawable.ic_image_not_supported_200dp
-                    }
-                }
-                ShowNsfwPreview.NO_IMAGE -> noImageId = R.drawable.ic_image_not_supported_200dp
-            }
-        } else if (redditPost.isSpoiler) {
-            obfuscatedUrl = getObfuscatedUrl()
-            // If we don't have a URL to show then show the NSFW drawable instead as a fallback
-            if (obfuscatedUrl == null) {
-                noImageId = R.drawable.ic_image_not_supported_200dp
-            }
+        val url = when {
+            redditPost.isNsfw -> variants.nsfw
+            redditPost.isSpoiler -> variants.spoiler
+            else -> variants.normal
         }
 
-        // noImageId is set, use the drawable instead
-        if (noImageId != -1) {
-            player.thumbnailDrawable = noImageId
+        if (url != null) {
+            player.thumbnailUrl = url
         } else {
-            player.thumbnailUrl = obfuscatedUrl ?: imageUrl ?: ""
+            player.thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
         }
-    }
-
-    /**
-     * Retrieves the obfuscated image URL to use
-     *
-     * @return An URL pointing to an image, or `null` of no obfuscated images were found
-     */
-    private fun getObfuscatedUrl(): String? {
-        val obfuscatedPreviews = redditPost.getObfuscatedPreviewImages()
-        return if (obfuscatedPreviews != null && obfuscatedPreviews.isNotEmpty()) {
-            // Obfuscated previews that are high res are still fairly showing sometimes, so
-            // get the lowest quality one as that will not be very easy to tell what it is
-            obfuscatedPreviews[0].url
-        } else null
     }
 }

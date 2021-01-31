@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.VideoYoutubeActivity
-import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentYoutubeVideoBinding
+import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import com.squareup.picasso.Picasso
 
 /**
@@ -32,25 +32,18 @@ class ContentYoutubeVideo : Content {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun updateView() {
-        // The previews will (I believe) never be above 1080p, and that should be fine for most devices
-        var previews: List<Image>? = redditPost.getPreviewImages()
+        val variants = getImageVariantsForRedditPost(redditPost)
 
-        // TODO spoiler
-        if (redditPost.isNsfw) {
-            val obfuscatedPreviews: List<Image>? = redditPost.getObfuscatedPreviewImages()
-            if (!obfuscatedPreviews.isNullOrEmpty()) {
-                previews = obfuscatedPreviews
-            }
+        val url = when {
+            redditPost.isNsfw -> variants.nsfw
+            redditPost.isSpoiler -> variants.spoiler
+            else -> variants.normal
         }
 
-        if (!previews.isNullOrEmpty()) {
-            val preview: Image = previews.last()
-
-            if (preview.url?.isNotBlank() == true) {
-                Picasso.get()
-                        .load(preview.url)
-                        .into(binding.thumbnail)
-            }
+        if (url != null) {
+            Picasso.get()
+                    .load(url)
+                    .into(binding.thumbnail)
         } else {
             val params: ViewGroup.LayoutParams = binding.thumbnail.layoutParams
             params.height = resources.getDimension(R.dimen.contentLinkNoThumbnailSize).toInt()
