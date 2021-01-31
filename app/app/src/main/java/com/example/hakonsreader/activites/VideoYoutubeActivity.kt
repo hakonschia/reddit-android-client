@@ -1,6 +1,9 @@
 package com.example.hakonsreader.activites
 
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowInsets
+import android.view.WindowManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -56,6 +59,14 @@ class VideoYoutubeActivity : BaseActivity() {
             return
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val controller = window.insetsController
+            controller?.hide(WindowInsets.Type.statusBars())
+        } else {
+            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
+        
         findViewById<YouTubePlayerView>(R.id.youtubePlayer).run {
             lifecycle.addObserver(this)
 
