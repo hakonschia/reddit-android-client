@@ -21,8 +21,13 @@ import retrofit2.Response
  * @param resp The response that failed
  */
 fun <T> apiError(resp: Response<T>) : ApiResponse.Error {
-    val errorBody = Gson().fromJson(resp.errorBody()?.string(), GenericError::class.java)
-    return ApiResponse.Error(errorBody, Throwable("Error executing request: ${resp.code()}"))
+    return try {
+        // Reddit might return an HTML page on errors, which makes the json parsing fail
+        val errorBody = Gson().fromJson(resp.errorBody()?.string(), GenericError::class.java)
+        ApiResponse.Error(errorBody, Throwable("Error executing request: ${resp.code()}"))
+    } catch (e: Exception) {
+        ApiResponse.Error(GenericError(resp.code()), Throwable("Error executing request: ${resp.code()}"))
+    }
 }
 
 /**

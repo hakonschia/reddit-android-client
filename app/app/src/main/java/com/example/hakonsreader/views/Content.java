@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -128,5 +129,18 @@ public abstract class Content extends FrameLayout {
      */
     public List<Pair<View, String>> getTransitionViews() {
         return new ArrayList<>();
+    }
+
+    /**
+     * Gets the contents wanted height. This is
+     *
+     * @return The height the view wants to use, or {@link ViewGroup.LayoutParams#WRAP_CONTENT} if
+     * it is not known
+     */
+    public int getWantedHeight() {
+        // Using View.measure and measureHeight with WRAP_CONTENT as height doesn't work with some
+        // of the subclasses, so instead this is an easy way of fixing the issue as they
+        // can directly say what the value would be (if it is known to the class)
+        return ViewGroup.LayoutParams.WRAP_CONTENT;
     }
 }

@@ -115,26 +115,22 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
     /**
      * The max height the post can have. This is for the entire post, ie. post info, content, and post bar combined
      */
-    private var maxPostHeight = -3
+    private val maxPostHeight by lazy {
+        getHeightForPost(forWhenCollapsedDisabled = false)
+    }
 
     /**
      * The max height the post can have when the post collapse has been disabled.
      * This is for the entire post, ie. post info, content, and post bar combined
      */
-    private var maxPostHeightWhenCollapsedDisabled = -3
-
-    /**
-     * The height of the post content when the post collapse was disabled
-     */
-    private var heightWhenCollapseDisabled: Int? = null
+    private val maxPostHeightWhenCollapsedDisabled by lazy {
+        getHeightForPost(forWhenCollapsedDisabled = true)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         slidrInterface = Slidr.attach(this)
-
-        maxPostHeight = getHeightForPost(false)
-        maxPostHeightWhenCollapsedDisabled = getHeightForPost(true)
 
         setupBinding()
         setupCommentsViewModel()
@@ -585,6 +581,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      *
      * @param enable True to enable the transition, false to disable
      * @param showSnackbar True to show a snackbar. Default to `true`
+     * @param updateHeight True to update the height of the content
      */
     private fun enableTransition(enable: Boolean, showSnackbar: Boolean = true, updateHeight: Boolean = true) {
         val transition = binding.parentLayout.getTransition(R.id.postTransition)
@@ -592,18 +589,13 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
 
         val stringId = if (enable) {
             if (updateHeight) {
-                if (heightWhenCollapseDisabled == null) {
-                    binding.post.updateMaxHeight(maxPostHeight)
-                } else {
-                    binding.post.setContentHeight(heightWhenCollapseDisabled!!)
-                }
+                binding.post.updateMaxHeight(maxPostHeight)
             }
 
             binding.expandOrCollapsePostBlock.visibility = GONE
             R.string.postTransitionEnabled
         } else {
             if (updateHeight) {
-                heightWhenCollapseDisabled = binding.post.getContentHeight()
                 binding.post.updateMaxHeight(maxPostHeightWhenCollapsedDisabled)
             }
 

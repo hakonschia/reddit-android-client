@@ -38,6 +38,9 @@ class ContentGallery : Content {
      */
     private var slidrLocked = false
 
+    private var maxHeight = -1
+    private var maxWidth = -1
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
@@ -46,9 +49,6 @@ class ContentGallery : Content {
         images = redditPost.galleryImages ?: return
 
         // Find the largest height and width and set the layout to that
-        var maxHeight = 0
-        var maxWidth = 0
-
         for (image in images) {
             val height = image.height
             val width = image.width
@@ -161,6 +161,8 @@ class ContentGallery : Content {
             lockSlidr(false)
         }
     }
+
+    override fun getWantedHeight() = maxHeight
 
     /**
      * Releases all views in the gallery

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.RelativeLayout
 import androidx.core.util.Pair
@@ -118,6 +119,7 @@ class Post : Content {
             // so copy the old ones, if possible.
             // Same with third party objects, as they are stored as a raw string it's faster to just
             // copy it instead of bothering with the json parsing
+            // TODO imgur albums dont seem to be passed along correctly? Possibly issue with all albums
             redditPost?.let { old ->
                 it.crossposts = old.crossposts
                 it.thirdPartyObject = old.thirdPartyObject
@@ -154,27 +156,43 @@ class Post : Content {
         }
         this.maxHeight = maxHeight
 
-        binding.content.getChildAt(0) ?: return
+        val content = binding.content.getChildAt(0) as Content? ?: return
 
         // Get height of the content and the total height of the entire post so we can resize the content correctly
         val contentHeight = binding.content.measuredHeight
         val totalHeight = binding.postsParentLayout.measuredHeight
 
-        // TODO this doesn't really work, since if the content is actually smaller the it will still resize
-        //  to the full height
+        // For some views making the measure with WRAP_CONTENT doesn't work, luckily those views
+        // know the wanted height already, so we can use the wantedHeight to achieve the same functionality
+        val wantedHeight = if (content.wantedHeight >= 0) {
+            content.wantedHeight
+        } else {
+            // Measure what the content at most wants
+            content.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            content.measuredHeight
+        }
+
+        // Calculate the height the content at most can be
         val newContentHeight = maxHeight - totalHeight + contentHeight
-        setContentHeight(newContentHeight)
+
+        // If the content does not need the maximum size "reserved" for it, set to the measured/wanted size
+        // This height is WRAP_CONTENT, so it will only take what it needs
+        if (newContentHeight > wantedHeight) {
+            setContentHeight(wantedHeight)
+        } else {
+            setContentHeight(newContentHeight)
+        }
     }
 
     /**
      * Sets the height of only the content view of the post. The value will be animated for a duration
      * of 250 milliseconds
      *
-     * This does not check the max height set
+     * This does not check [maxHeight]
      *
      * @param height The height to set
      */
-    fun setContentHeight(height: Int) {
+    private fun setContentHeight(height: Int) {
         // TODO links dont correctly regain their previous view. The image isn't correctly put back and
         //  the link text doesn't change position (might have to do something inside the class itself)
         if (height < 0) {
@@ -182,7 +200,7 @@ class Post : Content {
         }
         val content = binding.content.getChildAt(0)
 
-        ValueAnimator.ofInt(content.measuredHeight, height).run {
+        ValueAnimator.ofInt(content.height, height).run {
             addUpdateListener { valueAnimator ->
                 val value = valueAnimator.animatedValue as Int
                 val layoutParams = content.layoutParams

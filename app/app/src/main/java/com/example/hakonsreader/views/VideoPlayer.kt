@@ -243,6 +243,11 @@ class VideoPlayer : PlayerView {
         }
 
     /**
+     * The actual video height after it has been resized
+     */
+    var actualVideoHeight = -1
+
+    /**
      * Callback for when a video has been manually paused (ie. the pause button has been clicked)
      *
      * This will not be called when the video is paused by any other way (ie. calls to [pause])
@@ -424,6 +429,7 @@ class VideoPlayer : PlayerView {
 
         height = (app.screenHeight * heightRatio).toInt()
 
+        actualVideoHeight = height
 
         // I don't even really know why this works, but the actual video player will be in the
         // middle of the screen without being stretched, as I want to, and the controller goes

@@ -158,6 +158,12 @@ class ContentVideo : Content {
     override fun setExtras(extras: Bundle) = player.setExtras(extras)
 
     /**
+     * Gets the resized height of the video player (ie. the size the video actually is when fully
+     * expanded)
+     */
+    override fun getWantedHeight() = player.actualVideoHeight
+
+    /**
      * Sets the callback for when a video post has been manually paused
      *
      * @param onVideoManuallyPaused The callback
