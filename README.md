@@ -20,7 +20,7 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 
 ## Installation
 
-The downloadable [APK](apk/app-release.apk) contains the application at commit `9edbc1b2d719dfa2b0d8b42f1c25b2d9d9c0465f` (#1219). To install the app download the APK, open it on your phone, and follow the steps shown.
+The downloadable [APK](apk/app-release.apk) contains the application at commit `a4e7a7df1a70baad20767f08177404cc362943ad` (#1339). To install the app download the APK, open it on your phone, and follow the steps shown.
 
 ### Build yourself
 
@@ -83,6 +83,8 @@ The application uses [Firebase Crashlytics](https://firebase.google.com/docs/cra
   - Sticky posts and comments
   - Distinguish posts and comments as a moderator
   - View reports on posts and comments, with option to mark reports as ignored
+  - Mark posts as NSFW/spoiler
+  - Lock posts/comments
 
 
 ## Acknowledgements
