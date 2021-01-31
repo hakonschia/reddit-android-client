@@ -5,8 +5,12 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.interceptors.UserAgentInterceptor
 import com.example.hakonsreader.api.interfaces.OnFailure
 import com.example.hakonsreader.api.interfaces.OnNewToken
+import com.example.hakonsreader.api.interfaces.VoteableListing
+import com.example.hakonsreader.api.interfaces.VoteableRequest
 import com.example.hakonsreader.api.model.AccessToken
+import com.example.hakonsreader.api.model.RedditListing
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -91,6 +95,34 @@ import java.util.*
  *              val errorCode = response.error.code
  *              responses.throwable.printStackTrace()
  *         }
+ *     }
+ * }
+ * ```
+ *
+ * Models relating to Reddit specific content (such as posts or comments) inherit from [RedditListing].
+ * Most listings will also implement a variety of interfaces depending on what kind of listing it is.
+ * For example, [RedditPost] and [RedditComment] implement [VoteableListing]. The respective request models
+ * (eg. [PostRequest] for [RedditPost]) will also implement the corresponding interface [VoteableRequest].
+ * When performing API requests on these listings these interfaces can be taken advantage of to generify the code:
+ *
+ * ```
+ * val api = ...
+ * val listing: VoteableListing = ...
+ * val voteType = VoteType.UPVOTE
+ *
+ * CoroutineScope(IO).launch {
+ *     // Currently only RedditPost and RedditComment implement VoteableListing
+ *     val response = if (listing is RedditPost) {
+ *         api.post(listing.id)
+ *     } else {
+ *         api.comment(listing.id)
+ *     }.vote(voteType)
+ *     // The value returned is a VoteableRequest, and we invoke the function "vote(VoteType)" from
+ *     // that interface which performs the API request
+ *
+ *     when (response) {
+ *         is ApiResponse.Success -> {}
+ *         is ApiResponse.Error -> {}
  *     }
  * }
  * ```
@@ -479,10 +511,8 @@ class RedditApi constructor(
 
     /**
      * Retrieve a [UserRequests] object that can get handle requests for non-logged in users.
-     * For logged in users use [.user]
      *
      * @param username the username to to make calls towards.
-     *
      * @return An object that can perform various user related API requests for non-logged in users
      */
     fun user(username: String): UserRequests {
@@ -495,7 +525,6 @@ class RedditApi constructor(
      * For logged in users use [user]
      *
      * @return An object that can perform various user related API requests for logged in users
-     * @see .user
      */
     fun user(): UserRequestsLoggedInUser {
         return UserRequestsLoggedInUser(accessTokenInternal, userApi)

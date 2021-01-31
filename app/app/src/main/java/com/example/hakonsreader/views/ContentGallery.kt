@@ -15,7 +15,7 @@ import java.util.*
 import java.util.function.Consumer
 
 /**
- * Class for gallery posts. A gallery post is simply a collection of multiple images
+ * Class for gallery posts. A gallery post is simply a collection of multiple images or videos
  */
 class ContentGallery : Content {
     companion object {

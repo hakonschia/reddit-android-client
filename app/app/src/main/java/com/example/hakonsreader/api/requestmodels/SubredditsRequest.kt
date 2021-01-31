@@ -11,6 +11,9 @@ import com.example.hakonsreader.api.utils.apiError
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
+/**
+ * Request model for communicating with a collection of subreddits
+ */
 class SubredditsRequest(
         private val accessToken: AccessToken,
         private val api: SubredditsService

@@ -13,6 +13,9 @@ import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
+/**
+ * Request model for communicating with replies
+ */
 class ReplyableRequestModel(
         private val accessToken: AccessToken,
         private val api: ReplyService

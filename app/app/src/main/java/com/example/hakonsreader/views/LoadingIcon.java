@@ -5,6 +5,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ProgressBar;
 
+/**
+ * Superclass of {@link ProgressBar} that will automatically show/hide the progress bar
+ * when loading counts increase
+ */
 public class LoadingIcon extends ProgressBar {
     private static final String TAG = "LoadingIcon";
     
@@ -47,6 +51,11 @@ public class LoadingIcon extends ProgressBar {
         }
     }
 
+    /**
+     * Sets the total items loading and shows/hides the progress bar accordingly
+     *
+     * @param itemsLoading The amount of items loading
+     */
     public synchronized void setItemsLoading(int itemsLoading) {
         this.itemsLoading = itemsLoading;
         if (itemsLoading == 0) {
@@ -57,7 +66,9 @@ public class LoadingIcon extends ProgressBar {
     }
 
     /**
-     * Called when something has started or finished loading
+     * Called when something has started or finished loading.
+     *
+     * Convenience method for either {@link #increaseLoadCount()} and {@link #decreaseLoadCount()}
      *
      * @param up True if something has started loading
      */

@@ -14,6 +14,9 @@ import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
+/**
+ * Request model for communicating with Reddit comments
+ */
 class CommentRequest(
         private val accessToken: AccessToken,
         private val api: CommentService,
@@ -80,12 +83,12 @@ class CommentRequest(
     /**
      * Vote on the comment
      *
-     * OAuth scope required: *vote*
+     * OAuth scope required: `vote`
      *
      * @param voteType The type of vote to cast
      * @return An [ApiResponse] with no success data
      */
-    override suspend fun vote(voteType: VoteType): ApiResponse<Nothing?> {
+    override suspend fun vote(voteType: VoteType): ApiResponse<Any?> {
         return voteRequest.vote(Thing.COMMENT, commentId, voteType)
     }
 

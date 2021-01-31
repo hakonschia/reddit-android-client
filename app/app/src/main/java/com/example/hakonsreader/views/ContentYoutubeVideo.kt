@@ -14,12 +14,17 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentYoutubeVideoBinding
 import com.squareup.picasso.Picasso
 
+/**
+ * View serving as a redirect to a [VideoYoutubeActivity]. This class only displays a thumbnail
+ * of a [RedditPost] (and indicators that it is a YouTube video), which when clicked opens the
+ * YouTube video in a fullscreen activity
+ */
 class ContentYoutubeVideo : Content {
     // This class only serves as a redirect to VideoYoutubeActivity
     // The Youtube player library uses a WebView, which when used in a RecyclerView with many views
     // makes it extremely laggy
 
-    private val binding: ContentYoutubeVideoBinding = ContentYoutubeVideoBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding = ContentYoutubeVideoBinding.inflate(LayoutInflater.from(context), this, true)
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)

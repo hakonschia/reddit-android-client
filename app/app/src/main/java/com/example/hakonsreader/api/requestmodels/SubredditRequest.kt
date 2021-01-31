@@ -21,6 +21,9 @@ import com.example.hakonsreader.api.utils.apiListingErrors
 import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 
+/**
+ * Request model for communicating with a specific subreddit
+ */
 class SubredditRequest(
         private val subredditName: String,
         private val accessToken: AccessToken,

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import com.example.hakonsreader.App
 import com.example.hakonsreader.activites.DispatcherActivity
@@ -11,6 +12,9 @@ import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
 
+/**
+ * View for displaying in a single gallery item in [ContentGallery]
+ */
 class ContentGalleryImage : FrameLayout {
     companion object {
         private const val TAG = "ContentGalleryImage"
@@ -21,7 +25,6 @@ class ContentGalleryImage : FrameLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     /**
      * The Image to display
@@ -32,6 +35,9 @@ class ContentGalleryImage : FrameLayout {
             updateView()
         }
 
+    /**
+     * If [image] is an image, this should be set to the post the image is for
+     */
     var post: RedditPost? = null
 
     fun destroy() {
@@ -96,6 +102,13 @@ class ContentGalleryImage : FrameLayout {
         }
     }
 
+    /**
+     * Returns a [ContentImage] for a given [Image]. The image should be a image
+     *
+     * @param image The image to create an image view for
+     * @return A [ContentImage]
+     * @see asGif
+     */
     private fun asImage(image: Image) : ContentImage {
         // Use ContentImage as that already has listeners, NSFW caching etc already
         return ContentImage(context).apply {
@@ -103,6 +116,13 @@ class ContentGalleryImage : FrameLayout {
         }
     }
 
+    /**
+     * Returns a [VideoPlayer] for a given [Image]. The image should be a video
+     *
+     * @param image The image to create a video for
+     * @return A [VideoPlayer]
+     * @see asImage
+     */
     private fun asGif(image: Image) : VideoPlayer {
         return VideoPlayer(context).apply {
             // The height will resize accordingly as long as the width matches the screen

@@ -15,6 +15,9 @@ import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
 import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 
+/**
+ * View for displaying videos from a [RedditPost]
+ */
 class ContentVideo : Content {
     companion object {
         private const val TAG = "PostContentVideo"

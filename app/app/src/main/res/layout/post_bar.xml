@@ -4,10 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="com.example.hakonsreader.recyclerviewadapters.menuhandlers.PostsMenuHandlerKt" />
-
-        <variable
-            name="post"
-            type="com.example.hakonsreader.api.model.RedditPost" />
     </data>
 
 
@@ -52,7 +48,6 @@
 
             android:background="@null"
             android:foreground="@drawable/ripple_main_bg"
-            android:onClick="@{(view) -> PostsMenuHandlerKt.showPopupForPost(view, post)}"
 
             android:src="@drawable/ic_baseline_more_horiz_24"
 

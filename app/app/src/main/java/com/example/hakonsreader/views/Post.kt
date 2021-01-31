@@ -28,6 +28,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
+/**
+ * View for displaying a Reddit post, including the post information ([PostInfo]), the content (a subclass
+ * of [Content]), and the post bar ([PostBar])
+ *
+ * If wanted, the max height of the post can be set with [maxHeight] (and [updateMaxHeight] to update
+ * after the content has been created) which will ensure post does not go above said height. The
+ * content of the post will be resized to fit the given height.
+ */
 class Post : Content {
 
     companion object {

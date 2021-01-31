@@ -18,6 +18,10 @@ import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
+/**
+ * Request model for communicating with Reddit users. This should only be used for communcation
+ * about users not the logged in user. For logged in users use [UserRequestsLoggedInUser]
+ */
 class UserRequests(
         private val username: String,
         private val accessToken: AccessToken,

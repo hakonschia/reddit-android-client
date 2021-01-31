@@ -14,10 +14,14 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.api.model.Image
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
 import com.squareup.picasso.Picasso
 
+/**
+ * View for displaying links from a [RedditPost]. This will display different views depending on [App.dataSavingEnabled]
+ */
 class ContentLink : Content {
 
     val binding: ViewBinding = getCorrectBinding()

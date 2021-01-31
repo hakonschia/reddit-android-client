@@ -15,8 +15,12 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.databinding.TagBinding
 import com.squareup.picasso.Picasso
 
+/**
+ * View that displays text/images in a pill-style view. This view will truncate and ellipsize any
+ *  text at the end if the view is constrained
+ */
 class Tag @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context, attrs, defStyleAttr) {
-    private val binding: TagBinding = TagBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding = TagBinding.inflate(LayoutInflater.from(context), this, true)
     private var textColor = 0
     private var textColorOverridden = false
 
@@ -54,9 +58,7 @@ class Tag @JvmOverloads constructor(context: Context, attrs: AttributeSet? = nul
     /**
      * Adds a view to the flair
      *
-     *
      * If the tag has multiple views ensure they are added in the correct order
-     *
      *
      * Padding is added to the view
      */
@@ -68,7 +70,7 @@ class Tag @JvmOverloads constructor(context: Context, attrs: AttributeSet? = nul
     /**
      * Sets the fill/background color of the tag
      *
-     * @param color The color resource ID
+     * @param color The color to set
      */
     fun setFillColor(color: Int) {
         binding.cardView.setCardBackgroundColor(color)

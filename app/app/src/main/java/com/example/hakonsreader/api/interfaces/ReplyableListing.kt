@@ -3,7 +3,7 @@ package com.example.hakonsreader.api.interfaces
 import com.example.hakonsreader.api.model.RedditListing
 
 /**
- * Interface for a class extending [RedditListing] that is replyable
+ * Interface for a [RedditListing] that can be replied to
  */
 interface ReplyableListing {
 

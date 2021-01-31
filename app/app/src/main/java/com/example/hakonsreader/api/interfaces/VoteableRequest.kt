@@ -9,8 +9,19 @@ import com.example.hakonsreader.api.responses.ApiResponse
  * This interface is intended to be used with methods from [com.example.hakonsreader.api.RedditApi]
  * to use the same code for voting on different types of listings (comments or posts).
  */
+/**
+ * Interface for request models dealing with listings that implement [VoteableListing]
+ */
 interface VoteableRequest {
 
-    suspend fun vote(voteType: VoteType) : ApiResponse<Nothing?>
+    /**
+     * Vote on the listing
+     *
+     * OAuth scope required: `vote`
+     *
+     * @param voteType The vote type to update the listing with
+     * @return No response data is returned
+     */
+    suspend fun vote(voteType: VoteType) : ApiResponse<Any?>
 
 }

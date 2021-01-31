@@ -13,6 +13,9 @@ import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 import java.lang.StringBuilder
 
+/**
+ * Request model for communicating with Reddit messages
+ */
 class MessagesRequestModel(
         private val accessToken: AccessToken,
         private val api: MessageService

@@ -3,24 +3,37 @@ package com.example.hakonsreader.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.PostBarBinding
+import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForPost
 import com.robinhood.ticker.TickerUtils
 
+/**
+ * Wrapper for a full post bar. This view shows the number of comments on the post, as well as
+ * a [VoteBar] and a button to open a popup menu for the post
+ */
 class PostBar : FrameLayout {
 
-    private val binding = PostBarBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding = PostBarBinding.inflate(LayoutInflater.from(context), this, true).apply {
+        postPopupMenu.setOnClickListener {
+            showPopupForPost(it, post)
+        }
+    }
 
+    /**
+     * The post to display. The view is automatically updated when this is set, assuming the passed
+     * value isn't `null`
+     */
     var post: RedditPost? = null
         set(value) {
-
             field = value
-            binding.voteBar.listing = value
-            binding.post = value
-
-            updateView()
+            if (value != null) {
+                binding.voteBar.listing = value
+                updateView()
+            }
         }
 
     constructor(context: Context) : super(context)

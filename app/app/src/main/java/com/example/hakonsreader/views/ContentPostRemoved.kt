@@ -14,20 +14,11 @@ import com.example.hakonsreader.databinding.ContentPostRemovedBinding
  */
 class ContentPostRemoved : Content {
 
-    val binding: ContentPostRemovedBinding
+    val binding = ContentPostRemovedBinding.inflate(LayoutInflater.from(context), this, true)
 
-    constructor(context: Context?) : super(context) {
-        binding = ContentPostRemovedBinding.inflate(LayoutInflater.from(context), this, true)
-    }
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        binding = ContentPostRemovedBinding.inflate(LayoutInflater.from(context), this, true)
-    }
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        binding = ContentPostRemovedBinding.inflate(LayoutInflater.from(context), this, true)
-    }
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        binding = ContentPostRemovedBinding.inflate(LayoutInflater.from(context), this, true)
-    }
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     override fun updateView() {
         binding.post = redditPost

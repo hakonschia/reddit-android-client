@@ -1,13 +1,24 @@
 package com.example.hakonsreader.api.interfaces
 
+import com.example.hakonsreader.api.model.RedditListing
 import com.example.hakonsreader.api.responses.ApiResponse
 
 /**
- * Interface for requests that offer functionality to save/unsave a post or comment
+ * Interface for a [RedditListing] that can be saved/unsaved
  */
 interface SaveableRequest {
 
-    suspend fun save() : ApiResponse<Nothing?>
+    /**
+     * Save the listing
+     *
+     * @return No response data is returned
+     */
+    suspend fun save() : ApiResponse<Any?>
 
-    suspend fun unsave() : ApiResponse<Nothing?>
+    /**
+     * Unsave the listing
+     *
+     * @return No response data is returned
+     */
+    suspend fun unsave() : ApiResponse<Any?>
 }

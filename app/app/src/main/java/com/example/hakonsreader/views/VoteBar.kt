@@ -24,10 +24,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
+/**
+ * View for displaying a vote bar for a [VoteableListing]. This displays one button for upvoting the listing
+ * and one button for downvoting the listing, as well as a text with the score of the listing
+ */
 class VoteBar : FrameLayout {
-    // TODO when you upvote a post, go into the post, unvote/downvote, then go out to the list again
-    //  and cast another vote it will be unsynced since it doesn't update the post in the list of posts
-    //  Not really relevant to this class, but putting it here as a reminder
 
     private val binding = VoteBarBinding.inflate(LayoutInflater.from(context), this, true).apply {
         upvote.setOnClickListener { vote(VoteType.UPVOTE) }
@@ -36,11 +37,21 @@ class VoteBar : FrameLayout {
     }
 
 
+    /**
+     * If set to true, the score of the listing will be hidden
+     */
     var hideScore = false
+
+    /**
+     * The listing to show in the vote bar. Setting this automatically updates the view (unless
+     * the passed value is `null`)
+     */
     var listing: VoteableListing? = null
         set(value) {
             field = value
-            updateVoteStatus()
+            if (value != null) {
+                updateVoteStatus()
+            }
         }
 
     constructor(context: Context) : super(context)

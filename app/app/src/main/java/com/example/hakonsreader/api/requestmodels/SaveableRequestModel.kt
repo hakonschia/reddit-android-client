@@ -10,7 +10,9 @@ import com.example.hakonsreader.api.utils.apiError
 import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
-
+/**
+ * Request model for communicating with saveable reddit listings
+ */
 class SaveableRequestModel(
         private val accessToken: AccessToken,
         private val api: SaveService

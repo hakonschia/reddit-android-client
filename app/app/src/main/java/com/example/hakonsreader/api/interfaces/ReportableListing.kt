@@ -1,7 +1,9 @@
 package com.example.hakonsreader.api.interfaces
 
+import com.example.hakonsreader.api.model.RedditListing
+
 /**
- * Interface for listings that are reportable
+ * Interface for a [RedditListing] that can be reported
  */
 interface ReportableListing {
     /**

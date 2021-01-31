@@ -4,7 +4,7 @@ import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.model.RedditListing
 
 /**
- * Interface for a class extending [RedditListing] that is voteable
+ * Interface for a [RedditListing] that can be voted on
  */
 interface VoteableListing {
 
