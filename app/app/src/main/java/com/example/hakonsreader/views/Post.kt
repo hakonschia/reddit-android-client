@@ -298,7 +298,7 @@ class Post : Content {
         return when (post.getPostType()) {
             PostType.IMAGE -> {
                 ContentImage(context).apply {
-                    setImageLoadedCallback(this@Post.imageLoadedCallback)
+                    imageLoadedCallback = this@Post.imageLoadedCallback
                 }
             }
 
