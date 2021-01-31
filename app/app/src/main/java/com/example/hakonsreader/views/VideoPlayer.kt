@@ -19,6 +19,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.VideoActivity
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.views.util.VideoCache
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor
@@ -166,7 +167,7 @@ class VideoPlayer : PlayerView {
     var mp4Video = false
 
     /**
-     * True if the video should be cached
+     * True if the video and thumbnail should be cached
      *
      * Default to `true`
      */
@@ -386,6 +387,7 @@ class VideoPlayer : PlayerView {
             Picasso.get()
                     .load(thumbnailUrl)
                     // .resize(params.width, params.height)
+                    .cache(cacheVideo)
                     .into(thumbnail)
         } else if (thumbnailDrawable != -1) {
             Picasso.get()

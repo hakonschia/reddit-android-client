@@ -47,9 +47,7 @@ class ContentVideo : Content {
         setThumbnailUrl()
         setVideo()
 
-        if (redditPost.isNsfw && App.get().dontCacheNSFW()) {
-            player.cacheVideo = false
-        }
+        player.cacheVideo = cache
 
         if (App.get().muteVideoByDefault()) {
             player.toggleVolume(false)

@@ -11,11 +11,13 @@ import com.example.hakonsreader.App.Companion.get
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentImageBinding
+import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import com.example.hakonsreader.views.util.openImageInFullscreen
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.RequestCreator
 
 /**
  * Content view for Reddit images posts.
@@ -80,21 +82,18 @@ class ContentImage : Content {
                 // When opening the image we always want to open the normal
                 setOnClickListener { openImageInFullscreen(binding.image, normal) }
 
-                // If we have an obfuscated image, load that here instead
-                var creator = Picasso.get()
-                        .load(url)
-                        .placeholder(R.drawable.ic_wifi_tethering_150dp)
-                        .error(R.drawable.ic_wifi_tethering_150dp) // Scale so the image fits the width of the screen
-                        .resize(get().screenWidth, 0)
-
-                // Post is NSFW and user has chosen not to cache NSFW
                 // TODO this won't work as the actual image is only loaded in fullscreen, what is not cached here
                 //  is the obfuscated image, need to pass "dontCache" to ImageActivity
-                if (redditPost.isNsfw && get().dontCacheNSFW()) {
-                    // Don't store in cache and don't look in cache as this image will never be there
-                    creator = creator.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                }
-                creator.into(binding.image, imageLoadedCallback)
+
+                // If we have an obfuscated image, load that here instead
+                Picasso.get()
+                        .load(url)
+                        .placeholder(R.drawable.ic_wifi_tethering_150dp)
+                        .error(R.drawable.ic_wifi_tethering_150dp)
+                        .cache(cache)
+                        // Scale so the image fits the width of the screen
+                        .resize(get().screenWidth, 0)
+                        .into(binding.image, imageLoadedCallback)
             }
         } catch (e: RuntimeException) {
             e.printStackTrace()

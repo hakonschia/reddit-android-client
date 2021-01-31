@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
+import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.model.RedditPost;
 
 import java.util.ArrayList;
@@ -31,6 +32,11 @@ public abstract class Content extends FrameLayout {
      * The post the content is for
      */
     protected RedditPost redditPost;
+
+    /**
+     * If true, the content of {@link #redditPost} should be cached
+     */
+    protected boolean cache;
 
     /**
      * A bundle of extras. This will by default always be empty and it is up to subclasses
@@ -89,6 +95,7 @@ public abstract class Content extends FrameLayout {
     public void setRedditPost(@Nullable RedditPost redditPost) {
         this.redditPost = redditPost;
         if (redditPost != null) {
+            cache = !(redditPost.isNsfw() && App.Companion.get().dontCacheNSFW());
             this.updateView();
         }
     }

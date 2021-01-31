@@ -8,6 +8,7 @@ import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.RequestCreator
 
 /**
  * Loads an image from a network URL with a preferred and a backup URL. The backup URL will only
@@ -28,6 +29,21 @@ fun Picasso.loadIf(preferredUrl: String?, backupUrl: String?, into: ImageView) {
             this@loadIf.load(backupUrl).into(into)
         }
     })
+}
+
+/**
+ * Enable or disable cache when loading images with Picasso
+ *
+ * @param cache If true the image will be cached
+ * @return A RequestCreator that will set the [RequestCreator.networkPolicy] with [NetworkPolicy.NO_CACHE]
+ * and [NetworkPolicy.NO_STORE] if [cache] is false. Otherwise, the creator is returned as is
+ */
+fun RequestCreator.cache(cache: Boolean) : RequestCreator {
+    return if (cache) {
+        this
+    } else {
+        this.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
+    }
 }
 
 /**

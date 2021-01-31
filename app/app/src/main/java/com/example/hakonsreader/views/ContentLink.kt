@@ -16,6 +16,7 @@ import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
+import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import com.squareup.picasso.Picasso
 
@@ -77,6 +78,7 @@ class ContentLink : Content {
         if (url != null) {
             Picasso.get()
                     .load(url)
+                    .cache(cache)
                     .into(binding.thumbnail)
         } else {
             val params: ViewGroup.LayoutParams = binding.thumbnail.layoutParams

@@ -11,6 +11,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.VideoYoutubeActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentYoutubeVideoBinding
+import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import com.squareup.picasso.Picasso
 
@@ -26,10 +27,10 @@ class ContentYoutubeVideo : Content {
 
     private val binding = ContentYoutubeVideoBinding.inflate(LayoutInflater.from(context), this, true)
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun updateView() {
         val variants = getImageVariantsForRedditPost(redditPost)
@@ -43,6 +44,7 @@ class ContentYoutubeVideo : Content {
         if (url != null) {
             Picasso.get()
                     .load(url)
+                    .cache(cache)
                     .into(binding.thumbnail)
         } else {
             val params: ViewGroup.LayoutParams = binding.thumbnail.layoutParams
