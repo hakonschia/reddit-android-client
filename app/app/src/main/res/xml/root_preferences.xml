@@ -234,7 +234,6 @@
             app:singleLineTitle="false"
             app:iconSpaceReserved="false" />
 
-        <!-- TODO hide comments from users ("This will also remove their child comments") -->
     </PreferenceCategory>
 
 

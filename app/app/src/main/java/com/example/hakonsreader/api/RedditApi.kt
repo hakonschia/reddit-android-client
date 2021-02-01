@@ -17,6 +17,7 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.*
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
+import kotlinx.coroutines.Job
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -226,6 +227,8 @@ class RedditApi constructor(
         check(clientId.isNotBlank()) { "Client ID must not be empty" }
         createServices()
     }
+
+    val tokenJob: Job? = null
 
     /**
      * The access token that is used internally. When this is set, [onNewToken] is notified
@@ -560,22 +563,14 @@ class RedditApi constructor(
      */
     private inner class Authenticator : okhttp3.Authenticator {
         override fun authenticate(route: Route?, response: Response): Request? {
-            var newToken: AccessToken? = null
-
             // If we have an access token with a refresh token the token is for a logged in user and can be refreshed
-            if (accessTokenInternal.refreshToken != null) {
-                newToken = refreshToken()
-
-                // Token refreshed
-                if (newToken != null) {
-                    // The response does not send a new refresh token, so make sure the old one is saved
-                    newToken.refreshToken = accessTokenInternal.refreshToken
-                }
-            }
-
-            // No new token yet, either no user is logged in or the refresh failed
-            if (newToken == null) {
-                newToken = newNonLoggedInToken()
+            val newToken = if (accessTokenInternal.refreshToken != null) {
+                // The response does not send a new refresh token, so make sure the old one is saved
+                refreshToken()?.apply {
+                    refreshToken = accessTokenInternal.refreshToken
+                } ?: newNonLoggedInToken()
+            } else {
+                newNonLoggedInToken()
             }
 
             // New token received
@@ -596,14 +591,11 @@ class RedditApi constructor(
          * @return The new access token, or null if it couldn't be refreshed
          */
         private fun refreshToken() : AccessToken? {
-            var newToken: AccessToken? = null
-            try {
+            return try {
                 val call = accessTokenApi.refreshTokenNoSuspend(
                         basicAuthHeader,
                         accessTokenInternal.refreshToken,
                 ).execute()
-
-                newToken = call.body()
 
                 // If we get a 400 Bad Request when attempting to refresh the token, the token has been
                 // invalidated outside of the control of the API (ie. the applications access from reddit.com/prefs/apps
@@ -619,14 +611,13 @@ class RedditApi constructor(
                     )
                 }
 
-                if (newToken != null) {
-                    newToken.refreshToken = accessTokenInternal.refreshToken
+                call.body()?.apply {
+                    refreshToken = accessTokenInternal.refreshToken
                 }
-
             } catch (e: IOException) {
                 e.printStackTrace()
+                null
             }
-            return newToken
         }
     }
 

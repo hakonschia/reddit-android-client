@@ -108,7 +108,6 @@
             app:layout_constraintTop_toBottomOf="@+id/commentFrom"
             tools:text="Sent 5 hours ago" />
 
-        <!-- TODO the body uses markwon and the onClick doesn't work for the comment body -->
         <TextView
             android:id="@+id/body"
             android:layout_width="wrap_content"
@@ -116,6 +115,7 @@
 
             android:textColor="@color/text_color"
             app:markdown="@{message.body}"
+            android:onClick="@{(view) -> InboxAdapterKt.openMessageContext(view, message.context)}"
 
             app:layout_constraintStart_toStartOf="@+id/commentFrom"
             app:layout_constraintTop_toBottomOf="@+id/age"

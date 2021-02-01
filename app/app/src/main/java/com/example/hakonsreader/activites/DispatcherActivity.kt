@@ -95,11 +95,11 @@ class DispatcherActivity : AppCompatActivity() {
 
         val intent = url?.let { createIntent(it) }
 
+        startActivity(intent)
+
         if (fadeTransition) {
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
-
-        startActivity(intent)
     }
 
 

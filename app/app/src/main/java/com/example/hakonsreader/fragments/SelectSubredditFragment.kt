@@ -121,7 +121,6 @@ class SelectSubredditFragment : Fragment() {
         super.onResume()
 
         // If there's text in the input field, returning to the fragment should not trigger another search
-        // TODO restore the list as well
         searchTimerTask?.cancel()
     }
 

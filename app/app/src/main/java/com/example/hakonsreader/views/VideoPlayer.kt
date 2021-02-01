@@ -144,6 +144,12 @@ class VideoPlayer : PlayerView {
             loadThumbnail()
         }
 
+    /**
+     * The drawable to use for the thumbnail. If this and [thumbnailUrl] is set, [thumbnailUrl] has
+     * precedence. Setting this value will automatically load the thumbnail
+     *
+     * By default, an "Image not found" drawable is used
+     */
     var thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
         set(value) {
             field = value
@@ -263,12 +269,12 @@ class VideoPlayer : PlayerView {
     /**
      * The ExoPlayer displaying the video
      */
-    private var exoPlayer = createExoPlayer()
+    private val exoPlayer = createExoPlayer()
 
     /**
      * The ImageView displaying [thumbnailUrl]
      */
-    private var thumbnail: ImageView = findViewById(R.id.thumbnail)
+    private val thumbnail: ImageView = findViewById(R.id.thumbnail)
 
     /**
      * True if [exoPlayer] has been prepared
@@ -330,8 +336,6 @@ class VideoPlayer : PlayerView {
             }
 
             override fun onLoadingChanged(isLoading: Boolean) {
-                // TODO is this even visible? If the controller isn't visible this wont be visisble
-                //  it should be a part of the entire View, not just the controller view
                 loader.visibility = if (isLoading) VISIBLE else GONE
             }
 
@@ -433,11 +437,11 @@ class VideoPlayer : PlayerView {
 
         // I don't even really know why this works, but the actual video player will be in the
         // middle of the screen without being stretched, as I want to, and the controller goes
-        // to the screen width, which is also what I want to
-        // Kinda weird to create the params like this
-        val params = layoutParams ?: ViewGroup.LayoutParams(app.screenWidth, height)
-        params.width = app.screenWidth
-        params.height = height
+        // to the screen width, which is also what I want
+        val params = layoutParams?.also {
+            it.width = app.screenWidth
+            it.height = height
+        } ?: ViewGroup.LayoutParams(app.screenWidth, height)
 
         layoutParams = params
     }
@@ -457,8 +461,9 @@ class VideoPlayer : PlayerView {
             fullscreen.setOnClickListener {
                 fullScreenListener?.run()
 
-                val intent = Intent(context, VideoActivity::class.java)
-                intent.putExtra(VideoActivity.EXTRAS, getExtras())
+                val intent = Intent(context, VideoActivity::class.java).apply {
+                    putExtra(VideoActivity.EXTRAS, this@VideoPlayer.getExtras())
+                }
 
                 // Pause the video here so it doesn't play both places
                 pause()
@@ -467,8 +472,10 @@ class VideoPlayer : PlayerView {
             }
         } else {
             // If we are in a video activity and press fullscreen, show an "Exit fullscreen" icon and exit the activity
-            fullscreen.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fullscreen_exit_24dp))
-            fullscreen.setOnClickListener { (context as Activity).finish() }
+            fullscreen.apply {
+                setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fullscreen_exit_24dp))
+                setOnClickListener { (context as Activity).finish() }
+            }
         }
     }
 
@@ -478,8 +485,7 @@ class VideoPlayer : PlayerView {
      * [onManuallyPaused] will be called if not null
      */
     private fun setPauseButtonListener() {
-        val pauseButton: ImageButton = findViewById(R.id.exo_pause)
-        pauseButton.setOnClickListener {
+        findViewById<ImageButton>(R.id.exo_pause).setOnClickListener {
             // When overriding the click listener we need to manually pause the video
             pause()
             onManuallyPaused?.run()
@@ -490,16 +496,16 @@ class VideoPlayer : PlayerView {
      * Sets the listener for the volume button
      */
     private fun setVolumeListener() {
-        val volumeButton: ImageButton = findViewById(R.id.volumeButton)
-
-        volumeButton.setOnClickListener {
-            // TODO should this be in the listener? makes no sense really
-            val audioComponent = exoPlayer.audioComponent
-            // No audio, remove the button
-            if (audioComponent == null) {
-                it.visibility = GONE
-            } else {
-                toggleVolume()
+        findViewById<ImageButton>(R.id.volumeButton).apply {
+            setOnClickListener {
+                // TODO should this be in the listener? makes no sense really
+                val audioComponent = exoPlayer.audioComponent
+                // No audio, remove the button
+                if (audioComponent == null) {
+                    it.visibility = GONE
+                } else {
+                    toggleVolume()
+                }
             }
         }
     }
@@ -581,9 +587,8 @@ class VideoPlayer : PlayerView {
      * if false the volume is turned off. If this is null, the volume will be toggled based on the current state
      */
     fun toggleVolume(on: Boolean? = null) {
-        val audioComponent = exoPlayer.audioComponent
-        if (audioComponent != null) {
-            val volume = audioComponent.volume
+        exoPlayer.audioComponent?.let {
+            val volume = it.volume
 
             // If volume is off (not 1), set it to on
             // Use value of "on" if not null, otherwise toggle
@@ -593,15 +598,20 @@ class VideoPlayer : PlayerView {
             val button = findViewById<ImageButton>(R.id.volumeButton)
             button.setImageDrawable(drawable)
 
-            audioComponent.volume = if (volumeOn) 1f else 0f
+            it.volume = if (volumeOn) 1f else 0f
         }
     }
 
+    /**
+     * Makes the video fit the screen (sets width=MATCH_PARENT and height=WRAP_CONTENT).
+     * The controller will be at the bottom of the video, not the screen
+     */
     fun fitScreen() {
-        val params = layoutParams
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT
-        params.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        layoutParams = params
+        layoutParams?.apply {
+            this.width = ViewGroup.LayoutParams.MATCH_PARENT
+            this.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            layoutParams = this
+        }
     }
 
     fun getExtras() : Bundle {

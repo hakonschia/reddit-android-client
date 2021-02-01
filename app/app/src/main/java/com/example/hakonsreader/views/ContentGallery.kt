@@ -84,9 +84,10 @@ class ContentGallery : Content {
                 // swipe on the gallery, not remove the activity (this would probably be wrong for RTL layouts?)
                 lockSlidr(position != 0)
 
-                // Unselect the previous and set new and select that
+                // Unselect the previous and
                 currentView?.viewUnselected()
 
+                // Set new and select that
                 currentView = findViewWithTag(position)
                 currentView?.viewSelected()
             }
@@ -133,9 +134,9 @@ class ContentGallery : Content {
     }
 
     override fun getExtras(): Bundle {
-        val extras = super.getExtras()
-        extras.putInt(EXTRAS_ACTIVE_IMAGE, binding.galleryImages.currentItem)
-        return extras
+        return super.getExtras().apply {
+            putInt(EXTRAS_ACTIVE_IMAGE, binding.galleryImages.currentItem)
+        }
     }
 
     override fun setExtras(extras: Bundle) {
@@ -174,12 +175,14 @@ class ContentGallery : Content {
 
     private inner class Adapter(private val images: List<Image>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            // Destroy previous image
-            holder.image.destroy()
+            with (holder.image) {
+                // Destroy previous image
+                destroy()
 
-            val image = images[position]
-            holder.image.image = image
-            holder.image.tag = position
+                val image = images[position]
+                this.image = image
+                tag = position
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

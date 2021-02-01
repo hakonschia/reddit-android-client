@@ -1,6 +1,8 @@
 package com.example.hakonsreader.api.utils;
 
 
+import androidx.annotation.Nullable;
+
 /**
  * Utility class that contains various regex matchers and functions to deal with common problems for
  * links from Reddit
