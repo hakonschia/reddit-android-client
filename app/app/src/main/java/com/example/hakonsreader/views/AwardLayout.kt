@@ -145,7 +145,7 @@ class AwardLayout : FrameLayout {
     private fun showAwardDescription(award: RedditAward) {
         ShowAwardBottomSheet().run {
             this.award = award
-            show((context as AppCompatActivity).supportFragmentManager, "Award bottom sheet")
+            show((this@AwardLayout.context as AppCompatActivity).supportFragmentManager, "Award bottom sheet")
         }
     }
 }
