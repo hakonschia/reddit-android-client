@@ -34,7 +34,7 @@ import java.util.*
  *
  * Example creation of an object:
  * ```
- * val api = RedditApiKt(
+ * val api = RedditApi(
  *    // User-Agent and client ID must always be set and cannot be empty
  *    userAgent = NetworkConstants.USER_AGENT,
  *    clientId = NetworkConstants.CLIENT_ID,
@@ -227,8 +227,6 @@ class RedditApi constructor(
         check(clientId.isNotBlank()) { "Client ID must not be empty" }
         createServices()
     }
-
-    val tokenJob: Job? = null
 
     /**
      * The access token that is used internally. When this is set, [onNewToken] is notified

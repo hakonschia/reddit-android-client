@@ -149,7 +149,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
 
     override fun onResume() {
         super.onResume()
-        App.get().setActiveActivity(this)
 
         if (videoPlayingWhenPaused) {
             binding.post.viewSelected()

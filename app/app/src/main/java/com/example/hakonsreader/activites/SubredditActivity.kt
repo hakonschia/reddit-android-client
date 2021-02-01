@@ -129,11 +129,6 @@ class SubredditActivity : BaseActivity(), LockableSlidr {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        App.get().setActiveActivity(this)
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         supportFragmentManager.putFragment(outState, SAVED_SUBREDDIT, fragment!!)

@@ -103,11 +103,6 @@ class ReplyActivity : BaseActivity() {
         showNotLoggedInDialogIfNotLoggedIn()
     }
 
-    override fun onResume() {
-        super.onResume()
-        App.get().setActiveActivity(this)
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 

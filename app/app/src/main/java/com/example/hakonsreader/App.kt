@@ -6,8 +6,10 @@ import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
+import com.example.hakonsreader.activites.InvalidAccessTokenActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditUser
@@ -146,7 +148,6 @@ class App : Application() {
     val adjuster: MarkdownAdjuster = createMarkdownAdjuster()
 
     private val privateBrowsingObservables: MutableList<PrivateBrowsingObservable> = ArrayList()
-    private var activeActivity: Activity? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -773,17 +774,6 @@ class App : Application() {
         )
     }
 
-
-    /**
-     * Sets the activity currently active. This is used to show a dialog on the rare occasion that
-     * the user has revoked the applications access and a dialog must be shown that they must log in again
-     *
-     * @param activeActivity The activity currently active
-     */
-    fun setActiveActivity(activeActivity: Activity?) {
-        this.activeActivity = activeActivity
-    }
-
     /**
      * Handles when the API notifies that the access token is no longer valid, and the user should
      * be logged out and prompted to log back in.
@@ -791,15 +781,9 @@ class App : Application() {
     private fun onInvalidAccessToken() {
         clearUserInfo()
 
-        // Should we also recreate the app? We could have posts for the user, be in the profile etc
-
-        // Storing an activity like this is probably very bad? What happens if we forget to use
-        // setActiveActivity()? I don't know how else to overlay a dialog from an Application class
-        activeActivity?.runOnUiThread {
-            AlertDialog.Builder(activeActivity)
-                    .setTitle(R.string.applicationAccessRevokedHeader)
-                    .setMessage(R.string.applicationAccessRevokedContent)
-                    .show()
+        Intent(this, InvalidAccessTokenActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(this)
         }
     }
 

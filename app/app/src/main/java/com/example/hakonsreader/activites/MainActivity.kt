@@ -125,7 +125,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     override fun onResume() {
         super.onResume()
-        App.get().setActiveActivity(this)
 
         val uri = intent.data ?: return
 

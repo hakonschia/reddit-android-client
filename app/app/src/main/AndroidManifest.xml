@@ -78,6 +78,10 @@
             android:windowSoftInputMode="adjustPan" />
 
         <activity
+            android:name=".activites.InvalidAccessTokenActivity"
+            android:theme="@style/AppTheme.DispatcherTheme"/>
+
+        <activity
             android:name=".activites.DispatcherActivity"
             android:theme="@style/AppTheme.DispatcherTheme">
 
