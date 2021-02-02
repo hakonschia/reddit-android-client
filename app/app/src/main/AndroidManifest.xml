@@ -129,6 +129,7 @@
 
             <!-- Subreddits -->
             <tools:validation testUrl="https://www.reddit.com/r/GlobalOffensive/" />
+            <tools:validation testUrl="https://reddit.com/r/GlobalOffensive/" />
             <tools:validation testUrl="https://old.reddit.com/r/GlobalOffensive/" />
             <tools:validation testUrl="http://reddit.com/r/GlobalOffensive/" />
 
@@ -146,6 +147,10 @@
                     android:host="reddit.com"
                     android:pathPattern="/r/"
                     android:scheme="http" />
+                <data
+                    android:host="reddit.com"
+                    android:pathPattern="/r/"
+                    android:scheme="https" />
             </intent-filter>
 
 

@@ -122,7 +122,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             restoreFragmentStates(savedInstanceState)
         } else {
             // Use empty string as default (ie. front page)
-            val startSubreddit = intent.extras?.getString(START_SUBREDDIT) ?: "popular"
+            val startSubreddit = intent.extras?.getString(START_SUBREDDIT) ?: ""
             // Only setup the start fragment if we have no state to restore (as this is then a new activity)
             setupStartFragment(startSubreddit)
 

@@ -130,10 +130,18 @@ class DispatcherActivity : AppCompatActivity() {
             // Subreddits: https://reddit.com/r/GlobalOffensive
             url.matches(LinkUtils.SUBREDDIT_REGEX_COMBINED.toRegex(RegexOption.IGNORE_CASE)) -> {
                 // First is "r", second is the subreddit
-                val subreddit = pathSegments[1]
+                val subreddit = pathSegments[1].toLowerCase()
 
-                Intent(this, SubredditActivity::class.java).apply {
-                    putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit)
+                // TODO if the application is "new" we can also pass the subreddit to MainActivity since
+                //  the subreddit will be sent to the navbar subreddit and we wont mess up anything else
+                if (subreddit == "popular" || subreddit == "all") {
+                    Intent(this, MainActivity::class.java).apply {
+                        putExtra(MainActivity.START_SUBREDDIT, subreddit)
+                    }
+                } else {
+                    Intent(this, SubredditActivity::class.java).apply {
+                        putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit)
+                    }
                 }
             }
 
