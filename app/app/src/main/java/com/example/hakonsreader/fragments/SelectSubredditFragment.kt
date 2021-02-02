@@ -56,6 +56,13 @@ private const val SUBREDDIT_SEARCH_DELAY: Long = 500
  * to search for subreddits by a search field
  */
 class SelectSubredditFragment : Fragment() {
+    companion object {
+        /**
+         * @return A new instance of this fragment
+         */
+        fun newInstance() = SelectSubredditFragment()
+    }
+
     private val TAG = "SelectSubredditFragment"
 
     private var _binding: FragmentSelectSubredditBinding? = null

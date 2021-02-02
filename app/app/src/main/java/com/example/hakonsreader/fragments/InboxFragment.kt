@@ -19,6 +19,12 @@ import kotlinx.coroutines.launch
  * Fragment for displaying a users inbox
  */
 class InboxFragment : Fragment() {
+    companion object {
+        /**
+         * @return A new instance of this fragment
+         */
+        fun newInstance() = InboxFragment()
+    }
 
     private var _binding: FragmentInboxBinding? = null
     private val binding get() = _binding!!

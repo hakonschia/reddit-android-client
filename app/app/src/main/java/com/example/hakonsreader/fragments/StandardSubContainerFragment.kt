@@ -20,13 +20,17 @@ class StandardSubContainerFragment : Fragment() {
          * The key used to store the subreddit currently visible on the screen
          */
         private const val ACTIVE_SUBREDDIT_KEY = "active_subreddit_posts_container"
+
+        /**
+         * @return A new instance of this fragment
+         */
+        fun newInstance() = StandardSubContainerFragment()
     }
 
     enum class StandarSub(val value: String) {
         FRONT_PAGE(""),
         POPULAR("Popular"),
         ALL("All")
-
     }
 
     /**

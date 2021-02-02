@@ -16,6 +16,12 @@ import com.example.hakonsreader.constants.NetworkConstants
  * Fragment for logging in
  */
 class LogInFragment : Fragment() {
+    companion object {
+        /**
+         * @return A new instance of this fragment
+         */
+        fun newInstance() = LogInFragment()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_log_in, container, false).apply {

@@ -184,7 +184,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
                 // If the fragment has been killed by the OS make a new one (after a while it might be killed)
                 if (selectSubredditFragment == null) {
-                    selectSubredditFragment = SelectSubredditFragment()
+                    selectSubredditFragment = SelectSubredditFragment.newInstance()
                 }
 
                 // Since we are in a way going back in the same navbar item, use the close transition
@@ -235,7 +235,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     override fun onInboxClicked() {
         if (inboxFragment == null) {
-            inboxFragment = InboxFragment()
+            inboxFragment = InboxFragment.newInstance()
         }
 
         navigationViewListener.profileLastShownIsProfile = false
@@ -587,7 +587,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         profileFragment = supportFragmentManager.getFragment(restoredState, PROFILE_FRAGMENT) as ProfileFragment?
 
         if (standardSubFragment == null) {
-            standardSubFragment = StandardSubContainerFragment()
+            standardSubFragment = StandardSubContainerFragment.newInstance()
             standardSubFragment!!.restoreState(restoredState)
         }
 
@@ -615,7 +615,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      */
     private fun setupStartFragment() {
         if (standardSubFragment == null) {
-            standardSubFragment = StandardSubContainerFragment()
+            standardSubFragment = StandardSubContainerFragment.newInstance()
         }
 
         standardSubFragment?.let {
@@ -645,7 +645,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 R.id.navSubreddit -> {
                     activeSubreddit = null
                     if (selectSubredditFragment == null) {
-                        selectSubredditFragment = SelectSubredditFragment()
+                        selectSubredditFragment = SelectSubredditFragment.newInstance()
                         selectSubredditFragment!!.subredditSelected = this
                     }
 
@@ -731,7 +731,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 R.id.navHome -> {
                     navBarPos = 1
                     if (standardSubFragment == null) {
-                        standardSubFragment = StandardSubContainerFragment()
+                        standardSubFragment = StandardSubContainerFragment.newInstance()
                     }
                     selected = standardSubFragment as StandardSubContainerFragment
                 }
@@ -746,7 +746,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 R.id.navSettings -> {
                     navBarPos = 4
                     if (settingsFragment == null) {
-                        settingsFragment = SettingsFragment().apply {
+                        settingsFragment = SettingsFragment.newInstance().apply {
                             languageListener
                         }
                     }
@@ -797,7 +797,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          * the animation slides so it makes sense based on the nav bar
          */
         private fun replaceNavBarFragment(fragment: Fragment, goingRight: Boolean) {
-            supportFragmentManager.beginTransaction() // TODO if there is an ongoing transition and the user selects another nav bar item, the app crashes (need to somehow cancel the ongoing transition or something)
+            supportFragmentManager.beginTransaction()
+                    // TODO if there is an ongoing transition and the user selects another nav bar item, the app crashes (need to somehow cancel the ongoing transition or something)
                     .setCustomAnimations(if (goingRight) R.anim.slide_in_right else R.anim.slide_in_left, if (goingRight) R.anim.slide_out_left else R.anim.slide_out_right)
                     .replace(R.id.fragmentContainer, fragment) // Although we don't use the backstack to pop elements, it is needed to keep the state
                     // of the fragments (otherwise posts are reloaded when coming back)
@@ -822,7 +823,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             // No subreddit created (first time here), or we in a subreddit looking to get back
             return if (activeSubreddit == null) {
                 if (selectSubredditFragment == null) {
-                    selectSubredditFragment = SelectSubredditFragment().also {
+                    selectSubredditFragment = SelectSubredditFragment.newInstance().also {
                         it.subredditSelected = this@MainActivity
                     }
                 }
@@ -848,7 +849,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     profileLastShownIsProfile = false
 
                     if (inboxFragment == null) {
-                        inboxFragment = InboxFragment()
+                        inboxFragment = InboxFragment.newInstance()
                     }
                     inboxFragment!!
                 } else {
@@ -866,7 +867,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                         // Inbox shown last, show inbox again
                         false -> {
                             if (inboxFragment == null) {
-                                inboxFragment = InboxFragment()
+                                inboxFragment = InboxFragment.newInstance()
                             }
                             inboxFragment!!
                         }
@@ -874,7 +875,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
             } else {
                 if (logInFragment == null) {
-                    logInFragment = LogInFragment()
+                    logInFragment = LogInFragment.newInstance()
                 }
                 logInFragment!!
             }

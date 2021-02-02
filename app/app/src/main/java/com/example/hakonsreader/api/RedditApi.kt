@@ -17,7 +17,6 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.service.*
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
-import kotlinx.coroutines.Job
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -321,7 +320,7 @@ class RedditApi constructor(
         }
 
         // Http client for API calls that use an access token as the authorization
-        val apiClient = OkHttpClient.Builder()
+        val redditClient = OkHttpClient.Builder()
                 // Automatically refresh access token on authentication errors (401)
                 .authenticator(Authenticator())
                 // Add User-Agent header to every request
@@ -336,18 +335,19 @@ class RedditApi constructor(
 
         // Create the API service used to make calls towards oauth.reddit.com. This is used for
         // any API call towards Reddit that doesn't have to do with authentication
-        val apiRetrofit = Retrofit.Builder()
+        Retrofit.Builder()
                 .baseUrl("https://oauth.reddit.com/")
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(apiClient)
+                .client(redditClient)
                 .build()
-
-        userApi = apiRetrofit.create(UserService::class.java)
-        subredditApi = apiRetrofit.create(SubredditService::class.java)
-        subredditsApi = apiRetrofit.create(SubredditsService::class.java)
-        postApi = apiRetrofit.create(PostService::class.java)
-        commentApi = apiRetrofit.create(CommentService::class.java)
-        messageApi = apiRetrofit.create(MessageService::class.java)
+                .apply {
+                    userApi = create(UserService::class.java)
+                    subredditApi = create(SubredditService::class.java)
+                    subredditsApi = create(SubredditsService::class.java)
+                    postApi = create(PostService::class.java)
+                    commentApi = create(CommentService::class.java)
+                    messageApi = create(MessageService::class.java)
+                }
 
         val thirdPartyCacheInterceptor = Interceptor { chain ->
             val request = chain.request().newBuilder()
@@ -360,8 +360,7 @@ class RedditApi constructor(
         if (!imgurClientId.isNullOrBlank()) {
             val imgurClient = OkHttpClient.Builder()
                     .addInterceptor { chain ->
-                        val original = chain.request()
-                        val request = original.newBuilder()
+                        val request = chain.request().newBuilder()
                                 .header("Authorization", "Client-ID $imgurClientId")
                                 .build()
                         chain.proceed(request)
@@ -371,13 +370,14 @@ class RedditApi constructor(
                     .addInterceptor(logger)
                     .build()
 
-            val imgurRetrofit = Retrofit.Builder()
+            Retrofit.Builder()
                     .baseUrl("https://api.imgur.com/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(imgurClient)
                     .build()
-
-            imgurService = imgurRetrofit.create(ImgurService::class.java)
+                    .apply {
+                        imgurService = create(ImgurService::class.java)
+                    }
         }
 
         val gfycatClient = OkHttpClient.Builder()
@@ -385,15 +385,14 @@ class RedditApi constructor(
                 .cache(thirdPartyCache)
                 .addInterceptor(logger)
                 .build()
-        val gfycatRetrofit = Retrofit.Builder()
+        Retrofit.Builder()
                 .baseUrl("https://api.gfycat.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(gfycatClient)
                 .build()
-        gfycatService = gfycatRetrofit.create(GfycatService::class.java)
-
-        // Http client for OAuth related API calls (such as retrieving access tokens)
-        // The service created with this is for "RedditApi.accessToken()"
+                .apply {
+                    gfycatService = create(GfycatService::class.java)
+                }
 
         // Http client for OAuth related API calls (such as retrieving access tokens)
         // The service created with this is for "RedditApi.accessToken()"
@@ -402,15 +401,15 @@ class RedditApi constructor(
                 // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(logger)
                 .build()
-
-        // Authentication calls go to www.reddit.com, not oauth.reddit.com
-        val oauthRetrofit = Retrofit.Builder()
+        Retrofit.Builder()
+                // Authentication calls go to www.reddit.com, not oauth.reddit.com
                 .baseUrl("https://www.reddit.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(oauthClient)
                 .build()
-
-        accessTokenApi = oauthRetrofit.create(AccessTokenService::class.java)
+                .apply {
+                    accessTokenApi = create(AccessTokenService::class.java)
+                }
     }
 
     /**
@@ -625,7 +624,6 @@ class RedditApi constructor(
 
     /**
      * Interceptor that ensures that an access token is set and added as a request header.
-     *
      *
      * If no token is found a new token for non-logged in users is retrieved
      */

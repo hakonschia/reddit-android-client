@@ -22,6 +22,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
          * The String.format() format used for formatting the summary for the link scale
          */
         private const val LINK_SCALE_SUMMARY_FORMAT = "%.2f"
+
+        /**
+         * @return A new instance of this fragment
+         */
+        fun newInstance() = SettingsFragment()
     }
 
     private lateinit var settings: SharedPreferences
