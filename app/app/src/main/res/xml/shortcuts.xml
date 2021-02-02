@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The actual order of this when accessing the shortcut is reversed ¯\_(ツ)_/¯ -->
+
+    <!-- All -->
+    <shortcut
+        android:shortcutId="all"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/all"
+        android:icon="@drawable/ic_text_rotation_angleup_24">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.hakonsreader"
+            android:targetClass="com.example.hakonsreader.activites.DispatcherActivity"
+            android:data="r/all"/>
+    </shortcut>
+    <!-- Popular -->
+    <shortcut
+        android:shortcutId="popular"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/popular"
+        android:icon="@drawable/ic_trending_up_24">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.hakonsreader"
+            android:targetClass="com.example.hakonsreader.activites.DispatcherActivity"
+            android:data="r/popular"/>
+    </shortcut>
+
+    <!-- Front page -->
+    <shortcut
+        android:shortcutId="front_page"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/front_page"
+        android:icon="@drawable/ic_emoji_emotions_24dp">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.hakonsreader"
+            android:targetClass="com.example.hakonsreader.activites.DispatcherActivity"
+            android:data=""/>
+    </shortcut>
+</shortcuts>
