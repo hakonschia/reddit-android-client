@@ -60,6 +60,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          * be shown again instead of the list of subreddits
          */
         private const val ACTIVE_SUBREDDIT_NAME = "active_subreddit_name"
+
+        /**
+         * When creating this activity, set this on the extras to select the subreddit to show by default
+         *
+         * The value with this key should be a [String]
+         */
+        const val START_SUBREDDIT = "startSubreddit"
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -108,18 +115,21 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             //startActivity(this)
         }
 
+        setupNavBar(savedInstanceState)
+
         if (savedInstanceState != null) {
             savedState = savedInstanceState
             restoreFragmentStates(savedInstanceState)
         } else {
+            // Use empty string as default (ie. front page)
+            val startSubreddit = intent.extras?.getString(START_SUBREDDIT) ?: "popular"
             // Only setup the start fragment if we have no state to restore (as this is then a new activity)
-            setupStartFragment()
+            setupStartFragment(startSubreddit)
 
             // Only start the inbox listener once, or else every configuration change would start another timer
             startInboxListener()
         }
 
-        setupNavBar(savedInstanceState)
         App.get().registerReceivers()
     }
 
@@ -293,7 +303,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
                     withContext(Main) {
                         standardSubFragment = null
-                        setupStartFragment()
+                        setupStartFragment("")
                         Snackbar.make(binding.parentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT).show()
                     }
                 }
@@ -611,20 +621,32 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     /**
-     * Creates the posts fragment and replaces it in the container view
+     * Sets up the fragment to display at startup. This will create [standardSubFragment]
+     *
+     * @param startSubreddit The name of the subreddit to display. If this is a standard subreddit
+     * [standardSubFragment] will be shown with the corresponding subreddit selected. Otherwise,
+     * the [activeSubreddit] is set with the subreddit and is shown in the subreddit navbar
      */
-    private fun setupStartFragment() {
+    private fun setupStartFragment(startSubreddit: String) {
         if (standardSubFragment == null) {
             standardSubFragment = StandardSubContainerFragment.newInstance()
         }
 
-        standardSubFragment?.let {
-            // Use an open transition since we're calling this when the app has been started
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainer, it)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .addToBackStack(null)
-                    .commit()
+        val defaultSub = StandardSubContainerFragment.StandarSub.values().find { it.value == startSubreddit.toLowerCase() }
+
+        if (defaultSub != null) {
+            standardSubFragment!!.apply {
+                this.defaultSub = defaultSub
+                // Use an open transition since we're calling this when the app has been started
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer, this)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack(null)
+                        .commit()
+            }
+        } else {
+            activeSubreddit = SubredditFragment.newInstance(startSubreddit)
+            binding.bottomNav.selectedItemId = R.id.navSubreddit
         }
     }
 
@@ -645,8 +667,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 R.id.navSubreddit -> {
                     activeSubreddit = null
                     if (selectSubredditFragment == null) {
-                        selectSubredditFragment = SelectSubredditFragment.newInstance()
-                        selectSubredditFragment!!.subredditSelected = this
+                        selectSubredditFragment = SelectSubredditFragment.newInstance().apply {
+                            subredditSelected = this@MainActivity
+                        }
                     }
 
                     // Since we are in a way going back in the same navbar item, use the close transition

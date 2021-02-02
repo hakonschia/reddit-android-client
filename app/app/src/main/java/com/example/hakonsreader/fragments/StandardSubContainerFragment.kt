@@ -27,10 +27,16 @@ class StandardSubContainerFragment : Fragment() {
         fun newInstance() = StandardSubContainerFragment()
     }
 
+    /**
+     * Enum representing the names of the standard subs that this fragment can display.
+     *
+     * The enum value represents the subreddit name in lowercase, where front page is represented
+     * as an empty string
+     */
     enum class StandarSub(val value: String) {
         FRONT_PAGE(""),
-        POPULAR("Popular"),
-        ALL("All")
+        POPULAR("popular"),
+        ALL("all")
     }
 
     /**
@@ -77,9 +83,10 @@ class StandardSubContainerFragment : Fragment() {
     private fun setupFragments() {
         if (fragments.isEmpty()) {
             fragments.apply {
-                add(SubredditFragment.newInstance(StandarSub.FRONT_PAGE.value, SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
-                add(SubredditFragment.newInstance(StandarSub.POPULAR.value, SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
-                add(SubredditFragment.newInstance(StandarSub.ALL.value, SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
+                // We could use the enum value, but this is probably the easiest way to get the first letter capitalized
+                add(SubredditFragment.newInstance("", SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
+                add(SubredditFragment.newInstance("Popular", SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
+                add(SubredditFragment.newInstance("All", SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
             }
         }
     }
