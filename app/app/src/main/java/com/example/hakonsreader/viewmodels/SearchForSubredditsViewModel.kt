@@ -17,6 +17,11 @@ class SearchForSubredditsViewModel : ViewModel() {
     private val onCountChange = MutableLiveData<Boolean>()
     private val error = MutableLiveData<ErrorWrapper>()
 
+    /**
+     * Map containing the previous search results, mapping a search query to a list of subreddits
+     */
+    private val cachedSearchResults = HashMap<String, List<Subreddit>>()
+
     fun getSearchResults() : LiveData<List<Subreddit>> = searchResults
     fun getOnCountChange() : LiveData<Boolean> = onCountChange
     fun getError() : LiveData<ErrorWrapper> = error
@@ -28,6 +33,11 @@ class SearchForSubredditsViewModel : ViewModel() {
      * @param query The search query
      */
     fun search(query: String) {
+        if (cachedSearchResults.containsKey(query)) {
+            searchResults.postValue(cachedSearchResults[query])
+            return
+        }
+
         onCountChange.postValue(true)
 
         CoroutineScope(IO).launch {
@@ -35,7 +45,10 @@ class SearchForSubredditsViewModel : ViewModel() {
             onCountChange.postValue(false)
 
             when (resp) {
-                is ApiResponse.Success -> searchResults.postValue(resp.value)
+                is ApiResponse.Success -> {
+                    cachedSearchResults[query] = resp.value
+                    searchResults.postValue(resp.value)
+                }
                 is ApiResponse.Error -> error.postValue(ErrorWrapper(resp.error, resp.throwable))
             }
         }

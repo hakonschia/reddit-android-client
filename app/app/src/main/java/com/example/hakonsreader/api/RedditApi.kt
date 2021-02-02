@@ -36,8 +36,8 @@ import java.util.*
  * ```
  * val api = RedditApi(
  *    // User-Agent and client ID must always be set and cannot be empty
- *    userAgent = NetworkConstants.USER_AGENT,
- *    clientId = NetworkConstants.CLIENT_ID,
+ *    userAgent = "android:package-name v1.0.0 (by /u/hakonschia)",
+ *    clientId = "Client-ID",
  *
  *    // Set the initial access token to use (when the application has previously saved one)
  *    accessToken = savedAccessToken,
@@ -557,7 +557,10 @@ class RedditApi constructor(
     }
 
     /**
-     * Authenticator that automatically retrieves a new access token
+     * Authenticator that automatically retrieves a new access token. This will at first attempt
+     * to refresh [accessTokenInternal]. If the refresh fails, or this token has no refresh token, then
+     * a new anonymous/non-logged in access token is retrieved. If this also fails, the request will
+     * be cancelled.
      */
     private inner class Authenticator : okhttp3.Authenticator {
         override fun authenticate(route: Route?, response: Response): Request? {
