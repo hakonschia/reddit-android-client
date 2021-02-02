@@ -85,5 +85,9 @@
 
     <style name="Widget.MPM.Menu.Dark.CustomBackground">
         <item name="android:colorBackground">@color/dialogBackground</item>
+        <item name="mpm_primaryTextColor">@color/text_color</item>
+        <item name="mpm_secondaryTextColor">@color/secondary_text_color</item>
+        <item name="mpm_activeIconColor">@color/iconColor</item>
+        <item name="mpm_separatorColor">@color/divider</item>
     </style>
 </resources>
