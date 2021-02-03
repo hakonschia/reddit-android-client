@@ -89,7 +89,7 @@ private fun showAccountManagement(context: Context) {
             layoutManager = LinearLayoutManager(context)
             adapter = AccountsAdapter().apply {
                 CoroutineScope(IO).launch {
-                    val accs = app.database.userInfo().getAllUsers()
+                    val accs = app.database.userInfo().getAllUsers() as MutableList
                     withContext(Main) {
                         accounts = accs
                     }
@@ -99,6 +99,17 @@ private fun showAccountManagement(context: Context) {
                     val currentId = app.currentUserInfo?.accessToken?.userId
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
                         app.switchAccount(userInfoClicked.accessToken)
+                    }
+                }
+
+                onRemoveItem = OnClickListener { userInfoClicked ->
+                    val currentId = app.currentUserInfo?.accessToken?.userId
+                    // Don't remove the item if it's the currently active one
+                    if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
+                        removeItem(userInfoClicked)
+                        CoroutineScope(IO).launch {
+                            app.database.userInfo().delete(userInfoClicked)
+                        }
                     }
                 }
             }

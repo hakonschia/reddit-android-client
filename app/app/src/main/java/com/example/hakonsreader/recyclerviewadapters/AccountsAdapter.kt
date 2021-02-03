@@ -15,11 +15,24 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
      */
     var onItemClicked: OnClickListener<RedditUserInfo>? = null
 
-    var accounts: List<RedditUserInfo> = ArrayList()
+    /**
+     * Click listener for when "Remove account" has been clicked
+     */
+    var onRemoveItem: OnClickListener<RedditUserInfo>? = null
+
+    var accounts: MutableList<RedditUserInfo> = ArrayList()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
+
+    fun removeItem(account: RedditUserInfo) {
+        val pos = accounts.indexOf(account)
+        if (pos != -1) {
+            accounts.removeAt(pos)
+            notifyItemRemoved(pos)
+        }
+    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val account = accounts[position]
@@ -49,6 +62,11 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
             binding.root.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     onItemClicked?.onClick(accounts[adapterPosition])
+                }
+            }
+            binding.removeAccount.setOnClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    onRemoveItem?.onClick(accounts[adapterPosition])
                 }
             }
         }
