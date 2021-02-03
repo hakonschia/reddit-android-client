@@ -46,7 +46,7 @@ interface RedditSubredditsDao {
      * @return A list of subreddits based on the IDs
      */
     @Query("SELECT * FROM subreddits WHERE id IN (:ids)")
-    fun getSubsById(ids: Array<String>): List<Subreddit>
+    fun getSubsById(ids: List<String>): List<Subreddit>
 
     /**
      * Get the subreddit object from its name

@@ -25,7 +25,7 @@ class SelectSubredditsViewModel : ViewModel() {
 
     private val subreddits: MutableLiveData<List<Subreddit>> by lazy {
         MutableLiveData<List<Subreddit>>().also {
-            val ids = SharedPreferencesManager.get(SUBSCRIBED_SUBREDDITS_KEY, Array<String>::class.java)
+            val ids = App.get().currentUserInfo?.subscribedSubreddits
             if (!ids.isNullOrEmpty()) {
                 CoroutineScope(IO).launch {
                     subreddits.postValue(database.subreddits().getSubsById(ids))
@@ -69,17 +69,22 @@ class SelectSubredditsViewModel : ViewModel() {
 
                     subreddits.postValue(subs)
 
-                    // Store the subreddits so they're shown instantly the next time
-                    val ids = arrayOfNulls<String>(subs.size)
-                    subs.forEachIndexed { index, subreddit -> ids[index] = subreddit.id }
-                    SharedPreferencesManager.put(SUBSCRIBED_SUBREDDITS_KEY, ids)
+                    if (!loadDefaultSubs) {
+                        // Store the subreddits so they're shown instantly the next time
+                        val ids: MutableList<String> = ArrayList()
+                        subs.forEach { subreddit -> ids.add(subreddit.id) }
+                        App.get().currentUserInfo?.apply {
+                            subscribedSubreddits = ids
+
+                            database.userInfo().update(this)
+                        }
+                    }
 
                     // Although NSFW subs might be inserted with this, it's fine as if the user
                     // has subscribed to them it's fine (for non-logged in users, default subs don't include NSFW)
-                     database.subreddits().insertAll(subs)
+                    database.subreddits().insertAll(subs)
                 }
                 is ApiResponse.Error -> {
-                    response.throwable.printStackTrace()
                     error.postValue(ErrorWrapper(response.error, response.throwable))
                 }
             }

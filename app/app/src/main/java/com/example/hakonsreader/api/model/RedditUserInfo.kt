@@ -34,7 +34,7 @@ class RedditUserInfo(
     var userInfo: RedditUser? = null
 
     /**
-     * The name of the users subscribed subreddits
+     * The IDs of the users subscribed subreddits
      */
     var subscribedSubreddits: List<String>? = null
 

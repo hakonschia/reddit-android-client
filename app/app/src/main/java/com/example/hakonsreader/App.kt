@@ -158,6 +158,28 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         set()
+
+        val prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE)
+        SharedPreferencesManager.create(prefs)
+
+        CoroutineScope(IO).launch {
+            // There should probably be no issue with retrieving the user info in this way
+            // It should happen fast enough to be set before it is used
+            TokenManager.getToken()?.run {
+                val userId = this.userId
+                if (userId != AccessToken.NO_USER_ID) {
+                    currentUserInfo = database.userInfo().getById(userId)
+                }
+            }
+
+            // Remove records that are older than 2 days, as they likely won't be used again
+            val maxAge = 60L * 60 * 24 * 2
+            val count = database.posts().getCount()
+            val deleted = database.posts().deleteOld(maxAge)
+
+            Log.d(TAG, "onCreate: # of records=$count; # of deleted=$deleted")
+        }
+
         createInboxNotificationChannel()
 
         val dm = resources.displayMetrics
@@ -166,19 +188,7 @@ class App : Application() {
         screenWidth = dm.widthPixels
         screenHeight = dm.heightPixels
 
-        val prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE)
-        SharedPreferencesManager.create(prefs)
-
         updateTheme()
-
-        // Remove records that are older than 2 days, as they likely won't be used again
-        CoroutineScope(IO).launch {
-            val maxAge = 60L * 60 * 24 * 2
-            val count = database.posts().getCount()
-            val deleted = database.posts().deleteOld(maxAge)
-
-            Log.d(TAG, "onCreate: # of records=$count; # of deleted=$deleted")
-        }
     }
 
     /**
