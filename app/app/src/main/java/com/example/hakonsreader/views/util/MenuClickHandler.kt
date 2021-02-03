@@ -112,6 +112,11 @@ private fun showAccountManagement(context: Context) {
                         }
                     }
                 }
+
+                onNsfwClicked = OnClickListener { userInfoClicked ->
+                    // Kind of weird but works without having to create a 2-parameter listener I guess
+                    app.updateUserInfo(nsfwAccount = userInfoClicked.nsfwAccount)
+                }
             }
         }
 

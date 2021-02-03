@@ -38,4 +38,10 @@ class RedditUserInfo(
      */
     var subscribedSubreddits: List<String>? = null
 
+    /**
+     * If true, this account is marked by the user as a NSFW account and appropriate application
+     * action should be taken
+     */
+    var nsfwAccount = false
+
 }

@@ -386,7 +386,7 @@ class App : Application() {
      * @param info The information about the user
      * @param subreddits The list of subreddit IDs the user is subscribed to
      */
-    fun updateUserInfo(info: RedditUser? = null, subreddits: List<String>? = null) {
+    fun updateUserInfo(info: RedditUser? = null, subreddits: List<String>? = null, nsfwAccount: Boolean? = null) {
         CoroutineScope(IO).launch {
             TokenManager.getToken()?.let {
                 getAndSetCurrentUserInfo(it).apply {
@@ -395,6 +395,9 @@ class App : Application() {
                     }
                     if (subreddits != null) {
                         subscribedSubreddits = subreddits
+                    }
+                    if (nsfwAccount != null) {
+                        this.nsfwAccount = nsfwAccount
                     }
 
                     database.userInfo().update(this)
@@ -552,7 +555,8 @@ class App : Application() {
      * @return True if NSFW videos should be automatically played
      */
     fun autoPlayNsfwVideos(): Boolean {
-        return settings.getBoolean(getString(R.string.prefs_key_auto_play_nsfw_videos), resources.getBoolean(R.bool.prefs_default_autoplay_nsfw_videos))
+        return currentUserInfo?.nsfwAccount == true ||
+                settings.getBoolean(getString(R.string.prefs_key_auto_play_nsfw_videos), resources.getBoolean(R.bool.prefs_default_autoplay_nsfw_videos))
     }
 
     /**
@@ -695,6 +699,10 @@ class App : Application() {
      * @return An enum representing how to filter the images/thumbnails
      */
     fun showNsfwPreview(): ShowNsfwPreview {
+        if (currentUserInfo?.nsfwAccount == true) {
+            return ShowNsfwPreview.NORMAL
+        }
+
         return when (settings.getString(getString(R.string.prefs_key_show_nsfw_preview), getString(R.string.prefs_default_show_nsfw))) {
             getString(R.string.prefs_key_show_nsfw_preview_normal) -> ShowNsfwPreview.NORMAL
             getString(R.string.prefs_key_show_nsfw_preview_blur) -> ShowNsfwPreview.BLURRED
