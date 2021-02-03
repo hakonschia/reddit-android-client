@@ -31,6 +31,18 @@ public class SharedPreferencesManager {
                 .apply();
     }
 
+    public static void putNow(String key, Object value) {
+        if (prefs == null) {
+            throw new IllegalStateException(PREFERENCES_NOT_SET_ERROR_MESSAGE);
+        }
+
+        String asJson = gson.toJson(value);
+
+        prefs.edit()
+                .putString(key, asJson)
+                .commit();
+    }
+
     /**
      * Retrieves the requested key from the set SharedPreferences
      *

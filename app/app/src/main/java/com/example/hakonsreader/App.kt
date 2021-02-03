@@ -6,6 +6,7 @@ import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.activites.InvalidAccessTokenActivity
@@ -33,7 +34,9 @@ import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.Cache
 import okhttp3.logging.HttpLoggingInterceptor
 import java.io.File
@@ -305,18 +308,19 @@ class App : Application() {
     }
 
     /**
-     * Switches which account is the active account
+     * Switches which account is the active account. The app will be restarted
      *
      * @param token The token to use for the new active account
      */
     fun switchAccount(token: AccessToken) {
         api.switchAccessToken(token)
-        TokenManager.saveToken(token)
-        CoroutineScope(IO).launch {
-            getAndSetCurrentUserInfo(token).apply {
-                accessToken = token
-            }
-        }
+        TokenManager.saveTokenNow(token)
+
+        // The API also changes this (although it is recreated so it doesn't really matter)
+        // The observers also don't have to be notified since everything is recreated
+        settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, false).commit()
+
+        ProcessPhoenix.triggerRebirth(this@App)
     }
 
     /**
@@ -361,13 +365,15 @@ class App : Application() {
      */
     private fun onNewToken(token: AccessToken) {
         TokenManager.saveToken(token)
-        CoroutineScope(IO).launch {
-            getAndSetCurrentUserInfo(token).apply {
-                accessToken = token
+        if (token.userId != AccessToken.NO_USER_ID) {
+            CoroutineScope(IO).launch {
+                getAndSetCurrentUserInfo(token).apply {
+                    accessToken = token
 
-                // New token is for a user
-                if (token.userId != AccessToken.NO_USER_ID) {
-                    database.userInfo().insert(this)
+                    // New token is for a user
+                    if (token.userId != AccessToken.NO_USER_ID) {
+                        database.userInfo().insert(this)
+                    }
                 }
             }
         }

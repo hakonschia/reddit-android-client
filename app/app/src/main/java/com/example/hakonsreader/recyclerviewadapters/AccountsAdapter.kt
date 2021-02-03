@@ -2,12 +2,19 @@ package com.example.hakonsreader.recyclerviewadapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.databinding.ListItemAccountBinding
+import com.example.hakonsreader.interfaces.OnClickListener
 
 class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
+    /**
+     * Click listener for items in the list
+     */
+    var onItemClicked: OnClickListener<RedditUserInfo>? = null
+
     var accounts: List<RedditUserInfo> = ArrayList()
         set(value) {
             field = value
@@ -39,10 +46,9 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ListItemAccountBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
-            val app = App.get()
             binding.root.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    app.switchAccount(accounts[adapterPosition].accessToken)
+                    onItemClicked?.onClick(accounts[adapterPosition])
                 }
             }
         }

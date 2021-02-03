@@ -38,7 +38,12 @@ public class AccessToken {
         // The number at the start is the user ID, and will be the same in all access tokens for a given user
         // This user ID is the same as the fullname id (base 36), ie. for "hakonschia" the base 36 value is
         // "pa7zg", which is "42467308" in base 10
-        return accessToken.split("-")[0];
+        String id = accessToken != null ? accessToken.split("-")[0] : "";
+        if (id.isEmpty()) {
+            return NO_USER_ID;
+        } else {
+            return id;
+        }
     }
 
     /**

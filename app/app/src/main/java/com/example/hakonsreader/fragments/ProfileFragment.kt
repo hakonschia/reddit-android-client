@@ -150,8 +150,11 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             // getFloat() will return 0.0f if not found, and won't ever be null
             binding.parentLayout.progress = saveState?.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)!!
 
-            postIds = saveState?.getStringArrayList(POST_IDS_KEY) as ArrayList<String>
-            postsViewModel?.postIds = postIds
+            val ids = saveState?.getStringArrayList(POST_IDS_KEY) as ArrayList<String>?
+            if (ids != null) {
+                postIds = ids
+                postsViewModel?.postIds = postIds
+            }
         }
 
         // If we're on a logged in user, or the fragment has been recreated, we might have some old info

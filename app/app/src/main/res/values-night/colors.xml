@@ -40,4 +40,6 @@
 
     <color name="awardsLayoutBackground">#353535</color>
     <color name="awardsBottomSheetDivider">#5A5A5A</color>
+
+    <color name="activeAccountHighlight">#001C2C</color>
 </resources>

@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.view.*
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +15,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
+import com.example.hakonsreader.interfaces.OnClickListener
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.misc.startLoginIntent
@@ -21,7 +23,9 @@ import com.example.hakonsreader.recyclerviewadapters.AccountsAdapter
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -71,24 +75,36 @@ fun showPopupForProfile(view: View) {
 }
 
 private fun showAccountManagement(context: Context) {
-    Dialog(context).apply {
-        setContentView(R.layout.dialog_account_management)
-        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    val app = App.get()
 
-        findViewById<Button>(R.id.addAccount).setOnClickListener {
+    Dialog(context).also {
+        it.setContentView(R.layout.dialog_account_management)
+        it.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        it.findViewById<Button>(R.id.addAccount).setOnClickListener {
             startLoginIntent(context)
         }
 
-        findViewById<RecyclerView>(R.id.accounts).apply {
+        it.findViewById<RecyclerView>(R.id.accounts).apply {
             layoutManager = LinearLayoutManager(context)
             adapter = AccountsAdapter().apply {
                 CoroutineScope(IO).launch {
-                    accounts = App.get().database.userInfo().getAllUsers()
+                    val accs = app.database.userInfo().getAllUsers()
+                    withContext(Main) {
+                        accounts = accs
+                    }
+                }
+
+                onItemClicked = OnClickListener { userInfoClicked ->
+                    val currentId = app.currentUserInfo?.accessToken?.userId
+                    if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
+                        app.switchAccount(userInfoClicked.accessToken)
+                    }
                 }
             }
         }
 
-        show()
+        it.show()
     }
 }
 

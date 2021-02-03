@@ -44,6 +44,18 @@ public class TokenManager {
     }
 
     /**
+     * Saves the token to SharedPreferences
+     *
+     * @param newToken The new token to save
+     */
+    public static void saveTokenNow(AccessToken newToken) {
+        token = newToken;
+
+        // Save in shared prefs
+        SharedPreferencesManager.putNow(SharedPreferencesConstants.ACCESS_TOKEN, newToken);
+    }
+
+    /**
      * Clears the stored token
      *
      * <p>This call removes the token from SharedPreferences immediately</p>
