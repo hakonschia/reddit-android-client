@@ -21,10 +21,6 @@ public class SharedPreferencesConstants {
      */
     public static final String ACCESS_TOKEN = "accessToken";
 
-    /**
-     * The key for user information from the default SharedPreferences
-     */
-    public static final String USER_INFO = "userInfo";
 
     /**
      * The key used to store information about when a post was last opened. This key is a general

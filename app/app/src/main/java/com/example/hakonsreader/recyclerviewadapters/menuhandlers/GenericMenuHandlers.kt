@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
  */
 fun blockUserOnClick(view: View, username: String) {
     val api = App.get().api
-    val loggedInUser = App.storedUser ?: return
+    val loggedInUser = App.get().currentUserInfo?.userInfo ?: return
 
     CoroutineScope(IO).launch {
         when (val response = api.user(username).block()) {

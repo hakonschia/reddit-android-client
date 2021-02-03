@@ -16,10 +16,6 @@ import kotlinx.coroutines.launch
  * a logged in users subscribed subreddits, or for default subreddits for non-logged in users
  */
 class SelectSubredditsViewModel : ViewModel() {
-    companion object {
-        const val SUBSCRIBED_SUBREDDITS_KEY = "subscribedSubreddits"
-    }
-
     private val database = App.get().database
     private val api = App.get().api
 
@@ -47,7 +43,7 @@ class SelectSubredditsViewModel : ViewModel() {
      *
      * The list returned is not sorted
      *
-     * The IDs are stored in SharedPreferences with the key [SUBSCRIBED_SUBREDDITS_KEY]
+     * The IDs are stored in [App.currentUserInfo]
      *
      * @param loadDefaultSubs Set to *true* to load default subs, *false* to load subs for a logged in user.
      * Default is *true* (load default subs)

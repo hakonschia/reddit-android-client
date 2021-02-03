@@ -36,7 +36,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
         return
     }
 
-    val user = App.storedUser
+    val user = App.get().currentUserInfo?.userInfo
     val context = view.context
 
     popupMenu {

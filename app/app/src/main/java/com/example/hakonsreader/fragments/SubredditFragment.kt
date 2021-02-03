@@ -28,6 +28,7 @@ import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.responses.GenericError
@@ -655,12 +656,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     /**
      * Updates the users flair on the subreddit
      *
-     * If the username ([App.storedUser]) is `null` then this will return
+     * If the username ([App.currentUserInfo]) is `null` then this will return
      *
      * @param flair The flair to update, or `null` to disable the flair on the subreddit
      */
     private fun updateUserFlair(flair: RedditFlair?) {
-        val username = App.storedUser?.username ?: return
+        val username = App.get().currentUserInfo?.userInfo?.username ?: return
 
         CoroutineScope(IO).launch {
             subredditViewModel?.updateFlair(username, flair)

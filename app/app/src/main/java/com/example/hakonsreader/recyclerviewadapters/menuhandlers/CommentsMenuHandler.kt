@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
  * @param adapter The RecyclerView adapter the comment is in
  */
 fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAdapter) {
-    val user = App.storedUser
+    val user = App.get().currentUserInfo?.userInfo
     val context = view.context
     val parentComment = adapter.getCommentById(comment.parentId)
 

@@ -78,7 +78,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
          */
         fun newInstance(username: String? = null) = ProfileFragment().apply {
             arguments = Bundle().apply {
-                if (username == null || username == "me" || username.equals(App.storedUser?.username, ignoreCase = true)) {
+                if (username == null || username == "me" || username.equals(App.get().currentUserInfo?.userInfo?.username, ignoreCase = true)) {
                     putBoolean(IS_LOGGED_IN_USER_KEY, true)
                 }
                 putString(USERNAME_KEY, username)
@@ -121,7 +121,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         }
 
         if (isLoggedInUser) {
-            user = App.storedUser
+            user = App.get().currentUserInfo?.userInfo
             user?.let {
                 if (it.username.isNotBlank()) {
                     username = it.username
@@ -429,7 +429,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
         // Store the updated user information if this profile is for the logged in user
         if (isLoggedInUser) {
-            App.storeUserInfo(newUser)
+            App.get().updateUserInfo(info = newUser)
         }
 
         if (postsViewModel == null) {

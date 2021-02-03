@@ -65,21 +65,6 @@ class App : Application() {
         fun get(): App {
             return app
         }
-
-        /**
-         * @return Retrieves the user information stored in SharedPreferences
-         */
-        val storedUser: RedditUser?
-            get() = SharedPreferencesManager.get(SharedPreferencesConstants.USER_INFO, RedditUser::class.java)
-
-        /**
-         * Stores information about a user in SharedPreferences
-         *
-         * @param user The object to store
-         */
-        fun storeUserInfo(user: RedditUser?) {
-            SharedPreferencesManager.put(SharedPreferencesConstants.USER_INFO, user)
-        }
     }
 
 
@@ -303,7 +288,7 @@ class App : Application() {
                 clientId = NetworkConstants.CLIENT_ID,
 
                 accessToken = TokenManager.getToken(),
-                onNewToken = { newToken -> onNewToken(newToken) },
+                onNewToken = { newToken -> updateUserInfo(token = newToken) },
                 onInvalidToken = { _: GenericError?, _: Throwable? -> onInvalidAccessToken() },
 
                 loggerLevel = HttpLoggingInterceptor.Level.BODY,
@@ -320,24 +305,43 @@ class App : Application() {
     }
 
     /**
-     * Callback for when new tokens have been received. This will save the token to [TokenManager].
-     * If the token is for a logged in user, [currentUserInfo] will either be retrieved from the database
-     * or created if needed, and updated with the new token
+     * Saves user information to [currentUserInfo] and updates the local database.
+     * Pass parameters to this function to update the relevant values.
+     *
+     * If [currentUserInfo] is null it is retrieved from the database or created, as long as [token] is not null
+     *
+     * @param token The new token to use. This will save the token to [TokenManager]
+     * @param info The information about the user
+     * @param subreddits The list of subreddit IDs the user is subscribed to
      */
-    private fun onNewToken(token: AccessToken) {
-        TokenManager.saveToken(token)
-        // Anonymous token
-        if (token.userId == AccessToken.NO_USER_ID) {
-            return
+    fun updateUserInfo(token: AccessToken? = null, info: RedditUser? = null, subreddits: List<String>? = null) {
+        if (token != null) {
+            TokenManager.saveToken(token)
+            // Anonymous token
+            if (token.userId == AccessToken.NO_USER_ID) {
+                return
+            }
         }
 
         CoroutineScope(IO).launch {
             if (currentUserInfo == null) {
+                if (token == null || token.userId == AccessToken.NO_USER_ID) {
+                    return@launch
+                }
                 // Get from DB or create new based on the token
                 currentUserInfo = database.userInfo().getById(token.userId) ?: RedditUserInfo(token)
             }
 
-            currentUserInfo!!.accessToken = token
+            if (token != null) {
+                currentUserInfo!!.accessToken = token
+            }
+            if (info != null) {
+                currentUserInfo!!.userInfo = info
+            }
+            if (subreddits != null) {
+                currentUserInfo!!.subscribedSubreddits = subreddits
+            }
+
             database.userInfo().insert(currentUserInfo!!)
         }
     }
@@ -854,8 +858,6 @@ class App : Application() {
      */
     private fun clearUserInfo() {
         TokenManager.removeToken()
-        SharedPreferencesManager.removeNow(SharedPreferencesConstants.USER_INFO)
-        SharedPreferencesManager.removeNow(SelectSubredditsViewModel.SUBSCRIBED_SUBREDDITS_KEY)
         settings.edit().remove(PRIVATELY_BROWSING_KEY).commit()
     }
 }

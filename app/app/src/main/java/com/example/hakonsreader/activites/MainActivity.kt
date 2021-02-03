@@ -324,7 +324,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         CoroutineScope(IO).launch {
             when (val userInfo = api.user().info()) {
                 is ApiResponse.Success -> {
-                    App.storeUserInfo(userInfo.value)
+                    App.get().updateUserInfo(info = userInfo.value)
                     // This will be called after the activity has been restarted when logging in
                     // so call it when user information is retrieved as well
                     withContext(Main) {
@@ -549,7 +549,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * there is information about the user stored
      */
     private fun setProfileNavbarTitle() {
-        val user = App.storedUser
+        val user = App.get().currentUserInfo?.userInfo
         if (user != null) {
             binding.bottomNav.menu.findItem(R.id.navProfile).title = user.username
         }
