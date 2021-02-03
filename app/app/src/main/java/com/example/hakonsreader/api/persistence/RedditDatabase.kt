@@ -5,17 +5,21 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.hakonsreader.api.model.RedditMessage
-import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.model.SubredditRule
+import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 
 /**
  * The global database for the application, holds [RedditPost] and [Subreddit] entities
  */
-@Database(version = 20, exportSchema = false,
-        entities = [RedditPost::class, Subreddit::class, SubredditRule::class, RedditMessage::class, RedditFlair::class])
+@Database(version = 21, exportSchema = false,
+        entities = [
+            RedditPost::class,
+            Subreddit::class,
+            SubredditRule::class,
+            RedditMessage::class,
+            RedditFlair::class,
+            RedditUserInfo::class
+        ])
 @TypeConverters(PostConverter::class, EnumConverters::class)
 abstract class RedditDatabase : RoomDatabase() {
 
@@ -24,6 +28,7 @@ abstract class RedditDatabase : RoomDatabase() {
     abstract fun messages(): RedditMessagesDao
     abstract fun rules(): RedditSubredditRulesDao
     abstract fun flairs(): RedditFlairsDao
+    abstract fun userInfo() : RedditUserInfoDao
 
     /**
      * Clears user state from any records in the database

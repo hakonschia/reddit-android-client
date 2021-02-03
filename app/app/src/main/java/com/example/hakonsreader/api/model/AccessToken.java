@@ -7,6 +7,8 @@ import com.google.gson.annotations.SerializedName;
  * Class representing an OAuth access token from Reddit
  */
 public class AccessToken {
+    public static final int NO_USER_ID = -1;
+
     @SerializedName("access_token")
     private String accessToken;
 
@@ -24,6 +26,26 @@ public class AccessToken {
     @SerializedName("device_id")
     private String deviceId;
 
+    /**
+     * Extracts the user ID from the access token value. The value returned here is the same as
+     * {@link RedditUser#getId()} when converted to base 10.
+     *
+     * @return The user ID the access token represents, or {@link #NO_USER_ID} if there is no
+     * value or there was an error parsing the value
+     */
+    public int getUserId() {
+        // Example of an access token: 42467308-g43w5hwsftshyteds
+        // The number at the start is the user ID, and will be the same in all access tokens for a given user
+        // This user ID is the same as the fullname id (base 36), ie. for "hakonschia" the base 36 value is
+        // "pa7zg", which is "42467308" in base 10
+        String id = accessToken.split("-")[0];
+
+        try {
+            return Integer.parseInt(id);
+        } catch (NumberFormatException e) {
+            return NO_USER_ID;
+        }
+    }
 
     /**
      * Sets the refresh token for this token
@@ -110,6 +132,25 @@ public class AccessToken {
         }
     }
 
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    public void setExpiresIn(int expiresIn) {
+        this.expiresIn = expiresIn;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
 
     @Override
     public String toString() {

@@ -11,5 +11,5 @@ fun interface OnNewToken {
      *
      * @param newToken The new token
      */
-    fun newToken(newToken: AccessToken?)
+    fun newToken(newToken: AccessToken)
 }

@@ -6,7 +6,9 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Class for managing the access token for the logged in user
+ * Class for managing the access token for the logged in user. The token in this class
+ * represents the token for the currently active user and is the one that should be used when
+ * multiple users are stored on the device
  */
 public class TokenManager {
     private static AccessToken token;
@@ -30,7 +32,7 @@ public class TokenManager {
     }
 
     /**
-     * Saves the token to SharedPreferences and notifies the Reddit API instance of the change
+     * Saves the token to SharedPreferences
      *
      * @param newToken The new token to save
      */

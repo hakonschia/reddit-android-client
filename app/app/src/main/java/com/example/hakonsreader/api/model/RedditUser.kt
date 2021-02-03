@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.model
 
-import com.example.hakonsreader.api.enums.Thing
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -11,14 +10,9 @@ class RedditUser : RedditListing() {
     /**
      * The username of the user
      */
-    // The "username" in the JSOn is "name" (which for other listings are the fullname)
-    val username
-        get() = super.fullname
-
-    // The "name" in the user JSON returned is the username, so manually create the fullname
-    override var fullname = ""
-        get() = Thing.ACCOUNT.value + "_" + super.id
-
+    // The "username" in the JSON is "name" (which for other listings are the fullname)
+    @SerializedName("name")
+    var username = ""
 
     /**
      * The amount of comment karma the user has

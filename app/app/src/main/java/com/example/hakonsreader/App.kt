@@ -12,6 +12,7 @@ import com.example.hakonsreader.activites.InvalidAccessTokenActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.MarkdownAdjuster
@@ -145,6 +146,12 @@ class App : Application() {
      * *
      */
     val adjuster: MarkdownAdjuster = createMarkdownAdjuster()
+
+    /**
+     * The user info for the user that is currently active in the application (this will not be
+     * nulled if private browsing is enabled)
+     */
+    var currentUserInfo: RedditUserInfo? = null
 
     private val privateBrowsingObservables: MutableList<PrivateBrowsingObservable> = ArrayList()
 
@@ -286,7 +293,7 @@ class App : Application() {
                 clientId = NetworkConstants.CLIENT_ID,
 
                 accessToken = TokenManager.getToken(),
-                onNewToken = { newToken: AccessToken? -> TokenManager.saveToken(newToken) },
+                onNewToken = { newToken -> onNewToken(newToken) },
                 onInvalidToken = { _: GenericError?, _: Throwable? -> onInvalidAccessToken() },
 
                 loggerLevel = HttpLoggingInterceptor.Level.BODY,
@@ -299,6 +306,29 @@ class App : Application() {
                 thirdPartyCacheAge = thirdPartyCacheAge
         ).apply {
             enablePrivateBrowsing(privatelyBrowsing)
+        }
+    }
+
+    /**
+     * Callback for when new tokens have been received. This will save the token to [TokenManager].
+     * If the token is for a logged in user, [currentUserInfo] will either be retrieved from the database
+     * or created if needed, and updated with the new token
+     */
+    private fun onNewToken(token: AccessToken) {
+        TokenManager.saveToken(token)
+        // Anonymous token
+        if (token.userId == AccessToken.NO_USER_ID) {
+            return
+        }
+
+        CoroutineScope(IO).launch {
+            if (currentUserInfo == null) {
+                // Get from DB or create new based on the token
+                currentUserInfo = database.userInfo().getById(token.userId) ?: RedditUserInfo(token)
+            }
+
+            currentUserInfo!!.accessToken = token
+            database.userInfo().insert(currentUserInfo!!)
         }
     }
 

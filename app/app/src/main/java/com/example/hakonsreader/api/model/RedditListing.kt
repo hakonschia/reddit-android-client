@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.model
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.example.hakonsreader.api.enums.Thing
@@ -39,8 +40,8 @@ abstract class RedditListing {
      * This is typically what is referred to as a *fullname* by Reddit. A fullname if the listings
      * [kind] combined with its [id], eg. *t3_rerrg* for a post.
      */
-    @SerializedName("name")
-    open var fullname = ""
+    @Ignore
+    open var fullname = "${kind}_$id"
 
     /**
      * The UTC timestamp the listing was created
