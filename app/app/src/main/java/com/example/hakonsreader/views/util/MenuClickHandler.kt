@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.view.*
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +16,7 @@ import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.TokenManager
+import com.example.hakonsreader.misc.startLoginIntent
 import com.example.hakonsreader.recyclerviewadapters.AccountsAdapter
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import kotlinx.coroutines.CoroutineScope
@@ -72,6 +74,10 @@ private fun showAccountManagement(context: Context) {
     Dialog(context).apply {
         setContentView(R.layout.dialog_account_management)
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        findViewById<Button>(R.id.addAccount).setOnClickListener {
+            startLoginIntent(context)
+        }
 
         findViewById<RecyclerView>(R.id.accounts).apply {
             layoutManager = LinearLayoutManager(context)

@@ -25,7 +25,7 @@ class RedditUserInfo(
      * The user ID as retrieved from [accessToken]. This should not be set manually
      */
     @PrimaryKey
-    var userId = accessToken.userId
+    var userId: String = accessToken.userId
 
     /**
      * The user information about the user

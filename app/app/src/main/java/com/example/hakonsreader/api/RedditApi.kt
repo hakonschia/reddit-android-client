@@ -227,6 +227,8 @@ class RedditApi constructor(
         createServices()
     }
 
+    private var ignoreNextTokenChange = false
+
     /**
      * The access token that is used internally. When this is set, [onNewToken] is notified
      * if [isPrivatelyBrowsing] returns false
@@ -235,7 +237,7 @@ class RedditApi constructor(
         set(value) {
             field = value
 
-            if (!isPrivatelyBrowsing()) {
+            if (!ignoreNextTokenChange && !isPrivatelyBrowsing()) {
                 onNewToken?.newToken(field)
             }
         }
@@ -410,6 +412,18 @@ class RedditApi constructor(
                 .apply {
                     accessTokenApi = create(AccessTokenService::class.java)
                 }
+    }
+
+
+    /**
+     * Switches which access token to use. This should only be used to switch which account
+     * the API is now for, and should not be used to manually update the token
+     *
+     * @param accessToken The token to switch to
+     */
+    fun switchAccessToken(accessToken: AccessToken) {
+        ignoreNextTokenChange = true
+        accessTokenInternal = accessToken
     }
 
     /**

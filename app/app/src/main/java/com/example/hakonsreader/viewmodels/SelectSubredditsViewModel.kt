@@ -69,11 +69,7 @@ class SelectSubredditsViewModel : ViewModel() {
                         // Store the subreddits so they're shown instantly the next time
                         val ids: MutableList<String> = ArrayList()
                         subs.forEach { subreddit -> ids.add(subreddit.id) }
-                        App.get().currentUserInfo?.apply {
-                            subscribedSubreddits = ids
-
-                            database.userInfo().update(this)
-                        }
+                        App.get().updateUserInfo(subreddits = ids)
                     }
 
                     // Although NSFW subs might be inserted with this, it's fine as if the user

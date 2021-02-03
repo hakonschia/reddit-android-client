@@ -1,10 +1,14 @@
 package com.example.hakonsreader.misc
 
-import android.util.Log
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
@@ -113,4 +117,29 @@ private fun getObfuscated(post: RedditPost) : String? {
     } else {
         null
     }
+}
+
+/**
+ * Opens an intent to allow the user to log in. The OAuth state is generated with [App.generateAndGetOAuthState]
+ * and will be stored there
+ *
+ * @param context The context to start the intent with
+ */
+fun startLoginIntent(context: Context) {
+    // Generate a new state to validate when we get a response back
+    val state = App.get().generateAndGetOAuthState()
+
+    val uri = Uri.Builder()
+            .scheme("https")
+            .authority("reddit.com")
+            .path("api/v1/authorize")
+            .appendQueryParameter("response_type", NetworkConstants.RESPONSE_TYPE)
+            .appendQueryParameter("duration", NetworkConstants.DURATION)
+            .appendQueryParameter("redirect_uri" , NetworkConstants.CALLBACK_URL)
+            .appendQueryParameter("client_id", NetworkConstants.CLIENT_ID)
+            .appendQueryParameter("scope", NetworkConstants.SCOPE)
+            .appendQueryParameter("state", state)
+            .build()
+
+    ContextCompat.startActivity(context, Intent(Intent.ACTION_VIEW, uri), null)
 }

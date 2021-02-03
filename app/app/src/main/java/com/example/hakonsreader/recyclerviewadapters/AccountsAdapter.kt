@@ -3,6 +3,7 @@ package com.example.hakonsreader.recyclerviewadapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.databinding.ListItemAccountBinding
 
@@ -15,8 +16,12 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val account = accounts[position]
+
         with (holder.binding) {
             this.username = account.userInfo?.username
+
+            // Highlight the currently active account
+            this.highlight = App.get().currentUserInfo?.userId == account.userId
         }
     }
 
@@ -32,5 +37,14 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
 
     override fun getItemCount() = accounts.size
 
-    inner class ViewHolder(val binding: ListItemAccountBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(val binding: ListItemAccountBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            val app = App.get()
+            binding.root.setOnClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    app.switchAccount(accounts[adapterPosition].accessToken)
+                }
+            }
+        }
+    }
 }

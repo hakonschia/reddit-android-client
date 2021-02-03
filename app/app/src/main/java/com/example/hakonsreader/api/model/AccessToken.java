@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Class representing an OAuth access token from Reddit
  */
 public class AccessToken {
-    public static final int NO_USER_ID = -1;
+    public static final String NO_USER_ID = "NO_USER_ID";
 
     @SerializedName("access_token")
     private String accessToken;
@@ -30,21 +30,15 @@ public class AccessToken {
      * Extracts the user ID from the access token value. The value returned here is the same as
      * {@link RedditUser#getId()} when converted to base 10.
      *
-     * @return The user ID the access token represents, or {@link #NO_USER_ID} if there is no
-     * value or there was an error parsing the value
+     * @return A string representation of the user ID the access token represents (in base 10), or
+     * {@link #NO_USER_ID} if there is no value
      */
-    public int getUserId() {
+    public String getUserId() {
         // Example of an access token: 42467308-g43w5hwsftshyteds
         // The number at the start is the user ID, and will be the same in all access tokens for a given user
         // This user ID is the same as the fullname id (base 36), ie. for "hakonschia" the base 36 value is
         // "pa7zg", which is "42467308" in base 10
-        String id = accessToken.split("-")[0];
-
-        try {
-            return Integer.parseInt(id);
-        } catch (NumberFormatException e) {
-            return NO_USER_ID;
-        }
+        return accessToken.split("-")[0];
     }
 
     /**

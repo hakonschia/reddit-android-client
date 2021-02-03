@@ -288,7 +288,7 @@ class App : Application() {
                 clientId = NetworkConstants.CLIENT_ID,
 
                 accessToken = TokenManager.getToken(),
-                onNewToken = { newToken -> updateUserInfo(token = newToken) },
+                onNewToken = { newToken -> onNewToken(newToken) },
                 onInvalidToken = { _: GenericError?, _: Throwable? -> onInvalidAccessToken() },
 
                 loggerLevel = HttpLoggingInterceptor.Level.BODY,
@@ -305,44 +305,95 @@ class App : Application() {
     }
 
     /**
-     * Saves user information to [currentUserInfo] and updates the local database.
-     * Pass parameters to this function to update the relevant values.
+     * Switches which account is the active account
      *
-     * If [currentUserInfo] is null it is retrieved from the database or created, as long as [token] is not null
-     *
-     * @param token The new token to use. This will save the token to [TokenManager]
-     * @param info The information about the user
-     * @param subreddits The list of subreddit IDs the user is subscribed to
+     * @param token The token to use for the new active account
      */
-    fun updateUserInfo(token: AccessToken? = null, info: RedditUser? = null, subreddits: List<String>? = null) {
-        if (token != null) {
-            TokenManager.saveToken(token)
-            // Anonymous token
-            if (token.userId == AccessToken.NO_USER_ID) {
-                return
+    fun switchAccount(token: AccessToken) {
+        api.switchAccessToken(token)
+        TokenManager.saveToken(token)
+        CoroutineScope(IO).launch {
+            getAndSetCurrentUserInfo(token).apply {
+                accessToken = token
+            }
+        }
+    }
+
+    /**
+     * Gets a [RedditUserInfo] object corresponding to an access token and sets the object
+     * to [currentUserInfo]. If the token is for the same account as [currentUserInfo] is now, then
+     * [currentUserInfo] is returned as is. Otherwise the value stored in the database is retrieved,
+     * or a new one is created.
+     *
+     * Note that the object will not be modified in any way (ie. [token] is not set on the object
+     * automatically)
+     */
+    // Database operations must be suspended
+    @Suppress("RedundantSuspendModifier")
+    private suspend fun getAndSetCurrentUserInfo(token: AccessToken) : RedditUserInfo {
+        val current = currentUserInfo
+        return if (current != null) {
+            val currentId = current.accessToken.userId
+            // The current user is for the same user, return it
+            if (currentId != AccessToken.NO_USER_ID && currentId == token.userId) {
+                current
+            } else {
+                // Either get from the database, or create a new one
+                database.userInfo().getById(token.userId) ?: RedditUserInfo(token).also {
+                    currentUserInfo = it
+                }
+            }
+        } else {
+            // currentUserInfo == null, Either get from the database, or create a new one
+            database.userInfo().getById(token.userId) ?: RedditUserInfo(token).also {
+                currentUserInfo = it
             }
         }
 
+    }
+
+    /**
+     * Callback for when new access tokens are received. This will save the token to [TokenManager]
+     * and update [currentUserInfo] with the token, setting a new object on the variable if needed
+     * to correctly represent the user the token is for
+     *
+     * @param token The new token
+     */
+    private fun onNewToken(token: AccessToken) {
+        TokenManager.saveToken(token)
         CoroutineScope(IO).launch {
-            if (currentUserInfo == null) {
-                if (token == null || token.userId == AccessToken.NO_USER_ID) {
-                    return@launch
+            getAndSetCurrentUserInfo(token).apply {
+                accessToken = token
+
+                // New token is for a user
+                if (token.userId != AccessToken.NO_USER_ID) {
+                    database.userInfo().insert(this)
                 }
-                // Get from DB or create new based on the token
-                currentUserInfo = database.userInfo().getById(token.userId) ?: RedditUserInfo(token)
             }
+        }
+    }
 
-            if (token != null) {
-                currentUserInfo!!.accessToken = token
-            }
-            if (info != null) {
-                currentUserInfo!!.userInfo = info
-            }
-            if (subreddits != null) {
-                currentUserInfo!!.subscribedSubreddits = subreddits
-            }
+    /**
+     * Saves user information to [currentUserInfo] and updates the local database.
+     * Pass parameters to this function to update the relevant values.
+     *
+     * @param info The information about the user
+     * @param subreddits The list of subreddit IDs the user is subscribed to
+     */
+    fun updateUserInfo(info: RedditUser? = null, subreddits: List<String>? = null) {
+        CoroutineScope(IO).launch {
+            TokenManager.getToken()?.let {
+                getAndSetCurrentUserInfo(it).apply {
+                    if (info != null) {
+                        userInfo = info
+                    }
+                    if (subreddits != null) {
+                        subscribedSubreddits = subreddits
+                    }
 
-            database.userInfo().insert(currentUserInfo!!)
+                    database.userInfo().update(this)
+                }
+            }
         }
     }
 
@@ -358,7 +409,6 @@ class App : Application() {
 
     /**
      * Clears the OAuth state.
-     *
      *
      * Use this when the state has been verified
      */

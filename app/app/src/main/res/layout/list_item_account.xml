@@ -6,9 +6,14 @@
 
     <data>
         <import type="android.graphics.Typeface" />
+
         <variable
             name="username"
             type="String" />
+
+        <variable
+            name="highlight"
+            type="Boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
