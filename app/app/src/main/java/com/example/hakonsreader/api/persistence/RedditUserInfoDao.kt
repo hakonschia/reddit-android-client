@@ -13,6 +13,9 @@ interface RedditUserInfoDao {
     @Update
     fun update(userInfo: RedditUserInfo)
 
+    @Delete
+    fun delete(userInfo: RedditUserInfo)
+
     @Query("SELECT * FROM reddit_user_info WHERE userId=:id")
     fun getById(id: Int) : RedditUserInfo?
 

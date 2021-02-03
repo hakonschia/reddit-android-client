@@ -822,7 +822,7 @@ class App : Application() {
      * be logged out and prompted to log back in.
      */
     private fun onInvalidAccessToken() {
-        clearUserInfo()
+        logOut()
 
         Intent(this, InvalidAccessTokenActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -834,9 +834,6 @@ class App : Application() {
      * Clears any user information stored, logging a user out. The application will be restarted
      */
     fun logOut() {
-        // Clear shared preferences
-        clearUserInfo()
-
         CoroutineScope(IO).launch {
             // Revoke token, the response to this never holds any data. If it fails we could potentially
             // store that it failed and retry again later
@@ -845,19 +842,15 @@ class App : Application() {
             // Clear any user specific state from database records (such as vote status on posts)
             database.clearUserState()
 
+            currentUserInfo?.let {
+                database.userInfo().delete(it)
+            }
+
+            settings.edit().remove(PRIVATELY_BROWSING_KEY).commit()
+            TokenManager.removeToken()
+
             // Might be bad to just restart the app? Easiest way to ensure everything is reset though
             ProcessPhoenix.triggerRebirth(this@App)
         }
-    }
-
-    /**
-     * Clears any information stored locally about a logged in user from SharedPreferences.
-     *
-     *
-     * The preferences the user have chosen from the settings screen are not changed
-     */
-    private fun clearUserInfo() {
-        TokenManager.removeToken()
-        settings.edit().remove(PRIVATELY_BROWSING_KEY).commit()
     }
 }
