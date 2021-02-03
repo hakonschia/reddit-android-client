@@ -398,6 +398,7 @@
 
     <string name="menuPrivateBrowsingEnable">Enable private browsing</string>
     <string name="menuPrivateBrowsingDisable">Disable private browsing</string>
+    <string name="menuProfileManageAccounts">Accounts</string>
 
     <string name="disable">Disable</string>
     <string name="imageLoadFailedDialogTitle">Image failed to load</string>
@@ -500,4 +501,9 @@
     <string name="flairUpdated">Flair updated</string>
     <string name="flairsNotAllowedOnSubreddit">This subreddit doesn\'t allow users to assign flairs</string>
     <string name="subredditInfoCreatedAt">Created %s</string>
+
+    <string name="dialogAccountManagementHeader">Account management</string>
+    <string name="dialogAccountManagementAddAccount">Add account</string>
+    <string name="accountManagementNoUsername">No username</string>
+    <string name="accountManagementRemoveAccount">Remove account</string>
 </resources>

@@ -19,5 +19,7 @@ interface RedditUserInfoDao {
     @Query("SELECT * FROM reddit_user_info WHERE userId=:id")
     fun getById(id: Int) : RedditUserInfo?
 
+    @Query("SELECT * FROM reddit_user_info")
+    fun getAllUsers() : List<RedditUserInfo>
 
 }

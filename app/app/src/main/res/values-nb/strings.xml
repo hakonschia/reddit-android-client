@@ -342,4 +342,9 @@
     <string name="menuCommentLock">Lås</string>
     <string name="menuCommentUnlock">Lås opp</string>
     <string name="menuPostUnlock">Lås opp</string>
+    <string name="menuProfileManageAccounts">Kontoer</string>
+    <string name="dialogAccountManagementHeader">Administrer kontoer</string>
+    <string name="dialogAccountManagementAddAccount">Legg til konto</string>
+    <string name="accountManagementNoUsername">Brukernavn mangler</string>
+    <string name="accountManagementRemoveAccount">Fjern bruker</string>
 </resources>

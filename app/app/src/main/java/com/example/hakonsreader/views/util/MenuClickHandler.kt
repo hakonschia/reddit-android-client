@@ -1,10 +1,13 @@
 package com.example.hakonsreader.views.util
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -12,7 +15,11 @@ import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.TokenManager
+import com.example.hakonsreader.recyclerviewadapters.AccountsAdapter
 import com.github.zawadz88.materialpopupmenu.popupMenu
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -35,6 +42,12 @@ fun showPopupForProfile(view: View) {
             }
 
             item {
+                labelRes = R.string.menuProfileManageAccounts
+                icon = R.drawable.ic_baseline_person_24
+                callback = { showAccountManagement(view.context) }
+            }
+
+            item {
                 labelRes = if (privatelyBrowsing) {
                     R.string.menuPrivateBrowsingDisable
                 } else {
@@ -53,6 +66,24 @@ fun showPopupForProfile(view: View) {
             }
         }
     }.show(context, view)
+}
+
+private fun showAccountManagement(context: Context) {
+    Dialog(context).apply {
+        setContentView(R.layout.dialog_account_management)
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        findViewById<RecyclerView>(R.id.accounts).apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = AccountsAdapter().apply {
+                CoroutineScope(IO).launch {
+                    accounts = App.get().database.userInfo().getAllUsers()
+                }
+            }
+        }
+
+        show()
+    }
 }
 
 /**
