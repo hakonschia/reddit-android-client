@@ -2,30 +2,29 @@ package com.example.hakonsreader.recyclerviewadapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.databinding.ListItemAccountBinding
-import com.example.hakonsreader.interfaces.OnClickListener
 
 class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
-    /**
-     * Click listener for items in the list
-     */
-    var onItemClicked: OnClickListener<RedditUserInfo>? = null
+
 
     /**
-     * Click listener for when "Remove account" has been clicked
+     * Callback for when an item in the list has been clicked
      */
-    var onRemoveItem: OnClickListener<RedditUserInfo>? = null
+    var onItemClicked: ((RedditUserInfo) -> Unit)? = null
 
     /**
-     * Click listener for when "NSFW checkbox" has been clicked. When this is clicked the value at
-     * [RedditUserInfo.nsfwAccount] will be updated based on the checkbox value and the user info object
-     * is passed to the callback
+     * Callback for when "Remove account" has been clicked
      */
-    var onNsfwClicked: OnClickListener<RedditUserInfo>? = null
+    var onRemoveItemClicked: ((RedditUserInfo) -> Unit)? = null
+
+    /**
+     * Callback for when "NSFW checkbox" has been clicked. The account clicked and the new value
+     * is passed back
+     */
+    var onNsfwClicked: ((RedditUserInfo, Boolean) -> Unit)? = null
 
 
     var accounts: MutableList<RedditUserInfo> = ArrayList()
@@ -71,20 +70,17 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
         init {
             binding.root.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    onItemClicked?.onClick(accounts[adapterPosition])
+                    onItemClicked?.invoke(accounts[adapterPosition])
                 }
             }
             binding.removeAccount.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    onRemoveItem?.onClick(accounts[adapterPosition])
+                    onRemoveItemClicked?.invoke(accounts[adapterPosition])
                 }
             }
             binding.nsfwCheckBox.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    accounts[adapterPosition].run {
-                        nsfwAccount = binding.nsfwCheckBox.isChecked
-                        onNsfwClicked?.onClick(this)
-                    }
+                    onNsfwClicked?.invoke(accounts[adapterPosition], binding.nsfwCheckBox.isChecked)
                 }
             }
         }

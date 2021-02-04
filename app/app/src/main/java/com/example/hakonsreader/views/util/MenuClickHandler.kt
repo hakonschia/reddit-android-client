@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.Context
 import android.view.*
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +14,6 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
-import com.example.hakonsreader.interfaces.OnClickListener
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.misc.startLoginIntent
@@ -95,14 +93,14 @@ private fun showAccountManagement(context: Context) {
                     }
                 }
 
-                onItemClicked = OnClickListener { userInfoClicked ->
+                onItemClicked = { userInfoClicked ->
                     val currentId = app.currentUserInfo?.accessToken?.userId
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
                         app.switchAccount(userInfoClicked.accessToken)
                     }
                 }
 
-                onRemoveItem = OnClickListener { userInfoClicked ->
+                onRemoveItemClicked = { userInfoClicked ->
                     val currentId = app.currentUserInfo?.accessToken?.userId
                     // Don't remove the item if it's the currently active one
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
@@ -112,10 +110,19 @@ private fun showAccountManagement(context: Context) {
                         }
                     }
                 }
+                onNsfwClicked = { userInfoClicked, nsfwAccount ->
+                    val currentId = app.currentUserInfo?.accessToken?.userId
 
-                onNsfwClicked = OnClickListener { userInfoClicked ->
-                    // Kind of weird but works without having to create a 2-parameter listener I guess
-                    app.updateUserInfo(nsfwAccount = userInfoClicked.nsfwAccount)
+                    // Another account than the active was clicked, update it in the database
+                    if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
+                        userInfoClicked.nsfwAccount = nsfwAccount
+                        CoroutineScope(IO).launch {
+                            app.database.userInfo().update(userInfoClicked)
+                        }
+                    } else {
+                        // Update the current account
+                        app.updateUserInfo(nsfwAccount = nsfwAccount)
+                    }
                 }
             }
         }
