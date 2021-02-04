@@ -103,6 +103,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     var onInboxClicked: OnInboxClicked? = null
 
     private var username: String? = null
+    private var isInfoLoaded = false
 
     private var saveState: Bundle? = null
     private var postIds = ArrayList<String>()
@@ -137,10 +138,12 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         
         App.get().registerPrivateBrowsingObservable(this)
 
-        // Retrieve user info if the fragment hasn't loaded any already
-        if (savedInstanceState == null) {
+        if (isInfoLoaded) {
             retrieveUserInfo()
-        } else {
+        }
+
+        // Retrieve user info if the fragment hasn't loaded any already
+        if (savedInstanceState != null) {
             binding.parentLayout.progress = savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)
             postIds = savedInstanceState.getStringArrayList(POST_IDS_KEY) as ArrayList<String>
             postsViewModel?.postIds = postIds
@@ -427,6 +430,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
      * @param newUser The new user information
      */
     private fun onUserResponse(newUser: RedditUser) {
+        isInfoLoaded = true
         user = newUser
         username = newUser.username
 
