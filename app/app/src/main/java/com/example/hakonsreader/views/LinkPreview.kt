@@ -13,6 +13,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.databinding.LinkPreviewBinding
+import com.example.hakonsreader.misc.createIntent
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
@@ -78,10 +79,10 @@ class LinkPreview : FrameLayout {
             "https://reddit.com" + (if (link[0] == '/') "" else "/") + link
         } else link
 
-        val baseIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        val intent = createIntent(url, context)
 
         // Find all activities this intent would resolve to
-        val intentActivities = context.packageManager.queryIntentActivities(baseIntent, PackageManager.MATCH_DEFAULT_ONLY)
+        val intentActivities = context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
 
         // Could potentially check if this matches the default browser and not show icon for that, as
         // it will always show something in that case
@@ -104,9 +105,10 @@ class LinkPreview : FrameLayout {
 
         if (link.isNotEmpty()) {
             // Open link
-            val intent = Intent(context, DispatcherActivity::class.java)
-            intent.putExtra(DispatcherActivity.URL_KEY, link)
-            context.startActivity(intent)
+            Intent(context, DispatcherActivity::class.java).run {
+                putExtra(DispatcherActivity.URL_KEY, link)
+                context.startActivity(this)
+            }
         }
     }
 
