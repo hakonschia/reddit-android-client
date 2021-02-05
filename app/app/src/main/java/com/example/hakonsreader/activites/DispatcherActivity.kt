@@ -56,21 +56,11 @@ class DispatcherActivity : AppCompatActivity() {
 
         Log.d(TAG, "Dispatching $url")
 
-        // If the URL can be converted to a direct link (eg. as an image) ensure it is
-        url = LinkUtils.convertToDirectUrl(url)
-
-        // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
-        // and add the full url so it doesn't have to be handled separately, and potential links we don't
-        // handle are sent out correctly to the browser
-        if (!url.matches("^http(s)?.*".toRegex())) {
-            url = "https://reddit.com" + (if (url[0] == '/') "" else "/") + url
-        }
-
-        val intent = url?.let { createIntent(it, this) }
+        val intent = createIntent(url, this)
 
         startActivity(intent)
 
-        val packageName = intent?.component?.className
+        val packageName = intent.component?.className
         if (packageName == VideoActivity::class.java.name || packageName == ImageActivity::class.java.name) {
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }

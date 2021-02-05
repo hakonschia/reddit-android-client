@@ -154,11 +154,36 @@ private val IMAGE_FORMATS = Collections.unmodifiableList(listOf("png", "jpg", "j
 /**
  * Creates an intent based on the passed URL
  *
+ * @param url The URL to create an intent for. The URL will be converted in multiple ways:
+ * * It will be passed through [LinkUtils.convertToDirectUrl]
+ * * If it does not match https/http it will be assumed this link is a Reddit link and reddit.com will be added
+ * @param context The context to create the intent with
+ * @return An [Intent]
+ */
+fun createIntent(url: String, context: Context) : Intent {
+    // If the URL can be converted to a direct link (eg. as an image) ensure it is
+    var convertedUrl = LinkUtils.convertToDirectUrl(url)
+
+    // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
+    // and add the full url so it doesn't have to be handled separately, and potential links we don't
+    // handle are sent out correctly to the browser
+    if (!convertedUrl.matches("^http(s)?.*".toRegex())) {
+        convertedUrl = "https://reddit.com" + (if (convertedUrl[0] == '/') "" else "/") + convertedUrl
+    }
+
+    return createIntentInternal(convertedUrl, context)
+}
+
+/**
+ * Creates an intent based on the passed URL
+ *
  * @param url The URL to create an intent for
  * @param context The context to create the intent with
  * @return An [Intent]
  */
-fun createIntent(url: String, context: Context): Intent {
+fun createIntentInternal(url: String, context: Context): Intent {
+    println("Dispatching $url")
+
     val asUri = Uri.parse(url)
     val pathSegments = asUri.pathSegments
 
