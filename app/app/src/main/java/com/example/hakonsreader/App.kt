@@ -28,10 +28,12 @@ import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
+import com.squareup.picasso.Picasso
 import io.noties.markwon.Markwon
 import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.image.picasso.PicassoImagesPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -253,6 +255,7 @@ class App : Application() {
                 .usePlugin(CorePlugin.create())
                 .usePlugin(TablePlugin.create(this))
                 .usePlugin(StrikethroughPlugin.create())
+                .usePlugin(PicassoImagesPlugin.create(Picasso.get()))
 
                 // Custom plugins
                 .usePlugin(RedditSpoilerPlugin())
@@ -413,6 +416,7 @@ class App : Application() {
         return MarkdownAdjuster.Builder()
                 .checkHeaderSpaces()
                 .checkUrlEncoding()
+                .convertImageLinksToMarkdown()
                 .build()
     }
 

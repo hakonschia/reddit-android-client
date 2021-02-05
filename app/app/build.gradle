@@ -106,6 +106,7 @@ dependencies {
     implementation "io.noties.markwon:ext-tables:$markwon_version"
     implementation "io.noties.markwon:syntax-highlight:$markwon_version"
     implementation "io.noties.markwon:editor:$markwon_version"
+    implementation "io.noties.markwon:image-picasso:$markwon_version"
 
     // Misc
     implementation 'com.r0adkll:slidableactivity:2.1.0'

@@ -246,4 +246,57 @@ public class MarkdownAdjusterTest {
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void testImageLinkConverter() {
+        MarkdownAdjuster adjuster = new MarkdownAdjuster.Builder()
+                .convertImageLinksToMarkdown()
+                .build();
+
+        String markdown;
+        String expected;
+        String actual;
+
+        // Image file extension (.png)
+        markdown = "Next comes an image: https://i.redd.it/z4sgyaoenlf61.png what a nice image";
+        expected = "Next comes an image: ![image](https://i.redd.it/z4sgyaoenlf61.png) what a nice image";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        markdown = "https://i.redd.it/z4sgyaoenlf61.png";
+        expected = "![image](https://i.redd.it/z4sgyaoenlf61.png)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // Image file in query parameter (?format=jpg)
+        markdown = "https://pbs.twimg.com/media/Es_qtWVXEAMKEBd?format=jpg&name=large";
+        expected = "![image](https://pbs.twimg.com/media/Es_qtWVXEAMKEBd?format=jpg&name=large)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        markdown = "Next comes an image: https://pbs.twimg.com/media/Es_qtWVXEAMKEBd?format=jpg&name=large what a nice image";
+        expected = "Next comes an image: ![image](https://pbs.twimg.com/media/Es_qtWVXEAMKEBd?format=jpg&name=large) what a nice image";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        markdown = "This image is already ![image description](https://i.redd.it/z4sgyaoenlf61.png) in image markdown";
+        expected = "This image is already ![image description](https://i.redd.it/z4sgyaoenlf61.png) in image markdown";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // This could potentially be made to match as well, the downside is if an image is linked like this
+        // it might be odd to have it break that text with an image (could potentially be a setting of its own
+        // to show images directly if they're linked with text)
+        markdown = "This image is already [in a link](https://i.redd.it/z4sgyaoenlf61.png) in image markdown";
+        expected = "This image is already [in a link](https://i.redd.it/z4sgyaoenlf61.png) in image markdown";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+
+        // If the link is in a markdown link, but the text and link is just the link, then we can convert it
+        markdown = "This is a raw image link in markdown [https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)";
+        expected = "This is a raw image link in markdown ![image](https://i.redd.it/z4sgyaoenlf61.png)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+    }
 }

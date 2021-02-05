@@ -1,6 +1,8 @@
 package com.example.hakonsreader.api.utils;
 
 
+import com.example.hakonsreader.activites.ImageActivity;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -17,7 +19,7 @@ public class MarkdownAdjuster {
     private boolean checkHeaderSpaces;
     private boolean checkNormalLinks;
     private boolean checkUrlEncoding;
-
+    private boolean convertImageLinksToMarkdown;
 
     private MarkdownAdjuster() {}
 
@@ -26,6 +28,7 @@ public class MarkdownAdjuster {
         boolean bCheckHeaderSpaces = false;
         boolean bCheckNormalLinks = false;
         boolean bCheckUrlEncoding = false;
+        boolean bConvertImageLinksToMarkdown = false;
 
 
         /**
@@ -86,6 +89,20 @@ public class MarkdownAdjuster {
         }
 
         /**
+         * Wraps URLs pointing to images in Markdown image formatting to inline images directly.
+         *
+         * Ie. "https://i.redd.it/z4sgyaoenlf61.png" will be converted to "![image](https://i.redd.it/z4sgyaoenlf61.png)"
+         *
+         * Only URLs with https will be matched (not http)
+         *
+         * @return This builder
+         */
+        public Builder convertImageLinksToMarkdown() {
+            bConvertImageLinksToMarkdown = true;
+            return this;
+        }
+
+        /**
          * Builds the MarkdownAdjuster
          *
          * @return The MarkdownAdjuster
@@ -96,6 +113,7 @@ public class MarkdownAdjuster {
             adjuster.checkRedditSpecificLinks = bCheckRedditSpecificLinks;
             adjuster.checkNormalLinks = bCheckNormalLinks;
             adjuster.checkUrlEncoding = bCheckUrlEncoding;
+            adjuster.convertImageLinksToMarkdown = bConvertImageLinksToMarkdown;
 
             return adjuster;
         }
@@ -120,6 +138,9 @@ public class MarkdownAdjuster {
         }
         if (checkUrlEncoding) {
             markdown = this.adjustUrlEncoding(markdown);
+        }
+        if (convertImageLinksToMarkdown) {
+            markdown = this.convertImageLinks(markdown);
         }
 
         return markdown;
@@ -258,13 +279,11 @@ public class MarkdownAdjuster {
             String sub = entry.getKey();
             String formatted = entry.getValue();
 
-            // replaceAll is probably bad to use since we're actually only replacing the exact match each time
-            markdown = markdown.replaceAll(sub, formatted);
+            markdown = markdown.replace(sub, formatted);
         }
 
         return markdown;
     }
-
 
 
     /**
@@ -375,4 +394,29 @@ public class MarkdownAdjuster {
         return markdown;
     }
 
+    /**
+     * Wraps image URLs in markdown images, ie.: ![image](https://imgur.com/rthrth.png)
+     *
+     * @param markdown The markdown to adjust
+     * @return The adjusted markdown
+     */
+    private String convertImageLinks(String markdown) {
+        // This would also match stuff like "https:///.png", but I'm taking the chance that that won't happen
+        // over bothering to create a proper URL regex (it very likely won't happen)
+        // This has to match https only, as this will load actual images over the network, which might not
+        // support cleartext
+        String pattern = "(^|\\s)https://" +
+                // This will somewhat limit the URL correctly as it requires a slash before the image format
+                ".*/.*" +
+                "(" +
+                "\\.(png|jpg|jpeg)" +
+                // Kind of (very) bad as the format HAS to be the first query parameter
+                "|(\\?format=(png|jpg|jpeg))" +
+                ")" +
+                // Match anything afterwards until a whitespace or end of line (if .png isn't the last, or ?format=png&something=else)
+                "[^\\s]*(\\s|$)";
+        String replaceFormat = "![image](%s)";
+
+        return this.replace(markdown, pattern, replaceFormat);
+    }
 }
