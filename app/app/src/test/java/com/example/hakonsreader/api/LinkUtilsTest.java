@@ -81,8 +81,6 @@ public class LinkUtilsTest {
         String[] notMatchingTests = {
                 // Duplicate r
                 "https://www.reddit.com/rr/GlobalOffensive/",
-                // http is not allowed
-                "http://www.reddit.com/r/GlobalOffensive/",
                 // URLs matching more than the subreddit (links to posts) should not match
                 "https://www.reddit.com/r/norge/comments/ju1dvc/brelett_gang_rise_up/",
         };
@@ -199,8 +197,6 @@ public class LinkUtilsTest {
 
                 // Duplicate r
                 "https://www.reddit.com/rr/GlobalOffensive/",
-                // http is not allowed
-                "http://www.reddit.com/r/GlobalOffensive/",
                 // URLs matching more than the subreddit (links to posts) should not match
                 "https://www.reddit.com/r/norge/comments/ju1dvc/brelett_gang_rise_up/",
 
