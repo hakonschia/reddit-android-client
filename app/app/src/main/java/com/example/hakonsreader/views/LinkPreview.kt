@@ -13,6 +13,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.DispatcherActivity
 import com.example.hakonsreader.databinding.LinkPreviewBinding
+import com.example.hakonsreader.misc.CreateIntentOptions
 import com.example.hakonsreader.misc.createIntent
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -79,7 +80,9 @@ class LinkPreview : FrameLayout {
             "https://reddit.com" + (if (link[0] == '/') "" else "/") + link
         } else link
 
-        val intent = createIntent(url, context)
+        // Create the intent with internal links as false, otherwise any link would show our app
+        // icon as it would resolve to WebViewActivity/VideoYoutubeActivity (if the user had that option enabled)
+        val intent = createIntent(url, CreateIntentOptions(openLinksInternally = false, openYoutubeVideosInternally = false), context)
 
         // Find all activities this intent would resolve to
         val intentActivities = context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)

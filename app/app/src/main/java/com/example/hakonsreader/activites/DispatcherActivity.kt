@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
+import com.example.hakonsreader.misc.CreateIntentOptions
 import com.example.hakonsreader.misc.createIntent
 import com.jakewharton.processphoenix.ProcessPhoenix
 import java.util.*
@@ -34,10 +35,9 @@ class DispatcherActivity : AppCompatActivity() {
 
         val startIntent: Intent = intent
         val uri = startIntent.data
-        var url: String?
 
         // Activity started from a URL intent
-        url = if (uri != null) {
+        val url: String? = if (uri != null) {
             uri.toString()
         } else {
             // Activity started from a manual intent
@@ -56,12 +56,19 @@ class DispatcherActivity : AppCompatActivity() {
 
         Log.d(TAG, "Dispatching $url")
 
-        val intent = createIntent(url, this)
+        val options = CreateIntentOptions(
+                openLinksInternally = App.get().openLinksInApp(),
+                openYoutubeVideosInternally = App.get().openYouTubeVideosInApp()
+        )
+
+        val intent = createIntent(url, options,this)
 
         startActivity(intent)
 
+        // Fade in/out videos and images
+        val fadeActivityNames = listOf<String>(VideoYoutubeActivity::class.java.name, VideoActivity::class.java.name, ImageActivity::class.java.name)
         val packageName = intent.component?.className
-        if (packageName == VideoActivity::class.java.name || packageName == ImageActivity::class.java.name) {
+        if (fadeActivityNames.contains(packageName)) {
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
     }
