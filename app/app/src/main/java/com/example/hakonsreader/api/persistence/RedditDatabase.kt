@@ -11,14 +11,13 @@ import com.example.hakonsreader.api.model.flairs.RedditFlair
 /**
  * The global database for the application, holds [RedditPost] and [Subreddit] entities
  */
-@Database(version = 23, exportSchema = false,
+@Database(version = 24, exportSchema = false,
         entities = [
             RedditPost::class,
             Subreddit::class,
             SubredditRule::class,
             RedditMessage::class,
             RedditFlair::class,
-            RedditUserInfo::class
         ])
 @TypeConverters(PostConverter::class, EnumConverters::class)
 abstract class RedditDatabase : RoomDatabase() {
@@ -28,7 +27,6 @@ abstract class RedditDatabase : RoomDatabase() {
     abstract fun messages(): RedditMessagesDao
     abstract fun rules(): RedditSubredditRulesDao
     abstract fun flairs(): RedditFlairsDao
-    abstract fun userInfo() : RedditUserInfoDao
 
     /**
      * Clears user state from any records in the database

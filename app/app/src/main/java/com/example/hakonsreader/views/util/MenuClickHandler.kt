@@ -87,7 +87,7 @@ private fun showAccountManagement(context: Context) {
             layoutManager = LinearLayoutManager(context)
             adapter = AccountsAdapter().apply {
                 CoroutineScope(IO).launch {
-                    val accs = app.database.userInfo().getAllUsers() as MutableList
+                    val accs = app.userInfoDatabase.userInfo().getAllUsers() as MutableList
                     withContext(Main) {
                         accounts = accs
                     }
@@ -106,7 +106,7 @@ private fun showAccountManagement(context: Context) {
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
                         removeItem(userInfoClicked)
                         CoroutineScope(IO).launch {
-                            app.database.userInfo().delete(userInfoClicked)
+                            app.userInfoDatabase.userInfo().delete(userInfoClicked)
                         }
                     }
                 }
@@ -117,7 +117,7 @@ private fun showAccountManagement(context: Context) {
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
                         userInfoClicked.nsfwAccount = nsfwAccount
                         CoroutineScope(IO).launch {
-                            app.database.userInfo().update(userInfoClicked)
+                            app.userInfoDatabase.userInfo().update(userInfoClicked)
                         }
                     } else {
                         // Update the current account

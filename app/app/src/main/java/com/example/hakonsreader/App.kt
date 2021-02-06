@@ -18,6 +18,7 @@ import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.persistence.RedditDatabase
+import com.example.hakonsreader.api.persistence.RedditUserInfoDatabase
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.MarkdownAdjuster
 import com.example.hakonsreader.constants.NetworkConstants
@@ -52,6 +53,7 @@ import java.io.File
 import java.security.SecureRandom
 import java.util.*
 import java.util.function.Consumer
+import kotlin.collections.HashSet
 
 /**
  * Entry point for the application. Sets up various static variables used throughout the app
@@ -125,6 +127,13 @@ class App : Application() {
      */
     val database: RedditDatabase by lazy {
         RedditDatabase.getInstance(this)
+    }
+
+    /**
+     * A [RedditUserInfoDatabase] instance
+     */
+    val userInfoDatabase: RedditUserInfoDatabase by lazy {
+        RedditUserInfoDatabase.getInstance(this)
     }
 
     /**
@@ -225,7 +234,7 @@ class App : Application() {
             TokenManager.getToken()?.run {
                 val userId = this.userId
                 if (userId != AccessToken.NO_USER_ID) {
-                    currentUserInfo = database.userInfo().getById(userId)
+                    currentUserInfo = userInfoDatabase.userInfo().getById(userId)
                 }
             }
 
@@ -452,13 +461,13 @@ class App : Application() {
                 current
             } else {
                 // Either get from the database, or create a new one
-                database.userInfo().getById(token.userId) ?: RedditUserInfo(token).also {
+                userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token).also {
                     currentUserInfo = it
                 }
             }
         } else {
             // currentUserInfo == null, Either get from the database, or create a new one
-            database.userInfo().getById(token.userId) ?: RedditUserInfo(token).also {
+            userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token).also {
                 currentUserInfo = it
             }
         }
@@ -481,7 +490,7 @@ class App : Application() {
 
                     // New token is for a user
                     if (token.userId != AccessToken.NO_USER_ID) {
-                        database.userInfo().insert(this)
+                        userInfoDatabase.userInfo().insert(this)
                     }
                 }
             }
@@ -509,7 +518,7 @@ class App : Application() {
                         this.nsfwAccount = nsfwAccount
                     }
 
-                    database.userInfo().update(this)
+                    userInfoDatabase.userInfo().update(this)
                 }
             }
         }
@@ -1027,7 +1036,7 @@ class App : Application() {
             database.clearUserState()
 
             currentUserInfo?.let {
-                database.userInfo().delete(it)
+                userInfoDatabase.userInfo().delete(it)
             }
 
             settings.edit().remove(PRIVATELY_BROWSING_KEY).commit()
