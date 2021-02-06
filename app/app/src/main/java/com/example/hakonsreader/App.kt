@@ -106,15 +106,6 @@ class App : Application() {
     private var wifiConnected = false
 
     /**
-     * The [Markwon] object used to format markdown text. This object has custom plugins for Reddit
-     * specific markdown, and defines a custom theme
-     */
-    val markwon: Markwon by lazy {
-        // This requires the resources to be set, so lazy initialize it
-        createMarkwon()
-    }
-
-    /**
      * @return The [RedditApi] object to use for API calls
      */
     val api: RedditApi by lazy {
@@ -130,12 +121,77 @@ class App : Application() {
     }
 
     /**
+     * The [Markwon] object used to format markdown text. This object has custom plugins for Reddit
+     * specific markdown, and defines a custom theme
+     */
+    val markwonNoDataSaving: Markwon by lazy {
+        // This requires the resources to be set, so lazy initialize it
+        createMarkwon()
+    }
+
+    /**
+     * The [Markwon] object used to format markdown text. This object has custom plugins for Reddit
+     * specific markdown, and defines a custom theme. This will not look for images to inline, so
+     * if images aren't going to be inlined this should be used over [markwon] to avoid some unnecessary
+     * processing
+     */
+    val markwonDataSaving: Markwon by lazy {
+        // This requires the resources to be set, so lazy initialize it
+        createDataSavingMarkwon()
+    }
+
+    /**
+     * Gets the markwon object to use based on if data saving is enabled
+     *
+     * @see markwonNoDataSaving
+     * @see markwonDataSaving
+     */
+    val markwon: Markwon
+        get() {
+            return if (dataSavingEnabled()) {
+                markwonDataSaving
+            } else {
+                markwonNoDataSaving
+            }
+        }
+
+    /**
      * An instance of a [MarkdownAdjuster]. This instance checks the following:
      * * Header spaces
      * * URL encoding in Markdown links
-     * *
+     * * Image conversions for inline images
+     *
+     * @see adjuster
+     * @see adjusterDataSaving
      */
-    val adjuster: MarkdownAdjuster = createMarkdownAdjuster()
+    val adjusterNoDataSaving: MarkdownAdjuster = createMarkdownAdjuster()
+
+    /**
+     * An instance of a [MarkdownAdjuster] for when data saving is enabled. This instance checks the following:
+     * * Header spaces
+     * * URL encoding in Markdown links
+     *
+     * @see adjuster
+     * @see adjusterNoDataSaving
+     */
+    val adjusterDataSaving: MarkdownAdjuster = createMarkdownAdjusterDataSaving()
+
+    /**
+     * The markdown adjuster based on if data saving is enabled. When data saving is enabled
+     * images shouldn't be inlined, so the image link adjustment is skipped to not perform unnecessary
+     * processing
+     *
+     * @see adjusterNoDataSaving
+     * @see adjusterDataSaving
+     */
+    val adjuster: MarkdownAdjuster
+        get() {
+            return if (dataSavingEnabled()) {
+                adjusterDataSaving
+            } else {
+                adjusterNoDataSaving
+            }
+        }
 
     /**
      * The user info for the user that is currently active in the application (this will not be
@@ -143,7 +199,11 @@ class App : Application() {
      */
     var currentUserInfo: RedditUserInfo? = null
 
+    /**
+     * List of observers to be notified when private browsing is enabled/disabled
+     */
     private val privateBrowsingObservables: MutableList<PrivateBrowsingObservable> = ArrayList()
+
 
     override fun onCreate() {
         super.onCreate()
@@ -266,6 +326,24 @@ class App : Application() {
                 .usePlugin(ThemePlugin(this))
                 .build()
     }
+
+    private fun createDataSavingMarkwon(): Markwon {
+        return Markwon.builder(this)
+                // Headers, blockquote etc. are a part of the core
+                .usePlugin(CorePlugin.create())
+                .usePlugin(TablePlugin.create(this))
+                .usePlugin(StrikethroughPlugin.create())
+
+                // Custom plugins
+                .usePlugin(RedditSpoilerPlugin())
+                .usePlugin(RedditLinkPlugin())
+                .usePlugin(SuperscriptPlugin())
+                .usePlugin(LinkPlugin())
+                .usePlugin(EnlargeLinkPlugin())
+                .usePlugin(ThemePlugin(this))
+                .build()
+    }
+
 
     /**
      * Creates a new [RedditApi] instance.
@@ -417,6 +495,16 @@ class App : Application() {
                 .checkHeaderSpaces()
                 .checkUrlEncoding()
                 .convertImageLinksToMarkdown()
+                .build()
+    }
+
+    /**
+     * Returns a new instance of a [MarkdownAdjuster]
+     */
+    private fun createMarkdownAdjusterDataSaving() : MarkdownAdjuster {
+        return MarkdownAdjuster.Builder()
+                .checkHeaderSpaces()
+                .checkUrlEncoding()
                 .build()
     }
 
