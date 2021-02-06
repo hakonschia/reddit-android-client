@@ -58,14 +58,21 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         private const val LAYOUT_ANIMATION_PROGRESS_KEY = "layout_progress"
 
         /**
-         * The key set in the bundle with getArguments() that says the username the fragment is for
+         * The key set in [getArguments] that says the username the fragment is for
          */
         private const val USERNAME_KEY = "username"
 
         /**
-         * The key set in the bundle with getArguments() that says if the fragment is for the logged in user
+         * The key set in [getArguments] that says if the fragment is for the logged in user
          */
         private const val IS_LOGGED_IN_USER_KEY = "isLoggedInUser"
+
+        /**
+         * The key for instance saves that says if info has been loaded about the user
+         *
+         * The value stored with this should be a `boolean`
+         */
+        private const val IS_INFO_LOADED = "isInfoLoaded"
 
 
         /**
@@ -138,15 +145,13 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         
         App.get().registerPrivateBrowsingObservable(this)
 
-        if (isInfoLoaded) {
-            retrieveUserInfo()
-        }
-
+        var infoLoaded = false
         // Retrieve user info if the fragment hasn't loaded any already
         if (savedInstanceState != null) {
             binding.parentLayout.progress = savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)
             postIds = savedInstanceState.getStringArrayList(POST_IDS_KEY) as ArrayList<String>
             postsViewModel?.postIds = postIds
+            infoLoaded = savedInstanceState.getBoolean(IS_INFO_LOADED)
         }
 
         if (saveState != null) {
@@ -158,6 +163,12 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
                 postIds = ids
                 postsViewModel?.postIds = postIds
             }
+
+            infoLoaded = saveState!!.getBoolean(IS_INFO_LOADED)
+        }
+
+        if (!infoLoaded) {
+            retrieveUserInfo()
         }
 
         // If we're on a logged in user, or the fragment has been recreated, we might have some old info
@@ -189,6 +200,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         _binding?.let {  outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, it.parentLayout.progress) }
         outState.putParcelable(LAYOUT_STATE_KEY, postsLayoutManager?.onSaveInstanceState())
         outState.putStringArrayList(POST_IDS_KEY, postsViewModel?.postIds as ArrayList<String>?)
+        outState.putBoolean(IS_INFO_LOADED, isInfoLoaded)
     }
 
     override fun onPause() {
@@ -218,6 +230,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         saveState?.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.progress)
         saveState?.putParcelable(LAYOUT_STATE_KEY, postsLayoutManager?.onSaveInstanceState())
         saveState?.putStringArrayList(POST_IDS_KEY, postsViewModel?.postIds as ArrayList<String>?)
+        saveState?.putBoolean(IS_INFO_LOADED, isInfoLoaded)
 
         _binding = null
     }
