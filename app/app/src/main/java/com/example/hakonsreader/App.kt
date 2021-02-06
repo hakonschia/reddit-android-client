@@ -6,9 +6,12 @@ import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityOptionsCompat
 import androidx.preference.PreferenceManager
+import com.example.hakonsreader.activites.ImageActivity
 import com.example.hakonsreader.activites.InvalidAccessTokenActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.AccessToken
@@ -22,6 +25,7 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.markwonplugins.*
+import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.misc.SharedPreferencesManager
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
@@ -29,10 +33,12 @@ import com.jakewharton.processphoenix.ProcessPhoenix
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
 import com.squareup.picasso.Picasso
-import io.noties.markwon.Markwon
+import io.noties.markwon.*
 import io.noties.markwon.core.CorePlugin
+import io.noties.markwon.core.spans.LinkSpan
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.image.ImageProps
 import io.noties.markwon.image.picasso.PicassoImagesPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -41,6 +47,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.Cache
 import okhttp3.logging.HttpLoggingInterceptor
+import org.commonmark.node.Image
 import java.io.File
 import java.security.SecureRandom
 import java.util.*
@@ -316,6 +323,27 @@ class App : Application() {
                 .usePlugin(TablePlugin.create(this))
                 .usePlugin(StrikethroughPlugin.create())
                 .usePlugin(PicassoImagesPlugin.create(Picasso.get()))
+                .usePlugin(object : AbstractMarkwonPlugin() {
+                    override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
+                        builder.appendFactory(Image::class.java) { configuration, props ->
+
+                            // this is the destination of image, you can additionally process it
+                            val url = ImageProps.DESTINATION.require(props)
+
+                            LinkSpan(
+                                    configuration.theme(),
+                                    url,
+                                    // Not sure how this is supposed to work as even if I define my own custom
+                                    // resolver it still uses the default
+                                    // Might have something to do with how I set the LinkMovementMethod?
+                                    // I want to open the image with a SharedElementTransition like other images
+                                    // Might be impossible since it seems as the images are actually a TextView, not
+                                    // ImageView (from layout inspector)
+                                    configuration.linkResolver()
+                            )
+                        }
+                    }
+                })
 
                 // Custom plugins
                 .usePlugin(RedditSpoilerPlugin())
