@@ -80,7 +80,7 @@ class ContentImage : Content {
                 binding.image.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_image_not_supported_200dp))
             } else {
                 // When opening the image we always want to open the normal
-                setOnClickListener { openImageInFullscreen(binding.image, normal, cache) }
+                setOnClickListener { openImageInFullscreen(binding.image, imageUrl ?: normal, cache) }
 
                 // If we have an obfuscated image, load that here instead
                 Picasso.get()
