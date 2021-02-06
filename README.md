@@ -24,19 +24,7 @@ The downloadable [APK](apk/app-release.apk) contains the application at commit `
 
 ### Build yourself
 
-To build the application you have to create your own [Reddit application](https://www.reddit.com/prefs/apps) and sign up for API access.
-
 Create the file `secrets.properties` under [/app](app) and assign the following values:
-```
-REDDIT_CLIENT_ID = <The randomly generated client ID of the application>
-REDDIT_CALLBACK_URL = <The custom defined callback URL of the application>
-REDDIT_USER_AGENT = <The User-Agent to use for API calls towards Reddit as defined here: https://github.com/reddit-archive/reddit/wiki/API#rules>
-```
-
-Optionally, create an [Imgur app](https://api.imgur.com/oauth2/addclient) and pass the client ID to make requests towards the Imgur API. Some communication is done with Imgur, but these calls are optional and the app will be functional if this is omitted. Only userless/anonymous endpoints are used for Imgur.
-```
-IMGUR_CLIENT_ID = <The Imgur client ID>
-```
 
 To build release versions of the application, create [signing keys](https://developer.android.com/studio/publish/app-signing#sign-apk) and add the following values to `secrets.properties`:
 ```
@@ -48,6 +36,11 @@ KEY_PASSWORD = <The key password>
 
 Note: The signing values cannot be omitted. If you are not building a release version assign empty strings to these values (ie. `FILE_PATH = ""`)
 
+
+Optionally, create an [Imgur app](https://api.imgur.com/oauth2/addclient) and pass the client ID to make requests towards the Imgur API. Some communication is done with Imgur, but these calls are optional and the app will be functional if this is omitted. Only userless/anonymous endpoints are used for Imgur.
+```
+IMGUR_CLIENT_ID = <The Imgur client ID>
+```
 
 ### Crashlytics
 
