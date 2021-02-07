@@ -2,6 +2,7 @@ package com.example.hakonsreader.api.jsonadapters
 
 import com.example.hakonsreader.api.model.thirdparty.GfycatGif
 import com.example.hakonsreader.api.model.thirdparty.ImgurGif
+import com.example.hakonsreader.api.utils.thirdPartyObjectFromJsonString
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.TypeAdapter
@@ -58,20 +59,6 @@ class ThirdPartyObjectAdapter : TypeAdapter<Any>() {
     }
 
     override fun read(reader: JsonReader?): Any? {
-        val rawString = reader?.nextString()
-
-        val type = when (JsonParser.parseString(rawString).asJsonObject.get("type").asString) {
-            ImgurGif::class.java.typeName -> {
-                ImgurGif::class.java
-            }
-
-            GfycatGif::class.java.typeName -> {
-                GfycatGif::class.java
-            }
-
-            else -> null
-        }
-
-        return Gson().fromJson(rawString, type)
+        return reader?.nextString()?.let { thirdPartyObjectFromJsonString(it) }
     }
 }

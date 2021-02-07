@@ -6,7 +6,11 @@ import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditAward;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
+import com.example.hakonsreader.api.utils.UtilKt;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
@@ -126,12 +130,25 @@ public class PostConverter {
 
     @TypeConverter
     public static Object objectFromString(String value) {
+        Object thirdParty = UtilKt.thirdPartyObjectFromJsonString(value);
+        if (thirdParty != null) {
+            return thirdParty;
+        }
+
         Type listType = new TypeToken<Object>() {}.getType();
         return gson.fromJson(value, listType);
     }
 
     @TypeConverter
-    public static String stringFromObject(Object array) {
-        return gson.toJson(array);
+    public static String stringFromObject(Object object) {
+        try {
+            // Since this is a generic converter for any type of object, add the class name so it can be
+            // restored correctly later
+            JsonObject json = gson.toJsonTree(object).getAsJsonObject();
+            json.addProperty("type", object.getClass().getTypeName());
+            return json.toString();
+        } catch (IllegalStateException | JsonParseException e) {
+            return null;
+        }
     }
 }

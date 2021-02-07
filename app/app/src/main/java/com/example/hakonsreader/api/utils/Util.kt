@@ -7,9 +7,13 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.exceptions.RateLimitException
 import com.example.hakonsreader.api.exceptions.ThreadLockedException
 import com.example.hakonsreader.api.model.AccessToken
+import com.example.hakonsreader.api.model.thirdparty.GfycatGif
+import com.example.hakonsreader.api.model.thirdparty.ImgurGif
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
+import com.google.gson.JsonParser
 import retrofit2.Response
 
 
@@ -75,4 +79,31 @@ fun verifyLoggedInToken(accessToken: AccessToken) {
  */
 fun createFullName(thing: Thing, thingId: String): String {
     return thing.value + "_" + thingId
+}
+
+fun thirdPartyObjectFromJsonString(jsonString: String?) : Any? {
+    jsonString ?: return null
+
+    val asJsonObject = try {
+        JsonParser.parseString(jsonString).asJsonObject
+    } catch (e: IllegalStateException) {
+        // This happens if .asJsonObject fails
+        return null
+    } catch (e: JsonParseException) {
+        return null
+    }
+
+    val type = when (asJsonObject?.get("type")?.asString) {
+        ImgurGif::class.java.typeName -> {
+            ImgurGif::class.java
+        }
+
+        GfycatGif::class.java.typeName -> {
+            GfycatGif::class.java
+        }
+
+        else -> return null
+    }
+
+    return Gson().fromJson(jsonString, type)
 }
