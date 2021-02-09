@@ -250,7 +250,12 @@ class Post : Content {
      * The height of the post is resized to match [Post.maxHeight], if needed
      */
     private fun addContent() {
-        if (!showTextContent && redditPost.getPostType() == PostType.TEXT) {
+        val hasTextContent = redditPost.getPostType() == PostType.TEXT
+                // If the post is a crosspost and the crosspost is a text post, it's seen as LINK
+                // post as the post is a "link" to the crosspost, so check here if it's a text post
+                // as it would be added for generatePostContent
+                || redditPost?.crossposts?.find { it.getPostType() == PostType.TEXT } != null
+        if (!showTextContent && hasTextContent) {
             return
         }
 
