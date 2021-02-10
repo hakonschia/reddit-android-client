@@ -312,5 +312,22 @@ public class MarkdownAdjusterTest {
                 " and here is another one ![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png) :)";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
+
+        // Already in an image, nothing should happen
+        markdown = "This is an image in markdown ![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)";
+        expected = "This is an image in markdown ![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        markdown = "![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)";
+        expected = "![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // Should add (this tests that checking for a ! doesn't crash when it's checking "before" the text)
+        markdown = "[https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)";
+        expected = "![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
     }
 }

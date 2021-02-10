@@ -108,6 +108,10 @@ public class MarkdownAdjuster {
          *
          * Ie. "https://i.redd.it/z4sgyaoenlf61.png" will be converted to "![image](https://i.redd.it/z4sgyaoenlf61.png)"
          *
+         * Links already in a markdown link where the text matches the link will have a "!" added at the start
+         * to convert it to an image, ie. "[https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)"
+         * will be converted to "![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)"
+         *
          * Only URLs with https will be matched (not http)
          *
          * @return This builder
@@ -451,6 +455,11 @@ public class MarkdownAdjuster {
             String group = matcher.group().trim();
 
             int startPos = matcher.start();
+            // The markdown link is already as an image
+            if (startPos >= 1 && markdown.charAt(startPos - 1) == '!') {
+                continue;
+            }
+
             int textEnd = group.indexOf(']');
 
             // Remove the brackets around the text
