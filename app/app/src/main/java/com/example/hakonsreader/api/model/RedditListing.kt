@@ -35,13 +35,9 @@ abstract class RedditListing {
     var kind = ""
 
     /**
-     * The name of the listing.
-     *
-     * This is typically what is referred to as a *fullname* by Reddit. A fullname if the listings
-     * [kind] combined with its [id], eg. *t3_rerrg* for a post.
+     * The fullname of the listing. A fullname is the listings [kind] combined with its [id], eg. *t3_rerrg* for a post.
      */
-    @Ignore
-    open var fullname = "${kind}_$id"
+    open val fullname get() = "${kind}_$id"
 
     /**
      * The UTC timestamp the listing was created
