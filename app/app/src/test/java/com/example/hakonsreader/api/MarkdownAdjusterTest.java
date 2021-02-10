@@ -292,10 +292,24 @@ public class MarkdownAdjusterTest {
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
 
-
         // If the link is in a markdown link, but the text and link is just the link, then we can convert it
         markdown = "This is a raw image link in markdown [https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)";
-        expected = "This is a raw image link in markdown ![image](https://i.redd.it/z4sgyaoenlf61.png)";
+        expected = "This is a raw image link in markdown ![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // If the link is in a markdown link, but the text is an actual text and the link
+        // is a link to an image, then we should not convert it
+        markdown = "This is a link in markdown [image link](https://i.redd.it/z4sgyaoenlf61.png)";
+        expected = "This is a link in markdown [image link](https://i.redd.it/z4sgyaoenlf61.png)";
+        actual = adjuster.adjust(markdown);
+        assertEquals(expected, actual);
+
+        // Two links, ensure the exclamation mark is added at the correct spot for all links
+        markdown = "This is a raw image link in markdown [https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)" +
+                " and here is another one [https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png) :)";
+        expected = "This is a raw image link in markdown ![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png)" +
+                " and here is another one ![https://i.redd.it/z4sgyaoenlf61.png](https://i.redd.it/z4sgyaoenlf61.png) :)";
         actual = adjuster.adjust(markdown);
         assertEquals(expected, actual);
     }

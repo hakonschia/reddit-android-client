@@ -3,7 +3,10 @@ package com.example.hakonsreader.api.utils;
 
 import com.example.hakonsreader.activites.ImageActivity;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +18,18 @@ import java.util.regex.Pattern;
  * <p>Use {@link MarkdownAdjuster.Builder} to create new objects</p>
  */
 public class MarkdownAdjuster {
+    private static final String IMAGE_LINK_PATTERN =
+            "(^|\\s)https://" +
+            // This will somewhat limit the URL correctly as it requires a slash before the image format
+            ".*/.*" +
+            "(" +
+            "\\.(png|jpg|jpeg)" +
+            // Kind of (very) bad as the format HAS to be the first query parameter
+            "|(\\?format=(png|jpg|jpeg))" +
+            ")" +
+            // Match anything afterwards until a whitespace or end of line (if .png isn't the last, or ?format=png&something=else)
+            "[^\\s]*(\\s|$)";
+
     private boolean checkRedditSpecificLinks;
     private boolean checkHeaderSpaces;
     private boolean checkNormalLinks;
@@ -405,18 +420,62 @@ public class MarkdownAdjuster {
         // over bothering to create a proper URL regex (it very likely won't happen)
         // This has to match https only, as this will load actual images over the network, which might not
         // support cleartext
-        String pattern = "(^|\\s)https://" +
-                // This will somewhat limit the URL correctly as it requires a slash before the image format
-                ".*/.*" +
-                "(" +
-                "\\.(png|jpg|jpeg)" +
-                // Kind of (very) bad as the format HAS to be the first query parameter
-                "|(\\?format=(png|jpg|jpeg))" +
-                ")" +
-                // Match anything afterwards until a whitespace or end of line (if .png isn't the last, or ?format=png&something=else)
-                "[^\\s]*(\\s|$)";
         String replaceFormat = "![image](%s)";
 
-        return this.replace(markdown, pattern, replaceFormat);
+        String firstReplace = this.replace(markdown, IMAGE_LINK_PATTERN, replaceFormat);
+        return replaceImageUrlsWithImageMarkdown(firstReplace);
+    }
+
+    /**
+     * Converts image URLs found in markdown links where the text and link are identical (the link
+     * to the image) and converts it to be image markdown instead.
+     *
+     * Example: [https://imgur.com/rthrth.png](https://imgur.com/rthrth.png) will be converted to
+     * ![https://imgur.com/rthrth.png](https://imgur.com/rthrth.png)
+     *
+     * If the text is not identical, it will not be adjusted, ie. [link to image](https://imgur.com/rthrth.png)
+     * will stay as it is
+     *
+     * @param markdown The markdown to adjust
+     * @return The adjusted markdown
+     */
+    private String replaceImageUrlsWithImageMarkdown(String markdown) {
+        // Taken from: https://stackoverflow.com/a/37462442/7750841
+        // Find all markdown links, and afterwards check if they contain links to images
+        Pattern pattern = Pattern.compile("(?:__|[*#])|\\[(.*?)]\\(.*?\\)");
+        Matcher matcher = pattern.matcher(markdown);
+
+        List<Integer> positionsToAdd = new ArrayList<>();
+
+        while (matcher.find()) {
+            String group = matcher.group().trim();
+
+            int startPos = matcher.start();
+            int textEnd = group.indexOf(']');
+
+            // Remove the brackets around the text
+            String text = group.substring(1, textEnd);
+            // Remove the parentheses around the link
+            String link = group.substring(textEnd + 2, group.length() - 1);
+
+            if (text.equals(link) && text.matches(IMAGE_LINK_PATTERN)) {
+                positionsToAdd.add(startPos);
+            }
+        }
+
+        // No image links found
+        if (positionsToAdd.size() == 0) {
+            return markdown;
+        }
+
+        StringBuilder builder = new StringBuilder(markdown);
+
+        for (int i = 0; i < positionsToAdd.size(); i++) {
+            // Insert at the position, and add "i" as it needs to offset the previous inserted ones as well
+            int pos = positionsToAdd.get(i) + i;
+            builder.insert(pos, '!');
+        }
+
+        return builder.toString();
     }
 }
