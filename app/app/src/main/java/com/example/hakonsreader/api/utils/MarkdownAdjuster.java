@@ -444,9 +444,8 @@ public class MarkdownAdjuster {
      * @return The adjusted markdown
      */
     private String replaceImageUrlsWithImageMarkdown(String markdown) {
-        // Taken from: https://stackoverflow.com/a/37462442/7750841
         // Find all markdown links, and afterwards check if they contain links to images
-        Pattern pattern = Pattern.compile("(?:__|[*#])|\\[(.*?)]\\(.*?\\)");
+        Pattern pattern = Pattern.compile("\\[(.*?)]\\(.*?\\)");
         Matcher matcher = pattern.matcher(markdown);
 
         List<Integer> positionsToAdd = new ArrayList<>();
