@@ -3,11 +3,14 @@ package com.example.hakonsreader.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
@@ -28,7 +31,6 @@ import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.responses.GenericError
@@ -52,11 +54,17 @@ import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.util.ViewUtil
+import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
 import com.robinhood.ticker.TickerUtils
+import com.squareup.picasso.Callback
+import com.squareup.picasso.NetworkPolicy
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlin.math.abs
+
 
 class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservable {
 
@@ -152,6 +160,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * A DrawerListener for the drawer with subreddit info
      */
     var drawerListener: DrawerLayout.DrawerListener? = null
+
+    var onActionBarAttached: ((Toolbar) -> Unit)? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         isDefaultSubreddit = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
@@ -344,7 +354,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private fun setupBinding() {
         _binding = FragmentSubredditBinding.inflate(layoutInflater)
 
-        with (binding) {
+        with(binding) {
             subredditRefresh.setOnClickListener { refreshPosts() }
             subscribe.setOnClickListener { subscribeOnclick() }
             subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }
@@ -361,7 +371,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     ContextCompat.getColor(requireContext(), R.color.colorAccent)
             )
 
-            openDrawer.setOnClickListener { drawer.openDrawer(GravityCompat.END) }
             drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
@@ -384,9 +393,18 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                         }
                     }
                 }
-                override fun onDrawerSlide(drawerView: View, slideOffset: Float) { /* Not implemented */ }
-                override fun onDrawerClosed(drawerView: View) { /* Not implemented */ }
-                override fun onDrawerStateChanged(newState: Int) { /* Not implemented */ }
+
+                override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                    // Not implemented
+                }
+
+                override fun onDrawerClosed(drawerView: View) {
+                    // Not implemented
+                }
+
+                override fun onDrawerStateChanged(newState: Int) {
+                    // Not implemented
+                }
             })
         }
     }
@@ -431,6 +449,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 }).toLong()
 
                 ViewUtil.setSubredditIcon(binding.subredditIcon, it)
+                setBannerImage()
+
                 binding.subreddit = it
                 postsAdapter?.hideScoreTime = it.hideScoreTime
             }
@@ -629,6 +649,52 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         }
     }
 
+    /**
+     * Sets the subreddits banner image. If no image is found, the banners visibility is set to [View.GONE].
+     * When (if) the image loads then [FragmentSubredditBinding.setBannerLoaded] is called with `true`.
+     * If data saving is enabled, then the image will only be loaded if it is already cached, and will
+     * not load from the network
+     */
+    private fun setBannerImage() {
+        subreddit?.let {
+            val imageView = binding.banner
+            val bannerURL = it.bannerBackgroundImage
+            if (bannerURL.isNotEmpty()) {
+                // Data saving on, only load if the image is already cached
+                if (App.get().dataSavingEnabled()) {
+                    Picasso.get()
+                            .load(bannerURL)
+                            .networkPolicy(NetworkPolicy.OFFLINE)
+                            .into(imageView, object : Callback {
+                                override fun onSuccess() {
+                                    imageView.visibility = View.VISIBLE
+                                    binding.bannerLoaded = true
+                                }
+
+                                override fun onError(e: Exception) {
+                                    imageView.visibility = View.GONE
+                                    binding.bannerLoaded = false
+                                }
+                            })
+                } else {
+                    imageView.visibility = View.VISIBLE
+                    Picasso.get()
+                            .load(bannerURL)
+                            .into(imageView, object : Callback {
+                                override fun onSuccess() {
+                                    binding.bannerLoaded = true
+                                }
+
+                                override fun onError(e: Exception) {
+                                    binding.bannerLoaded = false
+                                }
+                            })
+                }
+            } else {
+                imageView.visibility = View.GONE
+            }
+        }
+    }
 
     /**
      * Refreshes the posts in the fragment

@@ -485,7 +485,10 @@
     <string name="awardTotalCoinPricePost">post</string>
     <string name="awardTotalCoinPricecomment">comment</string>
 
-    <string name="subredditActiveUsers">%d users online</string>
+    <plurals name="subredditActiveUsers">
+        <item quantity="one">%d user online</item>
+        <item quantity="other">%d users online</item>
+    </plurals>
     <string name="subredditRules">Rules</string>
     <string name="subredditRuleNumberAndName" translatable="false">%d. %s</string>
 

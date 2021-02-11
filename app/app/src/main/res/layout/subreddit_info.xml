@@ -111,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
 
-                android:text="@{@string/subredditActiveUsers(subreddit.activeUsers)}"
+                android:text="@{@plurals/subredditActiveUsers(subreddit.activeUsers, subreddit.activeUsers)}"
                 android:textColor="@color/secondary_text_color"
 
                 app:layout_constraintStart_toStartOf="parent"

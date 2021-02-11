@@ -4,14 +4,18 @@
     <color name="colorPrimaryDark">#005560</color>
     <color name="colorAccent">#088EC8</color>
 
-    <color name="toolbar">#191919</color>
+    <color name="toolbarBackground">#000000</color>
+    <color name="blackOrWhite">#000</color>
 
     <color name="background">#000000</color>
     <color name="secondary_background">#121212</color>
     <color name="opposite_background">#FFFFFF</color>
     <color name="opposite_secondaryBackground">#EAEAEA</color>
+    <color name="oppositeSecondaryBackgroundSemiTransparent">#3BEAEAEA</color>
     <color name="background_with_alpha">#FF000000</color>
     <color name="dialogBackground">#292929</color>
+
+    <color name="semiTransparentBackground">#43000000</color>
 
     <color name="text_input_background">#333333</color>
 

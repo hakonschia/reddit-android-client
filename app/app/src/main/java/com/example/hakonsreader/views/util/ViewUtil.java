@@ -68,50 +68,20 @@ public class ViewUtil {
                     .resize(size, size)
                     .into(imageView);
         } else {
-            imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_emoji_emotions_200dp));
-        }
-    }
+            String subredditName = subreddit.getName();
+            switch (subredditName.toLowerCase()) {
+                case "popular":
+                    imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_trending_up_100));
+                    break;
 
-    /**
-     * Sets an ImageView to a subreddits banner background. If no image is found the visibility of the view
-     * is set to GONE.
-     *
-     * <p>If data saving is enabled the image will only be loaded if the image is found in the local cache</p>
-     *
-     * @param imageView The ImageView to load the banner into
-     * @param subreddit The subreddit to load the banner for
-     */
-    @BindingAdapter("subredditBanner")
-    public static void setSubredditBannerImage(ImageView imageView, Subreddit subreddit) {
-        if (subreddit == null) {
-            return;
-        }
-        String bannerURL = subreddit.getBannerBackgroundImage();
-        if (bannerURL != null && !bannerURL.isEmpty()) {
-            // Data saving on, only load if the image is already cached
-            if (App.Companion.get().dataSavingEnabled()) {
-                Picasso.get()
-                        .load(bannerURL)
-                        .networkPolicy(NetworkPolicy.OFFLINE)
-                        .into(imageView, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                imageView.setVisibility(View.VISIBLE);
+                case "all":
+                    imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_text_rotation_angleup_24));
+                    break;
 
-                            }
-                            @Override
-                            public void onError(Exception e) {
-                                imageView.setVisibility(View.GONE);
-                            }
-                        });
-            } else {
-                imageView.setVisibility(View.VISIBLE);
-                Picasso.get()
-                        .load(bannerURL)
-                        .into(imageView);
+                default:
+                    imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_emoji_emotions_200dp));
+                    break;
             }
-        } else {
-            imageView.setVisibility(View.GONE);
         }
     }
 
