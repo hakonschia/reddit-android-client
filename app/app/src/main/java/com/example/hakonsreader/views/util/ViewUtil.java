@@ -49,7 +49,6 @@ public class ViewUtil {
         }
         String iconURL = subreddit.getIcon();
         String communityURL = subreddit.getCommunityIcon();
-        int size = (int) imageView.getResources().getDimension(R.dimen.subredditIconSizeInList);
 
         // We use error and placeholder as the default icon. In case no internet it would override
         // the android:src in the layout, and the error isn't shown until the attempt to get the image has been made
@@ -58,14 +57,12 @@ public class ViewUtil {
                     .load(iconURL)
                     .placeholder(R.drawable.ic_emoji_emotions_200dp)
                     .error(R.drawable.ic_emoji_emotions_200dp)
-                    .resize(size, size)
                     .into(imageView);
         } else if(communityURL != null && !communityURL.isEmpty()) {
             Picasso.get()
                     .load(communityURL)
                     .placeholder(R.drawable.ic_emoji_emotions_200dp)
                     .error(R.drawable.ic_emoji_emotions_200dp)
-                    .resize(size, size)
                     .into(imageView);
         } else {
             String subredditName = subreddit.getName();

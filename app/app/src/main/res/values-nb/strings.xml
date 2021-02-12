@@ -354,4 +354,6 @@
     <string name="frontPageDescription">Startsiden inneholder poster fra subredditer du har abonnert til</string>
     <string name="popularDescription">Popular inneholder trendene poster fra de mest populære subredditene</string>
     <string name="allDescription">All er en samlnig av de mest aktive postene fra alle subredditer</string>
+    <string name="subreddits">Subredditer</string>
+    <string name="trendingSubreddits">Trendene subredditer</string>
 </resources>

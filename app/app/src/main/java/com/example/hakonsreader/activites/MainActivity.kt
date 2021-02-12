@@ -8,17 +8,22 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
+import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
@@ -31,6 +36,8 @@ import com.example.hakonsreader.interfaces.OnSubredditSelected
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
+import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -96,6 +103,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     private var lastShownFragment: Fragment? = null
     private val navigationViewListener: BottomNavigationViewListener = BottomNavigationViewListener()
 
+    private var subredditsAdapter: SubredditsAdapter? = null
+    private var subredditsLayoutManager: LinearLayoutManager? = null
+    private var subredditsViewModel: SelectSubredditsViewModel? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch back to the app theme (from the launcher theme)
@@ -118,6 +129,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
 
         setupNavBar(savedInstanceState)
+        setupNavDrawer()
 
         if (savedInstanceState != null) {
             savedState = savedInstanceState
@@ -132,8 +144,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             startInboxListener()
         }
 
-        binding.navDrawer.userInfo = App.get().currentUserInfo
-        binding.navDrawer.subredditSelected = this
         App.get().registerReceivers()
     }
 
@@ -189,6 +199,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     override fun onBackPressed() {
+        if (binding.parentLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.parentLayout.closeDrawer(GravityCompat.START)
+            return
+        }
+
         val activeFragment = getActiveFragment()
         // In an active subreddit
         if (activeFragment is SubredditFragment) {
@@ -746,6 +761,57 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      */
     fun selectProfileNavBar() {
         binding.bottomNav.selectedItemId = R.id.navProfile
+    }
+
+    private fun setupNavDrawer() {
+        // TODO this and SelectSubredditFragment can use a SharedViewModel
+        subredditsViewModel = ViewModelProvider(this).get(SelectSubredditsViewModel::class.java).apply {
+            getSubreddits().observe(this@MainActivity, { subreddits ->
+                subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
+            })
+
+            getOnCountChange().observe(this@MainActivity, { onCountChange ->
+                //binding.loadingIcon.onCountChange(onCountChange)
+            })
+
+            getError().observe(this@MainActivity, { error ->
+                Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
+            })
+        }
+
+        with (binding.navDrawer) {
+            userInfo = App.get().currentUserInfo
+            subredditSelected = this@MainActivity
+
+            subredditsAdapter = SubredditsAdapter().apply {
+                viewType = SubredditsAdapter.SubredditViewType.SIMPLE
+                subredditSelected = this@MainActivity
+            }
+            subredditsLayoutManager = LinearLayoutManager(this@MainActivity)
+            subreddits.run {
+                adapter = subredditsAdapter
+                layoutManager = subredditsLayoutManager
+            }
+        }
+
+        binding.parentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerOpened(drawerView: View) {
+                // TODO Load subs from SharedViewModel
+                subredditsViewModel?.loadSubreddits(loadDefaultSubs = false)
+            }
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                // Not implemented
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                // Not implemented
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                // Not implemented
+            }
+        })
     }
 
 

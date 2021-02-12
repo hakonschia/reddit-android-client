@@ -10,6 +10,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.databinding.ListItemSubredditBinding
+import com.example.hakonsreader.databinding.ListItemSubredditSimpleBinding
 import com.example.hakonsreader.interfaces.OnClickListener
 import com.example.hakonsreader.interfaces.OnSubredditSelected
 import com.example.hakonsreader.recyclerviewadapters.diffutils.SubredditsDiffCallback
@@ -21,7 +22,13 @@ import kotlin.collections.ArrayList
 /**
  * Adapter for displaying a list of [Subreddit] items
  */
-class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
+class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    enum class SubredditViewType {
+        SIMPLE,
+        STANDARD
+    }
+
 
     private var subreddits: MutableList<Subreddit> = ArrayList()
 
@@ -34,6 +41,8 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
      * The listener for when the "Favorite" icon in a list item has been clicked
      */
     var favoriteClicked: OnClickListener<Subreddit>? = null
+
+    var viewType = SubredditViewType.STANDARD
 
 
     /**
@@ -178,44 +187,73 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
     }
 
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val sub = subreddits[position]
 
-        with(holder.binding) {
-            name.text = sub.name
-            App.get().markwon.setMarkdown(subredditDescription, sub.publicDescription)
-            ViewUtil.setSubredditIcon(icon, sub)
-
-            // You can only favorite subs you are subscribed to
-            favoriteSub.visibility = if (sub.isSubscribed) {
-                holder.updateFavorited(sub.isFavorited)
-                View.VISIBLE
-            } else {
-                View.GONE
+        when (viewType) {
+            SubredditViewType.SIMPLE -> {
+                (holder as SimpleViewHolder).bind(sub)
             }
-
-            nsfwTag.visibility = if (sub.isNsfw) {
-                View.VISIBLE
-            } else {
-                View.GONE
+            SubredditViewType.STANDARD -> {
+                (holder as StandardViewHolder).bind(sub)
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ListItemSubredditBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-        )
+    override fun onCreateViewHolder(parent: ViewGroup, vt: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            SubredditViewType.SIMPLE -> {
+                val binding = ListItemSubredditSimpleBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                )
 
-        return ViewHolder(binding)
+                SimpleViewHolder(binding)
+            }
+            SubredditViewType.STANDARD -> {
+                val binding = ListItemSubredditBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                )
+
+                StandardViewHolder(binding)
+            }
+        }
     }
 
     override fun getItemCount() = subreddits.size
 
+    inner class SimpleViewHolder(val binding: ListItemSubredditSimpleBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            with(binding) {
+                // The listener must be set on both the root view and the description since the description
+                // has movement method and we have to check if the description is clicked on a link
+                root.setOnClickListener {
+                    val pos = adapterPosition
 
-    inner class ViewHolder(val binding: ListItemSubredditBinding) : RecyclerView.ViewHolder(binding.root) {
+                    if (pos != RecyclerView.NO_POSITION) {
+                        subredditSelected?.subredditSelected(subreddits[pos].name)
+                    }
+                }
+
+                favoriteSub.setOnClickListener {
+                    val pos = adapterPosition
+
+                    if (pos != RecyclerView.NO_POSITION) {
+                        favoriteClicked?.onClick(subreddits[pos])
+                    }
+                }
+            }
+        }
+
+        fun bind(subreddit: Subreddit) {
+            binding.subreddit = subreddit
+        }
+    }
+
+    inner class StandardViewHolder(val binding: ListItemSubredditBinding) : RecyclerView.ViewHolder(binding.root) {
 
         init {
             with(binding) {
@@ -249,19 +287,8 @@ class SubredditsAdapter : RecyclerView.Adapter<SubredditsAdapter.ViewHolder>() {
             }
         }
 
-        /**
-         * Updates the favorite icon color
-         *
-         * @param favorited If true the icon will be set to show that a subreddit is favorited
-         */
-        fun updateFavorited(favorited: Boolean) {
-            val context = binding.root.context
-
-            binding.favoriteSub.setColorFilter(if (favorited) {
-                ContextCompat.getColor(context, R.color.subredditFavorited)
-            } else {
-                ContextCompat.getColor(context, R.color.iconColor)
-            })
+        fun bind(subreddit: Subreddit) {
+            binding.subreddit = subreddit
         }
     }
 }

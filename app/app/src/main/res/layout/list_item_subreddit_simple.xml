@@ -18,14 +18,10 @@
         android:layout_marginBottom="8dp"
         android:background="?android:selectableItemBackground">
 
-        <!-- This image goes a bit above the text, since the TextView height will differ
-          a bit depending on which characters are in the view. We can offset a little bit
-          manually (and use includeFontPadding=false), but it's not a perfect solution as it will look a bit off depending
-          on the text -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
 
             app:subredditIcon="@{subreddit}"
 
@@ -33,29 +29,32 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            tools:src="@drawable/ic_emoji_emotions_200dp" />
+            tools:src="@drawable/ic_emoji_emotions_24dp" />
 
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+
+            android:layout_marginEnd="8dp"
             android:ellipsize="end"
 
-            android:includeFontPadding="false"
             android:maxLines="1"
             android:text="@{subreddit.name}"
             android:textColor="@color/text_color"
-            android:textSize="20sp"
-            android:textStyle="bold"
+            android:textSize="16sp"
 
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@+id/nsfwTag"
+
+            app:layout_constraintBottom_toBottomOf="@+id/icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/nsfwTag"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@+id/icon"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="GlobalOffensiveReallyLongSubredditName" />
+            app:layout_constraintTop_toTopOf="@+id/icon"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            tools:text="GlobalOffensiveReallyLongSubrerdditName" />
 
         <com.example.hakonsreader.views.Tag
             android:id="@id/nsfwTag"
@@ -85,27 +84,9 @@
 
             android:background="?android:selectableItemBackground"
             android:src="@drawable/ic_star_24dp"
+            app:layout_constraintBottom_toBottomOf="@+id/name"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/subredditDescription"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-
-            android:ellipsize="end"
-            android:maxLines="3"
-            android:scrollbars="none"
-            android:singleLine="false"
-            app:markdown="@{subreddit.publicDescription}"
-            android:textColor="@color/secondary_text_color"
-            android:textSize="12sp"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/name"
-            app:layout_constraintTop_toBottomOf="@+id/name"
-            tools:text="@tools:sample/lorem/random" />
+            app:layout_constraintTop_toTopOf="@+id/name" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
