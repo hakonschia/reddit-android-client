@@ -81,7 +81,7 @@ private fun showPopupForLoggedInUser(view: View) {
     }.show(context, view)
 }
 
-private fun showAccountManagement(context: Context) {
+fun showAccountManagement(context: Context) {
     val app = App.get()
 
     Dialog(context).also {

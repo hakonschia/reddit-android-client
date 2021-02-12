@@ -10,12 +10,14 @@ import android.util.Log
 import android.view.MenuItem
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.constants.NetworkConstants
@@ -130,6 +132,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             startInboxListener()
         }
 
+        binding.navDrawer.userInfo = App.get().currentUserInfo
+        binding.navDrawer.subredditSelected = this
         App.get().registerReceivers()
     }
 
@@ -233,14 +237,41 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      *
      * @param subredditName The subreddit selected
      */
-    override fun subredditSelected(subredditName: String?) {
-        // Create new subreddit fragment and replace
-        activeSubreddit = SubredditFragment.newInstance(subredditName!!)
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, activeSubreddit!!)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit()
+    override fun subredditSelected(subredditName: String) {
+        val lowerCased = subredditName.toLowerCase()
+        // If default sub, use the home navbar instead
+        if (RedditApi.STANDARD_SUBS.contains(lowerCased)) {
+            val sub = StandardSubContainerFragment.StandarSub.values().find { it.value == lowerCased }
+                    ?: StandardSubContainerFragment.StandarSub.FRONT_PAGE
+
+            if (standardSubFragment == null) {
+                standardSubFragment = StandardSubContainerFragment.newInstance()
+            }
+
+            // I don't think this would trigger a reselect if already selected
+            binding.bottomNav.selectedItemId = R.id.navHome
+            standardSubFragment!!.setActiveSubreddit(sub)
+        } else {
+            // If the current subreddit is the same, use the old instead of creating a new one
+            if (activeSubreddit?.subredditName != subredditName) {
+                activeSubreddit = SubredditFragment.newInstance(subredditName)
+            }
+
+            // Already in the subreddit navbar, open subreddit with opening
+            if (binding.bottomNav.selectedItemId == R.id.navSubreddit) {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer, activeSubreddit!!)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack(null)
+                        .commit()
+            } else {
+                // Otherwise select the subreddit navbar, which will use activeSubreddit and deal with animations
+                binding.bottomNav.selectedItemId = R.id.navSubreddit
+            }
+        }
+
+        // If this was called from a drawer it should close (otherwise the drawer already is closed)
+        binding.parentLayout.closeDrawer(GravityCompat.START)
     }
 
     override fun onInboxClicked() {

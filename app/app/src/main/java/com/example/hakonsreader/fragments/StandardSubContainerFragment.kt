@@ -48,6 +48,10 @@ class StandardSubContainerFragment : Fragment() {
     private var viewPager: ViewPager? = null
     private val fragments = ArrayList<SubredditFragment>()
 
+    fun setActiveSubreddit(sub: StandarSub) {
+        viewPager?.currentItem = sub.ordinal
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_posts_container, container, false)
 

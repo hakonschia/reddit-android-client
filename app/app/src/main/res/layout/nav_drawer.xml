@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="com.example.hakonsreader.views.util.MenuClickHandlerKt"/>
+
+        <variable
+            name="userInfo"
+            type="com.example.hakonsreader.api.model.RedditUserInfo" />
+
+        <variable
+            name="subredditSelected"
+            type="com.example.hakonsreader.interfaces.OnSubredditSelected" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profilePicture"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+
+                android:src="@drawable/ic_baseline_person_100"
+                app:civ_border_color="@color/opposite_background"
+                app:civ_border_width="2dp"
+                app:civ_circle_background_color="@color/background"
+                app:layout_constraintStart_toStartOf="parent"
+
+                app:layout_constraintTop_toTopOf="parent"
+                app:profilePicture='@{userInfo != null ? userInfo.userInfo.profilePicture : ""}' />
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+
+                android:text='@{userInfo != null ? userInfo.userInfo.username : ""}'
+                android:textColor="@color/text_color"
+                android:textSize="18sp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/profilePicture"
+                app:layout_constraintTop_toTopOf="@+id/profilePicture"
+                tools:text="Hakonschiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" />
+
+            <Button
+                android:id="@+id/accountsBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accounts"
+                style="@style/ButtonStyleSmall"
+                android:onClick="@{(view) -> MenuClickHandlerKt.showAccountManagement(view.context)}"
+                app:layout_constraintStart_toStartOf="@+id/username"
+                app:layout_constraintTop_toBottomOf="@+id/username" />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/accountsBtn" />
+
+            <!-- Kind of weird to hardcode all 3 of these, but it's only 3 items and
+             creating a RecyclerView is definitely weird. Other option is creating another layout
+             and pass the values, but it uses different string resources so it isn't really easier-->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/frontPageIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_emoji_emotions_24dp"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/frontPage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+
+                android:text="@string/front_page"
+                android:maxLines="1"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
+
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="@+id/frontPageIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/frontPageIcon"
+                app:layout_constraintTop_toTopOf="@+id/frontPageIcon" />
+
+            <View
+                android:id="@+id/frontPageClicker"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+
+                android:layout_marginEnd="16dp"
+                android:onClick='@{(view) -> subredditSelected.subredditSelected("")}'
+                android:background="?android:attr/selectableItemBackground"
+
+                app:layout_constraintBottom_toBottomOf="@id/frontPageIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/frontPageIcon"
+                app:layout_constraintTop_toTopOf="@id/frontPageIcon" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/popularIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_trending_up_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/frontPageIcon"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/popular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+
+                android:text="@string/popular"
+                android:maxLines="1"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
+
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="@+id/popularIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/popularIcon"
+                app:layout_constraintTop_toTopOf="@+id/popularIcon" />
+
+            <View
+                android:id="@+id/popularClicker"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+
+                android:layout_marginEnd="16dp"
+                android:onClick='@{(view) -> subredditSelected.subredditSelected("popular")}'
+                android:background="?android:attr/selectableItemBackground"
+
+                app:layout_constraintBottom_toBottomOf="@id/popularIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/popularIcon"
+                app:layout_constraintTop_toTopOf="@id/popularIcon" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/allIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_text_rotation_angleup_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/popularIcon"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+
+                android:text="@string/all"
+                android:maxLines="1"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
+
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="@+id/allIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/allIcon"
+                app:layout_constraintTop_toTopOf="@+id/allIcon" />
+            <View
+                android:id="@+id/allClicker"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+
+                android:layout_marginEnd="16dp"
+                android:onClick='@{(view) -> subredditSelected.subredditSelected("all")}'
+                android:background="?android:attr/selectableItemBackground"
+
+                app:layout_constraintBottom_toBottomOf="@id/allIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/allIcon"
+                app:layout_constraintTop_toTopOf="@id/allIcon" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</layout>
