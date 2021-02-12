@@ -21,181 +21,186 @@
             type="boolean" />
     </data>
 
-    <androidx.constraintlayout.motion.widget.MotionLayout
-        android:id="@+id/parentLayout"
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/secondary_background"
-        app:layoutDescription="@xml/fragment_profile_xml_parentlayout_scene">
+        android:layout_height="match_parent">
 
-        <!-- This has a negative bottom margin to not get the rounded corners at the bottom -->
-        <ImageView
-            android:id="@+id/topLayout"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="@dimen/userAndSubredditTopLayoutMarginPreAnim"
-            android:background="@{privatelyBrowsing ? @drawable/rounded_square_main_bg_gradient_private_browsing : @drawable/rounded_square_main_bg_gradient}"
-
-            app:layout_constraintBottom_toBottomOf="@id/profileNameDivider"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profilePicture"
-            android:layout_width="@dimen/userAndSubredditIconSizePreAnim"
-            android:layout_height="@dimen/userAndSubredditIconSizePreAnim"
-            android:onClick="@{view -> ClickHandlerKt.openImageInFullscreen(view, user.profilePicture, true)}"
-
-            android:src="@drawable/ic_baseline_person_100"
-            app:profilePicture='@{user != null ? user.profilePicture : ""}'
-
-            app:civ_border_color="@color/opposite_background"
-            app:civ_border_width="2dp"
-            app:civ_circle_background_color="@color/background"
-
-            app:layout_constraintBottom_toTopOf="@+id/topLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/topLayout" />
-
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@{user.username}"
-
-            android:textColor="@color/text_color"
-            android:textSize="25sp"
-
-            app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-
-            app:layout_constraintTop_toBottomOf="@+id/profilePicture"
-            tools:text="Hakonschiasssssssssssssss" />
-
-        <TextView
-            android:id="@+id/profileAge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:textColor="@color/text_color"
-            android:maxLines="1"
-            android:ellipsize="end"
-
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/username"
-
-            app:profileAge="@{user != null ? user.createdAt : -1}"
-
-            tools:text="User since 12. August 1997" />
-
-        <TextView
-            android:id="@+id/commentKarma"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-
-            android:text='@{user != null ? @string/commentKarma(user.commentKarma) : ""}'
-            android:textColor="@color/text_color"
-
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileAge"
-
-            tools:text="1234 comment karma" />
-
-        <TextView
-            android:id="@+id/postKarma"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-
-            android:text='@{user != null ? @string/postKarma(user.postKarma) : ""}'
-            android:textColor="@color/text_color"
-
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileAge"
-
-            tools:text="51523 post karma" />
-
-        <!-- Rectangle divider -->
-        <View
-            android:id="@+id/profileNameDivider"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/parentLayout"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="match_parent"
+            android:background="@color/background">
 
-            android:layout_marginTop="8dp"
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:fitsSystemWindows="true">
 
-            android:layout_marginEnd="8dp"
-            android:background="@color/divider"
-            app:layout_constraintEnd_toEndOf="@+id/postKarma"
-            app:layout_constraintStart_toStartOf="@+id/commentKarma"
-            app:layout_constraintTop_toBottomOf="@id/commentKarma" />
+                <com.google.android.material.appbar.CollapsingToolbarLayout
+                    android:id="@+id/collapsingToolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    app:scrimVisibleHeightTrigger="100dp"
+                    android:background="@color/toolbarBackground"
+                    app:title='@{user != null ? user.username : ""}'
+                    tools:title="Hakonschia"
+                    app:expandedTitleMargin="24dp"
+                    app:expandedTitleTextAppearance="@style/ToolbarTitle"
+                    app:contentScrim="@color/toolbarBackground"
+                    app:toolbarId="@id/profileToolbar"
+                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/posts"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/background"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileNameDivider"
-            tools:listitem="@layout/post" />
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_collapseMode="parallax">
 
-        <com.example.hakonsreader.views.LoadingIcon
-            android:id="@+id/loadingIcon"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/profilePicture"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
 
-            android:indeterminateOnly="true"
-            android:visibility="gone"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="24dp"
+                            android:layout_marginTop="24dp"
 
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/profileNameDivider"
-            app:layout_constraintBottom_toBottomOf="@id/profileNameDivider"
+                            app:civ_border_color="@color/opposite_background"
+                            app:civ_border_width="2dp"
+                            app:civ_circle_background_color="@color/background"
+                            app:profilePicture='@{user != null ? user.profilePicture : ""}'
+                            android:src="@drawable/ic_baseline_person_100"
 
-            tools:visibility="visible" />
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/inbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+                        <TextView
+                            android:id="@+id/profileAge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
 
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_mail_24dp"
-            android:foreground="@drawable/ripple_main_bg"
-            android:visibility="@{loggedInUser ? View.VISIBLE : View.GONE}"
+                            android:textColor="@color/text_color"
 
-            app:layout_constraintEnd_toStartOf="@+id/menuProfile"
-            app:layout_constraintTop_toTopOf="@+id/menuProfile" />
+                            app:layout_constraintStart_toEndOf="@+id/profilePicture"
+                            app:layout_constraintTop_toTopOf="@id/profilePicture"
+                            app:profileAge="@{user != null ? user.createdAt : -1}"
+                            tools:text="User since 12. August 1997" />
 
-        <ImageView
-            android:id="@+id/menuProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+                        <TextView
+                            android:id="@+id/karmaHeader"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
 
-            android:foreground="@drawable/ripple_main_bg"
-            android:onClick="@{(view) -> MenuClickHandlerKt.showPopupForProfile(view)}"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/karmaHeader"
+                            android:textColor="@color/text_color"
+                            android:textStyle="bold"
+                            app:layout_constraintStart_toStartOf="@+id/profileAge"
+                            app:layout_constraintTop_toBottomOf="@+id/profileAge" />
 
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/topLayout"
+                        <TextView
+                            android:id="@+id/commentKarma"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
 
-            app:srcCompat="@drawable/ic_baseline_more_vert_24" />
-    </androidx.constraintlayout.motion.widget.MotionLayout>
+                            android:text='@{user != null ? @string/integer(user.commentKarma) : ""}'
+                            android:textColor="@color/text_color"
+
+                            app:layout_constraintStart_toStartOf="@+id/karmaHeader"
+                            app:layout_constraintTop_toBottomOf="@+id/karmaHeader"
+                            tools:text="1234"
+                            app:drawableStartCompat="@drawable/ic_message_24dp" />
+
+                        <TextView
+                            android:id="@+id/postKarma"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="16dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text='@{user != null ? @string/integer(user.postKarma) : ""}'
+                            android:textColor="@color/text_color"
+
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.0"
+                            app:layout_constraintStart_toEndOf="@+id/commentKarma"
+                            app:layout_constraintTop_toBottomOf="@+id/karmaHeader"
+                            tools:text="51,232"
+                            app:drawableStartCompat="@drawable/ic_upload_24" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/profileToolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        app:layout_collapseMode="pin" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom">
+
+                        <ImageButton
+                            android:id="@+id/inbox"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+
+                            android:layout_marginEnd="8dp"
+                            app:srcCompat="@drawable/ic_mail_24dp"
+                            android:background="@drawable/ripple_main_bg"
+                            android:tint="@color/text_color"
+                            android:visibility="@{loggedInUser ? View.VISIBLE : View.GONE}"
+
+                            app:layout_constraintBottom_toBottomOf="@id/menuProfile"
+                            app:layout_constraintEnd_toStartOf="@id/menuProfile" />
+
+                        <ImageButton
+                            android:id="@+id/menuProfile"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="16dp"
+                            android:tint="@color/text_color"
+
+                            app:srcCompat="@drawable/ic_baseline_more_vert_24"
+                            android:background="@drawable/ripple_main_bg"
+
+                            android:onClick="@{(view) -> MenuClickHandlerKt.showPopupForProfile(view, user)}"
+
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.appbar.CollapsingToolbarLayout>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/posts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                tools:listitem="@layout/list_item_post" />
+
+            <com.example.hakonsreader.views.LoadingIcon
+                android:id="@+id/loadingIcon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+
+                app:layout_anchor="@id/posts"
+                style="?android:attr/progressBarStyleHorizontal"
+
+                android:indeterminateOnly="true"
+                android:visibility="gone"
+
+                tools:visibility="visible" />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

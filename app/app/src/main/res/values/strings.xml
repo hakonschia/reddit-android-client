@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">Hakon\'s Reader</string>
 
+    <!-- Kind of weird to have a string resource for this? This is so integers can be formatted with
+      commas etc. so they're easier to read. This will adjust to the given locale, so it doesn't have to be added
+      to all translations-->
+    <string name="integer" translatable="false">%,d</string>
+
     <string name="loggedIn">Logged in</string>
 
     <string name="navbarHome">Home</string>
@@ -39,6 +44,7 @@
     <string name="comment_by_poster" translatable="false">u/%s (OP)</string>
 
     <string name="profileAge">User since %s</string>
+    <string name="karmaHeader">Karma</string>
     <string name="commentKarma">%d comment karma</string>
     <string name="postKarma">%d post karma</string>
 

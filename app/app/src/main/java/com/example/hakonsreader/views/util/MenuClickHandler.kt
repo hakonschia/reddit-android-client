@@ -13,6 +13,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
+import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.TokenManager
@@ -31,7 +32,15 @@ import java.util.*
  *
  * @param view The view clicked (where the menu will be attached)
  */
-fun showPopupForProfile(view: View) {
+fun showPopupForProfile(view: View, user: RedditUser?) {
+    user ?: return
+
+    if (App.get().currentUserInfo?.userInfo?.id == user.id) {
+        showPopupForLoggedInUser(view)
+    }
+}
+
+private fun showPopupForLoggedInUser(view: View) {
     val context = view.context
     val privatelyBrowsing = App.get().isUserLoggedInPrivatelyBrowsing()
 

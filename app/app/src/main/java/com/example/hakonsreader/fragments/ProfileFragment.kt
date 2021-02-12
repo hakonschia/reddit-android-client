@@ -148,16 +148,12 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         var infoLoaded = false
         // Retrieve user info if the fragment hasn't loaded any already
         if (savedInstanceState != null) {
-            binding.parentLayout.progress = savedInstanceState.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)
             postIds = savedInstanceState.getStringArrayList(POST_IDS_KEY) as ArrayList<String>
             postsViewModel?.postIds = postIds
             infoLoaded = savedInstanceState.getBoolean(IS_INFO_LOADED)
         }
 
         if (saveState != null) {
-            // getFloat() will return 0.0f if not found, and won't ever be null
-            binding.parentLayout.progress = saveState?.getFloat(LAYOUT_ANIMATION_PROGRESS_KEY)!!
-
             val ids = saveState?.getStringArrayList(POST_IDS_KEY) as ArrayList<String>?
             if (ids != null) {
                 postIds = ids
@@ -195,9 +191,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         // onSaveInstanceState is called for configuration changes (such as orientation)
         // so we need to store the animation state here and in saveState (for when the fragment has
         // been replaced but not destroyed)
-        // TODO this should be fixed as this is called on occasions such as theme change, but the view
-        //  has been destroyed so _binding is nulled
-        _binding?.let {  outState.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, it.parentLayout.progress) }
         outState.putParcelable(LAYOUT_STATE_KEY, postsLayoutManager?.onSaveInstanceState())
         outState.putStringArrayList(POST_IDS_KEY, postsViewModel?.postIds as ArrayList<String>?)
         outState.putBoolean(IS_INFO_LOADED, isInfoLoaded)
@@ -227,7 +220,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             saveState = Bundle()
         }
 
-        saveState?.putFloat(LAYOUT_ANIMATION_PROGRESS_KEY, binding.parentLayout.progress)
         saveState?.putParcelable(LAYOUT_STATE_KEY, postsLayoutManager?.onSaveInstanceState())
         saveState?.putStringArrayList(POST_IDS_KEY, postsViewModel?.postIds as ArrayList<String>?)
         saveState?.putBoolean(IS_INFO_LOADED, isInfoLoaded)
@@ -312,7 +304,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
         // We might not have a username at this point (first time loading for logged in user)
         if (username != null) {
-            binding.username.text = username
+            binding.collapsingToolbar.title = username
         }
 
         // Kinda weird to do this here, but even if we are privately browsing and on another users profile

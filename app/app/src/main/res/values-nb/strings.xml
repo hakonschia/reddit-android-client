@@ -350,4 +350,5 @@
     <string name="dialogAccountManagementAddAccount">Legg til konto</string>
     <string name="accountManagementNoUsername">Brukernavn mangler</string>
     <string name="accountManagementRemoveAccount">Fjern bruker</string>
+    <string name="karmaHeader">Karma</string>
 </resources>

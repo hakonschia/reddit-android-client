@@ -90,8 +90,8 @@
 
                         <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/subredditIcon"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
 
                             android:layout_gravity="center"
                             android:layout_marginStart="24dp"
@@ -179,8 +179,9 @@
                         app:layout_collapseMode="pin" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom">
 
                         <View
                             android:layout_width="0dp"
@@ -198,7 +199,7 @@
                             android:layout_height="24dp"
 
                             android:layout_marginEnd="8dp"
-                            android:background="?android:selectableItemBackground"
+                            android:background="@drawable/ripple_main_bg"
                             android:src="@drawable/ic_refresh_24dp"
                             android:tint="@color/text_color"
 
@@ -212,7 +213,7 @@
 
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="16dp"
-                            android:background="?android:selectableItemBackground"
+                            android:background="@drawable/ripple_main_bg"
                             android:tint="@color/text_color"
 
                             android:onClick="@{view -> MenuClickHandlerKt.showPopupSortWithTime(view)}"
