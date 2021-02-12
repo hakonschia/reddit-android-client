@@ -352,11 +352,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private fun setupBinding() {
         _binding = FragmentSubredditBinding.inflate(layoutInflater)
 
-        if (isDefaultSubreddit) {
-            setDefaultSubDescription()
-        }
-
         with(binding) {
+            if (isDefaultSubreddit) {
+                setDefaultSubDescription()
+                drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+            }
+
             subredditRefresh.setOnClickListener { refreshPosts() }
             subscribe.setOnClickListener { subscribeOnclick() }
             subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }
