@@ -116,6 +116,26 @@
                             android:visibility="@{subreddit.moderator ? View.VISIBLE : View.GONE}"
                             app:tint="@color/modTextColor" />
 
+                        <TextView
+                            android:id="@+id/standardSubDescription"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+
+                            android:layout_marginEnd="16dp"
+                            android:background="@{bannerLoaded ? @drawable/rounded_square_semi_transparent : null}"
+                            android:paddingStart="2dp"
+
+                            android:paddingEnd="2dp"
+                            android:textColor="@color/text_color"
+                            android:visibility="@{standardSub ? View.VISIBLE : View.GONE}"
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.0"
+                            app:layout_constraintStart_toEndOf="@+id/subredditIcon"
+                            app:layout_constraintTop_toTopOf="@id/subredditIcon"
+                            tools:text="Front page contains posts" />
+
                         <com.robinhood.ticker.TickerView
                             android:id="@+id/subredditSubscribers"
                             android:layout_width="wrap_content"

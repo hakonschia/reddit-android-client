@@ -161,8 +161,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     var drawerListener: DrawerLayout.DrawerListener? = null
 
-    var onActionBarAttached: ((Toolbar) -> Unit)? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         isDefaultSubreddit = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
 
@@ -353,6 +351,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     private fun setupBinding() {
         _binding = FragmentSubredditBinding.inflate(layoutInflater)
+
+        if (isDefaultSubreddit) {
+            setDefaultSubDescription()
+        }
 
         with(binding) {
             subredditRefresh.setOnClickListener { refreshPosts() }
@@ -834,6 +836,20 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 binding.drawer.openDrawer(GravityCompat.END)
             }
         }
+    }
+
+    /**
+     * Sets the subreddit description for default subs
+     */
+    private fun setDefaultSubDescription() {
+        val stringRes = when (subredditName.toLowerCase()) {
+            "" -> R.string.frontPageDescription
+            "popular" -> R.string.popularDescription
+            "all" -> R.string.allDescription
+            else -> null
+        } ?: return
+
+        _binding?.standardSubDescription?.text = getString(stringRes)
     }
 
     override fun new() {
