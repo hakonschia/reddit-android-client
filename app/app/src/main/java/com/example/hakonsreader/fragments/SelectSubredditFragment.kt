@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
@@ -32,24 +33,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-
-/**
- * The key used to store the state of the subreddits list
- */
-private const val LIST_STATE_KEY = "listState"
-
-/**
- * The key used to store the state of the searched subreddits list
- */
-private const val SEARCH_LIST_STATE_KEY = "searchListState"
-
-/**
- * The amount of milliseconds to wait to search for subreddits after text has been
- * input to the search field
- */
-private const val SUBREDDIT_SEARCH_DELAY: Long = 500
-
-
 /**
  * Fragment for selecting a subreddit. This fragment shows a list of subreddits (either the logged
  * in users subscribed subreddits or a list of default subreddits) and allows the user
@@ -57,13 +40,30 @@ private const val SUBREDDIT_SEARCH_DELAY: Long = 500
  */
 class SelectSubredditFragment : Fragment() {
     companion object {
+        private const val TAG = "SelectSubredditFragment"
+
+        /**
+         * The key used to store the state of the subreddits list
+         */
+        private const val LIST_STATE_KEY = "listState"
+
+        /**
+         * The key used to store the state of the searched subreddits list
+         */
+        private const val SEARCH_LIST_STATE_KEY = "searchListState"
+
+        /**
+         * The amount of milliseconds to wait to search for subreddits after text has been
+         * input to the search field
+         */
+        private const val SUBREDDIT_SEARCH_DELAY: Long = 500
+
         /**
          * @return A new instance of this fragment
          */
         fun newInstance() = SelectSubredditFragment()
     }
 
-    private val TAG = "SelectSubredditFragment"
 
     private var _binding: FragmentSelectSubredditBinding? = null
     private val binding get() = _binding!!
@@ -74,19 +74,13 @@ class SelectSubredditFragment : Fragment() {
 
     private var subredditsAdapter: SubredditsAdapter? = null
     private var subredditsLayoutManager: LinearLayoutManager? = null
-    private var subredditsViewModel: SelectSubredditsViewModel? = null
+    private val subredditsViewModel: SelectSubredditsViewModel by activityViewModels()
 
     private var searchSubredditsAdapter: SubredditsAdapter? = null
     private var searchSubredditsLayoutManager: LinearLayoutManager? = null
     private var searchSubredditsViewModel: SearchForSubredditsViewModel? = null
 
     private var searchTimerTask: TimerTask? = null
-
-    /**
-     * Flag to check if subreddits have already been loaded, and shouldn't be loaded again when
-     * the fragment view is recreated
-     */
-    private var subredditsLoaded = false
 
 
     /**
@@ -110,16 +104,6 @@ class SelectSubredditFragment : Fragment() {
 
         this.setupSearchViewModel()
         this.setupSubredditsViewModel()
-
-        if (!subredditsLoaded) {
-            val loadDefault = if (App.get().isUserLoggedIn()) {
-                // If the user is logged in we want to load default subs if they're privately browsing
-                App.get().isUserLoggedInPrivatelyBrowsing()
-            } else {
-                true
-            }
-            subredditsViewModel?.loadSubreddits(loadDefault)
-        }
 
         return binding.root
     }
@@ -184,21 +168,18 @@ class SelectSubredditFragment : Fragment() {
      * Initializes [subredditsViewModel] and observes all its values
      */
     private fun setupSubredditsViewModel() {
-        subredditsViewModel = ViewModelProvider(this).get(SelectSubredditsViewModel::class.java).apply {
-            getSubreddits().observe(viewLifecycleOwner, { subreddits ->
-                subredditsLoaded = true
-                subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
-                subredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY))
-            })
+        subredditsViewModel.getSubreddits().observe(viewLifecycleOwner, { subreddits ->
+            subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
+            subredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY))
+        })
 
-            getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
-                binding.loadingIcon.onCountChange(onCountChange)
-            })
+        subredditsViewModel.getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
+            binding.loadingIcon.onCountChange(onCountChange)
+        })
 
-            getError().observe(viewLifecycleOwner, { error ->
-                Util.handleGenericResponseErrors(view, error.error, error.throwable)
-            })
-        }
+        subredditsViewModel.getError().observe(viewLifecycleOwner, { error ->
+            Util.handleGenericResponseErrors(view, error.error, error.throwable)
+        })
     }
 
     /**
@@ -209,7 +190,6 @@ class SelectSubredditFragment : Fragment() {
             getSearchResults().observe(viewLifecycleOwner, { subreddits ->
                 binding.searchedSubredditsCount = subreddits.size
 
-                // TODO make some sort of animation for this
                 if (subreddits.isEmpty()) {
                     searchSubredditsAdapter?.clear()
                 } else {

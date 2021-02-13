@@ -813,9 +813,14 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         binding.parentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerOpened(drawerView: View) {
-                // TODO Load subs from SharedViewModel
                 if (subredditsAdapter?.itemCount == 0) {
-                    subredditsViewModel?.loadSubreddits(loadDefaultSubs = false)
+                    val loadDefault = if (App.get().isUserLoggedIn()) {
+                        // If the user is logged in we want to load default subs if they're privately browsing
+                        App.get().isUserLoggedInPrivatelyBrowsing()
+                    } else {
+                        true
+                    }
+                    subredditsViewModel?.loadSubreddits(loadDefault)
                 }
             }
 

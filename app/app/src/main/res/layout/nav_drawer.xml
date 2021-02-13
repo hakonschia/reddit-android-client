@@ -97,7 +97,7 @@
                 android:layout_marginTop="4dp"
                 android:background="@drawable/border_opposite_bg"
                 android:foreground="?android:attr/selectableItemBackground"
-                
+
                 android:text="@{privatelyBrowsing ? @string/menuPrivateBrowsingDisable : @string/menuPrivateBrowsingEnable}"
                 android:textColor="@color/text_color"
                 android:textSize="12sp"
