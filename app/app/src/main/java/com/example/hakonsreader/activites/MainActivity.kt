@@ -779,6 +779,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         binding.bottomNav.selectedItemId = R.id.navProfile
     }
 
+    /**
+     * Sets up the nav drawer, including initialization of [subredditsViewModel].
+     *
+     * [loadSubreddits] is automatically called
+     */
     private fun setupNavDrawer() {
         // TODO this and SelectSubredditFragment can use a SharedViewModel
         subredditsViewModel = ViewModelProvider(this).get(SelectSubredditsViewModel::class.java).apply {
@@ -811,33 +816,18 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
         }
 
-        binding.parentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
-            override fun onDrawerOpened(drawerView: View) {
-                if (subredditsAdapter?.itemCount == 0) {
-                    val loadDefault = if (App.get().isUserLoggedIn()) {
-                        // If the user is logged in we want to load default subs if they're privately browsing
-                        App.get().isUserLoggedInPrivatelyBrowsing()
-                    } else {
-                        true
-                    }
-                    subredditsViewModel?.loadSubreddits(loadDefault)
-                }
-            }
-
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-                // Not implemented
-            }
-
-            override fun onDrawerClosed(drawerView: View) {
-                // Not implemented
-            }
-
-            override fun onDrawerStateChanged(newState: Int) {
-                // Not implemented
-            }
-        })
+        loadSubreddits()
     }
 
+    private fun loadSubreddits() {
+        val loadDefault = if (App.get().isUserLoggedIn()) {
+            // If the user is logged in we want to load default subs if they're privately browsing
+            App.get().isUserLoggedInPrivatelyBrowsing()
+        } else {
+            true
+        }
+        subredditsViewModel?.loadSubreddits(loadDefault)
+    }
 
     /**
      * Custom BottomNavigationView item selection listener

@@ -45,6 +45,7 @@ public class SubredditsDiffCallback extends DiffUtil.Callback {
         // the list flash because this would return false and it would be redrawn
         return oldItem.getName().equals(newItem.getName())
                 && oldItem.isFavorited() == newItem.isFavorited()
+                && oldItem.isSubscribed() == newItem.isSubscribed()
                 && oldItem.getPublicDescription().equals(newItem.getPublicDescription());
     }
 }

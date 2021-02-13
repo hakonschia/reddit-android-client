@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 class SelectSubredditsViewModel : ViewModel() {
     private val database = App.get().database
     private val api = App.get().api
+    private var loadedFromApi = false
 
     private val subreddits: MutableLiveData<List<Subreddit>> by lazy {
         MutableLiveData<List<Subreddit>>().also {
@@ -47,8 +48,12 @@ class SelectSubredditsViewModel : ViewModel() {
      *
      * @param loadDefaultSubs Set to *true* to load default subs, *false* to load subs for a logged in user.
      * Default is *true* (load default subs)
+     * @param force If true then subreddits will be forced to load, even if previously loaded
      */
-    fun loadSubreddits(loadDefaultSubs: Boolean = true) {
+    fun loadSubreddits(loadDefaultSubs: Boolean = true, force: Boolean = false) {
+        if (loadedFromApi && !force) {
+            return
+        }
         onCountChange.value = true
 
         CoroutineScope(IO).launch {
@@ -61,6 +66,7 @@ class SelectSubredditsViewModel : ViewModel() {
 
             when (response) {
                 is ApiResponse.Success -> {
+                    loadedFromApi = true
                     val subs = response.value
 
                     subreddits.postValue(subs)
