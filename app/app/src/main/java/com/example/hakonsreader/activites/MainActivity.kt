@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -30,10 +31,7 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityMainBinding
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.*
-import com.example.hakonsreader.interfaces.LanguageListener
-import com.example.hakonsreader.interfaces.OnInboxClicked
-import com.example.hakonsreader.interfaces.OnSubredditSelected
-import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
+import com.example.hakonsreader.interfaces.*
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
@@ -50,7 +48,7 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.concurrent.fixedRateTimer
 
-class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
+class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged, PrivateBrowsingObservable {
 
     companion object {
         private const val TAG = "MainActivity"
@@ -144,7 +142,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             startInboxListener()
         }
 
-        App.get().registerReceivers()
+        App.get().run {
+            registerReceivers()
+            registerPrivateBrowsingObservable(this@MainActivity)
+        }
     }
 
     override fun onResume() {
@@ -160,7 +161,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     override fun onDestroy() {
         super.onDestroy()
-        App.get().unregisterReceivers()
+        App.get().run {
+            unregisterReceivers()
+            unregisterPrivateBrowsingObservable(this@MainActivity)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -308,6 +312,18 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     override fun showUnreadMessagesBadge(show: Boolean) {
         val badge = binding.bottomNav.getBadge(binding.bottomNav.menu.findItem(R.id.navProfile).itemId)
         badge?.isVisible = show
+    }
+
+    override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
+        with (binding.navDrawer) {
+            this.privatelyBrowsing = privatelyBrowsing
+
+            // This doesn't work programmatically
+            profilePicture.borderColor = ContextCompat.getColor(
+                    this@MainActivity,
+                    if (privatelyBrowsing) R.color.privatelyBrowsing else R.color.opposite_background
+            )
+        }
     }
 
     /**
@@ -780,6 +796,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
 
         with (binding.navDrawer) {
+            app = App.get()
             userInfo = App.get().currentUserInfo
             subredditSelected = this@MainActivity
 
@@ -797,7 +814,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         binding.parentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerOpened(drawerView: View) {
                 // TODO Load subs from SharedViewModel
-                subredditsViewModel?.loadSubreddits(loadDefaultSubs = false)
+                if (subredditsAdapter?.itemCount == 0) {
+                    subredditsViewModel?.loadSubreddits(loadDefaultSubs = false)
+                }
             }
 
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {

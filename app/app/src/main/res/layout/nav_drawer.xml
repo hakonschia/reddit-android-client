@@ -7,6 +7,14 @@
         <import type="com.example.hakonsreader.views.util.MenuClickHandlerKt"/>
 
         <variable
+            name="app"
+            type="com.example.hakonsreader.App" />
+
+        <variable
+            name="privatelyBrowsing"
+            type="boolean" />
+
+        <variable
             name="userInfo"
             type="com.example.hakonsreader.api.model.RedditUserInfo" />
 
@@ -15,7 +23,7 @@
             type="com.example.hakonsreader.interfaces.OnSubredditSelected" />
     </data>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -60,15 +68,44 @@
                 app:layout_constraintTop_toTopOf="@+id/profilePicture"
                 tools:text="Hakonschiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" />
 
-            <Button
+            <TextView
                 android:id="@+id/accountsBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Accounts"
-                style="@style/ButtonStyleSmall"
+
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/border_opposite_bg"
+
+                android:foreground="?android:attr/selectableItemBackground"
+                android:text="@string/menuProfileManageAccounts"
+                android:textColor="@color/text_color"
+                android:textSize="12sp"
                 android:onClick="@{(view) -> MenuClickHandlerKt.showAccountManagement(view.context)}"
-                app:layout_constraintStart_toStartOf="@+id/username"
-                app:layout_constraintTop_toBottomOf="@+id/username" />
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/profilePicture"
+                app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
+
+            <!-- Using '!privatelyBrowsing' in the onClick doesn't work as the data binding fails to build -->
+            <TextView
+                android:id="@+id/privateBrowsingBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="4dp"
+                android:background="@drawable/border_opposite_bg"
+                android:foreground="?android:attr/selectableItemBackground"
+                
+                android:text="@{privatelyBrowsing ? @string/menuPrivateBrowsingDisable : @string/menuPrivateBrowsingEnable}"
+                android:textColor="@color/text_color"
+                android:textSize="12sp"
+                android:onClick="@{() -> app.enablePrivateBrowsing(!app.userLoggedInPrivatelyBrowsing)}"
+
+                app:layout_constraintStart_toStartOf="@+id/accountsBtn"
+                app:layout_constraintTop_toBottomOf="@+id/accountsBtn"
+                tools:text="@string/menuPrivateBrowsingEnable"/>
 
             <View
                 android:id="@+id/divider"
@@ -76,12 +113,12 @@
                 android:layout_height="1dp"
 
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:background="@color/divider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/accountsBtn" />
+                app:layout_constraintTop_toBottomOf="@+id/privateBrowsingBtn" />
 
             <!-- Kind of weird to hardcode all 3 of these, but it's only 3 items and
              creating a RecyclerView is definitely weird. Other option is creating another layout
@@ -109,8 +146,8 @@
                 android:layout_marginEnd="16dp"
                 android:ellipsize="end"
 
-                android:text="@string/front_page"
                 android:maxLines="1"
+                android:text="@string/front_page"
                 android:textColor="@color/text_color"
                 android:textSize="16sp"
 
@@ -127,8 +164,8 @@
                 android:layout_height="0dp"
 
                 android:layout_marginEnd="16dp"
-                android:onClick='@{(view) -> subredditSelected.subredditSelected("")}'
                 android:background="?android:attr/selectableItemBackground"
+                android:onClick='@{(view) -> subredditSelected.subredditSelected("")}'
 
                 app:layout_constraintBottom_toBottomOf="@id/frontPageIcon"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -157,8 +194,8 @@
                 android:layout_marginEnd="16dp"
                 android:ellipsize="end"
 
-                android:text="@string/popular"
                 android:maxLines="1"
+                android:text="@string/popular"
                 android:textColor="@color/text_color"
                 android:textSize="16sp"
 
@@ -175,8 +212,8 @@
                 android:layout_height="0dp"
 
                 android:layout_marginEnd="16dp"
-                android:onClick='@{(view) -> subredditSelected.subredditSelected("popular")}'
                 android:background="?android:attr/selectableItemBackground"
+                android:onClick='@{(view) -> subredditSelected.subredditSelected("popular")}'
 
                 app:layout_constraintBottom_toBottomOf="@id/popularIcon"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -205,8 +242,8 @@
                 android:layout_marginEnd="16dp"
                 android:ellipsize="end"
 
-                android:text="@string/all"
                 android:maxLines="1"
+                android:text="@string/all"
                 android:textColor="@color/text_color"
                 android:textSize="16sp"
 
@@ -216,14 +253,15 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/allIcon"
                 app:layout_constraintTop_toTopOf="@+id/allIcon" />
+
             <View
                 android:id="@+id/allClicker"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
 
                 android:layout_marginEnd="16dp"
-                android:onClick='@{(view) -> subredditSelected.subredditSelected("all")}'
                 android:background="?android:attr/selectableItemBackground"
+                android:onClick='@{(view) -> subredditSelected.subredditSelected("all")}'
 
                 app:layout_constraintBottom_toBottomOf="@id/allIcon"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -253,8 +291,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/subredditsHeader"
-                tools:listitem="@layout/list_item_subreddit_simple"
-                tools:itemCount="5"/>
+                tools:itemCount="5"
+                tools:listitem="@layout/list_item_subreddit_simple" />
 
             <TextView
                 android:id="@+id/trendingSubredditsHeader"
@@ -279,9 +317,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/trendingSubredditsHeader"
-                tools:listitem="@layout/list_item_subreddit_simple"
-                tools:itemCount="5"/>
+                tools:itemCount="5"
+                tools:listitem="@layout/list_item_subreddit_simple" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
-
+    </androidx.core.widget.NestedScrollView>
 </layout>

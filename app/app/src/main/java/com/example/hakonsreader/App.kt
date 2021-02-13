@@ -602,7 +602,7 @@ class App : Application() {
     }
 
     /**
-     * Toggles the API to private browsing and stores locally that private browsing is enabled/disabled
+     * Enable or disable the APIs private browsing and stores locally that private browsing is enabled/disabled
      *
      * @param enable True to enable private browsing, false to disable
      */
