@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -773,10 +774,19 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
 
     /**
-     * Selects the profile nav bar
+     * Selects the profile nav bar. If the nav drawer is open it will be closed
      */
     fun selectProfileNavBar() {
+        binding.parentLayout.closeDrawer(GravityCompat.START)
         binding.bottomNav.selectedItemId = R.id.navProfile
+    }
+
+    /**
+     * Selects the settings nav bar. If the nav drawer is open it will be closed
+     */
+    fun selectSettingsNavBar() {
+        binding.parentLayout.closeDrawer(GravityCompat.START)
+        binding.bottomNav.selectedItemId = R.id.navSettings
     }
 
     /**
@@ -785,7 +795,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * [loadSubreddits] is automatically called
      */
     private fun setupNavDrawer() {
-        // TODO this and SelectSubredditFragment can use a SharedViewModel
         subredditsViewModel = ViewModelProvider(this).get(SelectSubredditsViewModel::class.java).apply {
             getSubreddits().observe(this@MainActivity, { subreddits ->
                 subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
@@ -804,6 +813,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             app = App.get()
             userInfo = App.get().currentUserInfo
             subredditSelected = this@MainActivity
+
+            profilePicture.setOnClickListener { selectProfileNavBar() }
+            username.setOnClickListener { selectProfileNavBar() }
+            settingsClicker.setOnClickListener { selectSettingsNavBar() }
 
             subredditsAdapter = SubredditsAdapter().apply {
                 viewType = SubredditsAdapter.SubredditViewType.SIMPLE
