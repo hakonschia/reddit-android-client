@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#005560</color>
     <color name="colorAccent">#088EC8</color>
 
-    <color name="toolbarBackground">#CACACA</color>
+    <color name="toolbarBackground">#FFF</color>
     <color name="blackOrWhite">#FFF</color>
 
     <color name="background">#FFFFFF</color>

@@ -817,6 +817,14 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             profilePicture.setOnClickListener { selectProfileNavBar() }
             username.setOnClickListener { selectProfileNavBar() }
             settingsClicker.setOnClickListener { selectSettingsNavBar() }
+            darkModeClicker.setOnClickListener {
+                PreferenceManager.getDefaultSharedPreferences(this@MainActivity).run {
+                    val key = getString(R.string.prefs_key_theme)
+                    val darkMode = getBoolean(key, resources.getBoolean(R.bool.prefs_default_theme))
+                    edit().putBoolean(key, !darkMode).apply()
+                    App.get().updateTheme()
+                }
+            }
 
             subredditsAdapter = SubredditsAdapter().apply {
                 viewType = SubredditsAdapter.SubredditViewType.SIMPLE
