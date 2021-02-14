@@ -1,9 +1,11 @@
 package com.example.hakonsreader.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
@@ -57,15 +59,40 @@ class StandardSubContainerFragment : Fragment() {
 
         setupFragments()
 
-        viewPager = view.findViewById<ViewPager>(R.id.postsContainer).apply { setupViewPager(this) }
+        viewPager = view.findViewById<ViewPager>(R.id.postsContainer).apply {
+            addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageSelected(position: Int) {
+                    setToolbar(position)
+                }
+
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                    // Not implemented
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+                    // Not implemented
+                }
+            })
+
+            // Set for initial toolbar
+            setupViewPager(this)
+        }
 
         return view
     }
 
     private fun setupViewPager(viewPager: ViewPager) {
+        val startPos: Int = if (saveState != null) {
+            saveState!!.getInt(ACTIVE_SUBREDDIT_KEY)
+        } else {
+            getDefaultSubPosition()
+        }
+
         val adapter = SectionsPageAdapter(childFragmentManager, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT).apply {
-            fragments.forEach {
-                addFragment(it)
+            fragments.forEachIndexed { index, fragment ->
+                // Only set the toolbar automatically on the starting fragment
+                fragment.setToolbarOnActivity = startPos == index
+                addFragment(fragment)
             }
         }
 
@@ -74,11 +101,7 @@ class StandardSubContainerFragment : Fragment() {
         // Always keep all fragments alive
         viewPager.offscreenPageLimit = 3
 
-        if (saveState != null) {
-            viewPager.setCurrentItem(saveState!!.getInt(ACTIVE_SUBREDDIT_KEY), false)
-        } else {
-            viewPager.setCurrentItem(getDefaultSubPosition(), false)
-        }
+        viewPager.setCurrentItem(startPos, false)
     }
 
     /**
@@ -122,5 +145,22 @@ class StandardSubContainerFragment : Fragment() {
 
         // viewPager shouldn't be null, but if it is use the default position
         saveState.putInt(ACTIVE_SUBREDDIT_KEY, viewPager?.currentItem ?: getDefaultSubPosition())
+    }
+
+    /**
+     * Calls [AppCompatActivity.setSupportActionBar] on the fragments activity with the toolbar in
+     * the subreddit given by [position]
+     *
+     * @param position The subreddit in position in [fragments] to set the toolbar for
+     */
+    private fun setToolbar(position: Int) {
+        if (fragments.size >= position) {
+            // Get the toolbar and set it on the activity. This has to be called each time
+            // otherwise all the toolbars will be added as this container fragment is created
+            // which means the last fragments toolbar will be the one added, which invalidates
+            // the other toolbars click listeners
+            val toolbar = fragments[position].getToolbar()
+            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        }
     }
 }

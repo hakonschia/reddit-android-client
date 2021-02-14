@@ -1,6 +1,8 @@
 package com.example.hakonsreader.activites
 
 import android.os.Bundle
+import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
 import com.example.hakonsreader.R
 import com.example.hakonsreader.fragments.ProfileFragment
 import com.example.hakonsreader.interfaces.LockableSlidr
@@ -88,4 +90,15 @@ class ProfileActivity : BaseActivity(), LockableSlidr {
         }
     }
 
+    override fun setSupportActionBar(toolbar: Toolbar?) {
+        super.setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> { finish(); true }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 }

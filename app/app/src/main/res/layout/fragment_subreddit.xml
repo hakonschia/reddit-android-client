@@ -53,10 +53,10 @@
                     android:fitsSystemWindows="true"
                     android:background="@color/toolbarBackground"
                     app:title="@{subreddit.name.empty ? @string/front_page : subreddit.name, default=@string/front_page}"
-                    app:expandedTitleMarginEnd="84dp"
                     app:expandedTitleTextAppearance="@style/ToolbarTitle"
                     app:contentScrim="@color/toolbarBackground"
                     app:expandedTitleMargin="24dp"
+                    app:expandedTitleMarginEnd="84dp"
                     app:toolbarId="@id/subredditToolbar"
                     app:scrimVisibleHeightTrigger="100dp"
                     app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
@@ -94,8 +94,8 @@
                             android:layout_height="60dp"
 
                             android:layout_gravity="center"
-                            android:layout_marginStart="24dp"
-                            android:layout_marginTop="24dp"
+                            android:layout_marginStart="48dp"
+                            android:layout_marginTop="16dp"
                             android:src="@drawable/ic_emoji_emotions_200dp"
 
                             app:civ_border_color="@color/opposite_background"

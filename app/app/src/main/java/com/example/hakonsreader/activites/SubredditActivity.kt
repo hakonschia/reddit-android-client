@@ -1,7 +1,10 @@
 package com.example.hakonsreader.activites
 
 import android.os.Bundle
+import android.util.Log
+import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
@@ -166,5 +169,18 @@ class SubredditActivity : BaseActivity(), LockableSlidr {
      */
     fun getSubredditName(): String? {
         return fragment?.subredditName
+    }
+
+    override fun setSupportActionBar(toolbar: Toolbar?) {
+        super.setSupportActionBar(toolbar)
+        // TODO this has a gray tint, and the other toolbar buttons use text_color (same for ProfileActivity)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> { finish(); true }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
@@ -314,6 +315,8 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         binding.inbox.setOnClickListener {
             onInboxClicked?.onInboxClicked()
         }
+
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.profileToolbar)
     }
 
     /**

@@ -4,10 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -54,7 +51,6 @@ import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.util.ViewUtil
-import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
 import com.robinhood.ticker.TickerUtils
 import com.squareup.picasso.Callback
@@ -63,7 +59,6 @@ import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 
 class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservable {
@@ -160,6 +155,12 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * A DrawerListener for the drawer with subreddit info
      */
     var drawerListener: DrawerLayout.DrawerListener? = null
+
+    /**
+     * If set to true, the fragments activity will call [AppCompatActivity.setSupportActionBar]
+     * when the view is created
+     */
+    var setToolbarOnActivity = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         isDefaultSubreddit = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
@@ -409,6 +410,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     // Not implemented
                 }
             })
+
+            if (setToolbarOnActivity) {
+                (requireActivity() as AppCompatActivity).setSupportActionBar(subredditToolbar)
+            }
         }
     }
 
@@ -851,6 +856,15 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         } ?: return
 
         _binding?.standardSubDescription?.text = getString(stringRes)
+    }
+
+    /**
+     * Retrieves this subreddits toolbar, if the view has been initialized
+     *
+     * @return The subreddits toolbar, or null if the view hasn't been created
+     */
+    fun getToolbar() : Toolbar? {
+        return _binding?.subredditToolbar
     }
 
     override fun new() {
