@@ -371,6 +371,7 @@
 
     <string name="subredditsSearchResult">Search results</string>
 
+    <string name="webViewCopyLink">Copy link</string>
     <string name="webViewRefresh">Refresh</string>
     <string name="webViewOpenInBrowser">Open in browser</string>
 

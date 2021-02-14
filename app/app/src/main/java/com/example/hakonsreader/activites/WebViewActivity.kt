@@ -2,6 +2,9 @@ package com.example.hakonsreader.activites
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,6 +16,8 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.activites.WebViewActivity.Companion.URL
 import com.example.hakonsreader.databinding.ActivityWebViewBinding
 import com.github.zawadz88.materialpopupmenu.popupMenu
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * Activity that displays a WebView with a given URL
@@ -126,6 +131,18 @@ class WebViewActivity : BaseActivity() {
             style = R.style.Widget_MPM_Menu_Dark_CustomBackground
 
             section {
+                item {
+                    labelRes = R.string.webViewCopyLink
+                    icon = R.drawable.ic_content_copy_24
+
+                    callback = {
+                        val clipboard = view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        val clip = ClipData.newPlainText("Link", binding.webView.url)
+                        clipboard.setPrimaryClip(clip)
+                        Snackbar.make(view, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
+                    }
+                }
+
                 item {
                     labelRes = R.string.webViewRefresh
                     icon = R.drawable.ic_refresh_24dp

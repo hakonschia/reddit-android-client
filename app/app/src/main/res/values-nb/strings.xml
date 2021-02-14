@@ -356,4 +356,5 @@
     <string name="allDescription">All er en samlnig av de mest aktive postene fra alle subredditer</string>
     <string name="subreddits">Subredditer</string>
     <string name="trendingSubreddits">Trendene subredditer</string>
+    <string name="webViewCopyLink">Kopier lenke</string>
 </resources>
