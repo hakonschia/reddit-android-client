@@ -18,6 +18,8 @@ import java.util.ArrayList
 class StandardSubContainerFragment : Fragment() {
 
     companion object {
+        private const val TAG = "StandardSubContainerFragment"
+
         /**
          * The key used to store the subreddit currently visible on the screen
          */
@@ -46,12 +48,19 @@ class StandardSubContainerFragment : Fragment() {
      */
     var defaultSub: StandarSub = StandarSub.FRONT_PAGE
 
+    private var overridenSub: StandarSub? = null
+
     private var saveState: Bundle? = null
     private var viewPager: ViewPager? = null
     private val fragments = ArrayList<SubredditFragment>()
 
     fun setActiveSubreddit(sub: StandarSub) {
-        viewPager?.currentItem = sub.ordinal
+        if (viewPager == null) {
+            overridenSub = sub
+        } else {
+            overridenSub = null
+            viewPager!!.currentItem = sub.ordinal
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -81,13 +90,23 @@ class StandardSubContainerFragment : Fragment() {
         return view
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewPager = null
+    }
+
     private fun setupViewPager(viewPager: ViewPager) {
-        val startPos: Int = if (saveState != null) {
-            saveState!!.getInt(ACTIVE_SUBREDDIT_KEY)
+        val startPos: Int = if(overridenSub != null) {
+            overridenSub!!.ordinal
         } else {
-            getDefaultSubPosition()
+            if (saveState != null) {
+                saveState!!.getInt(ACTIVE_SUBREDDIT_KEY)
+            } else {
+                getDefaultSubPosition()
+            }
         }
 
+        Log.d(TAG, "setupViewPager: overridenSub=$overridenSub, startPos=$startPos")
         val adapter = SectionsPageAdapter(childFragmentManager, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT).apply {
             fragments.forEachIndexed { index, fragment ->
                 // Only set the toolbar automatically on the starting fragment
@@ -101,7 +120,11 @@ class StandardSubContainerFragment : Fragment() {
         // Always keep all fragments alive
         viewPager.offscreenPageLimit = 3
 
-        viewPager.setCurrentItem(startPos, false)
+        // If an item has been selected based on overridenSub, and it isn't the sub previously selected
+        // then it wouldn't switch for some reason, so put it in post
+        viewPager.post {
+            viewPager.setCurrentItem(startPos, false)
+        }
     }
 
     /**
