@@ -129,9 +129,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             //startActivity(this)
         }
 
-        setupNavBar(savedInstanceState)
-        setupNavDrawer()
-
         if (savedInstanceState != null) {
             savedState = savedInstanceState
             restoreFragmentStates(savedInstanceState)
@@ -145,6 +142,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             startInboxListener()
         }
 
+        setupNavBar(savedInstanceState)
+        setupNavDrawer()
+        
         App.get().run {
             registerReceivers()
             registerPrivateBrowsingObservable(this@MainActivity)
