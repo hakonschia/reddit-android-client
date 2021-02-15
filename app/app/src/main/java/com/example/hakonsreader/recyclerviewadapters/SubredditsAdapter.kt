@@ -250,6 +250,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         fun bind(subreddit: Subreddit) {
             binding.subreddit = subreddit
+            binding.executePendingBindings()
         }
     }
 
@@ -289,6 +290,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         fun bind(subreddit: Subreddit) {
             binding.subreddit = subreddit
+            binding.executePendingBindings()
         }
     }
 }
