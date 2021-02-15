@@ -2,6 +2,7 @@ package com.example.hakonsreader.activites
 
 import android.app.AlertDialog
 import android.app.PendingIntent
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -10,6 +11,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -272,9 +274,14 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      *
      * A new instance of [SubredditFragment] is created and shown
      *
+     * This will hide the keyboard, if shown
+     *
      * @param subredditName The subreddit selected
      */
     override fun subredditSelected(subredditName: String) {
+        val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
+
         val lowerCased = subredditName.toLowerCase()
         // If default sub, use the home navbar instead
         if (RedditApi.STANDARD_SUBS.contains(lowerCased)) {
