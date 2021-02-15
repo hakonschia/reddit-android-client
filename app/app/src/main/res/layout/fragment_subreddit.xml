@@ -56,6 +56,7 @@
                     app:expandedTitleTextAppearance="@style/ToolbarTitle"
                     app:contentScrim="@color/toolbarBackground"
                     app:expandedTitleMargin="24dp"
+                    app:expandedTitleMarginBottom="16dp"
                     app:expandedTitleMarginEnd="84dp"
                     app:toolbarId="@id/subredditToolbar"
                     app:scrimVisibleHeightTrigger="100dp"
@@ -196,6 +197,7 @@
                         android:id="@+id/subredditToolbar"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
+                        app:titleMarginEnd="84dp"
                         app:layout_collapseMode="pin" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout

@@ -50,6 +50,7 @@
                     tools:title="Hakonschia"
                     app:expandedTitleMargin="24dp"
                     app:expandedTitleMarginEnd="84dp"
+                    app:expandedTitleMarginBottom="16dp"
                     app:expandedTitleTextAppearance="@style/ToolbarTitle"
                     app:contentScrim="@color/toolbarBackground"
                     app:toolbarId="@id/profileToolbar"
@@ -144,6 +145,7 @@
                         android:id="@+id/profileToolbar"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
+                        app:titleMarginEnd="84dp"
                         app:layout_collapseMode="pin" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
