@@ -853,6 +853,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             subredditsAdapter = SubredditsAdapter().apply {
                 viewType = SubredditsAdapter.SubredditViewType.SIMPLE
                 subredditSelected = this@MainActivity
+                favoriteClicked = OnClickListener { subreddit -> favoriteClicked(subreddit) }
             }
             subredditsLayoutManager = LinearLayoutManager(this@MainActivity)
             subreddits.run {
@@ -872,6 +873,33 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             true
         }
         subredditsViewModel?.loadSubreddits(loadDefault)
+    }
+
+    /**
+     * Updates the favorite for a subreddit. Calls the Reddit API and based on the response
+     * updates the favorite status and list accordingly
+     */
+    private fun favoriteClicked(subreddit: Subreddit) {
+        // TODO this is just copied from SelectSubredditFragment
+        val favorite = !subreddit.isFavorited
+
+        CoroutineScope(IO).launch {
+            when (val response = App.get().api.subreddit(subreddit.name).favorite(favorite)) {
+                is ApiResponse.Success -> {
+                    subreddit.isFavorited = favorite
+                    App.get().database.subreddits().update(subreddit)
+
+                    withContext(Main) {
+                        subredditsAdapter?.onFavorite(subreddit)
+                        // If the top is visible make sure the top is also visible after the item has moved
+                        if (subredditsLayoutManager?.findFirstCompletelyVisibleItemPosition() == 0) {
+                            subredditsLayoutManager?.scrollToPosition(0)
+                        }
+                    }
+                }
+                is ApiResponse.Error -> Util.handleGenericResponseErrors(binding.parentLayout, response.error, response.throwable)
+            }
+        }
     }
 
     /**
