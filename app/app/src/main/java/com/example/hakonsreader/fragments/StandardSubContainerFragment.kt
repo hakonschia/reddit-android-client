@@ -54,6 +54,11 @@ class StandardSubContainerFragment : Fragment() {
     private var viewPager: ViewPager? = null
     private val fragments = ArrayList<SubredditFragment>()
 
+    /**
+     * The currently active item in the ViewPager, or -1 if not yet set
+     */
+    private var activeItem = -1
+
     fun setActiveSubreddit(sub: StandarSub) {
         if (viewPager == null) {
             overridenSub = sub
@@ -72,6 +77,9 @@ class StandardSubContainerFragment : Fragment() {
             addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
                 override fun onPageSelected(position: Int) {
                     setToolbar(position)
+
+                    // Save the active item now, as the viewpager might be nulled by the time saveState is called
+                    activeItem = position
                 }
 
                 override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
@@ -83,7 +91,6 @@ class StandardSubContainerFragment : Fragment() {
                 }
             })
 
-            // Set for initial toolbar
             setupViewPager(this)
         }
 
@@ -96,26 +103,27 @@ class StandardSubContainerFragment : Fragment() {
     }
 
     private fun setupViewPager(viewPager: ViewPager) {
-        val startPos: Int = if(overridenSub != null) {
-            overridenSub!!.ordinal
+        val startPos: Int = if (overridenSub != null) {
+            val v = overridenSub!!.ordinal
+            overridenSub = null
+            v
         } else {
-            if (saveState != null) {
-                saveState!!.getInt(ACTIVE_SUBREDDIT_KEY)
-            } else {
-                getDefaultSubPosition()
+            when {
+                activeItem >= 0 -> activeItem
+                saveState != null -> saveState!!.getInt(ACTIVE_SUBREDDIT_KEY)
+                else -> getDefaultSubPosition()
             }
         }
 
-        Log.d(TAG, "setupViewPager: overridenSub=$overridenSub, startPos=$startPos")
-        val adapter = SectionsPageAdapter(childFragmentManager, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT).apply {
+        SectionsPageAdapter(childFragmentManager, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT).apply {
             fragments.forEachIndexed { index, fragment ->
                 // Only set the toolbar automatically on the starting fragment
                 fragment.setToolbarOnActivity = startPos == index
                 addFragment(fragment)
             }
-        }
 
-        viewPager.adapter = adapter
+            viewPager.adapter = this
+        }
 
         // Always keep all fragments alive
         viewPager.offscreenPageLimit = 3
@@ -166,8 +174,7 @@ class StandardSubContainerFragment : Fragment() {
             it.saveState(saveState)
         }
 
-        // viewPager shouldn't be null, but if it is use the default position
-        saveState.putInt(ACTIVE_SUBREDDIT_KEY, viewPager?.currentItem ?: getDefaultSubPosition())
+        saveState.putInt(ACTIVE_SUBREDDIT_KEY, activeItem)
     }
 
     /**
@@ -182,8 +189,9 @@ class StandardSubContainerFragment : Fragment() {
             // otherwise all the toolbars will be added as this container fragment is created
             // which means the last fragments toolbar will be the one added, which invalidates
             // the other toolbars click listeners
-            val toolbar = fragments[position].getToolbar()
-            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+            fragments[position].getToolbar()?.let {
+                (requireActivity() as AppCompatActivity).setSupportActionBar(it)
+            }
         }
     }
 }
