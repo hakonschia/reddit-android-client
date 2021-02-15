@@ -7,8 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -51,7 +54,7 @@ class StandardSubContainerFragment : Fragment() {
     private var overridenSub: StandarSub? = null
 
     private var saveState: Bundle? = null
-    private var viewPager: ViewPager? = null
+    private var viewPager: ViewPager2? = null
     private val fragments = ArrayList<SubredditFragment>()
 
     /**
@@ -59,6 +62,11 @@ class StandardSubContainerFragment : Fragment() {
      */
     private var activeItem = -1
 
+    /**
+     * Sets the subreddit to be active. If the view is not currently created, then the value will
+     * be stored and set when the view is created. Otherwise, the correct subreddit will be selected
+     * with a sliding animation
+     */
     fun setActiveSubreddit(sub: StandarSub) {
         if (viewPager == null) {
             overridenSub = sub
@@ -73,21 +81,13 @@ class StandardSubContainerFragment : Fragment() {
 
         setupFragments()
 
-        viewPager = view.findViewById<ViewPager>(R.id.postsContainer).apply {
-            addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        viewPager = view.findViewById<ViewPager2>(R.id.postsContainer).apply {
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     setToolbar(position)
 
                     // Save the active item now, as the viewpager might be nulled by the time saveState is called
                     activeItem = position
-                }
-
-                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                    // Not implemented
-                }
-
-                override fun onPageScrollStateChanged(state: Int) {
-                    // Not implemented
                 }
             })
 
@@ -102,7 +102,7 @@ class StandardSubContainerFragment : Fragment() {
         viewPager = null
     }
 
-    private fun setupViewPager(viewPager: ViewPager) {
+    private fun setupViewPager(viewPager: ViewPager2) {
         val startPos: Int = if (overridenSub != null) {
             val v = overridenSub!!.ordinal
             overridenSub = null
@@ -115,13 +115,12 @@ class StandardSubContainerFragment : Fragment() {
             }
         }
 
-        SectionsPageAdapter(childFragmentManager, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT).apply {
-            fragments.forEachIndexed { index, fragment ->
-                // Only set the toolbar automatically on the starting fragment
-                fragment.setToolbarOnActivity = startPos == index
-                addFragment(fragment)
-            }
+        fragments.forEachIndexed { index, fragment ->
+            // Only set the toolbar automatically on the starting fragment
+            fragment.setToolbarOnActivity = startPos == index
+        }
 
+        Adapter(fragments, this).apply {
             viewPager.adapter = this
         }
 
@@ -193,5 +192,10 @@ class StandardSubContainerFragment : Fragment() {
                 (requireActivity() as AppCompatActivity).setSupportActionBar(it)
             }
         }
+    }
+
+    private inner class Adapter(val fragments: List<SubredditFragment>, fragment: Fragment) : FragmentStateAdapter(fragment) {
+        override fun getItemCount() = fragments.size
+        override fun createFragment(position: Int) = fragments[position]
     }
 }
