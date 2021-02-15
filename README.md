@@ -20,9 +20,49 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 
 ## Installation
 
-The downloadable [APK](apk/app-release.apk) contains the application at commit `a4e7a7df1a70baad20767f08177404cc362943ad` (#1339). To install the app download the APK, open it on your phone, and follow the steps shown.
+The downloadable [APK](apk/app-release.apk) contains the application at commit `11ff32e05c486b65d0fe9547d2c5d5e433b30805` (#1407). To install the app download the APK, open it on your phone, and follow the steps shown.
 
-### Build yourself
+See also: [build](#build)
+
+
+## Features
+- **Appearance**
+  - Light and dark mode (true black)
+  - Translated to English and Norwegian (bokmål)
+
+
+- **Private browsing** - While logged in, [enable private browsing](images/enable-private-browsing.png) to temporarily act as an anonymous, non-logged in user. [Disable at any time](images/disable-private-browsing.png) when attempting to do an action that requires a logged in user.
+
+- **Multiple accounts** - Log in with [multiple accounts](images/multiple-accounts.png) and switch whenever you want to
+  - Mark account as NSFW to override various NSFW settings, such as how images/thumbnails are blurred
+
+- **Posts**
+  - [Control the size](images/control-size-of-post.png) of post content when opened, based on a percentage of the screen size.
+  - [Expand post](images/expand-post-content.gif) content at any time when scrolling through the comments.
+  - [Disable post from being collapsed](images/disable-post-collapse.gif) when scrolling in comments, with an independent size compared to when it can be collapsed.
+    - This can be set as the default for all posts
+  - [Filter posts](images/filter-posts.png) from subreddits from appearing in front page/popular/all
+
+- **Comments**
+  - [Navigate](images/navigate-top-level-comments.gif) between top level comments
+    - Optionally with an animation, with a customizable threshold for how many comments to at most smoothly navigate between.
+    - Long press to go to first/last
+  - Show [all](images/sidebars-all.png) sidebars, or [only](images/sidebars-only-one.png) one
+  - [Enlarge links](images/enlarge-links.png) to make them easier to click (up to 2.5x the size)
+  - [Show preview of links](images/show-link-previews.png)
+    - Optionally: show entire link (or only 1 line)
+    - Optionally: don't show preview when the link is identical to the text
+  - [Highlight comments](images/highlight-new-comments.png) added since the last time a post was viewed (can be toggled).
+
+- **Mod support**
+  - Sticky posts and comments
+  - Distinguish posts and comments as a moderator
+  - View reports on posts and comments, with option to mark reports as ignored
+  - Mark posts as NSFW/spoiler
+  - Lock posts/comments
+
+
+## Build
 
 Create the file `secrets.properties` under [/app](app) and assign the following values:
 
@@ -45,39 +85,6 @@ IMGUR_CLIENT_ID = <The Imgur client ID>
 ### Crashlytics
 
 The application uses [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/get-started?platform=android) for crash reporting. Set up your Firebase projects and add the `google-services.json` file to [/app/app](/app/app)
-
-
-## Features
-- **Appearance**
-  - Light and (true black) dark mode
-  - Translated to English and Norwegian (bokmål)
-
-- **Posts**
-  - [Control the size](images/control-size-of-post.png) of post content when opened, based on a percentage of the screen size.
-  - [Expand post](images/expand-post-content.gif) content at any time when scrolling through the comments.
-  - [Disable post from being collapsed](images/disable-post-collapse.gif) when scrolling in comments, with an independent size compared to when it can be collapsed.
-    - This can be set as the default for all posts
-  - [Filter posts](images/filter-posts.png) from subreddits from appearing in front page/popular/all
-
-- **Comments**
-  - [Navigate](images/navigate-top-level-comments.gif) between top level comments
-    - Optionally with an animation, with a customizable threshold for how many comments to at most smoothly navigate between.
-    - Long press to go to first/last
-  - Show [all](images/sidebars-all.png) sidebars, or [only](images/sidebars-only-one.png) one
-  - [Enlarge links](images/enlarge-links.png) to make them easier to click (up to 2.5x the size)
-  - [Show preview of links](images/show-link-previews.png)
-    - Optionally: show entire link (or only 1 line)
-    - Optionally: don't show preview when the link is identical to the text
-  - [Highlight comments](images/highlight-new-comments.png) added since the last time a post was viewed (can be toggled).
-
-- **Private browsing** - While logged in, [enable private browsing](images/enable-private-browsing.png) to temporarily act as an anonymous, non-logged in user. [Disable at any time](images/disable-private-browsing.png) when attempting to do an action that requires you to log in.
-
-- **Mod support**
-  - Sticky posts and comments
-  - Distinguish posts and comments as a moderator
-  - View reports on posts and comments, with option to mark reports as ignored
-  - Mark posts as NSFW/spoiler
-  - Lock posts/comments
 
 
 ## Acknowledgements
