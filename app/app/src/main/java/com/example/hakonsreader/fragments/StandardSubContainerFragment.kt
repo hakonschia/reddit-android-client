@@ -183,12 +183,13 @@ class StandardSubContainerFragment : Fragment() {
      * @param position The subreddit in position in [fragments] to set the toolbar for
      */
     private fun setToolbar(position: Int) {
+        // For some reason there is a sync issue between the this.fragments and the fragments actually
+        // shown, so this is the easiest way to get the actual fragments to correctly set the toolbar
+        // This issue only appears when the nav drawer has been opened from this container fragment
+        // and changing the theme, which causes a recreate and some issues occur with setting the toolbar
+        val fragments = childFragmentManager.fragments
         if (fragments.size >= position) {
-            // Get the toolbar and set it on the activity. This has to be called each time
-            // otherwise all the toolbars will be added as this container fragment is created
-            // which means the last fragments toolbar will be the one added, which invalidates
-            // the other toolbars click listeners
-            fragments[position].getToolbar()?.let {
+            (fragments[position] as SubredditFragment).getToolbar()?.let {
                 (requireActivity() as AppCompatActivity).setSupportActionBar(it)
             }
         }

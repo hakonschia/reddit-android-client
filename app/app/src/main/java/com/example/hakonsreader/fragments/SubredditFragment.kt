@@ -411,9 +411,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 }
             })
 
-            if (setToolbarOnActivity) {
-                (requireActivity() as AppCompatActivity).setSupportActionBar(subredditToolbar)
-            }
+            (requireActivity() as AppCompatActivity).setSupportActionBar(subredditToolbar)
         }
     }
 
