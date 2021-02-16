@@ -144,7 +144,7 @@ class SelectSubredditFragment : Fragment() {
     private fun setupSubredditsList() {
         subredditsAdapter = SubredditsAdapter().apply {
             this.subredditSelected = this@SelectSubredditFragment.subredditSelected
-            favoriteClicked = OnClickListener { subreddit -> favoriteClicked(subreddit) }
+            favoriteClicked = OnClickListener { subreddit -> subredditsViewModel.favorite(subreddit) }
 
             binding.subreddits.adapter = this
         }
@@ -170,7 +170,6 @@ class SelectSubredditFragment : Fragment() {
     private fun setupSubredditsViewModel() {
         subredditsViewModel.getSubreddits().observe(viewLifecycleOwner, { subreddits ->
             subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
-            subredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(LIST_STATE_KEY))
         })
 
         subredditsViewModel.getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
@@ -207,33 +206,6 @@ class SelectSubredditFragment : Fragment() {
             getError().observe(viewLifecycleOwner, { error ->
                 Util.handleGenericResponseErrors(view, error.error, error.throwable)
             })
-        }
-    }
-
-
-    /**
-     * Updates the favorite for a subreddit. Calls the Reddit API and based on the response
-     * updates the favorite status and list accordingly
-     */
-    private fun favoriteClicked(subreddit: Subreddit) {
-        val favorite = !subreddit.isFavorited
-
-        CoroutineScope(IO).launch {
-            when (val response = api.subreddit(subreddit.name).favorite(favorite)) {
-                is ApiResponse.Success -> {
-                    subreddit.isFavorited = favorite
-                    database.subreddits().update(subreddit)
-
-                    withContext(Main) {
-                        subredditsAdapter?.onFavorite(subreddit)
-                        // If the top is visible make sure the top is also visible after the item has moved
-                        if (subredditsLayoutManager?.findFirstCompletelyVisibleItemPosition() == 0) {
-                            subredditsLayoutManager?.scrollToPosition(0)
-                        }
-                    }
-                }
-                is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
-            }
         }
     }
 

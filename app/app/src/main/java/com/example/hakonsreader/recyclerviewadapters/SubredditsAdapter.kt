@@ -121,25 +121,6 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     /**
-     * Updates the position and view for a subreddit based on [Subreddit.isFavorited]
-     *
-     * @param subreddit The subreddit to update
-     */
-    fun onFavorite(subreddit: Subreddit) {
-        // Remove and add back at the correct position
-        val pos = subreddits.indexOf(subreddit)
-        subreddits.removeAt(pos)
-
-        val newPos = findPosForItem(subreddit)
-
-        subreddits.add(newPos, subreddit)
-
-        // itemMoved just moves the item, itemChanged updates the view
-        notifyItemMoved(pos, newPos)
-        notifyItemChanged(newPos)
-    }
-
-    /**
      * Finds the index of where an item should be inserted into the list
      *
      * @param subreddit The subreddit to find the index for

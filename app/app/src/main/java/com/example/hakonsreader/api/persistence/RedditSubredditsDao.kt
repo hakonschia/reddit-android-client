@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.persistence
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.hakonsreader.api.model.Subreddit
 import kotlinx.coroutines.flow.Flow
@@ -47,6 +48,12 @@ interface RedditSubredditsDao {
      */
     @Query("SELECT * FROM subreddits WHERE id IN (:ids)")
     fun getSubsById(ids: List<String>): List<Subreddit>
+
+    /**
+     * Gets an observable for the subreddits where [Subreddit.isSubscribed] is true
+     */
+    @Query("SELECT * FROM subreddits WHERE isSubscribed=1")
+    fun getSubscribedSubreddits(): LiveData<List<Subreddit>>
 
     /**
      * Get the subreddit object from its name

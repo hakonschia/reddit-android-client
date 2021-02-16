@@ -41,6 +41,7 @@ import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
+import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -819,7 +820,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * [loadSubreddits] is automatically called
      */
     private fun setupNavDrawer() {
-        subredditsViewModel = ViewModelProvider(this).get(SelectSubredditsViewModel::class.java).apply {
+        subredditsViewModel = ViewModelProvider(this,
+                SelectSubredditsFactory(App.get().isUserLoggedIn() && !App.get().isUserLoggedInPrivatelyBrowsing())
+        ).get(SelectSubredditsViewModel::class.java).apply {
             getSubreddits().observe(this@MainActivity, { subreddits ->
                 subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
             })
@@ -853,7 +856,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             subredditsAdapter = SubredditsAdapter().apply {
                 viewType = SubredditsAdapter.SubredditViewType.SIMPLE
                 subredditSelected = this@MainActivity
-                favoriteClicked = OnClickListener { subreddit -> favoriteClicked(subreddit) }
+                favoriteClicked = OnClickListener { subreddit -> subredditsViewModel?.favorite(subreddit) }
             }
             subredditsLayoutManager = LinearLayoutManager(this@MainActivity)
             subreddits.run {
@@ -873,33 +876,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             true
         }
         subredditsViewModel?.loadSubreddits(loadDefault)
-    }
-
-    /**
-     * Updates the favorite for a subreddit. Calls the Reddit API and based on the response
-     * updates the favorite status and list accordingly
-     */
-    private fun favoriteClicked(subreddit: Subreddit) {
-        // TODO this is just copied from SelectSubredditFragment
-        val favorite = !subreddit.isFavorited
-
-        CoroutineScope(IO).launch {
-            when (val response = App.get().api.subreddit(subreddit.name).favorite(favorite)) {
-                is ApiResponse.Success -> {
-                    subreddit.isFavorited = favorite
-                    App.get().database.subreddits().update(subreddit)
-
-                    withContext(Main) {
-                        subredditsAdapter?.onFavorite(subreddit)
-                        // If the top is visible make sure the top is also visible after the item has moved
-                        if (subredditsLayoutManager?.findFirstCompletelyVisibleItemPosition() == 0) {
-                            subredditsLayoutManager?.scrollToPosition(0)
-                        }
-                    }
-                }
-                is ApiResponse.Error -> Util.handleGenericResponseErrors(binding.parentLayout, response.error, response.throwable)
-            }
-        }
     }
 
     /**

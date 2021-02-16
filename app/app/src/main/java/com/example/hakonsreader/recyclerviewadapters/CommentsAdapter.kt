@@ -841,7 +841,7 @@ private fun addAllSidebars(barrier: Barrier, depth: Int) {
     // The last sidebar is constrained "end_toEndOf=barrier", that has to be removed as this
     // sidebar should now be constrained "end_toStartOf=nextSideBar"
     if (previousSidebarsSize > 0) {
-        val lastSidebar = previousSidebars[previousSidebars.size - 1]
+        val lastSidebar = previousSidebars.last()
 
         // Set constraints
         constraintSet.clone(parent)
@@ -870,10 +870,11 @@ private fun addAllSidebars(barrier: Barrier, depth: Int) {
     for (i in previousSidebarsSize until depth) {
         val id = View.generateViewId()
         referenceIds[i] = id
-        val view = View(barrier.context)
-        view.setBackgroundColor(ContextCompat.getColor(barrier.context, R.color.commentSideBar))
-        view.contentDescription = contentDescription
-        view.id = id
+        val view = View(barrier.context).apply {
+            setBackgroundColor(ContextCompat.getColor(barrier.context, R.color.commentSideBar))
+            this.contentDescription = contentDescription
+            this.id = id
+        }
 
         // The width of the view is set with this
         constraintSet.constrainWidth(id, barWidth)
