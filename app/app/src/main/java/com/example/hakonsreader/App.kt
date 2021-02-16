@@ -431,14 +431,19 @@ class App : Application() {
      * @param token The token to use for the new active account
      */
     fun switchAccount(token: AccessToken) {
-        api.switchAccessToken(token)
-        TokenManager.saveTokenNow(token)
+        CoroutineScope(IO).launch {
+            // Ensure no user state from one account is used for the new one
+            database.clearUserState()
 
-        // The API also changes this (although it is recreated so it doesn't really matter)
-        // The observers also don't have to be notified since everything is recreated
-        settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, false).commit()
+            api.switchAccessToken(token)
+            TokenManager.saveTokenNow(token)
 
-        ProcessPhoenix.triggerRebirth(this@App)
+            // The API also changes this (although it is recreated so it doesn't really matter)
+            // The observers also don't have to be notified since everything is recreated
+            settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, false).commit()
+
+            ProcessPhoenix.triggerRebirth(this@App)
+        }
     }
 
     /**

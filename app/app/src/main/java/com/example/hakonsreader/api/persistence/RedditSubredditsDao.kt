@@ -79,6 +79,6 @@ interface RedditSubredditsDao {
      * Clears user specific information from all posts. Sets to the values that the Reddit API
      * would return for non-logged in users
      */
-    @Query("UPDATE subreddits SET isSubscribed=0")
+    @Query("UPDATE subreddits SET isSubscribed=0, isFavorited=0")
     fun clearUserState()
 }
