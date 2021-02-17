@@ -162,8 +162,8 @@ import java.util.*
  * an OAuth client for anonymous use is sufficient. If set this will perform certain API calls
  * towards Imgur to load post content directly. Currently albums and gifs are loaded.
  *
- * Typically, an Imgur album will be represented as [PostType.LINK]. With this set to
- * true the API will automatically call the Imgur API when posts are received and get the individual
+ * Typically, an Imgur album will be represented as [PostType.LINK]. With this set the API will
+ * automatically call the Imgur API when posts are received and get the individual
  * images and store them so they are accessible through [RedditPost.galleryImages]
  * in the same way as a normal Reddit gallery would. The post type will be [PostType.GALLERY].
  * While Imgur albums are typically for multiple images, these albums sometimes only contain one image.
@@ -637,7 +637,14 @@ class RedditApi constructor(
                 }
 
                 call.body()?.apply {
-                    refreshToken = accessTokenInternal.refreshToken
+                    // The requests are supposedly going to give back a new refresh token from 15th of january
+                    // although as I'm writing this the 17th it isn't being given, so who knows
+                    // https://www.reddit.com/r/redditdev/comments/kvzaot/oauth2_api_changes_upcoming/?sort=new
+                    if (refreshToken == null) {
+                        refreshToken = accessTokenInternal.refreshToken
+                    } else {
+                        println("RedditApi.refreshToken: new refresh token was retrieved from the request")
+                    }
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
