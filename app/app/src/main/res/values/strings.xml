@@ -523,4 +523,7 @@
 
     <string name="subreddits">Subreddits</string>
     <string name="trendingSubreddits">Trending subreddits</string>
+    <string name="trendingSubredditsLastUpdated">Last updated %s</string>
+    <string name="trendingSubredditsLastUpdatedNow">Just updated</string>
+
 </resources>

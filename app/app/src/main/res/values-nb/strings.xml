@@ -357,4 +357,6 @@
     <string name="subreddits">Subredditer</string>
     <string name="trendingSubreddits">Trendene subredditer</string>
     <string name="webViewCopyLink">Kopier lenke</string>
+    <string name="trendingSubredditsLastUpdated">Oppdatert %s</string>
+    <string name="trendingSubredditsLastUpdatedNow">Akkurat oppdatert</string>
 </resources>

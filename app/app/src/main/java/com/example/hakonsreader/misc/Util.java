@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
@@ -266,6 +267,36 @@ public class Util {
         }
 
         return String.format(Locale.getDefault(), format, t);
+    }
+
+    /**
+     * Creates the text for text age on trending subreddits
+     *
+     * <p>Formats to make sure that it says 3 hours, 5 minutes etc. based on what makes sense</p>
+     *
+     * @param tv The text view to set the text on
+     * @param time The time to format as
+     */
+    public static void setAgeTextTrendingSubreddits(TextView tv, Duration time) {
+        final Resources resources = tv.getResources();
+        String format;
+        long t;
+
+        if ((t = time.toDays()) > 0) {
+            format = resources.getQuantityString(R.plurals.postAgeDays, (int) t);
+        } else if ((t = time.toHours()) > 0) {
+            format = resources.getQuantityString(R.plurals.postAgeHours, (int) t);
+        } else {
+            t = time.toMinutes();
+            if (t < 1) {
+                tv.setText(R.string.trendingSubredditsLastUpdatedNow);
+                return;
+            }
+            format = resources.getQuantityString(R.plurals.postAgeMinutes, (int) t);
+        }
+
+        String str = String.format(Locale.getDefault(), format, t);
+        tv.setText(resources.getString(R.string.trendingSubredditsLastUpdated, str));
     }
 
     /**

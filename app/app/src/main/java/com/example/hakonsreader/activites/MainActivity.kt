@@ -8,16 +8,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -30,6 +29,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.model.Subreddit
+import com.example.hakonsreader.api.model.TrendingSubreddits
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
@@ -39,8 +39,12 @@ import com.example.hakonsreader.fragments.*
 import com.example.hakonsreader.interfaces.*
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.Util.createAgeText
+import com.example.hakonsreader.misc.Util.setAgeTextTrendingSubreddits
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
+import com.example.hakonsreader.recyclerviewadapters.TrendingSubredditsAdapter
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
+import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
 import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -50,6 +54,9 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.concurrent.fixedRateTimer
@@ -111,6 +118,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     private var subredditsLayoutManager: LinearLayoutManager? = null
     private var subredditsViewModel: SelectSubredditsViewModel? = null
 
+    private var trendingSubredditsAdapter: TrendingSubredditsAdapter? = null
+    private var trendingSubredditsLayoutManager: LinearLayoutManager? = null
+    private val trendingSubredditsViewModel: TrendingSubredditsViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch back to the app theme (from the launcher theme)
@@ -143,6 +154,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
             // Only start the inbox listener once, or else every configuration change would start another timer
             startInboxListener()
+            trendingSubredditsViewModel.loadSubreddits()
         }
 
         setupNavBar(savedInstanceState)
@@ -265,7 +277,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            android.R.id.home -> { binding.parentLayout.openDrawer(GravityCompat.START); true }
+            android.R.id.home -> {
+                binding.parentLayout.openDrawer(GravityCompat.START); true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -341,7 +355,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
-        with (binding.navDrawer) {
+        with(binding.navDrawer) {
             this.privatelyBrowsing = privatelyBrowsing
 
             // This doesn't work programmatically
@@ -508,7 +522,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         if (updateFrequency != -1) {
             var counter = 0
 
-            fixedRateTimer("inboxTimer", false, 0L,  updateFrequency * 60 * 1000L) {
+            fixedRateTimer("inboxTimer", false, 0L, updateFrequency * 60 * 1000L) {
                 Log.d(TAG, "InboxTimer running")
 
                 CoroutineScope(IO).launch {
@@ -529,7 +543,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                             response.value.filter { it.isNew }.forEach { createInboxNotification(it) }
                             db.messages().insertAll(response.value)
                         }
-                        is ApiResponse.Error -> {}
+                        is ApiResponse.Error -> {
+                        }
                     }
                 }
             }
@@ -827,16 +842,62 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
             })
 
-            getOnCountChange().observe(this@MainActivity, { onCountChange ->
-                //binding.loadingIcon.onCountChange(onCountChange)
-            })
+            getOnCountChange().observe(this@MainActivity) {
+                binding.navDrawer.subredditsLoader.visibility = if (it) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            }
 
             getError().observe(this@MainActivity, { error ->
                 Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
             })
         }
 
-        with (binding.navDrawer) {
+        with(trendingSubredditsViewModel) {
+            trendingSubreddits.observe(this@MainActivity) { trending ->
+                trending.subreddits?.let {
+                    trendingSubredditsAdapter?.submitList(it)
+                }
+
+                setTrendingSubredditsLastUpdated(trending)
+            }
+
+            onCountchange.observe(this@MainActivity) {
+                binding.navDrawer.trendingSubredditsLoader.visibility = if (it) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            }
+
+            error.observe(this@MainActivity, { error ->
+                Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
+            })
+        }
+
+        binding.parentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerOpened(drawerView: View) {
+                trendingSubredditsViewModel.trendingSubreddits.value?.let {
+                    setTrendingSubredditsLastUpdated(it)
+                }
+            }
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                // Not implemented
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                // Not implemented
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                // Not implemented
+            }
+        })
+
+        with(binding.navDrawer) {
             app = App.get()
             userInfo = App.get().currentUserInfo
             subredditSelected = this@MainActivity
@@ -863,11 +924,30 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 adapter = subredditsAdapter
                 layoutManager = subredditsLayoutManager
             }
+
+            trendingSubredditsLastUpdated.setOnClickListener { trendingSubredditsViewModel.loadSubreddits() }
+            trendingSubredditsAdapter = TrendingSubredditsAdapter().apply {
+                onSubredditSelected = {
+                    Intent(this@MainActivity, SubredditActivity::class.java).apply {
+                        putExtra(SubredditActivity.SUBREDDIT_KEY, it)
+                        startActivity(this)
+                    }
+                }
+            }
+            trendingSubredditsLayoutManager = LinearLayoutManager(this@MainActivity)
+            trendingSubreddits.run {
+                adapter = trendingSubredditsAdapter
+                layoutManager = trendingSubredditsLayoutManager
+            }
         }
 
         loadSubreddits()
     }
 
+    /**
+     * Loads subreddits, either subscribed subreddits if there is a logged in user, or default
+     * if there isn't (or there is one privately browsing)
+     */
     private fun loadSubreddits() {
         val loadDefault = if (App.get().isUserLoggedIn()) {
             // If the user is logged in we want to load default subs if they're privately browsing
@@ -876,6 +956,18 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             true
         }
         subredditsViewModel?.loadSubreddits(loadDefault)
+    }
+
+    /**
+     * Sets the trending subreddits retrieved text in the nav drawer
+     *
+     * @param trendingSubreddits The trending subreddits object to use for the text
+     */
+    private fun setTrendingSubredditsLastUpdated(trendingSubreddits: TrendingSubreddits) {
+        val created = Instant.ofEpochSecond(trendingSubreddits.retrieved)
+        val now = Instant.now()
+        val between = Duration.between(created, now)
+        setAgeTextTrendingSubreddits(binding.navDrawer.trendingSubredditsLastUpdated, between)
     }
 
     /**

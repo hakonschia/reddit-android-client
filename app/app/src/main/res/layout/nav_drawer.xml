@@ -389,13 +389,26 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/all" />
 
+            <ProgressBar
+                android:id="@+id/subredditsLoader"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:indeterminateOnly="true"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/subredditsHeader"
+                app:layout_constraintTop_toBottomOf="@+id/subredditsHeader"
+                tools:visibility="visible"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/subreddits"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -415,17 +428,41 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/subreddits" />
 
+            <TextView
+                android:id="@+id/trendingSubredditsLastUpdated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                tools:text="Last updated: 23 hours ago"
+                android:textColor="@color/secondary_text_color"
+                android:textStyle="italic"
+                app:layout_constraintStart_toStartOf="@+id/trendingSubredditsHeader"
+                app:layout_constraintTop_toBottomOf="@+id/trendingSubredditsHeader" />
+
+            <ProgressBar
+                android:id="@+id/trendingSubredditsLoader"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:visibility="gone"
+                android:indeterminateOnly="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/trendingSubredditsLastUpdated"
+                app:layout_constraintTop_toBottomOf="@+id/trendingSubredditsLastUpdated"
+                tools:visibility="visible"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/trendingSubreddits"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/trendingSubredditsHeader"
+                app:layout_constraintTop_toBottomOf="@+id/trendingSubredditsLastUpdated"
                 tools:itemCount="5"
                 tools:listitem="@layout/list_item_subreddit_simple" />
         </androidx.constraintlayout.widget.ConstraintLayout>
