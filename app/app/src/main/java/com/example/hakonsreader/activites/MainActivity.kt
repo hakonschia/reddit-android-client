@@ -116,7 +116,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     private var subredditsAdapter: SubredditsAdapter? = null
     private var subredditsLayoutManager: LinearLayoutManager? = null
-    private var subredditsViewModel: SelectSubredditsViewModel? = null
+    private val subredditsViewModel: SelectSubredditsViewModel by viewModels {
+        SelectSubredditsFactory(App.get().isUserLoggedIn() && !App.get().isUserLoggedInPrivatelyBrowsing())
+    }
 
     private var trendingSubredditsAdapter: TrendingSubredditsAdapter? = null
     private var trendingSubredditsLayoutManager: LinearLayoutManager? = null
@@ -131,10 +133,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        checkAccessTokenScopes()
-        attachFragmentChangeListener()
-        setProfileNavbarTitle()
-
         // For testing purposes hardcode going into a subreddit/post etc.
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
@@ -143,9 +141,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             //startActivity(this)
         }
 
+        attachFragmentChangeListener()
+        setupNavBar()
+
         if (savedInstanceState != null) {
             savedState = savedInstanceState
             restoreFragmentStates(savedInstanceState)
+            restoreNavBar(savedInstanceState)
         } else {
             // Use empty string as default (ie. front page)
             val startSubreddit = intent.extras?.getString(START_SUBREDDIT) ?: ""
@@ -157,9 +159,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             trendingSubredditsViewModel.loadSubreddits()
         }
 
-        setupNavBar(savedInstanceState)
         setupNavDrawer()
-        
+        checkAccessTokenScopes()
+        setProfileNavbarTitle()
+
         App.get().run {
             registerReceivers()
             registerPrivateBrowsingObservable(this@MainActivity)
@@ -724,6 +727,18 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     /**
+     * Restores the state of the nav bar
+     */
+    private fun restoreNavBar(restoredState: Bundle) {
+        val active = restoredState.getInt(ACTIVE_NAV_ITEM)
+
+        // When we're restoring a state we don't want to play an animation, as the user hasn't manually
+        // selected a change
+        navigationViewListener.disableAnimationForNextChange()
+        binding.bottomNav.selectedItemId = active
+    }
+
+    /**
      * Sets up the fragment to display at startup. This will create [standardSubFragment]
      *
      * @param startSubreddit The name of the subreddit to display. If this is a standard subreddit
@@ -743,7 +758,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 // Use an open transition since we're calling this when the app has been started
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainer, this)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .addToBackStack(null)
                         .commit()
             }
@@ -760,7 +774,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * restored from a previous point) the active nav bar item is set to what is
      * stored in the state
      */
-    private fun setupNavBar(restoredState: Bundle?) {
+    private fun setupNavBar() {
         binding.bottomNav.setOnNavigationItemSelectedListener(navigationViewListener)
 
         // Set listener for when an item has been clicked when already selected
@@ -801,15 +815,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
             }
         }
-
-        if (restoredState != null) {
-            val active = restoredState.getInt(ACTIVE_NAV_ITEM)
-
-            // When we're restoring a state we don't want to play an animation, as the user hasn't manually
-            // selected a change
-            navigationViewListener.disableAnimationForNextChange()
-            binding.bottomNav.selectedItemId = active
-        }
     }
 
 
@@ -835,25 +840,21 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * [loadSubreddits] is automatically called
      */
     private fun setupNavDrawer() {
-        subredditsViewModel = ViewModelProvider(this,
-                SelectSubredditsFactory(App.get().isUserLoggedIn() && !App.get().isUserLoggedInPrivatelyBrowsing())
-        ).get(SelectSubredditsViewModel::class.java).apply {
-            getSubreddits().observe(this@MainActivity, { subreddits ->
-                subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
-            })
+        subredditsViewModel.getSubreddits().observe(this@MainActivity, { subreddits ->
+            subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
+        })
 
-            getOnCountChange().observe(this@MainActivity) {
-                binding.navDrawer.subredditsLoader.visibility = if (it) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
+        subredditsViewModel.getOnCountChange().observe(this@MainActivity) {
+            binding.navDrawer.subredditsLoader.visibility = if (it) {
+                View.VISIBLE
+            } else {
+                View.GONE
             }
-
-            getError().observe(this@MainActivity, { error ->
-                Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
-            })
         }
+
+        subredditsViewModel.getError().observe(this@MainActivity, { error ->
+            Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
+        })
 
         with(trendingSubredditsViewModel) {
             trendingSubreddits.observe(this@MainActivity) { trending ->
