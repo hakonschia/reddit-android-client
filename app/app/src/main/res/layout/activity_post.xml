@@ -166,56 +166,63 @@
 
             android:visibility="@{post.archived || (post.locked &amp;&amp; !post.userMod) ? View.GONE : View.VISIBLE}"
 
-            app:layout_constraintBottom_toBottomOf="@id/navigationButtons"
-            app:layout_constraintEnd_toStartOf="@id/navigationButtons" />
+            app:layout_constraintBottom_toBottomOf="@id/goToPreviousTopLevelComment"
+            app:layout_constraintEnd_toStartOf="@id/goToPreviousTopLevelComment" />
+
+        <!-- Background view for the navigation buttons so they look like one large divided button -->
+        <View
+            android:id="@+id/navigationButtonsBackground"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/ripple_rounded_square_button_bg"
+            app:layout_constraintBottom_toBottomOf="@id/goToPreviousTopLevelComment"
+            app:layout_constraintStart_toStartOf="@id/goToPreviousTopLevelComment"
+            app:layout_constraintEnd_toEndOf="@id/goToNextTopLevelComment"
+            app:layout_constraintTop_toTopOf="@+id/goToPreviousTopLevelComment"/>
 
         <!-- Navigation buttons -->
-        <LinearLayout
-            android:id="@+id/navigationButtons"
+        <ImageButton
+            android:id="@+id/goToNextTopLevelComment"
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
 
             android:background="@drawable/ripple_rounded_square_button_bg"
 
+            android:contentDescription="@string/content_description_next_top_level_comment"
+            android:onClick="goToNextTopLevelComment"
+            android:padding="10dp"
+
+            android:src="@drawable/ic_expand_more_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintEnd_toEndOf="parent" />
 
-            <ImageButton
-                android:id="@+id/goToPreviousTopLevelComment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ripple_rounded_square_button_bg"
+        <View
+            android:id="@+id/navigationButtonsDivider"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/divider"
+            app:layout_constraintBottom_toBottomOf="@id/goToPreviousTopLevelComment"
+            app:layout_constraintStart_toEndOf="@id/goToPreviousTopLevelComment"
+            app:layout_constraintTop_toTopOf="@+id/goToPreviousTopLevelComment" />
 
-                android:contentDescription="@string/content_description_previous_top_level_comment"
-                android:onClick="goToPreviousTopLevelComment"
-                android:padding="10dp"
+        <ImageButton
+            android:id="@+id/goToPreviousTopLevelComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_rounded_square_button_bg"
+            android:contentDescription="@string/content_description_previous_top_level_comment"
 
-                android:src="@drawable/ic_expand_less_24dp" />
+            android:onClick="goToPreviousTopLevelComment"
+            android:padding="10dp"
+            android:src="@drawable/ic_expand_less_24dp"
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
+            app:layout_constraintBottom_toBottomOf="@+id/goToNextTopLevelComment"
+            app:layout_constraintEnd_toStartOf="@+id/goToNextTopLevelComment" />
 
-                android:layout_marginBottom="5dp"
-                android:background="@color/divider" />
-
-            <ImageButton
-                android:id="@+id/goToNextTopLevelComment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ripple_rounded_square_button_bg"
-
-                android:contentDescription="@string/content_description_next_top_level_comment"
-                android:onClick="goToNextTopLevelComment"
-                android:padding="10dp"
-
-                android:src="@drawable/ic_expand_more_24dp" />
-        </LinearLayout>
 
         <com.example.hakonsreader.views.LoadingIcon
             android:id="@+id/loadingIcon"
