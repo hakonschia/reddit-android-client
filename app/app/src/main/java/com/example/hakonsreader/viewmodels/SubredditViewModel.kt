@@ -20,7 +20,7 @@ class SubredditViewModel(
 ) : ViewModel() {
     private val repo = SubredditRepository(subredditName, api, dao, postsDao)
 
-    val subreddit = repo.getSubreddit().asLiveData()
+    val subreddit = repo.getSubreddit()
     val errors = repo.errors
     val loading = repo.loading
 

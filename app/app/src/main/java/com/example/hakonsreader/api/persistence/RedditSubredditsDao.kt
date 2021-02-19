@@ -73,7 +73,7 @@ interface RedditSubredditsDao {
      * @return A LiveData with the subreddit, or null if not found
      */
     @Query("SELECT * FROM subreddits WHERE name=:subredditName COLLATE NOCASE")
-    fun getFlow(subredditName: String): Flow<Subreddit?>
+    fun getLive(subredditName: String): LiveData<Subreddit?>
 
     /**
      * Clears user specific information from all posts. Sets to the values that the Reddit API

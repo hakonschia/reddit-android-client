@@ -2,6 +2,7 @@ package com.example.hakonsreader.viewmodels.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.persistence.RedditPostsDao
@@ -23,19 +24,26 @@ class SubredditRepository(
 
     private var infoLoaded = false
 
+    private val subredditNameObservable = MutableLiveData<String>().apply {
+        value = subredditName
+    }
+
     private val _errors = MutableLiveData<ErrorWrapper>()
     private val _loading = MutableLiveData<Boolean>()
 
     val errors = _errors as LiveData<ErrorWrapper>
     val loading = _loading as LiveData<Boolean>
 
-    fun getSubreddit() : Flow<Subreddit?> {
+    fun getSubreddit() : LiveData<Subreddit?> {
         if (!infoLoaded) {
             CoroutineScope(IO).launch {
                 refresh()
             }
         }
-        return dao.getFlow(subredditName)
+
+        return Transformations.switchMap(subredditNameObservable) {
+            dao.getLive(it)
+        }
     }
 
     suspend fun refresh() {
@@ -44,7 +52,14 @@ class SubredditRepository(
         when (val resp = api.info()) {
             is ApiResponse.Success -> {
                 infoLoaded = true
-                dao.insert(resp.value)
+                val sub = resp.value
+                dao.insert(sub)
+
+                // If a redirect occurred, a different subreddit will be sent back
+                // Eg. if this is for the subreddit "random", a random subreddit will be returned
+                if (!subredditName.equals(sub.name, ignoreCase = true)) {
+                    subredditNameObservable.postValue(sub.name)
+                }
             }
             is ApiResponse.Error -> {
                 _errors.postValue(ErrorWrapper(resp.error, resp.throwable))
