@@ -2,6 +2,7 @@ package com.example.hakonsreader.api
 
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
+import com.example.hakonsreader.api.interceptors.BasicAuthInterceptor
 import com.example.hakonsreader.api.interceptors.UserAgentInterceptor
 import com.example.hakonsreader.api.interfaces.OnFailure
 import com.example.hakonsreader.api.interfaces.OnNewToken
@@ -407,7 +408,7 @@ class RedditApi constructor(
         // Http client for OAuth related API calls (such as retrieving access tokens)
         // The service created with this is for "RedditApi.accessToken()"
         val oauthClient = OkHttpClient.Builder()
-                .addInterceptor(BasicAuthInterceptor())
+                .addInterceptor(BasicAuthInterceptor(basicAuthHeader))
                 // Logger has to be at the end or else it won't log what has been added before
                 .addInterceptor(logger)
                 .build()
@@ -590,10 +591,7 @@ class RedditApi constructor(
         override fun authenticate(route: Route?, response: Response): Request? {
             // If we have an access token with a refresh token the token is for a logged in user and can be refreshed
             val newToken = if (accessTokenInternal.refreshToken != null) {
-                // The response does not send a new refresh token, so make sure the old one is saved
-                refreshToken()?.apply {
-                    refreshToken = accessTokenInternal.refreshToken
-                } ?: newNonLoggedInToken()
+                refreshToken() ?: newNonLoggedInToken()
             } else {
                 newNonLoggedInToken()
             }
@@ -672,24 +670,6 @@ class RedditApi constructor(
 
             request.header("Authorization", accessTokenInternal.generateHeaderString())
             return chain.proceed(request.build())
-        }
-    }
-
-
-    /**
-     * Interceptor that adds the "Authorization: basic " header to a request. This should be used for OAuth related
-     * API calls that do not use the access token as the authorization header
-     *
-     * The interceptor adds the value found in [basicAuthHeader]
-     */
-    private inner class BasicAuthInterceptor : Interceptor {
-        @Throws(IOException::class)
-        override fun intercept(chain: Interceptor.Chain): Response {
-            val original = chain.request()
-            val request = original.newBuilder()
-                    .header("Authorization", basicAuthHeader)
-                    .build()
-            return chain.proceed(request)
         }
     }
 }

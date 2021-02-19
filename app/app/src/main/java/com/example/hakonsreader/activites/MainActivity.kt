@@ -755,7 +755,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         if (defaultSub != null) {
             standardSubFragment!!.apply {
                 this.defaultSub = defaultSub
-                // Use an open transition since we're calling this when the app has been started
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainer, this)
                         .addToBackStack(null)
