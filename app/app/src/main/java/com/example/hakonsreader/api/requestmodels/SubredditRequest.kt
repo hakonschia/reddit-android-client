@@ -119,7 +119,9 @@ class SubredditRequest(
             // Additionally, if the search request returned subreddits, body.getListings() will hold a List<Subreddit> which will cause issues
             // This is also an "issue" for SubredditRequest.info(), but it will manage to convert that to a RedditListing
             // and the check for getId() will return null, so it doesn't have to be handled directly
-            // We could disable redirects, but I'm afraid of what issues that would cause later
+            // We could disable redirects, but I'm afraid of what issues that would cause later (edit: god prediction tbh)
+
+            // Some redirects are on purpose, such as going to "r/random" which will redirect to a random subreddit
             val prior = resp.raw().priorResponse()
             if (prior != null) {
 
@@ -128,7 +130,11 @@ class SubredditRequest(
                 // as the new response will hold the posts and be correct
                 val code = prior.code()
                 if (code in 300..399) {
-                    return ApiResponse.Error(GenericError(code), SubredditNotFoundException("No subreddit found with name: $subredditName"))
+                    // If the redirect is because it doesn't exist return, otherwise we can continue
+                    val pathSegments = resp.raw().request().url().pathSegments()
+                    if (pathSegments.size >= 2 && pathSegments[0] == "subreddits" && pathSegments[1] == "search") {
+                        return ApiResponse.Error(GenericError(code), SubredditNotFoundException("No subreddit found with name: $subredditName"))
+                    }
                 }
             }
 
