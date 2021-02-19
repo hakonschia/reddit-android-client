@@ -152,7 +152,7 @@ interface SubredditService {
     suspend fun selectFlair(
             @Path("subreddit") subredditName: String,
             @Field("name") username: String,
-            @Field("flair_template_id") flairId: String,
+            @Field("flair_template_id") flairId: String?,
 
             @Field("api_type") apiType: String = "json"
     ) : Response<JsonResponse<Any?>>

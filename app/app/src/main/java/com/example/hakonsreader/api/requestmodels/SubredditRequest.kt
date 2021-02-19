@@ -475,14 +475,16 @@ class SubredditRequest(
 
 
     /**
-     * Select a flair for a user on the subreddit
+     * Select a flair for a user on the subreddit. If [flairId] is not called with `null`, then
+     * [enableUserFlair] is called with `true` automatically
      *
      * OAuth scope required: *flair*
      *
      * @param username The username to select a flair for
-     * @param flairId The ID of the flair to select (as from [RedditFlair.id])
+     * @param flairId The ID of the flair to select (as from [RedditFlair.id]), or `null` to clear
+     * the users flair
      */
-    suspend fun selectFlair(username: String, flairId: String) : ApiResponse<Any?> {
+    suspend fun selectFlair(username: String, flairId: String?) : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -495,6 +497,9 @@ class SubredditRequest(
 
             if (body != null) {
                 if (!body.hasErrors()) {
+                    if (flairId != null) {
+                        enableUserFlair(true)
+                    }
                     ApiResponse.Success(null)
                 } else {
                     apiListingErrors(body.errors() as List<List<String>>)

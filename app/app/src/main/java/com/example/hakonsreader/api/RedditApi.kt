@@ -221,6 +221,12 @@ class RedditApi constructor(
         val STANDARD_SUBS: List<String> = Collections.unmodifiableList(listOf("", "popular", "all"))
     }
 
+    /**
+     * The authentication header to use when retrieving access tokens for the first time
+     *
+     * This is formatted as "Basic <value>" and can be used directly as a header value
+     */
+    private val basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString("$clientId:".toByteArray())
 
     init {
         check(userAgent.isNotBlank()) { "User-Agent must not be empty" }
@@ -260,13 +266,6 @@ class RedditApi constructor(
      * This should be set to `null` when private browsing is disabled
      */
     private var savedToken: AccessToken? = null
-
-    /**
-     * The authentication header to use when retrieving access tokens for the first time
-     *
-     * This is formatted as "Basic <value>" and can be used directly as a header value
-     */
-    private val basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString("$clientId:".toByteArray())
 
 
     // ------------------ Service objects ------------------

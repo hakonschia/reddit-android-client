@@ -91,33 +91,29 @@ class SubredditRepository(
     suspend fun updateFlair(username: String, flair: RedditFlair?) {
         val subreddit = dao.get(subredditName) ?: return
 
-        if (flair != null) {
-            subreddit.userFlairBackgroundColor = flair.backgroundColor
-            subreddit.userFlairRichText = flair.richtextFlairs
-            subreddit.userFlairText = flair.text
-            subreddit.userFlairTextColor = flair.textColor
+        subreddit.userFlairBackgroundColor = flair?.backgroundColor
+        subreddit.userFlairRichText = flair?.richtextFlairs
+        subreddit.userFlairText = flair?.text
+        subreddit.userFlairTextColor = flair?.textColor
 
-            dao.update(subreddit)
+        dao.update(subreddit)
 
-            // Update all posts the user potentially has in the database
-            postsDao.getPostsByUser(username).apply {
-                forEach {
-                    it.authorFlairBackgroundColor = flair.backgroundColor
-                    it.authorRichtextFlairs = flair.richtextFlairs
-                    it.authorFlairText = flair.text
-                    it.authorFlairTextColor = flair.textColor
-                }
-                postsDao.updateAll(this)
+        // Update all posts the user potentially has in the database
+        postsDao.getPostsByUser(username).apply {
+            forEach {
+                it.authorFlairBackgroundColor = flair?.backgroundColor
+                it.authorRichtextFlairs = flair?.richtextFlairs ?: ArrayList()
+                it.authorFlairText = flair?.text
+                it.authorFlairTextColor = flair?.textColor
             }
+            postsDao.updateAll(this)
+        }
 
-            when (val resp = api.selectFlair(username, flair.id)) {
-                is ApiResponse.Success -> { }
-                is ApiResponse.Error -> {
-                    _errors.postValue(ErrorWrapper(resp.error, resp.throwable))
-                }
+        when (val resp = api.selectFlair(username, flair?.id)) {
+            is ApiResponse.Success -> { }
+            is ApiResponse.Error -> {
+                _errors.postValue(ErrorWrapper(resp.error, resp.throwable))
             }
-        } else {
-            // TODO "dont show flair on subreddit"
         }
     }
 }
