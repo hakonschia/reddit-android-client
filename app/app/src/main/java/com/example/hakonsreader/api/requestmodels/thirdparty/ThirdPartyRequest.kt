@@ -168,7 +168,6 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             }
 
             post.thirdPartyObject = gif
-            post.crossposts?.get(0)?.thirdPartyObject = gif
             post.crossposts?.forEach {
                 it.thirdPartyObject = gif
             }

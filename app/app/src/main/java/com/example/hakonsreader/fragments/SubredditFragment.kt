@@ -170,16 +170,15 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         setupPostsList()
         setupSubredditViewModel()
         setupSubmitPostFab()
-        setupPostsViewModel()
 
         // Default subs don't have rules/flairs/info in drawers (could potentially add a tiny description
         // of the different default subs in the info)
         if (!isDefaultSubreddit) {
             setupRulesList()
-            setupRulesViewModel()
 
-            setupFlairsViewModel()
             automaticallyOpenDrawerIfSet()
+        } else {
+            setupPostsViewModel(subredditName)
         }
 
         App.get().registerPrivateBrowsingObservable(this)
@@ -446,6 +445,13 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     return@observe
                 }
 
+                setupPostsViewModel(it.name)
+                setupRulesViewModel(it.name)
+                setupFlairsViewModel(it.name)
+
+                // Kind of weird to call this I guess, but it's to now load load posts
+                onResume()
+
                 // If there is no subscribers previously the ticker animation looks very weird
                 // so disable it if it would like weird
                 val enableTickerAnimation = old != null && old.subscribers != 0
@@ -516,11 +522,13 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
     /**
      * Sets up [rulesViewModel]
+     *
+     * @param name The name of the subreddit the ViewModel is for
      */
-    private fun setupRulesViewModel() {
+    private fun setupRulesViewModel(name: String) {
         rulesViewModel = ViewModelProvider(this, SubredditRulesFactory(
-                subredditName,
-                api.subreddit(subredditName),
+                name,
+                api.subreddit(name),
                 database.rules()
         )).get(SubredditRulesViewModel::class.java).apply {
             rules.observe(viewLifecycleOwner) {
@@ -542,12 +550,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
     /**
      * Sets up [flairsViewModel]
+     *
+     * @param name The name of the subreddit the ViewModel is for
      */
-    private fun setupFlairsViewModel() {
+    private fun setupFlairsViewModel(name: String) {
         flairsViewModel = ViewModelProvider(this, SubredditFlairsFactory(
-                subredditName,
+                name,
                 FlairType.USER,
-                api.subreddit(subredditName),
+                api.subreddit(name),
                 database.flairs()
         )).get(SubredditFlairsViewModel::class.java).apply {
             flairs.observe(viewLifecycleOwner) {
@@ -618,11 +628,11 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     /**
      * Sets up [postsViewModel]
      *
-     * This requires [subreddit] to be set with a name
+     * @param name The name of the subreddit the ViewModel is for
      */
-    private fun setupPostsViewModel() {
+    private fun setupPostsViewModel(name: String) {
         postsViewModel = ViewModelProvider(this, PostsFactory(
-                subredditName,
+                name,
                 false
         )).get(PostsViewModel::class.java).apply {
             getPosts().observe(viewLifecycleOwner, { posts ->
