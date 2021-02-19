@@ -315,7 +315,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             standardSubFragment!!.setActiveSubreddit(sub)
         } else {
             // If the current subreddit is the same, use the old instead of creating a new one
-            if (activeSubreddit?.subredditName != subredditName) {
+            // If we're going to "r/random" we should recreate it, as that isn't really a specific subreddit
+            // (SubredditFragment should probably just change the subredditName tbh)
+            if (subredditName.equals("random", ignoreCase = true) || activeSubreddit?.subredditName != subredditName) {
                 activeSubreddit = SubredditFragment.newInstance(subredditName)
             }
 

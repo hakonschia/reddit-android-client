@@ -359,4 +359,5 @@
     <string name="webViewCopyLink">Kopier lenke</string>
     <string name="trendingSubredditsLastUpdated">Oppdatert %s</string>
     <string name="trendingSubredditsLastUpdatedNow">Akkurat oppdatert</string>
+    <string name="random">Tilfeldig</string>
 </resources>

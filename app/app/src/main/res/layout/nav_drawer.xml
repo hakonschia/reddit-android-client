@@ -378,6 +378,58 @@
                 app:layout_constraintTop_toTopOf="@id/allIcon" />
 
             <TextView
+                android:id="@+id/randomIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="\?"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textColor="@color/iconColor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/allIcon"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/random"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+
+                android:maxLines="1"
+                android:text="@string/random"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
+
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="@+id/randomIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/randomIcon"
+                app:layout_constraintTop_toTopOf="@+id/randomIcon" />
+
+            <View
+                android:id="@+id/randomClicker"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+
+                android:layout_marginEnd="16dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick='@{(view) -> subredditSelected.subredditSelected("random")}'
+
+                app:layout_constraintBottom_toBottomOf="@id/randomIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/randomIcon"
+                app:layout_constraintTop_toTopOf="@id/randomIcon" />
+
+            <TextView
                 android:id="@+id/subredditsHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -387,7 +439,7 @@
                 android:textColor="@color/text_color"
                 android:textSize="17sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/all" />
+                app:layout_constraintTop_toBottomOf="@id/random" />
 
             <ProgressBar
                 android:id="@+id/subredditsLoader"
