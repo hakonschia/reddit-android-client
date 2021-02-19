@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
 import android.view.*
+import android.widget.Adapter
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -551,6 +552,15 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         )).get(SubredditFlairsViewModel::class.java).apply {
             flairs.observe(viewLifecycleOwner) {
                 flairsAdapter = RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
+                    // If/when the flairs are updated the previous listener would trigger, which could
+                    // remove the users flair
+                    binding.subredditInfo.selectFlairSpinner.onItemSelectedListener = null
+
+                    binding.subredditInfo.selectFlairSpinner.adapter = this
+                    // Select the first item right away, as this would happen anyways, and would trigger the
+                    // item selected listener, which would call updateUserFlair with null, disabling the users flair
+                    binding.subredditInfo.selectFlairSpinner.setSelection(0, false)
+
                     binding.subredditInfo.selectFlairSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                             updateUserFlair(flairsAdapter?.getFlairAt(position))
@@ -559,7 +569,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                             // Not implemented
                         }
                     }
-                    binding.subredditInfo.selectFlairSpinner.adapter = this
                 }
             }
 
