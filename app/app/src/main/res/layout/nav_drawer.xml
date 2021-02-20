@@ -377,18 +377,14 @@
                 app:layout_constraintStart_toStartOf="@id/allIcon"
                 app:layout_constraintTop_toTopOf="@id/allIcon" />
 
-            <TextView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/randomIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
 
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                android:text="\?"
-                android:textStyle="bold"
-                android:textAlignment="center"
-                android:textSize="20sp"
-                android:textColor="@color/iconColor"
+                android:src="@drawable/ic_help_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/allIcon"
