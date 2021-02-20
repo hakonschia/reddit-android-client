@@ -411,6 +411,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 }
             })
 
+            // This is just to show a title until the info has been properly loaded
+            this.subreddit = Subreddit().apply { name = subredditName }
             (requireActivity() as AppCompatActivity).setSupportActionBar(subredditToolbar)
         }
     }
@@ -466,6 +468,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
                 binding.subreddit = it
                 postsAdapter?.hideScoreTime = it.hideScoreTime
+            }
+
+            loading.observe(viewLifecycleOwner) {
+                _binding?.loadingIcon?.onCountChange(it)
+            }
+
+            errors.observe(viewLifecycleOwner) {
+                handleErrors(it.error, it.throwable)
             }
         }
     }

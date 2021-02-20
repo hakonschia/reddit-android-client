@@ -48,7 +48,15 @@ class SubredditRequest(
             val sub = resp.body()
 
             if (sub != null) {
-                ApiResponse.Success(sub as Subreddit)
+                sub as Subreddit
+
+                // If there is no name, the subreddit wasn't found (this happens on redirects since the subreddit wasn't found
+                // and the cast is successful, but the object is empty with default values)
+                if (sub.name.isNotBlank()) {
+                    ApiResponse.Success(sub)
+                } else {
+                    ApiResponse.Error(GenericError(-1), SubredditNotFoundException("The subreddit '$subredditName' was not found"))
+                }
             } else {
                 apiError(resp)
             }
