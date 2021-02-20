@@ -116,6 +116,7 @@
 
             android:src="@drawable/ic_pin_24dp"
 
+            android:contentDescription="@string/content_description_post_sticky"
             android:visibility="@{post.stickied ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/crosspostIcon"
@@ -127,6 +128,7 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
 
+            android:contentDescription="@string/content_description_post_archived"
             app:marginStart="@{post.stickied ? @dimen/defaultMarginHalf : @dimen/noMargin}"
 
             android:src="@drawable/ic_archive_24dp"
@@ -144,6 +146,7 @@
 
             app:marginStart="@{post.archived ? @dimen/defaultMarginHalf : @dimen/noMargin}"
 
+            android:contentDescription="@string/content_description_post_locked"
             android:src="@drawable/ic_lock_24dp"
 
             android:visibility="@{post.locked ? View.VISIBLE : View.GONE, default=gone}"
@@ -247,6 +250,7 @@
             android:layout_height="13dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="2dp"
+            android:contentDescription="@string/content_description_post_crosspost"
             android:src="@drawable/ic_crosspost"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/postedIn" />

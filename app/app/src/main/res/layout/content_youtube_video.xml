@@ -22,6 +22,7 @@
             android:layout_height="@dimen/contentLinkThumbnailSize"
 
             android:scaleType="centerCrop"
+            android:contentDescription="@string/content_description_youtube_thumbnail"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -34,6 +35,7 @@
             android:layout_height="wrap_content"
 
             android:src="@drawable/exo_controls_play"
+            android:contentDescription="@string/content_description_youtube_play"
             app:layout_constraintTop_toTopOf="@id/thumbnail"
             app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
             app:layout_constraintEnd_toEndOf="@+id/thumbnail"
@@ -47,6 +49,7 @@
             android:layout_marginBottom="8dp"
             android:src="@drawable/yt_logo_rgb_light"
             android:adjustViewBounds="true"
+            android:contentDescription="@string/content_description_youtube_logo"
             app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
             app:layout_constraintEnd_toEndOf="@+id/thumbnail" />
 

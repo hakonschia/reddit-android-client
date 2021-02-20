@@ -110,6 +110,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
 
+            android:contentDescription="@string/content_description_comment_profile_icon_by_logged_in_user"
             android:layout_marginStart="4dp"
             android:src="@drawable/ic_baseline_person_100"
             android:visibility="@{isByLoggedInUser ? View.VISIBLE : View.GONE, default=gone}"
@@ -187,6 +188,7 @@
             android:layout_marginEnd="4dp"
             android:src="@drawable/ic_pin_24dp"
 
+            android:contentDescription="@string/content_description_comment_sticky"
             android:visibility="@{comment.stickied ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintEnd_toStartOf="@+id/lock"
 
@@ -201,6 +203,7 @@
             app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
             android:src="@drawable/ic_lock_24dp"
             android:visibility="@{comment.locked ? View.VISIBLE : View.GONE, default=gone}"
+            android:contentDescription="@string/content_description_comment_locked"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/commentAuthor"
@@ -275,6 +278,7 @@
             android:foreground="@drawable/ripple_main_bg"
             android:onClick="@{(view) -> adapter.moreOnClick(view, comment)}"
             android:src="@drawable/ic_baseline_more_horiz_24"
+            android:contentDescription="@string/content_description_comment_menu"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/peekParent"
@@ -293,6 +297,7 @@
             android:onClick="@{(view) -> CommentsMenuHandlerKt.peekCommentOnClick(view.context, adapter.getCommentById(comment.parentId))}"
             android:src="@drawable/ic_visibility_24dp"
             android:visibility="@{showPeekParentButton &amp;&amp; comment.depth != 0 ? View.VISIBLE : View.GONE}"
+            android:contentDescription="@string/content_description_comment_peek_parent"
 
             app:layout_constraintEnd_toStartOf="@+id/reply"
             app:layout_constraintTop_toTopOf="@+id/popupMenu" />

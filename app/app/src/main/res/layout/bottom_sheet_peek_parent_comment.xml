@@ -57,6 +57,7 @@
             android:src="@drawable/ic_baseline_person_100"
             android:visibility="@{isByLoggedInUser ? View.VISIBLE : View.GONE, default=gone}"
 
+            android:contentDescription="@string/content_description_comment_profile_icon_by_logged_in_user"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintBottom_toBottomOf="@+id/commentAuthor"
             app:layout_constraintStart_toEndOf="@+id/commentAuthor"
@@ -111,6 +112,7 @@
             android:layout_marginEnd="8dp"
             android:src="@drawable/ic_pin_24dp"
 
+            android:contentDescription="@string/content_description_comment_sticky"
             android:visibility="@{comment.stickied ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintEnd_toStartOf="@+id/lock"
 
@@ -123,6 +125,7 @@
             android:layout_height="18dp"
 
             android:src="@drawable/ic_lock_24dp"
+            android:contentDescription="@string/content_description_comment_locked"
 
             android:visibility="@{comment.locked ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintEnd_toEndOf="parent"

@@ -21,6 +21,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
 
+            android:contentDescription="@string/content_description_no_comments_yet_image"
             android:src="@drawable/ic_message_24dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

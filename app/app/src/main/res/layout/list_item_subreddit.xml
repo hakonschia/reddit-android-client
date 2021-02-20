@@ -83,6 +83,7 @@
             android:visibility="@{subreddit.subscribed ? View.VISIBLE : View.GONE}"
             android:tint="@{subreddit.favorited ? @color/subredditFavorited : @color/iconColor}"
 
+            android:contentDescription="@string/content_description_favorite_subreddit"
             android:background="?android:selectableItemBackground"
             android:src="@drawable/ic_star_24dp"
             app:layout_constraintEnd_toEndOf="parent"

@@ -93,6 +93,7 @@
             android:layout_marginStart="4dp"
             android:src="@drawable/ic_baseline_person_100"
             android:visibility="@{isByLoggedInUser ? View.VISIBLE : View.GONE, default=gone}"
+            android:contentDescription="@string/content_description_comment_profile_icon_by_logged_in_user"
 
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintBottom_toBottomOf="@+id/commentAuthor"

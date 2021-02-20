@@ -26,6 +26,7 @@
 
         android:background="@drawable/ripple_main_bg"
 
+        android:contentDescription="@string/content_description_upvote"
         android:src="@drawable/ic_arrow_upward_24dp" />
 
     <ImageButton
@@ -34,6 +35,7 @@
         android:layout_height="wrap_content"
 
         android:background="@drawable/ripple_main_bg"
+        android:contentDescription="@string/content_description_downvote"
 
         android:src="@drawable/ic_arrow_downward_24dp"/>
 </LinearLayout>

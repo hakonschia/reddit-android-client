@@ -158,6 +158,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
 
+                            android:contentDescription="@string/content_description_profile_inbox"
                             android:layout_marginEnd="8dp"
                             app:srcCompat="@drawable/ic_mail_24dp"
                             android:background="@drawable/ripple_main_bg"
@@ -172,6 +173,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
 
+                            android:contentDescription="@string/content_description_profile_menu"
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="16dp"
                             android:tint="@color/text_color"

@@ -79,6 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center|end"
 
+            android:contentDescription="@string/content_description_favorite_subreddit"
             android:visibility="@{subreddit.subscribed ? View.VISIBLE : View.GONE}"
             android:tint="@{subreddit.favorited ? @color/subredditFavorited : @color/iconColor}"
 

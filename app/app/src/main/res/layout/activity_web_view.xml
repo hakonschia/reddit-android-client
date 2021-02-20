@@ -31,6 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
 
+                android:contentDescription="@string/content_description_web_view_menu"
                 android:backgroundTint="#00000000"
                 android:foreground="@drawable/ripple_main_bg"
                 android:src="@drawable/ic_baseline_more_vert_24"
@@ -42,6 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
 
+                android:contentDescription="@string/content_description_web_view_close"
                 android:backgroundTint="#00000000"
                 android:foreground="@drawable/ripple_main_bg"
                 android:src="@drawable/ic_close_24dp"

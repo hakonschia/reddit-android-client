@@ -90,6 +90,7 @@
             android:foreground="@drawable/ripple_main_bg"
             android:onClick="@{(view) -> InboxMenuHandlerKt.showInboxMenu(view, message)}"
 
+            android:contentDescription="@string/content_description_inbox_menu"
             android:src="@drawable/ic_baseline_more_horiz_24"
 
             app:layout_constraintEnd_toEndOf="parent"
