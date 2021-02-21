@@ -21,7 +21,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
@@ -39,7 +38,6 @@ import com.example.hakonsreader.fragments.*
 import com.example.hakonsreader.interfaces.*
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.misc.Util
-import com.example.hakonsreader.misc.Util.createAgeText
 import com.example.hakonsreader.misc.Util.setAgeTextTrendingSubreddits
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.recyclerviewadapters.TrendingSubredditsAdapter
@@ -54,7 +52,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -161,7 +158,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         setupNavDrawer()
         checkAccessTokenScopes()
-        setProfileNavbarTitle()
+        setProfileNavBarTitle()
 
         App.get().run {
             registerReceivers()
@@ -435,7 +432,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     // This will be called after the activity has been restarted when logging in
                     // so call it when user information is retrieved as well
                     withContext(Main) {
-                        setProfileNavbarTitle()
+                        setProfileNavBarTitle()
                     }
                 }
                 is ApiResponse.Error -> {
@@ -634,8 +631,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      */
     private fun attachFragmentChangeListener() {
         supportFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
-            override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
-                super.onFragmentDetached(fm, f)
+            // onFragmentDetached suddenly stopped working. onFragmentViewDestroyed works as long as only one fragment
+            // is shown at a time (which is obviously true for how it is now, but if for instance this was in
+            // a tablet it could show more fragments at once, so it wouldn't work)
+            override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
+                super.onFragmentViewDestroyed(fm, f)
 
                 // The active subreddit doesn't have a chance to save its state, so it would be reloaded
                 // when detached
@@ -645,6 +645,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
 
                 // InboxGroupFragment is an "inner" fragment and not one we want to store directly
+                // (it is inside InboxFragment)
                 if (f !is InboxGroupFragment) {
                     lastShownFragment = f
                 }
@@ -653,10 +654,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     /**
-     * Sets the profile navbar title to the logged in users name, if there is a logged in user and
+     * Sets the profile nav bar title to the logged in users name, if there is a logged in user and
      * there is information about the user stored
      */
-    private fun setProfileNavbarTitle() {
+    private fun setProfileNavBarTitle() {
         val user = App.get().currentUserInfo?.userInfo
         if (user != null) {
             binding.bottomNav.menu.findItem(R.id.navProfile).title = user.username
@@ -769,11 +770,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     /**
-     * Sets up the navbar to be able to switch between the fragments
-     *
-     * @param restoredState The restored state of the activity. If this isn't null (the activity is
-     * restored from a previous point) the active nav bar item is set to what is
-     * stored in the state
+     * Sets up the nav bar to be able to switch between the fragments
      */
     private fun setupNavBar() {
         binding.bottomNav.setOnNavigationItemSelectedListener(navigationViewListener)
@@ -976,7 +973,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * Custom BottomNavigationView item selection listener
      */
     inner class BottomNavigationViewListener : BottomNavigationView.OnNavigationItemSelectedListener {
-        // TODO this class should probably be decoupled from MainActivity (need to pass the functions to call or something)
         private var playAnimationForNextChange = true
 
         /**
@@ -1054,9 +1050,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          * @param fragment The new fragment to show
          */
         private fun replaceNavBarFragmentNoAnimation(fragment: Fragment) {
-            val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
-            transaction
-                    .replace(R.id.fragmentContainer, fragment) // Although we don't use the backstack to pop elements, it is needed to keep the state
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    // Although we don't use the backstack to pop elements, it is needed to keep the state
                     // of the fragments (otherwise posts are reloaded when coming back)
                     // With the use of a local database I can easily restore the state without the back stack
                     // Not sure whats best to use, with addToBackStack it's smoother as it doesn't have to load

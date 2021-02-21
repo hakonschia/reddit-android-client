@@ -8,6 +8,7 @@ import android.transition.TransitionListenerAdapter
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.activity.viewModels
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -92,7 +93,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
     private lateinit var binding: ActivityPostBinding
     private lateinit var slidrInterface: SlidrInterface
 
-    private var commentsViewModel: CommentsViewModel? = null
+    private val commentsViewModel: CommentsViewModel by viewModels()
     private var commentsAdapter: CommentsAdapter? = null
     private var commentsLayoutManager: LinearLayoutManager? = null
 
@@ -253,10 +254,10 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
     }
 
     /**
-     * Sets up [commentsViewModel]
+     * Observes values from [commentsViewModel]
      */
     private fun setupCommentsViewModel() {
-        commentsViewModel = ViewModelProvider(this).get(CommentsViewModel::class.java).apply {
+        with (commentsViewModel) {
             getPost().observe(this@PostActivity) {
                 if (it != null) {
                     onNewPostInfo(it)
