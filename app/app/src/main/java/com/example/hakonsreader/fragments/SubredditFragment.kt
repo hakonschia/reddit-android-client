@@ -695,35 +695,37 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
             val imageView = binding.banner
             val bannerURL = it.bannerBackgroundImage
             if (bannerURL.isNotEmpty()) {
-                // Data saving on, only load if the image is already cached
-                if (App.get().dataSavingEnabled()) {
-                    Picasso.get()
-                            .load(bannerURL)
-                            .networkPolicy(NetworkPolicy.OFFLINE)
-                            .into(imageView, object : Callback {
-                                override fun onSuccess() {
-                                    imageView.visibility = View.VISIBLE
-                                    binding.bannerLoaded = true
-                                }
+                if (App.get().loadSubredditBanners()) {
+                    // Data saving on, only load if the image is already cached
+                    if (App.get().dataSavingEnabled()) {
+                        Picasso.get()
+                                .load(bannerURL)
+                                .networkPolicy(NetworkPolicy.OFFLINE)
+                                .into(imageView, object : Callback {
+                                    override fun onSuccess() {
+                                        imageView.visibility = View.VISIBLE
+                                        binding.bannerLoaded = true
+                                    }
 
-                                override fun onError(e: Exception) {
-                                    imageView.visibility = View.GONE
-                                    binding.bannerLoaded = false
-                                }
-                            })
-                } else {
-                    imageView.visibility = View.VISIBLE
-                    Picasso.get()
-                            .load(bannerURL)
-                            .into(imageView, object : Callback {
-                                override fun onSuccess() {
-                                    binding.bannerLoaded = true
-                                }
+                                    override fun onError(e: Exception) {
+                                        imageView.visibility = View.GONE
+                                        binding.bannerLoaded = false
+                                    }
+                                })
+                    } else {
+                        imageView.visibility = View.VISIBLE
+                        Picasso.get()
+                                .load(bannerURL)
+                                .into(imageView, object : Callback {
+                                    override fun onSuccess() {
+                                        binding.bannerLoaded = true
+                                    }
 
-                                override fun onError(e: Exception) {
-                                    binding.bannerLoaded = false
-                                }
-                            })
+                                    override fun onError(e: Exception) {
+                                        binding.bannerLoaded = false
+                                    }
+                                })
+                    }
                 }
             } else {
                 imageView.visibility = View.GONE

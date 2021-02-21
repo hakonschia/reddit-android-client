@@ -286,4 +286,16 @@
             app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_loop_videos" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/prefs_group_subreddits"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="@string/prefs_key_subreddits_load_banners"
+            app:title="@string/prefs_title_subreddits_load_banners"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_subreddits_load_banners" />
+    </PreferenceCategory>
 </PreferenceScreen>

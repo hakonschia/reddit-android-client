@@ -1016,6 +1016,16 @@ class App : Application() {
     }
 
     /**
+     * @return True if banners should be loaded on subreddits. This does not take into account data saving
+     */
+    fun loadSubredditBanners() : Boolean {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_subreddits_load_banners),
+                resources.getBoolean(R.bool.prefs_default_subreddits_load_banners)
+        )
+    }
+
+    /**
      * Handles when the API notifies that the access token is no longer valid, and the user should
      * be logged out and prompted to log back in.
      */

@@ -66,6 +66,7 @@
     <string name="prefs_group_comments">Comments</string>
     <string name="prefs_group_links">Links</string>
     <string name="prefs_group_inbox">Inbox</string>
+    <string name="prefs_group_subreddits">Subreddits</string>
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark mode</string>
@@ -120,6 +121,7 @@
     <string name="prefs_title_play_youtube_videos_in_app">Open YouTube videos in app</string>
     <string name="prefs_title_show_peek_parent_button_in_comments">Show button to peek parent in comments bar</string>
     <string name="prefs_title_send_crash_reports">Send crash reports</string>
+    <string name="prefs_title_subreddits_load_banners">Load banners</string>
 
 
     <!-- Preferences keys -->
@@ -171,6 +173,7 @@
     <string name="prefs_key_play_youtube_videos_in_app" translatable="false">play_youtube_videos_in_app</string>
     <string name="prefs_key_show_peek_parent_button_in_comments" translatable="false">show_peek_parent_button_in_comments</string>
     <string name="prefs_key_send_crash_reports" translatable="false">send_crash_reports</string>
+    <string name="prefs_key_subreddits_load_banners" translatable="false">load_banners</string>
 
 
     <plurals name="filteredSubredditsSummary">

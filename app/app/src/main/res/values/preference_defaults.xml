@@ -28,5 +28,6 @@
     <bool name="prefs_default_play_youtube_videos_in_app">true</bool>
     <bool name="prefs_default_show_peek_parent_button_in_comments">false</bool>
     <bool name="prefs_default_send_crash_reports">false</bool>
+    <bool name="prefs_default_subreddits_load_banners">true</bool>
 
 </resources>
