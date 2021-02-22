@@ -67,6 +67,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         private const val ACTIVE_SUBREDDIT_FRAGMENT = "activeSubredditFragment"
         private const val SELECT_SUBREDDIT_FRAGMENT = "selectSubredditFragment"
         private const val PROFILE_FRAGMENT = "profileFragment"
+        private const val SETTINGS_FRAGMENT = "settingsFragment"
         private const val ACTIVE_NAV_ITEM = "activeNavItem"
 
         /**
@@ -213,8 +214,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         if (profileFragment != null && profileFragment!!.isAdded) {
             supportFragmentManager.putFragment(outState, PROFILE_FRAGMENT, profileFragment!!)
         }
+        if (settingsFragment != null && settingsFragment!!.isAdded) {
+            supportFragmentManager.putFragment(outState, SETTINGS_FRAGMENT, settingsFragment!!)
+        }
 
-        // Login/settings fragments can just be recreated when needed as they don't store any specific state
+        // Login can just be recreated when needed as they don't store any specific state
 
         // Store state of navbar
         outState.putInt(ACTIVE_NAV_ITEM, binding.bottomNav.selectedItemId)
@@ -675,8 +679,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      */
     fun updateLanguage(language: String? = null, recreate: Boolean = false) {
         val settings = PreferenceManager.getDefaultSharedPreferences(this)
-        val lang = language ?: settings.getString(getString(R.string.prefs_key_language), getString(R.string.prefs_default_language))
-           ?: return
+        val lang = language ?: settings.getString(getString(R.string.prefs_key_language), getString(R.string.prefs_default_language)) ?: return
 
         val config = resources.configuration
         config.setLocale(Locale(lang))
@@ -704,6 +707,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         activeSubreddit = supportFragmentManager.getFragment(restoredState, ACTIVE_SUBREDDIT_FRAGMENT) as SubredditFragment?
         selectSubredditFragment = supportFragmentManager.getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT) as SelectSubredditFragment?
         profileFragment = supportFragmentManager.getFragment(restoredState, PROFILE_FRAGMENT) as ProfileFragment?
+        settingsFragment = supportFragmentManager.getFragment(restoredState, SETTINGS_FRAGMENT) as SettingsFragment?
 
         if (standardSubFragment == null) {
             standardSubFragment = StandardSubContainerFragment.newInstance()
