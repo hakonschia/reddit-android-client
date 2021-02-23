@@ -47,6 +47,46 @@ class SendPrivateMessageActivityTest {
     }
 
     /**
+     * Tests that the subject is set on the input field when passed
+     */
+    @Test
+    fun subjectIsSetWhenPassed() {
+        val intent = Intent(context, SendPrivateMessageActivity::class.java).apply {
+            putExtra(SendPrivateMessageActivity.EXTRAS_SUBJECT, "This is a message")
+        }
+        ActivityScenario.launch<SendPrivateMessageActivity>(intent)
+
+        onView(withId(R.id.subjectInput))
+                .check(matches(withText("This is a message")))
+    }
+
+    /**
+     * Tests that the message input field is set automatically when passed
+     */
+    @Test
+    fun messageIsSetWhenPassed() {
+        val intent = Intent(context, SendPrivateMessageActivity::class.java).apply {
+            putExtra(SendPrivateMessageActivity.EXTRAS_MESSAGE, "This is the content of the message")
+        }
+        ActivityScenario.launch<SendPrivateMessageActivity>(intent)
+
+        // This is a view inside MarkdownInput
+        onView(withId(R.id.replyText))
+                .check(matches(withText("This is the content of the message")))
+    }
+
+    /**
+     * Tests that the recipient input has focus by default
+     */
+    @Test
+    fun recipientHasFocusWhenNothingIsPassed() {
+        ActivityScenario.launch(SendPrivateMessageActivity::class.java)
+
+        onView(withId(R.id.recipientInput))
+                .check(matches(hasFocus()))
+    }
+
+    /**
      * Tests that the input field for the subject has focus automatically when a recipient
      * is passed to the activity
      */
@@ -62,17 +102,6 @@ class SendPrivateMessageActivityTest {
 
         onView(withId(R.id.subjectInput))
                 .check(matches(hasFocus()))
-    }
-
-    @Test
-    fun subjectIsSetWhenPassed() {
-        val intent = Intent(context, SendPrivateMessageActivity::class.java).apply {
-            putExtra(SendPrivateMessageActivity.EXTRAS_SUBJECT, "This is a message")
-        }
-        ActivityScenario.launch<SendPrivateMessageActivity>(intent)
-
-        onView(withId(R.id.subjectInput))
-                .check(matches(withText("This is a message")))
     }
 
     /**

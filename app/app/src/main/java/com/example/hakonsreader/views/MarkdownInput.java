@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -172,6 +173,13 @@ public class MarkdownInput extends FrameLayout {
      */
     public String getInputText() {
         return binding.replyText.getText().toString();
+    }
+
+    /**
+     * @return The actual view for the input text
+     */
+    public EditText getInputView() {
+        return binding.replyText;
     }
 
     /**

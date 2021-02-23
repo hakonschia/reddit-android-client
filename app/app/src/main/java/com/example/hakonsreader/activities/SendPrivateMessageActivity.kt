@@ -55,11 +55,17 @@ class SendPrivateMessageActivity : BaseActivity() {
             subjectInput.setText(subject)
             messageInput.setText(message)
 
-            // Set focus to the input field after the last pre-filled field
-            when {
-                recipient.isNotEmpty() -> subjectInput.requestFocusFromTouch()
-                subject.isNotEmpty() -> messageInput.requestFocusFromTouch()
-                else -> recipientInput.requestFocusFromTouch()
+            // By default the recipient has focus
+            recipientInput.requestFocusFromTouch()
+
+            // If the recipient is set, pass focus along
+            if (recipient.isNotEmpty()) {
+                subjectInput.requestFocusFromTouch()
+
+                // Subject is also set, pass focus to the message input
+                if (subject.isNotEmpty()) {
+                    messageInput.inputView.requestFocusFromTouch()
+                }
             }
 
             showPreview.setOnClickListener {
