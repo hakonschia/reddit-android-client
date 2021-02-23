@@ -1,4 +1,4 @@
-package com.example.hakonsreader.activites
+package com.example.hakonsreader.activities
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
@@ -13,7 +13,7 @@ import android.view.animation.LinearInterpolator
 import android.webkit.*
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.WebViewActivity.Companion.URL
+import com.example.hakonsreader.activities.WebViewActivity.Companion.URL
 import com.example.hakonsreader.databinding.ActivityWebViewBinding
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar

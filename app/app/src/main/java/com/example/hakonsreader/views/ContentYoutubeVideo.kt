@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.VideoYoutubeActivity
+import com.example.hakonsreader.activities.VideoYoutubeActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentYoutubeVideoBinding
 import com.example.hakonsreader.misc.cache

@@ -11,8 +11,8 @@ import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.LogInActivity;
-import com.example.hakonsreader.activites.MainActivity;
+import com.example.hakonsreader.activities.LogInActivity;
+import com.example.hakonsreader.activities.MainActivity;
 import com.example.hakonsreader.api.exceptions.ArchivedException;
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.RateLimitException;
