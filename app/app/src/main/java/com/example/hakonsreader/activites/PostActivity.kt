@@ -303,7 +303,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         commentsAdapter = CommentsAdapter().apply {
             replyListener = this@PostActivity
             commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
-            loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel?.loadMoreComments(comment, parent) }
+            loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel.loadMoreComments(comment, parent) }
             onChainShown = Runnable { binding.commentChainShown = true }
         }
 
@@ -311,7 +311,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
             comments.adapter = commentsAdapter
             comments.layoutManager = commentsLayoutManager
             showAllComments.setOnClickListener {
-                commentsAdapter?.commentIdChain = ""
+                commentsAdapter!!.commentIdChain = ""
                 commentChainShown = false
             }
         }

@@ -225,8 +225,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     override fun onBackPressed() {
-        if (binding.parentLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.parentLayout.closeDrawer(GravityCompat.START)
+        if (binding.mainParentLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.mainParentLayout.closeDrawer(GravityCompat.START)
             return
         }
 
@@ -282,7 +282,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                binding.parentLayout.openDrawer(GravityCompat.START); true
+                binding.mainParentLayout.openDrawer(GravityCompat.START); true
             }
             else -> super.onOptionsItemSelected(item)
         }
@@ -336,7 +336,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
 
         // If this was called from a drawer it should close (otherwise the drawer already is closed)
-        binding.parentLayout.closeDrawer(GravityCompat.START)
+        binding.mainParentLayout.closeDrawer(GravityCompat.START)
     }
 
     override fun onInboxClicked() {
@@ -381,13 +381,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         // Not a match from the state we generated, something weird is happening
         if (state == null || state != App.get().oauthState) {
-            Util.showErrorLoggingInSnackbar(binding.parentLayout)
+            Util.showErrorLoggingInSnackbar(binding.mainParentLayout)
             return
         }
 
         val code = uri.getQueryParameter("code")
         if (code == null) {
-            Util.showErrorLoggingInSnackbar(binding.parentLayout)
+            Util.showErrorLoggingInSnackbar(binding.mainParentLayout)
             return
         }
 
@@ -412,12 +412,12 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     withContext(Main) {
                         standardSubFragment = null
                         setupStartFragment("")
-                        Snackbar.make(binding.parentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.mainParentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT).show()
                     }
                 }
 
                 is ApiResponse.Error -> {
-                    Util.handleGenericResponseErrors(binding.parentLayout, resp.error, resp.throwable)
+                    Util.handleGenericResponseErrors(binding.mainParentLayout, resp.error, resp.throwable)
                 }
             }
         }
@@ -488,7 +488,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
 
             val adapter = OAuthScopeAdapter(this, R.layout.list_item_oauth_explanation, missingScopes)
-            val view = layoutInflater.inflate(R.layout.dialog_title_new_permissions, binding.parentLayout, false)
+            val view = layoutInflater.inflate(R.layout.dialog_title_new_permissions, binding.mainParentLayout, false)
 
             AlertDialog.Builder(this)
                     .setCustomTitle(view)
@@ -824,7 +824,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * Selects the profile nav bar. If the nav drawer is open it will be closed
      */
     fun selectProfileNavBar() {
-        binding.parentLayout.closeDrawer(GravityCompat.START)
+        binding.mainParentLayout.closeDrawer(GravityCompat.START)
         binding.bottomNav.selectedItemId = R.id.navProfile
     }
 
@@ -832,7 +832,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * Selects the settings nav bar. If the nav drawer is open it will be closed
      */
     fun selectSettingsNavBar() {
-        binding.parentLayout.closeDrawer(GravityCompat.START)
+        binding.mainParentLayout.closeDrawer(GravityCompat.START)
         binding.bottomNav.selectedItemId = R.id.navSettings
     }
 
@@ -855,7 +855,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
 
         subredditsViewModel.getError().observe(this@MainActivity, { error ->
-            Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
+            Util.handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable)
         })
 
         with(trendingSubredditsViewModel) {
@@ -876,11 +876,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
 
             error.observe(this@MainActivity, { error ->
-                Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
+                Util.handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable)
             })
         }
 
-        binding.parentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+        binding.mainParentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerOpened(drawerView: View) {
                 trendingSubredditsViewModel.trendingSubreddits.value?.let {
                     setTrendingSubredditsLastUpdated(it)

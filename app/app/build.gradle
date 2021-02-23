@@ -131,8 +131,18 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.7.22'
 
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    // androidx.test
+    def androidx_test = "1.1.2"
+    androidTestImplementation "androidx.test:runner:$androidx_test"
+    androidTestImplementation "androidx.test:core:$androidx_test"
+    androidTestImplementation "androidx.test:core-ktx:$androidx_test"
+    androidTestImplementation "androidx.test.ext:junit:$androidx_test"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$androidx_test"
+
+    // Espresso
+    androidTestImplementation "androidx.test.espresso:espresso-intents:3.3.0"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
     androidTestImplementation 'org.mockito:mockito-android:2.7.22'
 }
 repositories {
