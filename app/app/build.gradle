@@ -135,7 +135,6 @@ dependencies {
     def androidx_test = "1.1.2"
     androidTestImplementation "androidx.test:runner:$androidx_test"
     androidTestImplementation "androidx.test:core:$androidx_test"
-    androidTestImplementation "androidx.test:core-ktx:$androidx_test"
     androidTestImplementation "androidx.test.ext:junit:$androidx_test"
     androidTestImplementation "androidx.test.ext:junit-ktx:$androidx_test"
 
