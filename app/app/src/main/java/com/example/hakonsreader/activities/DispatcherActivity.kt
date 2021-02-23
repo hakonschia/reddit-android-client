@@ -1,20 +1,13 @@
-package com.example.hakonsreader.activites
+package com.example.hakonsreader.activities
 
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.media.Image
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.misc.CreateIntentOptions
 import com.example.hakonsreader.misc.createIntent
-import com.jakewharton.processphoenix.ProcessPhoenix
-import java.util.*
-import kotlin.collections.ArrayList
 
 class DispatcherActivity : AppCompatActivity() {
     companion object {

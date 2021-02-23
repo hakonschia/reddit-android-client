@@ -6,13 +6,9 @@ import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.ActivityOptionsCompat
 import androidx.preference.PreferenceManager
-import com.example.hakonsreader.activites.ImageActivity
-import com.example.hakonsreader.activites.InvalidAccessTokenActivity
+import com.example.hakonsreader.activities.InvalidAccessTokenActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditUser
@@ -26,10 +22,8 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.markwonplugins.*
-import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.misc.SharedPreferencesManager
 import com.example.hakonsreader.misc.TokenManager
-import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
@@ -43,9 +37,7 @@ import io.noties.markwon.image.ImageProps
 import io.noties.markwon.image.picasso.PicassoImagesPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.Cache
 import okhttp3.logging.HttpLoggingInterceptor
 import org.commonmark.node.Image
@@ -53,7 +45,6 @@ import java.io.File
 import java.security.SecureRandom
 import java.util.*
 import java.util.function.Consumer
-import kotlin.collections.HashSet
 
 /**
  * Entry point for the application. Sets up various static variables used throughout the app

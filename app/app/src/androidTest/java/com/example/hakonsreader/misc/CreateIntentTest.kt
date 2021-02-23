@@ -3,7 +3,7 @@ package com.example.hakonsreader.misc
 import android.content.Context
 import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.hakonsreader.activites.*
+import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import org.junit.Test

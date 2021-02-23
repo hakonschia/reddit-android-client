@@ -1,12 +1,10 @@
-package com.example.hakonsreader.activites
+package com.example.hakonsreader.activities
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods

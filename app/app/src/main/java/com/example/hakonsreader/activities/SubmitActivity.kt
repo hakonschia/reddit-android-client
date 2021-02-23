@@ -1,4 +1,4 @@
-package com.example.hakonsreader.activites
+package com.example.hakonsreader.activities
 
 import android.os.Bundle
 import android.text.Editable

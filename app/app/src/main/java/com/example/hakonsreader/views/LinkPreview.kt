@@ -5,13 +5,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.DispatcherActivity
+import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.databinding.LinkPreviewBinding
 import com.example.hakonsreader.misc.CreateIntentOptions
 import com.example.hakonsreader.misc.createIntent

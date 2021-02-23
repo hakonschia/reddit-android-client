@@ -3,9 +3,7 @@ package com.example.hakonsreader.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.*
-import android.widget.Adapter
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -20,8 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.PostActivity
-import com.example.hakonsreader.activites.SubmitActivity
+import com.example.hakonsreader.activities.PostActivity
+import com.example.hakonsreader.activities.SubmitActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.FlairType
 import com.example.hakonsreader.api.enums.PostTimeSort

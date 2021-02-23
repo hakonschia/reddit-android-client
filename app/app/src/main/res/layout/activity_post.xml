@@ -26,7 +26,7 @@
         android:layout_height="match_parent"
         android:background="@color/background"
         app:layoutDescription="@xml/activity_post_xml_parentlayout_scene"
-        tools:context=".activites.PostActivity">
+        tools:context=".activities.PostActivity">
 
         <com.example.hakonsreader.views.Post
             android:id="@+id/post"

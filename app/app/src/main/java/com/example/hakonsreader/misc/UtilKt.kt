@@ -7,7 +7,7 @@ import android.net.Uri
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
-import com.example.hakonsreader.activites.*
+import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.utils.LinkUtils

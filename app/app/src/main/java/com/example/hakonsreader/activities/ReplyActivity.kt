@@ -1,4 +1,4 @@
-package com.example.hakonsreader.activites
+package com.example.hakonsreader.activities
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -9,8 +9,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.ReplyActivity.Companion.LISTING_KEY
-import com.example.hakonsreader.activites.ReplyActivity.Companion.LISTING_KIND_KEY
+import com.example.hakonsreader.activities.ReplyActivity.Companion.LISTING_KEY
+import com.example.hakonsreader.activities.ReplyActivity.Companion.LISTING_KIND_KEY
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.interfaces.ReplyableListing

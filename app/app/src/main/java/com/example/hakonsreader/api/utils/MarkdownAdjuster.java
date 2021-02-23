@@ -1,9 +1,6 @@
 package com.example.hakonsreader.api.utils;
 
 
-import com.example.hakonsreader.activites.ImageActivity;
-
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.hakonsreader.activites
+package com.example.hakonsreader.activities
 
 import android.content.Intent
 import android.content.res.Configuration
@@ -11,7 +11,6 @@ import android.view.View.VISIBLE
 import androidx.activity.viewModels
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.example.hakonsreader.App

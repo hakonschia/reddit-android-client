@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 
 import com.example.hakonsreader.R;
-import com.example.hakonsreader.activites.DispatcherActivity;
+import com.example.hakonsreader.activities.DispatcherActivity;
 
 /**
  * Set this on a textview and then you can potentially open links locally if applicable

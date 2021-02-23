@@ -1,4 +1,4 @@
-package com.example.hakonsreader.activites
+package com.example.hakonsreader.activities
 
 import android.app.AlertDialog
 import android.os.Bundle

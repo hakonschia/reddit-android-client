@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.PostActivity
+import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentProfileBinding

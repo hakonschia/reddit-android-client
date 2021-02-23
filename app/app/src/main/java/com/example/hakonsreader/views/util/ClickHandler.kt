@@ -6,9 +6,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityOptionsCompat
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.ImageActivity
-import com.example.hakonsreader.activites.ProfileActivity
-import com.example.hakonsreader.activites.SubredditActivity
+import com.example.hakonsreader.activities.ImageActivity
+import com.example.hakonsreader.activities.ProfileActivity
+import com.example.hakonsreader.activities.SubredditActivity
 
 /**
  * Opens an activity with the selected subreddit

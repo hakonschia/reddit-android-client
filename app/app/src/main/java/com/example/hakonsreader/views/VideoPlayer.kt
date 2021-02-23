@@ -16,7 +16,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.VideoActivity
+import com.example.hakonsreader.activities.VideoActivity
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.misc.cache

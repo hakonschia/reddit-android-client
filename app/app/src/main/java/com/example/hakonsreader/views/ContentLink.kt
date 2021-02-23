@@ -12,7 +12,7 @@ import androidx.core.util.Pair
 import androidx.viewbinding.ViewBinding
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.DispatcherActivity
+import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding

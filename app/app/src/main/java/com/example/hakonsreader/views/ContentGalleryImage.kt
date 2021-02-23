@@ -4,10 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.FrameLayout
 import com.example.hakonsreader.App
-import com.example.hakonsreader.activites.DispatcherActivity
+import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding

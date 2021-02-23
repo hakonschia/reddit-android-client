@@ -8,12 +8,10 @@ import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.LayoutMatchers.hasEllipsizedText
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.ReplyActivity
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditPost
 import com.google.gson.Gson

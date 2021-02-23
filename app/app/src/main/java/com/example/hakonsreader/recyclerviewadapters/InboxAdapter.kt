@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.BR
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activites.DispatcherActivity
+import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.databinding.InboxCommentBinding
 import com.example.hakonsreader.databinding.InboxMessageBinding

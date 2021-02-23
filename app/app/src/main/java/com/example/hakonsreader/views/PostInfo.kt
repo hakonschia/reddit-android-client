@@ -7,7 +7,7 @@ import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import com.example.hakonsreader.activites.PostActivity
+import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.PostInfoBinding
 import com.example.hakonsreader.views.util.ViewUtil

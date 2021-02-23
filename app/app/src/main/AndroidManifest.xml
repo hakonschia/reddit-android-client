@@ -19,7 +19,7 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
 
-        <activity android:name=".activites.MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,51 +41,51 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".activites.SubredditActivity"
+            android:name=".activities.SubredditActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
-            android:name=".activites.ProfileActivity"
+            android:name=".activities.ProfileActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
-            android:name=".activites.PostActivity"
+            android:name=".activities.PostActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
-            android:name=".activites.ImageActivity"
+            android:name=".activities.ImageActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
-            android:name=".activites.VideoActivity"
+            android:name=".activities.VideoActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
-            android:name=".activites.VideoYoutubeActivity"
+            android:name=".activities.VideoYoutubeActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
 
         <activity
-            android:name=".activites.ReplyActivity"
+            android:name=".activities.ReplyActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".activites.WebViewActivity"
+            android:name=".activities.WebViewActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
-            android:name=".activites.LogInActivity"
+            android:name=".activities.LogInActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
 
         <activity
-            android:name=".activites.SubmitActivity"
-            android:theme="@style/AppTheme.SlidrActivityTheme"
-            android:windowSoftInputMode="adjustPan" />
-
-        <activity
-            android:name=".activites.SendPrivateMessageActivity"
+            android:name=".activities.SubmitActivity"
             android:theme="@style/AppTheme.SlidrActivityTheme"
             android:windowSoftInputMode="adjustPan" />
 
         <activity
-            android:name=".activites.InvalidAccessTokenActivity"
+            android:name=".activities.SendPrivateMessageActivity"
+            android:theme="@style/AppTheme.SlidrActivityTheme"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".activities.InvalidAccessTokenActivity"
             android:theme="@style/AppTheme.DispatcherTheme"/>
 
         <activity
-            android:name=".activites.DispatcherActivity"
+            android:name=".activities.DispatcherActivity"
             android:theme="@style/AppTheme.DispatcherTheme">
 
             <!--
