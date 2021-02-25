@@ -711,10 +711,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         if (standardSubFragment == null) {
             standardSubFragment = StandardSubContainerFragment.newInstance()
-            standardSubFragment!!.restoreState(restoredState)
         }
 
-        standardSubFragment!!.restoreState(restoredState)
+        standardSubFragment!!.restoreState(savedState)
 
         if (activeSubreddit != null) {
             activeSubreddit!!.restoreState(savedState)

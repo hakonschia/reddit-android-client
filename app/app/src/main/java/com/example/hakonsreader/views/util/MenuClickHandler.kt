@@ -5,18 +5,18 @@ import android.app.Dialog
 import android.content.Context
 import android.view.*
 import android.widget.Button
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
-import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
+import com.example.hakonsreader.fragments.PostsFragment
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.TokenManager
+import com.example.hakonsreader.misc.getSortText
+import com.example.hakonsreader.misc.getTimeSortText
 import com.example.hakonsreader.misc.startLoginIntent
 import com.example.hakonsreader.recyclerviewadapters.AccountsAdapter
 import com.github.zawadz88.materialpopupmenu.popupMenu
@@ -115,6 +115,7 @@ fun showAccountManagement(context: Context) {
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
                         removeItem(userInfoClicked)
                         CoroutineScope(IO).launch {
+                            // TODO revoke the token
                             app.userInfoDatabase.userInfo().delete(userInfoClicked)
                         }
                     }
@@ -158,41 +159,19 @@ private fun showApplicationPrivileges(context: Context, parent: ViewParent) {
  * Shows a popup menu to allow a list to change how it should be sorted. The menu shown here
  * includes time sorts for sorts such as top and controversial
  *
+ * @param postsFragment The fragment to update the sorting for
  * @param view The view clicked. If this view is not a child of a fragment or activity implementing
  * [SortableWithTime] nothing is done
  */
-fun showPopupSortWithTime(view: View) {
-    val f = FragmentManager.findFragment<Fragment>(view)
+fun showPopupSortWithTime(postsFragment: PostsFragment, view: View) {
     val context = view.context
-    val sortable: SortableWithTime = if (f is SortableWithTime) {
-        f
-    } else if (context is SortableWithTime) {
-        context
-    } else {
-        return
-    }
-
-    val sortText = when (sortable.currentSort()) {
-        SortingMethods.NEW -> context.getString(R.string.sortNew)
-        SortingMethods.HOT -> context.getString(R.string.sortHot)
-        SortingMethods.TOP -> context.getString(R.string.sortTop)
-        SortingMethods.CONTROVERSIAL -> context.getString(R.string.sortControversial)
-    }
-
-    val timeSortText = when (sortable.currentTimeSort()) {
-        PostTimeSort.HOUR -> context.getString(R.string.sortNow)
-        PostTimeSort.DAY -> context.getString(R.string.sortToday)
-        PostTimeSort.WEEK -> context.getString(R.string.sortWeek)
-        PostTimeSort.MONTH -> context.getString(R.string.sortMonth)
-        PostTimeSort.YEAR -> context.getString(R.string.sortYear)
-        PostTimeSort.ALL_TIME -> context.getString(R.string.sortAllTime)
-        else -> null
-    }
+    val sortText = getSortText(postsFragment.currentSort(), context)
+    val timeSortText = postsFragment.currentTimeSort()?.let { getTimeSortText(it, context) }
 
     val finalTitle = sortText + if (timeSortText != null) " - $timeSortText" else ""
 
     // The submenu sizes look weird if they are too small, so set to fixed 40 % of screen width
-    val submenuSize = App.get().screenWidth * 0.4f
+    val submenuSize = (App.get().screenWidth * 0.4f).toInt()
 
     popupMenu {
         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
@@ -202,11 +181,11 @@ fun showPopupSortWithTime(view: View) {
 
             item {
                 labelRes = R.string.sortNew
-                callback = { sortable.new() }
+                callback = { postsFragment.new() }
             }
             item {
                 labelRes = R.string.sortHot
-                callback = { sortable.hot() }
+                callback = { postsFragment.hot() }
             }
 
             item {
@@ -216,34 +195,34 @@ fun showPopupSortWithTime(view: View) {
                     // Show menu
                     popupMenu {
                         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
-                        fixedContentWidthInPx = submenuSize.toInt()
+                        fixedContentWidthInPx = submenuSize
 
                         section {
                             title = context.getString(R.string.sortTop)
 
                             item {
                                 labelRes = R.string.sortNow
-                                callback = { sortable.top(PostTimeSort.HOUR) }
+                                callback = { postsFragment.top(PostTimeSort.HOUR) }
                             }
                             item {
                                 labelRes = R.string.sortToday
-                                callback = { sortable.top(PostTimeSort.DAY) }
+                                callback = { postsFragment.top(PostTimeSort.DAY) }
                             }
                             item {
                                 labelRes = R.string.sortWeek
-                                callback = { sortable.top(PostTimeSort.WEEK) }
+                                callback = { postsFragment.top(PostTimeSort.WEEK) }
                             }
                             item {
                                 labelRes = R.string.sortMonth
-                                callback = { sortable.top(PostTimeSort.MONTH) }
+                                callback = { postsFragment.top(PostTimeSort.MONTH) }
                             }
                             item {
                                 labelRes = R.string.sortYear
-                                callback = { sortable.top(PostTimeSort.YEAR) }
+                                callback = { postsFragment.top(PostTimeSort.YEAR) }
                             }
                             item {
                                 labelRes = R.string.sortAllTime
-                                callback = { sortable.top(PostTimeSort.ALL_TIME) }
+                                callback = { postsFragment.top(PostTimeSort.ALL_TIME) }
                             }
                         }
                     }.show(context, view)
@@ -256,34 +235,34 @@ fun showPopupSortWithTime(view: View) {
                 callback = {
                     popupMenu {
                         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
-                        fixedContentWidthInPx = submenuSize.toInt()
+                        fixedContentWidthInPx = submenuSize
 
                         section {
                             title = context.getString(R.string.sortControversial)
 
                             item {
                                 labelRes = R.string.sortNow
-                                callback = { sortable.controversial(PostTimeSort.HOUR) }
+                                callback = { postsFragment.controversial(PostTimeSort.HOUR) }
                             }
                             item {
                                 labelRes = R.string.sortToday
-                                callback = { sortable.controversial(PostTimeSort.DAY) }
+                                callback = { postsFragment.controversial(PostTimeSort.DAY) }
                             }
                             item {
                                 labelRes = R.string.sortWeek
-                                callback = { sortable.controversial(PostTimeSort.WEEK) }
+                                callback = { postsFragment.controversial(PostTimeSort.WEEK) }
                             }
                             item {
                                 labelRes = R.string.sortMonth
-                                callback = { sortable.controversial(PostTimeSort.MONTH) }
+                                callback = { postsFragment.controversial(PostTimeSort.MONTH) }
                             }
                             item {
                                 labelRes = R.string.sortYear
-                                callback = { sortable.controversial(PostTimeSort.YEAR) }
+                                callback = { postsFragment.controversial(PostTimeSort.YEAR) }
                             }
                             item {
                                 labelRes = R.string.sortAllTime
-                                callback = { sortable.controversial(PostTimeSort.ALL_TIME) }
+                                callback = { postsFragment.controversial(PostTimeSort.ALL_TIME) }
                             }
                         }
                     }.show(context, view)

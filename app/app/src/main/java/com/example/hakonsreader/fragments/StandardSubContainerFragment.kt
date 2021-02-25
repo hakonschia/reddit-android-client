@@ -159,7 +159,9 @@ class StandardSubContainerFragment : Fragment() {
      *
      * @param state The bundle holding the stored state
      */
-    fun restoreState(state: Bundle?) = state?.let { saveState = it }
+    fun restoreState(state: Bundle?) {
+        saveState = state
+    }
 
     /**
      * Saves the state of the fragments to a bundle. Restore the state with [restoreState]

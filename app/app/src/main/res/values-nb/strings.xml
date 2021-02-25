@@ -400,4 +400,6 @@
     <string name="content_description_downvote">Stem ned</string>
     <string name="prefs_group_subreddits">Subredditer</string>
     <string name="prefs_title_subreddits_load_banners">Vis bannere</string>
+    <string name="subredditPostsPageTitle">Poster</string>
+    <string name="subredditWikiPageTitle">Wiki</string>
 </resources>

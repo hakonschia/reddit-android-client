@@ -2,13 +2,11 @@ package com.example.hakonsreader.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.*
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -18,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.activities.SubmitActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.FlairType
@@ -26,31 +23,22 @@ import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
-import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
-import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
-import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
-import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.Util
-import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
-import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
-import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
 import com.example.hakonsreader.viewmodels.SubredditRulesViewModel
 import com.example.hakonsreader.viewmodels.SubredditViewModel
-import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
-import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.util.ViewUtil
-import com.google.gson.Gson
+import com.example.hakonsreader.views.util.showPopupSortWithTime
 import com.robinhood.ticker.TickerUtils
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
@@ -60,7 +48,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
 
-class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservable {
+class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
     companion object {
         private const val TAG = "SubredditFragment"
@@ -69,21 +57,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
          * The key stored in [getArguments] saying the name the subreddit is for
          */
         private const val SUBREDDIT_NAME_KEY = "subredditName"
-
-        private const val FIRST_VIEW_STATE_STORED_KEY = "first_view_state_stored"
-        private const val LAST_VIEW_STATE_STORED_KEY = "last_view_state_stored"
-        private const val VIEW_STATE_STORED_KEY = "view_state_stored"
-
-        /**
-         * The key used to store the post IDs the fragment is showing
-         */
-        private const val POST_IDS_KEY = "post_ids"
-
-        /**
-         * The key used to store the state of [postsLayoutManager]
-         */
-        private const val LAYOUT_STATE_KEY = "layout_state"
-
 
         /**
          * The key used in [getArguments] for how to sort the posts when loading this subreddit
@@ -98,6 +71,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
          * The value with this key should be the value of corresponding enum value from [PostTimeSort]
          */
         private const val TIME_SORT = "time_sort"
+
+        private const val POSTS_TAG = "posts_subreddit"
 
         /**
          * The key used to [getArguments] if the subreddit rules should automatically be shown
@@ -129,7 +104,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var _binding: FragmentSubredditBinding? = null
     private val binding get() = _binding!!
     private var saveState: Bundle? = null
-    private var postIds = ArrayList<String>()
     private var isDefaultSubreddit = false
 
     val subredditName by lazy {
@@ -138,17 +112,14 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     private var subreddit: Subreddit? = null
     private var subredditViewModel: SubredditViewModel? = null
 
-    private var postsViewModel: PostsViewModel? = null
-    private var postsAdapter: PostsAdapter? = null
-    private var postsLayoutManager: LinearLayoutManager? = null
-    private var postsScrollListener: PostScrollListener? = null
-
     private var rulesViewModel: SubredditRulesViewModel? = null
     private var rulesAdapter: SubredditRulesAdapter? = null
     private var rulesLayoutManager: LinearLayoutManager? = null
 
     private var flairsViewModel: SubredditFlairsViewModel? = null
     private var flairsAdapter: RedditFlairAdapter? = null
+
+    private var postsFragment: PostsFragment? = null
 
     /**
      * A DrawerListener for the drawer with subreddit info
@@ -165,63 +136,22 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
         isDefaultSubreddit = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
 
         setupBinding()
-        setupPostsList()
         setupSubredditViewModel()
-        setupSubmitPostFab()
 
         // Default subs don't have rules/flairs/info in drawers (could potentially add a tiny description
         // of the different default subs in the info)
         if (!isDefaultSubreddit) {
             setupRulesList()
-
             automaticallyOpenDrawerIfSet()
         } else {
-            setupPostsViewModel(subredditName)
+            // Is default subreddit, we can create the fragment now since it will never change
+            // (if it is "random" it could change later, so initialize it later)
+            createAndAddPostsFragment(subredditName)
         }
 
         App.get().registerPrivateBrowsingObservable(this)
 
-        // TODO if you go to settings, rotate and change theme, then the IDs wont be saved. The subreddit will be notified about
-        //  the first change, save the state, but the state isn't restored again for the second save since it's restored here
-        //  so there's nothing to restore. saveState() should use the bundle "saveState"
-        saveState?.let {
-            val ids = it.getStringArrayList(saveKey(POST_IDS_KEY))
-            if (ids != null) {
-                postIds = ids
-                postsViewModel?.postIds = ids
-            }
-        }
-
         return binding.root
-    }
-
-    /**
-     * Checks if there are posts already loaded. If there are no posts loaded [postsViewModel]
-     * is notified to load posts automatically
-     */
-    override fun onResume() {
-        super.onResume()
-
-        // If the fragment is selected without any posts load posts automatically
-        if (postsAdapter?.itemCount == 0) {
-            // Starting from scratch
-            if (postIds.isEmpty()) {
-                val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
-                val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
-
-                postsViewModel?.loadPosts(sort, timeSort)
-            } else {
-                // Post IDs restored, set those
-                postsViewModel?.postIds = postIds
-            }
-        }
-
-        restoreViewHolderStates()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        saveViewHolderStates()
     }
 
     override fun onDestroyView() {
@@ -229,90 +159,26 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
         App.get().unregisterPrivateBrowsingObservable(this)
 
-        postsAdapter?.let {
-            // Ensure that all videos are cleaned up
-            for (i in 0 until it.itemCount) {
-                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
-                viewHolder?.destroy()
-            }
-
-            it.lifecycleOwner = null
-        }
-
         _binding = null
     }
 
     /**
-     * Saves the state of the visible ViewHolders to [saveState]
+     * Gets the [PostsFragment] holding the posts for this subreddit
      *
-     * @see restoreViewHolderStates
+     * @return The fragment holding the posts, or null if no fragment was found or if the [SubredditFragment]
+     * isn't attached
      */
-    private fun saveViewHolderStates() {
-        if (saveState == null) {
-            saveState = Bundle()
+    private fun getPostsFragment() : PostsFragment? {
+        // If the outer (this) fragment hasn't been added yet then the childFragmentManager will not be able to do anything
+        if (!isAdded) {
+            return null
         }
 
-        // TODO this should make use of the states stored by the adapter as that will have state
-        //  for all previous posts, not just the visible ones (although we still have to call onUnselected to pause videos etc)
-        saveState?.let { saveBundle ->
-            // It's probably not necessary to loop through all, but ViewHolders are still active even when not visible
-            // so just getting firstVisible and lastVisible probably won't be enough
-            for (i in 0 until postsAdapter?.itemCount!!) {
-                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
-
-                if (viewHolder != null) {
-                    val extras = viewHolder.getExtras()
-                    saveBundle.putBundle(saveKey(VIEW_STATE_STORED_KEY + i), extras)
-                    viewHolder.onUnselected()
-                }
-            }
-
-            postsLayoutManager?.let {
-                val firstVisible = it.findFirstVisibleItemPosition()
-                val lastVisible = it.findLastVisibleItemPosition()
-
-                saveBundle.putInt(saveKey(FIRST_VIEW_STATE_STORED_KEY), firstVisible)
-                saveBundle.putInt(saveKey(LAST_VIEW_STATE_STORED_KEY), lastVisible)
-            }
-        }
+        val fragment = childFragmentManager.findFragmentByTag(POSTS_TAG)
+        return if (fragment is PostsFragment) {
+            fragment
+        } else null
     }
-
-    /**
-     * Restores the state of the visible ViewHolders based on [saveState]
-     *
-     * @see saveViewHolderStates
-     */
-    private fun restoreViewHolderStates() {
-        saveState?.let {
-            val firstVisible = it.getInt(saveKey(FIRST_VIEW_STATE_STORED_KEY))
-            val lastVisible = it.getInt(saveKey(LAST_VIEW_STATE_STORED_KEY))
-
-            for (i in firstVisible..lastVisible) {
-                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
-
-                if (viewHolder != null) {
-                    // If the view has been destroyed the ViewHolders haven't been created yet
-                    val extras = it.getBundle(saveKey(VIEW_STATE_STORED_KEY + i))
-                    if (extras != null) {
-                        viewHolder.setExtras(extras)
-                    }
-                }
-            }
-        }
-    }
-
-
-    /**
-     * Converts a base key into a unique key for this subreddit, so that the subreddit state can be
-     * stored in a global bundle holding states for multiple subreddits
-     *
-     * @param baseKey The base key to use
-     * @return A key unique to this subreddit
-     */
-    private fun saveKey(baseKey: String) : String {
-        return baseKey + "_" + subredditName
-    }
-
     /**
      * Saves the state of the fragment to a bundle. Restore the state with [restoreState]
      *
@@ -320,12 +186,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * @see restoreState
      */
     fun saveState(saveState: Bundle) {
-        // If no items in the list it's no point in saving any state
-        if (postIds.isEmpty()) {
-            return
+        val fragment = getPostsFragment()
+        if (fragment is PostsFragment) {
+            fragment.saveState(saveState)
         }
-        saveState.putStringArrayList(saveKey(POST_IDS_KEY), postIds)
-        postsLayoutManager?.let { saveState.putParcelable(saveKey(LAYOUT_STATE_KEY), it.onSaveInstanceState()) }
     }
 
     /**
@@ -333,17 +197,53 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * way that doesn't permit the fragment to store its own state
      *
      * @param state The bundle holding the stored state
-     * @see saveState
      */
     fun restoreState(state: Bundle?) {
-        // Might be asking for trouble by doing overriding saveState like this? This function
-        // is meant to only be called when there is no saved state by the fragment
-        if (state != null) {
-            postIds = state.getStringArrayList(saveKey(POST_IDS_KEY)) ?: ArrayList()
-        }
         saveState = state
+
+        val fragment = getPostsFragment()
+        if (fragment is PostsFragment) {
+            fragment.restoreState(saveState)
+        }
     }
 
+    /**
+     * Creates a [PostsFragment] and adds it to [getChildFragmentManager]
+     *
+     * @param name The name of the subreddit the posts are for
+     */
+    private fun createAndAddPostsFragment(name: String) {
+        // TODO this will mess up configuration changes probably (if refreshed it wont use the current)
+        //  and probably if the sort is changed and then scrolled further it would revert to the original when
+        //  getting new posts
+        val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
+        val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
+
+        if (postsFragment == null) {
+            postsFragment = PostsFragment.newInstance(
+                    isForUser = false,
+                    name = name,
+                    sort = sort,
+                    timeSort = timeSort
+            ).apply {
+                // TODO saveState is null when coming from the standard subs
+                restoreState(saveState)
+
+                onError = { error, throwable ->
+                    handleErrors(error, throwable)
+                }
+                onLoadingChange = {
+                    _binding?.loadingIcon?.onCountChange(it)
+                }
+            }
+        }
+
+        childFragmentManager.beginTransaction()
+                .replace(R.id.postsContainer, postsFragment!!, POSTS_TAG)
+                .commit()
+
+        setupSubmitPostFab(postsFragment!!)
+    }
 
     /**
      * Inflates and sets up [binding]
@@ -357,21 +257,17 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
             }
 
-            subredditRefresh.setOnClickListener { refreshPosts() }
+            subredditRefresh.setOnClickListener { getPostsFragment()?.refreshPosts() }
+            subredditSort.setOnClickListener { view ->
+                getPostsFragment()?.let {
+                    showPopupSortWithTime(it, view)
+                }
+            }
+
             subscribe.setOnClickListener { subscribeOnclick() }
             subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }
 
             subredditSubscribers.setCharacterLists(TickerUtils.provideNumberList())
-
-            postsRefreshLayout.setOnRefreshListener {
-                refreshPosts()
-
-                // The refreshing will be visible with our own progress bar
-                postsRefreshLayout.isRefreshing = false
-            }
-            postsRefreshLayout.setProgressBackgroundColorSchemeColor(
-                    ContextCompat.getColor(requireContext(), R.color.colorAccent)
-            )
 
             drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
@@ -409,7 +305,8 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 }
             })
 
-            // This is just to show a title until the info has been properly loaded
+            // This is just to show a title until the info has been properly loaded, it might change
+            // for instance if the capitalization is different, or for r/random
             this.subreddit = Subreddit().apply { name = subredditName }
             (requireActivity() as AppCompatActivity).setSupportActionBar(subredditToolbar)
         }
@@ -445,7 +342,9 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     return@observe
                 }
 
-                setupPostsViewModel(it.name)
+                // TODO check if it is NSFW, if it is show a warning (this should also be a setting
+                //  ie. "Warn about NSFW subreddits"
+                createAndAddPostsFragment(it.name)
                 setupRulesViewModel(it.name)
                 setupFlairsViewModel(it.name)
 
@@ -465,7 +364,7 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 setBannerImage()
 
                 binding.subreddit = it
-                postsAdapter?.hideScoreTime = it.hideScoreTime
+                //postsAdapter?.hideScoreTime = it.hideScoreTime
             }
 
             loading.observe(viewLifecycleOwner) {
@@ -476,51 +375,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                 handleErrors(it.error, it.throwable)
             }
         }
-    }
-
-    /**
-     * Sets up [FragmentSubredditBinding.posts] and [postsAdapter]/[postsLayoutManager]
-     */
-    private fun setupPostsList() {
-        postsAdapter = PostsAdapter().apply {
-            lifecycleOwner = viewLifecycleOwner
-
-            binding.posts.adapter = this
-            onVideoManuallyPaused = OnVideoManuallyPaused { contentVideo ->
-                // Ignore post when scrolling if manually paused
-                postsScrollListener?.setPostToIgnore(contentVideo.redditPost?.id)
-            }
-
-            onVideoFullscreenListener = OnVideoFullscreenListener { contentVideo ->
-                // Ignore post when scrolling if it has been fullscreened
-                postsScrollListener?.setPostToIgnore(contentVideo.redditPost?.id)
-            }
-
-            onPostClicked = PostsAdapter.OnPostClicked { post ->
-                // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
-                // autoplay the video
-                val redditPost = post.redditPost
-                postsScrollListener?.setPostToIgnore(redditPost?.id)
-
-                val intent = Intent(context, PostActivity::class.java).apply {
-                    putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))
-                    putExtra(Content.EXTRAS, post.extras)
-                    putExtra(PostActivity.HIDE_SCORE_KEY, post.hideScore)
-                }
-
-                // Only really applicable for videos, as they should be paused
-                post.viewUnselected()
-
-                val activity = requireActivity()
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())
-                activity.startActivity(intent, options.toBundle())
-            }
-        }
-
-        postsLayoutManager = LinearLayoutManager(context).apply { binding.posts.layoutManager = this }
-
-        postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }
-        binding.posts.setOnScrollChangeListener(postsScrollListener)
     }
 
     private fun setupRulesList() {
@@ -609,10 +463,10 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      * then a scroll listener is added to [FragmentSubredditBinding.posts] to automatically show/hide the FAB
      * when scrolling, and an onClickListener is set to the fab to open a [SubmitActivity]
      */
-    private fun setupSubmitPostFab() {
-        if (!RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())) {
+    private fun setupSubmitPostFab(postsFragment: PostsFragment) {
+        if (!isDefaultSubreddit) {
             binding.let {
-                it.posts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                postsFragment.addScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
                         if (dy > 0) {
@@ -630,55 +484,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Sets up [postsViewModel]
-     *
-     * @param name The name of the subreddit the ViewModel is for
-     */
-    private fun setupPostsViewModel(name: String) {
-        postsViewModel = ViewModelProvider(this, PostsFactory(
-                name,
-                false
-        )).get(PostsViewModel::class.java).apply {
-            getPosts().observe(viewLifecycleOwner, { posts ->
-                // Store the updated post IDs right away
-                this@SubredditFragment.postIds = postIds as ArrayList<String>
-
-                // Posts have been cleared, clear the adapter and clear the layout manager state
-                if (posts.isEmpty()) {
-                    postsAdapter?.clearPosts()
-                    postsLayoutManager = LinearLayoutManager(context)
-                    return@observe
-                }
-
-                val previousSize = postsAdapter?.itemCount
-                postsAdapter?.submitList(filterPosts(posts))
-
-                if (saveState != null && previousSize == 0) {
-                    val layoutState: Parcelable? = saveState?.getParcelable(saveKey(LAYOUT_STATE_KEY))
-
-                    if (layoutState != null) {
-                        postsLayoutManager?.onRestoreInstanceState(layoutState)
-
-                        // If we're at this point we probably don't want the toolbar expanded
-                        // We get here when the fragment/activity holding the fragment has been restarted
-                        // so it usually looks odd if the toolbar now shows
-                        binding.subredditAppBarLayout.setExpanded(false, false)
-                    }
-                }
-            })
-
-            onLoadingCountChange().observe(viewLifecycleOwner, { up -> _binding?.loadingIcon?.onCountChange(up) })
-            getError().observe(viewLifecycleOwner, { error ->
-                run {
-                    // Error loading posts, reset onEndOfList so it tries again when scrolled
-                    postsScrollListener?.resetOnEndOfList()
-                    handleErrors(error.error, error.throwable)
-                }
-            })
         }
     }
 
@@ -732,18 +537,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
     }
 
     /**
-     * Refreshes the posts in the fragment
-     *
-     * To ensure that no list state is saved and restored, [saveState] is cleared
-     */
-    private fun refreshPosts() {
-        // If the user had previously gone out of the fragment and gone back, refreshing would
-        // restore the list state that was saved at that point, making the list scroll to that point
-        saveState?.clear()
-        postsViewModel?.restart()
-    }
-
-    /**
      * Click listener for the "+ Subscribe/- Unsubscribe" button.
      *
      * Sends an API request to Reddit to subscribe/unsubscribe
@@ -766,26 +559,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
 
         CoroutineScope(IO).launch {
             subredditViewModel?.updateFlair(username, flair)
-        }
-    }
-
-    /**
-     * Filters a list of posts based on [App.subredditsToFilterFromDefaultSubreddits]
-     *
-     * If [isDefaultSubreddit] is false, then the original list is returned
-     *
-     * @param posts The posts to filter
-     * @return The filtered posts, or [posts] if this is not a default subreddit
-     */
-    private fun filterPosts(posts: List<RedditPost>) : List<RedditPost> {
-        return if (isDefaultSubreddit) {
-            val subsToFilter = App.get().subredditsToFilterFromDefaultSubreddits()
-            posts.filter {
-                // Keep the post if the subreddit it is in isn't found in subsToFilter
-                !subsToFilter.contains(it.subreddit.toLowerCase())
-            }
-        } else {
-            posts
         }
     }
 
@@ -892,33 +665,6 @@ class SubredditFragment : Fragment(), SortableWithTime, PrivateBrowsingObservabl
      */
     fun getToolbar() : Toolbar? {
         return _binding?.subredditToolbar
-    }
-
-    override fun new() {
-        postsViewModel?.restart(SortingMethods.NEW)
-    }
-
-    override fun hot() {
-        postsViewModel?.restart(SortingMethods.HOT)
-    }
-
-    override fun top(timeSort: PostTimeSort) {
-        postsViewModel?.restart(SortingMethods.TOP, timeSort)
-    }
-
-    override fun controversial(timeSort: PostTimeSort) {
-        postsViewModel?.restart(SortingMethods.CONTROVERSIAL, timeSort)
-    }
-
-    override fun currentSort(): SortingMethods {
-        return postsViewModel?.sort ?: SortingMethods.HOT
-    }
-
-    override fun currentTimeSort(): PostTimeSort? {
-        return when (postsViewModel?.sort) {
-            SortingMethods.TOP, SortingMethods.CONTROVERSIAL -> postsViewModel?.timeSort
-            else -> null
-        }
     }
 
     override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {

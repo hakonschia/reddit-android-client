@@ -189,20 +189,19 @@
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/posts"
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/postsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                tools:listitem="@layout/list_item_post" />
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
             <com.example.hakonsreader.views.LoadingIcon
                 android:id="@+id/loadingIcon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="4dp"
 
-                app:layout_anchor="@id/posts"
+                app:layout_anchor="@id/appBarLayout"
+                app:layout_anchorGravity="bottom"
                 style="?android:attr/progressBarStyleHorizontal"
 
                 android:indeterminateOnly="true"

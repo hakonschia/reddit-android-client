@@ -7,7 +7,10 @@ import android.net.Uri
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
+import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.*
+import com.example.hakonsreader.api.enums.PostTimeSort
+import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.utils.LinkUtils
@@ -377,5 +380,31 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
                 baseIntent
             }
         }
+    }
+}
+
+/**
+ * Gets a string description of a sorting method
+ */
+fun getSortText(sort: SortingMethods, context: Context) : String {
+    return when (sort) {
+        SortingMethods.NEW -> context.getString(R.string.sortNew)
+        SortingMethods.HOT -> context.getString(R.string.sortHot)
+        SortingMethods.TOP -> context.getString(R.string.sortTop)
+        SortingMethods.CONTROVERSIAL -> context.getString(R.string.sortControversial)
+    }
+}
+
+/**
+ * Gets a string description of a time sorting method
+ */
+fun getTimeSortText(timeSort: PostTimeSort, context: Context) : String {
+    return when (timeSort) {
+        PostTimeSort.HOUR -> context.getString(R.string.sortNow)
+        PostTimeSort.DAY -> context.getString(R.string.sortToday)
+        PostTimeSort.WEEK -> context.getString(R.string.sortWeek)
+        PostTimeSort.MONTH -> context.getString(R.string.sortMonth)
+        PostTimeSort.YEAR -> context.getString(R.string.sortYear)
+        PostTimeSort.ALL_TIME -> context.getString(R.string.sortAllTime)
     }
 }
