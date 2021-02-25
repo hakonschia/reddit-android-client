@@ -67,8 +67,6 @@ class SelectSubredditFragment : Fragment() {
 
     private var _binding: FragmentSelectSubredditBinding? = null
     private val binding get() = _binding!!
-    private val api = App.get().api
-    private val database = App.get().database
 
     private val saveState: Bundle = Bundle()
 
@@ -168,17 +166,23 @@ class SelectSubredditFragment : Fragment() {
      * Initializes [subredditsViewModel] and observes all its values
      */
     private fun setupSubredditsViewModel() {
-        subredditsViewModel.getSubreddits().observe(viewLifecycleOwner, { subreddits ->
-            subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
-        })
+        with (subredditsViewModel) {
+            subreddits.observe(viewLifecycleOwner, { subreddits ->
+                subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
+            })
 
-        subredditsViewModel.getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
-            binding.loadingIcon.onCountChange(onCountChange)
-        })
+            isLoading.observe(viewLifecycleOwner, { isLoading ->
+                binding.loadingIcon.visibility = if (isLoading == true) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            })
 
-        subredditsViewModel.getError().observe(viewLifecycleOwner, { error ->
-            Util.handleGenericResponseErrors(view, error.error, error.throwable)
-        })
+            error.observe(viewLifecycleOwner, { error ->
+                Util.handleGenericResponseErrors(view, error.error, error.throwable)
+            })
+        }
     }
 
     /**
@@ -186,7 +190,7 @@ class SelectSubredditFragment : Fragment() {
      */
     private fun setupSearchViewModel() {
         searchSubredditsViewModel = ViewModelProvider(this).get(SearchForSubredditsViewModel::class.java).apply {
-            getSearchResults().observe(viewLifecycleOwner, { subreddits ->
+            searchResults.observe(viewLifecycleOwner, { subreddits ->
                 binding.searchedSubredditsCount = subreddits.size
 
                 if (subreddits.isEmpty()) {
@@ -199,11 +203,15 @@ class SelectSubredditFragment : Fragment() {
                 searchSubredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(SEARCH_LIST_STATE_KEY))
             })
 
-            getOnCountChange().observe(viewLifecycleOwner, { onCountChange ->
-                binding.loadingIcon.onCountChange(onCountChange)
+            isLoading.observe(viewLifecycleOwner, { onCountChange ->
+                binding.loadingIcon.visibility = if (onCountChange == true) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             })
 
-            getError().observe(viewLifecycleOwner, { error ->
+            error.observe(viewLifecycleOwner, { error ->
                 Util.handleGenericResponseErrors(view, error.error, error.throwable)
             })
         }

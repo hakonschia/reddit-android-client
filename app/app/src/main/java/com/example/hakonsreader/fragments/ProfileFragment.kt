@@ -91,6 +91,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
     private var username: String? = null
     private var isInfoLoaded = false
+    private var isInfoLoading = false
 
     private var postsFragment: PostsFragment? = null
 
@@ -212,7 +213,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
                     }
                 }
                 onLoadingChange = {
-                    _binding?.loadingIcon?.onCountChange(it)
+                    checkLoadingStatus()
                 }
             }
         }
@@ -231,7 +232,8 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     private fun retrieveUserInfo() {
-        binding.loadingIcon.onCountChange(true)
+        // TODO this should be in a new ViewModel for users (and isInfoLoading should be removed completely)
+        isInfoLoading = true
 
         CoroutineScope(IO).launch {
             val name = username
@@ -248,8 +250,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             withContext(Main) {
                 // In case the view has been destroyed before we get a response
                 _binding?.let {
-                    it.loadingIcon.onCountChange(false)
-
                     when (userResponse) {
                         is ApiResponse.Success -> onUserResponse(userResponse.value)
                         is ApiResponse.Error -> {
@@ -259,6 +259,9 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
                 }
             }
         }
+
+        isInfoLoading = false
+        checkLoadingStatus()
     }
 
     /**
@@ -279,6 +282,23 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         createAndAddPostsFragment(newUser.username)
 
         updateViews()
+    }
+
+    /**
+     * Checks all the loading values on the fragment and enables to loading icon accordingly
+     */
+    @Synchronized
+    private fun checkLoadingStatus() {
+        var count = 0
+
+        count += if (postsFragment?.isLoading() == true) 1 else 0
+        count += if (isInfoLoading) 1 else 0
+
+        _binding?.loadingIcon?.visibility = if (count > 0) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
     }
 }
 

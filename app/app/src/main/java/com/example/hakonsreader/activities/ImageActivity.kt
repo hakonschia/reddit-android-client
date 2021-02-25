@@ -2,6 +2,7 @@ package com.example.hakonsreader.activities
 
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
@@ -79,7 +80,7 @@ class ImageActivity : BaseActivity() {
 
             binding.image.setOnDoubleTapListener(PhotoViewDoubleTapListener(attacher, slidrInterface))
             imageUrl = LinkUtils.convertToDirectUrl(imageUrl)
-            binding.loadingIcon.onCountChange(true)
+            binding.loadingIcon.visibility = View.VISIBLE
 
             val cache = data.getBoolean(CACHE_IMAGE, true)
 
@@ -89,11 +90,12 @@ class ImageActivity : BaseActivity() {
                     .cache(cache)
                     .into(binding.image, object : Callback {
                         override fun onSuccess() {
-                            binding.loadingIcon.onCountChange(false)
+                            binding.loadingIcon.visibility = View.VISIBLE
+                            binding.loadingIcon.visibility = View.GONE
                         }
 
                         override fun onError(e: Exception) {
-                            binding.loadingIcon.onCountChange(false)
+                            binding.loadingIcon.visibility = View.GONE
                             e.printStackTrace()
                             AlertDialog.Builder(this@ImageActivity)
                                     .setTitle(R.string.imageLoadFailedDialogTitle)

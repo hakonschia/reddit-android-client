@@ -1,7 +1,6 @@
 package com.example.hakonsreader.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.persistence.RedditPostsDao
@@ -22,7 +21,7 @@ class SubredditViewModel(
 
     val subreddit = repo.getSubreddit()
     val errors = repo.errors
-    val loading = repo.loading
+    val isLoading = repo.isLoading
 
     /**
      * Update the subscription on a subreddit

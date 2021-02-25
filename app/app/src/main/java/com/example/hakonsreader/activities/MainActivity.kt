@@ -835,21 +835,23 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * [loadSubreddits] is automatically called
      */
     private fun setupNavDrawer() {
-        subredditsViewModel.getSubreddits().observe(this@MainActivity, { subreddits ->
-            subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
-        })
+        with (subredditsViewModel) {
+            subreddits.observe(this@MainActivity, { subreddits ->
+                subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
+            })
 
-        subredditsViewModel.getOnCountChange().observe(this@MainActivity) {
-            binding.navDrawer.subredditsLoader.visibility = if (it) {
-                View.VISIBLE
-            } else {
-                View.GONE
+            isLoading.observe(this@MainActivity) {
+                binding.navDrawer.subredditsLoader.visibility = if (it) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             }
-        }
 
-        subredditsViewModel.getError().observe(this@MainActivity, { error ->
-            Util.handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable)
-        })
+            error.observe(this@MainActivity, { error ->
+                Util.handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable)
+            })
+        }
 
         with(trendingSubredditsViewModel) {
             trendingSubreddits.observe(this@MainActivity) { trending ->
@@ -860,7 +862,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 setTrendingSubredditsLastUpdated(trending)
             }
 
-            onCountchange.observe(this@MainActivity) {
+            isLoading.observe(this@MainActivity) {
                 binding.navDrawer.trendingSubredditsLoader.visibility = if (it) {
                     View.VISIBLE
                 } else {

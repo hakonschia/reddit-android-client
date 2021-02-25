@@ -30,9 +30,9 @@ class PostsViewModel(
     private val database = App.get().database
     private val api = App.get().api
 
-    private val posts = MutableLiveData<List<RedditPost>>()
-    private val loadingChange = MutableLiveData<Boolean>()
-    private val error = MutableLiveData<ErrorWrapper>()
+    private val _posts = MutableLiveData<List<RedditPost>>()
+    private val _loadingChange = MutableLiveData<Boolean>()
+    private val _error = MutableLiveData<ErrorWrapper>()
 
     var sort: SortingMethods = SortingMethods.HOT
         private set
@@ -41,45 +41,12 @@ class PostsViewModel(
 
     /**
      * The post IDs refer to the IDs of the posts this ViewModel is currently tracking.
-     *
-     * Setting this value will retrieve the posts from the local database and set the value on [posts]
      */
     var postIds = mutableListOf<String>()
-        set(value) {
-            field = value
 
-            CoroutineScope(IO).launch {
-                val postsFromDb = database.posts().getPostsById(value)
-                val sorted = ArrayList<RedditPost>()
-
-                value.forEach {
-                    val post = findPost(postsFromDb, it)
-                    if (post != null) {
-                        sorted.add(post)
-                        val crosspostIds = post.crosspostIds
-                        if (crosspostIds?.isNotEmpty() == true) {
-                           post.crossposts = database.posts().getPostsById(crosspostIds)
-                        }
-                    }
-                }
-
-                posts.postValue(sorted)
-            }
-        }
-
-    private fun findPost(list: List<RedditPost>, id: String) : RedditPost? {
-        list.forEach {
-            if (it.id == id) {
-                return it
-            }
-        }
-
-        return null
-    }
-
-    fun getPosts() : LiveData<List<RedditPost>> = posts
-    fun onLoadingCountChange() : LiveData<Boolean> = loadingChange
-    fun getError() : LiveData<ErrorWrapper> = error
+    val posts: LiveData<List<RedditPost>> = _posts
+    val onLoadingCountChange: LiveData<Boolean> = _loadingChange
+    val error: LiveData<ErrorWrapper> = _error
 
 
     /**
@@ -87,7 +54,7 @@ class PostsViewModel(
      */
     fun restart() {
         postIds.clear()
-        posts.value = ArrayList<RedditPost>()
+        _posts.value = ArrayList<RedditPost>()
         loadPosts(sort, timeSort)
     }
 
@@ -133,18 +100,18 @@ class PostsViewModel(
      * @param count The amount of posts already seen
      */
     private fun load(after: String, count: Int) {
-        loadingChange.value = true
+        _loadingChange.value = true
         CoroutineScope(IO).launch {
             val resp = if (isUser) {
                 api.user(userOrSubredditName).posts(sort, timeSort, after, count)
             } else {
                 api.subreddit(userOrSubredditName).posts(sort, timeSort, after, count)
             }
-            loadingChange.postValue(false)
+            _loadingChange.postValue(false)
 
             when (resp) {
                 is ApiResponse.Success -> onPostsRetrieved(resp.value)
-                is ApiResponse.Error -> error.postValue(ErrorWrapper(resp.error, resp.throwable))
+                is ApiResponse.Error -> _error.postValue(ErrorWrapper(resp.error, resp.throwable))
             }
         }
     }
@@ -172,7 +139,7 @@ class PostsViewModel(
             newPosts
         }
 
-        posts.postValue(postsData)
+        _posts.postValue(postsData)
 
         // Inserting posts sometimes causes ConcurrentModificationException, so only insert posts
         // at the end instead of in the loop and at the end to try and fix it

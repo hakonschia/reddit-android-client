@@ -12,7 +12,6 @@ import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.viewmodels.ErrorWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class SubredditRepository(
@@ -29,10 +28,10 @@ class SubredditRepository(
     }
 
     private val _errors = MutableLiveData<ErrorWrapper>()
-    private val _loading = MutableLiveData<Boolean>()
+    private val _isLoading = MutableLiveData<Boolean>()
 
     val errors = _errors as LiveData<ErrorWrapper>
-    val loading = _loading as LiveData<Boolean>
+    val isLoading = _isLoading as LiveData<Boolean>
 
     fun getSubreddit() : LiveData<Subreddit?> {
         if (!infoLoaded) {
@@ -47,7 +46,7 @@ class SubredditRepository(
     }
 
     suspend fun refresh() {
-        _loading.postValue(true)
+        _isLoading.postValue(true)
 
         when (val resp = api.info()) {
             is ApiResponse.Success -> {
@@ -66,7 +65,7 @@ class SubredditRepository(
             }
         }
 
-        _loading.postValue(false)
+        _isLoading.postValue(false)
     }
 
     /**

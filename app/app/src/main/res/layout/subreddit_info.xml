@@ -247,7 +247,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
-            <com.example.hakonsreader.views.LoadingIcon
+            <ProgressBar
                 android:id="@+id/rulesloadingIcon"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="0dp"

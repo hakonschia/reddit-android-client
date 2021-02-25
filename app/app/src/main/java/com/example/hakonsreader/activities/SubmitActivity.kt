@@ -198,7 +198,7 @@ class SubmitActivity : BaseActivity() {
                 }
             }
             // There won't be anything else causing this to loader to load so this is safe
-            loading.observe(this@SubmitActivity) {
+            isLoading.observe(this@SubmitActivity) {
                 binding.submissionFlairLoadingIcon.visibility = if (it) {
                     VISIBLE
                 } else {
@@ -470,14 +470,14 @@ class SubmitActivity : BaseActivity() {
          */
         private fun getPostInfo(id: String) {
             (context as AppCompatActivity).runOnUiThread {
-                binding?.crosspostLoadingIcon?.onCountChange(true)
+                binding?.crosspostLoadingIcon?.visibility = VISIBLE
             }
 
             CoroutineScope(IO).launch {
                 val resp = api.post(id).info()
 
                 withContext(Main) {
-                    binding?.crosspostLoadingIcon?.onCountChange(false)
+                    binding?.crosspostLoadingIcon?.visibility = GONE
                 }
 
                 when (resp) {

@@ -16,11 +16,11 @@ class TrendingSubredditsViewModel : ViewModel() {
     // Although the request is a very low request so it isn't like it's very data intensive
 
     private val _trendingSubreddits = MutableLiveData<TrendingSubreddits>()
-    private val _onCountChange = MutableLiveData<Boolean>()
+    private val _isLoading = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<ErrorWrapper>()
 
     val trendingSubreddits: LiveData<TrendingSubreddits> = _trendingSubreddits
-    val onCountchange: LiveData<Boolean> = _onCountChange
+    val isLoading: LiveData<Boolean> = _isLoading
     val error: LiveData<ErrorWrapper> = _error
 
     /**
@@ -30,7 +30,7 @@ class TrendingSubredditsViewModel : ViewModel() {
         val api = App.get().api
 
         CoroutineScope(IO).launch {
-            _onCountChange.postValue(true)
+            _isLoading.postValue(true)
 
             when (val resp = api.subreditts().trending()) {
                 is ApiResponse.Success -> {
@@ -40,7 +40,7 @@ class TrendingSubredditsViewModel : ViewModel() {
                     _error.postValue(ErrorWrapper(resp.error, resp.throwable))
                 }
             }
-            _onCountChange.postValue(false)
+            _isLoading.postValue(false)
         }
     }
 }

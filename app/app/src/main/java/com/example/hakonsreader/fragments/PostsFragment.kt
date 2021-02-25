@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -74,7 +75,7 @@ class PostsFragment : Fragment(), SortableWithTime {
     private var _binding: FragmentPostsBinding? = null
     private val binding get() = _binding!!
 
-    private var postsViewModel: PostsViewModel? = null
+    private val postsViewModel: PostsViewModel by viewModels { PostsFactory(name, isForUser) }
     private var postsAdapter: PostsAdapter? = null
     private var postsLayoutManager: LinearLayoutManager? = null
     private var postsScrollListener: PostScrollListener? = null
@@ -98,6 +99,8 @@ class PostsFragment : Fragment(), SortableWithTime {
 
     /**
      * Callback for when posts have started/finished loading
+     *
+     * @see isLoading
      */
     var onLoadingChange: ((Boolean) -> Unit)? = null
 
@@ -111,7 +114,7 @@ class PostsFragment : Fragment(), SortableWithTime {
 
         setupBinding()
         setupPostsList()
-        setupPostsViewModel(name, isForUser)
+        setupPostsViewModel()
 
         return binding.root
     }
@@ -128,7 +131,7 @@ class PostsFragment : Fragment(), SortableWithTime {
             val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
             val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
 
-            postsViewModel?.loadPosts(sort, timeSort)
+            postsViewModel.loadPosts(sort, timeSort)
         }
     }
 
@@ -168,6 +171,11 @@ class PostsFragment : Fragment(), SortableWithTime {
             binding.posts.addOnScrollListener(listener)
         }
     }
+
+    /**
+     * @return True if the posts are currently loading, false otherwise
+     */
+    fun isLoading() = postsViewModel.onLoadingCountChange.value ?: false
 
     private fun setupBinding() {
         with (binding) {
@@ -232,21 +240,16 @@ class PostsFragment : Fragment(), SortableWithTime {
         }
 
         postsLayoutManager = LinearLayoutManager(context).apply { binding.posts.layoutManager = this }
-        postsScrollListener = PostScrollListener(binding.posts) { postsViewModel?.loadPosts() }
+        postsScrollListener = PostScrollListener(binding.posts) { postsViewModel.loadPosts() }
         binding.posts.setOnScrollChangeListener(postsScrollListener)
     }
 
     /**
-     * Sets up [postsViewModel]
-     *
-     * @param name The name of the subreddit the ViewModel is for
+     * Observes values on [postsViewModel]
      */
-    private fun setupPostsViewModel(name: String, isForUser: Boolean) {
-        postsViewModel = ViewModelProvider(this, PostsFactory(
-                name,
-                isForUser
-        )).get(PostsViewModel::class.java).apply {
-            getPosts().observe(viewLifecycleOwner, { posts ->
+    private fun setupPostsViewModel() {
+        with (postsViewModel) {
+            posts.observe(viewLifecycleOwner, { posts ->
                 // Posts have been cleared, clear the adapter and clear the layout manager state
                 if (posts.isEmpty()) {
                     postsAdapter?.clearPosts()
@@ -257,8 +260,8 @@ class PostsFragment : Fragment(), SortableWithTime {
                 postsAdapter?.submitList(filterPosts(posts))
             })
 
-            onLoadingCountChange().observe(viewLifecycleOwner, { onLoadingChange?.invoke(it) })
-            getError().observe(viewLifecycleOwner, { error ->
+            onLoadingCountChange.observe(viewLifecycleOwner, { onLoadingChange?.invoke(it) })
+            error.observe(viewLifecycleOwner, { error ->
                 // Error loading posts, reset onEndOfList so it tries again when scrolled
                 postsScrollListener?.resetOnEndOfList()
                 onError?.invoke(error.error, error.throwable)
@@ -291,34 +294,34 @@ class PostsFragment : Fragment(), SortableWithTime {
      * Refreshes the posts in the fragment
      */
     fun refreshPosts() {
-        postsViewModel?.restart()
+        postsViewModel.restart()
     }
 
     override fun new() {
-        postsViewModel?.restart(SortingMethods.NEW)
+        postsViewModel.restart(SortingMethods.NEW)
     }
 
     override fun hot() {
-        postsViewModel?.restart(SortingMethods.HOT)
+        postsViewModel.restart(SortingMethods.HOT)
     }
 
     override fun top(timeSort: PostTimeSort) {
-        postsViewModel?.restart(SortingMethods.TOP, timeSort)
+        postsViewModel.restart(SortingMethods.TOP, timeSort)
     }
 
     override fun controversial(timeSort: PostTimeSort) {
-        postsViewModel?.restart(SortingMethods.CONTROVERSIAL, timeSort)
+        postsViewModel.restart(SortingMethods.CONTROVERSIAL, timeSort)
     }
 
     override fun currentSort(): SortingMethods {
-        return postsViewModel?.sort ?: SortingMethods.HOT
+        return postsViewModel.sort
     }
 
     override fun currentTimeSort(): PostTimeSort? {
-       return when (postsViewModel?.sort) {
+       return when (postsViewModel.sort) {
            // This is only applicable for TOP/CONTROVERSIAL, but it might be set anyways from a previous
            // sort, so ensure it doesn't return the previous
-           SortingMethods.TOP, SortingMethods.CONTROVERSIAL -> postsViewModel?.timeSort
+           SortingMethods.TOP, SortingMethods.CONTROVERSIAL -> postsViewModel.timeSort
            else -> null
        }
     }

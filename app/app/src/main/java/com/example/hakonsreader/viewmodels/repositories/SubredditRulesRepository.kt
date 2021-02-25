@@ -18,10 +18,10 @@ class SubredditRulesRepository(
     private var rulesLoaded = false
 
     private val _errors = MutableLiveData<ErrorWrapper>()
-    private val _loading = MutableLiveData<Boolean>()
+    private val _isLoading = MutableLiveData<Boolean>()
 
     val errors = _errors as LiveData<ErrorWrapper>
-    val loading = _loading as LiveData<Boolean>
+    val isLoading = _isLoading as LiveData<Boolean>
 
     /**
      * Gets a Flow of the list of rules for the given subreddit
@@ -38,7 +38,7 @@ class SubredditRulesRepository(
      */
     suspend fun refresh(force: Boolean = false) {
         if (!rulesLoaded || force) {
-            _loading.postValue(true)
+            _isLoading.postValue(true)
 
             when (val resp = api.rules()) {
                 is ApiResponse.Success -> {
@@ -49,7 +49,7 @@ class SubredditRulesRepository(
                     _errors.postValue(ErrorWrapper(resp.error, resp.throwable))
                 }
             }
-            _loading.postValue(false)
+            _isLoading.postValue(false)
         }
     }
 

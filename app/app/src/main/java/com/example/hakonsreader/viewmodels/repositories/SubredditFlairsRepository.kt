@@ -23,10 +23,10 @@ class SubredditFlairsRepository(
     private var flairsLoaded = false
 
     private val _errors = MutableLiveData<ErrorWrapper>()
-    private val _loading = MutableLiveData<Boolean>()
+    private val _isLoading = MutableLiveData<Boolean>()
 
     val errors = _errors as LiveData<ErrorWrapper>
-    val loading = _loading as LiveData<Boolean>
+    val isLoading = _isLoading as LiveData<Boolean>
 
     fun getFlairs(): Flow<List<RedditFlair>> {
         return dao.getFlairsBySubredditAndType(subredditName, flairType.name)
@@ -40,7 +40,7 @@ class SubredditFlairsRepository(
      */
     suspend fun refresh(force: Boolean = false) {
         if (!flairsLoaded || force) {
-            _loading.postValue(true)
+            _isLoading.postValue(true)
 
             val response = when (flairType) {
                 FlairType.SUBMISSION -> api.submissionFlairs()
@@ -57,7 +57,7 @@ class SubredditFlairsRepository(
                 }
             }
 
-            _loading.postValue(false)
+            _isLoading.postValue(false)
         }
     }
 }

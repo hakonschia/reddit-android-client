@@ -20,7 +20,7 @@ class SubredditFlairsViewModel(
 
     val flairs = repo.getFlairs().asLiveData()
     val errors = repo.errors
-    val loading = repo.loading
+    val isLoading = repo.isLoading
 
     /**
      * Refreshes flairs for the subreddit from the Reddit API

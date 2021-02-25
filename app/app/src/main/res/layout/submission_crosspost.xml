@@ -34,7 +34,7 @@
             tools:text="@tools:sample/lorem[1]" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.example.hakonsreader.views.LoadingIcon
+    <ProgressBar
         android:id="@+id/crosspostLoadingIcon"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"

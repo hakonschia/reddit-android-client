@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
-import android.widget.TableLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -43,15 +42,12 @@ import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.views.util.ViewUtil
 import com.example.hakonsreader.views.util.showPopupSortWithTime
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import java.util.concurrent.locks.Lock
 
 
 class SubredditFragment : Fragment(), PrivateBrowsingObservable {
@@ -340,8 +336,8 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                 //postsAdapter?.hideScoreTime = it.hideScoreTime
             }
 
-            loading.observe(viewLifecycleOwner) {
-                _binding?.loadingIcon?.onCountChange(it)
+            isLoading.observe(viewLifecycleOwner) {
+                checkLoadingStatus()
             }
 
             errors.observe(viewLifecycleOwner) {
@@ -372,8 +368,8 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
             errors.observe(viewLifecycleOwner) {
                 handleErrors(it.error, it.throwable)
             }
-            // There won't be anything else causing this to loader to load so this is safe
-            loading.observe(viewLifecycleOwner) {
+
+            isLoading.observe(viewLifecycleOwner) {
                 binding.subredditInfo.rulesloadingIcon.visibility = if (it) {
                     View.VISIBLE
                 } else {
@@ -421,7 +417,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                 handleErrors(it.error, it.throwable)
             }
             // There won't be anything else causing this to loader to load so this is safe
-            loading.observe(viewLifecycleOwner) {
+            isLoading.observe(viewLifecycleOwner) {
                 binding.subredditInfo.selectFlairLoadingIcon.visibility = if (it) {
                     View.VISIBLE
                 } else {
@@ -536,6 +532,24 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
             subredditViewModel?.updateFlair(username, flair)
         }
     }
+
+    /**
+     * Checks all the loading values on the fragment and enables to loading icon accordingly
+     */
+    @Synchronized
+    private fun checkLoadingStatus() {
+        var count = 0
+
+        count += if (postsFragment?.isLoading() == true) 1 else 0
+        count += if (subredditViewModel?.isLoading?.value == true) 1 else 0
+
+        _binding?.loadingIcon?.visibility = if (count > 0) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+    }
+
 
     /**
      * Handles the errors received by the API
@@ -687,7 +701,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                             handleErrors(error, throwable)
                         }
                         onLoadingChange = {
-                            _binding?.loadingIcon?.onCountChange(it)
+                            checkLoadingStatus()
                         }
 
                         setupSubmitPostFab(this)

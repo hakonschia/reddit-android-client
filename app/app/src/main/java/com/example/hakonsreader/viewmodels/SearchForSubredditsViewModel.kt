@@ -13,18 +13,18 @@ import kotlinx.coroutines.launch
 class SearchForSubredditsViewModel : ViewModel() {
 
     private val api = App.get().api
-    private val searchResults = MutableLiveData<List<Subreddit>>()
-    private val onCountChange = MutableLiveData<Boolean>()
-    private val error = MutableLiveData<ErrorWrapper>()
+    private val _searchResults = MutableLiveData<List<Subreddit>>()
+    private val _isLoading = MutableLiveData<Boolean>()
+    private val _error = MutableLiveData<ErrorWrapper>()
 
     /**
      * Map containing the previous search results, mapping a search query to a list of subreddits
      */
     private val cachedSearchResults = HashMap<String, List<Subreddit>>()
 
-    fun getSearchResults() : LiveData<List<Subreddit>> = searchResults
-    fun getOnCountChange() : LiveData<Boolean> = onCountChange
-    fun getError() : LiveData<ErrorWrapper> = error
+    val searchResults : LiveData<List<Subreddit>> = _searchResults
+    val isLoading: LiveData<Boolean> = _isLoading
+    val error: LiveData<ErrorWrapper> = _error
 
 
     /**
@@ -34,22 +34,22 @@ class SearchForSubredditsViewModel : ViewModel() {
      */
     fun search(query: String) {
         if (cachedSearchResults.containsKey(query)) {
-            searchResults.postValue(cachedSearchResults[query])
+            _searchResults.postValue(cachedSearchResults[query])
             return
         }
 
-        onCountChange.postValue(true)
+        _isLoading.postValue(true)
 
         CoroutineScope(IO).launch {
             val resp = api.subreditts().search(query)
-            onCountChange.postValue(false)
+            _isLoading.postValue(false)
 
             when (resp) {
                 is ApiResponse.Success -> {
                     cachedSearchResults[query] = resp.value
-                    searchResults.postValue(resp.value)
+                    _searchResults.postValue(resp.value)
                 }
-                is ApiResponse.Error -> error.postValue(ErrorWrapper(resp.error, resp.throwable))
+                is ApiResponse.Error -> _error.postValue(ErrorWrapper(resp.error, resp.throwable))
             }
         }
     }
@@ -58,6 +58,6 @@ class SearchForSubredditsViewModel : ViewModel() {
      * Clear the search results
      */
     fun clearSearchResults() {
-        searchResults.postValue(ArrayList())
+        _searchResults.postValue(ArrayList())
     }
 }

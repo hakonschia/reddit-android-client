@@ -16,15 +16,15 @@ class CommentsViewModel: ViewModel() {
     private val api = App.get().api
     private val database = App.get().database
 
-    private val post = MutableLiveData<RedditPost>()
-    private val comments = MutableLiveData<List<RedditComment>>()
-    private val loadingChange = MutableLiveData<Boolean>()
-    private val error = MutableLiveData<ErrorWrapper>()
+    private val _post = MutableLiveData<RedditPost>()
+    private val _comments = MutableLiveData<List<RedditComment>>()
+    private val _isLoading = MutableLiveData<Boolean>()
+    private val _error = MutableLiveData<ErrorWrapper>()
 
-    fun getPost() : LiveData<RedditPost> = post
-    fun getComments() : LiveData<List<RedditComment>> = comments
-    fun onLoadingCountChange() : LiveData<Boolean> = loadingChange
-    fun getError() : LiveData<ErrorWrapper> = error
+    val post: LiveData<RedditPost> = _post
+    val comments: LiveData<List<RedditComment>> = _comments
+    val isLoading: LiveData<Boolean> = _isLoading
+    val error: LiveData<ErrorWrapper> = _error
 
     /**
      * The ID of the post. This must be set before an attempt at loading the comments is made
@@ -52,19 +52,19 @@ class CommentsViewModel: ViewModel() {
             throw IllegalStateException("Post ID not set")
         }
 
-        loadingChange.value = true
+        _isLoading.value = true
 
         CoroutineScope(IO).launch {
             val resp = api.post(postId).comments(loadThirdParty = loadThirdParty)
-            loadingChange.postValue(false)
+            _isLoading.postValue(false)
 
             when (resp) {
                 is ApiResponse.Success -> {
-                    post.postValue(resp.value.post)
-                    comments.postValue(resp.value.comments)
+                    _post.postValue(resp.value.post)
+                    _comments.postValue(resp.value.comments)
                     insertPostIntoDb(resp.value.post)
                 }
-                is ApiResponse.Error -> error.postValue(ErrorWrapper(resp.error, resp.throwable))
+                is ApiResponse.Error -> _error.postValue(ErrorWrapper(resp.error, resp.throwable))
             }
         }
     }
@@ -74,11 +74,13 @@ class CommentsViewModel: ViewModel() {
             throw IllegalStateException("Post ID not set")
         }
 
-        loadingChange.value = true
+        // Technically this is not a "1 thing loading" since this is something else than the main comments
+        // but I don't know how more comments and comments can be loaded at the same time so it's fine
+        _isLoading.value = true
 
         CoroutineScope(IO).launch {
             val resp = api.post(postId).moreComments(comment.children, parent)
-            loadingChange.postValue(false)
+            _isLoading.postValue(false)
 
             when (resp) {
                 is ApiResponse.Success -> {
@@ -94,11 +96,11 @@ class CommentsViewModel: ViewModel() {
 
                     parent?.removeReply(comment)
 
-                    comments.postValue(dataSet)
+                    _comments.postValue(dataSet)
                 }
                 is ApiResponse.Error -> {
                     resp.throwable.printStackTrace()
-                    error.postValue(ErrorWrapper(resp.error, resp.throwable))
+                    _error.postValue(ErrorWrapper(resp.error, resp.throwable))
                 }
             }
         }
@@ -111,7 +113,7 @@ class CommentsViewModel: ViewModel() {
      */
     @Throws(IllegalStateException::class)
     fun restart() {
-        comments.value = ArrayList()
+        _comments.value = ArrayList()
         loadComments()
     }
 
@@ -133,7 +135,7 @@ class CommentsViewModel: ViewModel() {
         }
 
         dataSet.add(posToInsert, newComment)
-        comments.value = dataSet
+        _comments.value = dataSet
     }
 
     private fun insertPostIntoDb(post: RedditPost) {

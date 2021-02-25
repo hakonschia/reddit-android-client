@@ -257,13 +257,13 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      */
     private fun setupCommentsViewModel() {
         with (commentsViewModel) {
-            getPost().observe(this@PostActivity) {
+            post.observe(this@PostActivity) {
                 if (it != null) {
                     onNewPostInfo(it)
                 }
             }
 
-            getComments().observe(this@PostActivity) { comments ->
+            comments.observe(this@PostActivity) { comments ->
                 // New comments are empty, previous comments are not, clear the previous comments
                 if (comments.isEmpty() && commentsAdapter?.itemCount != 0) {
                     commentsAdapter?.clearComments()
@@ -272,7 +272,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
 
                 // TODO these values should probably be deleted at some point? Can check at startup if any of the values are
                 //  over a few days old or something and delete those that are
-                val lastTimeOpenedKey = post?.id + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP
+                val lastTimeOpenedKey = this@PostActivity.post?.id + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP
                 val preferences = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME_POST_OPENED, MODE_PRIVATE)
                 val lastTimeOpened = preferences.getLong(lastTimeOpenedKey, -1)
 
@@ -285,8 +285,15 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                 binding.noComments = comments.isEmpty()
             }
 
-            onLoadingCountChange().observe(this@PostActivity, { up -> binding.loadingIcon.onCountChange(up) })
-            getError().observe(this@PostActivity, { error ->
+            isLoading.observe(this@PostActivity, { isLoading ->
+                binding.loadingIcon.visibility = if (isLoading) {
+                    VISIBLE
+                } else {
+                    GONE
+                }
+            })
+
+            error.observe(this@PostActivity, { error ->
                 Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
             })
         }

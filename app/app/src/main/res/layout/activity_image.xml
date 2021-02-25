@@ -13,7 +13,7 @@
 
         android:transitionName="image"/>
 
-    <com.example.hakonsreader.views.LoadingIcon
+    <ProgressBar
         android:id="@+id/loadingIcon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -26,14 +26,14 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
     private val loggedInUserLiveData = database.subreddits().getSubscribedSubreddits()
     private val defaultLiveData = MutableLiveData<List<Subreddit>>()
 
-    private val onCountChange = MutableLiveData<Boolean>()
-    private val error = MutableLiveData<ErrorWrapper>()
+    private val _isLoading = MutableLiveData<Boolean>()
+    private val _error = MutableLiveData<ErrorWrapper>()
 
     // Kind of weird probably? The subscribed subreddits can easily be observed and automatically updated
     // but the default subreddits don't have anything identifying them, and aren't the only subreddits stored
-    fun getSubreddits() : LiveData<List<Subreddit>> = if (isForLoggedInUser) loggedInUserLiveData else defaultLiveData
-    fun getOnCountChange() : LiveData<Boolean> = onCountChange
-    fun getError() : LiveData<ErrorWrapper> = error
+    val subreddits: LiveData<List<Subreddit>> = if (isForLoggedInUser) loggedInUserLiveData else defaultLiveData
+    val isLoading: LiveData<Boolean> = _isLoading
+    val error: LiveData<ErrorWrapper> = _error
 
     /**
      * Load the subreddits. If a user is logged in their subscribed subreddits are loaded, otherwise
@@ -49,7 +49,7 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
         if (loadedFromApi && !force) {
             return
         }
-        onCountChange.value = true
+        _isLoading.value = true
 
         CoroutineScope(IO).launch {
             val response = if (isForLoggedInUser) {
@@ -57,7 +57,7 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
             } else {
                 api.subreditts().defaultSubreddits()
             }
-            onCountChange.postValue(false)
+            _isLoading.postValue(false)
 
             when (response) {
                 is ApiResponse.Success -> {
@@ -78,7 +78,7 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
                     database.subreddits().insertAll(subs)
                 }
                 is ApiResponse.Error -> {
-                    error.postValue(ErrorWrapper(response.error, response.throwable))
+                    _error.postValue(ErrorWrapper(response.error, response.throwable))
                 }
             }
         }
@@ -100,7 +100,7 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
                     // Request failed, revert
                     subreddit.isFavorited = !favorite
                     database.subreddits().update(subreddit)
-                    error.postValue(ErrorWrapper(response.error, response.throwable))
+                    _error.postValue(ErrorWrapper(response.error, response.throwable))
                 }
             }
         }
