@@ -106,11 +106,10 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
     private var _binding: FragmentSubredditBinding? = null
     private val binding get() = _binding!!
-    private var isDefaultSubreddit = false
 
-    val subredditName by lazy {
-        arguments?.getString(SUBREDDIT_NAME_KEY) ?: ""
-    }
+    val subredditName by lazy { arguments?.getString(SUBREDDIT_NAME_KEY) ?: "" }
+    private val isDefaultSubreddit by lazy { RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase()) }
+
     private var subreddit: Subreddit? = null
     private var subredditViewModel: SubredditViewModel? = null
 
@@ -135,8 +134,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     var setToolbarOnActivity = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        isDefaultSubreddit = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
-
         if (savedInstanceState != null) {
             postsFragment = childFragmentManager.getFragment(savedInstanceState, SAVED_POSTS_FRAGMENT) as PostsFragment?
         }
@@ -248,7 +245,15 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
             subscribe.setOnClickListener { subscribeOnclick() }
             subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }
 
-            subredditSubscribers.setCharacterLists(TickerUtils.provideNumberList())
+            postsRefreshLayout.setOnRefreshListener {
+                postsFragment?.refreshPosts()
+
+                // The refreshing will be visible with our own progress bar
+                postsRefreshLayout.isRefreshing = false
+            }
+            postsRefreshLayout.setProgressBackgroundColorSchemeColor(
+                    ContextCompat.getColor(requireContext(), R.color.colorAccent)
+            )
 
             drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
@@ -440,9 +445,11 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     /**
-     * Sets up [FragmentSubredditBinding.submitPostFab]. If the current fragment isn't a standard sub,
-     * then a scroll listener is added to [FragmentSubredditBinding.posts] to automatically show/hide the FAB
+     * Sets up [FragmentSubredditBinding.submitPostFab]. If [isDefaultSubreddit] is false then a
+     * scroll listener is added to [postsFragment] to automatically show/hide the FAB
      * when scrolling, and an onClickListener is set to the fab to open a [SubmitActivity]
+     *
+     * @param postsFragment The fragment to add the scroll listener to
      */
     private fun setupSubmitPostFab(postsFragment: PostsFragment) {
         if (!isDefaultSubreddit) {
