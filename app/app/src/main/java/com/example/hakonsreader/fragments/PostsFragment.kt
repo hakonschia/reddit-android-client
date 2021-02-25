@@ -43,15 +43,6 @@ class PostsFragment : Fragment(), SortableWithTime {
          */
         private const val IS_FOR_USER = "isForUser"
 
-        /**
-         * The key used to store the post IDs the fragment is showing
-         */
-        private const val POST_IDS_KEY = "post_ids"
-
-        /**
-         * The key used to store the state of [postsLayoutManager]
-         */
-        private const val LAYOUT_STATE_KEY = "layout_state"
 
         /**
          * The key used in [getArguments] for how to sort the posts when loading this subreddit
@@ -68,10 +59,6 @@ class PostsFragment : Fragment(), SortableWithTime {
         private const val TIME_SORT = "time_sort"
 
 
-        private const val FIRST_VIEW_STATE_STORED_KEY = "first_view_state_stored"
-        private const val LAST_VIEW_STATE_STORED_KEY = "last_view_state_stored"
-        private const val VIEW_STATE_STORED_KEY = "view_state_stored"
-
         fun newInstance(isForUser: Boolean, name: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = PostsFragment().apply {
             arguments = Bundle().apply {
                 putBoolean(IS_FOR_USER, isForUser)
@@ -85,8 +72,6 @@ class PostsFragment : Fragment(), SortableWithTime {
     private var _binding: FragmentPostsBinding? = null
     private val binding get() = _binding!!
 
-    private var postIds = ArrayList<String>()
-
     private var postsViewModel: PostsViewModel? = null
     private var postsAdapter: PostsAdapter? = null
     private var postsLayoutManager: LinearLayoutManager? = null
@@ -97,6 +82,12 @@ class PostsFragment : Fragment(), SortableWithTime {
      * be set on the posts list when created
      */
     private val scrollListeners: MutableList<RecyclerView.OnScrollListener> = ArrayList()
+
+    /**
+     * The states/extras for the view holders saved when the fragment view was destroyed
+     */
+    // TODO this should also be saved in onSaveInstanceState
+    private var savedViewHolderStates: HashMap<String, Bundle>? = null
 
     /**
      * Callback for errors when loading posts
@@ -112,7 +103,6 @@ class PostsFragment : Fragment(), SortableWithTime {
     val isForUser: Boolean by lazy { arguments?.getBoolean(IS_FOR_USER) ?: false }
 
     private val isDefaultSubreddit = isForUser && RedditApi.STANDARD_SUBS.contains(name.toLowerCase())
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPostsBinding.inflate(inflater)
@@ -133,24 +123,11 @@ class PostsFragment : Fragment(), SortableWithTime {
 
         // If the fragment is selected without any posts load posts automatically
         if (postsAdapter?.itemCount == 0) {
-            // Starting from scratch
-            if (postIds.isEmpty()) {
-                val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
-                val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
+            val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
+            val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
 
-                postsViewModel?.loadPosts(sort, timeSort)
-            } else {
-                // Post IDs restored, set those
-                postsViewModel?.postIds = postIds
-            }
+            postsViewModel?.loadPosts(sort, timeSort)
         }
-
-        restoreViewHolderStates()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        saveViewHolderStates()
     }
 
     override fun onDestroyView() {
@@ -160,8 +137,14 @@ class PostsFragment : Fragment(), SortableWithTime {
             // Ensure that all videos are cleaned up
             for (i in 0 until it.itemCount) {
                 val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
-                viewHolder?.destroy()
+                if (viewHolder != null) {
+                    // Ensure the extras for the view holder is saved
+                    viewHolder.saveExtras()
+                    viewHolder.destroy()
+                }
             }
+
+            savedViewHolderStates = it.postExtras
 
             it.lifecycleOwner = null
         }
@@ -195,6 +178,10 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     private fun setupPostsList() {
         postsAdapter = PostsAdapter().apply {
+            savedViewHolderStates?.let {
+                postExtras = it
+            }
+
             lifecycleOwner = viewLifecycleOwner
 
             binding.posts.adapter = this
@@ -246,9 +233,6 @@ class PostsFragment : Fragment(), SortableWithTime {
                 isForUser
         )).get(PostsViewModel::class.java).apply {
             getPosts().observe(viewLifecycleOwner, { posts ->
-                // Store the updated post IDs right away
-                this@PostsFragment.postIds = postIds as ArrayList<String>
-
                 // Posts have been cleared, clear the adapter and clear the layout manager state
                 if (posts.isEmpty()) {
                     postsAdapter?.clearPosts()
@@ -256,18 +240,7 @@ class PostsFragment : Fragment(), SortableWithTime {
                     return@observe
                 }
 
-                val previousSize = postsAdapter?.itemCount
                 postsAdapter?.submitList(filterPosts(posts))
-
-                /*
-                if (saveState != null && previousSize == 0) {
-                    val layoutState: Parcelable? = saveState?.getParcelable(saveKey(LAYOUT_STATE_KEY))
-
-                    if (layoutState != null) {
-                        postsLayoutManager?.onRestoreInstanceState(layoutState)
-                    }
-                }
-                 */
             })
 
             onLoadingCountChange().observe(viewLifecycleOwner, { onLoadingChange?.invoke(it) })
@@ -277,70 +250,6 @@ class PostsFragment : Fragment(), SortableWithTime {
                 onError?.invoke(error.error, error.throwable)
             })
         }
-    }
-
-    /**
-     * Saves the state of the visible ViewHolders to [saveState]
-     *
-     * @see restoreViewHolderStates
-     */
-    private fun saveViewHolderStates() {
-        /*
-        if (saveState == null) {
-            saveState = Bundle()
-        }
-
-        // TODO this should make use of the states stored by the adapter as that will have state
-        //  for all previous posts, not just the visible ones (although we still have to call onUnselected to pause videos etc)
-        saveState?.let { saveBundle ->
-            // It's probably not necessary to loop through all, but ViewHolders are still active even when not visible
-            // so just getting firstVisible and lastVisible probably won't be enough
-            for (i in 0 until postsAdapter?.itemCount!!) {
-                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
-
-                if (viewHolder != null) {
-                    val extras = viewHolder.getExtras()
-                    saveBundle.putBundle(saveKey(VIEW_STATE_STORED_KEY + i), extras)
-                    viewHolder.onUnselected()
-                }
-            }
-
-            postsLayoutManager?.let {
-                val firstVisible = it.findFirstVisibleItemPosition()
-                val lastVisible = it.findLastVisibleItemPosition()
-
-                saveBundle.putInt(saveKey(FIRST_VIEW_STATE_STORED_KEY), firstVisible)
-                saveBundle.putInt(saveKey(LAST_VIEW_STATE_STORED_KEY), lastVisible)
-            }
-        }
-
-         */
-    }
-
-    /**
-     * Restores the state of the visible ViewHolders based on [saveState]
-     *
-     * @see saveViewHolderStates
-     */
-    private fun restoreViewHolderStates() {
-        /*
-        saveState?.let {
-            val firstVisible = it.getInt(saveKey(FIRST_VIEW_STATE_STORED_KEY))
-            val lastVisible = it.getInt(saveKey(LAST_VIEW_STATE_STORED_KEY))
-
-            for (i in firstVisible..lastVisible) {
-                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
-
-                if (viewHolder != null) {
-                    // If the view has been destroyed the ViewHolders haven't been created yet
-                    val extras = it.getBundle(saveKey(VIEW_STATE_STORED_KEY + i))
-                    if (extras != null) {
-                        viewHolder.setExtras(extras)
-                    }
-                }
-            }
-        }
-         */
     }
 
     /**
@@ -368,12 +277,6 @@ class PostsFragment : Fragment(), SortableWithTime {
      * Refreshes the posts in the fragment
      */
     fun refreshPosts() {
-        // If the user had previously gone out of the fragment and gone back, refreshing would
-        // restore the list state that was saved at that point, making the list scroll to that point
-
-        // TODO clear only the relevant parts for this fragment, this will clear the entire bundle
-        //  which can/will include other fragments
-        //saveState?.clear()
         postsViewModel?.restart()
     }
 

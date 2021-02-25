@@ -26,7 +26,7 @@ import java.time.Instant
 class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     
     private var posts = ArrayList<RedditPost>()
-    val postExtras = HashMap<String, Bundle>()
+    var postExtras = HashMap<String, Bundle>()
 
     /**
      * The amount of minutes scores should be hidden (default to -1 means not specified)
@@ -233,6 +233,16 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
         fun destroy() {
             post.cleanUpContent()
             post.lifecycleOwner = null
+        }
+
+        /**
+         * Saves the extras of the view holder to [postExtras]
+         */
+        fun saveExtras() {
+            val rp = post.redditPost
+            if (rp != null) {
+                postExtras[rp.id] = post.extras
+            }
         }
     }
 
