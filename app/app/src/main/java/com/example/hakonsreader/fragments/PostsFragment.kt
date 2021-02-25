@@ -31,6 +31,7 @@ import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.views.Content
 import com.google.gson.Gson
+import java.lang.RuntimeException
 
 class PostsFragment : Fragment(), SortableWithTime {
 
@@ -64,6 +65,9 @@ class PostsFragment : Fragment(), SortableWithTime {
 
         fun newInstance(isForUser: Boolean, name: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = PostsFragment().apply {
             arguments = Bundle().apply {
+                if (!isForUser) {
+                    println("Creating Posts for subreddits")
+                }
                 putBoolean(IS_FOR_USER, isForUser)
                 putString(NAME_KEY, name)
                 sort?.let { putString(SORT, it.value) }
@@ -71,6 +75,9 @@ class PostsFragment : Fragment(), SortableWithTime {
             }
         }
     }
+
+    val name: String by lazy { arguments?.getString(NAME_KEY) ?: "" }
+    val isForUser: Boolean by lazy { arguments?.getBoolean(IS_FOR_USER) ?: false }
 
     private var _binding: FragmentPostsBinding? = null
     private val binding get() = _binding!!
@@ -104,12 +111,12 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     var onLoadingChange: ((Boolean) -> Unit)? = null
 
-    val name: String by lazy { arguments?.getString(NAME_KEY) ?: "" }
-    val isForUser: Boolean by lazy { arguments?.getBoolean(IS_FOR_USER) ?: false }
-
-    private val isDefaultSubreddit = isForUser && RedditApi.STANDARD_SUBS.contains(name.toLowerCase())
+    private var isDefaultSubreddit = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        // Must not be a user to be a default subreddit (eg. /u/popular is an actual user)
+        isDefaultSubreddit = !isForUser && RedditApi.STANDARD_SUBS.contains(name.toLowerCase())
+
         _binding = FragmentPostsBinding.inflate(inflater)
 
         setupBinding()
@@ -261,6 +268,7 @@ class PostsFragment : Fragment(), SortableWithTime {
             })
 
             onLoadingCountChange.observe(viewLifecycleOwner, { onLoadingChange?.invoke(it) })
+
             error.observe(viewLifecycleOwner, { error ->
                 // Error loading posts, reset onEndOfList so it tries again when scrolled
                 postsScrollListener?.resetOnEndOfList()

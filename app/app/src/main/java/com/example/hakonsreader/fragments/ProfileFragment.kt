@@ -234,6 +234,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     private fun retrieveUserInfo() {
         // TODO this should be in a new ViewModel for users (and isInfoLoading should be removed completely)
         isInfoLoading = true
+        checkLoadingStatus()
 
         CoroutineScope(IO).launch {
             val name = username
