@@ -7,11 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
+import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -168,8 +170,20 @@ class PostsFragment : Fragment(), SortableWithTime {
     }
 
     private fun setupBinding() {
-        scrollListeners.forEach {
-            binding.posts.addOnScrollListener(it)
+        with (binding) {
+            scrollListeners.forEach {
+                posts.addOnScrollListener(it)
+            }
+
+            postsRefreshLayout.setOnRefreshListener {
+                refreshPosts()
+
+                // The refreshing will be visible with our own progress bar
+                postsRefreshLayout.isRefreshing = false
+            }
+            postsRefreshLayout.setProgressBackgroundColorSchemeColor(
+                    ContextCompat.getColor(requireContext(), R.color.colorAccent)
+            )
         }
     }
 
@@ -278,17 +292,6 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     fun refreshPosts() {
         postsViewModel?.restart()
-    }
-
-    /**
-     * Converts a base key into a unique key for this fragment, so that the fragment state can be
-     * stored in a global bundle holding states for multiple fragments
-     *
-     * @param baseKey The base key to use
-     * @return A key unique to this subreddit
-     */
-    private fun saveKey(baseKey: String) : String {
-        return baseKey + "_" + if (isForUser) { "_username_" } else { "_subredditname" } + name
     }
 
     override fun new() {

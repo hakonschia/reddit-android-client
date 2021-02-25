@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
+import android.widget.TableLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -14,9 +15,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activities.MainActivity
 import com.example.hakonsreader.activities.SubmitActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.FlairType
@@ -29,6 +31,7 @@ import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
+import com.example.hakonsreader.interfaces.LockableSlidr
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
@@ -40,13 +43,15 @@ import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.views.util.ViewUtil
 import com.example.hakonsreader.views.util.showPopupSortWithTime
-import com.robinhood.ticker.TickerUtils
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import java.util.concurrent.locks.Lock
 
 
 class SubredditFragment : Fragment(), PrivateBrowsingObservable {
@@ -149,7 +154,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         } else {
             // Is default subreddit, we can create the fragment now since it will never change
             // (if it is "random" it could change later, so initialize it later)
-            createAndAddPostsFragment(subredditName)
+            setupViewPager(subredditName)
         }
 
         App.get().registerPrivateBrowsingObservable(this)
@@ -189,41 +194,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     /**
-     * Creates a [PostsFragment] and adds it to [getChildFragmentManager]
-     *
-     * @param name The name of the subreddit the posts are for
-     */
-    private fun createAndAddPostsFragment(name: String) {
-        // TODO this will mess up configuration changes probably (if refreshed it wont use the current)
-        //  and probably if the sort is changed and then scrolled further it would revert to the original when
-        //  getting new posts
-        val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
-        val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
-
-        if (postsFragment == null) {
-            postsFragment = PostsFragment.newInstance(
-                    isForUser = false,
-                    name = name,
-                    sort = sort,
-                    timeSort = timeSort
-            ).apply {
-                onError = { error, throwable ->
-                    handleErrors(error, throwable)
-                }
-                onLoadingChange = {
-                    _binding?.loadingIcon?.onCountChange(it)
-                }
-            }
-        }
-
-        childFragmentManager.beginTransaction()
-                .replace(R.id.postsContainer, postsFragment!!, POSTS_TAG)
-                .commit()
-
-        setupSubmitPostFab(postsFragment!!)
-    }
-
-    /**
      * Inflates and sets up [binding]
      */
     private fun setupBinding() {
@@ -244,16 +214,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
             subscribe.setOnClickListener { subscribeOnclick() }
             subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }
-
-            postsRefreshLayout.setOnRefreshListener {
-                postsFragment?.refreshPosts()
-
-                // The refreshing will be visible with our own progress bar
-                postsRefreshLayout.isRefreshing = false
-            }
-            postsRefreshLayout.setProgressBackgroundColorSchemeColor(
-                    ContextCompat.getColor(requireContext(), R.color.colorAccent)
-            )
 
             drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
@@ -299,6 +259,33 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     /**
+     * Sets up the ViewPager (containing the posts) with a given subreddit name
+     *
+     * @param name The name of the subreddit the subreddit is for
+     */
+    private fun setupViewPager(name: String) {
+        // TODO unless you know the wiki it's not obvious since there arent tabs
+        //  TabLayout could be here, but need to figure out how to hide that (along with the toolbar)
+        //  since it's annoying to have it on screen the entire time
+        binding.pager.adapter = Adapter(name, this@SubredditFragment)
+
+        val act = activity
+        binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+
+                val onFirstPage = position == 0
+
+                // If the activity is a Slidr activity we have to lock it to avoid swiping away
+                // when swiping back
+                if (act is LockableSlidr) {
+                    act.lock(!onFirstPage)
+                }
+            }
+        })
+    }
+
+    /**
      * Sets up [subredditViewModel], assuming [isDefaultSubreddit] is false. If [isDefaultSubreddit]
      * is true, then a base subreddit is set on [binding] with [subredditName]
      */
@@ -330,7 +317,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
                 // TODO check if it is NSFW, if it is show a warning (this should also be a setting
                 //  ie. "Warn about NSFW subreddits"
-                createAndAddPostsFragment(it.name)
+                setupViewPager(it.name)
                 setupRulesViewModel(it.name)
                 setupFlairsViewModel(it.name)
 
@@ -661,5 +648,57 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                 requireContext(),
                 if (privatelyBrowsing) R.color.privatelyBrowsing else R.color.opposite_background
         )
+    }
+
+    class WikiFragment : Fragment() {
+        companion object {
+            fun newInstance() = WikiFragment()
+        }
+
+        private var _binding: FragmentSubredditWikiBinding? = null
+        private val binding get() = _binding!!
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+            _binding = FragmentSubredditWikiBinding.inflate(inflater)
+            return binding.root
+        }
+
+        override fun onDestroyView() {
+            super.onDestroyView()
+            _binding = null
+        }
+    }
+
+    private inner class Adapter(val name: String, fragment: Fragment) : FragmentStateAdapter(fragment) {
+        // Kind of bad to hardcode the count I guess but whatever
+        override fun getItemCount() = if (isDefaultSubreddit) 1 else 2
+        override fun createFragment(position: Int) : Fragment {
+            return when (position) {
+                0 -> {
+                    val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
+                    val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
+                    PostsFragment.newInstance(
+                            isForUser = false,
+                            name = name,
+                            sort = sort,
+                            timeSort = timeSort
+                    ).apply {
+                        onError = { error, throwable ->
+                            handleErrors(error, throwable)
+                        }
+                        onLoadingChange = {
+                            _binding?.loadingIcon?.onCountChange(it)
+                        }
+
+                        setupSubmitPostFab(this)
+
+                        postsFragment = this
+                    }
+                }
+                1 -> WikiFragment.newInstance()
+
+                else -> throw IllegalStateException("Unexpected position: $position")
+            }
+        }
     }
 }
