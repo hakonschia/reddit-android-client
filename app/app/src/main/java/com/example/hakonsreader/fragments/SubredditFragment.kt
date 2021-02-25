@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activities.MainActivity
 import com.example.hakonsreader.activities.SubmitActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.FlairType
@@ -82,6 +83,8 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
          */
         private const val SHOW_RULES = "show_rules"
 
+        private const val SAVED_POSTS_FRAGMENT = "savedPostsFragment"
+
         /**
          * Creates a new instance of the fragment
          *
@@ -103,7 +106,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
     private var _binding: FragmentSubredditBinding? = null
     private val binding get() = _binding!!
-    private var saveState: Bundle? = null
     private var isDefaultSubreddit = false
 
     val subredditName by lazy {
@@ -135,6 +137,10 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         isDefaultSubreddit = RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())
 
+        if (savedInstanceState != null) {
+            postsFragment = childFragmentManager.getFragment(savedInstanceState, SAVED_POSTS_FRAGMENT) as PostsFragment?
+        }
+
         setupBinding()
         setupSubredditViewModel()
 
@@ -152,6 +158,11 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         App.get().registerPrivateBrowsingObservable(this)
 
         return binding.root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        postsFragment?.let { childFragmentManager.putFragment(outState, SAVED_POSTS_FRAGMENT, it) }
     }
 
     override fun onDestroyView() {
@@ -179,33 +190,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
             fragment
         } else null
     }
-    /**
-     * Saves the state of the fragment to a bundle. Restore the state with [restoreState]
-     *
-     * @param saveState The bundle to store the state to
-     * @see restoreState
-     */
-    fun saveState(saveState: Bundle) {
-        val fragment = getPostsFragment()
-        if (fragment is PostsFragment) {
-            fragment.saveState(saveState)
-        }
-    }
-
-    /**
-     * Restores the state stored for when the activity holding the fragment has been recreated in a
-     * way that doesn't permit the fragment to store its own state
-     *
-     * @param state The bundle holding the stored state
-     */
-    fun restoreState(state: Bundle?) {
-        saveState = state
-
-        val fragment = getPostsFragment()
-        if (fragment is PostsFragment) {
-            fragment.restoreState(saveState)
-        }
-    }
 
     /**
      * Creates a [PostsFragment] and adds it to [getChildFragmentManager]
@@ -226,9 +210,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                     sort = sort,
                     timeSort = timeSort
             ).apply {
-                // TODO saveState is null when coming from the standard subs
-                restoreState(saveState)
-
                 onError = { error, throwable ->
                     handleErrors(error, throwable)
                 }

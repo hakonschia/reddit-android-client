@@ -68,6 +68,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         private const val SELECT_SUBREDDIT_FRAGMENT = "selectSubredditFragment"
         private const val PROFILE_FRAGMENT = "profileFragment"
         private const val SETTINGS_FRAGMENT = "settingsFragment"
+
+        /**
+         * The saved position of the nav bar
+         */
         private const val ACTIVE_NAV_ITEM = "activeNavItem"
 
         /**
@@ -77,7 +81,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          * at the time the instance was saved, but means that when clicking on the subreddit navbar, this should
          * be shown again instead of the list of subreddits
          */
-        private const val ACTIVE_SUBREDDIT_NAME = "active_subreddit_name"
+        private const val ACTIVE_SUBREDDIT_NAME = "main_activity_active_subreddit_name"
 
         /**
          * When creating this activity, set this on the extras to select the subreddit to show by default
@@ -193,29 +197,26 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // Save which fragment is the active one as well
 
         standardSubFragment?.let {
-            it.saveState(outState)
-            if (it.isAdded) {
-                supportFragmentManager.putFragment(outState, POSTS_FRAGMENT, standardSubFragment!!)
-            }
+            supportFragmentManager.putFragment(outState, POSTS_FRAGMENT, it)
         }
 
         activeSubreddit?.let {
             // If there is an active subreddit it won't be null, store the state of it even if it isn't
             // currently added (shown on screen)
             outState.putString(ACTIVE_SUBREDDIT_NAME, it.subredditName)
-            it.saveState(outState)
-            if (it.isAdded) {
-                supportFragmentManager.putFragment(outState, ACTIVE_SUBREDDIT_FRAGMENT, activeSubreddit!!)
-            }
+            supportFragmentManager.putFragment(outState, ACTIVE_SUBREDDIT_FRAGMENT, it)
         }
-        if (selectSubredditFragment != null && selectSubredditFragment!!.isAdded) {
-            supportFragmentManager.putFragment(outState, SELECT_SUBREDDIT_FRAGMENT, selectSubredditFragment!!)
+
+        profileFragment?.let {
+            supportFragmentManager.putFragment(outState, PROFILE_FRAGMENT, it)
         }
-        if (profileFragment != null && profileFragment!!.isAdded) {
-            supportFragmentManager.putFragment(outState, PROFILE_FRAGMENT, profileFragment!!)
+
+        selectSubredditFragment?.let {
+            supportFragmentManager.putFragment(outState, SELECT_SUBREDDIT_FRAGMENT, it)
         }
-        if (settingsFragment != null && settingsFragment!!.isAdded) {
-            supportFragmentManager.putFragment(outState, SETTINGS_FRAGMENT, settingsFragment!!)
+
+        settingsFragment?.let {
+            supportFragmentManager.putFragment(outState, SETTINGS_FRAGMENT, it)
         }
 
         // Login can just be recreated when needed as they don't store any specific state
@@ -645,7 +646,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 // when detached
                 if (f == activeSubreddit) {
                     f as SubredditFragment
-                    f.saveState(savedState)
                 }
 
                 // InboxGroupFragment is an "inner" fragment and not one we want to store directly
@@ -713,17 +713,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             standardSubFragment = StandardSubContainerFragment.newInstance()
         }
 
-        standardSubFragment!!.restoreState(savedState)
-
-        if (activeSubreddit != null) {
-            activeSubreddit!!.restoreState(savedState)
-        } else {
+        if (activeSubreddit == null) {
             // Active subreddit not restored directly, check if it should be restored manually
             val activeSubredditName = restoredState.getString(ACTIVE_SUBREDDIT_NAME)
             if (activeSubredditName != null) {
-                activeSubreddit = SubredditFragment.newInstance(activeSubredditName).also {
-                    it.restoreState(savedState)
-                }
+                activeSubreddit = SubredditFragment.newInstance(activeSubredditName)
             }
         }
 
@@ -1105,7 +1099,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
                 selectSubredditFragment!!
             } else {
-                activeSubreddit!!.restoreState(savedState)
                 activeSubreddit!!
             }
         }

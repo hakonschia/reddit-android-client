@@ -53,6 +53,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
         private const val POSTS_TAG = "posts_profile"
 
+        private const val SAVED_POSTS_FRAGMENT = "savedPostsFragment"
 
         /**
          * Create a new ProfileFragment for a user by their username
@@ -91,10 +92,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     private var username: String? = null
     private var isInfoLoaded = false
 
-    private var saveState: Bundle? = null
-
     private var postsFragment: PostsFragment? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,10 +121,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         // Retrieve user info if the fragment hasn't loaded any already
         if (savedInstanceState != null) {
             infoLoaded = savedInstanceState.getBoolean(IS_INFO_LOADED)
-        }
-
-        if (saveState != null) {
-            infoLoaded = saveState!!.getBoolean(IS_INFO_LOADED)
+            postsFragment = childFragmentManager.getFragment(savedInstanceState, SAVED_POSTS_FRAGMENT) as PostsFragment?
         }
 
         if (!infoLoaded) {
@@ -157,18 +152,13 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         // so we need to store the animation state here and in saveState (for when the fragment has
         // been replaced but not destroyed)
         outState.putBoolean(IS_INFO_LOADED, isInfoLoaded)
+        postsFragment?.let { childFragmentManager.putFragment(outState, SAVED_POSTS_FRAGMENT, it) }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
         App.get().unregisterPrivateBrowsingObservable(this)
-
-        if (saveState == null) {
-            saveState = Bundle()
-        }
-
-        saveState?.putBoolean(IS_INFO_LOADED, isInfoLoaded)
 
         _binding = null
     }
@@ -216,8 +206,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
                     name = name,
                     sort = SortingMethods.NEW
             ).apply {
-                restoreState(saveState)
-
                 onError = { error, throwable ->
                     _binding?.let {
                         Util.handleGenericResponseErrors(it.root, error, throwable)

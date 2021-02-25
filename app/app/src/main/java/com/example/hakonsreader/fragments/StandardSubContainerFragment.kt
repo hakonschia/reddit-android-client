@@ -26,7 +26,8 @@ class StandardSubContainerFragment : Fragment() {
         /**
          * The key used to store the subreddit currently visible on the screen
          */
-        private const val ACTIVE_SUBREDDIT_KEY = "active_subreddit_posts_container"
+        private const val ACTIVE_SUBREDDIT_KEY = "posts_container_active_subreddit"
+
 
         /**
          * @return A new instance of this fragment
@@ -53,9 +54,7 @@ class StandardSubContainerFragment : Fragment() {
 
     private var overridenSub: StandarSub? = null
 
-    private var saveState: Bundle? = null
     private var viewPager: ViewPager2? = null
-    private val fragments = ArrayList<SubredditFragment>()
 
     /**
      * The currently active item in the ViewPager, or -1 if not yet set
@@ -79,8 +78,6 @@ class StandardSubContainerFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_posts_container, container, false)
 
-        setupFragments()
-
         viewPager = view.findViewById<ViewPager2>(R.id.postsContainer).apply {
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -91,10 +88,15 @@ class StandardSubContainerFragment : Fragment() {
                 }
             })
 
-            setupViewPager(this)
+            setupViewPager(this, savedInstanceState)
         }
 
         return view
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(ACTIVE_SUBREDDIT_KEY, activeItem)
     }
 
     override fun onDestroyView() {
@@ -102,7 +104,7 @@ class StandardSubContainerFragment : Fragment() {
         viewPager = null
     }
 
-    private fun setupViewPager(viewPager: ViewPager2) {
+    private fun setupViewPager(viewPager: ViewPager2, savedInstanceState: Bundle?) {
         val startPos: Int = if (overridenSub != null) {
             val v = overridenSub!!.ordinal
             overridenSub = null
@@ -110,17 +112,12 @@ class StandardSubContainerFragment : Fragment() {
         } else {
             when {
                 activeItem >= 0 -> activeItem
-                saveState != null -> saveState!!.getInt(ACTIVE_SUBREDDIT_KEY)
+                savedInstanceState != null -> savedInstanceState.getInt(ACTIVE_SUBREDDIT_KEY)
                 else -> getDefaultSubPosition()
             }
         }
 
-        fragments.forEachIndexed { index, fragment ->
-            // Only set the toolbar automatically on the starting fragment
-            fragment.setToolbarOnActivity = startPos == index
-        }
-
-        Adapter(fragments, this).apply {
+        Adapter(startPos, this).apply {
             viewPager.adapter = this
         }
 
@@ -135,54 +132,15 @@ class StandardSubContainerFragment : Fragment() {
     }
 
     /**
-     * Sets up [fragments], if it is empty
-     */
-    private fun setupFragments() {
-        if (fragments.isEmpty()) {
-            fragments.apply {
-                // We could use the enum value, but this is probably the easiest way to get the first letter capitalized
-                add(SubredditFragment.newInstance("", SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
-                add(SubredditFragment.newInstance("Popular", SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
-                add(SubredditFragment.newInstance("All", SortingMethods.HOT, PostTimeSort.DAY).apply { restoreState(saveState) })
-            }
-        }
-    }
-
-    /**
      * Gets the array position in [fragments] based on [defaultSub]
      */
     private fun getDefaultSubPosition() = defaultSub.ordinal
 
     /**
-     * Restores the state stored for when the activity holding the fragment has been recreated in a
-     * way that doesn't permit the fragment to store its own state
-     *
-     * @param state The bundle holding the stored state
-     */
-    fun restoreState(state: Bundle?) {
-        saveState = state
-    }
-
-    /**
-     * Saves the state of the fragments to a bundle. Restore the state with [restoreState]
-     *
-     * @param saveState The bundle to store the state to
-     */
-    fun saveState(saveState: Bundle) {
-        // If the fragments haven't been recreated yet, ie. in a subreddit from the navbar and they were destroyed
-        // but haven't yet been accessed again
-        fragments.forEach {
-            it.saveState(saveState)
-        }
-
-        saveState.putInt(ACTIVE_SUBREDDIT_KEY, activeItem)
-    }
-
-    /**
      * Calls [AppCompatActivity.setSupportActionBar] on the fragments activity with the toolbar in
      * the subreddit given by [position]
      *
-     * @param position The subreddit in position in [fragments] to set the toolbar for
+     * @param position The subreddit position in the ViewPager/[getChildFragmentManager]
      */
     private fun setToolbar(position: Int) {
         // For some reason there is a sync issue between the this.fragments and the fragments actually
@@ -197,8 +155,19 @@ class StandardSubContainerFragment : Fragment() {
         }
     }
 
-    private inner class Adapter(val fragments: List<SubredditFragment>, fragment: Fragment) : FragmentStateAdapter(fragment) {
-        override fun getItemCount() = fragments.size
-        override fun createFragment(position: Int) = fragments[position]
+    private inner class Adapter(val startPos: Int, fragment: Fragment) : FragmentStateAdapter(fragment) {
+        override fun getItemCount() = 3
+        override fun createFragment(position: Int) : Fragment {
+            return when (position) {
+                0 -> SubredditFragment.newInstance("", SortingMethods.HOT, PostTimeSort.DAY)
+                1 -> SubredditFragment.newInstance("Popular", SortingMethods.HOT, PostTimeSort.DAY)
+                2 -> SubredditFragment.newInstance("All", SortingMethods.HOT, PostTimeSort.DAY)
+
+                // Idk?
+                else -> SubredditFragment.newInstance("", SortingMethods.HOT, PostTimeSort.DAY)
+            }.also {
+                it.setToolbarOnActivity = startPos == position
+            }
+        }
     }
 }

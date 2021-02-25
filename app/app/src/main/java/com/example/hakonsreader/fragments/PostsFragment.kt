@@ -85,7 +85,6 @@ class PostsFragment : Fragment(), SortableWithTime {
     private var _binding: FragmentPostsBinding? = null
     private val binding get() = _binding!!
 
-    private var saveState: Bundle? = null
     private var postIds = ArrayList<String>()
 
     private var postsViewModel: PostsViewModel? = null
@@ -100,7 +99,7 @@ class PostsFragment : Fragment(), SortableWithTime {
     private val scrollListeners: MutableList<RecyclerView.OnScrollListener> = ArrayList()
 
     /**
-     * Callback for
+     * Callback for errors when loading posts
      */
     var onError: ((GenericError, Throwable) -> Unit)? = null
 
@@ -121,17 +120,6 @@ class PostsFragment : Fragment(), SortableWithTime {
         setupBinding()
         setupPostsList()
         setupPostsViewModel(name, isForUser)
-
-        // TODO if you go to settings, rotate and change theme, then the IDs wont be saved. The subreddit will be notified about
-        //  the first change, save the state, but the state isn't restored again for the second save since it's restored here
-        //  so there's nothing to restore. saveState() should use the bundle "saveState"
-        saveState?.let {
-            val ids = it.getStringArrayList(saveKey(POST_IDS_KEY))
-            if (ids != null) {
-                postIds = ids
-                postsViewModel?.postIds = ids
-            }
-        }
 
         return binding.root
     }
@@ -194,32 +182,6 @@ class PostsFragment : Fragment(), SortableWithTime {
         } else {
             binding.posts.addOnScrollListener(listener)
         }
-    }
-
-    fun saveState(saveState: Bundle) {
-        // If no items in the list it's no point in saving any state
-        if (postIds.isEmpty()) {
-            return
-        }
-        saveState.putStringArrayList(saveKey(POST_IDS_KEY), postIds)
-        postsLayoutManager?.let { saveState.putParcelable(saveKey(LAYOUT_STATE_KEY), it.onSaveInstanceState()) }
-    }
-
-
-    /**
-     * Restores the state stored for when the activity holding the fragment has been recreated in a
-     * way that doesn't permit the fragment to store its own state
-     *
-     * @param state The bundle holding the stored state
-     * @see saveState
-     */
-    fun restoreState(state: Bundle?) {
-        // Might be asking for trouble by doing overriding saveState like this? This function
-        // is meant to only be called when there is no saved state by the fragment
-        if (state != null) {
-            postIds = state.getStringArrayList(saveKey(POST_IDS_KEY)) ?: ArrayList()
-        }
-        saveState = state
     }
 
     private fun setupBinding() {
@@ -297,6 +259,7 @@ class PostsFragment : Fragment(), SortableWithTime {
                 val previousSize = postsAdapter?.itemCount
                 postsAdapter?.submitList(filterPosts(posts))
 
+                /*
                 if (saveState != null && previousSize == 0) {
                     val layoutState: Parcelable? = saveState?.getParcelable(saveKey(LAYOUT_STATE_KEY))
 
@@ -304,6 +267,7 @@ class PostsFragment : Fragment(), SortableWithTime {
                         postsLayoutManager?.onRestoreInstanceState(layoutState)
                     }
                 }
+                 */
             })
 
             onLoadingCountChange().observe(viewLifecycleOwner, { onLoadingChange?.invoke(it) })
@@ -321,6 +285,7 @@ class PostsFragment : Fragment(), SortableWithTime {
      * @see restoreViewHolderStates
      */
     private fun saveViewHolderStates() {
+        /*
         if (saveState == null) {
             saveState = Bundle()
         }
@@ -348,6 +313,8 @@ class PostsFragment : Fragment(), SortableWithTime {
                 saveBundle.putInt(saveKey(LAST_VIEW_STATE_STORED_KEY), lastVisible)
             }
         }
+
+         */
     }
 
     /**
@@ -356,6 +323,7 @@ class PostsFragment : Fragment(), SortableWithTime {
      * @see saveViewHolderStates
      */
     private fun restoreViewHolderStates() {
+        /*
         saveState?.let {
             val firstVisible = it.getInt(saveKey(FIRST_VIEW_STATE_STORED_KEY))
             val lastVisible = it.getInt(saveKey(LAST_VIEW_STATE_STORED_KEY))
@@ -372,6 +340,7 @@ class PostsFragment : Fragment(), SortableWithTime {
                 }
             }
         }
+         */
     }
 
     /**
