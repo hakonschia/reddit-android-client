@@ -185,24 +185,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     /**
-     * Gets the [PostsFragment] holding the posts for this subreddit
-     *
-     * @return The fragment holding the posts, or null if no fragment was found or if the [SubredditFragment]
-     * isn't attached
-     */
-    private fun getPostsFragment() : PostsFragment? {
-        // If the outer (this) fragment hasn't been added yet then the childFragmentManager will not be able to do anything
-        if (!isAdded) {
-            return null
-        }
-
-        val fragment = childFragmentManager.findFragmentByTag(POSTS_TAG)
-        return if (fragment is PostsFragment) {
-            fragment
-        } else null
-    }
-
-    /**
      * Inflates and sets up [binding]
      */
     private fun setupBinding() {
@@ -214,9 +196,9 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                 drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
             }
 
-            subredditRefresh.setOnClickListener { getPostsFragment()?.refreshPosts() }
+            subredditRefresh.setOnClickListener { postsFragment?.refreshPosts() }
             subredditSort.setOnClickListener { view ->
-                getPostsFragment()?.let {
+                postsFragment?.let {
                     showPopupSortWithTime(it, view)
                 }
             }
