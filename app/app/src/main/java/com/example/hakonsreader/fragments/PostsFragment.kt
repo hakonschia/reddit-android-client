@@ -111,6 +111,15 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     var onLoadingChange: ((Boolean) -> Unit)? = null
 
+    /**
+     * The time, in minutes, the score should be hidden on the posts shown
+     */
+    var hideScoreTime = 0
+        set(value) {
+            field = value
+            postsAdapter?.hideScoreTime = value
+        }
+
     private var isDefaultSubreddit = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -212,6 +221,8 @@ class PostsFragment : Fragment(), SortableWithTime {
             }
 
             lifecycleOwner = viewLifecycleOwner
+
+            hideScoreTime = this@PostsFragment.hideScoreTime
 
             binding.posts.adapter = this
 

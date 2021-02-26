@@ -163,7 +163,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         } else {
             // Is default subreddit, we can create the fragment now since it will never change
             // (if it is "random" it could change later, so initialize it later)
-            setupViewPager(subredditName)
+            setupViewPager(Subreddit().apply { name = subredditName })
         }
 
         App.get().registerPrivateBrowsingObservable(this)
@@ -254,11 +254,11 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
      *
      * @param name The name of the subreddit the subreddit is for
      */
-    private fun setupViewPager(name: String) {
+    private fun setupViewPager(subreddit: Subreddit) {
         // TODO unless you know the wiki it's not obvious since there arent tabs
         //  TabLayout could be here, but need to figure out how to hide that (along with the toolbar)
         //  since it's annoying to have it on screen the entire time
-        binding.pager.adapter = Adapter(name, this@SubredditFragment)
+        binding.pager.adapter = Adapter(subreddit, this@SubredditFragment)
 
         val act = activity
         binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -466,7 +466,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
      * Sets a subreddit on the binding and sets up various things to load the subreddit
      */
     private fun setSubredditAndLoadPosts(subreddit: Subreddit) {
-        setupViewPager(subreddit.name)
+        setupViewPager(subreddit)
         setupRulesViewModel(subreddit.name)
         setupFlairsViewModel(subreddit.name)
 
@@ -474,7 +474,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         setBannerImage()
 
         binding.subreddit = subreddit
-        //postsAdapter?.hideScoreTime = it.hideScoreTime
     }
 
     /**
@@ -819,7 +818,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         }
     }
 
-    private inner class Adapter(val name: String, fragment: Fragment) : FragmentStateAdapter(fragment) {
+    private inner class Adapter(val subreddit: Subreddit, fragment: Fragment) : FragmentStateAdapter(fragment) {
         // Kind of bad to hardcode the count I guess but whatever
         override fun getItemCount() = if (isDefaultSubreddit) 1 else 2
         override fun createFragment(position: Int) : Fragment {
@@ -829,7 +828,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                     val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
                     PostsFragment.newInstance(
                             isForUser = false,
-                            name = name,
+                            name = subreddit.name,
                             sort = sort,
                             timeSort = timeSort
                     ).apply {
@@ -840,12 +839,14 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                             checkLoadingStatus()
                         }
 
+                        hideScoreTime = subreddit.hideScoreTime
+
                         setupSubmitPostFab(this)
 
                         postsFragment = this
                     }
                 }
-                1 -> WikiFragment.newInstance(name).apply {
+                1 -> WikiFragment.newInstance(subreddit.name).apply {
                     onLoadingChange = {
                         checkLoadingStatus()
                     }
