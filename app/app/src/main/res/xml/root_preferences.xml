@@ -297,5 +297,12 @@
             app:iconSpaceReserved="false"
             app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_subreddits_load_banners" />
+
+        <SwitchPreference
+            app:key="@string/prefs_key_subreddits_warn_nsfw"
+            app:title="@string/prefs_title_subreddits_warn_nsfw"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_subreddits_warn_nsfw" />
     </PreferenceCategory>
 </PreferenceScreen>

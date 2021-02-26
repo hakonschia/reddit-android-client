@@ -1017,6 +1017,16 @@ class App : Application() {
     }
 
     /**
+     * @return True if a warning should be displayed when opening NSFW subreddits
+     */
+    fun warnNsfwSubreddits() : Boolean {
+        return settings.getBoolean(
+                getString(R.string.prefs_key_subreddits_warn_nsfw),
+                resources.getBoolean(R.bool.prefs_default_subreddits_warn_nsfw)
+        )
+    }
+
+    /**
      * Handles when the API notifies that the access token is no longer valid, and the user should
      * be logged out and prompted to log back in.
      */
