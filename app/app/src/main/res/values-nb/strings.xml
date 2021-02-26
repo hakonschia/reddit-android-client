@@ -408,4 +408,9 @@
     <string name="subredditWikiNotCreated">Denne wikien har ikke blitt opprettet enda</string>
     <string name="subredditWikiNotFound">Fant ikke wiki siden</string>
     <string name="subredditWikiCannotView">Du får ikke lov til å se denne wikien</string>
+    <string name="prefs_title_subreddits_warn_nsfw">Vis NSFW advarsel</string>
+    <string name="subredditNsfwWarningHeader">NSFW subreddit</string>
+    <string name="subredditNsfwWarningContent">Dette er en NSFW subreddit, er du sikker på at du vil se den?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nei</string>
 </resources>

@@ -1,11 +1,13 @@
 package com.example.hakonsreader.fragments
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -131,6 +133,8 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     // Not sure if storing the fragments like might cause a leak? Need to access them somehow though
     private var postsFragment: PostsFragment? = null
     private var wikiFragment: WikiFragment? = null
+
+    private var nsfwWarningDialog: AlertDialog? = null
 
     /**
      * A DrawerListener for the drawer with subreddit info
@@ -320,15 +324,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                     return@observe
                 }
 
-                // TODO check if it is NSFW, if it is show a warning (this should also be a setting
-                //  ie. "Warn about NSFW subreddits"
-                setupViewPager(it.name)
-                setupRulesViewModel(it.name)
-                setupFlairsViewModel(it.name)
-
-                // Kind of weird to call this I guess, but it's to now load load posts
-                onResume()
-
                 // If there is no subscribers previously the ticker animation looks very weird
                 // so disable it if it would like weird
                 val enableTickerAnimation = old != null && old.subscribers != 0
@@ -338,11 +333,29 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                     0
                 }).toLong()
 
-                ViewUtil.setSubredditIcon(binding.subredditIcon, it)
-                setBannerImage()
+                if (it.isNsfw && App.get().warnNsfwSubreddits()) {
+                    if (nsfwWarningDialog == null) {
+                        nsfwWarningDialog = AlertDialog.Builder(requireContext())
+                            .setTitle(R.string.subredditNsfwWarningHeader)
+                            .setMessage(R.string.subredditNsfwWarningContent)
+                            .setPositiveButton(R.string.yes) { dialogInterface: DialogInterface, _: Int ->
+                                setSubredditAndLoadPosts(it)
+                                dialogInterface.dismiss()
+                            }
+                            .setNegativeButton(R.string.no) { dialogInterface: DialogInterface, _: Int ->
+                                // Do something else
+                                // We should probably create some sort of listener as this depends on
+                                // where the fragment is (like in SubredditActivity it should probably finish
+                                // and in MainActivity do something else like go back to the subreddits list or something)
+                                dialogInterface.dismiss()
+                            }
+                            .create()
+                    }
 
-                binding.subreddit = it
-                //postsAdapter?.hideScoreTime = it.hideScoreTime
+                    nsfwWarningDialog?.show()
+                } else {
+                    setSubredditAndLoadPosts(it)
+                }
             }
 
             isLoading.observe(viewLifecycleOwner) {
@@ -468,6 +481,21 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     /**
+     * Sets a subreddit on the binding and sets up various things to load the subreddit
+     */
+    private fun setSubredditAndLoadPosts(subreddit: Subreddit) {
+        setupViewPager(subreddit.name)
+        setupRulesViewModel(subreddit.name)
+        setupFlairsViewModel(subreddit.name)
+
+        ViewUtil.setSubredditIcon(binding.subredditIcon, subreddit)
+        setBannerImage()
+
+        binding.subreddit = subreddit
+        //postsAdapter?.hideScoreTime = it.hideScoreTime
+    }
+
+    /**
      * Sets the subreddits banner image. If no image is found, the banners visibility is set to [View.GONE].
      * When (if) the image loads then [FragmentSubredditBinding.setBannerLoaded] is called with `true`.
      * If data saving is enabled, then the image will only be loaded if it is already cached, and will
@@ -558,16 +586,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         } else {
             View.GONE
         }
-    }
-
-    private fun getWikiFragment() : WikiFragment? {
-        if (_binding == null) {
-            return null
-        }
-
-        return if (binding.pager.childCount >= 2) {
-            binding.pager[1] as WikiFragment
-        } else null
     }
 
     /**

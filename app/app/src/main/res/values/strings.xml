@@ -6,6 +6,9 @@
       to all translations-->
     <string name="integer" translatable="false">%,d</string>
 
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
     <string name="loggedIn">Logged in</string>
 
     <string name="navbarHome">Home</string>
@@ -578,4 +581,7 @@
     <string name="subredditWikiNotCreated">This wiki has not yet been created</string>
     <string name="subredditWikiNotFound">Couldn\'t find wiki page</string>
     <string name="subredditWikiCannotView">You\'re not allowed to view this wiki</string>
+
+    <string name="subredditNsfwWarningHeader">NSFW subreddit</string>
+    <string name="subredditNsfwWarningContent">This is a NSFW subreddit, are you sure you want to view it?</string>
 </resources>
