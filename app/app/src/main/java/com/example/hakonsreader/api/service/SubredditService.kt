@@ -5,6 +5,8 @@ import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.model.flairs.RedditFlair
+import com.example.hakonsreader.api.model.internal.SubredditRuleInternal
+import com.example.hakonsreader.api.model.internal.SubredditWikiPageInternal
 import com.example.hakonsreader.api.responses.JsonResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -179,4 +181,16 @@ interface SubredditService {
      */
     @GET("r/{subreddit}/about/rules?raw_json=1")
     suspend fun getRules(@Path("subreddit") subredditName: String) : Response<SubredditRuleInternal>
+
+    /**
+     * Gets the rules of a subreddit
+     *
+     * @param subredditName The name of the subreddit to get the wiki for
+     * @param wikiPage The name of the subpage to get
+     */
+    @GET("r/{subreddit}/wiki/{page}?raw_json=1")
+    suspend fun getWikiPage(
+            @Path("subreddit") subredditName: String,
+            @Path("page") wikiPage: String
+    ) : Response<SubredditWikiPageInternal>
 }

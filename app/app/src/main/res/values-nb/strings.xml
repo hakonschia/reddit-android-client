@@ -402,4 +402,6 @@
     <string name="prefs_title_subreddits_load_banners">Vis bannere</string>
     <string name="subredditPostsPageTitle">Poster</string>
     <string name="subredditWikiPageTitle">Wiki</string>
+    <string name="oauthScopeExplanationWikiread">Tillater applikasjonen å lese subreddit wikisider</string>
+    <string name="oauthScopeHeader">"%s - "</string>
 </resources>

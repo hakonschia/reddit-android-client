@@ -1,5 +1,6 @@
-package com.example.hakonsreader.api.model
+package com.example.hakonsreader.api.model.internal
 
+import com.example.hakonsreader.api.model.SubredditRule
 import com.google.gson.annotations.SerializedName
 
 class SubredditRuleInternal {

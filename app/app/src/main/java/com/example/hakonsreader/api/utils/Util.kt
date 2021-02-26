@@ -28,6 +28,10 @@ fun <T> apiError(resp: Response<T>) : ApiResponse.Error {
     return try {
         // Reddit might return an HTML page on errors, which makes the json parsing fail
         val errorBody = Gson().fromJson(resp.errorBody()?.string(), GenericError::class.java)
+        // Sometimes the code isn't returned in the error body, so manually set it
+        if (errorBody.code == 0) {
+            errorBody.code = resp.code()
+        }
         ApiResponse.Error(errorBody, Throwable("Error executing request: ${resp.code()}"))
     } catch (e: Exception) {
         ApiResponse.Error(GenericError(resp.code()), Throwable("Error executing request: ${resp.code()}"))

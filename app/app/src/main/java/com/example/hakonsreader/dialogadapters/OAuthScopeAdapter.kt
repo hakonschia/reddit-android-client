@@ -30,7 +30,7 @@ class OAuthScopeAdapter(
 
         val scope = scopes[position]
 
-        header.text = "$scope - "
+        header.text = context.getString(R.string.oauthScopeHeader, scope)
         content.text = getOAuthExplanation(scope)
 
         return view
@@ -57,6 +57,7 @@ class OAuthScopeAdapter(
             "read" -> R.string.oauthScopeExplanationRead
             "privatemessages" -> R.string.oauthScopeExplanationPrivatemessage
             "modposts" -> R.string.oauthScopeExplanationModposts
+            "wikiread" -> R.string.oauthScopeExplanationWikiread
             else -> -1
         }
 

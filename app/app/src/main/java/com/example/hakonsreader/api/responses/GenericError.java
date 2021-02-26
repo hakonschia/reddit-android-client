@@ -30,6 +30,21 @@ public class GenericError {
      */
     public static final String REQUIRES_REDDIT_PREMIUM = "gold_only";
 
+    /**
+     * Error for when a wiki page hasn't been created. This error will occur when a moderator of the subreddit
+     * the wiki is in tries to access a non-existing wiki page, with a 404 error code.
+     * When a non-moderator user access this page the error will be {@link #WIKI_DISABLED} with a 403 code
+     */
+    public static final String WIKI_PAGE_NOT_CREATED = "PAGE_NOT_CREATED";
+
+    /**
+     * Error for when a wiki page is disabled (does not exist). This error will occur when a non-moderator of the subreddit
+     * the wiki is in tries to access a non-existing wiki page, with a 403 error code. When a moderator user access this page
+     * the error will be {@link #WIKI_PAGE_NOT_CREATED} with a 404 error code
+     */
+    public static final String WIKI_DISABLED = "WIKI_DISABLED";
+
+
 
     @SerializedName("error")
     private int code;
@@ -48,10 +63,20 @@ public class GenericError {
     /**
      * Retrieves the code for the request. This will generally be an HTTP status code
      *
-     * @return The code for the request. This will always be present
+     * @return The code for the request
      */
     public int getCode() {
         return code;
+    }
+
+    /**
+     * Sets the code for the request. This should only be used in cases where the error returned from
+     * the API doesn't give an explicit code
+     *
+     * @param code The code for the request
+     */
+    public void setCode(int code) {
+        this.code = code;
     }
 
     /**

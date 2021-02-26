@@ -135,23 +135,9 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        // If we have no username we can't get posts (we can't ask for posts for the logged in user without
-        // their username). The posts are retrieved automatically when the user information loads
-        // TODO this might require some differences in PostsFragment
-        //if (postsAdapter?.getPosts()?.isEmpty() == true && postIds.isEmpty() && username != null) {
-        //    postsViewModel?.loadPosts()
-        //}
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        // onSaveInstanceState is called for configuration changes (such as orientation)
-        // so we need to store the animation state here and in saveState (for when the fragment has
-        // been replaced but not destroyed)
         outState.putBoolean(IS_INFO_LOADED, isInfoLoaded)
         postsFragment?.let { childFragmentManager.putFragment(outState, SAVED_POSTS_FRAGMENT, it) }
     }

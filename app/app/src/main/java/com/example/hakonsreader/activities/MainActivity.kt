@@ -433,6 +433,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         CoroutineScope(IO).launch {
             when (val userInfo = api.user().info()) {
                 is ApiResponse.Success -> {
+                    // TODO this has to update the nav drawer (which should happen automatically with observables)
                     App.get().updateUserInfo(info = userInfo.value)
                     // This will be called after the activity has been restarted when logging in
                     // so call it when user information is retrieved as well

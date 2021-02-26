@@ -555,4 +555,26 @@ class SubredditRequest(
             ApiResponse.Error(GenericError(-1), e)
         }
     }
+
+    /**
+     * Gets a wiki page for the subreddit
+     *
+     * OAuth scope required: `wikiread`
+     *
+     * @param page The name of the page to retrieve. Default to `index` (the start of the wiki)
+     */
+    suspend fun wiki(page: String = "index") : ApiResponse<SubredditWikiPage> {
+        return try {
+            val response = api.getWikiPage(subredditName, page)
+            val body = response.body()?.data
+            if (body != null) {
+                body.subreddit = subredditName
+                ApiResponse.Success(body)
+            } else {
+                apiError(response)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
 }
