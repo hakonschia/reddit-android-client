@@ -1,7 +1,9 @@
 package com.example.hakonsreader.fragments
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
@@ -9,8 +11,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +22,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.activities.SubmitActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.FlairType
@@ -32,14 +37,17 @@ import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.example.hakonsreader.interfaces.LockableSlidr
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
+import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
 import com.example.hakonsreader.viewmodels.SubredditRulesViewModel
 import com.example.hakonsreader.viewmodels.SubredditViewModel
+import com.example.hakonsreader.viewmodels.SubredditWikiViewModel
 import com.example.hakonsreader.viewmodels.factories.SubredditFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
+import com.example.hakonsreader.viewmodels.factories.SubredditWikiFactory
 import com.example.hakonsreader.views.util.ViewUtil
 import com.example.hakonsreader.views.util.showPopupSortWithTime
 import com.squareup.picasso.Callback
@@ -48,6 +56,8 @@ import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import java.lang.RuntimeException
+import kotlin.math.log
 
 
 class SubredditFragment : Fragment(), PrivateBrowsingObservable {
@@ -121,7 +131,9 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     private var flairsViewModel: SubredditFlairsViewModel? = null
     private var flairsAdapter: RedditFlairAdapter? = null
 
+    // Not sure if storing the fragments like might cause a leak? Need to access them somehow though
     private var postsFragment: PostsFragment? = null
+    private var wikiFragment: WikiFragment? = null
 
     /**
      * A DrawerListener for the drawer with subreddit info
@@ -541,6 +553,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         var count = 0
 
         count += if (postsFragment?.isLoading() == true) 1 else 0
+        count += if (wikiFragment?.isLoading() == true) 1 else 0
         count += if (subredditViewModel?.isLoading?.value == true) 1 else 0
 
         _binding?.loadingIcon?.visibility = if (count > 0) {
@@ -550,6 +563,15 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         }
     }
 
+    private fun getWikiFragment() : WikiFragment? {
+        if (_binding == null) {
+            return null
+        }
+
+        return if (binding.pager.childCount >= 2) {
+            binding.pager[1] as WikiFragment
+        } else null
+    }
 
     /**
      * Handles the errors received by the API
@@ -665,15 +687,87 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     class WikiFragment : Fragment() {
+        // TODO back button should probably go back to the previous wiki page. Unless the page has a button
+        //  back it's impossible to get back. Can have a stack of the wiki names loaded or something
+        //  (probably in the ViewModel with a (goToPrevious()) or something
+
         companion object {
-            fun newInstance() = WikiFragment()
+            private const val WIKI_SUBREDDIT_NAME = "wikiSubredditName"
+
+            fun newInstance(name: String) = WikiFragment().apply {
+                arguments = Bundle().apply {
+                    putString(WIKI_SUBREDDIT_NAME, name)
+                }
+            }
         }
 
         private var _binding: FragmentSubredditWikiBinding? = null
         private val binding get() = _binding!!
 
+        private val name by lazy {
+            arguments?.getString(WIKI_SUBREDDIT_NAME)
+                    ?: throw RuntimeException("No subreddit name given to wiki")
+        }
+
+        private val wikiViewModel: SubredditWikiViewModel by viewModels { SubredditWikiFactory(App.get().api.subreddit(name)) }
+
+        /**
+         * A movement method to be used in the wiki that checks if the clicked link is another wiki page, and
+         * loads that page internally instead of sending to [DispatcherActivity]
+         */
+        private val wikiLinkMovementMethod = InternalLinkMovementMethod { linkText ->
+            // If linkText matches another wiki page, load that on the ViewModel, otherwise send to Dispatcher
+            // Ensure we have a full URL (assume non-http links are to Reddit)
+            val url = if (!linkText.matches("^http(s)?.*".toRegex())) {
+                "https://reddit.com" + (if (linkText[0] == '/') "" else "/") + linkText
+            } else linkText
+
+            // Wiki pages might be in multiple paths (ie. "index/rules/whatever")
+            // Must also match "/wiki", which should be treated as "wiki/index"
+            if (url.matches("https://(.*)?reddit.com/r/$name/wiki.*".toRegex())) {
+                // Get everything after "wiki"
+                val wikiPage = url.split("/wiki").last()
+
+                // Don't keep the first "/" if present. Reddit will handle it, but to be safe in the future
+                if (wikiPage.isNotEmpty() && wikiPage.first() == '/') {
+                    wikiViewModel.loadPage(wikiPage.substring(1))
+                } else {
+                    wikiViewModel.loadPage(wikiPage)
+                }
+            } else {
+                Intent(requireContext(), DispatcherActivity::class.java).apply {
+                    putExtra(DispatcherActivity.URL_KEY, linkText)
+                    requireContext().startActivity(this)
+                }
+            }
+
+            true
+        }
+
+        /**
+         * Callback for errors when loading posts
+         */
+        var onError: ((GenericError, Throwable) -> Unit)? = null
+
+        /**
+         * Callback for when posts have started/finished loading
+         *
+         * @see isLoading
+         */
+        var onLoadingChange: ((Boolean) -> Unit)? = null
+
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
             _binding = FragmentSubredditWikiBinding.inflate(inflater)
+
+            binding.wikiContent.movementMethod = wikiLinkMovementMethod
+
+            setupViewModel()
+
+            if (wikiViewModel.page.value == null) {
+                // Load index if no page is already loaded
+                wikiViewModel.loadPage()
+            }
+
             return binding.root
         }
 
@@ -681,6 +775,28 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
             super.onDestroyView()
             _binding = null
         }
+
+        private fun setupViewModel() {
+            with (wikiViewModel) {
+                page.observe(viewLifecycleOwner) {
+                    // Ensure we're at the top when loading a new page (this might have to be stored in onSaveInstanceState)
+                    binding.scroller.scrollTo(0, 0)
+                    val content = App.get().adjuster.adjust(it.content)
+
+                    App.get().markwon.setMarkdown(binding.wikiContent, content)
+                }
+
+                isLoading.observe(viewLifecycleOwner) {
+                    onLoadingChange?.invoke(it)
+                }
+
+                error.observe(viewLifecycleOwner) {
+                    // TODO Handle wiki specific errors such as not found
+                }
+            }
+        }
+
+        fun isLoading() = wikiViewModel.isLoading.value
     }
 
     private inner class Adapter(val name: String, fragment: Fragment) : FragmentStateAdapter(fragment) {
@@ -709,7 +825,13 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                         postsFragment = this
                     }
                 }
-                1 -> WikiFragment.newInstance()
+                1 -> WikiFragment.newInstance(name).apply {
+                    onLoadingChange = {
+                        checkLoadingStatus()
+                    }
+
+                    wikiFragment = this
+                }
 
                 else -> throw IllegalStateException("Unexpected position: $position")
             }

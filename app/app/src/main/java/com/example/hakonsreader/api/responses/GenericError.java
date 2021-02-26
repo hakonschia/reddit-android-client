@@ -38,12 +38,19 @@ public class GenericError {
     public static final String WIKI_PAGE_NOT_CREATED = "PAGE_NOT_CREATED";
 
     /**
-     * Error for when a wiki page is disabled (does not exist). This error will occur when a non-moderator of the subreddit
+     * Error for when a wiki page is disabled. This error will occur when a non-moderator of the subreddit
      * the wiki is in tries to access a non-existing wiki page, with a 403 error code. When a moderator user access this page
      * the error will be {@link #WIKI_PAGE_NOT_CREATED} with a 404 error code
      */
     public static final String WIKI_DISABLED = "WIKI_DISABLED";
 
+    public static final String WIKI_PAGE_NOT_FOUND = "PAGE_NOT_FOUND";
+
+    /**
+     * Error for when an attempt to get a wiki page for a subreddit that is not wikiable. This typically
+     * occurs when attempting to get wiki pages for subreddits such as popular and front page
+     */
+    public static final String NOT_WIKIABLE = "NOT_WIKIABLE";
 
 
     @SerializedName("error")
