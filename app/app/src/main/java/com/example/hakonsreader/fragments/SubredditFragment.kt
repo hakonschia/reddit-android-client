@@ -40,10 +40,7 @@ import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
-import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
-import com.example.hakonsreader.viewmodels.SubredditRulesViewModel
-import com.example.hakonsreader.viewmodels.SubredditViewModel
-import com.example.hakonsreader.viewmodels.SubredditWikiViewModel
+import com.example.hakonsreader.viewmodels.*
 import com.example.hakonsreader.viewmodels.factories.SubredditFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
@@ -745,11 +742,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         }
 
         /**
-         * Callback for errors when loading posts
-         */
-        var onError: ((GenericError, Throwable) -> Unit)? = null
-
-        /**
          * Callback for when posts have started/finished loading
          *
          * @see isLoading
@@ -791,12 +783,40 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                 }
 
                 error.observe(viewLifecycleOwner) {
-                    // TODO Handle wiki specific errors such as not found
+                    handleErrors(it)
                 }
             }
         }
 
         fun isLoading() = wikiViewModel.isLoading.value
+
+        private fun handleErrors(error: ErrorWrapper) {
+
+            when (error.error.reason) {
+                // Disabled is basically if the subreddit hasn't created a wiki (or disabled later I suppose)
+                GenericError.WIKI_DISABLED -> {
+                    // Just use this I guess
+                    _binding?.wikiContent?.text = getString(R.string.subredditWikiDisabled)
+                }
+
+                GenericError.WIKI_PAGE_NOT_FOUND -> {
+                    _binding?.wikiContent?.text = getString(R.string.subredditWikiNotFound)
+                }
+
+                // Moderator accessing a page not created
+                GenericError.WIKI_PAGE_NOT_CREATED -> {
+                    _binding?.wikiContent?.text = getString(R.string.subredditWikiNotCreated)
+                }
+
+                GenericError.WIKI_MAY_NOT_VIEW -> {
+                    _binding?.wikiContent?.text = getString(R.string.subredditWikiCannotView)
+                }
+
+                else -> {
+                    Util.handleGenericResponseErrors(binding.root, error.error, error.throwable)
+                }
+            }
+        }
     }
 
     private inner class Adapter(val name: String, fragment: Fragment) : FragmentStateAdapter(fragment) {

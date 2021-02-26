@@ -572,4 +572,8 @@
 
     <string name="subredditPostsPageTitle">Posts</string>
     <string name="subredditWikiPageTitle">Wiki</string>
+    <string name="subredditWikiDisabled">This wiki has been disabled</string>
+    <string name="subredditWikiNotCreated">This wiki has not yet been created</string>
+    <string name="subredditWikiNotFound">Couldn\'t find wiki page</string>
+    <string name="subredditWikiCannotView">You\'re not allowed to view this wiki</string>
 </resources>

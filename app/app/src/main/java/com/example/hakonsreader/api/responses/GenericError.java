@@ -47,6 +47,11 @@ public class GenericError {
     public static final String WIKI_PAGE_NOT_FOUND = "PAGE_NOT_FOUND";
 
     /**
+     * Error for when a wiki isn't viewable, typically accompanied by a 403 error
+     */
+    public static final String WIKI_MAY_NOT_VIEW = "MAY_NOT_VIEW";
+
+    /**
      * Error for when an attempt to get a wiki page for a subreddit that is not wikiable. This typically
      * occurs when attempting to get wiki pages for subreddits such as popular and front page
      */

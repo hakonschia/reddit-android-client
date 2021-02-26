@@ -404,4 +404,8 @@
     <string name="subredditWikiPageTitle">Wiki</string>
     <string name="oauthScopeExplanationWikiread">Tillater applikasjonen å lese subreddit wikisider</string>
     <string name="oauthScopeHeader">"%s - "</string>
+    <string name="subredditWikiDisabled">Denne wikien har blitt deaktivert</string>
+    <string name="subredditWikiNotCreated">Denne wikien har ikke blitt opprettet enda</string>
+    <string name="subredditWikiNotFound">Fant ikke wiki siden</string>
+    <string name="subredditWikiCannotView">Du får ikke lov til å se denne wikien</string>
 </resources>
