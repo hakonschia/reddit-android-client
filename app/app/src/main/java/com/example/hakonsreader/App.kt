@@ -514,7 +514,11 @@ class App : Application() {
                         this.nsfwAccount = nsfwAccount
                     }
 
-                    userInfoDatabase.userInfo().update(this)
+                    if (userInfoDatabase.userInfo().userExists(it.userId)) {
+                        userInfoDatabase.userInfo().update(this)
+                    } else {
+                        userInfoDatabase.userInfo().insert(this)
+                    }
                 }
             }
         }

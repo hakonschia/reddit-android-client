@@ -810,7 +810,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         private fun setupViewModel() {
             with (wikiViewModel) {
                 page.observe(viewLifecycleOwner) {
-                    println("PageStack=${stackSize()}")
                     binding.wikiGoBack.visibility = if (stackSize() > 1) {
                         View.VISIBLE
                     } else {

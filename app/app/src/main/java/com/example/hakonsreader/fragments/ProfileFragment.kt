@@ -1,12 +1,14 @@
 package com.example.hakonsreader.fragments
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
@@ -15,7 +17,10 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentProfileBinding
+import com.example.hakonsreader.databinding.SubredditRequiresPremiumBinding
+import com.example.hakonsreader.databinding.UserIsSuspendedBinding
 import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.misc.Util
@@ -259,16 +264,21 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     private fun onUserResponse(newUser: RedditUser) {
         isInfoLoaded = true
         user = newUser
-        username = newUser.username
 
-        // Store the updated user information if this profile is for the logged in user
-        if (isLoggedInUser) {
-            App.get().updateUserInfo(info = newUser)
+        if (newUser.isSuspended) {
+            userIsSuspended(newUser)
+        } else {
+            username = newUser.username
+
+            // Store the updated user information if this profile is for the logged in user
+            if (isLoggedInUser) {
+                App.get().updateUserInfo(info = newUser)
+            }
+
+            createAndAddPostsFragment(newUser.username)
+
+            updateViews()
         }
-
-        createAndAddPostsFragment(newUser.username)
-
-        updateViews()
     }
 
     /**
@@ -285,6 +295,14 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
             View.VISIBLE
         } else {
             View.GONE
+        }
+    }
+
+    private fun userIsSuspended(user: RedditUser) {
+        UserIsSuspendedBinding.inflate(layoutInflater, binding.parentLayout, true).apply {
+            username = user.username
+            (root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
+            root.requestLayout()
         }
     }
 }

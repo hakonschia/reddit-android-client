@@ -16,6 +16,9 @@ interface RedditUserInfoDao {
     @Delete
     fun delete(userInfo: RedditUserInfo)
 
+    @Query("SELECT EXISTS(SELECT * FROM reddit_user_info WHERE userId=:id)")
+    fun userExists(id: String) : Boolean
+
     @Query("SELECT * FROM reddit_user_info WHERE userId=:id")
     fun getById(id: String) : RedditUserInfo?
 

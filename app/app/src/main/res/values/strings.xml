@@ -586,4 +586,7 @@
 
     <string name="subredditNsfwWarningHeader">NSFW subreddit</string>
     <string name="subredditNsfwWarningContent">This is a NSFW subreddit, are you sure you want to view it?</string>
+    
+    <string name="userSuspended">%s has been suspended</string>
+    <string name="userSuspendedDescription">Users are suspended by violating Reddit\'s content policy or by suspicious activity</string>
 </resources>

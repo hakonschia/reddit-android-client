@@ -415,4 +415,6 @@
     <string name="no">Nei</string>
     <string name="subredditWikiEmpty">Denne wikien er tom</string>
     <string name="content_description_wiki_back">Gå tilbake i wikien</string>
+    <string name="userSuspended">%s er suspandert</string>
+    <string name="userSuspendedDescription">Brukere blir suspandert ved å bryte Reddit sin innholdspolicy eller ved mistenkelig kontoaktivitet</string>
 </resources>

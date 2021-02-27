@@ -47,7 +47,7 @@ class SubredditWikiViewModel(
         if (stackSize() >= 2) {
             pageStack.removeLast()
             val pageName = pageStack.last()
-            // Since we're popping the stack we don't want to the page back
+            // Since we're popping the stack we don't want to add the page back
             loadPage(pageName, addToStack = false)
         }
     }

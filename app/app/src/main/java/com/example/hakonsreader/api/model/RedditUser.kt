@@ -57,6 +57,44 @@ class RedditUser : RedditListing() {
     @SerializedName("is_employee")
     var isAdmin = false
 
+    /**
+     * True if the user has been suspended
+     */
+    @SerializedName("is_suspended")
+    var isSuspended = false
 
-    // TODO there is also an inner "subreddit" object which is somewhat identical to the "Subreddit" class
+    /**
+     * True if the currently logged in user is a friend of this user
+     */
+    @SerializedName("is_friend")
+    var isFriend = false
+
+    @SerializedName("has_subscribed")
+    var isSubscribed = false
+
+    /**
+     * True if the user is a moderator in at least one subreddit
+     */
+    @SerializedName("is_mod")
+    var isMod = false
+
+    @SerializedName("is_gold")
+    var isGold = false
+
+    @SerializedName("verified")
+    var verified = false
+
+    @SerializedName("hide_from_robots")
+    var hideFromRobots = false
+
+
+    @SerializedName("pref_show_snoovatar")
+    var showSnoovatar = false
+
+    /**
+     * The URL to the soovatar. If not set, this will be empty
+     */
+    @SerializedName("snoovatar_img")
+    var snoovatarImage = ""
+
 }

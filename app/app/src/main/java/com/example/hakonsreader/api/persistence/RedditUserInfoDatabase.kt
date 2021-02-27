@@ -11,7 +11,7 @@ import com.example.hakonsreader.api.model.RedditUserInfo
  * A local database for keeping track of user information. This is in a separate database
  * to simplify updating the database without losing the logged in users
  */
-@Database(version = 1, exportSchema = false, entities = [RedditUserInfo::class])
+@Database(version = 2, exportSchema = false, entities = [RedditUserInfo::class])
 @TypeConverters(PostConverter::class, EnumConverters::class)
 abstract class RedditUserInfoDatabase : RoomDatabase() {
     abstract fun userInfo() : RedditUserInfoDao
