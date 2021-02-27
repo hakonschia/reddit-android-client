@@ -763,6 +763,8 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                 } else {
                     wikiViewModel.loadPage(wikiPage)
                 }
+            } else if (url.matches("https://(.*)?reddit.com/r/$name/about/rules/?".toRegex())) {
+                onRulesLinkClicked?.invoke()
             } else {
                 Intent(requireContext(), DispatcherActivity::class.java).apply {
                     putExtra(DispatcherActivity.URL_KEY, linkText)
@@ -779,6 +781,11 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
          * @see isLoading
          */
         var onLoadingChange: ((Boolean) -> Unit)? = null
+
+        /**
+         * Callback for when a rules link for (only) the given subreddit has been clicked
+         */
+        var onRulesLinkClicked: (() -> Unit)? = null
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
             _binding = FragmentSubredditWikiBinding.inflate(inflater)
@@ -899,6 +906,10 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                 1 -> WikiFragment.newInstance(subreddit.name).apply {
                     onLoadingChange = {
                         checkLoadingStatus()
+                    }
+
+                    onRulesLinkClicked = {
+                        binding.drawer.openDrawer(GravityCompat.END)
                     }
 
                     wikiFragment = this
