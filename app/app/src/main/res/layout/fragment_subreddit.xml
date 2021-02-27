@@ -105,8 +105,7 @@
                             app:civ_circle_background_color="@color/background"
 
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:subredditIcon="@{subreddit}" />
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <ImageView
                             android:id="@+id/modIcon"

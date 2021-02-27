@@ -94,6 +94,9 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
         private const val SAVED_POSTS_FRAGMENT = "savedPostsFragment"
 
+        private const val NSFW_WARNING_SHOWN = "nsfwWarningShown"
+        private const val NSFW_WARNING_DISMISSED_WITH_SUCCESS = "nsfwWarningDismissedWithSuccess"
+
         /**
          * Creates a new instance of the fragment
          *
@@ -133,7 +136,16 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     private var postsFragment: PostsFragment? = null
     private var wikiFragment: WikiFragment? = null
 
-    private var nsfwWarningDialog: AlertDialog? = null
+    /**
+     * Flag for if the NSFW warning for this sub has already been shown, and shouldn't be shown again
+     */
+    private var nsfwWarningShown = false
+
+    /**
+     * Flag for if the NSFW warning was dismissed with a success (ie. that the user "accepted" to load NSFW)
+     */
+    private var nsfwWarningDismissedWithSuccess = false
+
 
     /**
      * A DrawerListener for the drawer with subreddit info
@@ -141,14 +153,15 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     var drawerListener: DrawerLayout.DrawerListener? = null
 
     /**
-     * If set to true, the fragments activity will call [AppCompatActivity.setSupportActionBar]
-     * when the view is created
+     * If set to true, the fragment will call [AppCompatActivity.setSupportActionBar] when the view is created
      */
     var setToolbarOnActivity = true
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         if (savedInstanceState != null) {
             postsFragment = childFragmentManager.getFragment(savedInstanceState, SAVED_POSTS_FRAGMENT) as PostsFragment?
+            nsfwWarningShown = savedInstanceState.getBoolean(NSFW_WARNING_SHOWN)
+            nsfwWarningDismissedWithSuccess = savedInstanceState.getBoolean(NSFW_WARNING_DISMISSED_WITH_SUCCESS)
         }
 
         setupBinding()
@@ -172,7 +185,11 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        postsFragment?.let { childFragmentManager.putFragment(outState, SAVED_POSTS_FRAGMENT, it) }
+        outState.apply {
+            putBoolean(NSFW_WARNING_SHOWN, nsfwWarningShown)
+            putBoolean(NSFW_WARNING_DISMISSED_WITH_SUCCESS, nsfwWarningDismissedWithSuccess)
+            postsFragment?.let { childFragmentManager.putFragment(this, SAVED_POSTS_FRAGMENT, it) }
+        }
     }
 
     override fun onDestroyView() {
@@ -251,7 +268,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     /**
      * Sets up the ViewPager (containing the posts) with a given subreddit name
      *
-     * @param name The name of the subreddit the subreddit is for
+     * @param subreddit The the subreddit to display
      */
     private fun setupViewPager(subreddit: Subreddit) {
         // TODO unless you know the wiki it's not obvious since there arent tabs
@@ -314,26 +331,30 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                     0
                 }).toLong()
 
-                if (it.isNsfw && App.get().warnNsfwSubreddits()) {
-                    if (nsfwWarningDialog == null) {
-                        nsfwWarningDialog = AlertDialog.Builder(requireContext())
-                            .setTitle(R.string.subredditNsfwWarningHeader)
-                            .setMessage(R.string.subredditNsfwWarningContent)
-                            .setPositiveButton(R.string.yes) { dialogInterface: DialogInterface, _: Int ->
-                                setSubredditAndLoadPosts(it)
-                                dialogInterface.dismiss()
-                            }
-                            .setNegativeButton(R.string.no) { dialogInterface: DialogInterface, _: Int ->
-                                // Do something else
-                                // We should probably create some sort of listener as this depends on
-                                // where the fragment is (like in SubredditActivity it should probably finish
-                                // and in MainActivity do something else like go back to the subreddits list or something)
-                                dialogInterface.dismiss()
-                            }
-                            .create()
-                    }
+                binding.subreddit = it
 
-                    nsfwWarningDialog?.show()
+                if (it.isNsfw && !nsfwWarningDismissedWithSuccess && App.get().warnNsfwSubreddits()) {
+                    // Only show warning once
+                    if (!nsfwWarningShown) {
+                        AlertDialog.Builder(requireContext())
+                                .setTitle(R.string.subredditNsfwWarningHeader)
+                                .setMessage(R.string.subredditNsfwWarningContent)
+                                .setPositiveButton(R.string.yes) { dialogInterface: DialogInterface, _: Int ->
+                                    nsfwWarningDismissedWithSuccess = true
+                                    setSubredditAndLoadPosts(it)
+                                    dialogInterface.dismiss()
+                                }
+                                .setNegativeButton(R.string.no) { dialogInterface: DialogInterface, _: Int ->
+                                    // Do something else
+                                    // We should probably create some sort of listener as this depends on
+                                    // where the fragment is (like in SubredditActivity it should probably finish
+                                    // and in MainActivity do something else like go back to the subreddits list or something)
+                                    nsfwWarningDismissedWithSuccess = false
+                                    dialogInterface.dismiss()
+                                }
+                                .show()
+                    }
+                    nsfwWarningShown = true
                 } else {
                     setSubredditAndLoadPosts(it)
                 }
@@ -462,22 +483,19 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     /**
-     * Sets a subreddit on the binding and sets up various things to load the subreddit
+     * Sets the icon and banner on the subreddit, as well as loading the fragments for the pagers and
+     * initializing the rules/flairs ViewModels
      *
      * @param subreddit The subreddit to load. If the name of this subreddit matches the adapter found
      * in the ViewPager then the subreddit will only be changed on the binding
      */
     private fun setSubredditAndLoadPosts(subreddit: Subreddit) {
-        // This still has to be set to reflect the changes the subreddit might have
-        binding.subreddit = subreddit
-
         // Chance of this having to change is small, but just to be sure
         ViewUtil.setSubredditIcon(binding.subredditIcon, subreddit)
         setBannerImage()
 
         val pagerAdapter = binding.pager.adapter
         if (pagerAdapter is Adapter && pagerAdapter.subreddit.name == subreddit.name) {
-            Log.d(TAG, "setSubredditAndLoadPosts: same name, returning")
             return
         }
         
