@@ -1,5 +1,6 @@
 package com.example.hakonsreader.fragments
 
+import android.animation.LayoutTransition
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -719,10 +720,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
     }
 
     class WikiFragment : Fragment() {
-        // TODO back button should probably go back to the previous wiki page. Unless the page has a button
-        //  back it's impossible to get back. Can have a stack of the wiki names loaded or something
-        //  (probably in the ViewModel with a (goToPrevious()) or something
-
         companion object {
             private const val WIKI_SUBREDDIT_NAME = "wikiSubredditName"
 
@@ -786,12 +783,19 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
             _binding = FragmentSubredditWikiBinding.inflate(inflater)
 
+            with (binding.wikiContainer.layoutTransition) {
+                setAnimateParentHierarchy(false)
+                enableTransitionType(LayoutTransition.CHANGING)
+            }
+
             binding.wikiContent.movementMethod = wikiLinkMovementMethod
+            binding.wikiGoBack.setOnClickListener {
+                wikiViewModel.pop()
+            }
 
             setupViewModel()
 
             if (wikiViewModel.page.value == null) {
-                // Load index if no page is already loaded
                 wikiViewModel.loadPage()
             }
 
@@ -806,6 +810,13 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         private fun setupViewModel() {
             with (wikiViewModel) {
                 page.observe(viewLifecycleOwner) {
+                    println("PageStack=${stackSize()}")
+                    binding.wikiGoBack.visibility = if (stackSize() > 1) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
+
                     if (it.content.isBlank()) {
                         binding.wikiContent.text = getString(R.string.subredditWikiEmpty)
                         return@observe
