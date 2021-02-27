@@ -83,7 +83,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
          */
         private const val TIME_SORT = "time_sort"
 
-        private const val POSTS_TAG = "posts_subreddit"
 
         /**
          * The key used to [getArguments] if the subreddit rules should automatically be shown
@@ -464,16 +463,27 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
     /**
      * Sets a subreddit on the binding and sets up various things to load the subreddit
+     *
+     * @param subreddit The subreddit to load. If the name of this subreddit matches the adapter found
+     * in the ViewPager then the subreddit will only be changed on the binding
      */
     private fun setSubredditAndLoadPosts(subreddit: Subreddit) {
-        setupViewPager(subreddit)
-        setupRulesViewModel(subreddit.name)
-        setupFlairsViewModel(subreddit.name)
+        // This still has to be set to reflect the changes the subreddit might have
+        binding.subreddit = subreddit
 
+        // Chance of this having to change is small, but just to be sure
         ViewUtil.setSubredditIcon(binding.subredditIcon, subreddit)
         setBannerImage()
 
-        binding.subreddit = subreddit
+        val pagerAdapter = binding.pager.adapter
+        if (pagerAdapter is Adapter && pagerAdapter.subreddit.name == subreddit.name) {
+            Log.d(TAG, "setSubredditAndLoadPosts: same name, returning")
+            return
+        }
+        
+        setupViewPager(subreddit)
+        setupRulesViewModel(subreddit.name)
+        setupFlairsViewModel(subreddit.name)
     }
 
     /**
@@ -770,6 +780,11 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         private fun setupViewModel() {
             with (wikiViewModel) {
                 page.observe(viewLifecycleOwner) {
+                    if (it.content.isBlank()) {
+                        binding.wikiContent.text = getString(R.string.subredditWikiEmpty)
+                        return@observe
+                    }
+
                     // Ensure we're at the top when loading a new page (this might have to be stored in onSaveInstanceState)
                     binding.scroller.scrollTo(0, 0)
                     val content = App.get().adjuster.adjust(it.content)
@@ -790,7 +805,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         fun isLoading() = wikiViewModel.isLoading.value
 
         private fun handleErrors(error: ErrorWrapper) {
-
             when (error.error.reason) {
                 // Disabled is basically if the subreddit hasn't created a wiki (or disabled later I suppose)
                 GenericError.WIKI_DISABLED -> {

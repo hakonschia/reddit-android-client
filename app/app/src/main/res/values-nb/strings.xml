@@ -413,4 +413,5 @@
     <string name="subredditNsfwWarningContent">Dette er en NSFW subreddit, er du sikker på at du vil se den?</string>
     <string name="yes">Ja</string>
     <string name="no">Nei</string>
+    <string name="subredditWikiEmpty">Denne wikien er tom</string>
 </resources>
