@@ -1020,7 +1020,7 @@ class App : Application() {
      * @return True if a warning should be displayed when opening NSFW subreddits
      */
     fun warnNsfwSubreddits() : Boolean {
-        return currentUserInfo?.nsfwAccount == true || settings.getBoolean(
+        return currentUserInfo?.nsfwAccount != true && settings.getBoolean(
                 getString(R.string.prefs_key_subreddits_warn_nsfw),
                 resources.getBoolean(R.bool.prefs_default_subreddits_warn_nsfw)
         )
