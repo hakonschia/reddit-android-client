@@ -94,7 +94,14 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
         private const val SAVED_POSTS_FRAGMENT = "savedPostsFragment"
 
+        /**
+         * Key to save [nsfwWarningShown]
+         */
         private const val NSFW_WARNING_SHOWN = "nsfwWarningShown"
+
+        /**
+         * Key to save [nsfwWarningDismissedWithSuccess]
+         */
         private const val NSFW_WARNING_DISMISSED_WITH_SUCCESS = "nsfwWarningDismissedWithSuccess"
 
         /**
@@ -460,23 +467,24 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
      */
     private fun setupSubmitPostFab(postsFragment: PostsFragment) {
         if (!isDefaultSubreddit) {
-            binding.let {
-                postsFragment.addScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        if (dy > 0) {
-                            it.submitPostFab.hide()
-                        } else {
-                            it.submitPostFab.show()
-                        }
-                    }
-                })
+            postsFragment.addScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
 
-                it.submitPostFab.setOnClickListener {
-                    Intent(context, SubmitActivity::class.java).apply {
-                        putExtra(SubmitActivity.SUBREDDIT_KEY, subredditName)
-                        startActivity(this)
+                    // This *shouldn't* be called after onDestroyView, so _binding *shouldn't* be nulled
+                    // but just to be 100 % to not cause a crash on this use null checks
+                    if (dy > 0) {
+                        _binding?.submitPostFab?.hide()
+                    } else {
+                        _binding?.submitPostFab?.show()
                     }
+                }
+            })
+
+            binding.submitPostFab.setOnClickListener {
+                Intent(context, SubmitActivity::class.java).apply {
+                    putExtra(SubmitActivity.SUBREDDIT_KEY, subredditName)
+                    startActivity(this)
                 }
             }
         }

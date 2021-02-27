@@ -3,6 +3,7 @@ package com.example.hakonsreader.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +37,7 @@ import java.lang.RuntimeException
 class PostsFragment : Fragment(), SortableWithTime {
 
     companion object {
+        private const val TAG = "PostsFragment"
 
         /**
          * The key stored in [getArguments] saying the name the of the subreddit/user the posts are for
@@ -170,20 +172,19 @@ class PostsFragment : Fragment(), SortableWithTime {
             it.lifecycleOwner = null
         }
 
-        scrollListeners.clear()
         _binding = null
     }
 
     /**
      * Adds a scroll listener to the posts RecyclerView.
-     * If the fragments view has not yet been created then this listener will be stored and added
-     * when the view is created. The list of stored listeners will be cleared when the fragment view
-     * is destroyed
+     *
+     * The listener will be stored and added when the fragments view is created. If the fragment view
+     * is created when this is called then the listener is added now, as well as being stored to be
+     * automatically added again if the view is recreated
      */
     fun addScrollListener(listener: RecyclerView.OnScrollListener) {
-        if (_binding == null) {
-            scrollListeners.add(listener)
-        } else {
+        scrollListeners.add(listener)
+        if (_binding != null) {
             binding.posts.addOnScrollListener(listener)
         }
     }
@@ -196,6 +197,7 @@ class PostsFragment : Fragment(), SortableWithTime {
     private fun setupBinding() {
         with (binding) {
             scrollListeners.forEach {
+                Log.d(TAG, "setupBinding: added a scroll listener")
                 posts.addOnScrollListener(it)
             }
 
