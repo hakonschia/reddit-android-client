@@ -270,8 +270,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                     return@observe
                 }
 
-                // TODO these values should probably be deleted at some point? Can check at startup if any of the values are
-                //  over a few days old or something and delete those that are
                 val lastTimeOpenedKey = this@PostActivity.post?.id + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP
                 val preferences = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME_POST_OPENED, MODE_PRIVATE)
                 val lastTimeOpened = preferences.getLong(lastTimeOpenedKey, -1)

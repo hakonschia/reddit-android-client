@@ -6,6 +6,7 @@ import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -236,6 +237,9 @@ class App : Application() {
             val deleted = database.posts().deleteOld(maxAge)
 
             Log.d(TAG, "onCreate: # of records=$count; # of deleted=$deleted")
+
+            // Calling this from the Coroutine because then we can pretend to be smart about performance :)
+            removeOldPostOpenedPreferences()
         }
 
         createInboxNotificationChannel()
@@ -273,6 +277,37 @@ class App : Application() {
                     getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
+    }
+
+    /**
+     * Removes keys older than 2 weeks from the SharedPreferences holding the opened post values
+     */
+    private fun removeOldPostOpenedPreferences() {
+        // Having these keys in SharedPreferences is kind of weird, but it's way easier than creating
+        // a database for it, so it works I guess
+
+        val twoWeeksAgo = (System.currentTimeMillis() / 1000L) - 60 * 60 * 24 * 14
+        val keysToRemove = ArrayList<String>()
+
+        val prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME_POST_OPENED, MODE_PRIVATE)
+
+        val sizeBefore = prefs.all.size
+        prefs.all.forEach { (key, value) ->
+            value as Long
+
+            if (twoWeeksAgo > value) {
+                keysToRemove.add(key)
+            }
+        }
+
+        val editor = prefs.edit()
+
+        keysToRemove.forEach {
+            editor.remove(it)
+        }
+
+        editor.apply()
+        Log.d(TAG, "removeOldPostOpenedPreferences: removed ${keysToRemove.size} keys from $sizeBefore total")
     }
 
     /**
