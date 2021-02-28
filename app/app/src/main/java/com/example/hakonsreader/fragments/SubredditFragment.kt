@@ -1,12 +1,9 @@
 package com.example.hakonsreader.fragments
 
 import android.animation.LayoutTransition
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
@@ -15,7 +12,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -41,7 +37,6 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.example.hakonsreader.interfaces.LockableSlidr
-import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
@@ -59,7 +54,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import java.lang.RuntimeException
-import kotlin.math.log
 
 
 /**
@@ -67,7 +61,7 @@ import kotlin.math.log
  * response for the information is retrieved, and therefore potential redirects for subreddit names
  * is supported
  */
-class SubredditFragment : Fragment(), PrivateBrowsingObservable {
+class SubredditFragment : Fragment() {
 
     companion object {
         private const val TAG = "SubredditFragment"
@@ -191,7 +185,9 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
             setupViewPager(Subreddit().apply { name = subredditName })
         }
 
-        App.get().registerPrivateBrowsingObservable(this)
+        App.get().privatelyBrowsing.observe(viewLifecycleOwner) {
+            privateBrowsingStateChanged(it)
+        }
 
         return binding.root
     }
@@ -206,9 +202,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
     override fun onDestroyView() {
         super.onDestroyView()
-
-        App.get().unregisterPrivateBrowsingObservable(this)
-
         _binding = null
     }
 
@@ -765,7 +758,7 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         return _binding?.subredditToolbar
     }
 
-    override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
+    private fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
         binding.privatelyBrowsing = privatelyBrowsing
         binding.subredditIcon.borderColor = ContextCompat.getColor(
                 requireContext(),

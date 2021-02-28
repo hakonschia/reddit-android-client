@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -19,13 +18,9 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentProfileBinding
-import com.example.hakonsreader.databinding.SubredditRequiresPremiumBinding
 import com.example.hakonsreader.databinding.UserIsSuspendedBinding
-import com.example.hakonsreader.fragments.SubredditFragment.WikiFragment
 import com.example.hakonsreader.interfaces.OnInboxClicked
-import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.misc.Util
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +35,7 @@ import java.util.*
 /**
  * Fragment for displaying a Reddit user profile
  */
-class ProfileFragment : Fragment(), PrivateBrowsingObservable {
+class ProfileFragment : Fragment() {
 
     companion object {
         private const val TAG = "ProfileFragment"
@@ -62,6 +57,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
          */
         private const val IS_INFO_LOADED = "isInfoLoaded"
 
+        private const val SAVED_POSTS_FRAGMENT = "savedPostsFragment"
 
         /**
          * Create a new ProfileFragment for a user by their username
@@ -125,12 +121,11 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         setupBinding()
         addFragmentListener()
 
-        App.get().registerPrivateBrowsingObservable(this)
-
         var infoLoaded = false
         // Retrieve user info if the fragment hasn't loaded any already
         if (savedInstanceState != null) {
             infoLoaded = savedInstanceState.getBoolean(IS_INFO_LOADED)
+            postsFragment = childFragmentManager.getFragment(savedInstanceState, SAVED_POSTS_FRAGMENT) as PostsFragment?
         }
 
         if (!infoLoaded) {
@@ -140,20 +135,21 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         // If we're on a logged in user, or the fragment has been recreated, we might have some old info
         updateViews()
 
+        App.get().privatelyBrowsing.observe(viewLifecycleOwner) {
+            privateBrowsingStateChanged(it)
+        }
+
         return binding.root
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
         outState.putBoolean(IS_INFO_LOADED, isInfoLoaded)
+        postsFragment?.let { childFragmentManager.putFragment(outState, SAVED_POSTS_FRAGMENT, it) }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-
-        App.get().unregisterPrivateBrowsingObservable(this)
-
         _binding = null
     }
 
@@ -238,7 +234,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
     }
 
 
-    override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
+    private fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
         binding.privatelyBrowsing = privatelyBrowsing
         binding.profilePicture.borderColor = ContextCompat.getColor(
                 requireContext(),

@@ -58,7 +58,7 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.concurrent.fixedRateTimer
 
-class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged, PrivateBrowsingObservable {
+class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
 
     companion object {
         private const val TAG = "MainActivity"
@@ -92,7 +92,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     private lateinit var binding: ActivityMainBinding
-    private var savedState = Bundle()
 
     private val db = App.get().database
 
@@ -147,7 +146,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         setupNavBar()
 
         if (savedInstanceState != null) {
-            savedState = savedInstanceState
             restoreFragmentStates(savedInstanceState)
             restoreNavBar(savedInstanceState)
         } else {
@@ -167,7 +165,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         App.get().run {
             registerReceivers()
-            registerPrivateBrowsingObservable(this@MainActivity)
+            privatelyBrowsing.observe(this@MainActivity) {
+                privateBrowsingStateChanged(it)
+            }
         }
     }
 
@@ -186,7 +186,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         super.onDestroy()
         App.get().run {
             unregisterReceivers()
-            unregisterPrivateBrowsingObservable(this@MainActivity)
         }
     }
 
@@ -361,7 +360,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         badge?.isVisible = show
     }
 
-    override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
+    private fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
         with(binding.navDrawer) {
             this.privatelyBrowsing = privatelyBrowsing
 

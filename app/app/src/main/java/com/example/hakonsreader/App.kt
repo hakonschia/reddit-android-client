@@ -7,6 +7,8 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.activities.InvalidAccessTokenActivity
 import com.example.hakonsreader.api.RedditApi
@@ -20,7 +22,6 @@ import com.example.hakonsreader.api.utils.MarkdownAdjuster
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.enums.ShowNsfwPreview
-import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.markwonplugins.*
 import com.example.hakonsreader.misc.SharedPreferencesManager
 import com.example.hakonsreader.misc.TokenManager
@@ -44,7 +45,6 @@ import org.commonmark.node.Image
 import java.io.File
 import java.security.SecureRandom
 import java.util.*
-import java.util.function.Consumer
 
 /**
  * Entry point for the application. Sets up various static variables used throughout the app
@@ -206,11 +206,12 @@ class App : Application() {
      */
     var currentUserInfo: RedditUserInfo? = null
 
-    /**
-     * List of observers to be notified when private browsing is enabled/disabled
-     */
-    private val privateBrowsingObservables: MutableList<PrivateBrowsingObservable> = ArrayList()
+    private val _privatelyBrowsing = MutableLiveData<Boolean>()
 
+    /**
+     * A LiveData observable for the state of the APIs private browsing context
+     */
+    val privatelyBrowsing: LiveData<Boolean> = _privatelyBrowsing
 
     override fun onCreate() {
         super.onCreate()
@@ -609,29 +610,9 @@ class App : Application() {
     fun enablePrivateBrowsing(enable: Boolean) {
         api.enablePrivateBrowsing(enable)
         settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, enable).apply()
-        privateBrowsingObservables.forEach(Consumer { observable: PrivateBrowsingObservable -> observable.privateBrowsingStateChanged(enable) })
-    }
 
-    /**
-     * Registers an observer for private browsing changes
-     *
-     *
-     * The observable will be called automatically when registered
-     *
-     * @param observable The observable to register
-     */
-    fun registerPrivateBrowsingObservable(observable: PrivateBrowsingObservable) {
-        privateBrowsingObservables.add(observable)
-        observable.privateBrowsingStateChanged(isUserLoggedInPrivatelyBrowsing())
-    }
-
-    /**
-     * Unregisters an observer from the observers of private browsing changes
-     *
-     * @param observable The observable to remove
-     */
-    fun unregisterPrivateBrowsingObservable(observable: PrivateBrowsingObservable) {
-        privateBrowsingObservables.remove(observable)
+        // To be certain it doesn't crash if this is called from a background thread
+        _privatelyBrowsing.postValue(enable)
     }
 
     /**
