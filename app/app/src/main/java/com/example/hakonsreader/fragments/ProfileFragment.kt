@@ -10,8 +10,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -21,6 +23,7 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentProfileBinding
 import com.example.hakonsreader.databinding.SubredditRequiresPremiumBinding
 import com.example.hakonsreader.databinding.UserIsSuspendedBinding
+import com.example.hakonsreader.fragments.SubredditFragment.WikiFragment
 import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.interfaces.PrivateBrowsingObservable
 import com.example.hakonsreader.misc.Util
@@ -34,6 +37,9 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
 
+/**
+ * Fragment for displaying a Reddit user profile
+ */
 class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
     companion object {
@@ -56,9 +62,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
          */
         private const val IS_INFO_LOADED = "isInfoLoaded"
 
-        private const val POSTS_TAG = "posts_profile"
-
-        private const val SAVED_POSTS_FRAGMENT = "savedPostsFragment"
 
         /**
          * Create a new ProfileFragment for a user by their username
@@ -120,6 +123,7 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setupBinding()
+        addFragmentListener()
 
         App.get().registerPrivateBrowsingObservable(this)
 
@@ -127,7 +131,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         // Retrieve user info if the fragment hasn't loaded any already
         if (savedInstanceState != null) {
             infoLoaded = savedInstanceState.getBoolean(IS_INFO_LOADED)
-            postsFragment = childFragmentManager.getFragment(savedInstanceState, SAVED_POSTS_FRAGMENT) as PostsFragment?
         }
 
         if (!infoLoaded) {
@@ -144,7 +147,6 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
         super.onSaveInstanceState(outState)
 
         outState.putBoolean(IS_INFO_LOADED, isInfoLoaded)
-        postsFragment?.let { childFragmentManager.putFragment(outState, SAVED_POSTS_FRAGMENT, it) }
     }
 
     override fun onDestroyView() {
@@ -192,27 +194,49 @@ class ProfileFragment : Fragment(), PrivateBrowsingObservable {
      * @param name The name of the profile the posts are for
      */
     private fun createAndAddPostsFragment(name: String) {
-        if (postsFragment == null) {
-            postsFragment = PostsFragment.newInstance(
-                    isForUser = true,
-                    name = name,
-                    sort = SortingMethods.NEW
-            ).apply {
-                onError = { error, throwable ->
-                    _binding?.let {
-                        Util.handleGenericResponseErrors(it.root, error, throwable)
-                    }
-                }
-                onLoadingChange = {
-                    checkLoadingStatus()
-                }
-            }
-        }
+        val fragment = PostsFragment.newInstance(
+                isForUser = true,
+                name = name,
+                sort = SortingMethods.NEW
+        )
 
         childFragmentManager.beginTransaction()
-                .replace(R.id.postsContainer, postsFragment!!, POSTS_TAG)
+                .replace(R.id.postsContainer, fragment)
                 .commit()
     }
+
+    /**
+     * Adds a fragment lifecycle listener to [getChildFragmentManager] that sets [PostsFragment] and
+     * as well as setting listeners on the fragment
+     *
+     * When their views are destroyed the references will be nulled.
+     */
+    private fun addFragmentListener() {
+        childFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
+            override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
+                if (f is PostsFragment) {
+                    postsFragment = f.apply {
+                        onError = { error, throwable ->
+                            _binding?.let {
+                                Util.handleGenericResponseErrors(it.root, error, throwable)
+                            }
+                        }
+                        onLoadingChange = {
+                            checkLoadingStatus()
+                        }
+                        postsFragment = this
+                    }
+                }
+            }
+
+            override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
+                if (f is PostsFragment) {
+                    postsFragment = null
+                }
+            }
+        }, false)
+    }
+
 
     override fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
         binding.privatelyBrowsing = privatelyBrowsing

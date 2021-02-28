@@ -1,6 +1,7 @@
 package com.example.hakonsreader.fragments
 
 import android.animation.LayoutTransition
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -17,6 +18,7 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,6 +62,11 @@ import java.lang.RuntimeException
 import kotlin.math.log
 
 
+/**
+ * Fragment for displaying a subreddit. The posts/wiki/rules etc. will not be loaded until a valid
+ * response for the information is retrieved, and therefore potential redirects for subreddit names
+ * is supported
+ */
 class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
     companion object {
@@ -92,8 +99,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
          * The value with this key should be a [Boolean]
          */
         private const val SHOW_RULES = "show_rules"
-
-        private const val SAVED_POSTS_FRAGMENT = "savedPostsFragment"
 
         /**
          * Key to save [nsfwWarningShown]
@@ -167,13 +172,13 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         if (savedInstanceState != null) {
-            postsFragment = childFragmentManager.getFragment(savedInstanceState, SAVED_POSTS_FRAGMENT) as PostsFragment?
             nsfwWarningShown = savedInstanceState.getBoolean(NSFW_WARNING_SHOWN)
             nsfwWarningDismissedWithSuccess = savedInstanceState.getBoolean(NSFW_WARNING_DISMISSED_WITH_SUCCESS)
         }
 
         setupBinding()
         setupSubredditViewModel()
+        addFragmentListener()
 
         // Default subs don't have rules/flairs/info in drawers (could potentially add a tiny description
         // of the different default subs in the info)
@@ -196,7 +201,6 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
         outState.apply {
             putBoolean(NSFW_WARNING_SHOWN, nsfwWarningShown)
             putBoolean(NSFW_WARNING_DISMISSED_WITH_SUCCESS, nsfwWarningDismissedWithSuccess)
-            postsFragment?.let { childFragmentManager.putFragment(this, SAVED_POSTS_FRAGMENT, it) }
         }
     }
 
@@ -271,6 +275,56 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
             this.subreddit = Subreddit().apply { name = subredditName }
             (requireActivity() as AppCompatActivity).setSupportActionBar(subredditToolbar)
         }
+    }
+
+    /**
+     * Adds a fragment lifecycle listener to [getChildFragmentManager] that sets [PostsFragment] and
+     * [WikiFragment] when their views are created, as well as setting listeners on
+     * the fragment
+     *
+     * When their views are destroyed the references will be nulled.
+     */
+    private fun addFragmentListener() {
+         childFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
+             override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
+                 if (f is PostsFragment) {
+                     postsFragment = f.apply {
+                         onError = { error, throwable ->
+                             handleErrors(error, throwable)
+                         }
+                         onLoadingChange = {
+                             checkLoadingStatus()
+                         }
+
+                         hideScoreTime = subreddit?.hideScoreTime ?: 0
+
+                         setupSubmitPostFab(this)
+
+                         postsFragment = this
+                     }
+                 } else if (f is WikiFragment) {
+                     wikiFragment = f.apply {
+                         onLoadingChange = {
+                             checkLoadingStatus()
+                         }
+
+                         onRulesLinkClicked = {
+                             binding.drawer.openDrawer(GravityCompat.END)
+                         }
+
+                         wikiFragment = this
+                     }
+                 }
+             }
+
+             override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
+                 if (f is PostsFragment) {
+                     postsFragment = null
+                 } else if (f is WikiFragment) {
+                     wikiFragment = null
+                 }
+             }
+         }, false)
     }
 
     /**
@@ -888,32 +942,9 @@ class SubredditFragment : Fragment(), PrivateBrowsingObservable {
                             name = subreddit.name,
                             sort = sort,
                             timeSort = timeSort
-                    ).apply {
-                        onError = { error, throwable ->
-                            handleErrors(error, throwable)
-                        }
-                        onLoadingChange = {
-                            checkLoadingStatus()
-                        }
-
-                        hideScoreTime = subreddit.hideScoreTime
-
-                        setupSubmitPostFab(this)
-
-                        postsFragment = this
-                    }
+                    )
                 }
-                1 -> WikiFragment.newInstance(subreddit.name).apply {
-                    onLoadingChange = {
-                        checkLoadingStatus()
-                    }
-
-                    onRulesLinkClicked = {
-                        binding.drawer.openDrawer(GravityCompat.END)
-                    }
-
-                    wikiFragment = this
-                }
+                1 -> WikiFragment.newInstance(subreddit.name)
 
                 else -> throw IllegalStateException("Unexpected position: $position")
             }
