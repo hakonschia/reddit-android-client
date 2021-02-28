@@ -864,7 +864,7 @@ class SubredditFragment : Fragment() {
         private fun setupViewModel() {
             with (wikiViewModel) {
                 page.observe(viewLifecycleOwner) {
-                    binding.wikiGoBack.visibility = if (stackSize() > 1) {
+                    binding.wikiGoBack.visibility = if (canGoBack()) {
                         View.VISIBLE
                     } else {
                         View.GONE

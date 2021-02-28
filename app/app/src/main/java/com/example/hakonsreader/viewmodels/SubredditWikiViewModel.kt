@@ -8,7 +8,6 @@ import com.example.hakonsreader.api.model.SubredditWikiPage
 import com.example.hakonsreader.api.requestmodels.SubredditRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 
@@ -35,16 +34,15 @@ class SubredditWikiViewModel(
     val error: LiveData<ErrorWrapper> = _error
 
     /**
-     * The size of the page stack
+     * @return True if the pages can go back
      */
-    fun stackSize() = pageStack.size
+    fun canGoBack() = pageStack.size >= 2
 
     /**
-     * Pops the stack and updates [page] with the next item. If [stackSize] is less than 2 then nothing is done,
-     * as this needs to remove one before
+     * Pops the stack of pages and updates [page] with the next item, if [canGoBack] returns true
      */
     fun pop() {
-        if (stackSize() >= 2) {
+        if (canGoBack()) {
             pageStack.removeLast()
             val pageName = pageStack.last()
             // Since we're popping the stack we don't want to add the page back
