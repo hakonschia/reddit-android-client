@@ -115,8 +115,8 @@ fun showAccountManagement(context: Context) {
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
                         removeItem(userInfoClicked)
                         CoroutineScope(IO).launch {
-                            // TODO revoke the token
                             app.userInfoDatabase.userInfo().delete(userInfoClicked)
+                            app.api.accessToken().revoke(userInfoClicked.accessToken)
                         }
                     }
                 }
