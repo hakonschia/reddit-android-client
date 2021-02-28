@@ -5,7 +5,6 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -215,11 +214,16 @@ public class MarkdownInput extends FrameLayout {
         text.insert(end, endSyntax);
         text.insert(start, startSyntax);
 
+        // Ensure the input field has the focus
+        binding.replyText.requestFocus();
+
         // When no text is selected start == end
         // If we're not selecting a text to bold, set the cursor to the middle so we can start writing
         if (start == end) {
             // Set cursor to the middle
             binding.replyText.setSelection(start + startSyntax.length());
+        } else {
+            binding.replyText.setSelection(start + startSyntax.length() + end + endSyntax.length());
         }
     }
 
@@ -252,23 +256,17 @@ public class MarkdownInput extends FrameLayout {
 
         // If we didn't find 6 # we can insert another one
         if (posToInsert != startPos + 6) {
-            Log.d(TAG, "headerOnClick: posToInsert=" + posToInsert);
             String textToAdd = "#";
 
             // Text is long enough to might have a space already
             if (text.length() > posToInsert) {
-                char charAt = text.charAt(posToInsert);
-                Log.d(TAG, "headerOnClick: charAt="+charAt);
-
                 // Not a space afterwards, so add it
                 if (text.charAt(posToInsert) != ' ') {
                     textToAdd += " ";
-                    Log.d(TAG, "headerOnClick: Space might have been here, but it isn't");
                 }
             } else {
                 // Text will never be long enough to have a space, so add it
                 textToAdd += " ";
-                Log.d(TAG, "headerOnClick: Text isn't long enough to have possibility of space being here");
             }
 
             binding.replyText.getText().insert(posToInsert, textToAdd);
