@@ -21,6 +21,10 @@
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
         <Constraint
+            android:id="@+id/progressBarLayout">
+            <PropertySet motion:visibilityMode="ignore"/>
+        </Constraint>
+        <Constraint
             android:id="@+id/noCommentsLayout">
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
@@ -74,6 +78,10 @@
 
         <Constraint
             android:id="@+id/loadingIcon">
+            <PropertySet motion:visibilityMode="ignore"/>
+        </Constraint>
+        <Constraint
+            android:id="@+id/progressBarLayout">
             <PropertySet motion:visibilityMode="ignore"/>
         </Constraint>
         <Constraint

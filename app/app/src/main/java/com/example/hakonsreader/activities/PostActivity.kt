@@ -284,7 +284,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
             }
 
             isLoading.observe(this@PostActivity, { isLoading ->
-                binding.loadingIcon.visibility = if (isLoading) {
+                binding.progressBarLayout.visibility = if (isLoading) {
                     VISIBLE
                 } else {
                     GONE

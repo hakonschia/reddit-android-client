@@ -311,7 +311,7 @@ class ProfileFragment : Fragment() {
         count += if (postsFragment?.isLoading() == true) 1 else 0
         count += if (isInfoLoading) 1 else 0
 
-        _binding?.loadingIcon?.visibility = if (count > 0) {
+        _binding?.progressBarLayout?.visibility = if (count > 0) {
             View.VISIBLE
         } else {
             View.GONE

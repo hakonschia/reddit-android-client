@@ -195,21 +195,28 @@
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-            <ProgressBar
-                android:id="@+id/loadingIcon"
+            <FrameLayout
+                android:id="@+id/progressBarLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
+                android:layout_height="@dimen/horizontalProgressBarHeight"
                 app:layout_anchor="@id/appBarLayout"
                 app:layout_anchorGravity="bottom"
-                style="?android:attr/progressBarStyleHorizontal"
-
                 android:indeterminateOnly="true"
                 android:visibility="gone"
+                tools:visibility="visible">
 
-                tools:visibility="visible" />
+                <!-- The height of this has to be some arbitrary large value, otherwise the actual
+                 progress bar will be very thin and the width will be tiny. It doesn't actually affect
+                 the height of progress bar since the FrameLayout is smaller -->
+                <ProgressBar
+                    android:id="@+id/loadingIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
 
+                    android:indeterminateOnly="true"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_gravity="center" />
+            </FrameLayout>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
     </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

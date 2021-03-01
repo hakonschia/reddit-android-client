@@ -646,7 +646,7 @@ class SubredditFragment : Fragment() {
         count += if (wikiFragment?.isLoading() == true) 1 else 0
         count += if (subredditViewModel?.isLoading?.value == true) 1 else 0
 
-        _binding?.loadingIcon?.visibility = if (count > 0) {
+        _binding?.progressBarLayout?.visibility = if (count > 0) {
             View.VISIBLE
         } else {
             View.GONE

@@ -70,10 +70,8 @@
     <dimen name="buttonPadding">6dp</dimen>
 
     <integer name="submissionTitleMaxLength">300</integer>
-
     <dimen name="linkPreviewTopMargin">4dp</dimen>
-
     <dimen name="postBarHeight">24dp</dimen>
-
     <dimen name="awardIconSize">14dp</dimen>
+    <dimen name="horizontalProgressBarHeight">2.5dp</dimen>
 </resources>

@@ -225,20 +225,31 @@
             app:layout_constraintEnd_toStartOf="@+id/goToNextTopLevelComment" />
 
 
-        <ProgressBar
-            android:id="@+id/loadingIcon"
-            style="?android:attr/progressBarStyleHorizontal"
+        <FrameLayout
+            android:id="@+id/progressBarLayout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:indeterminateOnly="true"
-            android:paddingTop="2.5dp"
-
+            android:layout_height="@dimen/horizontalProgressBarHeight"
             android:visibility="gone"
-
+            app:layout_anchor="@id/subredditAppBarLayout"
+            app:layout_anchorGravity="bottom"
             app:layout_constraintBottom_toBottomOf="@id/post"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/post"
-            tools:visibility="visible" />
+            tools:visibility="visible">
+
+            <!-- The height of this has to be some arbitrary large value, otherwise the actual
+             progress bar will be very thin and the width will be tiny. It doesn't actually affect
+             the height of progress bar since the FrameLayout is smaller -->
+            <ProgressBar
+                android:id="@+id/loadingIcon"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+
+                android:indeterminateOnly="true" />
+        </FrameLayout>
     </com.example.hakonsreader.views.SwipeRefreshMotionLayout>
 </layout>
