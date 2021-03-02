@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -22,6 +23,8 @@ import com.example.hakonsreader.databinding.FragmentProfileBinding
 import com.example.hakonsreader.databinding.UserIsSuspendedBinding
 import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.viewmodels.RedditUserViewModel
+import com.example.hakonsreader.viewmodels.factories.RedditUserFactory
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -50,13 +53,6 @@ class ProfileFragment : Fragment() {
          */
         private const val IS_LOGGED_IN_USER_KEY = "isLoggedInUser"
 
-        /**
-         * The key for instance saves that says if info has been loaded about the user
-         *
-         * The value stored with this should be a `boolean`
-         */
-        private const val IS_INFO_LOADED = "isInfoLoaded"
-
         private const val SAVED_POSTS_FRAGMENT = "savedPostsFragment"
 
         /**
@@ -77,63 +73,33 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private val api = App.get().api
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
-    /**
-     * The object representing the Reddit user the fragment is for
-     */
-    private var user: RedditUser? = null
+    private val username by lazy { arguments?.getString(USERNAME_KEY) }
 
     /**
      * Flag to set if the fragment is for the logged in user or not
      */
-    private var isLoggedInUser = false
+    private val isLoggedInUser by lazy { arguments?.getBoolean(IS_LOGGED_IN_USER_KEY) ?: false }
+
+    private val viewModel: RedditUserViewModel by viewModels {
+        RedditUserFactory(username, isLoggedInUser)
+    }
 
     var onInboxClicked: OnInboxClicked? = null
 
-    private var username: String? = null
-    private var isInfoLoaded = false
-    private var isInfoLoading = false
-
     private var postsFragment: PostsFragment? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            username = it.getString(USERNAME_KEY)
-            isLoggedInUser = it.getBoolean(IS_LOGGED_IN_USER_KEY)
-        }
-
-        if (isLoggedInUser) {
-            user = App.get().currentUserInfo?.userInfo
-            user?.let {
-                if (it.username.isNotBlank()) {
-                    username = it.username
-                }
-            }
-        }
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        setupBinding()
-        addFragmentListener()
-
-        var infoLoaded = false
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Retrieve user info if the fragment hasn't loaded any already
         if (savedInstanceState != null) {
-            infoLoaded = savedInstanceState.getBoolean(IS_INFO_LOADED)
             postsFragment = childFragmentManager.getFragment(savedInstanceState, SAVED_POSTS_FRAGMENT) as PostsFragment?
         }
 
-        if (!infoLoaded) {
-            retrieveUserInfo()
-        }
-
-        // If we're on a logged in user, or the fragment has been recreated, we might have some old info
-        updateViews()
+        setupBinding()
+        setupViewModel()
+        addFragmentListener()
 
         App.get().privatelyBrowsing.observe(viewLifecycleOwner) {
             privateBrowsingStateChanged(it)
@@ -144,22 +110,12 @@ class ProfileFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(IS_INFO_LOADED, isInfoLoaded)
         postsFragment?.let { childFragmentManager.putFragment(outState, SAVED_POSTS_FRAGMENT, it) }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    /**
-     * Updates [binding] with new user information, if [user] isn't *null*
-     */
-    private fun updateViews() {
-        if (user != null) {
-            binding.user = user
-        }
     }
 
     /**
@@ -184,17 +140,39 @@ class ProfileFragment : Fragment() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.profileToolbar)
     }
 
+
+    private fun setupViewModel() {
+        with(viewModel!!) {
+            user.observe(viewLifecycleOwner) {
+                onUserResponse(it)
+            }
+            isLoading.observe(viewLifecycleOwner) {
+                checkLoadingStatus()
+            }
+            error.observe(viewLifecycleOwner) {
+                Util.handleGenericResponseErrors(binding.parentLayout, it.error, it.throwable)
+            }
+
+            load()
+        }
+    }
+
     /**
-     * Creates a [PostsFragment] and adds it to [getChildFragmentManager]
+     * Creates a [PostsFragment] and adds it to [getChildFragmentManager]. If [postsFragment] is not null
+     * it is added directly
      *
      * @param name The name of the profile the posts are for
      */
     private fun createAndAddPostsFragment(name: String) {
-        val fragment = PostsFragment.newInstance(
+        val fragment = if (postsFragment != null) {
+            postsFragment!!
+        } else {
+            PostsFragment.newInstance(
                 isForUser = true,
                 name = name,
                 sort = SortingMethods.NEW
-        )
+            )
+        }
 
         childFragmentManager.beginTransaction()
                 .replace(R.id.postsContainer, fragment)
@@ -242,62 +220,22 @@ class ProfileFragment : Fragment() {
         )
     }
 
-    private fun retrieveUserInfo() {
-        // TODO this should be in a new ViewModel for users (and isInfoLoading should be removed completely)
-        isInfoLoading = true
-        checkLoadingStatus()
-
-        CoroutineScope(IO).launch {
-            val name = username
-            // If we're privately browsing, attempting to get user info for a logged in user would
-            // fail with a "You're currently privately browsing"
-            // If the user is privately browsing but no name is previously set this would fail since name would be null
-            // But that should never happen? A logged in user should always have a user object with name stored
-            val userResponse = if ((isLoggedInUser && !App.get().isUserLoggedInPrivatelyBrowsing()) || name == null) {
-                api.user().info()
-            } else {
-                api.user(name).info()
-            }
-
-            withContext(Main) {
-                // In case the view has been destroyed before we get a response
-                _binding?.let {
-                    when (userResponse) {
-                        is ApiResponse.Success -> onUserResponse(userResponse.value)
-                        is ApiResponse.Error -> {
-                            Util.handleGenericResponseErrors(it.parentLayout, userResponse.error, userResponse.throwable)
-                        }
-                    }
-                }
-            }
-        }
-
-        isInfoLoading = false
-        checkLoadingStatus()
-    }
-
     /**
      * Updates the fragments user information and loads posts automatically
      *
      * @param newUser The new user information
      */
     private fun onUserResponse(newUser: RedditUser) {
-        isInfoLoaded = true
-        user = newUser
-
         if (newUser.isSuspended) {
             userIsSuspended(newUser)
         } else {
-            username = newUser.username
-
             // Store the updated user information if this profile is for the logged in user
             if (isLoggedInUser) {
                 App.get().updateUserInfo(info = newUser)
             }
 
             createAndAddPostsFragment(newUser.username)
-
-            updateViews()
+            binding.user = newUser
         }
     }
 
@@ -309,7 +247,7 @@ class ProfileFragment : Fragment() {
         var count = 0
 
         count += if (postsFragment?.isLoading() == true) 1 else 0
-        count += if (isInfoLoading) 1 else 0
+        count += if (viewModel?.isLoading?.value == true) 1 else 0
 
         _binding?.progressBarLayout?.visibility = if (count > 0) {
             View.VISIBLE
