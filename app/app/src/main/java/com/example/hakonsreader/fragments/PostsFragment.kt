@@ -31,6 +31,7 @@ import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListene
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.views.Content
+import com.example.hakonsreader.views.Post
 import com.google.gson.Gson
 import java.lang.RuntimeException
 
@@ -156,20 +157,9 @@ class PostsFragment : Fragment(), SortableWithTime {
     override fun onDestroyView() {
         super.onDestroyView()
 
+        binding.posts.adapter = null
         postsAdapter?.let {
-            // Ensure that all videos are cleaned up
-            for (i in 0 until it.itemCount) {
-                val viewHolder = binding.posts.findViewHolderForLayoutPosition(i) as PostsAdapter.ViewHolder?
-                if (viewHolder != null) {
-                    // Ensure the extras for the view holder is saved
-                    viewHolder.saveExtras()
-                    viewHolder.destroy()
-                }
-            }
-
             savedViewHolderStates = it.postExtras
-
-            it.lifecycleOwner = null
         }
 
         _binding = null
@@ -197,7 +187,6 @@ class PostsFragment : Fragment(), SortableWithTime {
     private fun setupBinding() {
         with (binding) {
             scrollListeners.forEach {
-                Log.d(TAG, "setupBinding: added a scroll listener")
                 posts.addOnScrollListener(it)
             }
 

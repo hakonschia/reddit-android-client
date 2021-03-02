@@ -100,8 +100,8 @@ class StandardSubContainerFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         viewPager = null
+        super.onDestroyView()
     }
 
     private fun setupViewPager(viewPager: ViewPager2, savedInstanceState: Bundle?) {

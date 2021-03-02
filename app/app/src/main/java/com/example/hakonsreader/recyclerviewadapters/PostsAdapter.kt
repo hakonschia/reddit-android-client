@@ -21,11 +21,23 @@ import java.time.Duration
 import java.time.Instant
 
 /**
- * Adapter for recycler view of [RedditPost]
+ * Adapter for recycler view of [RedditPost].
+ *
+ * Note: When the RecyclerView using this adapter is finished with it (ie. the RecyclerView/the view
+ * holding the RecyclerView is destroyed) the RecyclerView has to set its adapter to `null`, otherwise
+ * a leak will occur (if there are video posts, or galleries with videos, these ExoPlayer instances
+ * might not be released, and if [lifecycleOwner] is set these references will also not be cleared).
+ * [postExtras] will be set when this is done to store the states of the ViewHolders
  */
 class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     
     private var posts = ArrayList<RedditPost>()
+
+    /**
+     * A list of the view holders this adapter has
+     */
+    private val viewHolders = ArrayList<ViewHolder>()
+
     var postExtras = HashMap<String, Bundle>()
 
     /**
@@ -54,9 +66,16 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
      * redrawing the ViewHolder
      *
      * When the view is destroyed, this must be set to `null` to avoid a leak, as well as setting the
-     * ViewHolders of the adapter to null (with [Post.lifecycleOwner])
+     * ViewHolders of the adapter to null (with [Post.lifecycleOwner]). Optionally, set the entire
+     * adapter to null to combine these operations.
      */
     var lifecycleOwner: LifecycleOwner? = null
+        set(value) {
+            field = value
+            viewHolders.forEach {
+                it.post.lifecycleOwner = value
+            }
+        }
 
 
     /**
@@ -101,7 +120,9 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        // Save the extras of the previous post
         saveExtras(holder.post)
+
         val post = posts[position]
 
         // Disable any animation to avoid it updating when scrolling, as this would animate changes from
@@ -129,7 +150,9 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
                 false
         )
 
-        return ViewHolder(view)
+        return ViewHolder(view).also {
+            viewHolders.add(it)
+        }
     }
 
     override fun getItemCount() = posts.size
@@ -138,6 +161,19 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
         super.onAttachedToRecyclerView(recyclerView)
         val divider = ListDivider(ContextCompat.getDrawable(recyclerView.context, R.drawable.list_divider))
         recyclerView.addItemDecoration(divider)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        viewHolders.forEach {
+            it.saveExtras()
+            it.destroy()
+        }
+
+        // Not sure if this is strictly necessary, but it shouldn't cause any issues
+        viewHolders.clear()
+
+        lifecycleOwner = null
     }
 
 
