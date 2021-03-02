@@ -47,7 +47,7 @@ class SearchForSubredditsViewModel : ViewModel() {
             when (resp) {
                 is ApiResponse.Success -> {
                     cachedSearchResults[query] = resp.value
-                    _searchResults.postValue(resp.value)
+                    _searchResults.postValue(resp.value!!)
                 }
                 is ApiResponse.Error -> _error.postValue(ErrorWrapper(resp.error, resp.throwable))
             }

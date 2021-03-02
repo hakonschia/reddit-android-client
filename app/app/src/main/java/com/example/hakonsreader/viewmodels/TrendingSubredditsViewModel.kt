@@ -34,7 +34,7 @@ class TrendingSubredditsViewModel : ViewModel() {
 
             when (val resp = api.subreditts().trending()) {
                 is ApiResponse.Success -> {
-                    _trendingSubreddits.postValue(resp.value)
+                    _trendingSubreddits.postValue(resp.value!!)
                 }
                 is ApiResponse.Error -> {
                     _error.postValue(ErrorWrapper(resp.error, resp.throwable))

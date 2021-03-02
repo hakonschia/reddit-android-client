@@ -36,9 +36,25 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     /**
      * A list of the view holders this adapter has
      */
-    private val viewHolders = ArrayList<ViewHolder>()
+    val viewHolders = ArrayList<ViewHolder>()
 
+    /**
+     * The extras for the posts. Setting this value will update the ViewHolders automatically
+     */
     var postExtras = HashMap<String, Bundle>()
+        set(value) {
+            field = value
+
+            viewHolders.forEach {
+                val id = it.post.redditPost?.id
+                if (id != null) {
+                    val extras: Bundle? = field[id]
+                    if (extras != null) {
+                        it.post.extras = extras
+                    }
+                }
+            }
+        }
 
     /**
      * The amount of minutes scores should be hidden (default to -1 means not specified)

@@ -80,7 +80,7 @@ class PostsFragment : Fragment(), SortableWithTime {
     }
 
     val name: String by lazy { arguments?.getString(NAME_KEY) ?: "" }
-    val isForUser: Boolean by lazy { arguments?.getBoolean(IS_FOR_USER) ?: false }
+    private val isForUser: Boolean by lazy { arguments?.getBoolean(IS_FOR_USER) ?: false }
 
     private var _binding: FragmentPostsBinding? = null
     private val binding get() = _binding!!
@@ -138,6 +138,18 @@ class PostsFragment : Fragment(), SortableWithTime {
         return binding.root
     }
 
+    override fun onPause() {
+        super.onPause()
+        postsAdapter?.let {
+            // Tell all the view holders to save their extras and then deselect them (primarily to pause videos)
+            it.viewHolders.forEach { viewHolder ->
+                viewHolder.saveExtras()
+                viewHolder.onUnselected()
+            }
+            savedViewHolderStates = it.postExtras
+        }
+    }
+
     /**
      * Checks if there are posts already loaded. If there are no posts loaded [postsViewModel]
      * is notified to load posts automatically
@@ -151,6 +163,11 @@ class PostsFragment : Fragment(), SortableWithTime {
             val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
 
             postsViewModel.loadPosts(sort, timeSort)
+        } else {
+            // If we have posts, restore extras if possible
+            savedViewHolderStates?.let {
+                postsAdapter?.postExtras = it
+            }
         }
     }
 
