@@ -1,6 +1,7 @@
 package com.example.hakonsreader.views
 
 import android.content.Intent
+import android.view.KeyEvent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
@@ -694,9 +695,7 @@ class MarkdownInputTest {
      */
     @Test
     fun syntaxButtonsSuperscript_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
-        // Click the input field it to give focus
         onView(withId(R.id.replyText))
-                // Select "Hello there"
                 .perform(typeText("Hello there general Kenobi"), setCursorPosition(start = 0, end = 11))
 
         onView(withId(R.id.markdownSuperscript))
@@ -706,5 +705,417 @@ class MarkdownInputTest {
         onView(withId(R.id.replyText))
                 .check(matches(editTextEqualTo("^(Hello there) general Kenobi")))
                 .check(matches(cursorPosition(start = 14)))
+    }
+
+    /**
+     * Tests that when the superscript button is clicked with a selection on the text that the selection
+     * is wrapped with superscript syntax, and that the cursor is moved to the end of the syntax so the user
+     * can continue typing the other text
+     */
+    @Test
+    fun syntaxButtonsSuperscript_nestedSuperscriptWithSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
+        onView(withId(R.id.replyText))
+                .perform(typeText("Hello there general Kenobi"), setCursorPosition(start = 0, end = 11))
+
+        onView(withId(R.id.markdownSuperscript))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("^(Hello there) general Kenobi")))
+                .check(matches(cursorPosition(start = 14)))
+
+        onView(withId(R.id.replyText))
+                // Select "there"
+                .perform(setCursorPosition(start = 8, end = 13))
+
+        onView(withId(R.id.markdownSuperscript))
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                // Select "there"
+                .check(matches(editTextEqualTo("^(Hello ^(there)) general Kenobi")))
+                .check(matches(cursorPosition(start = 16)))
+
+        // Select "general" as well (there used to be a bug where the selection got put beyond the text
+        // length, causing a crash, which would happen when selecting "general" in this string)
+        onView(withId(R.id.replyText))
+                // Select "general"
+                .perform(setCursorPosition(start = 18, end = 25))
+
+        onView(withId(R.id.markdownSuperscript))
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                // Select "there"
+                .check(matches(editTextEqualTo("^(Hello ^(there)) ^(general) Kenobi")))
+                .check(matches(cursorPosition(start = 28)))
+    }
+
+
+    /**
+     * Simple test to ensure the unordered list adds the syntax correctly
+     */
+    @Test
+    fun syntaxButtonsUnorderedList_addsSyntaxCorrectly() {
+        onView(withId(R.id.markdownBulletList))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("* ")))
+                .perform(typeTextIntoFocusedView("Hello there\nGeneral\n"))
+
+        onView(withId(R.id.markdownBulletList))
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo(textToCheck =
+                "* Hello there\n" +
+                        "General\n" +
+                        "* "
+                )))
+    }
+
+    /**
+     * Tests that a list is automatically continued when enter is pressed on a line that starts with
+     * list syntax
+     */
+    @Test
+    fun syntaxButtonsUnorderedList_listContinuesWhenEnterIsPressed() {
+        onView(withId(R.id.markdownBulletList))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("* ")))
+                .perform(typeTextIntoFocusedView("Hello there"))
+                .perform(typeTextIntoFocusedView("\n"))
+                .check(matches(editTextEqualTo(textToCheck =
+                "* Hello there" +
+                        // Should automatically continue the list
+                        "* "
+                )))
+    }
+
+    /**
+     * Tests that a list is automatically continued when enter is pressed on a line that starts with
+     * list syntax, and then removed if enter is pressed again
+     */
+    @Test
+    fun syntaxButtonsUnorderedList_listContinuationEndsWhenEnterIsPressedTwice() {
+        onView(withId(R.id.markdownBulletList))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("* ")))
+                .perform(typeTextIntoFocusedView("Hello there"))
+                // Once should continue
+                .perform(typeTextIntoFocusedView("\n"))
+                .check(matches(editTextEqualTo(textToCheck =
+                "* Hello there" +
+                        // Should automatically continue the list
+                        "* "
+                )))
+                // And when enter is pressed again it should now remove the syntax again
+                .perform(typeTextIntoFocusedView("\n"))
+                .check(matches(editTextEqualTo("* Hello there\n")))
+    }
+
+    /**
+     * Tests that a list is automatically continued when enter is pressed on a line that starts with
+     * list syntax, and if the syntax is manually removed it does nothing (it does not add the syntax back)
+     */
+    @Test
+    fun syntaxButtonsUnorderedList_listContinuationWhenBackIsPressedWorks() {
+        onView(withId(R.id.markdownBulletList))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("* ")))
+                .perform(typeTextIntoFocusedView("Hello there"))
+                // Once should continue
+                .perform(typeTextIntoFocusedView("\n"))
+                .check(matches(editTextEqualTo(textToCheck =
+                "* Hello there" +
+                        // Should automatically continue the list
+                        "* "
+                )))
+                // Removes the space
+                .perform(pressKey(KeyEvent.KEYCODE_DEL))
+                // Removes the syntax
+                .perform(pressKey(KeyEvent.KEYCODE_DEL))
+                .check(matches(editTextEqualTo("* Hello there\n")))
+    }
+
+
+    /**
+     * Simple test to ensure the unordered list adds the syntax correctly
+     */
+    @Test
+    fun syntaxButtonsOrderedList_addsSyntaxCorrectly() {
+        // Click the input field it to give focus
+        onView(withId(R.id.markdownNumberedList))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("1. ")))
+                .perform(typeTextIntoFocusedView("Hello there\nGeneral\n"))
+
+        onView(withId(R.id.markdownNumberedList))
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo(textToCheck =
+                "1. Hello there\n" +
+                        "General\n" +
+                        // Might look weird but which number it is in the raw markdown doesn't matter
+                        // and is always "1." for simplicities sake
+                        "1. "
+                )))
+    }
+
+    /**
+     * Tests that a list is automatically continued when enter is pressed on a line that starts with
+     * list syntax
+     */
+    @Test
+    fun syntaxButtonsOrderedList_listContinuesWhenEnterIsPressed() {
+        onView(withId(R.id.markdownNumberedList))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("* ")))
+                .perform(typeTextIntoFocusedView("Hello there"))
+                .perform(typeTextIntoFocusedView("\n"))
+                .check(matches(editTextEqualTo(textToCheck =
+                "1. Hello there" +
+                        // Should automatically continue the list
+                        "1. "
+                )))
+    }
+
+    /**
+     * Tests that a list is automatically continued when enter is pressed on a line that starts with
+     * list syntax
+     */
+    @Test
+    fun syntaxButtonsOrderedList_listContinuationEndsWhenEnterIsPressedTwice() {
+        onView(withId(R.id.markdownNumberedList))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("1. ")))
+                .perform(typeTextIntoFocusedView("Hello there"))
+                // Once should continue
+                .perform(typeTextIntoFocusedView("\n"))
+                .check(matches(editTextEqualTo(textToCheck =
+                "1. Hello there" +
+                        // Should automatically continue the list
+                        "1. "
+                )))
+                // And when enter is pressed again it should now remove the syntax again
+                .perform(typeTextIntoFocusedView("\n"))
+                .check(matches(editTextEqualTo("* Hello there\n")))
+    }
+
+    /**
+     * Tests that a list is automatically continued when enter is pressed on a line that starts with
+     * list syntax, and if the syntax is manually removed it does nothing (it does not add the syntax back)
+     */
+    @Test
+    fun syntaxButtonsOrderedList_listContinuationWhenBackIsPressedWorks() {
+        onView(withId(R.id.markdownNumberedList))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("1. ")))
+                .perform(typeTextIntoFocusedView("Hello there"))
+                // Once should continue
+                .perform(typeTextIntoFocusedView("\n"))
+                .check(matches(editTextEqualTo(textToCheck =
+                "1. Hello there" +
+                        // Should automatically continue the list
+                        "1. "
+                )))
+                // Removes the space
+                .perform(pressKey(KeyEvent.KEYCODE_DEL))
+                // Removes the "."
+                .perform(pressKey(KeyEvent.KEYCODE_DEL))
+                // Removes the "1"
+                .perform(pressKey(KeyEvent.KEYCODE_DEL))
+                .check(matches(editTextEqualTo("* Hello there\n")))
+    }
+
+
+    /**
+     * Tests that when the inline code button is clicked without any selection, and the cursor not set
+     * (by the EditText not having focus) that the cursor goes to the middle of the syntax so
+     * that the user can start typing in the italic section
+     */
+    @Test
+    fun syntaxButtonsInlineCode_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
+        onView(withId(R.id.markdownInlineCode))
+                .perform(scrollTo())
+                .perform(click())
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("``")))
+                .check(matches(cursorPosition(start = 1)))
+    }
+
+    /**
+     * Tests that when the inline code button is clicked without any selection, but with the text input having focus,
+     * that the cursor goes to the middle of the syntax so that the user can start typing in the inline code section
+     */
+    @Test
+    fun syntaxButtonsInlineCode_noSelectionPutsCursorInTheMiddleWithCursorSet() {
+        // Click the input field it to give focus
+        onView(withId(R.id.replyText))
+                .perform(click())
+
+        onView(withId(R.id.markdownInlineCode))
+                .perform(scrollTo())
+                .perform(click())
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("``")))
+                .check(matches(cursorPosition(start = 1)))
+                // If we use "typeText" here it performs a click and the cursor will move
+                .perform(typeTextIntoFocusedView("Hello"))
+                .check(matches(editTextEqualTo("`Hello`")))
+    }
+
+    /**
+     * Tests that when the inline code button is clicked with a selection on the text that the selection
+     * is wrapped with inline code syntax, and that the cursor is moved to the end of the syntax so the user
+     * can continue typing the other text
+     */
+    @Test
+    fun syntaxButtonsInlineCode_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
+        onView(withId(R.id.replyText))
+                .perform(typeText("Hello there general Kenobi"), setCursorPosition(start = 0, end = 11))
+
+        onView(withId(R.id.markdownInlineCode))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                .check(matches(editTextEqualTo("`Hello there` general Kenobi")))
+                .check(matches(cursorPosition(start = 13)))
+    }
+
+
+    /**
+     * Basic test for the code block button to ensure that the syntax is added correctly to an empty input field
+     */
+    @Test
+    fun syntaxButtonsCodeBlock_addsSyntaxCorrectlyIntoEmptyInputField() {
+        onView(withId(R.id.markdownCodeBlock))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                // When nothing is in the input field the button should only add the 4 spaces and no lines
+                .check(matches(editTextEqualTo("    ")))
+    }
+
+    /**
+     * Basic test for the code block button to ensure that the syntax is added correctly to an input
+     * field with some text previously typed
+     */
+    @Test
+    fun syntaxButtonsCodeBlock_addsSyntaxCorrectlyToInputFieldWithText() {
+        onView(withId(R.id.replyText))
+                .perform(typeText("Hello there"))
+
+        onView(withId(R.id.markdownCodeBlock))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                // With something in the input field it should add 2 newlines after it
+                // When nothing is in the input field the button should only add the 4 spaces and no lines
+                .check(matches(editTextEqualTo("Hello there\n\n    ")))
+    }
+
+    /**
+     * Tests that the code block continues when enter is pressed on inside a code block
+     */
+    @Test
+    fun syntaxButtonsCodeBlock_continuesSyntaxWhenEnterIsPressed() {
+        onView(withId(R.id.replyText))
+                .perform(typeText("Hello there"))
+
+        onView(withId(R.id.markdownCodeBlock))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                // With something in the input field it should add 2 newlines after it
+                // When nothing is in the input field the button should only add the 4 spaces and no lines
+                .check(matches(editTextEqualTo("Hello there\n\n    ")))
+                // Type some code and then press enter, should automatically continue the code block
+                .perform(typeTextIntoFocusedView("if(true)\n"))
+                .check(matches(editTextEqualTo("Hello there\n\n    if(true)\n    ")))
+    }
+
+    /**
+     * Tests that the code block syntax does not continue when enter is pressed twice
+     */
+    @Test
+    fun syntaxButtonsCodeBlock_doesNotContinuesSyntaxWhenEnterIsPressedTwice() {
+        onView(withId(R.id.replyText))
+                .perform(typeText("Hello there"))
+
+        onView(withId(R.id.markdownCodeBlock))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                // With something in the input field it should add 2 newlines after it
+                // When nothing is in the input field the button should only add the 4 spaces and no lines
+                .check(matches(editTextEqualTo("Hello there\n\n    ")))
+                // Type some code and then press enter, should automatically continue the code block
+                .perform(typeTextIntoFocusedView("if(true)\n"))
+                .check(matches(editTextEqualTo("Hello there\n\n    if(true)\n    ")))
+                // Type enter again
+                .perform(typeTextIntoFocusedView("\n"))
+                // Should now go to a new line without syntax
+                // This should maybe remove the syntax as well, but it doesn't matter if the spaces are there
+                // as it is rendered the same no mater what
+                .check(matches(editTextEqualTo("Hello there\n\n    if(true)\n    \n")))
+    }
+
+    /**
+     * Tests that the code block syntax does not continue when enter is pressed twice
+     */
+    @Test
+    fun syntaxButtonsCodeBlock_doesNotAddSyntaxWhenManuallyRemoved() {
+        onView(withId(R.id.replyText))
+                .perform(typeText("Hello there"))
+
+        onView(withId(R.id.markdownCodeBlock))
+                .perform(scrollTo())
+                .perform(click())
+
+        onView(withId(R.id.replyText))
+                // With something in the input field it should add 2 newlines after it
+                // When nothing is in the input field the button should only add the 4 spaces and no lines
+                .check(matches(editTextEqualTo("Hello there\n\n    ")))
+                // Type some code and then press enter, should automatically continue the code block
+                .perform(typeTextIntoFocusedView("if(true)\n"))
+                .check(matches(editTextEqualTo("Hello there\n\n    if(true)\n    ")))
+                // Remove the spaces manually, this should not add the syntax back
+                // (which it currently does, or if I've fixed this and not removed the comment, it used to do)
+                .perform(pressKey(KeyEvent.KEYCODE_DEL))
+                .perform(pressKey(KeyEvent.KEYCODE_DEL))
+                .perform(pressKey(KeyEvent.KEYCODE_DEL))
+                .perform(pressKey(KeyEvent.KEYCODE_DEL))
+                .check(matches(editTextEqualTo("Hello there\n\n    if(true)\n")))
     }
 }

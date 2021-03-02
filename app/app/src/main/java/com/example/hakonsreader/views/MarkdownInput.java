@@ -223,7 +223,7 @@ public class MarkdownInput extends FrameLayout {
             // Set cursor to the middle
             binding.replyText.setSelection(start + startSyntax.length());
         } else {
-            binding.replyText.setSelection(start + startSyntax.length() + end + endSyntax.length());
+            binding.replyText.setSelection(startSyntax.length() + end + endSyntax.length());
         }
     }
 
