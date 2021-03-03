@@ -15,6 +15,7 @@ import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.toSpannable
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -644,6 +645,13 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 }
 
+val sidebarColors: List<Int> = listOf(
+        R.color.sidebar0,
+        R.color.sidebar1,
+        R.color.sidebar2,
+        R.color.sidebar3,
+)
+
 /**
  * Formats the author text based on whether or not it is posted by an admin or a mod.
  * If no match is found, the default author color is used.
@@ -712,18 +720,18 @@ fun addSidebars(barrier: Barrier, depth: Int) {
     if (App.get().showAllSidebars()) {
         addAllSidebars(barrier, depth)
     } else {
-        addOneColoredSidebar(barrier, depth)
+        addOneSidebar(barrier, depth)
     }
 }
 
 /**
- * Adds one colored sidebar to a ConstraintLayout to show the boundary of the comment. The comment
+ * Adds one sidebar to a ConstraintLayout to show the boundary of the comment. The comment
  * will be indented according to [depth]
  *
  * @param barrier The barrier to reference the sidebar to
  * @param depth The depth of the comment, if this is 0 then no sidebar is added
  */
-private fun addOneColoredSidebar(barrier: Barrier, depth: Int) {
+private fun addOneSidebar(barrier: Barrier, depth: Int) {
     val parent = barrier.parent as ConstraintLayout
     val res = barrier.context.resources
     val indent = res.getDimension(R.dimen.commentDepthIndent).toInt()
@@ -731,7 +739,7 @@ private fun addOneColoredSidebar(barrier: Barrier, depth: Int) {
     val barMargin = res.getDimension(R.dimen.commentSideBarMarginOneBar).toInt()
     val contentDescription = "sidebar"
 
-    val previousSidebars = java.util.ArrayList<View>()
+    val previousSidebars = ArrayList<View>()
     parent.findViewsWithText(previousSidebars, contentDescription, View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
 
     // No sidebar for top-level comments
@@ -754,6 +762,11 @@ private fun addOneColoredSidebar(barrier: Barrier, depth: Int) {
             background = ContextCompat.getDrawable(barrier.context, R.drawable.comment_sidebar_one_sidebar_background)
             parent.addView(this)
         }
+    }.apply {
+        // This has to be set when the view is created, and updated when reused (otherwise the color can be wrong)
+        // Use depth - 1 to not skip the first color (the sidebar "belongs" to the comment here, compared to it starting from
+        // below the comment it "belongs" to when all are shown)
+        DrawableCompat.setTint(background, ContextCompat.getColor(context, sidebarColors[(depth - 1) % sidebarColors.size]))
     }
 
     // Set constraints
@@ -801,7 +814,7 @@ private fun addAllSidebars(barrier: Barrier, depth: Int) {
     // Find the previous sidebars added to the ConstraintLayout
     // By doing this we can reuse views by removing only the overflow amount/only adding the extra
     // needed. When scrolling through a lot of comments this will save 100s of views from being created
-    val previousSidebars = java.util.ArrayList<View>()
+    val previousSidebars = ArrayList<View>()
     parent.findViewsWithText(previousSidebars, contentDescription, View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION)
     val previousSidebarsSize = previousSidebars.size
 
@@ -871,7 +884,7 @@ private fun addAllSidebars(barrier: Barrier, depth: Int) {
         val id = View.generateViewId()
         referenceIds[i] = id
         val view = View(barrier.context).apply {
-            setBackgroundColor(ContextCompat.getColor(barrier.context, R.color.commentSideBar))
+            setBackgroundColor(ContextCompat.getColor(barrier.context, sidebarColors[i % sidebarColors.size]))
             this.contentDescription = contentDescription
             this.id = id
         }

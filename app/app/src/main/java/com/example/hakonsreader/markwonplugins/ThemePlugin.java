@@ -28,7 +28,7 @@ public class ThemePlugin extends AbstractMarkwonPlugin {
                 .blockMargin((int)context.getResources().getDimension(R.dimen.quoteMargin))
                 .blockQuoteWidth((int)context.getResources().getDimension(R.dimen.quoteWidth))
                 .thematicBreakHeight((int)context.getResources().getDimension(R.dimen.markdownThematicBreakHeight))
-                .thematicBreakColor(ContextCompat.getColor(context, R.color.commentSideBar))
+                .thematicBreakColor(ContextCompat.getColor(context, R.color.markdownThematicBreakColor))
                 .linkColor(ContextCompat.getColor(context, R.color.link_color))
                 .build();
     }
