@@ -22,7 +22,7 @@
           a bit depending on which characters are in the view. We can offset a little bit
           manually (and use includeFontPadding=false), but it's not a perfect solution as it will look a bit off depending
           on the text -->
-        <de.hdodenhof.circleimageview.CircleImageView
+        <com.makeramen.roundedimageview.RoundedImageView
             android:id="@+id/icon"
             android:layout_width="40dp"
             android:layout_height="40dp"

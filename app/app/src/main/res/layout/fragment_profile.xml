@@ -63,24 +63,22 @@
 
                         <!-- Probably somewhat bad to do it this way, but this has a fairly high start
                          margin since it will either be a menu item or a back item on the toolbar-->
-                        <de.hdodenhof.circleimageview.CircleImageView
+                        <com.makeramen.roundedimageview.RoundedImageView
                             android:id="@+id/profilePicture"
                             android:layout_width="60dp"
-                            android:layout_height="60dp"
+                            android:layout_height="0dp"
 
-                            android:layout_gravity="center"
                             android:layout_marginStart="48dp"
                             android:layout_marginTop="16dp"
                             android:onClick="@{view -> ClickHandlerKt.openImageInFullscreen(view, user.profilePicture, true)}"
 
                             android:src="@drawable/ic_baseline_person_100"
-                            app:civ_border_color="@color/opposite_background"
-                            app:civ_border_width="2dp"
-                            app:civ_circle_background_color="@color/background"
-                            app:layout_constraintStart_toStartOf="parent"
+                            android:background="@color/background"
 
+                            app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:profilePicture='@{user != null ? user.profilePicture : ""}' />
+                            app:layout_constraintBottom_toBottomOf="@id/commentKarma"
+                            app:profilePicture='@{user}' />
 
                         <TextView
                             android:id="@+id/profileAge"

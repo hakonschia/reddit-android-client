@@ -5,7 +5,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -18,19 +17,14 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditUser
-import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentProfileBinding
 import com.example.hakonsreader.databinding.UserIsSuspendedBinding
 import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.viewmodels.RedditUserViewModel
 import com.example.hakonsreader.viewmodels.factories.RedditUserFactory
+import com.makeramen.roundedimageview.RoundedImageView
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
@@ -142,7 +136,7 @@ class ProfileFragment : Fragment() {
 
 
     private fun setupViewModel() {
-        with(viewModel!!) {
+        with(viewModel) {
             user.observe(viewLifecycleOwner) {
                 onUserResponse(it)
             }
@@ -247,7 +241,7 @@ class ProfileFragment : Fragment() {
         var count = 0
 
         count += if (postsFragment?.isLoading() == true) 1 else 0
-        count += if (viewModel?.isLoading?.value == true) 1 else 0
+        count += if (viewModel.isLoading.value == true) 1 else 0
 
         _binding?.progressBarLayout?.visibility = if (count > 0) {
             View.VISIBLE
@@ -266,13 +260,28 @@ class ProfileFragment : Fragment() {
 }
 
 /**
- * Binding adapter for loading a profile picture
+ * Binding adapter for loading a profile picture. This will prefer loading a snoovatar ([RedditUser.snoovatarImage])
+ * if one is found
  *
  * @param imageView The view to load the picture into
- * @param url The URL to the picture
+ * @param user The user to load the picture for
  */
 @BindingAdapter("profilePicture")
-fun setProfilePicture(imageView: ImageView, url: String) {
+fun setProfilePicture(imageView: RoundedImageView, user: RedditUser?) {
+    user ?: return
+
+    val url = if (user.snoovatarImage.isNotEmpty()) {
+        user.snoovatarImage
+    } else {
+        with(imageView) {
+            borderWidth = Util.dpToPixels(2f, imageView.resources).toFloat()
+            borderColor = ContextCompat.getColor(imageView.context, R.color.opposite_background)
+            cornerRadius = Util.dpToPixels(30f, imageView.resources).toFloat()
+            mutateBackground(true)
+        }
+        user.profilePicture
+    }
+
     // Load the users profile picture
     if (url.isNotBlank()) {
         Picasso.get()

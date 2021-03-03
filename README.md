@@ -98,7 +98,7 @@ Thank you to Reddit for making this project possible by providing an open API.
   * [Gson](https://github.com/google/gson) - For API deserialization and other JSON needs
 * [Picasso](https://github.com/square/picasso) - Image processing, downloading, and caching
 * [PhotoView](https://github.com/chrisbanes/PhotoView) - For zoomable ImageViews
-* [CircleImageView](https://github.com/hdodenhof/CircleImageView) - To create circular ImageViews
+* [RoundedImageView](https://github.com/vinc3m1/RoundedImageView) - To create circular ImageViews
 * [Slidr](https://github.com/r0adkll/Slidr) - To easily create swipeable activities
 * [Markwon](https://github.com/noties/Markwon) - Markdown text rendering in TextViews
 * [ExoPlayer](https://github.com/google/ExoPlayer) - Used for playing videos

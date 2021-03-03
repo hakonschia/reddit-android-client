@@ -18,7 +18,7 @@
         android:layout_marginBottom="8dp"
         android:background="?android:selectableItemBackground">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <com.makeramen.roundedimageview.RoundedImageView
             android:id="@+id/icon"
             android:layout_width="24dp"
             android:layout_height="24dp"

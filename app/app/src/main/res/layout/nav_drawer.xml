@@ -31,23 +31,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/profilePicture"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
 
-                android:layout_gravity="center"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
 
                 android:src="@drawable/ic_baseline_person_100"
-                app:civ_border_color="@color/opposite_background"
-                app:civ_border_width="2dp"
-                app:civ_circle_background_color="@color/background"
                 app:layout_constraintStart_toStartOf="parent"
-
                 app:layout_constraintTop_toTopOf="parent"
-                app:profilePicture='@{userInfo != null ? userInfo.userInfo.profilePicture : ""}' />
+                app:profilePicture='@{userInfo.userInfo}' />
 
             <TextView
                 android:id="@+id/username"
@@ -120,7 +115,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/privateBrowsingBtn" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/settingsIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -168,7 +163,7 @@
                 app:layout_constraintStart_toStartOf="@id/settingsIcon"
                 app:layout_constraintTop_toTopOf="@id/settingsIcon" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/darkModeIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -232,7 +227,7 @@
             <!-- Kind of weird to hardcode all 3 of these, but it's only 3 items and
              creating a RecyclerView is definitely weird. Other option is creating another layout
              and pass the values, but it uses different string resources so it isn't really easier-->
-            <de.hdodenhof.circleimageview.CircleImageView
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/frontPageIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -281,7 +276,7 @@
                 app:layout_constraintStart_toStartOf="@id/frontPageIcon"
                 app:layout_constraintTop_toTopOf="@id/frontPageIcon" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/popularIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -329,7 +324,7 @@
                 app:layout_constraintStart_toStartOf="@id/popularIcon"
                 app:layout_constraintTop_toTopOf="@id/popularIcon" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/allIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -377,7 +372,7 @@
                 app:layout_constraintStart_toStartOf="@id/allIcon"
                 app:layout_constraintTop_toTopOf="@id/allIcon" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/randomIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
