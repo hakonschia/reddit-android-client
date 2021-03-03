@@ -1,5 +1,6 @@
 package com.example.hakonsreader.views
 
+import android.animation.LayoutTransition
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -252,16 +253,32 @@ class VideoPlayer : PlayerView {
     var actualVideoHeight = -1
 
     /**
+     * If set to true the controller will be animated (primarily by fading in/out).
+     *
+     * This should not be used in RecyclerViews, as scrolling can cause the view to jump. This is
+     * not enabled by default
+     */
+    var transitionEnabled = false
+        set(value) {
+            field = value
+            layoutTransition = if (field) {
+                LayoutTransition()
+            } else {
+                null
+            }
+        }
+
+    /**
      * Callback for when a video has been manually paused (ie. the pause button has been clicked)
      *
      * This will not be called when the video is paused by any other way (ie. calls to [pause])
      */
-    var onManuallyPaused: Runnable? = null
+    var onManuallyPaused: (() -> Unit)? = null
 
     /**
      * Callback for when a video has entered fullscreen
      */
-    var fullScreenListener: Runnable? = null
+    var fullScreenListener: (() -> Unit)? = null
 
 
     /**
@@ -488,7 +505,7 @@ class VideoPlayer : PlayerView {
         findViewById<ImageButton>(R.id.exo_pause).setOnClickListener {
             // When overriding the click listener we need to manually pause the video
             pause()
-            onManuallyPaused?.run()
+            onManuallyPaused?.invoke()
         }
     }
 

@@ -28,6 +28,7 @@ import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.example.hakonsreader.viewmodels.CommentsViewModel
 import com.example.hakonsreader.views.Content
+import com.example.hakonsreader.views.ContentVideo
 import com.example.hakonsreader.views.VideoPlayer
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
@@ -228,9 +229,9 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                 commentsSwipeRefresh.isRefreshing = false
 
                 // If the app has been idled the post ID and such might be killed and the system will
-                // try to restore the activity, so this would throw an excpetion since the post ID isn't set
+                // try to restore the activity, so this would throw an exception since the post ID isn't set
                 try {
-                    commentsViewModel?.restart()
+                    commentsViewModel.restart()
                 } catch (e: IllegalStateException) {
                     finish()
                 }
@@ -358,6 +359,12 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         binding.setPost(newPost)
         binding.post.redditPost = newPost
 
+        // This is for the controller transitions
+        val content = binding.post.getContent()
+        if (content is ContentVideo) {
+            content.enableTransitions(true)
+        }
+
         if (extras != null) {
             binding.post.extras = extras
         }
@@ -390,7 +397,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         }
 
         if (postId != null) {
-            commentsViewModel?.let {
+            commentsViewModel.let {
                 it.postId = postId
 
                 try {

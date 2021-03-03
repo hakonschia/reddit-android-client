@@ -58,6 +58,7 @@ class VideoActivity : BaseActivity() {
             }
 
             videoPlayer.run {
+                transitionEnabled = true
                 dashVideo = extras.getBoolean(VideoPlayer.EXTRA_IS_DASH)
                 url = extras.getString(VideoPlayer.EXTRA_URL) ?: ""
                 setExtras(extras)

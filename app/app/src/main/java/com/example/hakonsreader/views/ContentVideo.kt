@@ -11,8 +11,6 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentVideoBinding
-import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
-import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 
 /**
@@ -168,9 +166,9 @@ class ContentVideo : Content {
      *
      * @param onVideoManuallyPaused The callback
      */
-    fun setOnVideoManuallyPaused(onVideoManuallyPaused: OnVideoManuallyPaused?) {
-        player.onManuallyPaused = Runnable {
-            onVideoManuallyPaused?.postPaused(this)
+    fun setOnVideoManuallyPaused(onVideoManuallyPaused: (ContentVideo) -> Unit) {
+        player.onManuallyPaused = {
+            onVideoManuallyPaused.invoke(this)
         }
     }
 
@@ -179,9 +177,9 @@ class ContentVideo : Content {
      *
      * @param onVideoFullscreenListener The callback
      */
-    fun setOnVideoFullscreenListener(onVideoFullscreenListener: OnVideoFullscreenListener?) {
-        player.fullScreenListener = Runnable {
-            onVideoFullscreenListener?.onFullscreen(this)
+    fun setOnVideoFullscreenListener(onVideoFullscreenListener: (ContentVideo) -> Unit) {
+        player.fullScreenListener = {
+            onVideoFullscreenListener.invoke(this)
         }
     }
 
@@ -190,6 +188,17 @@ class ContentVideo : Content {
      */
     fun release() {
         player.release()
+    }
+
+    /**
+     * If set to true the controller will be animated (primarily by fading in/out).
+     *
+     * This should not be used in RecyclerViews, as scrolling can cause the view to jump
+     *
+     * @param enable True to enable transitions
+     */
+    fun enableTransitions(enable: Boolean) {
+        player.transitionEnabled = enable
     }
 
     private fun setThumbnailUrl() {

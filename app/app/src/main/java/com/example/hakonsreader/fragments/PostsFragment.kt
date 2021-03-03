@@ -2,8 +2,6 @@ package com.example.hakonsreader.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +9,6 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
@@ -23,17 +20,13 @@ import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentPostsBinding
-import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
-import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.views.Content
-import com.example.hakonsreader.views.Post
 import com.google.gson.Gson
-import java.lang.RuntimeException
 
 class PostsFragment : Fragment(), SortableWithTime {
 
@@ -234,12 +227,12 @@ class PostsFragment : Fragment(), SortableWithTime {
 
             binding.posts.adapter = this
 
-            onVideoManuallyPaused = OnVideoManuallyPaused { contentVideo ->
+            onVideoManuallyPaused = { contentVideo ->
                 // Ignore post when scrolling if manually paused
                 postsScrollListener?.setPostToIgnore(contentVideo.redditPost?.id)
             }
 
-            onVideoFullscreenListener = OnVideoFullscreenListener { contentVideo ->
+            onVideoFullscreenListener = { contentVideo ->
                 // Ignore post when scrolling if it has been fullscreened
                 postsScrollListener?.setPostToIgnore(contentVideo.redditPost?.id)
             }

@@ -18,15 +18,8 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.PostBinding
-import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
-import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
 import com.squareup.picasso.Callback
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -63,12 +56,12 @@ class Post : Content {
     /**
      * The callback for when a video post has been manually paused
      */
-    var onVideoManuallyPaused: OnVideoManuallyPaused? = null
+    var onVideoManuallyPaused: ((ContentVideo) -> Unit)? = null
 
     /**
      * The callback for when a video post has been manually paused
      */
-    var onVideoFullscreenListener: OnVideoFullscreenListener? = null
+    var onVideoFullscreenListener: ((ContentVideo) -> Unit)? = null
 
     /**
      * The max height of the entire post (post info + content + post bar)
@@ -330,8 +323,8 @@ class Post : Content {
                 // Show as link content if we can't show it as a video
                 if (isRedditPostVideoPlayable(post)) {
                     ContentVideo(context).apply {
-                        setOnVideoManuallyPaused(this@Post.onVideoManuallyPaused)
-                        setOnVideoFullscreenListener(this@Post.onVideoFullscreenListener)
+                        this@Post.onVideoManuallyPaused?.let { setOnVideoManuallyPaused(it) }
+                        this@Post.onVideoFullscreenListener?.let { setOnVideoFullscreenListener(it) }
                     }
                 } else if (App.get().openYouTubeVideosInApp()
                         && (redditPost.domain == "youtu.be" || redditPost.domain == "youtube.com")) {
@@ -415,6 +408,13 @@ class Post : Content {
      */
     fun getContentBottomY(): Int {
         return getContentY() + binding.content.measuredHeight
+    }
+
+    /**
+     * Gets the content view displayed in the post
+     */
+    fun getContent(): View? {
+        return binding.content.getChildAt(0)
     }
 
 

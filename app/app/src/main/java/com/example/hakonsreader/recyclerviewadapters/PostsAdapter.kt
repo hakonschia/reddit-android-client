@@ -12,9 +12,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.interfaces.OnVideoFullscreenListener
-import com.example.hakonsreader.interfaces.OnVideoManuallyPaused
 import com.example.hakonsreader.recyclerviewadapters.diffutils.PostsDiffCallback
+import com.example.hakonsreader.views.ContentVideo
 import com.example.hakonsreader.views.ListDivider
 import com.example.hakonsreader.views.Post
 import java.time.Duration
@@ -69,12 +68,12 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     /**
      * Listener for when a video has manually been paused
      */
-    var onVideoManuallyPaused: OnVideoManuallyPaused? = null
+    var onVideoManuallyPaused: ((ContentVideo) -> Unit)? = null
 
     /**
      * Listener for when a video has entered fullscreen
      */
-    var onVideoFullscreenListener: OnVideoFullscreenListener? = null
+    var onVideoFullscreenListener: ((ContentVideo) -> Unit)? = null
 
     /**
      * The lifecycle owner of the adapter. If this is set the posts in the adapter will observe
