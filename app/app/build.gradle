@@ -91,7 +91,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 
     // ExoPlayer
-    final def exo_player_version = '2.11.8'
+    final def exo_player_version = '2.13.2'
     implementation "com.google.android.exoplayer:exoplayer:$exo_player_version"
     implementation "com.google.android.exoplayer:exoplayer-core:$exo_player_version"
     implementation "com.google.android.exoplayer:exoplayer-dash:$exo_player_version"

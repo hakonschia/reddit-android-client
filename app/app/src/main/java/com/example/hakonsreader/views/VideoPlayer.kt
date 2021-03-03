@@ -3,7 +3,6 @@ package com.example.hakonsreader.views
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
@@ -17,7 +16,6 @@ import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.VideoActivity
-import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.views.util.VideoCache
@@ -31,7 +29,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.squareup.picasso.Picasso
 
 /**
@@ -309,7 +307,7 @@ class VideoPlayer : PlayerView {
         val loadControl: LoadControl = DefaultLoadControl.Builder()
                 // Buffer size between 2.5 and 7.5 seconds, with minimum of 1 second for playback to start
                 .setBufferDurationsMs(2500, 7500, 1000, 500)
-                .createDefaultLoadControl()
+                .build()
 
         val player = SimpleExoPlayer.Builder(context)
                 .setLoadControl(loadControl)
@@ -350,31 +348,33 @@ class VideoPlayer : PlayerView {
         return player
     }
 
-    /**
-     * Creates a media source with [url] as its source
-     *
-     * This will check [cacheVideo] and [dashVideo] and create the media source accordingly
-     */
     private fun createMediaSource() : MediaSource {
         // Data source is constant for all media sources
         val dataSourceFactory = if (cacheVideo) {
-            val defaultFactory = DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT)
-            CacheDataSourceFactory(VideoCache.getCache(context), defaultFactory)
+            val defaultFactory = DefaultDataSourceFactory(context)
+            CacheDataSource.Factory()
+                    .setUpstreamDataSourceFactory(defaultFactory)
+                    .setCache(VideoCache.getCache(context))
         } else {
-            DefaultDataSourceFactory(context, NetworkConstants.USER_AGENT)
+            DefaultDataSourceFactory(context)
         }
 
         Log.d(TAG, "createMediaSource: loading $url")
+
+        val mediaItem = MediaItem.Builder()
+                .setUri(url)
+                .build()
+
         return if (dashVideo) {
             DashMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(Uri.parse(url))
+                    .createMediaSource(mediaItem)
         } else {
             if (mp4Video) {
                 ProgressiveMediaSource.Factory(dataSourceFactory, Mp4Extractor.FACTORY)
-                        .createMediaSource(Uri.parse(url))
+                        .createMediaSource(mediaItem)
             } else {
                 ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(Uri.parse(url))
+                        .createMediaSource(mediaItem)
             }
         }
     }
@@ -522,7 +522,8 @@ class VideoPlayer : PlayerView {
         // Create the media source and prepare the exoPlayer
         createMediaSource().also {
             isPrepared = true
-            exoPlayer.prepare(it)
+            exoPlayer.setMediaSource(it)
+            exoPlayer.prepare()
         }
     }
 
