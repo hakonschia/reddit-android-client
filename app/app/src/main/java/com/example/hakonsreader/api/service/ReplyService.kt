@@ -21,7 +21,7 @@ interface ReplyService {
      * @param returnJson The boolean value "false". MUST be set to false
      * @return A Response that holds the newly created comment
      */
-    @POST("api/comment")
+    @POST("api/comment?raw_json=1")
     @FormUrlEncoded
     suspend fun postComment(
             @Field("text") comment: String,
