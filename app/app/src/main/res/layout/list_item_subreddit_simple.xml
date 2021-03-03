@@ -25,11 +25,26 @@
 
             app:subredditIcon="@{subreddit}"
 
+            app:riv_border_color="@color/opposite_background"
+            app:riv_corner_radius="12dp"
+            app:riv_border_width="1dp"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
             tools:src="@drawable/ic_emoji_emotions_24dp" />
+
+        <ImageView
+            android:id="@+id/modIcon"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:src="@drawable/ic_admin_24px"
+            android:contentDescription="@string/content_description_subreddit_icon_mod"
+            app:layout_constraintBottom_toBottomOf="@+id/icon"
+            app:layout_constraintEnd_toEndOf="@+id/icon"
+            android:visibility="@{subreddit.moderator ? View.VISIBLE : View.GONE}"
+            app:tint="@color/modTextColor" />
 
         <TextView
             android:id="@+id/name"
