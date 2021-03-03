@@ -267,7 +267,17 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     .addToBackStack(null)
                     .commit()
         } else {
-            binding.bottomNav.selectedItemId = R.id.navHome
+            if (binding.bottomNav.selectedItemId == R.id.navHome) {
+                // moveTaskToBack() is like pressing home, which closes the app without killing it
+                // This fails/returns false when the app was started from somewhere (like an intent),
+                // and we can use onBackPressed() as this will go back (normally onBackPressed() would
+                // use the fragment backstack which causes some weird issues that doesn't close the app)
+                if (!moveTaskToBack(true)) {
+                    super.onBackPressed()
+                }
+            } else {
+                binding.bottomNav.selectedItemId = R.id.navHome
+            }
         }
     }
 
