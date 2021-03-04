@@ -3,6 +3,7 @@ package com.example.hakonsreader.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -51,7 +52,7 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
         }
         _isLoading.value = true
 
-        CoroutineScope(IO).launch {
+        viewModelScope.launch {
             val response = if (isForLoggedInUser) {
                 api.subreditts().subscribedSubreddits()
             } else {
@@ -92,7 +93,7 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
         val favorite = !subreddit.isFavorited
         subreddit.isFavorited = favorite
 
-        CoroutineScope(IO).launch {
+        viewModelScope.launch {
             database.subreddits().update(subreddit)
             when (val response = api.subreddit(subreddit.name).favorite(favorite)) {
                 is ApiResponse.Success -> { }

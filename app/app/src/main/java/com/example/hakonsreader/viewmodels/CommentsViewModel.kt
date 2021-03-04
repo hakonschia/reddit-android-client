@@ -3,6 +3,7 @@ package com.example.hakonsreader.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
@@ -54,7 +55,7 @@ class CommentsViewModel: ViewModel() {
 
         _isLoading.value = true
 
-        CoroutineScope(IO).launch {
+        viewModelScope.launch {
             val resp = api.post(postId).comments(loadThirdParty = loadThirdParty)
             _isLoading.postValue(false)
 
@@ -78,7 +79,7 @@ class CommentsViewModel: ViewModel() {
         // but I don't know how more comments and comments can be loaded at the same time so it's fine
         _isLoading.value = true
 
-        CoroutineScope(IO).launch {
+        viewModelScope.launch {
             val resp = api.post(postId).moreComments(comment.children, parent)
             _isLoading.postValue(false)
 

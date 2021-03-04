@@ -3,6 +3,7 @@ package com.example.hakonsreader.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.TrendingSubreddits
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -29,7 +30,7 @@ class TrendingSubredditsViewModel : ViewModel() {
     fun loadSubreddits() {
         val api = App.get().api
 
-        CoroutineScope(IO).launch {
+        viewModelScope.launch {
             _isLoading.postValue(true)
 
             when (val resp = api.subreditts().trending()) {

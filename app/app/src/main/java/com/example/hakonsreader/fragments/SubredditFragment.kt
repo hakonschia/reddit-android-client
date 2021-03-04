@@ -235,17 +235,13 @@ class SubredditFragment : Fragment() {
                         // No rules, or we have rules and data saving is not on
                         // Ie. only load rules again from API if we're not on data saving
                         if (rulesCount == 0 || (rulesCount != 0 && !App.get().dataSavingEnabled())) {
-                            CoroutineScope(IO).launch {
-                                rulesViewModel?.refresh()
-                            }
+                            rulesViewModel?.refresh()
                         }
 
                         // The adapter will always have one more (for the "Select flair")
                         val flairsCount = flairsAdapter?.count?.minus(1) ?: 0
                         if ((it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !App.get().dataSavingEnabled()))) {
-                            CoroutineScope(IO).launch {
-                                flairsViewModel?.refresh()
-                            }
+                            flairsViewModel?.refresh()
                         }
                     }
                 }
@@ -615,9 +611,7 @@ class SubredditFragment : Fragment() {
      * Sends an API request to Reddit to subscribe/unsubscribe
      */
     private fun subscribeOnclick() {
-        CoroutineScope(IO).launch {
-            subredditViewModel?.subscribe()
-        }
+        subredditViewModel?.subscribe()
     }
 
     /**
@@ -630,9 +624,7 @@ class SubredditFragment : Fragment() {
     private fun updateUserFlair(flair: RedditFlair?) {
         val username = App.get().currentUserInfo?.userInfo?.username ?: return
 
-        CoroutineScope(IO).launch {
-            subredditViewModel?.updateFlair(username, flair)
-        }
+        subredditViewModel?.updateFlair(username, flair)
     }
 
     /**

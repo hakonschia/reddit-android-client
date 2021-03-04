@@ -3,6 +3,7 @@ package com.example.hakonsreader.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -101,7 +102,8 @@ class PostsViewModel(
      */
     private fun load(after: String, count: Int) {
         _loadingChange.value = true
-        CoroutineScope(IO).launch {
+
+        viewModelScope.launch {
             val resp = if (isUser) {
                 api.user(userOrSubredditName).posts(sort, timeSort, after, count)
             } else {

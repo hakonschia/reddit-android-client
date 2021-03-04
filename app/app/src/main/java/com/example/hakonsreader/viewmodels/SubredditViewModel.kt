@@ -1,12 +1,14 @@
 package com.example.hakonsreader.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.requestmodels.SubredditRequest
 import com.example.hakonsreader.viewmodels.repositories.SubredditRepository
+import kotlinx.coroutines.launch
 
 /**
  * ViewModel for observing a [Subreddit]
@@ -30,11 +32,15 @@ class SubredditViewModel(
      * success, which means the values will be updated right away, and if the request fails will be
      * reverted back
      */
-    suspend fun subscribe() {
-        repo.subscribe()
+    fun subscribe() {
+        viewModelScope.launch {
+            repo.subscribe()
+        }
     }
 
-    suspend fun updateFlair(username: String, flair: RedditFlair?) {
-        repo.updateFlair(username, flair)
+    fun updateFlair(username: String, flair: RedditFlair?) {
+        viewModelScope.launch {
+            repo.updateFlair(username, flair)
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.example.hakonsreader.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -40,7 +41,7 @@ class SearchForSubredditsViewModel : ViewModel() {
 
         _isLoading.postValue(true)
 
-        CoroutineScope(IO).launch {
+        viewModelScope.launch {
             val resp = api.subreditts().search(query)
             _isLoading.postValue(false)
 
