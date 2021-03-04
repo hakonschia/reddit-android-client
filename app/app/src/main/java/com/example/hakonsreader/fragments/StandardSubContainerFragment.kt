@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -100,6 +101,7 @@ class StandardSubContainerFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        viewPager?.adapter = null
         viewPager = null
         super.onDestroyView()
     }
@@ -117,9 +119,7 @@ class StandardSubContainerFragment : Fragment() {
             }
         }
 
-        Adapter(startPos, this).apply {
-            viewPager.adapter = this
-        }
+        viewPager.adapter = Adapter(startPos, this)
 
         // Always keep all fragments alive
         viewPager.offscreenPageLimit = 3

@@ -13,6 +13,7 @@ import com.example.hakonsreader.viewmodels.ErrorWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SubredditRepository(
         private val subredditName: String,
@@ -74,14 +75,18 @@ class SubredditRepository(
      * [Subreddit.isSubscribed] will be flipped, and the subscribe count will be updated
      */
     suspend fun subscribe() {
-        val subreddit = dao.get(subredditName) ?: return
+        val subreddit = withContext(IO) {
+            dao.get(subredditName)
+        } ?: return
 
         // Assume success
         val newSubscription = !subreddit.isSubscribed
         subreddit.isSubscribed = newSubscription
         subreddit.subscribers += if (newSubscription) 1 else -1
 
-        dao.update(subreddit)
+        withContext(IO) {
+            dao.update(subreddit)
+        }
 
         when (val response = api.subscribe(newSubscription)) {
             is ApiResponse.Success -> { }
@@ -89,7 +94,10 @@ class SubredditRepository(
                 // Revert back
                 subreddit.isSubscribed = !newSubscription
                 subreddit.subscribers += if (!newSubscription) 1 else -1
-                dao.update(subreddit)
+                withContext(IO) {
+                    dao.update(subreddit)
+                }
+
                 _errors.postValue(ErrorWrapper(response.error, response.throwable))
             }
         }
@@ -103,24 +111,28 @@ class SubredditRepository(
      * @param flair The flair to change to, or `null` to disable the flair on the subreddit
      */
     suspend fun updateFlair(username: String, flair: RedditFlair?) {
-        val subreddit = dao.get(subredditName) ?: return
+        val subreddit = withContext(IO) {
+            dao.get(subredditName)
+        } ?: return
 
         subreddit.userFlairBackgroundColor = flair?.backgroundColor
         subreddit.userFlairRichText = flair?.richtextFlairs
         subreddit.userFlairText = flair?.text
         subreddit.userFlairTextColor = flair?.textColor
 
-        dao.update(subreddit)
+        withContext(IO) {
+            dao.update(subreddit)
 
-        // Update all posts the user potentially has in the database
-        postsDao.getPostsByUser(username).apply {
-            forEach {
-                it.authorFlairBackgroundColor = flair?.backgroundColor
-                it.authorRichtextFlairs = flair?.richtextFlairs ?: ArrayList()
-                it.authorFlairText = flair?.text
-                it.authorFlairTextColor = flair?.textColor
+            // Update all posts the user potentially has in the database
+            postsDao.getPostsByUser(username).apply {
+                forEach {
+                    it.authorFlairBackgroundColor = flair?.backgroundColor
+                    it.authorRichtextFlairs = flair?.richtextFlairs ?: ArrayList()
+                    it.authorFlairText = flair?.text
+                    it.authorFlairTextColor = flair?.textColor
+                }
+                postsDao.updateAll(this)
             }
-            postsDao.updateAll(this)
         }
 
         when (val resp = api.selectFlair(username, flair?.id)) {

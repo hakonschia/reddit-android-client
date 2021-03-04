@@ -34,7 +34,7 @@ class ShowAwardBottomSheet : BottomSheetDialogFragment() {
 
         binding.award = award
 
-        binding.description.movementMethod = InternalLinkMovementMethod.getInstance(requireContext())
+        binding.description.movementMethod = InternalLinkMovementMethod()
 
         // Some descriptions have a placeholder for the web version to display an icon, but we don't
         // show those so remove the text

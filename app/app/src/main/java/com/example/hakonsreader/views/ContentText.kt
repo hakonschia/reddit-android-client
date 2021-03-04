@@ -24,7 +24,7 @@ class ContentText : Content {
         var markdown: String = redditPost.selftext
 
         if (markdown.isNotEmpty()) {
-            binding.content.movementMethod = InternalLinkMovementMethod.getInstance(context)
+            binding.content.movementMethod = InternalLinkMovementMethod()
 
             markdown = App.get().adjuster.adjust(markdown)
             App.get().markwon.setMarkdown(binding.content, markdown)

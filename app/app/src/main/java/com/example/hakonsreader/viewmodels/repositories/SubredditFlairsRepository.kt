@@ -8,7 +8,9 @@ import com.example.hakonsreader.api.persistence.RedditFlairsDao
 import com.example.hakonsreader.api.requestmodels.SubredditRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.viewmodels.ErrorWrapper
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 /**
  * Repository for a list of [RedditFlair]
@@ -50,7 +52,9 @@ class SubredditFlairsRepository(
             when (response) {
                 is ApiResponse.Success -> {
                     flairsLoaded = true
-                    dao.insert(response.value)
+                    withContext(IO) {
+                        dao.insert(response.value)
+                    }
                 }
                 is ApiResponse.Error -> {
                     _errors.postValue(ErrorWrapper(response.error, response.throwable))

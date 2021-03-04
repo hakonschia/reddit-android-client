@@ -15,20 +15,15 @@ import org.jetbrains.annotations.Nullable;
  * Scroll listener for RecyclerView of Reddit posts. This will automatically "select" a post
  * when it is the main content on the screen. The behaviour of being "selected" and "unselected"
  * is defined in subclasses' implementation of {@link Content#viewSelected()} and {@link Content#viewUnselected()}
+ *
+ * This listener can currently only be attached to a {@link RecyclerView} with a {@link LinearLayoutManager}
+ * and {@link PostsAdapter} attached to it
  */
 public class PostScrollListener implements View.OnScrollChangeListener {
     private static final String TAG = "PostScrollListener";
 
     private static final int SCREEN_HEIGHT = App.Companion.get().getScreenHeight();
 
-
-    private final LinearLayoutManager layoutManager;
-    private final PostsAdapter adapter;
-
-    /**
-     * The list of the posts
-     */
-    private final RecyclerView posts;
 
     /**
      * The runnable to run when the end of list has been reached
@@ -67,26 +62,12 @@ public class PostScrollListener implements View.OnScrollChangeListener {
      *     </li>
      *</ol>
      *
-     * @param posts The {@link RecyclerView} the listener is attached to. The RecyclerView must have
-     *              an adapter of type {@link PostsAdapter} and layout manager of type {@link LinearLayoutManager}
-     *              set before this is called
      * @param onEndOfList The runnable to run when the end of the list has (almost) been reached
      * @throws IllegalStateException If the {@code RecyclerView} does not have an adapter or layout manager
      * attached to it
      */
-    public PostScrollListener(RecyclerView posts, Runnable onEndOfList) {
-        this.posts = posts;
+    public PostScrollListener(Runnable onEndOfList) {
         this.onEndOfList = onEndOfList;
-
-        this.adapter = (PostsAdapter) posts.getAdapter();
-        this.layoutManager = (LinearLayoutManager) posts.getLayoutManager();
-
-        if (this.adapter == null) {
-            throw new IllegalStateException("The RecyclerView must have an adapter attached to it");
-        }
-        if (this.layoutManager == null) {
-            throw new IllegalStateException("The RecyclerView must have a layout manager attached to it");
-        }
     }
 
     /**
@@ -124,21 +105,27 @@ public class PostScrollListener implements View.OnScrollChangeListener {
 
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldX, int oldY) {
+        // If these aren't set correctly they will crash, which is fine as it would be a development crash
+        RecyclerView posts = (RecyclerView) v;
+        // Currently this listener only supports a LinearLayoutManager. This will cause issues later
+        // if we want to use a different one for future layouts, but currently it will work fine
+        LinearLayoutManager layoutManager = (LinearLayoutManager) posts.getLayoutManager();
+
         // Find the positions of first and last visible items to find all visible items
         int posFirstItem = layoutManager.findFirstVisibleItemPosition();
         int posLastItem = layoutManager.findLastVisibleItemPosition();
 
-        int listSize = adapter.getItemCount();
+        int listSize = posts.getAdapter().getItemCount();
 
         // Load more posts before we reach the end to create an "infinite" list
         // Only load posts if there hasn't been an attempt at loading more posts
         if (posLastItem + numRemainingPostsBeforeRun > listSize && lastLoadAttemptCount < listSize) {
-            lastLoadAttemptCount = adapter.getItemCount();
+            lastLoadAttemptCount = listSize;
 
             onEndOfList.run();
         }
 
-        this.checkSelectedPost(posFirstItem, posLastItem, oldY > 0);
+        this.checkSelectedPost(posts, posFirstItem, posLastItem, oldY > 0);
     }
 
     /**
@@ -146,11 +133,11 @@ public class PostScrollListener implements View.OnScrollChangeListener {
      * and {@link PostsAdapter.ViewHolder#onUnselected()} based on if a post has been "selected" (ie. is the main
      * item on the screen) or "unselected" (ie. no longer the main item)
      *
-     * @param startPost The index of the post to start at (from {@link PostsAdapter#getPosts()} or {@link PostScrollListener#layoutManager}
-     * @param endPost The index of the post to end at (from {@link PostsAdapter#getPosts()} or {@link PostScrollListener#layoutManager}
+     * @param startPost The index of the post to start at
+     * @param endPost The index of the post to end at
      * @param scrollingUp Whether or not we are scrolling up or down in the list
      */
-    private void checkSelectedPost(int startPost, int endPost, boolean scrollingUp) {
+    private void checkSelectedPost(RecyclerView posts, int startPost, int endPost, boolean scrollingUp) {
         // The behavior is:
         // When scrolling UP:
         // 1. postToIgnore is reset when any view is UNSELECTED

@@ -16,6 +16,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -133,11 +134,7 @@ class SubredditFragment : Fragment() {
     private var subredditViewModel: SubredditViewModel? = null
 
     private var rulesViewModel: SubredditRulesViewModel? = null
-    private var rulesAdapter: SubredditRulesAdapter? = null
-    private var rulesLayoutManager: LinearLayoutManager? = null
-
     private var flairsViewModel: SubredditFlairsViewModel? = null
-    private var flairsAdapter: RedditFlairAdapter? = null
 
     // Not sure if storing the fragments like might cause a leak? Need to access them somehow though
     private var postsFragment: PostsFragment? = null
@@ -201,8 +198,8 @@ class SubredditFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
+        super.onDestroyView()
     }
 
     /**
@@ -231,7 +228,7 @@ class SubredditFragment : Fragment() {
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
                     this@SubredditFragment.subreddit?.let {
-                        val rulesCount = rulesAdapter?.itemCount ?: 0
+                        val rulesCount = binding.subredditInfo.rules.adapter?.itemCount ?: 0
                         // No rules, or we have rules and data saving is not on
                         // Ie. only load rules again from API if we're not on data saving
                         if (rulesCount == 0 || (rulesCount != 0 && !App.get().dataSavingEnabled())) {
@@ -239,7 +236,7 @@ class SubredditFragment : Fragment() {
                         }
 
                         // The adapter will always have one more (for the "Select flair")
-                        val flairsCount = flairsAdapter?.count?.minus(1) ?: 0
+                        val flairsCount = binding.subredditInfo.selectFlairSpinner.adapter?.count?.minus(1) ?: 0
                         if ((it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !App.get().dataSavingEnabled()))) {
                             flairsViewModel?.refresh()
                         }
@@ -325,6 +322,9 @@ class SubredditFragment : Fragment() {
         // TODO unless you know the wiki it's not obvious since there arent tabs
         //  TabLayout could be here, but need to figure out how to hide that (along with the toolbar)
         //  since it's annoying to have it on screen the entire time
+        // TODO this causes a leak for some reason, the PostsFragment causes a leak on the postsRefreshLayout
+        //  and the wiki causes a leak on the scroll view (the root views). This might not actually be
+        //  an issue with the fragments themselves but the views inside the fragments (not sure how LeakCanary works yet)
         binding.pager.adapter = Adapter(subreddit, this@SubredditFragment)
 
         val act = activity
@@ -422,8 +422,8 @@ class SubredditFragment : Fragment() {
     }
 
     private fun setupRulesList() {
-        rulesAdapter = SubredditRulesAdapter().apply { binding.subredditInfo.rules.adapter = this }
-        rulesLayoutManager = LinearLayoutManager(context).apply { binding.subredditInfo.rules.layoutManager = this }
+        binding.subredditInfo.rules.adapter = SubredditRulesAdapter()
+        binding.subredditInfo.rules.layoutManager = LinearLayoutManager(context)
     }
 
     /**
@@ -438,7 +438,7 @@ class SubredditFragment : Fragment() {
                 database.rules()
         )).get(SubredditRulesViewModel::class.java).apply {
             rules.observe(viewLifecycleOwner) {
-                rulesAdapter?.submitList(it)
+                (binding.subredditInfo.rules.adapter as SubredditRulesAdapter?)?.submitList(it)
             }
             errors.observe(viewLifecycleOwner) {
                 handleErrors(it.error, it.throwable)
@@ -467,7 +467,7 @@ class SubredditFragment : Fragment() {
                 database.flairs()
         )).get(SubredditFlairsViewModel::class.java).apply {
             flairs.observe(viewLifecycleOwner) {
-                flairsAdapter = RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
+                RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).run {
                     // If/when the flairs are updated the previous listener would trigger, which could
                     // remove the users flair
                     binding.subredditInfo.selectFlairSpinner.onItemSelectedListener = null
@@ -479,7 +479,7 @@ class SubredditFragment : Fragment() {
 
                     binding.subredditInfo.selectFlairSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                            updateUserFlair(flairsAdapter?.getFlairAt(position))
+                            updateUserFlair(getFlairAt(position))
                         }
                         override fun onNothingSelected(parent: AdapterView<*>?) {
                             // Not implemented
@@ -783,7 +783,7 @@ class SubredditFragment : Fragment() {
          * A movement method to be used in the wiki that checks if the clicked link is another wiki page, and
          * loads that page internally instead of sending to [DispatcherActivity]
          */
-        private val wikiLinkMovementMethod = InternalLinkMovementMethod { linkText ->
+        private val wikiLinkMovementMethod = InternalLinkMovementMethod { linkText, context ->
             // If linkText matches another wiki page, load that on the ViewModel, otherwise send to Dispatcher
             // Ensure we have a full URL (assume non-http links are to Reddit)
             val url = if (!linkText.matches("^http(s)?.*".toRegex())) {
@@ -805,7 +805,7 @@ class SubredditFragment : Fragment() {
             } else if (url.matches("https://(.*)?reddit.com/r/$name/about/rules/?".toRegex())) {
                 onRulesLinkClicked?.invoke()
             } else {
-                Intent(requireContext(), DispatcherActivity::class.java).apply {
+                Intent(context, DispatcherActivity::class.java).apply {
                     putExtra(DispatcherActivity.URL_KEY, linkText)
                     requireContext().startActivity(this)
                 }

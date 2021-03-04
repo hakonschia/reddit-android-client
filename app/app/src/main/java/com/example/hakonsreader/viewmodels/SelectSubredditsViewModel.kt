@@ -96,14 +96,19 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
         subreddit.isFavorited = favorite
 
         viewModelScope.launch {
-            database.subreddits().update(subreddit)
+            withContext(IO) {
+                database.subreddits().update(subreddit)
+            }
             when (val response = api.subreddit(subreddit.name).favorite(favorite)) {
                 is ApiResponse.Success -> { }
                 is ApiResponse.Error -> {
+                    _error.postValue(ErrorWrapper(response.error, response.throwable))
+
                     // Request failed, revert
                     subreddit.isFavorited = !favorite
-                    database.subreddits().update(subreddit)
-                    _error.postValue(ErrorWrapper(response.error, response.throwable))
+                    withContext(IO) {
+                        database.subreddits().update(subreddit)
+                    }
                 }
             }
         }

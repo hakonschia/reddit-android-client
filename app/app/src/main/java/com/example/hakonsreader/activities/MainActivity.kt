@@ -155,7 +155,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             setupStartFragment(startSubreddit)
 
             // Only start the inbox listener once, or else every configuration change would start another timer
-            startInboxListener()
+            // TODO this has to be improved as now it leaks and doesn't really work at all
+            //startInboxListener()
             trendingSubredditsViewModel.loadSubreddits()
         }
 

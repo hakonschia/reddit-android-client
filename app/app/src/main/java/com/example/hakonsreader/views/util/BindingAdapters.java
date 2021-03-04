@@ -134,7 +134,7 @@ public class BindingAdapters {
             return;
         }
 
-        textView.setMovementMethod(InternalLinkMovementMethod.getInstance(textView.getContext()));
+        textView.setMovementMethod(new InternalLinkMovementMethod());
         markdown = App.Companion.get().getAdjuster().adjust(markdown);
         App.Companion.get().getMarkwon().setMarkdown(textView, markdown);
     }

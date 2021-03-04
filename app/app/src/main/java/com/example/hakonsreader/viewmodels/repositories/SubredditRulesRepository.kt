@@ -7,7 +7,9 @@ import com.example.hakonsreader.api.persistence.RedditSubredditRulesDao
 import com.example.hakonsreader.api.requestmodels.SubredditRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.viewmodels.ErrorWrapper
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class SubredditRulesRepository(
         private val subredditName: String,
@@ -43,7 +45,9 @@ class SubredditRulesRepository(
             when (val resp = api.rules()) {
                 is ApiResponse.Success -> {
                     rulesLoaded = true
-                    rulesDao.insertAll(resp.value)
+                    withContext(IO) {
+                        rulesDao.insertAll(resp.value)
+                    }
                 }
                 is ApiResponse.Error -> {
                     _errors.postValue(ErrorWrapper(resp.error, resp.throwable))

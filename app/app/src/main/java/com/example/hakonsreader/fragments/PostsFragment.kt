@@ -2,6 +2,7 @@ package com.example.hakonsreader.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,8 +80,6 @@ class PostsFragment : Fragment(), SortableWithTime {
     private val binding get() = _binding!!
 
     private val postsViewModel: PostsViewModel by viewModels { PostsFactory(name, isForUser) }
-    private var postsAdapter: PostsAdapter? = null
-    private var postsLayoutManager: LinearLayoutManager? = null
     private var postsScrollListener: PostScrollListener? = null
 
     /**
@@ -113,7 +112,7 @@ class PostsFragment : Fragment(), SortableWithTime {
     var hideScoreTime = 0
         set(value) {
             field = value
-            postsAdapter?.hideScoreTime = value
+            (_binding?.posts?.adapter as PostsAdapter?)?.hideScoreTime = value
         }
 
     private var isDefaultSubreddit = false
@@ -133,7 +132,11 @@ class PostsFragment : Fragment(), SortableWithTime {
 
     override fun onPause() {
         super.onPause()
-        postsAdapter?.let {
+
+        // If the layout is refreshing when the fragment is paused it can cause a leak (at least it used to)
+        binding.postsRefreshLayout.isEnabled = false
+
+        (binding.posts.adapter as PostsAdapter?)?.let {
             // Tell all the view holders to save their extras and then deselect them (primarily to pause videos)
             it.viewHolders.forEach { viewHolder ->
                 viewHolder.saveExtras()
@@ -149,9 +152,12 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     override fun onResume() {
         super.onResume()
+        binding.postsRefreshLayout.isEnabled = true
+
+        val adapter = binding.posts.adapter as PostsAdapter?
 
         // If the fragment is selected without any posts load posts automatically
-        if (postsAdapter?.itemCount == 0) {
+        if (adapter?.itemCount == 0) {
             val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
             val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
 
@@ -159,20 +165,18 @@ class PostsFragment : Fragment(), SortableWithTime {
         } else {
             // If we have posts, restore extras if possible
             savedViewHolderStates?.let {
-                postsAdapter?.postExtras = it
+                adapter?.postExtras = it
             }
         }
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
-
-        binding.posts.adapter = null
-        postsAdapter?.let {
+        (binding.posts.adapter as PostsAdapter?)?.let {
             savedViewHolderStates = it.postExtras
         }
 
         _binding = null
+        super.onDestroyView()
     }
 
     /**
@@ -183,7 +187,7 @@ class PostsFragment : Fragment(), SortableWithTime {
      * automatically added again if the view is recreated
      */
     fun addScrollListener(listener: RecyclerView.OnScrollListener) {
-        scrollListeners.add(listener)
+        //scrollListeners.add(listener)
         if (_binding != null) {
             binding.posts.addOnScrollListener(listener)
         }
@@ -213,18 +217,17 @@ class PostsFragment : Fragment(), SortableWithTime {
     }
 
     /**
-     * Sets up [postsAdapter]/[postsLayoutManager]
+     * Sets up the posts list. The adapter set is a [PostsAdapter], with a [LinearLayoutManager] as the
+     * layout manager
      */
     private fun setupPostsList() {
-        postsAdapter = PostsAdapter().apply {
+        PostsAdapter().apply {
             savedViewHolderStates?.let {
                 postExtras = it
             }
 
-            lifecycleOwner = viewLifecycleOwner
-
             hideScoreTime = this@PostsFragment.hideScoreTime
-
+            lifecycleOwner = viewLifecycleOwner
             binding.posts.adapter = this
 
             onVideoManuallyPaused = { contentVideo ->
@@ -258,8 +261,8 @@ class PostsFragment : Fragment(), SortableWithTime {
             }
         }
 
-        postsLayoutManager = LinearLayoutManager(context).apply { binding.posts.layoutManager = this }
-        postsScrollListener = PostScrollListener(binding.posts) { postsViewModel.loadPosts() }
+        LinearLayoutManager(context).apply { binding.posts.layoutManager = this }
+        postsScrollListener = PostScrollListener { postsViewModel.loadPosts() }
         binding.posts.setOnScrollChangeListener(postsScrollListener)
     }
 
@@ -269,14 +272,16 @@ class PostsFragment : Fragment(), SortableWithTime {
     private fun setupPostsViewModel() {
         with (postsViewModel) {
             posts.observe(viewLifecycleOwner, { posts ->
+                val adapter = binding.posts.adapter as PostsAdapter?
+
                 // Posts have been cleared, clear the adapter and clear the layout manager state
                 if (posts.isEmpty()) {
-                    postsAdapter?.clearPosts()
-                    postsLayoutManager = LinearLayoutManager(context)
+                    adapter?.clearPosts()
+                    binding.posts.layoutManager = LinearLayoutManager(context)
                     return@observe
                 }
 
-                postsAdapter?.submitList(filterPosts(posts))
+                adapter?.submitList(filterPosts(posts))
             })
 
             onLoadingCountChange.observe(viewLifecycleOwner, { onLoadingChange?.invoke(it) })

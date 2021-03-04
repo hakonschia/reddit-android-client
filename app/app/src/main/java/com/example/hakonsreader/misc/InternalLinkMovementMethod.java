@@ -11,6 +11,8 @@ import android.text.style.URLSpan;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activities.DispatcherActivity;
 
@@ -22,36 +24,19 @@ import com.example.hakonsreader.activities.DispatcherActivity;
 public class InternalLinkMovementMethod extends LinkMovementMethod {
     private static final String TAG = "InternalLinkMovementMethod";
 
-    private static InternalLinkMovementMethod subredditAndUserInstance;
-
-
-    /**
-     * Retrieves the instance that checks for links that are subreddits and user profiles
-     *
-     * <p>When a subreddit or user profile is detected the corresponding activity is started.
-     * If no match is found the link is handled normally</p>
-     *
-     * @param context The context to use for opening new activities
-     * @return The static instance
-     */
-    public static InternalLinkMovementMethod getInstance(Context context) {
-        if (subredditAndUserInstance == null) {
-            subredditAndUserInstance = new InternalLinkMovementMethod(linkText -> {
-                // Let the dispatch activity handle all links
-                Intent intent = new Intent(context, DispatcherActivity.class);
-                intent.putExtra(DispatcherActivity.URL_KEY, linkText);
-                context.startActivity(intent);
-                return true;
-            });
-        }
-
-        return subredditAndUserInstance;
-    }
-
-
     private final OnLinkClickedListener mOnLinkClickedListener;
 
-    public InternalLinkMovementMethod(OnLinkClickedListener onLinkClickedListener) {
+    public InternalLinkMovementMethod() {
+        mOnLinkClickedListener = (linkText, context) -> {
+            // Let the dispatch activity handle all links
+            Intent intent = new Intent(context, DispatcherActivity.class);
+            intent.putExtra(DispatcherActivity.URL_KEY, linkText);
+            context.startActivity(intent);
+            return true;
+        };
+    }
+
+    public InternalLinkMovementMethod(@NonNull OnLinkClickedListener onLinkClickedListener) {
         mOnLinkClickedListener = onLinkClickedListener;
     }
 
@@ -93,7 +78,7 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
                 // Set background span to show what is being clicked
                 buffer.setSpan(new CustomBackgroundColorSpan(widget.getContext().getColor(R.color.linkColorPressedBackground)), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else if (action == MotionEvent.ACTION_UP) {
-                boolean handled = mOnLinkClickedListener.onLinkClicked(url);
+                boolean handled = mOnLinkClickedListener.onLinkClicked(url, widget.getContext());
                 if (handled) {
                     return true;
                 }
@@ -104,7 +89,7 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
     }
 
     public interface OnLinkClickedListener {
-        boolean onLinkClicked(String url);
+        boolean onLinkClicked(String url, Context context);
     }
 
     /**

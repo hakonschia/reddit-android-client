@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
@@ -43,16 +44,6 @@ class SelectSubredditFragment : Fragment() {
         private const val TAG = "SelectSubredditFragment"
 
         /**
-         * The key used to store the state of the subreddits list
-         */
-        private const val LIST_STATE_KEY = "listState"
-
-        /**
-         * The key used to store the state of the searched subreddits list
-         */
-        private const val SEARCH_LIST_STATE_KEY = "searchListState"
-
-        /**
          * The amount of milliseconds to wait to search for subreddits after text has been
          * input to the search field
          */
@@ -68,15 +59,8 @@ class SelectSubredditFragment : Fragment() {
     private var _binding: FragmentSelectSubredditBinding? = null
     private val binding get() = _binding!!
 
-    private val saveState: Bundle = Bundle()
-
-    private var subredditsAdapter: SubredditsAdapter? = null
-    private var subredditsLayoutManager: LinearLayoutManager? = null
     private val subredditsViewModel: SelectSubredditsViewModel by activityViewModels()
-
-    private var searchSubredditsAdapter: SubredditsAdapter? = null
-    private var searchSubredditsLayoutManager: LinearLayoutManager? = null
-    private var searchSubredditsViewModel: SearchForSubredditsViewModel? = null
+    private val searchSubredditsViewModel: SearchForSubredditsViewModel by viewModels()
 
     private var searchTimerTask: TimerTask? = null
 
@@ -90,18 +74,19 @@ class SelectSubredditFragment : Fragment() {
             // When the device orientation changes and the fragment is recreated, the setter for this
             // will be called after the fragment has gone through onCreate/onCreateView, so the
             // value set on subredditsAdapter will be null
-            subredditsAdapter?.subredditSelected = value
+            (_binding?.subreddits?.adapter as SubredditsAdapter?)?.subredditSelected = value
+            (_binding?.searchedSubreddits?.adapter as SubredditsAdapter?)?.subredditSelected = value
         }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        this.setupBinding(container)
+        setupBinding(container)
 
-        this.setupSubredditsList()
-        this.setupSearchSubredditsList()
+        setupSubredditsList()
+        setupSearchSubredditsList()
 
-        this.setupSearchViewModel()
-        this.setupSubredditsViewModel()
+        setupSearchViewModel()
+        setupSubredditsViewModel()
 
         return binding.root
     }
@@ -113,21 +98,14 @@ class SelectSubredditFragment : Fragment() {
         searchTimerTask?.cancel()
     }
 
-    override fun onPause() {
-        super.onPause()
-
-        saveState.putParcelable(LIST_STATE_KEY, subredditsLayoutManager?.onSaveInstanceState())
-        saveState.putParcelable(SEARCH_LIST_STATE_KEY, searchSubredditsLayoutManager?.onSaveInstanceState())
-    }
-
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
+        super.onDestroyView()
     }
 
 
     /**
-     * Infaltes and sets up [binding]
+     * Inflates and sets up [binding]
      */
     private fun setupBinding(container: ViewGroup?) {
         _binding = FragmentSelectSubredditBinding.inflate(layoutInflater, container, false)
@@ -140,26 +118,26 @@ class SelectSubredditFragment : Fragment() {
      * Sets up the list of subreddits (the "default" list shown with subscribed/default subreddits)
      */
     private fun setupSubredditsList() {
-        subredditsAdapter = SubredditsAdapter().apply {
+        SubredditsAdapter().run {
             this.subredditSelected = this@SelectSubredditFragment.subredditSelected
             favoriteClicked = OnClickListener { subreddit -> subredditsViewModel.favorite(subreddit) }
 
             binding.subreddits.adapter = this
         }
 
-        subredditsLayoutManager = LinearLayoutManager(context).apply { binding.subreddits.layoutManager = this }
+        binding.subreddits.layoutManager = LinearLayoutManager(context)
     }
 
     /**
      * Sets up the list of subreddits from search results
      */
     private fun setupSearchSubredditsList() {
-        searchSubredditsAdapter = SubredditsAdapter().apply {
+        SubredditsAdapter().run {
             this.subredditSelected = this@SelectSubredditFragment.subredditSelected
             binding.searchedSubreddits.adapter = this
         }
 
-        searchSubredditsLayoutManager = LinearLayoutManager(context).apply { binding.searchedSubreddits.layoutManager = this }
+        binding.searchedSubreddits.layoutManager = LinearLayoutManager(context)
     }
 
     /**
@@ -168,7 +146,8 @@ class SelectSubredditFragment : Fragment() {
     private fun setupSubredditsViewModel() {
         with (subredditsViewModel) {
             subreddits.observe(viewLifecycleOwner, { subreddits ->
-                subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
+                (binding.subreddits.adapter as SubredditsAdapter?)
+                        ?.submitList(subreddits as MutableList<Subreddit>, true)
             })
 
             isLoading.observe(viewLifecycleOwner, { isLoading ->
@@ -189,18 +168,16 @@ class SelectSubredditFragment : Fragment() {
      * Initializes [searchSubredditsViewModel] and observes all its values
      */
     private fun setupSearchViewModel() {
-        searchSubredditsViewModel = ViewModelProvider(this).get(SearchForSubredditsViewModel::class.java).apply {
+        with(searchSubredditsViewModel) {
             searchResults.observe(viewLifecycleOwner, { subreddits ->
                 binding.searchedSubredditsCount = subreddits.size
+                val adapter = binding.searchedSubreddits.adapter as SubredditsAdapter? ?: return@observe
 
                 if (subreddits.isEmpty()) {
-                    searchSubredditsAdapter?.clear()
+                    adapter.clear()
                 } else {
-                    searchSubredditsAdapter?.submitList(subreddits.toMutableList(), false)
-                    searchSubredditsLayoutManager?.scrollToPosition(0)
+                    adapter.submitList(subreddits.toMutableList(), false)
                 }
-
-                searchSubredditsLayoutManager?.onRestoreInstanceState(saveState.getParcelable(SEARCH_LIST_STATE_KEY))
             })
 
             isLoading.observe(viewLifecycleOwner, { onCountChange ->
