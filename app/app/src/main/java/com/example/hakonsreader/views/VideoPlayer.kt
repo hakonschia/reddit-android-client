@@ -476,7 +476,7 @@ class VideoPlayer : PlayerView {
         // Open video if we are not in a video activity
         if (context !is VideoActivity) {
             fullscreen.setOnClickListener {
-                fullScreenListener?.run()
+                fullScreenListener?.invoke()
 
                 val intent = Intent(context, VideoActivity::class.java).apply {
                     putExtra(VideoActivity.EXTRAS, this@VideoPlayer.getExtras())

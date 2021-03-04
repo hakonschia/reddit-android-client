@@ -11,6 +11,7 @@ import com.example.hakonsreader.api.responses.ApiResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CommentsViewModel: ViewModel() {
 
@@ -63,7 +64,9 @@ class CommentsViewModel: ViewModel() {
                 is ApiResponse.Success -> {
                     _post.postValue(resp.value.post)
                     _comments.postValue(resp.value.comments)
-                    insertPostIntoDb(resp.value.post)
+                    withContext(IO) {
+                        insertPostIntoDb(resp.value.post)
+                    }
                 }
                 is ApiResponse.Error -> _error.postValue(ErrorWrapper(resp.error, resp.throwable))
             }

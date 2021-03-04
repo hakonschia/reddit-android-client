@@ -115,6 +115,7 @@ dependencies {
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5'
     implementation 'com.github.zawadz88.materialpopupmenu:material-popup-menu:4.1.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
 
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:26.3.0')

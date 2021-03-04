@@ -13,6 +13,7 @@ import com.example.hakonsreader.api.responses.ApiResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -112,7 +113,7 @@ class PostsViewModel(
             _loadingChange.postValue(false)
 
             when (resp) {
-                is ApiResponse.Success -> onPostsRetrieved(resp.value)
+                is ApiResponse.Success -> withContext(IO) { onPostsRetrieved(resp.value) }
                 is ApiResponse.Error -> _error.postValue(ErrorWrapper(resp.error, resp.throwable))
             }
         }
