@@ -21,6 +21,7 @@ import com.example.hakonsreader.api.responses.GenericError;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.Locale;
 
@@ -46,7 +47,11 @@ public class Util {
         t.printStackTrace();
 
         if (t instanceof IOException) {
-            Util.showNoInternetSnackbar(parent);
+            if (t instanceof SocketTimeoutException) {
+                Util.showNetworkTimeoutException(parent);
+            } else {
+                Util.showNoInternetSnackbar(parent);
+            }
         } else if (t instanceof InvalidAccessTokenException) {
             if (App.Companion.get().isUserLoggedInPrivatelyBrowsing()) {
                 Util.showPrivatelyBrowsingSnackbar(parent);
@@ -81,7 +86,16 @@ public class Util {
      * @param parent The view to attach the snackbar to
      */
     public static void showNoInternetSnackbar(View parent) {
-        Snackbar.make(parent, parent.getResources().getString(R.string.noInternetConnection), LENGTH_SHORT).show();
+        Snackbar.make(parent, parent.getResources().getString(R.string.noInternetConnection), LENGTH_LONG).show();
+    }
+
+    /**
+     * Creates and shows a snackbar for errors caused by a network timeout
+     *
+     * @param parent The view to attach the snackbar to
+     */
+    public static void showNetworkTimeoutException(View parent) {
+        Snackbar.make(parent, parent.getResources().getString(R.string.networkTimeout), LENGTH_LONG).show();
     }
 
     /**

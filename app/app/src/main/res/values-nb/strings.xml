@@ -417,4 +417,5 @@
     <string name="content_description_wiki_back">Gå tilbake i wikien</string>
     <string name="userSuspended">%s er suspandert</string>
     <string name="userSuspendedDescription">Brukere blir suspandert ved å bryte Reddit sin innholdspolicy eller ved mistenkelig kontoaktivitet</string>
+    <string name="networkTimeout">Nettverket ble tidsavbrutt</string>
 </resources>

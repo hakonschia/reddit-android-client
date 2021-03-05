@@ -215,6 +215,7 @@
     <string name="tooManyRequestsError">Too many request sent. Try again in a few seconds</string>
     <string name="errorLoggingIn">Error logging in</string>
     <string name="noInternetConnection">No internet connection</string>
+    <string name="networkTimeout">The network timed out</string>
     <string name="forbiddenError">Not allowed by Reddit. Try to log out and in again</string>
     <string name="threadLockedError">The thread has been locked</string>
     <string name="unknownError">An unknown error occurred</string>
