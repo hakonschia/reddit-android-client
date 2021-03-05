@@ -364,7 +364,7 @@ class Post : Content {
      * Releases any relevant resources and removes the content view
      *
      *
-     * If relevant to the type of post, various resoruces (such as video players) are released
+     * If relevant to the type of post, various resources (such as video players) are released
      * when this is called
      */
     fun cleanUpContent() {

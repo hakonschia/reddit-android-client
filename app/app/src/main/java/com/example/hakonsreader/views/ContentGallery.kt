@@ -31,6 +31,7 @@ class ContentGallery : Content {
     private val binding: ContentGalleryBinding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true)
     private lateinit var images: List<Image>
     private val galleryViews: MutableList<ContentGalleryImage> = ArrayList()
+    private var currentView: ContentGalleryImage? = null
 
     /**
      * The current Slidr lock this view has called. This should be checked to make sure duplicate calls
@@ -74,8 +75,6 @@ class ContentGallery : Content {
         binding.galleryImages.offscreenPageLimit = offscreenLimit
 
         binding.galleryImages.registerOnPageChangeCallback(object : OnPageChangeCallback() {
-            var currentView: ContentGalleryImage? = null
-
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 setActiveImageText(position)
@@ -147,6 +146,7 @@ class ContentGallery : Content {
 
     override fun viewSelected() {
         super.viewSelected()
+        currentView?.viewSelected()
 
         // Send a request to lock the slidr if the view is selected when not on the first image
         if (binding.galleryImages.currentItem != 0) {
@@ -156,6 +156,9 @@ class ContentGallery : Content {
 
     override fun viewUnselected() {
         super.viewUnselected()
+        galleryViews.forEach {
+            it.viewUnselected()
+        }
 
         // Send a request to unlock the slidr if the view is unselected when not on the first image
         if (binding.galleryImages.currentItem != 0) {
@@ -171,6 +174,7 @@ class ContentGallery : Content {
     fun release() {
         galleryViews.forEach(Consumer { obj: ContentGalleryImage -> obj.destroy() })
         galleryViews.clear()
+        currentView = null
     }
 
     private inner class Adapter(private val images: List<Image>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
