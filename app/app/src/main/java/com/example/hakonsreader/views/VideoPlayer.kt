@@ -4,9 +4,11 @@ import android.animation.LayoutTransition
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -14,8 +16,10 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.drawToBitmap
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.activities.VideoActivity
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.misc.cache
@@ -230,20 +234,23 @@ class VideoPlayer : PlayerView {
         }
 
     /**
-     * The size of the video in Megabytes. This will show a text in the overlay with the size in MB
+     * The size of the video in Megabytes. This will show a text in the overlay with the size in MB,
+     * if the size given is larger than 0 bytes
      */
     var videoSize = -1
         set(value) {
             field = value
 
-            val videoSizeView: TextView = findViewById(R.id.videoSize)
+            if (field > 0) {
+                val videoSizeView: TextView = findViewById(R.id.videoSize)
 
-            videoSizeView.visibility = if (value >= 0) {
-                val sizeInMb = videoSize / (1024 * 1024f)
-                videoSizeView.text = context.getString(R.string.videoSize, sizeInMb)
-                VISIBLE
-            } else {
-                GONE
+                videoSizeView.visibility = if (value >= 0) {
+                    val sizeInMb = videoSize / (1024 * 1024f)
+                    videoSizeView.text = context.getString(R.string.videoSize, sizeInMb)
+                    VISIBLE
+                } else {
+                    GONE
+                }
             }
         }
 
@@ -345,7 +352,7 @@ class VideoPlayer : PlayerView {
                 if (isPlaying) {
                     thumbnail.visibility = GONE
 
-                    // Hide the controller instantly when the state changes
+                    // Hide the controller instantly on playback
                     hideController()
                 }
             }
@@ -358,6 +365,14 @@ class VideoPlayer : PlayerView {
                 // If the player is trying to play and hasn't yet prepared the video, prepare it
                 if (playWhenReady && !isPrepared) {
                     prepare()
+                }
+
+                controllerShowTimeoutMs = if (playbackState == Player.STATE_BUFFERING) {
+                    // When buffering the controller shouldn't be auto hidden, as the thumbnail is part of
+                    // the controller it might disappear on slow connections which makes the "video" black
+                    -1
+                } else {
+                    CONTROLLER_TIMEOUT
                 }
             }
         })
@@ -400,7 +415,7 @@ class VideoPlayer : PlayerView {
      * Loads the thumbnail into [thumbnail]. If [thumbnailUrl] is not empty, then the URL will be loaded.
      * Otherwise [thumbnailDrawable] will be loaded
      */
-    private fun loadThumbnail() {
+    fun loadThumbnail() {
         // Set the background color for the controls as a filter here since the thumbnail is shown
         // over the controls
         thumbnail.setColorFilter(ContextCompat.getColor(context, R.color.videoControlBackground))
@@ -544,12 +559,6 @@ class VideoPlayer : PlayerView {
         }
     }
 
-    /**
-     * Removes the thumbnail from being shown
-     */
-    fun removeThumbnail() {
-        thumbnail.visibility = GONE
-    }
 
     /**
      * Releases the video to free up its resources
@@ -632,11 +641,25 @@ class VideoPlayer : PlayerView {
         }
     }
 
+    /**
+     * Gets a bitmap of the current frame displayed, or the bitmap displayed in the thumbnail
+     * if the video hasn't played yet
+     */
+    fun getCurrentFrame() : Bitmap {
+        return (videoSurfaceView as TextureView).bitmap ?: thumbnail.drawToBitmap()
+    }
+
+    /**
+     * Sets a bitmap to the thumbnail
+     */
+    fun setThumbnailBitmap(bitmap: Bitmap) {
+        thumbnail.setImageBitmap(bitmap)
+    }
+
     fun getExtras() : Bundle {
         return Bundle().also {
             it.putLong(EXTRA_TIMESTAMP, getPosition())
             it.putBoolean(EXTRA_IS_PLAYING, isPlaying())
-            it.putBoolean(EXTRA_SHOW_CONTROLS, isControllerVisible)
             it.putBoolean(EXTRA_VOLUME, isAudioOn())
 
             // Probably have to pass thumbnail?
@@ -649,7 +672,6 @@ class VideoPlayer : PlayerView {
     fun setExtras(extras: Bundle) {
         val timestamp = extras.getLong(EXTRA_TIMESTAMP)
         val isPlaying = extras.getBoolean(EXTRA_IS_PLAYING)
-        val showController = extras.getBoolean(EXTRA_SHOW_CONTROLS)
         val volumeOn = extras.getBoolean(EXTRA_VOLUME)
 
         videoSize = extras.getInt(EXTRA_VIDEO_SIZE)
@@ -660,11 +682,9 @@ class VideoPlayer : PlayerView {
         if (timestamp != 0L) {
             prepare()
             setPosition(timestamp)
-
-            // If the video was paused, remove the thumbnail so it shows the correct frame
-            if (!isPlaying) {
-                removeThumbnail()
-            }
+        } else {
+            thumbnail.visibility = VISIBLE
+            loadThumbnail()
         }
 
         if (isPlaying) {
@@ -672,12 +692,6 @@ class VideoPlayer : PlayerView {
         } else {
             // Probably unnecessary?
             pause()
-        }
-
-        if (showController) {
-            showController()
-        } else {
-            hideController()
         }
     }
 }

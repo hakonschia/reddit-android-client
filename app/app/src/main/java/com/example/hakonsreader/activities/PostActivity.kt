@@ -2,6 +2,7 @@ package com.example.hakonsreader.activities
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.transition.Transition
 import android.transition.TransitionListenerAdapter
@@ -88,6 +89,12 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
          * Request code for opening a reply activity
          */
         const val REQUEST_REPLY = 1
+
+        /**
+         * The bitmap to display when transitioning videos. This should be set just before the
+         * activity is started and will be nulled when the activity is destroyed
+         */
+        var VIDEO_THUMBNAIL_BITMAP: Bitmap? = null
     }
 
     private lateinit var binding: ActivityPostBinding
@@ -176,6 +183,8 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         // Ensure resources are freed when the activity exits
         binding.post.cleanUpContent()
         binding.post.lifecycleOwner = null
+        
+        VIDEO_THUMBNAIL_BITMAP = null
     }
 
     /**
@@ -187,7 +196,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         if (requestCode == REQUEST_REPLY && resultCode == RESULT_OK && data != null) {
             val newComment = Gson().fromJson(data.getStringExtra(ReplyActivity.LISTING_KEY), RedditComment::class.java)
             val parent = if (replyingTo is RedditComment) replyingTo as RedditComment else null
-            commentsViewModel?.insertComment(newComment, parent)
+            commentsViewModel.insertComment(newComment, parent)
         }
     }
 
@@ -359,12 +368,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         binding.setPost(newPost)
         binding.post.redditPost = newPost
 
-        // This is for the controller transitions
-        val content = binding.post.getContent()
-        if (content is ContentVideo) {
-            content.enableTransitions(true)
-        }
-
         if (extras != null) {
             binding.post.extras = extras
         }
@@ -446,6 +449,14 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                     // Load the post, but don't set extras yet
                     onNewPostInfo(redditPost)
 
+                    val content = binding.post.getContent() as ContentVideo
+
+                    // If a thumbnail was passed to the activity then use that as the thumbnail during
+                    // the transition
+                    VIDEO_THUMBNAIL_BITMAP?.let {
+                        content.setThumbnailBitmap(it)
+                    } ?: content.loadThumbnail()
+
                     // For videos we don't want to set the extras right away. If a video is playing during the
                     // animation the animation looks very choppy, so it should only be played at the end
                     window.sharedElementEnterTransition.addListener(object : TransitionListenerAdapter() {
@@ -455,6 +466,8 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                             if (postExtras != null) {
                                 binding.post.extras = postExtras
                             }
+
+                            content.enableControllerTransitions(true)
                         }
                     })
                 }

@@ -2,7 +2,6 @@ package com.example.hakonsreader.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +26,7 @@ import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListene
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.views.Content
+import com.example.hakonsreader.views.ContentVideo
 import com.google.gson.Gson
 
 class PostsFragment : Fragment(), SortableWithTime {
@@ -245,6 +245,12 @@ class PostsFragment : Fragment(), SortableWithTime {
                 // autoplay the video
                 val redditPost = post.redditPost
                 postsScrollListener?.setPostToIgnore(redditPost?.id)
+
+                val content = post.getContent()
+                if (content is ContentVideo) {
+                    val currentFrame = content.getCurrentFrame()
+                    PostActivity.VIDEO_THUMBNAIL_BITMAP = currentFrame
+                }
 
                 val intent = Intent(context, PostActivity::class.java).apply {
                     putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))

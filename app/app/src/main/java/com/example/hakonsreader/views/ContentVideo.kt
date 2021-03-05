@@ -1,6 +1,7 @@
 package com.example.hakonsreader.views
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -197,8 +198,29 @@ class ContentVideo : Content {
      *
      * @param enable True to enable transitions
      */
-    fun enableTransitions(enable: Boolean) {
+    fun enableControllerTransitions(enable: Boolean) {
         player.transitionEnabled = enable
+    }
+
+    /**
+     * Gets a bitmap of the current frame displayed, or null if the video hasn't yet been loaded
+     */
+    fun getCurrentFrame(): Bitmap {
+        return player.getCurrentFrame()
+    }
+
+    /**
+     * Sets a bitmap to the thumbnail
+     */
+    fun setThumbnailBitmap(bitmap: Bitmap) {
+        player.setThumbnailBitmap(bitmap)
+    }
+
+    /**
+     * Loads the default thumbnail on the video
+     */
+    fun loadThumbnail() {
+        player.loadThumbnail()
     }
 
     private fun setThumbnailUrl() {
