@@ -10,7 +10,6 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.databinding.ContentGalleryBinding
-import com.example.hakonsreader.interfaces.LockableSlidr
 import java.util.*
 import java.util.function.Consumer
 
@@ -32,12 +31,6 @@ class ContentGallery : Content {
     private lateinit var images: List<Image>
     private val galleryViews: MutableList<ContentGalleryImage> = ArrayList()
     private var currentView: ContentGalleryImage? = null
-
-    /**
-     * The current Slidr lock this view has called. This should be checked to make sure duplicate calls
-     * to lock a Slidr isn't done
-     */
-    private var slidrLocked = false
 
     private var maxHeight = -1
     private var maxWidth = -1
@@ -79,10 +72,6 @@ class ContentGallery : Content {
                 super.onPageSelected(position)
                 setActiveImageText(position)
 
-                // Make sure the slidr is locked when not on the first item, so that swiping right will
-                // swipe on the gallery, not remove the activity (this would probably be wrong for RTL layouts?)
-                lockSlidr(position != 0)
-
                 // Unselect the previous and
                 currentView?.viewUnselected()
 
@@ -111,27 +100,6 @@ class ContentGallery : Content {
         }
     }
 
-    /**
-     * Lock or unlock a Slidr.
-     *
-     * @param lock True to lock, false to unlock
-     */
-    private fun lockSlidr(lock: Boolean) {
-        // Return to avoid duplicate calls on the same type of lock
-        if (lock == slidrLocked) {
-            return
-        }
-        slidrLocked = lock
-        val context = context
-
-        // This might be bad? The "correct" way of doing it might be to add listeners
-        // and be notified that way, but I don't want to add 1000 functions to add the listener
-        // all the way up here from an activity
-        if (context is LockableSlidr) {
-            (context as LockableSlidr).lock(lock)
-        }
-    }
-
     override fun getExtras(): Bundle {
         return super.getExtras().apply {
             putInt(EXTRAS_ACTIVE_IMAGE, binding.galleryImages.currentItem)
@@ -147,22 +115,12 @@ class ContentGallery : Content {
     override fun viewSelected() {
         super.viewSelected()
         currentView?.viewSelected()
-
-        // Send a request to lock the slidr if the view is selected when not on the first image
-        if (binding.galleryImages.currentItem != 0) {
-            lockSlidr(true)
-        }
     }
 
     override fun viewUnselected() {
         super.viewUnselected()
         galleryViews.forEach {
             it.viewUnselected()
-        }
-
-        // Send a request to unlock the slidr if the view is unselected when not on the first image
-        if (binding.galleryImages.currentItem != 0) {
-            lockSlidr(false)
         }
     }
 

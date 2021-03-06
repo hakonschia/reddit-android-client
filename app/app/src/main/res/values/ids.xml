@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://github.com/r0adkll/Slidr/blob/master/library/src/main/res/values/ids.xml -->
+<resources>
+    <item name="slidable_panel" type="id" />
+    <item name="slidable_content" type="id" />
+</resources>
