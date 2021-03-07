@@ -26,6 +26,12 @@ class ContentGallery : Content {
         const val EXTRAS_ACTIVE_IMAGE = "activeImage"
     }
 
+
+    // TODO this ViewPager2 causes issues with AppBarLayout. When scrolling vertically on a RecyclerView item
+    //  with this view inside it the appbar wont be hidden (it hides when you "fling" the view, but not if you
+    //  hold the entire time you scroll)
+
+
     // This file and ContentImage is really coupled together, should be fixed to not be so terrible
     private val binding: ContentGalleryBinding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true)
     private lateinit var images: List<Image>

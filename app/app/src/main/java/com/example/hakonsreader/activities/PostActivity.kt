@@ -254,10 +254,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
             expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
         }
 
-        // TODO if it should collapse by default it should also update the height so that is set
-        //  which probably causes issues when we go back? Since it probably doesnt have the correct "previous" value set
-        //  The solution now kind of works, but when we enable collapse again the size will always be the max, so
-        //  if the content doesn't need that much space it will still take that much space and be empty
         val collapsePostByDefault = App.get().collapsePostsByDefaultWhenScrollingComments()
         enableTransition(collapsePostByDefault, showSnackbar = false, updateHeight = !collapsePostByDefault)
     }

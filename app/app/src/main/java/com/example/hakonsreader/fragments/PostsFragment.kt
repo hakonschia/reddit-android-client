@@ -2,6 +2,8 @@ package com.example.hakonsreader.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +30,10 @@ import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.ContentVideo
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class PostsFragment : Fragment(), SortableWithTime {
 
@@ -58,6 +64,17 @@ class PostsFragment : Fragment(), SortableWithTime {
          * The value with this key should be the value of corresponding enum value from [PostTimeSort]
          */
         private const val TIME_SORT = "time_sort"
+
+        /**
+         * The amount of milliseconds that should the used to wait to open more posts after a post has
+         * been opened
+         */
+        // This value is fairly arbitrary. Its purpose is to avoid posts being opened multiple times
+        // if clicked fast after each other. The time can be relatively large as when opening posts normally
+        // you have to wait for the animation anyways, which takes a decent amount of time
+        // For "normal" use of opening posts, reading some comments, and then going back it will never be noticeable
+        // You would have to actively try to notice this, and even then it's hard
+        private const val POST_OPEN_TIMEOUT = 1250L
 
 
         fun newInstance(isForUser: Boolean, name: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = PostsFragment().apply {
@@ -93,6 +110,11 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     // TODO this should also be saved in onSaveInstanceState
     private var savedViewHolderStates: HashMap<String, Bundle>? = null
+
+    /**
+     * The timestamp the last time a post was opened (or -1 if no post has been opened)
+     */
+    private var lastPostOpened = -1L
 
     /**
      * Callback for errors when loading posts
@@ -241,6 +263,16 @@ class PostsFragment : Fragment(), SortableWithTime {
             }
 
             onPostClicked = PostsAdapter.OnPostClicked { post ->
+                val currentTime = System.currentTimeMillis()
+                synchronized(lastPostOpened) {
+                    if (lastPostOpened + POST_OPEN_TIMEOUT > currentTime) {
+                        Log.d(TAG, "setupPostsList: Not opening")
+                        return@OnPostClicked
+                    }
+
+                    lastPostOpened = currentTime
+                }
+
                 // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
                 // autoplay the video
                 val redditPost = post.redditPost
