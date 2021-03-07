@@ -1,5 +1,6 @@
 package com.example.hakonsreader.viewmodels
 
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * ViewModel for retrieving Reddit posts from a user or subreddit
@@ -35,6 +37,11 @@ class PostsViewModel(
     private val _posts = MutableLiveData<List<RedditPost>>()
     private val _loadingChange = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<ErrorWrapper>()
+
+    /**
+     * The saved states of the posts
+     */
+    var savedPostStates: HashMap<String, Bundle>? = null
 
     var sort: SortingMethods = SortingMethods.HOT
         private set

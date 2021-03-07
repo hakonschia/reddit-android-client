@@ -93,11 +93,14 @@ class PostsFragment : Fragment(), SortableWithTime {
     val name: String by lazy { arguments?.getString(NAME_KEY) ?: "" }
     private val isForUser: Boolean by lazy { arguments?.getBoolean(IS_FOR_USER) ?: false }
 
+    // Must not be a user to be a default subreddit (eg. /u/popular is an actual user)
+    private val isDefaultSubreddit = !isForUser && RedditApi.STANDARD_SUBS.contains(name.toLowerCase())
+
     private var _binding: FragmentPostsBinding? = null
     private val binding get() = _binding!!
 
     private val postsViewModel: PostsViewModel by viewModels { PostsFactory(name, isForUser) }
-    private var postsScrollListener: PostScrollListener? = null
+    private val postsScrollListener: PostScrollListener = PostScrollListener { postsViewModel.loadPosts() }
 
     /**
      * A list of scroll listeners that were set before the fragments view was created, and should
@@ -137,13 +140,13 @@ class PostsFragment : Fragment(), SortableWithTime {
             (_binding?.posts?.adapter as PostsAdapter?)?.hideScoreTime = value
         }
 
-    private var isDefaultSubreddit = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        // Must not be a user to be a default subreddit (eg. /u/popular is an actual user)
-        isDefaultSubreddit = !isForUser && RedditApi.STANDARD_SUBS.contains(name.toLowerCase())
-
         _binding = FragmentPostsBinding.inflate(inflater)
+
+        postsViewModel.savedPostStates?.let {
+            savedViewHolderStates = it
+        }
 
         setupBinding()
         setupPostsList()
@@ -195,6 +198,7 @@ class PostsFragment : Fragment(), SortableWithTime {
     override fun onDestroyView() {
         (binding.posts.adapter as PostsAdapter?)?.let {
             savedViewHolderStates = it.postExtras
+            postsViewModel.savedPostStates = it.postExtras
         }
 
         _binding = null
@@ -300,7 +304,6 @@ class PostsFragment : Fragment(), SortableWithTime {
         }
 
         LinearLayoutManager(context).apply { binding.posts.layoutManager = this }
-        postsScrollListener = PostScrollListener { postsViewModel.loadPosts() }
         binding.posts.setOnScrollChangeListener(postsScrollListener)
     }
 
