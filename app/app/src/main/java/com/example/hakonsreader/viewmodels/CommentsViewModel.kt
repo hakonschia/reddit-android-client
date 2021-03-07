@@ -1,5 +1,6 @@
 package com.example.hakonsreader.viewmodels
 
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,6 +33,8 @@ class CommentsViewModel: ViewModel() {
      * The ID of the post. This must be set before an attempt at loading the comments is made
      */
     var postId = ""
+
+    var savedExtras: Bundle? = null
 
 
     /**

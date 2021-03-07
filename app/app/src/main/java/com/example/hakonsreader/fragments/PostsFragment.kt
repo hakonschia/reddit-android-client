@@ -2,8 +2,6 @@ package com.example.hakonsreader.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,10 +28,7 @@ import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.ContentVideo
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+
 
 class PostsFragment : Fragment(), SortableWithTime {
 

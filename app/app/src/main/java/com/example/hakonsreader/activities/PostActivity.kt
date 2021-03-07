@@ -166,6 +166,10 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
     override fun onPause() {
         super.onPause()
 
+        // This is only really for when the activity is destroyed, but onPause is called first
+        // and it calls viewUnselected which would make the extras PAUSED be false
+        commentsViewModel.savedExtras = binding.post.extras
+        
         videoPlayingWhenPaused = binding.post.extras.getBoolean(VideoPlayer.EXTRA_IS_PLAYING)
         binding.post.viewUnselected()
     }
@@ -265,7 +269,15 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         with (commentsViewModel) {
             post.observe(this@PostActivity) {
                 if (it != null) {
-                    onNewPostInfo(it)
+                    if (savedExtras != null) {
+                        onNewPostInfo(it, savedExtras)
+                    } else {
+                        onNewPostInfo(it)
+                    }
+
+                    // We don't want to accidentally set this more than once, this is only for
+                    // configuration changes (if we manually refreshed the comments this will trigger again)
+                    savedExtras = null
                 }
             }
 
