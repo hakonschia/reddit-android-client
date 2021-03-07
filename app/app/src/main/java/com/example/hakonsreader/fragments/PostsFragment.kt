@@ -108,11 +108,6 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     private val scrollListeners: MutableList<RecyclerView.OnScrollListener> = ArrayList()
 
-    /**
-     * The states/extras for the view holders saved when the fragment view was destroyed
-     */
-    // TODO this should also be saved in onSaveInstanceState
-    private var savedViewHolderStates: HashMap<String, Bundle>? = null
 
     /**
      * The timestamp the last time a post was opened (or -1 if no post has been opened)
@@ -143,16 +138,15 @@ class PostsFragment : Fragment(), SortableWithTime {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPostsBinding.inflate(inflater)
+        return binding.root
+    }
 
-        postsViewModel.savedPostStates?.let {
-            savedViewHolderStates = it
-        }
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupBinding()
         setupPostsList()
         setupPostsViewModel()
 
-        return binding.root
+        viewLifecycleOwner.lifecycle.addObserver(postsScrollListener)
     }
 
     override fun onPause() {
@@ -167,7 +161,7 @@ class PostsFragment : Fragment(), SortableWithTime {
                 viewHolder.saveExtras()
                 viewHolder.onUnselected()
             }
-            savedViewHolderStates = it.postExtras
+            postsViewModel.savedPostStates = it.postExtras
         }
     }
 
@@ -187,19 +181,14 @@ class PostsFragment : Fragment(), SortableWithTime {
             val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
 
             postsViewModel.loadPosts(sort, timeSort)
-        } else {
-            // If we have posts, restore extras if possible
-            savedViewHolderStates?.let {
-                adapter?.postExtras = it
-            }
         }
     }
 
     override fun onDestroyView() {
         (binding.posts.adapter as PostsAdapter?)?.let {
-            savedViewHolderStates = it.postExtras
             postsViewModel.savedPostStates = it.postExtras
         }
+        binding.posts.adapter = null
 
         _binding = null
         super.onDestroyView()
@@ -248,29 +237,24 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     private fun setupPostsList() {
         PostsAdapter().apply {
-            savedViewHolderStates?.let {
-                postExtras = it
-            }
-
             hideScoreTime = this@PostsFragment.hideScoreTime
             lifecycleOwner = viewLifecycleOwner
             binding.posts.adapter = this
 
             onVideoManuallyPaused = { contentVideo ->
                 // Ignore post when scrolling if manually paused
-                postsScrollListener?.setPostToIgnore(contentVideo.redditPost?.id)
+                postsScrollListener.setPostToIgnore(contentVideo.redditPost?.id)
             }
 
             onVideoFullscreenListener = { contentVideo ->
                 // Ignore post when scrolling if it has been fullscreened
-                postsScrollListener?.setPostToIgnore(contentVideo.redditPost?.id)
+                postsScrollListener.setPostToIgnore(contentVideo.redditPost?.id)
             }
 
             onPostClicked = PostsAdapter.OnPostClicked { post ->
                 val currentTime = System.currentTimeMillis()
                 synchronized(lastPostOpened) {
                     if (lastPostOpened + POST_OPEN_TIMEOUT > currentTime) {
-                        Log.d(TAG, "setupPostsList: Not opening")
                         return@OnPostClicked
                     }
 
@@ -280,7 +264,7 @@ class PostsFragment : Fragment(), SortableWithTime {
                 // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
                 // autoplay the video
                 val redditPost = post.redditPost
-                postsScrollListener?.setPostToIgnore(redditPost?.id)
+                postsScrollListener.setPostToIgnore(redditPost?.id)
 
                 val content = post.getContent()
                 if (content is ContentVideo) {
@@ -314,6 +298,9 @@ class PostsFragment : Fragment(), SortableWithTime {
         with (postsViewModel) {
             posts.observe(viewLifecycleOwner, { posts ->
                 val adapter = binding.posts.adapter as PostsAdapter?
+                postsViewModel.savedPostStates?.let {
+                    adapter?.postExtras = it
+                }
 
                 // Posts have been cleared, clear the adapter and clear the layout manager state
                 if (posts.isEmpty()) {
@@ -329,7 +316,7 @@ class PostsFragment : Fragment(), SortableWithTime {
 
             error.observe(viewLifecycleOwner, { error ->
                 // Error loading posts, reset onEndOfList so it tries again when scrolled
-                postsScrollListener?.resetOnEndOfList()
+                postsScrollListener.resetOnEndOfList()
                 onError?.invoke(error.error, error.throwable)
             })
         }

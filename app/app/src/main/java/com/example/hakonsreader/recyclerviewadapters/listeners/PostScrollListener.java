@@ -2,6 +2,9 @@ package com.example.hakonsreader.recyclerviewadapters.listeners;
 
 import android.view.View;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,8 +21,11 @@ import org.jetbrains.annotations.Nullable;
  *
  * This listener can currently only be attached to a {@link RecyclerView} with a {@link LinearLayoutManager}
  * and {@link PostsAdapter} attached to it
+ *
+ * This listener implements {@link LifecycleObserver} and will listen to {@link Lifecycle.Event#ON_RESUME} and
+ * {@link Lifecycle.Event#ON_PAUSE} which will ensure the listener never listens to anything in a paused state
  */
-public class PostScrollListener implements View.OnScrollChangeListener {
+public class PostScrollListener implements View.OnScrollChangeListener, LifecycleObserver {
     private static final String TAG = "PostScrollListener";
 
     private static final int SCREEN_HEIGHT = App.Companion.get().getScreenHeight();
@@ -44,6 +50,11 @@ public class PostScrollListener implements View.OnScrollChangeListener {
      * The ID of the post to ignore when calling {@link PostsAdapter.ViewHolder#onSelected()}
      */
     private String postToIgnore = "";
+
+    /**
+     * If true the listener is in a paused state and should not listen to scroll changes
+     */
+    private boolean paused = false;
 
 
     /**
@@ -103,8 +114,21 @@ public class PostScrollListener implements View.OnScrollChangeListener {
         lastLoadAttemptCount = -1;
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    private void paused() {
+        paused = true;
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    private void resumed() {
+        paused = false;
+    }
+
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldX, int oldY) {
+        if (paused) {
+            return;
+        }
         // If these aren't set correctly they will crash, which is fine as it would be a development crash
         RecyclerView posts = (RecyclerView) v;
         // Currently this listener only supports a LinearLayoutManager. This will cause issues later
