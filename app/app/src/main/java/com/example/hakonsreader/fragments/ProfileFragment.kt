@@ -285,6 +285,11 @@ fun setProfilePicture(imageView: RoundedImageView, user: RedditUser?) {
     user ?: return
 
     val url = if (user.snoovatarImage.isNotEmpty()) {
+        with(imageView) {
+            borderWidth = 0f
+            cornerRadius = 0f
+            mutateBackground(false)
+        }
         user.snoovatarImage
     } else {
         with(imageView) {

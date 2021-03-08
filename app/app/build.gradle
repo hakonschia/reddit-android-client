@@ -109,7 +109,6 @@ dependencies {
     // Misc
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
-    implementation 'com.jakewharton:process-phoenix:2.0.0'
     implementation 'com.robinhood.ticker:ticker:2.0.2'
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:10.0.5'
     implementation 'com.github.zawadz88.materialpopupmenu:material-popup-menu:4.1.0'

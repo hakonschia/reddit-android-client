@@ -1084,6 +1084,9 @@ class App : Application() {
 
     /**
      * Clears any user information stored, logging a user out. The application will be restarted
+     *
+     * @param context The context requesting the log out. If this is a [MainActivity] then [MainActivity.recreateAsNewUser]
+     * will be called. Otherwise, if it is an activity then [AppCompatActivity.recreate] will be called
      */
     fun logOut(context: Context? = null) {
         CoroutineScope(IO).launch {

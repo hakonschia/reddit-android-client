@@ -414,7 +414,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     /**
-     * Sets various things when the activity is in a context
+     * Sets various things when the activity is in a private browsing context
      */
     private fun asPrivatelyBrowsingUser(userInfo: RedditUserInfo) {
         privateBrowsingStateChanged(true)
@@ -426,8 +426,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
     }
 
+    /**
+     * Sets various things when the activity is in a context of a logger out user
+     */
     private fun asLoggedOutUser() {
-        // TODO do some stuff in the nav drawer at least
+        privateBrowsingStateChanged(false)
+        binding.navDrawer.userInfo = null
+        binding.bottomNav.menu.findItem(R.id.navProfile).title = getString(R.string.navbarProfile)
     }
 
     /**
