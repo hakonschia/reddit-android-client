@@ -88,8 +88,7 @@ class PostsFragment : Fragment(), SortableWithTime {
     val name: String by lazy { arguments?.getString(NAME_KEY) ?: "" }
     private val isForUser: Boolean by lazy { arguments?.getBoolean(IS_FOR_USER) ?: false }
 
-    // Must not be a user to be a default subreddit (eg. /u/popular is an actual user)
-    private val isDefaultSubreddit = !isForUser && RedditApi.STANDARD_SUBS.contains(name.toLowerCase())
+    private var isDefaultSubreddit = false
 
     private var _binding: FragmentPostsBinding? = null
     private val binding get() = _binding!!
@@ -137,6 +136,9 @@ class PostsFragment : Fragment(), SortableWithTime {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // Must not be a user to be a default subreddit (eg. /u/popular is an actual user)
+        isDefaultSubreddit = !isForUser && RedditApi.STANDARD_SUBS.contains(name.toLowerCase())
+
         setupBinding()
         setupPostsList()
         setupPostsViewModel()

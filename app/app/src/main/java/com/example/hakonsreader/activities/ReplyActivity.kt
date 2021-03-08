@@ -18,6 +18,7 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.ActivityReplyBinding
+import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.misc.Util
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -231,12 +232,12 @@ class ReplyActivity : BaseActivity() {
      * they are not logged in and won't be able to send a reply
      */
     private fun showNotLoggedInDialogIfNotLoggedIn() {
-        if (!App.get().isUserLoggedIn()) {
+        if (App.get().loggedInState.value is LoggedInState.LoggedIn) {
             AlertDialog.Builder(this)
                     .setTitle(getString(R.string.dialogReplyNotLoggedInTitle))
                     .setMessage(getString(R.string.dialogReplyNotLoggedInContent))
                     .show()
-        } else if (App.get().isUserLoggedInPrivatelyBrowsing()) {
+        } else if (App.get().loggedInState.value is LoggedInState.PrivatelyBrowsing) {
             Dialog(this).apply {
                 setContentView(R.layout.dialog_send_reply_privately_browsing)
                 window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)

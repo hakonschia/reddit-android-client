@@ -11,9 +11,8 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.misc.Util
-import com.github.zawadz88.materialpopupmenu.MaterialPopupMenu
-import com.github.zawadz88.materialpopupmenu.MaterialPopupMenuBuilder
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -36,7 +35,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
         return
     }
 
-    val user = App.get().currentUserInfo?.userInfo
+    val user = App.get().getUserInfo()?.userInfo
     val context = view.context
 
     popupMenu {
@@ -65,7 +64,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
 
         // There is a logged in user, show actions that require logged in users
         // Technically this could be null even if there is
-        if (App.get().isUserLoggedIn()) {
+        if (App.get().loggedInState.value is LoggedInState.LoggedIn) {
             section {
                 item {
                     labelRes = if (post.isSaved) {

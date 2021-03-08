@@ -6,12 +6,13 @@ import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.activities.InvalidAccessTokenActivity
+import com.example.hakonsreader.activities.MainActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditUser
@@ -26,7 +27,7 @@ import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.markwonplugins.*
 import com.example.hakonsreader.misc.SharedPreferencesManager
 import com.example.hakonsreader.misc.TokenManager
-import com.jakewharton.processphoenix.ProcessPhoenix
+import com.example.hakonsreader.states.LoggedInState
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
 import com.squareup.picasso.Picasso
@@ -39,7 +40,9 @@ import io.noties.markwon.image.ImageProps
 import io.noties.markwon.image.picasso.PicassoImagesPlugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.Cache
 import okhttp3.logging.HttpLoggingInterceptor
 import org.commonmark.node.Image
@@ -201,18 +204,14 @@ class App : Application() {
             }
         }
 
-    /**
-     * The user info for the user that is currently active in the application (this will not be
-     * nulled if private browsing is enabled)
-     */
-    var currentUserInfo: RedditUserInfo? = null
-
-    private val _privatelyBrowsing = MutableLiveData<Boolean>()
+    private val _loggedInState = MutableLiveData<LoggedInState>()
 
     /**
-     * A LiveData observable for the state of the APIs private browsing context
+     * A LiveData observable for the user state of the application. This will update either if
+     * some user info was updated for the current user, the current user account changed, or if the
+     * current user logged out
      */
-    val privatelyBrowsing: LiveData<Boolean> = _privatelyBrowsing
+    val loggedInState: LiveData<LoggedInState> = _loggedInState
 
     override fun onCreate() {
         super.onCreate()
@@ -221,16 +220,26 @@ class App : Application() {
         val prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE)
         SharedPreferencesManager.create(prefs)
 
-        CoroutineScope(IO).launch {
-            // There should probably be no issue with retrieving the user info in this way
-            // It should happen fast enough to be set before it is used
-            TokenManager.getToken()?.run {
-                val userId = this.userId
-                if (userId != AccessToken.NO_USER_ID) {
-                    currentUserInfo = userInfoDatabase.userInfo().getById(userId)
-                }
-            }
+        val token = TokenManager.getToken()
 
+        // We have a token, and it is for a user
+        val state = if (token != null && token.userId != AccessToken.NO_USER_ID) {
+
+            // This database allows for main thread queries, since this has to be set before anything
+            // is started to ensure that the state is correct (this might be kind of bad, but the query
+            // should be fast enough that it doesn't impact startup by any noticeable amount)
+            val info = userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token)
+            if (api.isPrivatelyBrowsing()) {
+                LoggedInState.PrivatelyBrowsing(info)
+            } else {
+                LoggedInState.LoggedIn(info)
+            }
+        } else {
+            LoggedInState.LoggedOut
+        }
+        _loggedInState.value = state
+
+        CoroutineScope(IO).launch {
             // Remove records that are older than 2 days, as they likely won't be used again
             val maxAge = 60L * 60 * 24 * 2
             val count = database.posts().getCount()
@@ -308,6 +317,20 @@ class App : Application() {
 
         editor.apply()
         Log.d(TAG, "removeOldPostOpenedPreferences: removed ${keysToRemove.size} keys from $sizeBefore total")
+    }
+
+    /**
+     * Gets the current user info, or null if there is no user logged in.
+     *
+     * Note this can be null even with a logged in user and should not be used as verification for
+     * the logged in state. Use [loggedInState] for that.
+     */
+    fun getUserInfo() : RedditUserInfo? {
+        return when (val state = _loggedInState.value) {
+            is LoggedInState.LoggedIn -> state.userInfo
+            is LoggedInState.PrivatelyBrowsing -> state.userInfo
+            else -> null
+        }
     }
 
     /**
@@ -453,11 +476,12 @@ class App : Application() {
     }
 
     /**
-     * Switches which account is the active account. The app will be restarted
+     * Switches which account is the active account.
      *
      * @param token The token to use for the new active account
+     * @param activity The activity currently active. The activity will be recreated
      */
-    fun switchAccount(token: AccessToken) {
+    fun switchAccount(token: AccessToken, activity: AppCompatActivity) {
         CoroutineScope(IO).launch {
             // Ensure no user state from one account is used for the new one
             database.clearUserState()
@@ -469,23 +493,26 @@ class App : Application() {
             // The observers also don't have to be notified since everything is recreated
             settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, false).commit()
 
-            ProcessPhoenix.triggerRebirth(this@App)
+            withContext(Main) {
+                _loggedInState.value = LoggedInState.LoggedIn(getUserInfoFromToken(null, token))
+                if (activity is MainActivity) {
+                    activity.recreateAsNewUser()
+                } else {
+                    activity.recreate()
+                }
+            }
         }
     }
 
     /**
-     * Gets a [RedditUserInfo] object corresponding to an access token and sets the object
-     * to [currentUserInfo]. If the token is for the same account as [currentUserInfo] is now, then
-     * [currentUserInfo] is returned as is. Otherwise the value stored in the database is retrieved,
-     * or a new one is created.
+     * Gets a [RedditUserInfo] object corresponding to an access token.
      *
      * Note that the object will not be modified in any way (ie. [token] is not set on the object
      * automatically)
      */
     // Database operations must be suspended
     @Suppress("RedundantSuspendModifier")
-    private suspend fun getAndSetCurrentUserInfo(token: AccessToken) : RedditUserInfo {
-        val current = currentUserInfo
+    private suspend fun getUserInfoFromToken(current: RedditUserInfo?, token: AccessToken) : RedditUserInfo {
         return if (current != null) {
             val currentId = current.accessToken.userId
             // The current user is for the same user, return it
@@ -493,31 +520,29 @@ class App : Application() {
                 current
             } else {
                 // Either get from the database, or create a new one
-                userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token).also {
-                    currentUserInfo = it
-                }
+                userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token)
             }
         } else {
             // currentUserInfo == null, Either get from the database, or create a new one
-            userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token).also {
-                currentUserInfo = it
-            }
+            userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token)
         }
-
     }
 
     /**
      * Callback for when new access tokens are received. This will save the token to [TokenManager]
-     * and update [currentUserInfo] with the token, setting a new object on the variable if needed
-     * to correctly represent the user the token is for
      *
      * @param token The new token
      */
     private fun onNewToken(token: AccessToken) {
+        val state = _loggedInState.value
+        val currentInfo = if (state is LoggedInState.LoggedIn) {
+            state.userInfo
+        } else null
+
         TokenManager.saveToken(token)
         if (token.userId != AccessToken.NO_USER_ID) {
             CoroutineScope(IO).launch {
-                getAndSetCurrentUserInfo(token).apply {
+                getUserInfoFromToken(currentInfo, token).apply {
                     accessToken = token
 
                     // New token is for a user
@@ -530,7 +555,8 @@ class App : Application() {
     }
 
     /**
-     * Saves user information to [currentUserInfo] and updates the local database.
+     * Saves user info and updates the local database.
+     *
      * Pass parameters to this function to update the relevant values.
      *
      * @param info The information about the user
@@ -539,7 +565,7 @@ class App : Application() {
     fun updateUserInfo(info: RedditUser? = null, subreddits: List<String>? = null, nsfwAccount: Boolean? = null) {
         CoroutineScope(IO).launch {
             TokenManager.getToken()?.let {
-                getAndSetCurrentUserInfo(it).apply {
+                getUserInfoFromToken(getUserInfo(), it).apply {
                     if (info != null) {
                         userInfo = info
                     }
@@ -549,6 +575,8 @@ class App : Application() {
                     if (nsfwAccount != null) {
                         this.nsfwAccount = nsfwAccount
                     }
+
+                    _loggedInState.postValue(LoggedInState.LoggedIn(this))
 
                     if (userInfoDatabase.userInfo().userExists(it.userId)) {
                         userInfoDatabase.userInfo().update(this)
@@ -616,38 +644,33 @@ class App : Application() {
     }
 
     /**
-     * Checks if there currently is a user logged in
-     *
-     * @return True if there is a user logged in
-     * @see App.isUserLoggedInPrivatelyBrowsing
+     * Toggles private browsing. This is just a convenience method for [enablePrivateBrowsing] with
+     * null passed as the argument
      */
-    fun isUserLoggedIn(): Boolean {
-        val accessToken = TokenManager.getToken()
-        // Only logged in users have a refresh token
-        return accessToken != null && accessToken.refreshToken != null
-    }
-
-    /**
-     * Checks if there currently is a user logged in that is privately browsing
-     *
-     * @return True if there is a user logged in and private browsing is enabled
-     * @see App.isUserLoggedIn
-     */
-    fun isUserLoggedInPrivatelyBrowsing(): Boolean {
-        return isUserLoggedIn() && api.isPrivatelyBrowsing()
+    fun togglePrivateBrowsing() {
+        enablePrivateBrowsing()
     }
 
     /**
      * Enable or disable the APIs private browsing and stores locally that private browsing is enabled/disabled
      *
-     * @param enable True to enable private browsing, false to disable
+     * @param enable True to enable private browsing, false to disable. Use null to toggle
      */
-    fun enablePrivateBrowsing(enable: Boolean) {
-        api.enablePrivateBrowsing(enable)
-        settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, enable).apply()
+    fun enablePrivateBrowsing(enable: Boolean? = null) {
+        val enableActual = enable ?: !api.isPrivatelyBrowsing()
 
-        // To be certain it doesn't crash if this is called from a background thread
-        _privatelyBrowsing.postValue(enable)
+        api.enablePrivateBrowsing(enableActual)
+        settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, enableActual).apply()
+
+        // When enabling/disabling private browsing we *should* have a user, but if not return
+        val userInfo = getUserInfo() ?: return
+        val state = if (enableActual) {
+            LoggedInState.PrivatelyBrowsing(userInfo)
+        } else {
+            LoggedInState.LoggedIn(userInfo)
+        }
+
+        _loggedInState.postValue(state)
     }
 
     /**
@@ -700,7 +723,7 @@ class App : Application() {
      * @return True if NSFW videos should be automatically played
      */
     fun autoPlayNsfwVideos(): Boolean {
-        return currentUserInfo?.nsfwAccount == true ||
+        return getUserInfo()?.nsfwAccount == true ||
                 settings.getBoolean(getString(R.string.prefs_key_auto_play_nsfw_videos), resources.getBoolean(R.bool.prefs_default_autoplay_nsfw_videos))
     }
 
@@ -844,7 +867,7 @@ class App : Application() {
      * @return An enum representing how to filter the images/thumbnails
      */
     fun showNsfwPreview(): ShowNsfwPreview {
-        if (currentUserInfo?.nsfwAccount == true) {
+        if (getUserInfo()?.nsfwAccount == true) {
             return ShowNsfwPreview.NORMAL
         }
 
@@ -1040,7 +1063,7 @@ class App : Application() {
      * @return True if a warning should be displayed when opening NSFW subreddits
      */
     fun warnNsfwSubreddits() : Boolean {
-        return currentUserInfo?.nsfwAccount != true && settings.getBoolean(
+        return getUserInfo()?.nsfwAccount != true && settings.getBoolean(
                 getString(R.string.prefs_key_subreddits_warn_nsfw),
                 resources.getBoolean(R.bool.prefs_default_subreddits_warn_nsfw)
         )
@@ -1062,7 +1085,7 @@ class App : Application() {
     /**
      * Clears any user information stored, logging a user out. The application will be restarted
      */
-    fun logOut() {
+    fun logOut(context: Context? = null) {
         CoroutineScope(IO).launch {
             // Revoke token, the response to this never holds any data. If it fails we could potentially
             // store that it failed and retry again later
@@ -1071,15 +1094,25 @@ class App : Application() {
             // Clear any user specific state from database records (such as vote status on posts)
             database.clearUserState()
 
-            currentUserInfo?.let {
+            getUserInfo()?.let {
                 userInfoDatabase.userInfo().delete(it)
             }
 
             settings.edit().remove(PRIVATELY_BROWSING_KEY).commit()
             TokenManager.removeToken()
 
-            // Might be bad to just restart the app? Easiest way to ensure everything is reset though
-            ProcessPhoenix.triggerRebirth(this@App)
+            withContext(Main) {
+                // We could potential look for other users stored here, but we might not want to
+                // assume which account to use then, so it's better to just let the user choose later
+                _loggedInState.value = LoggedInState.LoggedOut
+
+                if (context is MainActivity) {
+                    context.recreateAsNewUser()
+                } else if (context is AppCompatActivity) {
+                    context.recreate()
+                }
+            }
+
         }
     }
 }

@@ -9,7 +9,10 @@ import com.example.hakonsreader.api.model.RedditUserInfo
 
 /**
  * A local database for keeping track of user information. This is in a separate database
- * to simplify updating the database without losing the logged in users
+ * to simplify updating the database without losing the logged in users.
+ *
+ * This database does allow for main thread queries, but should only be used when necessary (such
+ * as when the application is starting)
  */
 @Database(version = 2, exportSchema = false, entities = [RedditUserInfo::class])
 @TypeConverters(PostConverter::class, EnumConverters::class)
@@ -31,7 +34,7 @@ abstract class RedditUserInfoDatabase : RoomDatabase() {
                 val i = Room.databaseBuilder(
                         context.applicationContext,
                         RedditUserInfoDatabase::class.java, "local_reddit_user_info_db"
-                ).fallbackToDestructiveMigration().build()
+                ).fallbackToDestructiveMigration().allowMainThreadQueries().build()
                 instance = i
                 i
             }

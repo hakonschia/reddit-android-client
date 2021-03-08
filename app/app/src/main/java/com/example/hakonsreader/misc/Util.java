@@ -18,6 +18,7 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException;
 import com.example.hakonsreader.api.exceptions.RateLimitException;
 import com.example.hakonsreader.api.exceptions.ThreadLockedException;
 import com.example.hakonsreader.api.responses.GenericError;
+import com.example.hakonsreader.states.LoggedInState;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class Util {
                 Util.showNoInternetSnackbar(parent);
             }
         } else if (t instanceof InvalidAccessTokenException) {
-            if (App.Companion.get().isUserLoggedInPrivatelyBrowsing()) {
+            if (App.Companion.get().getLoggedInState().getValue() instanceof LoggedInState.PrivatelyBrowsing) {
                 Util.showPrivatelyBrowsingSnackbar(parent);
             } else {
                 Util.showNotLoggedInSnackbar(parent);

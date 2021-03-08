@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.view.*
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
@@ -14,11 +15,9 @@ import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.PostsFragment
 import com.example.hakonsreader.interfaces.SortableWithTime
-import com.example.hakonsreader.misc.TokenManager
-import com.example.hakonsreader.misc.getSortText
-import com.example.hakonsreader.misc.getTimeSortText
-import com.example.hakonsreader.misc.startLoginIntent
+import com.example.hakonsreader.misc.*
 import com.example.hakonsreader.recyclerviewadapters.AccountsAdapter
+import com.example.hakonsreader.states.LoggedInState
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -35,14 +34,14 @@ import java.util.*
 fun showPopupForProfile(view: View, user: RedditUser?) {
     user ?: return
 
-    if (App.get().currentUserInfo?.userInfo?.id == user.id) {
+    if (App.get().getUserInfo()?.userInfo?.id == user.id) {
         showPopupForLoggedInUser(view)
     }
 }
 
 private fun showPopupForLoggedInUser(view: View) {
     val context = view.context
-    val privatelyBrowsing = App.get().isUserLoggedInPrivatelyBrowsing()
+    val privatelyBrowsing = App.get().loggedInState.value is LoggedInState.PrivatelyBrowsing
 
     popupMenu {
         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
@@ -51,7 +50,7 @@ private fun showPopupForLoggedInUser(view: View) {
             item {
                 labelRes = R.string.logOut
                 icon = R.drawable.ic_signout
-                callback = { App.get().logOut() }
+                callback = { App.get().logOut(context) }
             }
 
             item {
@@ -103,14 +102,28 @@ fun showAccountManagement(context: Context) {
                 }
 
                 onItemClicked = { userInfoClicked ->
-                    val currentId = app.currentUserInfo?.accessToken?.userId
-                    if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
-                        app.switchAccount(userInfoClicked.accessToken)
+                    val userInfo =  when (val state = app.loggedInState.value) {
+                        is LoggedInState.LoggedIn -> state.userInfo
+                        is LoggedInState.PrivatelyBrowsing -> state.userInfo
+
+                        // Ie. LoggedOut (or state = null)
+                        else -> null
+                    }
+
+                    val currentId = userInfo?.accessToken?.userId
+
+                    if (currentId != userInfoClicked.accessToken.userId) {
+                        // Not sure what we would do if not (although I'm not sure how we would get
+                        // here without an activity context)
+                        if (context is AppCompatActivity) {
+                            app.switchAccount(userInfoClicked.accessToken, context)
+                        }
                     }
                 }
 
                 onRemoveItemClicked = { userInfoClicked ->
-                    val currentId = app.currentUserInfo?.accessToken?.userId
+                    val state = app.loggedInState.value as LoggedInState.LoggedIn
+                    val currentId = state.userInfo.accessToken.userId
                     // Don't remove the item if it's the currently active one
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
                         removeItem(userInfoClicked)
@@ -121,7 +134,8 @@ fun showAccountManagement(context: Context) {
                     }
                 }
                 onNsfwClicked = { userInfoClicked, nsfwAccount ->
-                    val currentId = app.currentUserInfo?.accessToken?.userId
+                    val state = app.loggedInState.value as LoggedInState.LoggedIn
+                    val currentId = state.userInfo.accessToken.userId
 
                     // Another account than the active was clicked, update it in the database
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
@@ -146,7 +160,7 @@ fun showAccountManagement(context: Context) {
  */
 private fun showApplicationPrivileges(context: Context, parent: ViewParent) {
     // TODO if scopes have been added to the application that isn't in the stored token, show which are missing as well
-    val scopes = ArrayList(Arrays.asList(*TokenManager.getToken()!!.scopesAsArray))
+    val scopes = ArrayList(listOf(*TokenManager.getToken()!!.scopesAsArray))
     val adapter = OAuthScopeAdapter(context, R.layout.list_item_oauth_explanation, scopes)
     val title = LayoutInflater.from(context).inflate(R.layout.dialog_title_oauth_explanation, parent as ViewGroup, false)
     AlertDialog.Builder(context)

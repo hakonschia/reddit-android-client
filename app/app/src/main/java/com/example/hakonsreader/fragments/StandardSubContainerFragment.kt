@@ -1,23 +1,16 @@
 package com.example.hakonsreader.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.Lifecycle
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
-import com.example.hakonsreader.misc.SectionsPageAdapter
-import java.util.ArrayList
 
 class StandardSubContainerFragment : Fragment() {
 
@@ -132,7 +125,7 @@ class StandardSubContainerFragment : Fragment() {
     }
 
     /**
-     * Gets the array position in [fragments] based on [defaultSub]
+     * Gets the position of [defaultSub]
      */
     private fun getDefaultSubPosition() = defaultSub.ordinal
 

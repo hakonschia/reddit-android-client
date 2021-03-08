@@ -20,6 +20,7 @@ import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.databinding.FragmentProfileBinding
 import com.example.hakonsreader.databinding.UserIsSuspendedBinding
 import com.example.hakonsreader.interfaces.OnInboxClicked
+import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.viewmodels.RedditUserViewModel
 import com.example.hakonsreader.viewmodels.factories.RedditUserFactory
@@ -59,10 +60,23 @@ class ProfileFragment : Fragment() {
          */
         fun newInstance(username: String? = null) = ProfileFragment().apply {
             arguments = Bundle().apply {
-                if (username == null || username == "me" || username.equals(App.get().currentUserInfo?.userInfo?.username, ignoreCase = true)) {
-                    putBoolean(IS_LOGGED_IN_USER_KEY, true)
+                // Must be logged in (ie. not privately browsing)
+                val state = App.get().loggedInState.value
+
+                val isLoggedIn = state is LoggedInState.LoggedIn &&
+                        (username.equals(App.get().getUserInfo()?.userInfo?.username, ignoreCase = true) ||
+                        username == null || username == "me")
+
+                putBoolean(IS_LOGGED_IN_USER_KEY, isLoggedIn)
+
+                // No username given and not a logged in user then we have to assume there is a username
+                // stored previously that we can use as the "anonymous" user (this should happen when a user
+                // browsing privately goes to their profile)
+                if (!isLoggedIn && username == null) {
+                    putString(USERNAME_KEY, App.get().getUserInfo()?.userInfo?.username)
+                } else {
+                    putString(USERNAME_KEY, username)
                 }
-                putString(USERNAME_KEY, username)
             }
         }
     }
@@ -95,10 +109,14 @@ class ProfileFragment : Fragment() {
         setupViewModel()
         addFragmentListener()
 
-        App.get().privatelyBrowsing.observe(viewLifecycleOwner) {
-            privateBrowsingStateChanged(it)
-        }
+        App.get().loggedInState.observe(viewLifecycleOwner) {
+            when (it) {
+                is LoggedInState.LoggedIn -> privateBrowsingStateChanged(false)
+                is LoggedInState.PrivatelyBrowsing -> privateBrowsingStateChanged(true)
 
+                // This observer is only really for private browsing changes
+            }
+        }
         return binding.root
     }
 
@@ -208,10 +226,6 @@ class ProfileFragment : Fragment() {
 
     private fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
         binding.privatelyBrowsing = privatelyBrowsing
-        binding.profilePicture.borderColor = ContextCompat.getColor(
-                requireContext(),
-                if (privatelyBrowsing) R.color.privatelyBrowsing else R.color.opposite_background
-        )
     }
 
     /**

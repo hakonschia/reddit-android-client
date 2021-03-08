@@ -72,7 +72,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:visibility="@{standardSub ? View.GONE : View.VISIBLE}"
+                            android:visibility="@{standardSub ? View.GONE : View.VISIBLE, default=gone}"
+                            tools:visibility="visible"
                             app:constraint_referenced_ids="activeUsers, subscribe, subredditSubscribers" />
 
                         <ImageView
@@ -110,14 +111,27 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <ImageView
+                            android:id="@+id/privateBrowsingIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@string/content_description_private_browsing_icon"
+                            android:src="@drawable/ic_incognito"
+
+                            android:visibility="@{privatelyBrowsing ? View.VISIBLE : View.GONE, default=gone}"
+                            tools:visibility="visible"
+                            app:layout_constraintBottom_toBottomOf="@+id/subredditIcon"
+                            app:layout_constraintStart_toStartOf="@+id/subredditIcon" />
+
+                        <ImageView
                             android:id="@+id/modIcon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:src="@drawable/ic_admin_24px"
                             android:contentDescription="@string/content_description_subreddit_icon_mod"
                             app:layout_constraintBottom_toBottomOf="@+id/subredditIcon"
                             app:layout_constraintEnd_toEndOf="@+id/subredditIcon"
-                            android:visibility="@{subreddit.moderator ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{subreddit.moderator ? View.VISIBLE : View.GONE, default=gone}"
+                            tools:visibility="visible"
                             app:tint="@color/modTextColor" />
 
                         <TextView

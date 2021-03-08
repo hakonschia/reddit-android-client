@@ -80,6 +80,18 @@
                             app:layout_constraintBottom_toBottomOf="@id/commentKarma"
                             app:profilePicture='@{user}' />
 
+                        <ImageView
+                            android:id="@+id/privateBrowsingIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@string/content_description_private_browsing_icon"
+                            android:src="@drawable/ic_incognito"
+
+                            android:visibility="@{privatelyBrowsing ? View.VISIBLE : View.GONE}"
+
+                            app:layout_constraintBottom_toBottomOf="@+id/profilePicture"
+                            app:layout_constraintStart_toStartOf="@+id/profilePicture" />
+
                         <TextView
                             android:id="@+id/profileAge"
                             android:layout_width="wrap_content"

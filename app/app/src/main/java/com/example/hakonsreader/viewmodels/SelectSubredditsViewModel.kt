@@ -7,10 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.misc.SharedPreferencesManager
-import com.example.hakonsreader.misc.Util
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,8 +37,6 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
      * default subs are loaded.
      *
      * The list returned is not sorted
-     *
-     * The IDs are stored in [App.currentUserInfo]
      *
      * @param force If true then subreddits will be forced to load, even if previously loaded
      */

@@ -48,7 +48,7 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
             this.username = account.userInfo?.username
 
             // Highlight the currently active account
-            this.highlight = App.get().currentUserInfo?.userId == account.userId
+            this.highlight = App.get().getUserInfo()?.userId == account.userId
 
             this.nsfwAccount = account.nsfwAccount
         }

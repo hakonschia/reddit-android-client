@@ -456,7 +456,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 // User wants to highlight new comments, and the comment was added after the last time the post was opened
                 || (App.get().highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
 
-        val byLoggedInUser = comment.author == App.get().currentUserInfo?.userInfo?.username
+        val byLoggedInUser = comment.author == App.get().getUserInfo()?.userInfo?.username
 
         when (holder.itemViewType) {
             MORE_COMMENTS_TYPE -> (holder as MoreCommentsViewHolder).bind(comment)

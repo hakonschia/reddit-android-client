@@ -169,7 +169,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         // This is only really for when the activity is destroyed, but onPause is called first
         // and it calls viewUnselected which would make the extras PAUSED be false
         commentsViewModel.savedExtras = binding.post.extras
-        
+
         videoPlayingWhenPaused = binding.post.extras.getBoolean(VideoPlayer.EXTRA_IS_PLAYING)
         binding.post.viewUnselected()
     }
@@ -465,6 +465,8 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                         content.setThumbnailBitmap(it)
                     } ?: content.loadThumbnail()
 
+                    content.enableControllerTransitions(true)
+
                     // For videos we don't want to set the extras right away. If a video is playing during the
                     // animation the animation looks very choppy, so it should only be played at the end
                     window.sharedElementEnterTransition.addListener(object : TransitionListenerAdapter() {
@@ -474,8 +476,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                             if (postExtras != null) {
                                 binding.post.extras = postExtras
                             }
-
-                            content.enableControllerTransitions(true)
                         }
                     })
                 }
@@ -495,7 +495,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      *
      * @param view Ignored
      */
-    fun goToNextTopLevelComment(view: View) {
+    fun goToNextTopLevelComment(@Suppress("UNUSED_PARAMETER")view: View) {
         val currentPos = commentsLayoutManager!!.findFirstVisibleItemPosition()
         val next = commentsAdapter!!.getNextTopLevelCommentPos(currentPos + 1)
         smoothScrollHelper(currentPos, next)
@@ -506,7 +506,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      *
      * @param view Ignored
      */
-    fun goToPreviousTopLevelComment(view: View) {
+    fun goToPreviousTopLevelComment(@Suppress("UNUSED_PARAMETER")view: View) {
         val currentPos = commentsLayoutManager!!.findFirstVisibleItemPosition()
         // We're at the top so we can't scroll further up
         if (currentPos == 0) {
@@ -522,7 +522,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      * @param view Ignored
      * @return Always true, as this function will be used to indicate a long click has been handled
      */
-    private fun goToFirstComment(view: View): Boolean {
+    private fun goToFirstComment(@Suppress("UNUSED_PARAMETER")view: View): Boolean {
         binding.comments.stopScroll()
         binding.comments.scrollToPosition(0)
         return true
@@ -534,7 +534,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      * @param view Ignored
      * @return Always true, as this function will be used to indicate a long click has been handled
      */
-    private fun goToLastComment(view: View): Boolean {
+    private fun goToLastComment(@Suppress("UNUSED_PARAMETER")view: View): Boolean {
         binding.comments.stopScroll()
         binding.comments.scrollToPosition(commentsAdapter!!.itemCount - 1)
         return true
@@ -594,7 +594,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      *
      * @param view Ignored
      */
-    fun replyToPost(view: View) {
+    fun replyToPost(@Suppress("UNUSED_PARAMETER")view: View) {
         post?.let { replyTo(it) }
     }
 

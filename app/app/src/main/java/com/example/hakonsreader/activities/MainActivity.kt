@@ -27,6 +27,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
+import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.TrendingSubreddits
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -37,6 +38,7 @@ import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.*
 import com.example.hakonsreader.interfaces.*
 import com.example.hakonsreader.misc.TokenManager
+import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.misc.Util.setAgeTextTrendingSubreddits
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
@@ -83,6 +85,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          */
         private const val ACTIVE_SUBREDDIT_NAME = "main_activity_active_subreddit_name"
 
+        private const val RECREATED_AS_NEW_USER = "recreatedAsNewUser"
+
         /**
          * When creating this activity, set this on the extras to select the subreddit to show by default
          *
@@ -104,13 +108,18 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     private val notifications = HashMap<String, Int>()
 
+    /**
+     * If set to true the first call to [onSaveInstanceState] will ignore the fragment states and only
+     * store the current active nav bar position
+     */
+    private var recreateAsNewUser = false
+
     // The fragments to show in the nav bar
     private var standardSubFragment: StandardSubContainerFragment? = null
     private var activeSubreddit: SubredditFragment? = null
     private var selectSubredditFragment: SelectSubredditFragment? = null
     private var profileFragment: ProfileFragment? = null
     private var inboxFragment: InboxFragment? = null
-    private var logInFragment: LogInFragment? = null
     private var settingsFragment: SettingsFragment? = null
     private var lastShownFragment: Fragment? = null
     private val navigationViewListener: BottomNavigationViewListener = BottomNavigationViewListener()
@@ -118,7 +127,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     private var subredditsAdapter: SubredditsAdapter? = null
     private var subredditsLayoutManager: LinearLayoutManager? = null
     private val subredditsViewModel: SelectSubredditsViewModel by viewModels {
-        SelectSubredditsFactory(App.get().isUserLoggedIn() && !App.get().isUserLoggedInPrivatelyBrowsing())
+        SelectSubredditsFactory(App.get().loggedInState.value is LoggedInState.LoggedIn)
     }
 
     private var trendingSubredditsAdapter: TrendingSubredditsAdapter? = null
@@ -131,8 +140,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = ActivityMainBinding.inflate(layoutInflater).also {
+            setContentView(it.root)
+        }
 
         // For testing purposes hardcode going into a subreddit/post etc.
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
@@ -145,8 +155,12 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         attachFragmentChangeListener()
         setupNavBar()
 
+        val recreatedAsNewUser = savedInstanceState?.getBoolean(RECREATED_AS_NEW_USER, false)
+
         if (savedInstanceState != null) {
-            restoreFragmentStates(savedInstanceState)
+            // recreatedAsNewUser will never be null if we get here
+            restoreFragmentStates(savedInstanceState, recreatedAsNewUser!!)
+
             restoreNavBar(savedInstanceState)
         } else {
             // Use empty string as default (ie. front page)
@@ -157,19 +171,18 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             // Only start the inbox listener once, or else every configuration change would start another timer
             // TODO this has to be improved as now it leaks and doesn't really work at all
             //startInboxListener()
+
+            // Trending subreddits aren't user specific so they don't have to be retrieved again
             trendingSubredditsViewModel.loadSubreddits()
         }
 
+        observeUserState()
+        // If recreated as a new user we always want to load the subreddits
+        subredditsViewModel.loadSubreddits(force = recreatedAsNewUser == true)
         setupNavDrawer()
         checkAccessTokenScopes()
-        setProfileNavBarTitle()
 
-        App.get().run {
-            registerReceivers()
-            privatelyBrowsing.observe(this@MainActivity) {
-                privateBrowsingStateChanged(it)
-            }
-        }
+        App.get().registerReceivers()
     }
 
     override fun onResume() {
@@ -192,9 +205,20 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        // Store state of nav bar
+        // TODO this will not store nested items (like subreddits) and therefore wont restore correctly
+        //  when recreating as a new user
+        outState.putInt(ACTIVE_NAV_ITEM, binding.bottomNav.selectedItemId)
+        outState.putBoolean(RECREATED_AS_NEW_USER, recreateAsNewUser)
 
-        // If fragments aren't null, save them
-        // Save which fragment is the active one as well
+        settingsFragment?.let {
+            supportFragmentManager.putFragment(outState, SETTINGS_FRAGMENT, it)
+        }
+
+        if (recreateAsNewUser) {
+            recreateAsNewUser = false
+            return
+        }
 
         standardSubFragment?.let {
             supportFragmentManager.putFragment(outState, POSTS_FRAGMENT, it)
@@ -214,15 +238,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         selectSubredditFragment?.let {
             supportFragmentManager.putFragment(outState, SELECT_SUBREDDIT_FRAGMENT, it)
         }
-
-        settingsFragment?.let {
-            supportFragmentManager.putFragment(outState, SETTINGS_FRAGMENT, it)
-        }
-
-        // Login can just be recreated when needed as they don't store any specific state
-
-        // Store state of navbar
-        outState.putInt(ACTIVE_NAV_ITEM, binding.bottomNav.selectedItemId)
     }
 
     override fun onBackPressed() {
@@ -371,16 +386,63 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         badge?.isVisible = show
     }
 
-    private fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
-        with(binding.navDrawer) {
-            this.privatelyBrowsing = privatelyBrowsing
-
-            // This doesn't work programmatically
-            profilePicture.borderColor = ContextCompat.getColor(
-                    this@MainActivity,
-                    if (privatelyBrowsing) R.color.privatelyBrowsing else R.color.opposite_background
-            )
+    private fun observeUserState() {
+        App.get().loggedInState.observe(this) {
+            when (it) {
+                is LoggedInState.LoggedIn -> asLoggedInUser(it.userInfo)
+                is LoggedInState.PrivatelyBrowsing -> asPrivatelyBrowsingUser(it.userInfo)
+                LoggedInState.LoggedOut -> asLoggedOutUser()
+            }
         }
+    }
+
+    private fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
+        binding.navDrawer.privatelyBrowsing = privatelyBrowsing
+    }
+
+    /**
+     * Sets various things when the activity is in a context
+     */
+    private fun asLoggedInUser(userInfo: RedditUserInfo) {
+        privateBrowsingStateChanged(false)
+        binding.navDrawer.userInfo = userInfo
+
+        val user = userInfo.userInfo
+        if (user != null) {
+            binding.bottomNav.menu.findItem(R.id.navProfile).title = user.username
+        }
+    }
+
+    /**
+     * Sets various things when the activity is in a context
+     */
+    private fun asPrivatelyBrowsingUser(userInfo: RedditUserInfo) {
+        privateBrowsingStateChanged(true)
+        binding.navDrawer.userInfo = userInfo
+
+        val user = userInfo.userInfo
+        if (user != null) {
+            binding.bottomNav.menu.findItem(R.id.navProfile).title = user.username
+        }
+    }
+
+    private fun asLoggedOutUser() {
+        // TODO do some stuff in the nav drawer at least
+    }
+
+    /**
+     * Recreates the activity as a new user
+     */
+    fun recreateAsNewUser() {
+        recreateAsNewUser = true
+
+        val transaction = supportFragmentManager.beginTransaction()
+        supportFragmentManager.fragments.forEach {
+            transaction.remove(it)
+        }
+        transaction.commit()
+
+        recreate()
     }
 
     /**
@@ -443,13 +505,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         CoroutineScope(IO).launch {
             when (val userInfo = api.user().info()) {
                 is ApiResponse.Success -> {
-                    // TODO this has to update the nav drawer (which should happen automatically with observables)
                     App.get().updateUserInfo(info = userInfo.value)
-                    // This will be called after the activity has been restarted when logging in
-                    // so call it when user information is retrieved as well
-                    withContext(Main) {
-                        setProfileNavBarTitle()
-                    }
                 }
                 is ApiResponse.Error -> {
                     // Seeing as this is called when the access token was just retrieved, it is very
@@ -523,7 +579,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      */
     private fun startInboxListener() {
         // The activity should be recreated when a user logs in, so this should be fine
-        if (!App.get().isUserLoggedIn()) {
+        if (App.get().loggedInState.value !is LoggedInState.LoggedIn) {
             return
         }
 
@@ -641,9 +697,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     /**
      * Attaches a listener to [getSupportFragmentManager] that stores fragments when detached
      * and saves it to [lastShownFragment]
-     *
-     * In addition, if the fragment detached was [activeSubreddit], its state is saved with [SubredditFragment.saveState]
-     * to [savedState]
      */
     private fun attachFragmentChangeListener() {
         supportFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
@@ -666,17 +719,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
             }
         }, false)
-    }
-
-    /**
-     * Sets the profile nav bar title to the logged in users name, if there is a logged in user and
-     * there is information about the user stored
-     */
-    private fun setProfileNavBarTitle() {
-        val user = App.get().currentUserInfo?.userInfo
-        if (user != null) {
-            binding.bottomNav.menu.findItem(R.id.navProfile).title = user.username
-        }
     }
 
     /**
@@ -712,13 +754,18 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * Restores the state of the fragments as saved in [onSaveInstanceState]
      *
      * @param restoredState The bundle with the state of the fragments
+     * @param onlyRestoreUserLess If true only fragments that are user less will be restored
      */
-    private fun restoreFragmentStates(restoredState: Bundle) {
+    private fun restoreFragmentStates(restoredState: Bundle, onlyRestoreUserLess: Boolean) {
+        settingsFragment = supportFragmentManager.getFragment(restoredState, SETTINGS_FRAGMENT) as SettingsFragment?
+
+        if (onlyRestoreUserLess) {
+            return
+        }
         standardSubFragment = supportFragmentManager.getFragment(restoredState, POSTS_FRAGMENT) as StandardSubContainerFragment?
         activeSubreddit = supportFragmentManager.getFragment(restoredState, ACTIVE_SUBREDDIT_FRAGMENT) as SubredditFragment?
         selectSubredditFragment = supportFragmentManager.getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT) as SelectSubredditFragment?
         profileFragment = supportFragmentManager.getFragment(restoredState, PROFILE_FRAGMENT) as ProfileFragment?
-        settingsFragment = supportFragmentManager.getFragment(restoredState, SETTINGS_FRAGMENT) as SettingsFragment?
 
         if (standardSubFragment == null) {
             standardSubFragment = StandardSubContainerFragment.newInstance()
@@ -786,6 +833,22 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // Set listener for when an item has been clicked when already selected
         binding.bottomNav.setOnNavigationItemReselectedListener { item ->
             when (item.itemId) {
+                R.id.navHome -> {
+                    // This is kinda hacky, but when the activity is recreated with a new user the
+                    // fragment for some reason stays here even though this is nulled (unless we clear the fragment manager)
+                    // and if it was called in the nav home this reselect will be called, so if it is null
+                    // we just create a new one (if we later want some special functionality we can add it in the else)
+                    // This is pretty much just the same functionality as when it is selected as normal
+                    if (standardSubFragment == null) {
+                        standardSubFragment = StandardSubContainerFragment.newInstance()
+
+                        supportFragmentManager.beginTransaction()
+                                .replace(R.id.fragmentContainer, standardSubFragment!!)
+                                .addToBackStack(null)
+                                .commit()
+                    }
+                }
+                
                 // When "Subreddit" is clicked when already in "subreddit" go back to the subreddit list
                 R.id.navSubreddit -> {
                     activeSubreddit = null
@@ -842,11 +905,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     /**
      * Sets up the nav drawer, including initialization of [subredditsViewModel].
-     *
-     * [loadSubreddits] is automatically called
      */
     private fun setupNavDrawer() {
-        with (subredditsViewModel) {
+        with(subredditsViewModel) {
             subreddits.observe(this@MainActivity, { subreddits ->
                 subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
             })
@@ -908,7 +969,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         with(binding.navDrawer) {
             app = App.get()
-            userInfo = App.get().currentUserInfo
             subredditSelected = this@MainActivity
 
             profilePicture.setOnClickListener { selectProfileNavBar() }
@@ -949,22 +1009,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 layoutManager = trendingSubredditsLayoutManager
             }
         }
-
-        loadSubreddits()
-    }
-
-    /**
-     * Loads subreddits, either subscribed subreddits if there is a logged in user, or default
-     * if there isn't (or there is one privately browsing)
-     */
-    private fun loadSubreddits() {
-        val loadDefault = if (App.get().isUserLoggedIn()) {
-            // If the user is logged in we want to load default subs if they're privately browsing
-            App.get().isUserLoggedInPrivatelyBrowsing()
-        } else {
-            true
-        }
-        subredditsViewModel?.loadSubreddits(loadDefault)
     }
 
     /**
@@ -992,7 +1036,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         private var navBarPos = 0
 
         /**
-         * Flag indicating if that the last time the profile was selected in the navbar, the profile
+         * Flag indicating if that the last time the profile was selected in the nav bar, the profile
          * was shown, and not the inbox
          *
          * If this is null, then no previous fragment has been shown and should decide which fragment
@@ -1082,7 +1126,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         private fun replaceNavBarFragment(fragment: Fragment, goingRight: Boolean) {
             supportFragmentManager.beginTransaction()
                     // TODO if there is an ongoing transition and the user selects another nav bar item, the app crashes (need to somehow cancel the ongoing transition or something)
-                    .setCustomAnimations(if (goingRight) R.anim.slide_in_right else R.anim.slide_in_left, if (goingRight) R.anim.slide_out_left else R.anim.slide_out_right)
+                    .setCustomAnimations(
+                            if (goingRight) R.anim.slide_in_right else R.anim.slide_in_left,
+                            if (goingRight) R.anim.slide_out_left else R.anim.slide_out_right)
+
                     .replace(R.id.fragmentContainer, fragment) // Although we don't use the backstack to pop elements, it is needed to keep the state
                     // of the fragments (otherwise posts are reloaded when coming back)
                     // With the use of a local database I can easily restore the state without the back stack
@@ -1124,7 +1171,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          */
         private fun onNavBarProfile(): Fragment {
             // If logged in, show profile, otherwise show log in page
-            return if (App.get().isUserLoggedIn()) {
+            return if (App.get().loggedInState.value is LoggedInState.LoggedOut) {
+                LogInFragment.newInstance()
+            } else {
                 // Go to inbox if there are unread messages
                 // unreadMessages should maybe be synchronized? Dunno tbh
                 if (unreadMessages != 0) {
@@ -1155,11 +1204,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                         }
                     }
                 }
-            } else {
-                if (logInFragment == null) {
-                    logInFragment = LogInFragment.newInstance()
-                }
-                logInFragment!!
             }
         }
     }

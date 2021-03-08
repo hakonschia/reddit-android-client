@@ -10,13 +10,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +37,7 @@ import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.example.hakonsreader.interfaces.LockableSlidr
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
+import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.viewmodels.*
@@ -51,9 +50,6 @@ import com.example.hakonsreader.views.util.showPopupSortWithTime
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import java.lang.RuntimeException
 
 
@@ -182,8 +178,13 @@ class SubredditFragment : Fragment() {
             setupViewPager(Subreddit().apply { name = subredditName })
         }
 
-        App.get().privatelyBrowsing.observe(viewLifecycleOwner) {
-            privateBrowsingStateChanged(it)
+        App.get().loggedInState.observe(viewLifecycleOwner) {
+            when (it) {
+                is LoggedInState.LoggedIn -> privateBrowsingStateChanged(false)
+                is LoggedInState.PrivatelyBrowsing -> privateBrowsingStateChanged(true)
+
+                // This observer is only really for private browsing changes
+            }
         }
 
         return binding.root
@@ -617,12 +618,12 @@ class SubredditFragment : Fragment() {
     /**
      * Updates the users flair on the subreddit
      *
-     * If the username ([App.currentUserInfo]) is `null` then this will return
+     * If the username ([App.getUserInfo]) is `null` then this will return
      *
      * @param flair The flair to update, or `null` to disable the flair on the subreddit
      */
     private fun updateUserFlair(flair: RedditFlair?) {
-        val username = App.get().currentUserInfo?.userInfo?.username ?: return
+        val username = App.get().getUserInfo()?.userInfo?.username ?: return
 
         subredditViewModel?.updateFlair(username, flair)
     }
@@ -752,10 +753,6 @@ class SubredditFragment : Fragment() {
 
     private fun privateBrowsingStateChanged(privatelyBrowsing: Boolean) {
         binding.privatelyBrowsing = privatelyBrowsing
-        binding.subredditIcon.borderColor = ContextCompat.getColor(
-                requireContext(),
-                if (privatelyBrowsing) R.color.privatelyBrowsing else R.color.opposite_background
-        )
     }
 
     class WikiFragment : Fragment() {
