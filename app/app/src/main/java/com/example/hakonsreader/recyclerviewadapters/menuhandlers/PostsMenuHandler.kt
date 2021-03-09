@@ -11,8 +11,8 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
-import com.example.hakonsreader.misc.Util
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -215,7 +215,7 @@ private fun savePostOnClick(view: View, post: RedditPost) {
                 }
                 Snackbar.make(view, saveString, BaseTransientBottomBar.LENGTH_SHORT).show()
             }
-            is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+            is ApiResponse.Error -> handleGenericResponseErrors(view, response.error, response.throwable)
         }
     }
 }
@@ -239,7 +239,7 @@ private fun distinguishAsModOnClick(view: View, post: RedditPost) {
             is ApiResponse.Success -> {
                 response.value
             }
-            is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+            is ApiResponse.Error -> handleGenericResponseErrors(view, response.error, response.throwable)
         }
     }
 }
@@ -265,7 +265,7 @@ private fun stickyOnClick(view: View, post: RedditPost) {
                 // Revert back
                 post.isStickied = !post.isStickied
                 db.posts().update(post)
-                Util.handleGenericResponseErrors(view, response.error, response.throwable)
+                handleGenericResponseErrors(view, response.error, response.throwable)
             }
         }
     }
@@ -292,7 +292,7 @@ private fun markNsfwOnClick(view: View, post: RedditPost) {
                 // Revert back
                 post.isNsfw = !post.isNsfw
                 db.posts().update(post)
-                Util.handleGenericResponseErrors(view, response.error, response.throwable)
+                handleGenericResponseErrors(view, response.error, response.throwable)
             }
         }
     }
@@ -319,7 +319,7 @@ private fun markSpoilerOnClick(view: View, post: RedditPost) {
                 // Revert back
                 post.isSpoiler = !post.isSpoiler
                 db.posts().update(post)
-                Util.handleGenericResponseErrors(view, response.error, response.throwable)
+                handleGenericResponseErrors(view, response.error, response.throwable)
             }
         }
     }
@@ -375,7 +375,7 @@ private fun deletePostOnClick(view: View, post: RedditPost) {
                 withContext(Main) {
                     when (response) {
                         is ApiResponse.Success -> Snackbar.make(view, R.string.postDeleted, BaseTransientBottomBar.LENGTH_SHORT).show()
-                        is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+                        is ApiResponse.Error -> handleGenericResponseErrors(view, response.error, response.throwable)
                     }
                 }
             }

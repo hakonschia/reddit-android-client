@@ -18,8 +18,8 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.ActivityReplyBinding
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
-import com.example.hakonsreader.misc.Util
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -288,7 +288,7 @@ class ReplyActivity : BaseActivity() {
 
                 when (response) {
                     is ApiResponse.Success -> withContext(Main) { replySuccess(response.value) }
-                    is ApiResponse.Error -> Util.handleGenericResponseErrors(binding.parentLayout, response.error, response.throwable)
+                    is ApiResponse.Error -> handleGenericResponseErrors(binding.parentLayout, response.error, response.throwable)
                 }
             }
         }

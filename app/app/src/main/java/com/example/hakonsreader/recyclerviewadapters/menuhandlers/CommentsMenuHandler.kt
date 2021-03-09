@@ -13,8 +13,8 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.fragments.bottomsheets.PeekCommentBottomSheet
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
-import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -150,7 +150,7 @@ private fun deleteCommentOnClick(view: View, comment: RedditComment) {
                 withContext(Main) {
                     when (response) {
                         is ApiResponse.Success -> Snackbar.make(view, R.string.commentDeleted, BaseTransientBottomBar.LENGTH_SHORT).show()
-                        is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+                        is ApiResponse.Error -> handleGenericResponseErrors(view, response.error, response.throwable)
                     }
                 }
             }
@@ -191,7 +191,7 @@ private fun saveCommentOnClick(view: View, comment: RedditComment) {
                 val saveString = if (save) R.string.commentSaved else R.string.commentUnsaved
                 Snackbar.make(view, saveString, BaseTransientBottomBar.LENGTH_SHORT).show()
             }
-            is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+            is ApiResponse.Error -> handleGenericResponseErrors(view, response.error, response.throwable)
         }
     }
 }
@@ -216,7 +216,7 @@ private fun distinguishAsModOnclick(view: View, comment: RedditComment, adapter:
         withContext(Main) {
             when (response) {
                 is ApiResponse.Success -> updateDistinguishAndSticky(comment, response.value, adapter)
-                is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+                is ApiResponse.Error -> handleGenericResponseErrors(view, response.error, response.throwable)
             }
         }
     }
@@ -242,7 +242,7 @@ private fun stickyOnClick(view: View, comment: RedditComment, adapter: CommentsA
         withContext(Main) {
             when (response) {
                 is ApiResponse.Success -> updateDistinguishAndSticky(comment, response.value, adapter)
-                is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+                is ApiResponse.Error -> handleGenericResponseErrors(view, response.error, response.throwable)
             }
         }
     }

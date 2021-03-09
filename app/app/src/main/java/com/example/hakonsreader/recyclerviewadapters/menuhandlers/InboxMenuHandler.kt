@@ -5,7 +5,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -59,7 +59,7 @@ private fun markUnreadOnClick(view: View, message: RedditMessage) {
                 // Rollback to original
                 message.isNew = markRead
                 db.messages().insert(message)
-                Util.handleGenericResponseErrors(view, resp.error, resp.throwable)
+                handleGenericResponseErrors(view, resp.error, resp.throwable)
             }
         }
     }

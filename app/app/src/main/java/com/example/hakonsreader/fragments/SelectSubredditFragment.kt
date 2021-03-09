@@ -13,25 +13,17 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.FragmentSelectSubredditBinding
 import com.example.hakonsreader.interfaces.OnClickListener
 import com.example.hakonsreader.interfaces.OnSubredditSelected
-import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.viewmodels.SearchForSubredditsViewModel
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 /**
@@ -159,7 +151,10 @@ class SelectSubredditFragment : Fragment() {
             })
 
             error.observe(viewLifecycleOwner, { error ->
-                Util.handleGenericResponseErrors(view, error.error, error.throwable)
+                // View should never be null when an observer is fired but whatever
+                view?.let {
+                    handleGenericResponseErrors(it, error.error, error.throwable)
+                }
             })
         }
     }
@@ -189,7 +184,9 @@ class SelectSubredditFragment : Fragment() {
             })
 
             error.observe(viewLifecycleOwner, { error ->
-                Util.handleGenericResponseErrors(view, error.error, error.throwable)
+                view?.let {
+                    handleGenericResponseErrors(it, error.error, error.throwable)
+                }
             })
         }
     }

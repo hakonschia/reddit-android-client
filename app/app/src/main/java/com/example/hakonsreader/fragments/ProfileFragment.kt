@@ -20,8 +20,9 @@ import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.databinding.FragmentProfileBinding
 import com.example.hakonsreader.databinding.UserIsSuspendedBinding
 import com.example.hakonsreader.interfaces.OnInboxClicked
+import com.example.hakonsreader.misc.dpToPixels
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
-import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.viewmodels.RedditUserViewModel
 import com.example.hakonsreader.viewmodels.factories.RedditUserFactory
 import com.makeramen.roundedimageview.RoundedImageView
@@ -162,7 +163,7 @@ class ProfileFragment : Fragment() {
                 checkLoadingStatus()
             }
             error.observe(viewLifecycleOwner) {
-                Util.handleGenericResponseErrors(binding.parentLayout, it.error, it.throwable)
+                handleGenericResponseErrors(binding.parentLayout, it.error, it.throwable)
             }
 
             load()
@@ -204,7 +205,7 @@ class ProfileFragment : Fragment() {
                     postsFragment = f.apply {
                         onError = { error, throwable ->
                             _binding?.let {
-                                Util.handleGenericResponseErrors(it.root, error, throwable)
+                                handleGenericResponseErrors(it.root, error, throwable)
                             }
                         }
                         onLoadingChange = {
@@ -293,9 +294,9 @@ fun setProfilePicture(imageView: RoundedImageView, user: RedditUser?) {
         user.snoovatarImage
     } else {
         with(imageView) {
-            borderWidth = Util.dpToPixels(2f, imageView.resources).toFloat()
+            borderWidth = dpToPixels(2f, imageView.resources).toFloat()
             borderColor = ContextCompat.getColor(imageView.context, R.color.opposite_background)
-            cornerRadius = Util.dpToPixels(30f, imageView.resources).toFloat()
+            cornerRadius = dpToPixels(30f, imageView.resources).toFloat()
             mutateBackground(true)
         }
         user.profilePicture

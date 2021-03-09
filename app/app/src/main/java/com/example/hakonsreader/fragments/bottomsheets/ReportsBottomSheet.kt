@@ -11,7 +11,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.BottomSheetReportsBinding
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener
-import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.ReportsAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
@@ -110,7 +110,7 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
                             // the response comes through
                             _binding?.let { bind ->
                                 bind.ignored = !ignore
-                                Util.handleGenericResponseErrors(bind.root, resp.error, resp.throwable)
+                                handleGenericResponseErrors(bind.root, resp.error, resp.throwable)
                             }
                         }
                     }
@@ -118,5 +118,4 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
             }
         }
     }
-
 }

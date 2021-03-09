@@ -37,9 +37,10 @@ import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.*
 import com.example.hakonsreader.interfaces.*
 import com.example.hakonsreader.misc.TokenManager
+import com.example.hakonsreader.misc.handleGenericResponseErrors
+import com.example.hakonsreader.misc.setAgeTextTrendingSubreddits
 import com.example.hakonsreader.states.LoggedInState
-import com.example.hakonsreader.misc.Util
-import com.example.hakonsreader.misc.Util.setAgeTextTrendingSubreddits
+import com.example.hakonsreader.misc.showErrorLoggingInSnackbar
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.recyclerviewadapters.TrendingSubredditsAdapter
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
@@ -469,13 +470,15 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         // Not a match from the state we generated, something weird is happening
         if (state == null || state != App.get().oauthState) {
-            Util.showErrorLoggingInSnackbar(binding.mainParentLayout)
+            showErrorLoggingInSnackbar(binding.mainParentLayout, binding.bottomNav)
+            performSetup(null)
             return
         }
 
         val code = uri.getQueryParameter("code")
         if (code == null) {
-            Util.showErrorLoggingInSnackbar(binding.mainParentLayout)
+            showErrorLoggingInSnackbar(binding.mainParentLayout, binding.bottomNav)
+            performSetup(null)
             return
         }
 
@@ -503,7 +506,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
 
                 is ApiResponse.Error -> {
-                    Util.handleGenericResponseErrors(binding.mainParentLayout, resp.error, resp.throwable)
+                    handleGenericResponseErrors(binding.mainParentLayout, resp.error, resp.throwable, binding.bottomNav)
                 }
             }
         }
@@ -943,7 +946,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
 
             error.observe(this@MainActivity, { error ->
-                Util.handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable)
+                handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable, binding.bottomNav)
             })
         }
 
@@ -965,7 +968,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
 
             error.observe(this@MainActivity, { error ->
-                Util.handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable)
+                handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable, binding.bottomNav)
             })
         }
 

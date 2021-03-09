@@ -8,7 +8,7 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -42,7 +42,7 @@ fun blockUserOnClick(view: View, username: String) {
                         }
                         .show()
             }
-            is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+            is ApiResponse.Error -> handleGenericResponseErrors(view, response.error, response.throwable)
         }
     }
 }
@@ -63,7 +63,7 @@ fun unblockUser(view: View, username: String, loggedInUser: RedditUser) {
                 val userUnblockedString = view.context.getString(R.string.userUnblocked, username)
                 Snackbar.make(view, userUnblockedString, BaseTransientBottomBar.LENGTH_SHORT).show()
             }
-            is ApiResponse.Error -> Util.handleGenericResponseErrors(view, response.error, response.throwable)
+            is ApiResponse.Error -> handleGenericResponseErrors(view, response.error, response.throwable)
         }
     }
 }
@@ -113,7 +113,7 @@ fun lockListingOnClick(view: View, listing: LockableListing, commentsAdapter: Co
                 }
 
                 withContext(Main) {
-                    Util.handleGenericResponseErrors(view, resp.error, resp.throwable)
+                    handleGenericResponseErrors(view, resp.error, resp.throwable)
                 }
             }
         }

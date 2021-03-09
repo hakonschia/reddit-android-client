@@ -25,7 +25,7 @@ import com.example.hakonsreader.databinding.ActivityPostBinding
 import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.LockableSlidr
 import com.example.hakonsreader.interfaces.OnReplyListener
-import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.example.hakonsreader.viewmodels.CommentsViewModel
 import com.example.hakonsreader.views.Content
@@ -310,7 +310,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
             })
 
             error.observe(this@PostActivity, { error ->
-                Util.handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
+                handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
             })
         }
 

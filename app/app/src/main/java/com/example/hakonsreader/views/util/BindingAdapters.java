@@ -10,7 +10,7 @@ import androidx.databinding.BindingAdapter;
 import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.misc.InternalLinkMovementMethod;
-import com.example.hakonsreader.misc.Util;
+import com.example.hakonsreader.misc.UtilKt;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -40,7 +40,7 @@ public class BindingAdapters {
             Instant now = Instant.now();
             Duration between = Duration.between(created, now);
 
-            textView.setText(Util.createAgeText(textView.getResources(), between));
+            textView.setText(UtilKt.createAgeText(textView.getResources(), between));
         }
     }
 
@@ -77,7 +77,7 @@ public class BindingAdapters {
             Instant now = Instant.now();
             Duration between = Duration.between(created, now);
 
-            textView.setText("*" + Util.createAgeText(textView.getResources(), between));
+            textView.setText("*" + UtilKt.createAgeText(textView.getResources(), between));
         }
     }
 
@@ -96,7 +96,7 @@ public class BindingAdapters {
             Instant now = Instant.now();
             Duration between = Duration.between(created, now);
 
-            textView.setText(Util.createAgeTextShortened(textView.getResources(), between));
+            textView.setText(UtilKt.createAgeTextShortened(textView.getResources(), between));
         }
     }
 
@@ -114,7 +114,7 @@ public class BindingAdapters {
             Instant now = Instant.now();
             Duration between = Duration.between(created, now);
 
-            textView.setText("*" + Util.createAgeTextShortened(textView.getResources(), between));
+            textView.setText("*" + UtilKt.createAgeTextShortened(textView.getResources(), between));
         }
     }
 

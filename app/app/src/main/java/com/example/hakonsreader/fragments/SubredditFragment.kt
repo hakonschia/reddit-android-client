@@ -37,8 +37,8 @@ import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.example.hakonsreader.interfaces.LockableSlidr
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
-import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.viewmodels.*
 import com.example.hakonsreader.viewmodels.factories.SubredditFactory
@@ -698,7 +698,7 @@ class SubredditFragment : Fragment() {
                     layout.root.requestLayout()
                     return
                 }
-                Util.handleGenericResponseErrors(binding.parentLayout, error, throwable)
+                handleGenericResponseErrors(binding.parentLayout, error, throwable)
             }
         }
     }
@@ -905,7 +905,7 @@ class SubredditFragment : Fragment() {
                 }
 
                 else -> {
-                    Util.handleGenericResponseErrors(binding.root, error.error, error.throwable)
+                    handleGenericResponseErrors(binding.root, error.error, error.throwable)
                 }
             }
         }

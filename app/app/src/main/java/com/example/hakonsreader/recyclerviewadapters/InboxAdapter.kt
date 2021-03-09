@@ -16,7 +16,7 @@ import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.databinding.InboxCommentBinding
 import com.example.hakonsreader.databinding.InboxMessageBinding
-import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.createAgeText
 import com.example.hakonsreader.recyclerviewadapters.diffutils.MessagesDiffCallback
 import com.example.hakonsreader.views.ListDivider
 import java.time.Duration
@@ -87,7 +87,7 @@ fun setSentAgoText(textView: TextView, createdAt: Long) {
     val created = Instant.ofEpochSecond(createdAt)
     val now = Instant.now()
     val between = Duration.between(created, now)
-    val createdAtText = Util.createAgeText(textView.resources, between)
+    val createdAtText = createAgeText(textView.resources, between)
 
     textView.text = textView.resources.getString(R.string.inboxSent, createdAtText)
 }

@@ -19,10 +19,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.activities.VideoActivity
-import com.example.hakonsreader.misc.Util
 import com.example.hakonsreader.misc.cache
+import com.example.hakonsreader.misc.createVideoDuration
 import com.example.hakonsreader.views.util.VideoCache
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor
@@ -230,7 +229,7 @@ class VideoPlayer : PlayerView {
             findViewById<View>(R.id.exo_duration).visibility = GONE
             val duration = findViewById<TextView>(R.id.duration)
             duration.visibility = VISIBLE
-            duration.text = Util.createVideoDuration(field)
+            duration.text = createVideoDuration(field)
         }
 
     /**

@@ -25,7 +25,7 @@ import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
 import com.example.hakonsreader.databinding.SubmissionLinkBinding
 import com.example.hakonsreader.databinding.SubmissionTextBinding
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
-import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
 import com.example.hakonsreader.viewmodels.SubredditViewModel
 import com.example.hakonsreader.viewmodels.factories.SubredditFactory
@@ -194,7 +194,7 @@ class SubmitActivity : BaseActivity() {
                 if (it.error.code == 403) {
                     binding.flairSpinner.visibility = GONE
                 } else {
-                    Util.handleGenericResponseErrors(binding.root, it.error, it.throwable)
+                    handleGenericResponseErrors(binding.root, it.error, it.throwable)
                 }
             }
             // There won't be anything else causing this to loader to load so this is safe

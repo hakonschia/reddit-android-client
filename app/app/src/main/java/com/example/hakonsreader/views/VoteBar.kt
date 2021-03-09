@@ -13,7 +13,7 @@ import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.VoteBarBinding
-import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.robinhood.ticker.TickerUtils
@@ -112,8 +112,7 @@ class VoteBar : FrameLayout {
 
                         withContext(Main) {
                             updateVoteStatus()
-                            resp.throwable.printStackTrace()
-                            Util.handleGenericResponseErrors(this@VoteBar, resp.error, resp.throwable)
+                            handleGenericResponseErrors(this@VoteBar, resp.error, resp.throwable)
                         }
                     }
                 }

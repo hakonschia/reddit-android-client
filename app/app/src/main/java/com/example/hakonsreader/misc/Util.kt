@@ -3,23 +3,38 @@ package com.example.hakonsreader.misc
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.net.Uri
+import android.util.TypedValue
+import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
+import com.example.hakonsreader.api.exceptions.ArchivedException
+import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
+import com.example.hakonsreader.api.exceptions.RateLimitException
+import com.example.hakonsreader.api.exceptions.ThreadLockedException
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.enums.ShowNsfwPreview
+import com.example.hakonsreader.states.LoggedInState.PrivatelyBrowsing
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.time.Duration
 import java.util.*
 
 /**
@@ -105,7 +120,7 @@ private fun getNsfw(post: RedditPost) : String? {
     return when (App.get().showNsfwPreview()) {
         ShowNsfwPreview.NORMAL -> getNormal(post)
         ShowNsfwPreview.BLURRED -> getObfuscated(post)
-        ShowNsfwPreview.NO_IMAGE-> null
+        ShowNsfwPreview.NO_IMAGE -> null
     }
 }
 
@@ -142,7 +157,7 @@ fun startLoginIntent(context: Context) {
             .path("api/v1/authorize")
             .appendQueryParameter("response_type", NetworkConstants.RESPONSE_TYPE)
             .appendQueryParameter("duration", NetworkConstants.DURATION)
-            .appendQueryParameter("redirect_uri" , NetworkConstants.CALLBACK_URL)
+            .appendQueryParameter("redirect_uri", NetworkConstants.CALLBACK_URL)
             .appendQueryParameter("client_id", NetworkConstants.CLIENT_ID)
             .appendQueryParameter("scope", NetworkConstants.SCOPE)
             .appendQueryParameter("state", state)
@@ -407,4 +422,377 @@ fun getTimeSortText(timeSort: PostTimeSort, context: Context) : String {
         PostTimeSort.YEAR -> context.getString(R.string.sortYear)
         PostTimeSort.ALL_TIME -> context.getString(R.string.sortAllTime)
     }
+}
+
+
+/**
+ * Handles generic errors that are common for all API responses and shows a snackbar to the user
+ *
+ * @param parent The view to attach the snackbar to
+ * @param error The error for the request
+ * @param t Throwable from the request
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun handleGenericResponseErrors(parent: View, error: GenericError, t: Throwable, anchor: View? = null) {
+    val code = error.code
+    val reason = error.reason
+    t.printStackTrace()
+
+    when {
+        t is IOException -> {
+            if (t is SocketTimeoutException) {
+                showNetworkTimeoutException(parent, anchor)
+            } else {
+                showNoInternetSnackbar(parent, anchor)
+            }
+        }
+
+        t is InvalidAccessTokenException -> {
+            if (App.get().loggedInState.value is PrivatelyBrowsing) {
+                showPrivatelyBrowsingSnackbar(parent, anchor)
+            } else {
+                showNotLoggedInSnackbar(parent, anchor)
+            }
+        }
+
+        t is ThreadLockedException -> {
+            showThreadLockedException(parent, anchor)
+        }
+
+        t is ArchivedException -> {
+            showArchivedException(parent, anchor)
+        }
+
+        reason == GenericError.REQUIRES_REDDIT_PREMIUM -> {
+            showRequiresRedditPremiumSnackbar(parent, anchor)
+        }
+
+        code == 400 -> {
+            // 400 requests are "Bad request" which means something went wrong (Reddit are generally pretty
+            // "secretive" with their error responses, they only give a code)
+            showBadRequestSnackbar(parent, anchor)
+        }
+
+        code == 403 -> {
+            showForbiddenErrorSnackbar(parent, anchor)
+        }
+
+        code == 429 || t is RateLimitException -> {
+            // 429 = Too many requests. Reddit sometimes returns a 429, or 200 with a "RATELIMIT" error message
+            showTooManyRequestsSnackbar(parent, anchor)
+        }
+
+        code in 500..599 -> {
+            showGenericServerErrorSnackbar(parent, anchor)
+        }
+
+        else -> {
+            showUnknownError(parent, anchor)
+        }
+    }
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by no internet connection
+ *
+ * @param parent The view to attach the snackbar to
+ */
+fun showNoInternetSnackbar(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, parent.resources.getString(R.string.noInternetConnection), BaseTransientBottomBar.LENGTH_LONG)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by a network timeout
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showNetworkTimeoutException(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, R.string.networkTimeout, BaseTransientBottomBar.LENGTH_LONG)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for when an action was attempted that requires a logged in user,
+ * but private browsing is currently enabled.
+ *
+ *
+ * The snackbar includes a button to disable private browsing
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showPrivatelyBrowsingSnackbar(parent: View, anchor: View? = null) {
+    val context = parent.context
+    Snackbar.make(parent, R.string.privatelyBrowsingError, BaseTransientBottomBar.LENGTH_LONG)
+            .setAnchorView(anchor)
+            .setAction(R.string.disable) { App.get().enablePrivateBrowsing(false) }
+            .setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent))
+            .show()
+    }
+
+/**
+ * Creates and shows a snackbar for when an action was attempted that requires the user to be logged in
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showNotLoggedInSnackbar(parent: View, anchor: View? = null) {
+    val context = parent.context
+    Snackbar.make(parent, R.string.notLoggedInError, BaseTransientBottomBar.LENGTH_LONG)
+            .setAnchorView(anchor)
+            .setAction(R.string.log_in) {
+                // If getContext instance of MainActivity we can set the nav bar item to profile and, otherwise create activity for logging in
+                if (context is MainActivity) {
+                    context.selectProfileNavBar()
+                } else {
+                    // Otherwise we can open an activity showing a login fragment
+                    context.startActivity(Intent(context, LogInActivity::class.java))
+                }
+            }
+            .setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent))
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by a thread being locked
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showThreadLockedException(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, R.string.threadLockedError, BaseTransientBottomBar.LENGTH_SHORT)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by a listing being archived
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showArchivedException(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, R.string.listingArchivedError, BaseTransientBottomBar.LENGTH_SHORT)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by a 400 bad request error
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showBadRequestSnackbar(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, R.string.badRequestError, BaseTransientBottomBar.LENGTH_SHORT)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by no internet connection
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showForbiddenErrorSnackbar(parent: View, anchor: View? = null) {
+    // 403 errors are generally when the access token is outdated and new functionality has been
+    // added that requires more OAuth scopes
+    Snackbar.make(parent, R.string.forbiddenError, BaseTransientBottomBar.LENGTH_SHORT)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for generic server errors
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showGenericServerErrorSnackbar(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, R.string.genericServerError, BaseTransientBottomBar.LENGTH_SHORT)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by too many requests sent
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showTooManyRequestsSnackbar(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, R.string.tooManyRequestsError, BaseTransientBottomBar.LENGTH_SHORT)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by too many requests sent
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showErrorLoggingInSnackbar(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, R.string.errorLoggingIn, BaseTransientBottomBar.LENGTH_SHORT)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by no internet connection
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showUnknownError(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, R.string.unknownError, BaseTransientBottomBar.LENGTH_SHORT)
+            .setAnchorView(anchor)
+            .show()
+}
+
+/**
+ * Creates and shows a snackbar for errors caused by an action being attempted that requires
+ * Reddit premium
+ *
+ * @param parent The view to attach the snackbar to
+ * @param anchor Optionally, the anchor of the snackbar
+ */
+fun showRequiresRedditPremiumSnackbar(parent: View, anchor: View? = null) {
+    Snackbar.make(parent, R.string.requiresRedditPremium, BaseTransientBottomBar.LENGTH_SHORT)
+            .setAnchorView(anchor)
+            .show()
+}
+
+
+/**
+ * Creates the text for text age text fields. For a shorter text see
+ * [createAgeTextShortened]
+ *
+ * Formats to make sure that it says 3 hours, 5 minutes etc. based on what makes sense
+ *
+ * @param resources Resources to retrieve strings from
+ * @param time The time to format as
+ * @return The time formatted as a string
+ */
+fun createAgeText(resources: Resources, time: Duration): String {
+    var t: Long
+
+    val format = when {
+        time.toDays().also { t = it } > 0L -> {
+            resources.getQuantityString(R.plurals.postAgeDays, t.toInt())
+        }
+
+        time.toHours().also { t = it } > 0 -> {
+            resources.getQuantityString(R.plurals.postAgeHours, t.toInt())
+        }
+
+        else -> {
+            t = time.toMinutes()
+            if (t < 1) {
+                resources.getString(R.string.postAgeJustPosted)
+            }
+            resources.getQuantityString(R.plurals.postAgeMinutes, t.toInt())
+        }
+    }
+
+    return String.format(Locale.getDefault(), format, t)
+}
+
+
+/**
+ * Creates the text for text age text fields with a shorter text than with
+ * [createAgeText]
+ *
+ * Formats to make sure that it says 3h, 5m etc. based on what makes sense
+ *
+ * @param resources Resources to retrieve strings from
+ * @param time The time to format as
+ * @return The time formatted as a string
+ */
+fun createAgeTextShortened(resources: Resources, time: Duration): String {
+    var t: Long
+
+    val format = when {
+        time.toDays().also { t = it } > 0L -> {
+            resources.getString(R.string.postAgeDaysShortened, t.toInt())
+        }
+
+        time.toHours().also { t = it } > 0 -> {
+            resources.getString(R.string.postAgeHoursShortened, t.toInt())
+        }
+
+        else -> {
+            t = time.toMinutes()
+            if (t < 1) {
+                resources.getString(R.string.postAgeJustPostedShortened)
+            }
+            resources.getString(R.string.postAgeMinutesShortened, t.toInt())
+        }
+    }
+
+    return String.format(Locale.getDefault(), format, t)
+}
+
+/**
+ * Creates the text for text age on trending subreddits
+ *
+ * Formats to make sure that it says 3 hours, 5 minutes etc. based on what makes sense
+ *
+ * @param tv The text view to set the text on
+ * @param time The time to format as
+ */
+fun setAgeTextTrendingSubreddits(tv: TextView, time: Duration) {
+    val resources = tv.resources
+    var t: Long
+
+    val format = when {
+        time.toDays().also { t = it } > 0L -> {
+            resources.getQuantityString(R.plurals.postAgeDays, t.toInt())
+        }
+
+        time.toHours().also { t = it } > 0 -> {
+            resources.getQuantityString(R.plurals.postAgeHours, t.toInt())
+        }
+
+        else -> {
+            t = time.toMinutes()
+            if (t < 1) {
+                tv.setText(R.string.trendingSubredditsLastUpdatedNow)
+                return
+            }
+            resources.getQuantityString(R.plurals.postAgeMinutes, t.toInt())
+        }
+    }
+
+    val str = String.format(Locale.getDefault(), format, t)
+    tv.text = resources.getString(R.string.trendingSubredditsLastUpdated, str)
+}
+
+/**
+ * Create a duration string in the format of "mm:ss" that can be used in videos
+ *
+ * @param seconds The amount of seconds to display
+ * @return A string formatted as "mm:ss"
+ */
+fun createVideoDuration(seconds: Int): String {
+    return String.format("%02d:%02d", seconds % 3600 / 60, seconds % 60)
+}
+
+/**
+ * Converts dp to pixels
+ * @param dp The amount of dp to convert
+ * @param res The resources
+ * @return The pixel amount of *dp*
+ */
+fun dpToPixels(dp: Float, res: Resources): Int {
+    return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp,
+            res.displayMetrics
+    ).toInt()
 }

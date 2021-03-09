@@ -3,7 +3,6 @@ package com.example.hakonsreader.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,7 +14,7 @@ import com.example.hakonsreader.api.model.RedditAward
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.AwardLayoutBinding
 import com.example.hakonsreader.fragments.bottomsheets.ShowAwardBottomSheet
-import com.example.hakonsreader.misc.Util
+import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.misc.loadIf
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
@@ -50,8 +49,8 @@ class AwardLayout : FrameLayout {
         // Sort awards by descending price (so the most expensive awards are shown first)
         val sortedAwards = listing?.awardings?.sortedByDescending { award -> award.price } ?: return
 
-        val awardImageTopBottomMargin = Util.dpToPixels(2f, resources)
-        val awardImageStartMargin = Util.dpToPixels(6f, resources)
+        val awardImageTopBottomMargin = dpToPixels(2f, resources)
+        val awardImageStartMargin = dpToPixels(6f, resources)
         val count = getTotalAwardsCount()
         val awardIconSize = resources.getDimension(R.dimen.awardIconSize).toInt()
 
