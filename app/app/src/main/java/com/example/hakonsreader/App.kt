@@ -1094,6 +1094,8 @@ class App : Application() {
             // store that it failed and retry again later
             TokenManager.getToken()?.let { api.accessToken().revoke(it) }
 
+            api.logOut()
+
             // Clear any user specific state from database records (such as vote status on posts)
             database.clearUserState()
 

@@ -438,6 +438,15 @@ class RedditApi constructor(
     }
 
     /**
+     * Removes the access token currently set and sets the API in a context of a logged out user
+     */
+    fun logOut() {
+        ignoreNextTokenChange = true
+        accessTokenInternal = AccessToken()
+        enablePrivateBrowsing(false)
+    }
+
+    /**
      * Checks if the API is currently in a private browsing context, meaning that there is a user
      * logged in, but the API calls should currently not be made on behalf of that user
      *

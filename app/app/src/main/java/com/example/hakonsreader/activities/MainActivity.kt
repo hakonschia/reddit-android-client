@@ -15,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -152,6 +151,25 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             //startActivity(this)
         }
 
+        val uri = intent.data
+        if (uri != null) {
+            // Resumed from OAuth authorization
+            if (uri.toString().startsWith(NetworkConstants.CALLBACK_URL)) {
+                handleOAuthResume(uri)
+            } else {
+                performSetup(savedInstanceState)
+            }
+        } else {
+            performSetup(savedInstanceState)
+        }
+    }
+
+    /**
+     * Performs setup of the activity
+     *
+     * @param savedInstanceState The saved instance state
+     */
+    private fun performSetup(savedInstanceState: Bundle?) {
         attachFragmentChangeListener()
         setupNavBar()
 
@@ -160,7 +178,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         if (savedInstanceState != null) {
             // recreatedAsNewUser will never be null if we get here
             restoreFragmentStates(savedInstanceState, recreatedAsNewUser!!)
-
             restoreNavBar(savedInstanceState)
         } else {
             // Use empty string as default (ie. front page)
@@ -170,6 +187,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
             // Only start the inbox listener once, or else every configuration change would start another timer
             // TODO this has to be improved as now it leaks and doesn't really work at all
+            //  it should probably be some sort of service or something and not just this naively done
             //startInboxListener()
 
             // Trending subreddits aren't user specific so they don't have to be retrieved again
@@ -177,30 +195,19 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
 
         observeUserState()
+
         // If recreated as a new user we always want to load the subreddits
         subredditsViewModel.loadSubreddits(force = recreatedAsNewUser == true)
+
         setupNavDrawer()
         checkAccessTokenScopes()
 
         App.get().registerReceivers()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        val uri = intent.data ?: return
-
-        // Resumed from OAuth authorization
-        if (uri.toString().startsWith(NetworkConstants.CALLBACK_URL)) {
-            handleOAuthResume(uri)
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        App.get().run {
-            unregisterReceivers()
-        }
+        App.get().unregisterReceivers()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -273,7 +280,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             if (profileFragment == null) {
                 profileFragment = ProfileFragment.newInstance()
             }
-            profileFragment
 
             navigationViewListener.profileLastShownIsProfile = true
 
@@ -328,7 +334,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
 
         val lowerCased = subredditName.toLowerCase()
-        // If default sub, use the home navbar instead
+        // If default sub, use the home nav bar instead
         if (RedditApi.STANDARD_SUBS.contains(lowerCased)) {
             val sub = StandardSubContainerFragment.StandarSub.values().find { it.value == lowerCased }
                     ?: StandardSubContainerFragment.StandarSub.FRONT_PAGE
@@ -372,8 +378,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         navigationViewListener.profileLastShownIsProfile = false
 
-        // Should maybe be sure that the profile navbar is clicked? Dunno
-        // Change the navbar name to be "Inbox" maybe?
+        // Should maybe be sure that the profile nav bar is clicked? Dunno
+        // Change the nav bar name to be "Inbox" maybe?
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, inboxFragment!!)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -431,8 +437,12 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      */
     private fun asLoggedOutUser() {
         privateBrowsingStateChanged(false)
+
         binding.navDrawer.userInfo = null
         binding.bottomNav.menu.findItem(R.id.navProfile).title = getString(R.string.navbarProfile)
+
+        // No need to keep this at this point
+        profileFragment = null
     }
 
     /**
@@ -471,8 +481,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         App.get().clearOAuthState()
 
-        // This might be bad, but onResume is called when opening a post and going back and still
-        // holds the same intent which causes this branch to execute again, causing issues
+        // This might be bad, but onCreate is called with the same intent when the activity
+        // is recreated which would cause this to run again, so we have to clear the intent
         intent.replaceExtras(Bundle())
         intent.action = ""
         intent.data = null
@@ -485,12 +495,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 is ApiResponse.Success -> {
                     getUserInfo()
 
-                    // Re-create the start fragment as it now should load posts for the logged in user
-                    // TODO this is kinda bad as it gets posts and then gets posts again for the logged in user
                     withContext(Main) {
-                        standardSubFragment = null
-                        setupStartFragment("")
-                        Snackbar.make(binding.mainParentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.mainParentLayout, R.string.loggedIn, BaseTransientBottomBar.LENGTH_SHORT)
+                                .setAnchorView(binding.bottomNav)
+                                .show()
                     }
                 }
 
@@ -511,6 +519,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             when (val userInfo = api.user().info()) {
                 is ApiResponse.Success -> {
                     App.get().updateUserInfo(info = userInfo.value)
+                    withContext(Main) {
+                        performSetup(null)
+                    }
                 }
                 is ApiResponse.Error -> {
                     // Seeing as this is called when the access token was just retrieved, it is very
@@ -519,7 +530,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                             .setAction(R.string.userInfoFailedToGetTryAgain) {
                                 getUserInfo()
                             }
+                            .setAnchorView(binding.bottomNav)
                             .show()
+
+                    // This should always happen
+                    withContext(Main) {
+                        performSetup(null)
+                    }
                 }
             }
         }
