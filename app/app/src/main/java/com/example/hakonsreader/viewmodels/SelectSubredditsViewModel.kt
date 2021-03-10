@@ -19,10 +19,10 @@ class SelectSubredditsViewModel(var isForLoggedInUser: Boolean) : ViewModel() {
     private val api = App.get().api
     private var loadedFromApi = false
 
-    private val _subreddits = MutableLiveData<List<Subreddit>>().also {
+    private val ids = MutableLiveData<List<String>>().apply {
         CoroutineScope(IO).launch {
-            it.postValue(if (isForLoggedInUser) {
-                database.subreddits().getSubscribedSubredditsNoObservable()
+            postValue(if (isForLoggedInUser) {
+                database.subreddits().getSubscribedSubredditsNoObservable().map { it.id }
             } else {
                 ArrayList()
             })
@@ -32,9 +32,11 @@ class SelectSubredditsViewModel(var isForLoggedInUser: Boolean) : ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<ErrorWrapper>()
 
-    // Kind of weird probably? The subscribed subreddits can easily be observed and automatically updated
-    // but the default subreddits don't have anything identifying them, and aren't the only subreddits stored
-    val subreddits: LiveData<List<Subreddit>> = _subreddits
+    val subreddits: LiveData<List<Subreddit>> get() {
+        return Transformations.switchMap(ids) {
+            database.subreddits().getSubsById(it)
+        }
+    }
     val isLoading: LiveData<Boolean> = _isLoading
     val error: LiveData<ErrorWrapper> = _error
 
@@ -63,21 +65,22 @@ class SelectSubredditsViewModel(var isForLoggedInUser: Boolean) : ViewModel() {
             when (response) {
                 is ApiResponse.Success -> {
                     loadedFromApi = true
-                    val subs = response.value
+                    val subreddits = response.value
+
+                    val subredditIds: MutableList<String> = ArrayList()
+                    subreddits.forEach { subreddit -> subredditIds.add(subreddit.id) }
+
+                    ids.postValue(subredditIds)
 
                     if (isForLoggedInUser) {
                         // Store the subreddits so they're shown instantly the next time
-                        val ids: MutableList<String> = ArrayList()
-                        subs.forEach { subreddit -> ids.add(subreddit.id) }
-                        App.get().updateUserInfo(subreddits = ids)
+                        App.get().updateUserInfo(subreddits = subredditIds)
                     }
-
-                    _subreddits.postValue(subs)
 
                     // Although NSFW subs might be inserted with this, it's fine as if the user
                     // has subscribed to them it's fine (for non-logged in users, default subs don't include NSFW)
                     withContext(IO) {
-                        database.subreddits().insertAll(subs)
+                        database.subreddits().insertAll(subreddits)
                     }
                 }
                 is ApiResponse.Error -> {

@@ -47,7 +47,7 @@ interface RedditSubredditsDao {
      * @return A list of subreddits based on the IDs
      */
     @Query("SELECT * FROM subreddits WHERE id IN (:ids)")
-    fun getSubsById(ids: List<String>): List<Subreddit>
+    fun getSubsById(ids: List<String>): LiveData<List<Subreddit>>
 
     /**
      * Gets an observable for the subreddits where [Subreddit.isSubscribed] is true
