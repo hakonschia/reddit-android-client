@@ -145,7 +145,9 @@ fun showAccountManagement(context: Context) {
                         }
                     } else {
                         // Update the current account
-                        app.updateUserInfo(nsfwAccount = nsfwAccount)
+                        CoroutineScope(IO).launch {
+                            app.updateUserInfo(nsfwAccount = nsfwAccount)
+                        }
                     }
                 }
             }

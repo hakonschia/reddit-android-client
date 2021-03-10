@@ -1,12 +1,11 @@
 package com.example.hakonsreader.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.states.LoggedInState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -15,20 +14,27 @@ import kotlinx.coroutines.withContext
  * ViewModel for retrieving subreddits. The subreddits retrieved are automatically chosen for
  * a logged in users subscribed subreddits, or for default subreddits for non-logged in users
  */
-class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewModel() {
+class SelectSubredditsViewModel(var isForLoggedInUser: Boolean) : ViewModel() {
     private val database = App.get().database
     private val api = App.get().api
     private var loadedFromApi = false
 
-    private val loggedInUserLiveData = database.subreddits().getSubscribedSubreddits()
-    private val defaultLiveData = MutableLiveData<List<Subreddit>>()
+    private val _subreddits = MutableLiveData<List<Subreddit>>().also {
+        CoroutineScope(IO).launch {
+            it.postValue(if (isForLoggedInUser) {
+                database.subreddits().getSubscribedSubredditsNoObservable()
+            } else {
+                ArrayList()
+            })
+        }
+    }
 
     private val _isLoading = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<ErrorWrapper>()
 
     // Kind of weird probably? The subscribed subreddits can easily be observed and automatically updated
     // but the default subreddits don't have anything identifying them, and aren't the only subreddits stored
-    val subreddits: LiveData<List<Subreddit>> = if (isForLoggedInUser) loggedInUserLiveData else defaultLiveData
+    val subreddits: LiveData<List<Subreddit>> = _subreddits
     val isLoading: LiveData<Boolean> = _isLoading
     val error: LiveData<ErrorWrapper> = _error
 
@@ -64,9 +70,9 @@ class SelectSubredditsViewModel(private val isForLoggedInUser: Boolean) : ViewMo
                         val ids: MutableList<String> = ArrayList()
                         subs.forEach { subreddit -> ids.add(subreddit.id) }
                         App.get().updateUserInfo(subreddits = ids)
-                    } else {
-                        defaultLiveData.postValue(subs)
                     }
+
+                    _subreddits.postValue(subs)
 
                     // Although NSFW subs might be inserted with this, it's fine as if the user
                     // has subscribed to them it's fine (for non-logged in users, default subs don't include NSFW)

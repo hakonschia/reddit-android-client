@@ -56,6 +56,12 @@ interface RedditSubredditsDao {
     fun getSubscribedSubreddits(): LiveData<List<Subreddit>>
 
     /**
+     * Gets a list of the subreddits where [Subreddit.isSubscribed] is true
+     */
+    @Query("SELECT * FROM subreddits WHERE isSubscribed=1")
+    fun getSubscribedSubredditsNoObservable(): List<Subreddit>
+
+    /**
      * Get the subreddit object from its name
      *
      * @param subredditName The name of the subreddit (as equal to [Subreddit.getName]).

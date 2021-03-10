@@ -27,6 +27,9 @@ import com.example.hakonsreader.viewmodels.RedditUserViewModel
 import com.example.hakonsreader.viewmodels.factories.RedditUserFactory
 import com.makeramen.roundedimageview.RoundedImageView
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
@@ -240,7 +243,9 @@ class ProfileFragment : Fragment() {
         } else {
             // Store the updated user information if this profile is for the logged in user
             if (isLoggedInUser) {
-                App.get().updateUserInfo(info = newUser)
+                CoroutineScope(IO).launch {
+                    App.get().updateUserInfo(info = newUser)
+                }
             }
 
             createAndAddPostsFragment(newUser.username)

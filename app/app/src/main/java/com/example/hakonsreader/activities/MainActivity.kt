@@ -122,7 +122,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     private var inboxFragment: InboxFragment? = null
     private var settingsFragment: SettingsFragment? = null
     private var lastShownFragment: Fragment? = null
-    private val navigationViewListener: BottomNavigationViewListener = BottomNavigationViewListener()
+    private val navigationViewListener = BottomNavigationViewListener()
 
     private var subredditsAdapter: SubredditsAdapter? = null
     private var subredditsLayoutManager: LinearLayoutManager? = null
@@ -197,7 +197,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         observeUserState()
 
-        // If recreated as a new user we always want to load the subreddits
+        subredditsViewModel.isForLoggedInUser = App.get().loggedInState.value is LoggedInState.LoggedIn
         subredditsViewModel.loadSubreddits(force = recreatedAsNewUser == true)
 
         setupNavDrawer()
@@ -933,9 +933,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      */
     private fun setupNavDrawer() {
         with(subredditsViewModel) {
-            subreddits.observe(this@MainActivity, { subreddits ->
+            subreddits.observe(this@MainActivity) { subreddits ->
                 subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
-            })
+            }
 
             isLoading.observe(this@MainActivity) {
                 binding.navDrawer.subredditsLoader.visibility = if (it) {
@@ -945,9 +945,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
             }
 
-            error.observe(this@MainActivity, { error ->
+            error.observe(this@MainActivity) { error ->
                 handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable, binding.bottomNav)
-            })
+            }
         }
 
         with(trendingSubredditsViewModel) {
@@ -967,9 +967,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
             }
 
-            error.observe(this@MainActivity, { error ->
+            error.observe(this@MainActivity) { error ->
                 handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable, binding.bottomNav)
-            })
+            }
         }
 
         binding.mainParentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {

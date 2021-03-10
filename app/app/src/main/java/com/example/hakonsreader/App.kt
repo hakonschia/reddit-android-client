@@ -562,27 +562,27 @@ class App : Application() {
      * @param info The information about the user
      * @param subreddits The list of subreddit IDs the user is subscribed to
      */
-    fun updateUserInfo(info: RedditUser? = null, subreddits: List<String>? = null, nsfwAccount: Boolean? = null) {
-        CoroutineScope(IO).launch {
-            TokenManager.getToken()?.let {
-                getUserInfoFromToken(getUserInfo(), it).apply {
-                    if (info != null) {
-                        userInfo = info
-                    }
-                    if (subreddits != null) {
-                        subscribedSubreddits = subreddits
-                    }
-                    if (nsfwAccount != null) {
-                        this.nsfwAccount = nsfwAccount
-                    }
+    suspend fun updateUserInfo(info: RedditUser? = null, subreddits: List<String>? = null, nsfwAccount: Boolean? = null) {
+        TokenManager.getToken()?.let {
+            getUserInfoFromToken(getUserInfo(), it).apply {
+                if (info != null) {
+                    userInfo = info
+                }
+                if (subreddits != null) {
+                    subscribedSubreddits = subreddits
+                }
+                if (nsfwAccount != null) {
+                    this.nsfwAccount = nsfwAccount
+                }
 
-                    _loggedInState.postValue(LoggedInState.LoggedIn(this))
+                withContext(Main) {
+                    _loggedInState.value = LoggedInState.LoggedIn(this@apply)
+                }
 
-                    if (userInfoDatabase.userInfo().userExists(it.userId)) {
-                        userInfoDatabase.userInfo().update(this)
-                    } else {
-                        userInfoDatabase.userInfo().insert(this)
-                    }
+                if (userInfoDatabase.userInfo().userExists(it.userId)) {
+                    userInfoDatabase.userInfo().update(this)
+                } else {
+                    userInfoDatabase.userInfo().insert(this)
                 }
             }
         }
