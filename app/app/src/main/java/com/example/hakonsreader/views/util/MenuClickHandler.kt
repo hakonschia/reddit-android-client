@@ -122,10 +122,14 @@ fun showAccountManagement(context: Context) {
                 }
 
                 onRemoveItemClicked = { userInfoClicked ->
-                    val state = app.loggedInState.value as LoggedInState.LoggedIn
-                    val currentId = state.userInfo.accessToken.userId
+                    val currentId = when (val state = app.loggedInState.value) {
+                        is LoggedInState.LoggedIn -> state.userInfo.userId
+                        is LoggedInState.PrivatelyBrowsing -> state.userInfo.userId
+                        else -> null
+                    }
+
                     // Don't remove the item if it's the currently active one
-                    if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
+                    if (currentId != userInfoClicked.accessToken.userId) {
                         removeItem(userInfoClicked)
                         CoroutineScope(IO).launch {
                             app.userInfoDatabase.userInfo().delete(userInfoClicked)
