@@ -124,14 +124,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     private var lastShownFragment: Fragment? = null
     private val navigationViewListener = BottomNavigationViewListener()
 
-    private var subredditsAdapter: SubredditsAdapter? = null
-    private var subredditsLayoutManager: LinearLayoutManager? = null
     private val subredditsViewModel: SelectSubredditsViewModel by viewModels {
         SelectSubredditsFactory(App.get().loggedInState.value is LoggedInState.LoggedIn)
     }
-
-    private var trendingSubredditsAdapter: TrendingSubredditsAdapter? = null
-    private var trendingSubredditsLayoutManager: LinearLayoutManager? = null
     private val trendingSubredditsViewModel: TrendingSubredditsViewModel by viewModels()
 
 
@@ -935,7 +930,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     private fun setupNavDrawer() {
         with(subredditsViewModel) {
             subreddits.observe(this@MainActivity) { subreddits ->
-                subredditsAdapter?.submitList(subreddits as MutableList<Subreddit>, true)
+                (binding.navDrawer.subreddits.adapter as SubredditsAdapter)
+                        .submitList(subreddits as MutableList<Subreddit>, true)
             }
 
             isLoading.observe(this@MainActivity) {
@@ -954,7 +950,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         with(trendingSubredditsViewModel) {
             trendingSubreddits.observe(this@MainActivity) { trending ->
                 trending.subreddits?.let {
-                    trendingSubredditsAdapter?.submitList(it)
+                    (binding.navDrawer.trendingSubreddits.adapter as TrendingSubredditsAdapter).submitList(it)
                 }
 
                 setTrendingSubredditsLastUpdated(trending)
@@ -1009,19 +1005,15 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
             }
 
-            subredditsAdapter = SubredditsAdapter().apply {
+            subreddits.adapter = SubredditsAdapter().apply {
                 viewType = SubredditsAdapter.SubredditViewType.SIMPLE
                 subredditSelected = this@MainActivity
-                favoriteClicked = OnClickListener { subreddit -> subredditsViewModel?.favorite(subreddit) }
+                favoriteClicked = OnClickListener { subreddit -> subredditsViewModel.favorite(subreddit) }
             }
-            subredditsLayoutManager = LinearLayoutManager(this@MainActivity)
-            subreddits.run {
-                adapter = subredditsAdapter
-                layoutManager = subredditsLayoutManager
-            }
+            subreddits.layoutManager = LinearLayoutManager(this@MainActivity)
 
             trendingSubredditsLastUpdated.setOnClickListener { trendingSubredditsViewModel.loadSubreddits() }
-            trendingSubredditsAdapter = TrendingSubredditsAdapter().apply {
+            trendingSubreddits.adapter = TrendingSubredditsAdapter().apply {
                 onSubredditSelected = {
                     Intent(this@MainActivity, SubredditActivity::class.java).apply {
                         putExtra(SubredditActivity.SUBREDDIT_KEY, it)
@@ -1029,11 +1021,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     }
                 }
             }
-            trendingSubredditsLayoutManager = LinearLayoutManager(this@MainActivity)
-            trendingSubreddits.run {
-                adapter = trendingSubredditsAdapter
-                layoutManager = trendingSubredditsLayoutManager
-            }
+            trendingSubreddits.layoutManager = LinearLayoutManager(this@MainActivity)
         }
     }
 

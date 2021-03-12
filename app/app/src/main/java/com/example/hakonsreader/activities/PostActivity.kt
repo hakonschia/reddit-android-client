@@ -101,8 +101,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
     private lateinit var slidrInterface: SlidrInterface
 
     private val commentsViewModel: CommentsViewModel by viewModels()
-    private var commentsAdapter: CommentsAdapter? = null
-    private var commentsLayoutManager: LinearLayoutManager? = null
 
     /**
      * The post shown in the activity
@@ -282,9 +280,10 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
             }
 
             comments.observe(this@PostActivity) { comments ->
+                val adapter = binding.comments.adapter as CommentsAdapter
                 // New comments are empty, previous comments are not, clear the previous comments
-                if (comments.isEmpty() && commentsAdapter?.itemCount != 0) {
-                    commentsAdapter?.clearComments()
+                if (comments.isEmpty() && adapter.itemCount != 0) {
+                    adapter.clearComments()
                     return@observe
                 }
 
@@ -295,8 +294,8 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                 // Update the value
                 preferences.edit().putLong(lastTimeOpenedKey, System.currentTimeMillis() / 1000L).apply()
 
-                commentsAdapter?.lastTimeOpened = lastTimeOpened
-                commentsAdapter?.submitList(comments)
+                adapter.lastTimeOpened = lastTimeOpened
+                adapter.submitList(comments)
 
                 binding.noComments = comments.isEmpty()
             }
@@ -320,20 +319,18 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      * Sets up [ActivityPostBinding.comments]
      */
     private fun setupCommentsList() {
-        commentsLayoutManager = LinearLayoutManager(this)
+        with(binding) {
+            val adapter = CommentsAdapter().apply {
+                replyListener = this@PostActivity
+                commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
+                loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel.loadMoreComments(comment, parent) }
+                onChainShown = Runnable { binding.commentChainShown = true }
+            }
 
-        commentsAdapter = CommentsAdapter().apply {
-            replyListener = this@PostActivity
-            commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
-            loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel.loadMoreComments(comment, parent) }
-            onChainShown = Runnable { binding.commentChainShown = true }
-        }
-
-        with (binding) {
-            comments.adapter = commentsAdapter
-            comments.layoutManager = commentsLayoutManager
+            comments.adapter = adapter
+            comments.layoutManager = LinearLayoutManager(this@PostActivity)
             showAllComments.setOnClickListener {
-                commentsAdapter!!.commentIdChain = ""
+                adapter.commentIdChain = ""
                 commentChainShown = false
             }
         }
@@ -501,8 +498,11 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      * @param view Ignored
      */
     fun goToNextTopLevelComment(@Suppress("UNUSED_PARAMETER")view: View) {
-        val currentPos = commentsLayoutManager!!.findFirstVisibleItemPosition()
-        val next = commentsAdapter!!.getNextTopLevelCommentPos(currentPos + 1)
+        val layoutManager = binding.comments.layoutManager as LinearLayoutManager
+        val adapter = binding.comments.adapter as CommentsAdapter
+
+        val currentPos = layoutManager.findFirstVisibleItemPosition()
+        val next = adapter.getNextTopLevelCommentPos(currentPos + 1)
         smoothScrollHelper(currentPos, next)
     }
 
@@ -512,12 +512,15 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      * @param view Ignored
      */
     fun goToPreviousTopLevelComment(@Suppress("UNUSED_PARAMETER")view: View) {
-        val currentPos = commentsLayoutManager!!.findFirstVisibleItemPosition()
+        val layoutManager = binding.comments.layoutManager as LinearLayoutManager
+        val adapter = binding.comments.adapter as CommentsAdapter
+
+        val currentPos = layoutManager.findFirstVisibleItemPosition()
         // We're at the top so we can't scroll further up
         if (currentPos == 0) {
             return
         }
-        val previous = commentsAdapter!!.getPreviousTopLevelCommentPos(currentPos - 1)
+        val previous = adapter.getPreviousTopLevelCommentPos(currentPos - 1)
         smoothScrollHelper(currentPos, previous)
     }
 
@@ -541,7 +544,7 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      */
     private fun goToLastComment(@Suppress("UNUSED_PARAMETER")view: View): Boolean {
         binding.comments.stopScroll()
-        binding.comments.scrollToPosition(commentsAdapter!!.itemCount - 1)
+        binding.comments.scrollToPosition(binding.comments.adapter!!.itemCount - 1)
         return true
     }
 
@@ -554,6 +557,8 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
      * @param scrollPos The position to scroll to
      */
     private fun smoothScrollHelper(currentPos: Int, scrollPos: Int) {
+        val layoutManager = binding.comments.layoutManager as LinearLayoutManager
+
         // Scrolling up
         val gapSize = if (currentPos > scrollPos) {
             currentPos - scrollPos
@@ -571,9 +576,9 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
                 }
             }.apply { targetPosition = scrollPos }
 
-            commentsLayoutManager?.startSmoothScroll(smoothScroller)
+            layoutManager.startSmoothScroll(smoothScroller)
         } else {
-            commentsLayoutManager?.scrollToPositionWithOffset(scrollPos, 0)
+            layoutManager.scrollToPositionWithOffset(scrollPos, 0)
         }
     }
 
