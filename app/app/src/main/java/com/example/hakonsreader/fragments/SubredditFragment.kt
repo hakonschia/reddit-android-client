@@ -446,7 +446,7 @@ class SubredditFragment : Fragment() {
             }
 
             isLoading.observe(viewLifecycleOwner) {
-                binding.subredditInfo.rulesloadingIcon.visibility = if (it) {
+                binding.subredditInfo.rulesloadingIconLayout.visibility = if (it) {
                     View.VISIBLE
                 } else {
                     View.INVISIBLE
@@ -494,7 +494,7 @@ class SubredditFragment : Fragment() {
             }
             // There won't be anything else causing this to loader to load so this is safe
             isLoading.observe(viewLifecycleOwner) {
-                binding.subredditInfo.selectFlairLoadingIcon.visibility = if (it) {
+                binding.subredditInfo.selectFlairLoadingIconLayout.visibility = if (it) {
                     View.VISIBLE
                 } else {
                     View.INVISIBLE

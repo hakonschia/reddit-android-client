@@ -4,11 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.databinding.ListItemTrendingSubredditBinding
+import com.example.hakonsreader.interfaces.OnSubredditSelected
 
 class TrendingSubredditsAdapter : RecyclerView.Adapter<TrendingSubredditsAdapter.ViewHolder>() {
 
     private var trendingSubreddits: List<String> = ArrayList()
-    var onSubredditSelected: ((String) -> Unit)? = null
+    var subredditSelected: OnSubredditSelected? = null
 
     fun submitList(trendingSubreddits: List<String>) {
         this.trendingSubreddits = trendingSubreddits
@@ -35,7 +36,7 @@ class TrendingSubredditsAdapter : RecyclerView.Adapter<TrendingSubredditsAdapter
         init {
             binding.root.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    onSubredditSelected?.invoke(trendingSubreddits[adapterPosition])
+                    subredditSelected?.subredditSelected(trendingSubreddits[adapterPosition])
                 }
             }
         }

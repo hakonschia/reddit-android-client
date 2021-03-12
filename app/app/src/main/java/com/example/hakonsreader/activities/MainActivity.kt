@@ -935,7 +935,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
 
             isLoading.observe(this@MainActivity) {
-                binding.navDrawer.subredditsLoader.visibility = if (it) {
+                binding.navDrawer.subredditsLoaderLayout.visibility = if (it) {
                     View.VISIBLE
                 } else {
                     View.GONE
@@ -957,7 +957,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
 
             isLoading.observe(this@MainActivity) {
-                binding.navDrawer.trendingSubredditsLoader.visibility = if (it) {
+                binding.navDrawer.trendingSubredditsLoaderLayout.visibility = if (it) {
                     View.VISIBLE
                 } else {
                     View.GONE
@@ -1014,12 +1014,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
             trendingSubredditsLastUpdated.setOnClickListener { trendingSubredditsViewModel.loadSubreddits() }
             trendingSubreddits.adapter = TrendingSubredditsAdapter().apply {
-                onSubredditSelected = {
-                    Intent(this@MainActivity, SubredditActivity::class.java).apply {
-                        putExtra(SubredditActivity.SUBREDDIT_KEY, it)
-                        startActivity(this)
-                    }
-                }
+                subredditSelected = this@MainActivity
             }
             trendingSubreddits.layoutManager = LinearLayoutManager(this@MainActivity)
         }

@@ -205,21 +205,31 @@
                 app:layout_constraintStart_toStartOf="@+id/selectFlairHeader"
                 app:layout_constraintTop_toBottomOf="@+id/selectFlairHeader" />
 
-            <ProgressBar
-                android:id="@+id/selectFlairLoadingIcon"
-                style="?android:attr/progressBarStyleHorizontal"
+            <FrameLayout
+                android:id="@+id/selectFlairLoadingIconLayout"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-
-                android:indeterminateOnly="true"
-
+                android:layout_height="@dimen/horizontalProgressBarHeight"
+                android:layout_marginEnd="16dp"
                 android:visibility="gone"
-
                 app:layout_constraintBottom_toBottomOf="@+id/selectFlairSpinner"
-                app:layout_constraintEnd_toEndOf="@+id/selectFlairSpinner"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/selectFlairSpinner"
                 app:layout_constraintTop_toBottomOf="@+id/selectFlairSpinner"
-                tools:visibility="visible" />
+                tools:visibility="visible">
+
+                <!-- The height of this has to be some arbitrary large value, otherwise the actual
+                 progress bar will be very thin and the width will be tiny. It doesn't actually affect
+                 the height of progress bar since the FrameLayout is smaller -->
+                <ProgressBar
+                    android:id="@+id/selectFlairLoadingIcon"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+
+                    android:indeterminateOnly="true" />
+            </FrameLayout>
 
             <View
                 android:id="@+id/divider2"
@@ -231,7 +241,7 @@
                 android:background="@color/awardsBottomSheetDivider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/selectFlairLoadingIcon" />
+                app:layout_constraintTop_toBottomOf="@id/selectFlairLoadingIconLayout" />
 
             <TextView
                 android:id="@+id/rulesHeader"
@@ -247,25 +257,33 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
-            <ProgressBar
-                android:id="@+id/rulesloadingIcon"
-                style="?android:attr/progressBarStyleHorizontal"
+            <FrameLayout
+                android:id="@+id/rulesloadingIconLayout"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-
-                android:layout_marginStart="16dp"
+                android:layout_height="@dimen/horizontalProgressBarHeight"
                 android:layout_marginEnd="16dp"
-
-                android:indeterminateOnly="true"
-                android:paddingTop="4dp"
-                android:visibility="gone"
-
+                android:layout_marginStart="16dp"
                 app:layout_constraintBottom_toBottomOf="@+id/rulesHeader"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-
                 app:layout_constraintTop_toBottomOf="@id/rulesHeader"
-                tools:visibility="visible" />
+
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!-- The height of this has to be some arbitrary large value, otherwise the actual
+                 progress bar will be very thin and the width will be tiny. It doesn't actually affect
+                 the height of progress bar since the FrameLayout is smaller -->
+                <ProgressBar
+                    android:id="@+id/rulesloadingIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_gravity="center"
+
+                    android:indeterminateOnly="true" />
+            </FrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rules"

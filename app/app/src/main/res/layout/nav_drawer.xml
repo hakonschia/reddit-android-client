@@ -445,18 +445,32 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/random" />
 
-            <ProgressBar
-                android:id="@+id/subredditsLoader"
-                style="?android:attr/progressBarStyleHorizontal"
+            <FrameLayout
+                android:id="@+id/subredditsLoaderLayout"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/horizontalProgressBarHeight"
                 android:layout_marginEnd="16dp"
-                android:indeterminateOnly="true"
-                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/subredditsHeader"
                 app:layout_constraintTop_toBottomOf="@+id/subredditsHeader"
-                tools:visibility="visible"/>
+
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!-- The height of this has to be some arbitrary large value, otherwise the actual
+                 progress bar will be very thin and the width will be tiny. It doesn't actually affect
+                 the height of progress bar since the FrameLayout is smaller -->
+                <ProgressBar
+                    android:id="@+id/subredditsLoader"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_gravity="center"
+
+                    android:indeterminateOnly="true" />
+            </FrameLayout>
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/subreddits"
@@ -495,18 +509,31 @@
                 app:layout_constraintStart_toStartOf="@+id/trendingSubredditsHeader"
                 app:layout_constraintTop_toBottomOf="@+id/trendingSubredditsHeader" />
 
-            <ProgressBar
-                android:id="@+id/trendingSubredditsLoader"
-                style="?android:attr/progressBarStyleHorizontal"
+            <FrameLayout
+                android:id="@+id/trendingSubredditsLoaderLayout"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/horizontalProgressBarHeight"
                 android:layout_marginEnd="16dp"
-                android:visibility="gone"
-                android:indeterminateOnly="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/trendingSubredditsLastUpdated"
                 app:layout_constraintTop_toBottomOf="@+id/trendingSubredditsLastUpdated"
-                tools:visibility="visible"/>
+
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!-- The height of this has to be some arbitrary large value, otherwise the actual
+                 progress bar will be very thin and the width will be tiny. It doesn't actually affect
+                 the height of progress bar since the FrameLayout is smaller -->
+                <ProgressBar
+                    android:id="@+id/trendingSubredditsLoader"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_gravity="center"
+
+                    android:indeterminateOnly="true" />
+            </FrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/trendingSubreddits"
