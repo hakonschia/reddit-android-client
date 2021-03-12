@@ -487,45 +487,29 @@ class App : Application() {
             database.clearUserState()
 
             api.switchAccessToken(token)
-            TokenManager.saveTokenNow(token)
+            TokenManager.saveToken(token)
 
-            // The API also changes this (although it is recreated so it doesn't really matter)
-            // The observers also don't have to be notified since everything is recreated
             settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, false).commit()
 
             withContext(Main) {
-                _loggedInState.value = LoggedInState.LoggedIn(getUserInfoFromToken(null, token))
                 if (activity is MainActivity) {
                     activity.recreateAsNewUser()
                 } else {
                     activity.recreate()
                 }
             }
+
+            _loggedInState.postValue(LoggedInState.LoggedIn(getUserInfoFromToken(token)))
         }
     }
 
     /**
      * Gets a [RedditUserInfo] object corresponding to an access token.
-     *
-     * Note that the object will not be modified in any way (ie. [token] is not set on the object
-     * automatically)
      */
     // Database operations must be suspended
     @Suppress("RedundantSuspendModifier")
-    private suspend fun getUserInfoFromToken(current: RedditUserInfo?, token: AccessToken) : RedditUserInfo {
-        return if (current != null) {
-            val currentId = current.accessToken.userId
-            // The current user is for the same user, return it
-            if (currentId != AccessToken.NO_USER_ID && currentId == token.userId) {
-                current
-            } else {
-                // Either get from the database, or create a new one
-                userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token)
-            }
-        } else {
-            // currentUserInfo == null, Either get from the database, or create a new one
-            userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token)
-        }
+    private suspend fun getUserInfoFromToken(token: AccessToken) : RedditUserInfo {
+        return userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token)
     }
 
     /**
@@ -534,19 +518,16 @@ class App : Application() {
      * @param token The new token
      */
     private fun onNewToken(token: AccessToken) {
-        val state = _loggedInState.value
-        val currentInfo = if (state is LoggedInState.LoggedIn) {
-            state.userInfo
-        } else null
-
         TokenManager.saveToken(token)
         if (token.userId != AccessToken.NO_USER_ID) {
             CoroutineScope(IO).launch {
-                getUserInfoFromToken(currentInfo, token).apply {
+                getUserInfoFromToken(token).apply {
                     accessToken = token
 
                     // New token is for a user
-                    if (token.userId != AccessToken.NO_USER_ID) {
+                    if (userInfoDatabase.userInfo().userExists(userId)) {
+                        userInfoDatabase.userInfo().update(this)
+                    } else {
                         userInfoDatabase.userInfo().insert(this)
                     }
                 }
@@ -555,7 +536,24 @@ class App : Application() {
     }
 
     /**
-     * Saves user info and updates the local database.
+     * Adds a new user
+     */
+    // Database operations must be suspended
+    @Suppress("RedundantSuspendModifier")
+    suspend fun addNewUser(token: AccessToken) {
+        TokenManager.saveToken(token)
+        val userInfo = RedditUserInfo(token)
+
+        withContext(Main) {
+            _loggedInState.value = LoggedInState.LoggedIn(userInfo)
+        }
+
+        userInfoDatabase.userInfo().insert(userInfo)
+    }
+
+    /**
+     * Saves user info and updates the local database for the currently logged in user. This uses
+     * the value from [loggedInState] to determine the user
      *
      * Pass parameters to this function to update the relevant values.
      *
@@ -563,28 +561,36 @@ class App : Application() {
      * @param subreddits The list of subreddit IDs the user is subscribed to
      */
     suspend fun updateUserInfo(info: RedditUser? = null, subreddits: List<String>? = null, nsfwAccount: Boolean? = null) {
-        TokenManager.getToken()?.let {
-            getUserInfoFromToken(getUserInfo(), it).apply {
-                if (info != null) {
-                    userInfo = info
-                }
-                if (subreddits != null) {
-                    subscribedSubreddits = subreddits
-                }
-                if (nsfwAccount != null) {
-                    this.nsfwAccount = nsfwAccount
-                }
+        val state = loggedInState.value
+        val userInfo = when (state) {
+            is LoggedInState.LoggedIn -> state.userInfo
+            is LoggedInState.PrivatelyBrowsing -> state.userInfo
+            else -> return
+        }
 
-                withContext(Main) {
-                    _loggedInState.value = LoggedInState.LoggedIn(this@apply)
-                }
+        if (info != null) {
+            userInfo.userInfo = info
+        }
+        if (subreddits != null) {
+            userInfo.subscribedSubreddits = subreddits
+        }
+        if (nsfwAccount != null) {
+            userInfo.nsfwAccount = nsfwAccount
+        }
 
-                if (userInfoDatabase.userInfo().userExists(it.userId)) {
-                    userInfoDatabase.userInfo().update(this)
-                } else {
-                    userInfoDatabase.userInfo().insert(this)
-                }
+        withContext(Main) {
+            // The state should not change, just update the information
+            if (state is LoggedInState.LoggedIn) {
+                _loggedInState.value = LoggedInState.LoggedIn(userInfo)
+            } else {
+                _loggedInState.value = LoggedInState.PrivatelyBrowsing(userInfo)
             }
+        }
+
+        if (userInfoDatabase.userInfo().userExists(userInfo.userId)) {
+            userInfoDatabase.userInfo().update(userInfo)
+        } else {
+            userInfoDatabase.userInfo().insert(userInfo)
         }
     }
 

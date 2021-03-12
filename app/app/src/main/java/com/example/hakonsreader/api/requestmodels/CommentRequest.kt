@@ -93,7 +93,7 @@ class CommentRequest(
     }
 
     /**
-     * Submit a new comment as a reply to the post. For replies to other comments use {@link CommentRequest#reply(String, OnResponse, OnFailure)}
+     * Submit a new comment as a reply to the post. For replies to other comments use [CommentRequest.reply]
      *
      * OAuth scope required: *submit*
      *

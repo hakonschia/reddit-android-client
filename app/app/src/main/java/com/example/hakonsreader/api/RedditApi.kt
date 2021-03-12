@@ -4,8 +4,6 @@ import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.interceptors.BasicAuthInterceptor
 import com.example.hakonsreader.api.interceptors.UserAgentInterceptor
-import com.example.hakonsreader.api.interfaces.OnFailure
-import com.example.hakonsreader.api.interfaces.OnNewToken
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.interfaces.VoteableRequest
 import com.example.hakonsreader.api.model.AccessToken
@@ -153,7 +151,7 @@ import java.util.*
  * is communicated through [onNewToken] as with other new tokens.
  *
  * @param callbackUrl The callback URL used for OAuth. This is used when retrieving access tokens
- * <p>This must match the callback URL set in <a href="https://www.reddit.com/prefs/apps">Reddit apps</a></p>
+ * for logged in users. This must match the callback URL set in [Reddit apps](https://www.reddit.com/prefs/apps)
  *
  * @param deviceId The device ID to use to receive access tokens for non-logged in users
  * If this is null or empty "DO_NOT_TRACK_THIS_DEVICE" will be used. See
@@ -194,8 +192,8 @@ class RedditApi constructor(
         private val clientId: String,
 
         private val accessToken: AccessToken? = null,
-        private val onNewToken: OnNewToken? = null,
-        private val onInvalidToken: OnFailure? = null,
+        private val onNewToken: ((AccessToken) -> Unit)? = null,
+        private val onInvalidToken: ((GenericError, Throwable) -> Unit)? = null,
 
         private val callbackUrl: String? = null,
         private val deviceId: String? = null,
@@ -253,7 +251,7 @@ class RedditApi constructor(
             }
 
             if (!isPrivatelyBrowsing()) {
-                onNewToken?.newToken(field)
+                onNewToken?.invoke(field)
             }
         }
 
@@ -499,7 +497,10 @@ class RedditApi constructor(
      */
     fun accessToken(): AccessTokenModel {
         check(!callbackUrl.isNullOrBlank()) { "RedditApi.callbackUrl cannot be empty" }
-        return AccessTokenModel(accessTokenApi, callbackUrl) { token: AccessToken? -> accessTokenInternal = token ?: AccessToken() }
+        return AccessTokenModel(accessTokenApi, callbackUrl) { token: AccessToken? ->
+            ignoreNextTokenChange = true
+            accessTokenInternal = token ?: AccessToken()
+        }
     }
 
     /**
@@ -635,7 +636,7 @@ class RedditApi constructor(
                 val code = call.code()
 
                 if (code == 400) {
-                    onInvalidToken?.onFailure(
+                    onInvalidToken?.invoke(
                             GenericError(code),
                             InvalidAccessTokenException("The access token couldn't be refreshed. Either the access token set when building the API object" +
                                     " was never valid, or the user has revoked the applications access to their account.")

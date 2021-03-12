@@ -496,6 +496,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         CoroutineScope(IO).launch {
             when (val resp = api.accessToken().get(code)) {
                 is ApiResponse.Success -> {
+                    App.get().addNewUser(resp.value)
                     getUserInfo()
 
                     withContext(Main) {

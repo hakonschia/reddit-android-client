@@ -102,15 +102,11 @@ fun showAccountManagement(context: Context) {
                 }
 
                 onItemClicked = { userInfoClicked ->
-                    val userInfo =  when (val state = app.loggedInState.value) {
-                        is LoggedInState.LoggedIn -> state.userInfo
-                        is LoggedInState.PrivatelyBrowsing -> state.userInfo
-
-                        // Ie. LoggedOut (or state = null)
+                    val currentId = when (val state = app.loggedInState.value) {
+                        is LoggedInState.LoggedIn -> state.userInfo.userId
+                        is LoggedInState.PrivatelyBrowsing -> state.userInfo.userId
                         else -> null
                     }
-
-                    val currentId = userInfo?.accessToken?.userId
 
                     if (currentId != userInfoClicked.accessToken.userId) {
                         // Not sure what we would do if not (although I'm not sure how we would get
@@ -138,8 +134,11 @@ fun showAccountManagement(context: Context) {
                     }
                 }
                 onNsfwClicked = { userInfoClicked, nsfwAccount ->
-                    val state = app.loggedInState.value as LoggedInState.LoggedIn
-                    val currentId = state.userInfo.accessToken.userId
+                    val currentId = when (val state = app.loggedInState.value) {
+                        is LoggedInState.LoggedIn -> state.userInfo.userId
+                        is LoggedInState.PrivatelyBrowsing -> state.userInfo.userId
+                        else -> null
+                    }
 
                     // Another account than the active was clicked, update it in the database
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {

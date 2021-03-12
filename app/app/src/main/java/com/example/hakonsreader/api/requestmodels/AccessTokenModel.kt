@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.requestmodels
 
-import com.example.hakonsreader.api.interfaces.OnNewToken
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -12,7 +11,7 @@ import java.lang.Exception
 class AccessTokenModel(
         private val api: AccessTokenService,
         private val callbackUrl: String,
-        private val onNewToken: OnNewToken
+        private val onNewToken: (AccessToken) -> Unit
 ) {
 
     /**
@@ -28,13 +27,10 @@ class AccessTokenModel(
      * Gets a new access token. This must be called after the initial login process is completed and
      * a `authorization_code` is retrieved from `https://www.reddit.com/api/v1/authorize`
      *
-     * The new token is sent to the callback set when building the [RedditApi] object
-     *
      * @param code The authorization code received from the initial login process
-     * @return This will not return any data. If an access token was retrieved, it is sent to the
-     * registered token listener
+     * @return A response with the new token
      */
-    suspend fun get(code: String) : ApiResponse<Any?> {
+    suspend fun get(code: String) : ApiResponse<AccessToken> {
         if (callbackUrl.isBlank()) {
             throw IllegalStateException("Callback URL is not set. Use RedditApi.callbackUrl")
         }
@@ -44,8 +40,10 @@ class AccessTokenModel(
             val token = response.body()
 
             if (token != null) {
-                onNewToken.newToken(token)
-                ApiResponse.Success(null)
+                // Need to notify the API itself (this is kinda bad I guess since it needs to know that
+                // the API won't call its own callback)
+                onNewToken.invoke(token)
+                ApiResponse.Success(token)
             } else {
                 apiError(response)
             }
@@ -89,7 +87,7 @@ class AccessTokenModel(
             }
 
             if (response.isSuccessful) {
-                onNewToken.newToken(AccessToken())
+                onNewToken.invoke(AccessToken())
                 ApiResponse.Success(null)
             } else {
                 apiError(response)
