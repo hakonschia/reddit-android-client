@@ -467,6 +467,11 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
 
                     content.enableControllerTransitions(true)
 
+                    // We want to set this right away to ensure that the audio icon doesn't appear
+                    // and disappear when the extras are set
+                    val hasAudio = postExtras?.getBoolean(VideoPlayer.EXTRA_HAS_AUDIO) ?: true
+                    content.showAudioIcon(hasAudio)
+
                     // For videos we don't want to set the extras right away. If a video is playing during the
                     // animation the animation looks very choppy, so it should only be played at the end
                     window.sharedElementEnterTransition.addListener(object : TransitionListenerAdapter() {

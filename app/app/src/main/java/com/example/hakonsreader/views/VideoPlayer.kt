@@ -27,9 +27,11 @@ import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.source.dash.DashMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
@@ -108,18 +110,18 @@ class VideoPlayer : PlayerView {
         const val EXTRA_IS_PLAYING = "isPlaying"
 
         /**
-         * The key used for extra information about the playback state of a video
-         *
-         * The value stored with this key will be a `boolean`
-         */
-        const val EXTRA_SHOW_CONTROLS = "showControls"
-
-        /**
          * The key used for extra information about the volume of the video
          *
          * The value stored with this key will be a `boolean`
          */
         const val EXTRA_VOLUME = "volume"
+
+        /**
+         * The key used for extra information about if the video being played has an audio track
+         *
+         * The value stored with this key will be a `boolean`
+         */
+        const val EXTRA_HAS_AUDIO = "hasAudio"
 
         /**
          * The key used for extra information about the size of the video (in bytes)
@@ -345,6 +347,32 @@ class VideoPlayer : PlayerView {
         val loader: ProgressBar = findViewById(R.id.buffering)
         // Add listener for buffering changes, playback changes etc.
         player.addListener(object : Player.EventListener {
+
+            override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
+                super.onTracksChanged(trackGroups, trackSelections)
+                var audioFound = false
+
+                for (i in 0 until trackGroups.length) {
+                    // We're only looking for audio tracks, so if we found one we don't have to look any more
+                    if (audioFound) {
+                        break
+                    }
+
+                    val trackGroup = trackGroups[i]
+                    for (j in 0 until trackGroup.length) {
+                        val track = trackGroup.getFormat(j)
+                        val mimeType = track.sampleMimeType
+                        if (mimeType?.contains("audio".toRegex()) == true) {
+                            audioFound = true
+                            break
+                        }
+                    }
+                }
+
+                // Don't set hasAudio directly as if we set it to false first then true in the loop
+                // it might cause the icon to flash for a split second
+                hasAudio = audioFound
+            }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 // Ensure the thumbnail isn't visible when the video is playing
@@ -664,6 +692,7 @@ class VideoPlayer : PlayerView {
             // Probably have to pass thumbnail?
             it.putString(EXTRA_URL, url)
             it.putBoolean(EXTRA_IS_DASH, dashVideo)
+            it.putBoolean(EXTRA_HAS_AUDIO, hasAudio)
             it.putInt(EXTRA_VIDEO_SIZE, videoSize)
         }
     }
@@ -673,6 +702,7 @@ class VideoPlayer : PlayerView {
         val isPlaying = extras.getBoolean(EXTRA_IS_PLAYING)
         val volumeOn = extras.getBoolean(EXTRA_VOLUME)
 
+        hasAudio = extras.getBoolean(EXTRA_HAS_AUDIO)
         videoSize = extras.getInt(EXTRA_VIDEO_SIZE)
 
         toggleVolume(volumeOn)

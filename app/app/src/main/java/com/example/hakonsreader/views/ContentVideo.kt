@@ -223,6 +223,16 @@ class ContentVideo : Content {
         player.loadThumbnail()
     }
 
+    /**
+     * Show or remove the audio icon on the video
+     *
+     * @param show True to show, false to disable. Note that if this is set to false and the video
+     * actually has audio, there will be no way to mute the video
+     */
+    fun showAudioIcon(show: Boolean) {
+        player.hasAudio = show
+    }
+
     private fun setThumbnailUrl() {
         val variants = getImageVariantsForRedditPost(redditPost)
 
