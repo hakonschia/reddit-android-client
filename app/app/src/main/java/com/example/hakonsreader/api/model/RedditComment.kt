@@ -10,7 +10,13 @@ import com.example.hakonsreader.api.responses.ListingResponse
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 
-class RedditComment : RedditListing(), VoteableListing, ReplyableListing, ReportableListing, AwardableListing, LockableListing {
+class RedditComment : RedditListing(),
+        VoteableListing,
+        ReplyableListing,
+        ReportableListing,
+        AwardableListing,
+        LockableListing,
+        DistinguishableListing {
 
     /**
      * The body of comment in Markdown
@@ -163,19 +169,7 @@ class RedditComment : RedditListing(), VoteableListing, ReplyableListing, Report
      * @see isAdmin
      */
     @SerializedName("distinguished")
-    var distinguished: String? = null
-
-    /**
-     * @return True if the comment is made by, and distinguished as, a moderator
-     * @see distinguished
-     */
-    fun isMod() : Boolean = distinguished == "moderator"
-
-    /**
-     * @return True if the comment is made by, and distinguished as, an admin (Reddit employee)
-     * @see distinguished
-     */
-    fun isAdmin() : Boolean = distinguished == "admin"
+    override var distinguished: String? = null
 
     /**
      * True if the comment is made by the poster of the post

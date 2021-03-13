@@ -19,7 +19,13 @@ import com.google.gson.internal.LinkedTreeMap
 
 @Entity(tableName = "posts")
 @TypeConverters(PostConverter::class)
-class RedditPost : RedditListing(), VoteableListing, ReplyableListing, ReportableListing, AwardableListing, LockableListing {
+class RedditPost : RedditListing(),
+        VoteableListing,
+        ReplyableListing,
+        ReportableListing,
+        AwardableListing,
+        LockableListing,
+        DistinguishableListing {
 
     /**
      * The title of the post
@@ -157,19 +163,7 @@ class RedditPost : RedditListing(), VoteableListing, ReplyableListing, Reportabl
      * @see isAdmin
      */
     @SerializedName("distinguished")
-    var distinguished: String? = null
-
-    /**
-     * @return True if the post is made by, and distinguished as, a moderator
-     * @see distinguished
-     */
-    fun isMod() : Boolean = distinguished == "moderator"
-
-    /**
-     * @return True if the post is made by, and distinguished as, an admin (Reddit employee)
-     * @see distinguished
-     */
-    fun isAdmin() : Boolean = distinguished == "admin"
+    override var distinguished: String? = null
 
 
     /**

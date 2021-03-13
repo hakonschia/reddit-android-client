@@ -21,7 +21,7 @@ class CommentRequest(
         private val accessToken: AccessToken,
         private val api: CommentService,
         private val commentId: String
-) : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest, LockableRequest {
+) : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest, LockableRequest, DistinguishableRequest {
 
     private val voteRequest: VoteableRequestModel = VoteableRequestModel(accessToken, api)
     private val replyRequest: ReplyableRequestModel = ReplyableRequestModel(accessToken, api)
@@ -138,7 +138,7 @@ class CommentRequest(
      * @return An [ApiResponse] with the updated comment
      * @see removeModDistinguish
      */
-    suspend fun distinguishAsMod() : ApiResponse<RedditComment> {
+    override suspend fun distinguishAsMod() : ApiResponse<RedditComment> {
         return modRequest.distinguishAsModComment(commentId, distinguish =  true, sticky = false)
     }
 
@@ -150,7 +150,7 @@ class CommentRequest(
      * @return An [ApiResponse] with the updated comment
      * @see distinguishAsMod
      */
-    suspend fun removeModDistinguish() : ApiResponse<RedditComment> {
+    override suspend fun removeModDistinguish() : ApiResponse<RedditComment> {
         return modRequest.distinguishAsModComment(commentId, distinguish =  false, sticky = false)
     }
 

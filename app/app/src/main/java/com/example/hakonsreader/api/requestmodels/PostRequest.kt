@@ -28,7 +28,7 @@ class PostRequest(
         private val postId: String,
         imgurApi: ImgurService?,
         gfycatApi: GfycatService
-) : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest, LockableRequest {
+) : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest, LockableRequest, DistinguishableRequest {
 
     private val voteRequest: VoteableRequestModel = VoteableRequestModel(accessToken, api)
     private val replyRequest: ReplyableRequestModel = ReplyableRequestModel(accessToken, api)
@@ -182,7 +182,7 @@ class PostRequest(
      * @return An [ApiResponse] with the updated post
      * @see removeModDistinguish
      */
-    suspend fun distinguishAsMod() : ApiResponse<RedditPost> {
+    override suspend fun distinguishAsMod() : ApiResponse<RedditPost> {
         return modRequest.distinguishAsModPost(postId, true)
     }
 
@@ -196,7 +196,7 @@ class PostRequest(
      * @return An [ApiResponse] with the updated post
      * @see removeModDistinguish
      */
-    suspend fun removeModDistinguish() : ApiResponse<RedditPost> {
+    override suspend fun removeModDistinguish() : ApiResponse<RedditPost> {
         return modRequest.distinguishAsModPost(postId, false)
     }
 
