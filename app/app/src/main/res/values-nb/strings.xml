@@ -422,4 +422,5 @@
     <string name="peekUrlBottomSheetOpenUrl">Åpne</string>
     <string name="peekUrlBottomSheetTextHeader">Tekst</string>
     <string name="peekUrlBottomSheetUrlHeader">URL</string>
+    <string name="postHasNoText">Posten har ikke noe tekst</string>
 </resources>

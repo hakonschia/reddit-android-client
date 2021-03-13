@@ -1,6 +1,8 @@
 package com.example.hakonsreader.views
 
 import android.animation.ValueAnimator
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
@@ -8,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.core.util.Pair
 import androidx.lifecycle.LifecycleOwner
@@ -18,7 +21,9 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.PostBinding
+import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
 import java.util.*
 
@@ -36,12 +41,32 @@ class Post : Content {
         private const val TAG = "Post"
 
         /**
-         * Flag used for when the [Post.maxHeight] isn't set
+         * Value used when [Post.maxHeight] isn't set
          */
         private const val NO_MAX_HEIGHT = -1
     }
 
-    private val binding = PostBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding = PostBinding.inflate(LayoutInflater.from(context), this, true).apply {
+        setOnLongClickListener {
+            redditPost?.let { post ->
+                // If we're already showing text content it's no point in showing this dialog
+                if (post.getPostType() == PostType.TEXT && !showTextContent) {
+                    val markdown: String = post.selftext
+
+                    if (markdown.isNotEmpty()) {
+                        AlertDialog.Builder(context)
+                                .setView(ContentText(context).apply {
+                                    setRedditPost(post)
+                                })
+                                .show()
+                    } else {
+                        Snackbar.make(it, R.string.postHasNoText, Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            true
+        }
+    }
 
     /**
      * If set to false, text posts will not show the content of the post, only the post info/post bar

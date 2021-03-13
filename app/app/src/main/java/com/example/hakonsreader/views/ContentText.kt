@@ -38,7 +38,9 @@ class ContentText : Content {
                     val text = it.text.subSequence(start, end).toString()
                     val url = span.url
 
-                    showPeekUrlBottomSheet(it.context as AppCompatActivity, text, url)
+                    if (context is AppCompatActivity) {
+                        showPeekUrlBottomSheet(context as AppCompatActivity, text, url)
+                    }
                 }
             }
 

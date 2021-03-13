@@ -30,7 +30,8 @@ public abstract class Content extends FrameLayout {
 
 
     /**
-     * The post the content is for
+     * The post the content is for. Children should use {@link #setRedditPost(RedditPost)} if the goal
+     * is to update the view automatically.
      */
     protected RedditPost redditPost;
 
