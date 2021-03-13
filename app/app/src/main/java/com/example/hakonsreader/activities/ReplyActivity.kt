@@ -232,7 +232,7 @@ class ReplyActivity : BaseActivity() {
      * they are not logged in and won't be able to send a reply
      */
     private fun showNotLoggedInDialogIfNotLoggedIn() {
-        if (App.get().loggedInState.value is LoggedInState.LoggedIn) {
+        if (App.get().loggedInState.value is LoggedInState.LoggedOut) {
             AlertDialog.Builder(this)
                     .setTitle(getString(R.string.dialogReplyNotLoggedInTitle))
                     .setMessage(getString(R.string.dialogReplyNotLoggedInContent))
