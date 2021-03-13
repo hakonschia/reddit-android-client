@@ -540,9 +540,9 @@
     <string name="awardPrice">This award costs %d Reddit coins</string>
     <string name="awardReward">The receiver is awarded %d Reddit coins</string>
     <string name="awardSubredditReward">The subreddit is awarded %d Reddit coins</string>
-    <string name="awardTotalCoinPrice">The %s totals %d Reddit coins</string>
+    <string name="awardTotalCoinPrice">The %s has received %,d Reddit coins</string>
     <string name="awardTotalCoinPricePost">post</string>
-    <string name="awardTotalCoinPricecomment">comment</string>
+    <string name="awardTotalCoinPriceComment">comment</string>
 
     <plurals name="subredditActiveUsers">
         <item quantity="one">%d user online</item>

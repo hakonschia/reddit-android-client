@@ -315,9 +315,9 @@
         <item quantity="other">%d brukere online</item>
     </plurals>
     <string name="subredditRules">Regler</string>
-    <string name="awardTotalCoinPrice">%s har totalt %d Reddit coins</string>
+    <string name="awardTotalCoinPrice">%s har mottatt %,d Reddit coins</string>
     <string name="awardTotalCoinPricePost">Posten</string>
-    <string name="awardTotalCoinPricecomment">Kommentaren</string>
+    <string name="awardTotalCoinPriceComment">Kommentaren</string>
     <string name="prefs_title_send_crash_reports">Send krasj logger</string>
     <string name="enable">Skru på</string>
     <string name="dialogHeaderEnableCrashlytics">Skru på krasj logging</string>

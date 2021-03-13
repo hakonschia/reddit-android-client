@@ -206,48 +206,10 @@ class RedditComment : RedditListing(),
      * Null = no vote
      */
     @SerializedName("likes")
-    private var liked: Boolean? = null
+    override var liked: Boolean? = null
 
     @SerializedName("all_awardings")
     override var awardings: List<RedditAward>? = null
-
-    /**
-     * The vote type the post has
-     *
-     * Setting this value will automatically update [score], and is idempotent
-     */
-    override var voteType: VoteType
-        get() {
-            return when (liked) {
-                true -> VoteType.UPVOTE
-                false -> VoteType.DOWNVOTE
-                null -> VoteType.NO_VOTE
-            }
-        }
-        set(value) {
-            // Don't do anything if there is no update to the vote
-            if (value == voteType) {
-                return
-            }
-
-            // Going from upvote to downvote: -1 - 1 = -2
-            // Going from downvote to upvote: 1 - (-1) = 2
-            // Going from downvote to no vote: 0 - (-1) = 1
-
-            // Going from upvote to downvote: -1 - 1 = -2
-            // Going from downvote to upvote: 1 - (-1) = 2
-            // Going from downvote to no vote: 0 - (-1) = 1
-            val difference: Int = value.value - voteType.value
-
-            score += difference
-
-            // Update the internal data as that is used in getVoteType
-            liked = when (value) {
-                VoteType.UPVOTE -> true
-                VoteType.DOWNVOTE -> false
-                VoteType.NO_VOTE -> null
-            }
-        }
 
 
     /**

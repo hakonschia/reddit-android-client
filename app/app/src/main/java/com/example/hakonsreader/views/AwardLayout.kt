@@ -118,7 +118,7 @@ class AwardLayout : FrameLayout {
             val isPost = if (listing is RedditPost) {
                 context.getString(R.string.awardTotalCoinPricePost)
             } else {
-                context.getString(R.string.awardTotalCoinPricecomment)
+                context.getString(R.string.awardTotalCoinPriceComment)
             }
 
             // No listing will ever have 1 coin, so we don't have to care for plurals

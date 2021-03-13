@@ -24,9 +24,49 @@ interface VoteableListing {
     var isScoreHidden: Boolean
 
     /**
-     * The vote type of the listing
+     * The internal value used for [voteType]
+     *
+     * True = upvote
+     * False = downvote
+     * Null = no vote
+     */
+    var liked: Boolean?
+
+    /**
+     * The vote type of the listing. Setting this value will automatically update [score]
      */
     var voteType: VoteType
+        get() {
+            return when (liked) {
+                true -> VoteType.UPVOTE
+                false -> VoteType.DOWNVOTE
+                null -> VoteType.NO_VOTE
+            }
+        }
+        set(value) {
+            // Don't do anything if there is no update to the vote
+            if (value == voteType) {
+                return
+            }
+
+            // Going from upvote to downvote: -1 - 1 = -2
+            // Going from downvote to upvote: 1 - (-1) = 2
+            // Going from downvote to no vote: 0 - (-1) = 1
+
+            // Going from upvote to downvote: -1 - 1 = -2
+            // Going from downvote to upvote: 1 - (-1) = 2
+            // Going from downvote to no vote: 0 - (-1) = 1
+            val difference: Int = value.value - voteType.value
+
+            score += difference
+
+            // Update the internal data as that is used in getVoteType
+            liked = when (value) {
+                VoteType.UPVOTE -> true
+                VoteType.DOWNVOTE -> false
+                VoteType.NO_VOTE -> null
+            }
+        }
 
     /**
      * True if the listing is archived
