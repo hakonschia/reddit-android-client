@@ -419,4 +419,7 @@
     <string name="userSuspendedDescription">Brukere blir suspandert ved å bryte Reddit sin innholdspolicy eller ved mistenkelig kontoaktivitet</string>
     <string name="networkTimeout">Nettverket ble tidsavbrutt</string>
     <string name="content_description_private_browsing_icon">Surfer privat</string>
+    <string name="peekUrlBottomSheetOpenUrl">Åpne</string>
+    <string name="peekUrlBottomSheetTextHeader">Tekst</string>
+    <string name="peekUrlBottomSheetUrlHeader">URL</string>
 </resources>

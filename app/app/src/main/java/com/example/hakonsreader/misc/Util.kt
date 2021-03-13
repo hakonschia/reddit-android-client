@@ -9,6 +9,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
@@ -25,6 +26,7 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.enums.ShowNsfwPreview
+import com.example.hakonsreader.fragments.bottomsheets.PeekUrlBottomSheet
 import com.example.hakonsreader.states.LoggedInState.PrivatelyBrowsing
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -795,4 +797,17 @@ fun dpToPixels(dp: Float, res: Resources): Int {
             dp,
             res.displayMetrics
     ).toInt()
+}
+
+/**
+ * Shows a bottom sheet to peek a URL
+ *
+ * @param activity The activity to show the fragment from
+ * @param text The text of the URL
+ * @param url The URL
+ */
+fun showPeekUrlBottomSheet(activity: AppCompatActivity, text: String, url: String) {
+    PeekUrlBottomSheet.newInstance(text = text, url = url).run {
+        show(activity.supportFragmentManager, "Peek URL")
+    }
 }

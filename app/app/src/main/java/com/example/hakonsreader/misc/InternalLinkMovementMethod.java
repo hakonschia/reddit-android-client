@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activities.DispatcherActivity;
@@ -25,6 +26,7 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
     private static final String TAG = "InternalLinkMovementMethod";
 
     private final OnLinkClickedListener mOnLinkClickedListener;
+    private boolean ignoreNextClick = false;
 
     public InternalLinkMovementMethod() {
         mOnLinkClickedListener = (linkText, context) -> {
@@ -40,6 +42,14 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
         mOnLinkClickedListener = onLinkClickedListener;
     }
 
+    /**
+     * Ignores the next click
+     */
+    public void ignoreNextClick() {
+        ignoreNextClick = true;
+    }
+
+    @Override
     public boolean onTouchEvent(TextView widget, android.text.Spannable buffer, android.view.MotionEvent event) {
         int action = event.getAction();
 
@@ -68,7 +78,7 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
                 buffer.removeSpan(span);
             }
         }
-        
+
         if (link.length != 0) {
             String url = link[0].getURL();
             int start = buffer.getSpanStart(link[0]);
@@ -78,7 +88,15 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
                 // Set background span to show what is being clicked
                 buffer.setSpan(new CustomBackgroundColorSpan(widget.getContext().getColor(R.color.linkColorPressedBackground)), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else if (action == MotionEvent.ACTION_UP) {
-                boolean handled = mOnLinkClickedListener.onLinkClicked(url, widget.getContext());
+                // Even if we ignore the click we have to return true, otherwise the system will
+                // handle the click (which probably opens the URL in a browser)
+                boolean handled = true;
+                if (ignoreNextClick) {
+                    ignoreNextClick = false;
+                } else {
+                    handled = mOnLinkClickedListener.onLinkClicked(url, widget.getContext());
+                }
+
                 if (handled) {
                     return true;
                 }

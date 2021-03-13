@@ -591,4 +591,8 @@
     
     <string name="userSuspended">%s has been suspended</string>
     <string name="userSuspendedDescription">Users are suspended by violating Reddit\'s content policy or by suspicious activity</string>
+
+    <string name="peekUrlBottomSheetTextHeader">Text</string>
+    <string name="peekUrlBottomSheetUrlHeader">URL</string>
+    <string name="peekUrlBottomSheetOpenUrl">Open</string>
 </resources>
