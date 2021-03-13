@@ -409,9 +409,9 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             if (start == -1 && end == -1) {
                 hideComments(comment)
             } else {
-                val method = view.movementMethod
-                if (method is InternalLinkMovementMethod) {
-                    method.ignoreNextClick()
+                val movementMethod = view.movementMethod
+                if (movementMethod is InternalLinkMovementMethod) {
+                    movementMethod.ignoreNextClick()
                     val spans = view.text.toSpannable().getSpans(start, end, URLSpan::class.java)
                     if (spans.isNotEmpty()) {
                         val span = spans.first()

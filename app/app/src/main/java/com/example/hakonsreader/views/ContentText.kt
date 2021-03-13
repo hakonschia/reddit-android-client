@@ -19,29 +19,18 @@ import com.example.hakonsreader.misc.showPeekUrlBottomSheet
  */
 class ContentText : Content {
 
-    val binding = ContentTextBinding.inflate(LayoutInflater.from(context), this, true)
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-
-    override fun updateView() {
-        var markdown: String = redditPost.selftext
-
-        if (markdown.isNotEmpty()) {
-            binding.content.movementMethod = InternalLinkMovementMethod()
-
-            markdown = App.get().adjuster.adjust(markdown)
-            App.get().markwon.setMarkdown(binding.content, markdown)
-        }
-
-        binding.content.setOnLongClickListener {
+    private val binding = ContentTextBinding.inflate(LayoutInflater.from(context), this, true).apply {
+        val movementMethod = InternalLinkMovementMethod()
+        content.movementMethod = movementMethod
+        content.setOnLongClickListener {
             it as TextView
 
             val start = it.selectionStart
             val end = it.selectionEnd
 
             if (start != -1 && end != -1) {
+                movementMethod.ignoreNextClick()
+
                 val spans = it.text.toSpannable().getSpans(start, end, URLSpan::class.java)
                 if (spans.isNotEmpty()) {
                     val span = spans.first()
@@ -57,4 +46,16 @@ class ContentText : Content {
         }
     }
 
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
+    override fun updateView() {
+        var markdown: String = redditPost.selftext
+
+        if (markdown.isNotEmpty()) {
+            markdown = App.get().adjuster.adjust(markdown)
+            App.get().markwon.setMarkdown(binding.content, markdown)
+        }
+    }
 }
