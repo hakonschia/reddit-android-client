@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.Pair
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -21,6 +22,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.PostBinding
+import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
 import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
 import com.google.android.material.snackbar.Snackbar
@@ -54,11 +56,18 @@ class Post : Content {
                     val markdown: String = post.selftext
 
                     if (markdown.isNotEmpty()) {
-                        AlertDialog.Builder(context)
-                                .setView(ContentText(context).apply {
-                                    setRedditPost(post)
-                                })
-                                .show()
+                        if (context is AppCompatActivity) {
+                            PeekTextPostBottomSheet.newInstance(post).show((context as AppCompatActivity).supportFragmentManager, "Text post")
+                        } else {
+                            // Not sure if this will ever happen, but in case it does
+                            // This would make the peek url in the post not work though, as it uses bottom sheet as well
+                            AlertDialog.Builder(context)
+                                    .setView(ContentText(context).apply {
+                                        setRedditPost(post)
+                                    })
+                                    .show()
+                        }
+
                     } else {
                         Snackbar.make(it, R.string.postHasNoText, Snackbar.LENGTH_SHORT).show()
                     }

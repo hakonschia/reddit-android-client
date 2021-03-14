@@ -47,6 +47,7 @@ import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
 import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -735,7 +736,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
                 // InboxGroupFragment is an "inner" fragment and not one we want to store directly
                 // (it is inside InboxFragment)
-                if (f !is InboxGroupFragment) {
+                // Also don't save bottom sheets, as 1) they will leak (until something else is set)
+                // and 2) they aren't relevant
+                if (f !is InboxGroupFragment && f !is BottomSheetDialogFragment) {
                     lastShownFragment = f
                 }
             }
