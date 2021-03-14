@@ -14,6 +14,9 @@ import com.example.hakonsreader.views.ContentText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
 
+/**
+ * Bottom sheet for peeking a text post
+ */
 class PeekTextPostBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
@@ -38,23 +41,14 @@ class PeekTextPostBottomSheet : BottomSheetDialogFragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val post: RedditPost = Gson().fromJson(requireArguments().getString(POST), RedditPost::class.java)
+        val post = Gson().fromJson(requireArguments().getString(POST), RedditPost::class.java)
 
         // ContentText has a ScrollView, but if we change that to a NestedScrollView we can't scroll when
         // opening posts, and without it here we can't scroll back up without dismissing the bottom sheet
         return NestedScrollView(requireContext()).apply {
-            // ContentText sets start/end margin itself (this should be changed, but for now this is how it is)
-            val margin8 = dpToPixels(8f, resources)
-            val margin = dpToPixels(16f, resources)
-            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                setMargins(margin8, margin, margin8, margin)
-            }
-
-            val view = ContentText(requireContext()).apply {
+            addView(ContentText(requireContext()).apply {
                 redditPost = post
-            }
-
-            addView(view)
+            })
         }
     }
 }

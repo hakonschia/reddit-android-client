@@ -327,15 +327,21 @@ class Post : Content {
      * @return A view with the content of the post
      */
     private fun generatePostContent(post: RedditPost, context: Context): Content? {
+        val margin8 = dpToPixels(8f, resources)
+        val marginParams = MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            setMargins(margin8, 0, margin8, 0)
+        }
+
         // If the post has been removed don't try to render the content as it can cause a crash later
         // Just show that the post has been removed
         // For instance, if the post is not uploaded to reddit the URL will still link to something (like an imgur gif)
         // TODO maybe the only posts actually removed completely so they're not able ot be watched are videos? Even text/images uploaded
         //  to reddit directly are still there
         if (post.removedByCategory != null) {
-            val c = ContentPostRemoved(context)
-            c.setRedditPost(post)
-            return c
+            return ContentPostRemoved(context).apply {
+                setRedditPost(post)
+                layoutParams = marginParams
+            }
         }
 
         // Generate the content based on the crosspost. Videos hosted on reddit aren't sent to the "child"
@@ -362,14 +368,20 @@ class Post : Content {
                     }
                 } else if (App.get().openYouTubeVideosInApp()
                         && (redditPost.domain == "youtu.be" || redditPost.domain == "youtube.com")) {
-                    ContentYoutubeVideo(context)
+                    ContentYoutubeVideo(context).apply {
+                        layoutParams = marginParams
+                    }
                 } else {
-                    ContentLink(context)
+                    ContentLink(context).apply {
+                        layoutParams = marginParams
+                    }
                 }
             }
 
             PostType.LINK -> {
-                ContentLink(context)
+                ContentLink(context).apply {
+                    layoutParams = marginParams
+                }
             }
 
             PostType.TEXT -> {
@@ -377,7 +389,9 @@ class Post : Content {
                 val selfText = post.selftext
 
                 if (selfText.isNotEmpty()) {
-                    ContentText(context)
+                    ContentText(context).apply {
+                        layoutParams = marginParams
+                    }
                 } else {
                     null
                 }

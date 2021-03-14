@@ -6,9 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:transitionName="content_link_root_view"
-    android:layout_marginStart="@dimen/postMargin"
-    android:layout_marginEnd="@dimen/postMargin">
+    android:transitionName="content_link_root_view">
 
     <androidx.cardview.widget.CardView
         android:layout_width="@dimen/contentLinkSimpleThumbnailWidth"

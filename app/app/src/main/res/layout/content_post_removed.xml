@@ -14,10 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@color/secondary_background"
-        app:cardCornerRadius="8dp"
-
-        android:layout_marginStart="@dimen/postMargin"
-        android:layout_marginEnd="@dimen/postMargin">
+        app:cardCornerRadius="8dp">
 
         <!-- This layout is so copied from Reddit, but it looks good so :) -->
         <androidx.constraintlayout.widget.ConstraintLayout

@@ -8,7 +8,7 @@
     android:layout_height="wrap_content"
 
     android:background="@color/background"
-    android:foreground="?attr/selectableItemBackground"
+    android:foreground="@drawable/ripple_main_bg"
     android:paddingBottom="4dp">
 
     <com.example.hakonsreader.views.PostInfo

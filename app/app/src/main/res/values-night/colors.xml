@@ -20,7 +20,7 @@
     <color name="text_input_background">#333333</color>
 
     <color name="text_color">#FFFFFF</color>
-    <color name="textColorTextPosts">#DFDFDF</color>
+    <color name="textPostsBackground">#1B1B1B</color>
     <color name="secondary_text_color">#BDBDBD</color>
     <color name="link_color">#03A9F4</color>
     <color name="linkColorPressedBackground">#0A2733</color>

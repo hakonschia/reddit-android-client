@@ -6,8 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginStart="@dimen/postMargin"
-    android:layout_marginEnd="@dimen/postMargin"
     android:transitionName="content_link_root_view"
     app:cardBackgroundColor="@color/secondary_background"
     app:cardCornerRadius="8dp">
