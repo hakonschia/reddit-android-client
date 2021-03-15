@@ -492,14 +492,14 @@ class App : Application() {
             settings.edit().putBoolean(PRIVATELY_BROWSING_KEY, false).commit()
 
             withContext(Main) {
+                _loggedInState.value = LoggedInState.LoggedIn(getUserInfoFromToken(token))
+
                 if (activity is MainActivity) {
                     activity.recreateAsNewUser()
                 } else {
                     activity.recreate()
                 }
             }
-
-            _loggedInState.postValue(LoggedInState.LoggedIn(getUserInfoFromToken(token)))
         }
     }
 
