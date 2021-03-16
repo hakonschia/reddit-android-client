@@ -4,6 +4,7 @@ import android.animation.LayoutTransition
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
+import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -176,6 +178,9 @@ class SubredditFragment : Fragment() {
             // Is default subreddit, we can create the fragment now since it will never change
             // (if it is "random" it could change later, so initialize it later)
             setupViewPager(Subreddit().apply { name = subredditName })
+
+            // Default subs don't have banners
+            bannerLoaded(false)
         }
 
         App.get().loggedInState.observe(viewLifecycleOwner) {
@@ -222,7 +227,6 @@ class SubredditFragment : Fragment() {
                 }
             }
 
-            subscribe.setOnClickListener { subscribeOnclick() }
             subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }
 
             drawerListener?.let { drawer.addDrawerListener(it) }
@@ -236,9 +240,10 @@ class SubredditFragment : Fragment() {
                             rulesViewModel?.refresh()
                         }
 
-                        // The adapter will always have one more (for the "Select flair")
+                        val isLoggedIn = App.get().loggedInState.value is LoggedInState.LoggedIn
+                        // The adapter will always have one more (for the "Select flair"), so the actual count is one less than the adapter count
                         val flairsCount = binding.subredditInfo.selectFlairSpinner.adapter?.count?.minus(1) ?: 0
-                        if ((it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !App.get().dataSavingEnabled()))) {
+                        if (isLoggedIn && (it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !App.get().dataSavingEnabled()))) {
                             flairsViewModel?.refresh()
                         }
                     }
@@ -564,6 +569,11 @@ class SubredditFragment : Fragment() {
      * not load from the network
      */
     private fun setBannerImage() {
+        if (isDefaultSubreddit) {
+            bannerLoaded(false)
+            return
+        }
+
         subreddit?.let {
             val imageView = binding.banner
             val bannerURL = it.bannerBackgroundImage
@@ -576,33 +586,60 @@ class SubredditFragment : Fragment() {
                                 .networkPolicy(NetworkPolicy.OFFLINE)
                                 .into(imageView, object : Callback {
                                     override fun onSuccess() {
-                                        imageView.visibility = View.VISIBLE
-                                        binding.bannerLoaded = true
+                                        bannerLoaded(true)
                                     }
 
                                     override fun onError(e: Exception) {
-                                        imageView.visibility = View.GONE
-                                        binding.bannerLoaded = false
+                                        bannerLoaded(false)
                                     }
                                 })
                     } else {
-                        imageView.visibility = View.VISIBLE
                         Picasso.get()
                                 .load(bannerURL)
                                 .into(imageView, object : Callback {
                                     override fun onSuccess() {
-                                        binding.bannerLoaded = true
+                                        bannerLoaded(true)
                                     }
 
                                     override fun onError(e: Exception) {
-                                        binding.bannerLoaded = false
+                                        bannerLoaded(false)
                                     }
                                 })
                     }
                 }
             } else {
-                imageView.visibility = View.GONE
+                bannerLoaded(false)
             }
+        } ?: bannerLoaded(false)
+    }
+
+    /**
+     * Sets if the banner is loaded on the subreddit
+     */
+    private fun bannerLoaded(loaded: Boolean) {
+        binding.bannerLoaded = loaded
+        if (loaded) {
+            binding.banner.updateLayoutParams {
+                height = resources.getDimension(R.dimen.subredditToolbarBannerLoaded).toInt()
+            }
+            binding.collapsingToolbar.updateLayoutParams {
+                height = resources.getDimension(R.dimen.subredditToolbarWithBanner).toInt()
+            }
+            binding.subredditAppBarLayout.updateLayoutParams {
+                height = resources.getDimension(R.dimen.subredditToolbarWithBanner).toInt()
+            }
+            binding.collapsingToolbar.scrimVisibleHeightTrigger = resources.getDimension(R.dimen.subredditToolbarScrimWithBanner).toInt()
+        } else {
+            binding.banner.updateLayoutParams {
+                height = resources.getDimension(R.dimen.subredditToolbarBannerNotLoaded).toInt()
+            }
+            binding.collapsingToolbar.updateLayoutParams {
+                height = resources.getDimension(R.dimen.subredditToolbarWithoutBanner).toInt()
+            }
+            binding.subredditAppBarLayout.updateLayoutParams {
+                height = resources.getDimension(R.dimen.subredditToolbarWithoutBanner).toInt()
+            }
+            binding.collapsingToolbar.scrimVisibleHeightTrigger = resources.getDimension(R.dimen.subredditToolbarScrimWithoutBanner).toInt()
         }
     }
 

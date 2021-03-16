@@ -2,6 +2,7 @@ package com.example.hakonsreader.views.util
 
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
 
 /**
@@ -60,5 +61,12 @@ fun marginEnd(view: View, margin: Float) {
     (view.layoutParams as MarginLayoutParams).run {
         marginEnd = margin.toInt()
         view.layoutParams = this
+    }
+}
+
+@BindingAdapter("layout_height")
+fun layoutHeight(view: View, height: Float) {
+    view.updateLayoutParams {
+        this.height = height.toInt()
     }
 }

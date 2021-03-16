@@ -44,10 +44,10 @@
                     android:id="@+id/collapsingToolbar"
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
-                    app:scrimVisibleHeightTrigger="100dp"
                     android:background="@color/toolbarBackground"
-                    app:title='@{user != null ? user.username : ""}'
+                    app:title='@{user.username ?? ""}'
                     tools:title="Hakonschia"
+                    app:scrimVisibleHeightTrigger="100dp"
                     app:expandedTitleMargin="24dp"
                     app:expandedTitleMarginEnd="84dp"
                     app:expandedTitleMarginBottom="16dp"
@@ -56,13 +56,18 @@
                     app:toolbarId="@id/profileToolbar"
                     app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
+                    <!-- This has to have an elevation to be above the toolbar, otherwise
+                       the parts of the profile picture will be below the toolbar and cannot be clicked.
+                       As long as nothing overlaps with the back/home button in the toolbar it will be visible
+                       and clickable-->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:elevation="1dp"
                         app:layout_collapseMode="parallax">
 
                         <!-- Probably somewhat bad to do it this way, but this has a fairly high start
-                         margin since it will either be a menu item or a back item on the toolbar-->
+                         margin since it will either be a menu item or a back item on the toolbar -->
                         <com.makeramen.roundedimageview.RoundedImageView
                             android:id="@+id/profilePicture"
                             android:layout_width="60dp"

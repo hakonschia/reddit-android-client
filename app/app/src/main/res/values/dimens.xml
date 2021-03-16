@@ -74,4 +74,11 @@
     <dimen name="postBarHeight">24dp</dimen>
     <dimen name="awardIconSize">14dp</dimen>
     <dimen name="horizontalProgressBarHeight">2.5dp</dimen>
+
+    <dimen name="subredditToolbarScrimWithBanner">175dp</dimen>
+    <dimen name="subredditToolbarScrimWithoutBanner">135dp</dimen>
+    <dimen name="subredditToolbarWithBanner">230dp</dimen>
+    <dimen name="subredditToolbarWithoutBanner">190dp</dimen>
+    <dimen name="subredditToolbarBannerLoaded">115dp</dimen>
+    <dimen name="subredditToolbarBannerNotLoaded">75dp</dimen>
 </resources>

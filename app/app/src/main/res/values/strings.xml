@@ -546,7 +546,7 @@
 
     <plurals name="subredditActiveUsers">
         <item quantity="one">%d user online</item>
-        <item quantity="other">%d users online</item>
+        <item quantity="other">%,d users online</item>
     </plurals>
     <string name="subredditRules">Rules</string>
     <string name="subredditRuleNumberAndName" translatable="false">%d. %s</string>

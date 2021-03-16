@@ -23,9 +23,6 @@
             name="bannerLoaded"
             type="boolean" />
 
-        <variable
-            name="toolbarCollapsed"
-            type="boolean" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -42,24 +39,24 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/subredditAppBarLayout"
                 android:layout_width="match_parent"
-                android:layout_height="150dp">
+                android:layout_height="@dimen/subredditToolbarWithBanner">
 
-                <!-- marignEnd = 16dp + refresh(24dp) + sort(24dp) + 16dp
+                <!-- titleMarginEnd = 16dp + refresh(24dp) + sort(24dp) + 16dp
                  so that it doesn't overlap with the buttons-->
                 <com.google.android.material.appbar.CollapsingToolbarLayout
                     android:id="@+id/collapsingToolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
+                    android:layout_height="@dimen/subredditToolbarWithBanner"
                     android:fitsSystemWindows="true"
                     android:background="@color/toolbarBackground"
                     app:title="@{subreddit.name.empty ? @string/front_page : subreddit.name, default=@string/front_page}"
                     app:expandedTitleTextAppearance="@style/ToolbarTitle"
                     app:contentScrim="@color/toolbarBackground"
                     app:expandedTitleMargin="24dp"
-                    app:expandedTitleMarginBottom="16dp"
+                    app:expandedTitleMarginBottom="20dp"
                     app:expandedTitleMarginEnd="84dp"
                     app:toolbarId="@id/subredditToolbar"
-                    app:scrimVisibleHeightTrigger="100dp"
+                    app:scrimVisibleHeightTrigger="@dimen/subredditToolbarScrimWithBanner"
                     app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -74,20 +71,21 @@
 
                             android:visibility="@{standardSub ? View.GONE : View.VISIBLE, default=gone}"
                             tools:visibility="visible"
-                            app:constraint_referenced_ids="activeUsers, subscribe, subredditSubscribers" />
+                            app:constraint_referenced_ids="activeUsers, subredditSubscribers" />
 
                         <ImageView
                             android:id="@+id/banner"
                             android:layout_width="0dp"
-                            android:layout_height="0dp"
+                            android:layout_height="@dimen/subredditToolbarBannerLoaded"
 
                             android:scaleType="centerCrop"
                             android:contentDescription="@string/content_description_subreddit_banner"
 
+                            android:background="@color/secondary_background"
+
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
 
                             tools:src="@tools:sample/avatars"/>
 
@@ -97,18 +95,40 @@
                             android:layout_height="60dp"
 
                             android:layout_gravity="center"
-                            android:layout_marginStart="48dp"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginStart="16dp"
+
+                            android:background="@color/background"
                             android:src="@drawable/ic_emoji_emotions_200dp"
 
+                            app:layout_constraintBottom_toBottomOf="@+id/subredditTitle"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/banner"
+                            app:layout_constraintVertical_bias="0.43"
                             app:riv_border_color="@color/opposite_background"
                             app:riv_border_width="2dp"
                             app:riv_corner_radius="30dp"
-                            app:riv_mutate_background="true"
-                            android:background="@color/background"
+                            app:riv_mutate_background="true" />
 
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                        <TextView
+                            android:id="@+id/subredditTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginStart="4dp"
+                            android:layout_marginEnd="16dp"
+
+                            android:textColor="@color/text_color"
+                            android:textSize="20sp"
+                            android:text='@{subreddit.title ?? ""}'
+                            android:maxLines="1"
+                            android:ellipsize="end"
+
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.0"
+                            app:layout_constraintStart_toEndOf="@+id/subredditIcon"
+                            app:layout_constraintTop_toBottomOf="@+id/banner"
+                            tools:text="Couner-Strike: Global Offensive" />
 
                         <ImageView
                             android:id="@+id/privateBrowsingIcon"
@@ -142,76 +162,57 @@
 
                             android:layout_marginEnd="16dp"
                             android:background="@{bannerLoaded ? @drawable/rounded_square_semi_transparent : null}"
-                            android:paddingStart="2dp"
-
-                            android:paddingEnd="2dp"
                             android:textColor="@color/text_color"
                             android:visibility="@{standardSub ? View.VISIBLE : View.GONE}"
                             app:layout_constrainedWidth="true"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_bias="0.0"
                             app:layout_constraintStart_toEndOf="@+id/subredditIcon"
-                            app:layout_constraintTop_toTopOf="@id/subredditIcon"
+                            app:layout_constraintTop_toBottomOf="@+id/banner"
                             tools:text="Front page contains posts" />
-
-                        <com.robinhood.ticker.TickerView
-                            android:id="@+id/subredditSubscribers"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:background="@{bannerLoaded ? @drawable/rounded_square_semi_transparent : null}"
-
-                            android:paddingStart="2dp"
-                            android:paddingEnd="2dp"
-                            android:text="@{@plurals/amountOfSubscribers(subreddit.subscribers, subreddit.subscribers)}"
-                            android:textColor="@color/text_color"
-
-                            app:ticker_defaultCharacterList="number"
-
-                            app:layout_constraintEnd_toStartOf="@id/subscribe"
-                            app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintHorizontal_chainStyle="packed"
-                            app:layout_constraintStart_toEndOf="@+id/subredditIcon"
-                            app:layout_constraintTop_toTopOf="@id/subredditIcon"
-                            app:ticker_animationDuration="@integer/tickerAnimationDefault"
-                            tools:text="523 123 subscribers" />
-
-                        <TextView
-                            android:id="@+id/subscribe"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-
-                            android:layout_marginStart="4dp"
-                            android:layout_marginEnd="24dp"
-                            android:background="@drawable/border_opposite_bg_semi_transparent"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:text="@{subreddit.subscribed ? @string/btnSubscrubeUnsubscribe : @string/btnSubscribeSubscribe}"
-                            android:textColor="@color/text_color"
-                            android:textSize="12sp"
-
-                            app:layout_constraintBottom_toBottomOf="@+id/subredditSubscribers"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/subredditSubscribers"
-                            app:layout_constraintTop_toTopOf="@+id/subredditSubscribers"
-                            tools:text="@string/btnSubscribeSubscribe" />
 
                         <TextView
                             android:id="@+id/activeUsers"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingStart="2dp"
-                            android:paddingEnd="2dp"
 
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="16dp"
+
+                            android:ellipsize="end"
+                            android:maxLines="1"
                             android:text="@{@plurals/subredditActiveUsers(subreddit.activeUsers, subreddit.activeUsers)}"
                             android:textColor="@color/text_color"
-                            android:background="@{bannerLoaded ? @drawable/rounded_square_semi_transparent : null}"
+                            app:layout_constrainedWidth="true"
 
-                            app:layout_constraintStart_toStartOf="@+id/subredditSubscribers"
-                            app:layout_constraintTop_toBottomOf="@+id/subredditSubscribers"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.0"
+                            app:layout_constraintStart_toEndOf="@+id/subredditSubscribers"
+                            app:layout_constraintTop_toBottomOf="@+id/subredditTitle"
                             tools:text="123 users online" />
+
+                        <com.robinhood.ticker.TickerView
+                            android:id="@+id/subredditSubscribers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_marginStart="4dp"
+
+                            android:text="@{@plurals/amountOfSubscribers(subreddit.subscribers, subreddit.subscribers)}"
+                            android:textColor="@color/text_color"
+
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintBottom_toBottomOf="@+id/activeUsers"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintStart_toEndOf="@+id/modIcon"
+                            app:layout_constraintTop_toBottomOf="@+id/subredditTitle"
+                            app:ticker_animationDuration="@integer/tickerAnimationDefault"
+                            app:ticker_defaultCharacterList="number"
+                            tools:text="523 123 231 subscribers" />
+
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
+                    <!-- titleMarginEnd = 16dp + refresh(24dp) + sort(24dp) + 16dp
+                     so that it doesn't overlap with the buttons-->
                     <com.google.android.material.appbar.MaterialToolbar
                         android:id="@+id/subredditToolbar"
                         android:layout_width="match_parent"
@@ -223,16 +224,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|bottom">
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-
-                            app:layout_constraintStart_toStartOf="@id/subredditRefresh"
-                            app:layout_constraintEnd_toEndOf="@id/subredditSort"
-                            app:layout_constraintTop_toTopOf="@id/subredditRefresh"
-                            app:layout_constraintBottom_toBottomOf="@id/subredditRefresh"
-                            android:background="@{bannerLoaded &amp;&amp; !toolbarCollapsed ? @drawable/rounded_square_semi_transparent : null}"/>
 
                         <ImageButton
                             android:id="@+id/subredditRefresh"
