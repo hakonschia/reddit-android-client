@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.PostActivity
+import com.example.hakonsreader.activities.VideoActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -246,6 +248,19 @@ class PostsFragment : Fragment(), SortableWithTime {
             onVideoFullscreenListener = { contentVideo ->
                 // Ignore post when scrolling if it has been fullscreened
                 postsScrollListener.setPostToIgnore(contentVideo.redditPost?.id)
+
+                val intent = Intent(context, VideoActivity::class.java).apply {
+                    putExtra(VideoActivity.EXTRAS, contentVideo.extras)
+                }
+
+                // Pause the video here so it doesn't play both places
+                contentVideo.viewUnselected()
+                requireContext().run {
+                    startActivity(intent)
+                    if (this is AppCompatActivity) {
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+                    }
+                }
             }
 
             onPostClicked = PostsAdapter.OnPostClicked { post ->

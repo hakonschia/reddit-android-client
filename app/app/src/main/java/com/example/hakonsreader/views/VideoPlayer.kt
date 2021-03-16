@@ -277,6 +277,22 @@ class VideoPlayer : PlayerView {
         }
 
     /**
+     * Set this to true if the video is in fullscreen. This changes the drawable for the fullscreen button
+     */
+    var isFullscreen = false
+        set(value) {
+            field = value
+
+            val drawable = if (field) {
+               R.drawable.ic_fullscreen_exit_24dp
+            } else {
+                R.drawable.ic_fullscreen_24dp
+            }
+
+            findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(context, drawable))
+        }
+
+    /**
      * Callback for when a video has been manually paused (ie. the pause button has been clicked)
      *
      * This will not be called when the video is paused by any other way (ie. calls to [pause])
@@ -284,7 +300,7 @@ class VideoPlayer : PlayerView {
     var onManuallyPaused: (() -> Unit)? = null
 
     /**
-     * Callback for when a video has entered fullscreen
+     * Callback for when the fullscreen button has been clicked
      */
     var fullScreenListener: (() -> Unit)? = null
 
@@ -506,35 +522,12 @@ class VideoPlayer : PlayerView {
     }
 
     /**
-     * Sets the onClickListener for the fullscreen button. This will open a [VideoActivity] with
-     * the video. If the activity is in a [VideoActivity] already, this will be a "Close" button instead,
-     * to get out of the fullscreen
+     * Sets the onClickListener for the fullscreen button. This simply sets the fullscreen button
+     * to invoke [fullScreenListener] when clicked
      */
     private fun setFullscreenListener() {
-        val context = context
-
-        val fullscreen = findViewById<ImageButton>(R.id.fullscreen)
-
-        // Open video if we are not in a video activity
-        if (context !is VideoActivity) {
-            fullscreen.setOnClickListener {
-                fullScreenListener?.invoke()
-
-                val intent = Intent(context, VideoActivity::class.java).apply {
-                    putExtra(VideoActivity.EXTRAS, this@VideoPlayer.getExtras())
-                }
-
-                // Pause the video here so it doesn't play both places
-                pause()
-                context.startActivity(intent)
-                (context as Activity).overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-            }
-        } else {
-            // If we are in a video activity and press fullscreen, show an "Exit fullscreen" icon and exit the activity
-            fullscreen.apply {
-                setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_fullscreen_exit_24dp))
-                setOnClickListener { (context as Activity).finish() }
-            }
+        findViewById<ImageButton>(R.id.fullscreen).setOnClickListener {
+            fullScreenListener?.invoke()
         }
     }
 
@@ -557,14 +550,7 @@ class VideoPlayer : PlayerView {
     private fun setVolumeListener() {
         findViewById<ImageButton>(R.id.volumeButton).apply {
             setOnClickListener {
-                // TODO should this be in the listener? makes no sense really
-                val audioComponent = exoPlayer.audioComponent
-                // No audio, remove the button
-                if (audioComponent == null) {
-                    it.visibility = GONE
-                } else {
-                    toggleVolume()
-                }
+                toggleVolume()
             }
         }
     }

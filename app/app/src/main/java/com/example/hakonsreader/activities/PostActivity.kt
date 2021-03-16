@@ -464,6 +464,17 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
 
                     content.enableControllerTransitions(true)
 
+                    content.setOnVideoFullscreenListener { contentVideo ->
+                        val intent = Intent(this, VideoActivity::class.java).apply {
+                            putExtra(VideoActivity.EXTRAS, contentVideo.extras)
+                        }
+
+                        // Pause the video here so it doesn't play both places
+                        contentVideo.viewUnselected()
+                        startActivity(intent)
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+                    }
+
                     // We want to set this right away to ensure that the audio icon doesn't appear
                     // and disappear when the extras are set
                     val hasAudio = postExtras?.getBoolean(VideoPlayer.EXTRA_HAS_AUDIO) ?: true

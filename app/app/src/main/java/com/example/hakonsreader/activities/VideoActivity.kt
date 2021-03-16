@@ -58,6 +58,7 @@ class VideoActivity : BaseActivity() {
             }
 
             videoPlayer.run {
+                isFullscreen = true
                 transitionEnabled = true
                 dashVideo = extras.getBoolean(VideoPlayer.EXTRA_IS_DASH)
                 url = extras.getString(VideoPlayer.EXTRA_URL) ?: ""
@@ -65,6 +66,10 @@ class VideoActivity : BaseActivity() {
 
                 fitScreen()
                 play()
+
+                fullScreenListener = {
+                    finish()
+                }
             }
         } else {
             finish()
