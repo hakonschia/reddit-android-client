@@ -614,6 +614,10 @@ class SubredditFragment : Fragment() {
             binding.collapsingToolbar.scrimVisibleHeightTrigger = resources.getDimension(R.dimen.subredditToolbarScrimWithBanner).toInt()
         } else {
             val color = when {
+                !subreddit?.bannerBackgroundColor.isNullOrEmpty() -> {
+                    Color.parseColor(subreddit!!.bannerBackgroundColor)
+                }
+
                 !subreddit?.primaryColor.isNullOrEmpty() -> {
                     Color.parseColor(subreddit!!.primaryColor)
                 }
