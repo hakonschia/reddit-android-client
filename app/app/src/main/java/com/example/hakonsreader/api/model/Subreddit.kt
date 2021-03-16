@@ -103,6 +103,14 @@ class Subreddit : RedditListing() {
     @SerializedName("primary_color")
     var primaryColor = ""
 
+    /**
+     * A hex representation of the key color of the Subreddit
+     */
+    @SerializedName("key_color")
+    var keyColor = ""
+
+    @SerializedName("banner_background_color")
+    var bannerBackgroundColor = ""
 
     /**
      * True if the Subreddit is quarantined
@@ -160,6 +168,16 @@ class Subreddit : RedditListing() {
      */
     @SerializedName("user_is_moderator")
     var isModerator = false
+
+    /**
+     * True if the wiki on the subreddit is enabled
+     */
+    @SerializedName("wiki_enabled")
+    var wikiEnabled = false
+
+    @SerializedName("show_media")
+    var showMedia = true
+
 
 
     /**

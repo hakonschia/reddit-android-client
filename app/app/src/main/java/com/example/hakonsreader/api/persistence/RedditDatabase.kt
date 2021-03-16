@@ -11,14 +11,15 @@ import com.example.hakonsreader.api.model.flairs.RedditFlair
 /**
  * The global database for the application, holds [RedditPost] and [Subreddit] entities
  */
-@Database(version = 25, exportSchema = false,
+@Database(version = 26, exportSchema = false,
         entities = [
             RedditPost::class,
             Subreddit::class,
             SubredditRule::class,
             RedditMessage::class,
             RedditFlair::class,
-        ])
+        ]
+)
 @TypeConverters(PostConverter::class, EnumConverters::class)
 abstract class RedditDatabase : RoomDatabase() {
 

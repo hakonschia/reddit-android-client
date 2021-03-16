@@ -1,9 +1,7 @@
 package com.example.hakonsreader.views
 
 import android.animation.LayoutTransition
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.AttributeSet
@@ -19,11 +17,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activities.VideoActivity
 import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.misc.createVideoDuration
 import com.example.hakonsreader.views.util.VideoCache
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -426,9 +424,8 @@ class VideoPlayer : PlayerView {
     private fun createMediaSource() : MediaSource {
         // Data source is constant for all media sources
         val dataSourceFactory = if (cacheVideo) {
-            val defaultFactory = DefaultDataSourceFactory(context)
             CacheDataSource.Factory()
-                    .setUpstreamDataSourceFactory(defaultFactory)
+                    .setUpstreamDataSourceFactory(DefaultDataSourceFactory(context))
                     .setCache(VideoCache.getCache(context))
         } else {
             DefaultDataSourceFactory(context)
@@ -442,16 +439,15 @@ class VideoPlayer : PlayerView {
 
         return if (dashVideo) {
             DashMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(mediaItem)
         } else {
-            if (mp4Video) {
-                ProgressiveMediaSource.Factory(dataSourceFactory, Mp4Extractor.FACTORY)
-                        .createMediaSource(mediaItem)
+            val extractor = if (mp4Video) {
+                Mp4Extractor.FACTORY
             } else {
-                ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(mediaItem)
+                DefaultExtractorsFactory()
             }
-        }
+
+            ProgressiveMediaSource.Factory(dataSourceFactory, extractor)
+        }.createMediaSource(mediaItem)
     }
 
     /**

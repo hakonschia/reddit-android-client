@@ -3,6 +3,7 @@ package com.example.hakonsreader.fragments
 import android.animation.LayoutTransition
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
@@ -630,6 +632,22 @@ class SubredditFragment : Fragment() {
             }
             binding.collapsingToolbar.scrimVisibleHeightTrigger = resources.getDimension(R.dimen.subredditToolbarScrimWithBanner).toInt()
         } else {
+            val color = when {
+                !subreddit?.primaryColor.isNullOrEmpty() -> {
+                    Color.parseColor(subreddit!!.primaryColor)
+                }
+
+                !subreddit?.keyColor.isNullOrEmpty() -> {
+                    Color.parseColor(subreddit!!.keyColor)
+                }
+
+                else -> {
+                    ContextCompat.getColor(requireContext(), R.color.secondary_background)
+                }
+            }
+
+            binding.banner.setBackgroundColor(color)
+
             binding.banner.updateLayoutParams {
                 height = resources.getDimension(R.dimen.subredditToolbarBannerNotLoaded).toInt()
             }
