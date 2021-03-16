@@ -23,7 +23,6 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityPostBinding
 import com.example.hakonsreader.interfaces.LoadMoreComments
-import com.example.hakonsreader.interfaces.LockableSlidr
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
@@ -35,13 +34,12 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.r0adkll.slidr.Slidr
-import com.r0adkll.slidr.model.SlidrInterface
 import com.squareup.picasso.Callback
 
 /**
  * Activity to show a Reddit post with its comments
  */
-class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
+class PostActivity : BaseActivity(), OnReplyListener {
 
     companion object {
         private const val TAG = "PostActivity"
@@ -98,7 +96,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
     }
 
     private lateinit var binding: ActivityPostBinding
-    private lateinit var slidrInterface: SlidrInterface
 
     private val commentsViewModel: CommentsViewModel by viewModels()
 
@@ -133,10 +130,9 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
         getHeightForPost(forWhenCollapsedDisabled = true)
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        slidrInterface = Slidr.attach(this)
+        Slidr.attach(this)
 
         setupBinding()
         setupCommentsViewModel()
@@ -201,15 +197,6 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
             commentsViewModel.insertComment(newComment, parent)
         }
     }
-
-    override fun lock(lock: Boolean) {
-        if (lock) {
-            slidrInterface.lock()
-        } else {
-            slidrInterface.unlock()
-        }
-    }
-
 
     /**
      * Sets up [binding]
@@ -345,6 +332,8 @@ class PostActivity : BaseActivity(), OnReplyListener, LockableSlidr {
     private fun onNewPostInfo(newPost: RedditPost, extras: Bundle? = null) {
         val postPreviouslySet = binding.post.redditPost != null
         post = newPost
+
+        (binding.comments.adapter as CommentsAdapter).post = newPost
 
         // If we have a post already just update the info so the content isn't reloaded
         if (postPreviouslySet) {

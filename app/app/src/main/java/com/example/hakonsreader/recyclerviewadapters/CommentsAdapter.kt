@@ -26,6 +26,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditComment
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ListItemCommentBinding
 import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding
@@ -88,6 +89,11 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      * previously shown when the user wants to get out of a chain
      */
     private var commentsShownWhenChainSet: ArrayList<RedditComment>? = null
+
+    /**
+     * The post the comments are for. This should be set before comments are shown
+     */
+    var post: RedditPost? = null
 
     /**
      * The timestamp in milliseconds of when the post was opened last
@@ -504,7 +510,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             else -> {
                 NormalCommentViewHolder(ListItemCommentBinding.inflate(layoutInflater, parent, false).apply {
                     adapter = this@CommentsAdapter
-                    post = post
+                    post = this@CommentsAdapter.post
                     onReportsIgnoreChange =  OnReportsIgnoreChangeListener { invalidateAll() }
                     showPeekParentButton = App.get().showPeekParentButtonInComments()
                 })
