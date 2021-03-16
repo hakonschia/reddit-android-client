@@ -162,13 +162,6 @@ class SubredditActivity : BaseActivity(), LockableSlidr {
         }
     }
 
-    /**
-     * @return The name of the subreddit the activity is displaying
-     */
-    fun getSubredditName(): String? {
-        return fragment?.subredditName
-    }
-
     override fun setSupportActionBar(toolbar: Toolbar?) {
         super.setSupportActionBar(toolbar)
         // TODO this has a gray tint, and the other toolbar buttons use text_color (same for ProfileActivity)

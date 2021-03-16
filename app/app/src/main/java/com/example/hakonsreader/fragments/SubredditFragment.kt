@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
@@ -23,7 +22,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
@@ -39,7 +37,6 @@ import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
-import com.example.hakonsreader.interfaces.LockableSlidr
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
@@ -330,25 +327,7 @@ class SubredditFragment : Fragment() {
         // TODO unless you know the wiki it's not obvious since there arent tabs
         //  TabLayout could be here, but need to figure out how to hide that (along with the toolbar)
         //  since it's annoying to have it on screen the entire time
-        // TODO this causes a leak for some reason, the PostsFragment causes a leak on the postsRefreshLayout
-        //  and the wiki causes a leak on the scroll view (the root views). This might not actually be
-        //  an issue with the fragments themselves but the views inside the fragments (not sure how LeakCanary works yet)
         binding.pager.adapter = Adapter(subreddit, this@SubredditFragment)
-
-        val act = activity
-        binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-
-                val onFirstPage = position == 0
-
-                // If the activity is a Slidr activity we have to lock it to avoid swiping away
-                // when swiping back
-                if (act is LockableSlidr) {
-                    act.lock(!onFirstPage)
-                }
-            }
-        })
     }
 
     /**
@@ -608,6 +587,8 @@ class SubredditFragment : Fragment() {
                                     }
                                 })
                     }
+                } else {
+                    bannerLoaded(false)
                 }
             } else {
                 bannerLoaded(false)
@@ -968,7 +949,7 @@ class SubredditFragment : Fragment() {
 
     private inner class Adapter(val subreddit: Subreddit, fragment: Fragment) : FragmentStateAdapter(fragment) {
         // Kind of bad to hardcode the count I guess but whatever
-        override fun getItemCount() = if (isDefaultSubreddit) 1 else 2
+        override fun getItemCount() = if (isDefaultSubreddit || !subreddit.wikiEnabled) 1 else 2
         override fun createFragment(position: Int) : Fragment {
             return when (position) {
                 0 -> {
