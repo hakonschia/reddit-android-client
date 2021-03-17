@@ -229,6 +229,7 @@ class SubredditFragment : Fragment() {
 
             subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }
 
+            subredditInfo.description.setLongClickToPeekUrl()
             drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {

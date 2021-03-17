@@ -15,6 +15,7 @@ import com.example.hakonsreader.interfaces.OnClickListener
 import com.example.hakonsreader.interfaces.OnSubredditSelected
 import com.example.hakonsreader.recyclerviewadapters.diffutils.SubredditsDiffCallback
 import com.example.hakonsreader.views.util.ViewUtil
+import com.example.hakonsreader.views.util.setLongClickToPeekUrl
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
@@ -197,7 +198,9 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         LayoutInflater.from(parent.context),
                         parent,
                         false
-                )
+                ).apply {
+                    subredditDescription.setLongClickToPeekUrl()
+                }
 
                 StandardViewHolder(binding)
             }

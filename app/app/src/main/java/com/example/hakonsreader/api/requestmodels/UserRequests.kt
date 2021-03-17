@@ -4,22 +4,19 @@ import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
-import com.example.hakonsreader.api.model.AccessToken
-import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.requestmodels.thirdparty.ThirdPartyRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
-import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.UserService
+import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import com.example.hakonsreader.api.utils.apiError
 import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
-import java.lang.Exception
 
 /**
- * Request model for communicating with Reddit users. This should only be used for communcation
+ * Request model for communicating with Reddit users. This should only be used for communication
  * about users not the logged in user. For logged in users use [UserRequestsLoggedInUser]
  */
 class UserRequests(
@@ -27,10 +24,21 @@ class UserRequests(
         private val accessToken: AccessToken,
         private val api: UserService,
         imgurApi: ImgurService?,
-        gfycatApi: GfycatService
+        gfycatApi: GfycatService,
 ) {
 
-    private val imgurRequest = ThirdPartyRequest(imgurApi, gfycatApi)
+    /**
+     * Listing types that can be retrieved for users
+     */
+    private enum class ListingType(val value: String) {
+        POSTS("submitted"),
+        COMMENTS("comments"),
+        UPVOTED("upvoted"),
+        DOWNVOTED("DOWNVOTED"),
+        SAVED("saved");
+    }
+
+    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
 
 
     /**
@@ -56,9 +64,54 @@ class UserRequests(
     }
 
     /**
-     * Retrieves posts from the user. This requires the username to be set, even for logged in users.
+     * Gets listings for a user
      *
-     * If an access token for a user is set posts are customized for the user
+     * OAuth scope required: *read*
+     *
+     * @param what What listing type to get
+     * @param postSort sort for the posts (new, hot, top, or controversial). Default is [SortingMethods.HOT]
+     * @param timeSort How the posts should be time sorted. This only has an affect on top and controversial.
+     * Default is [PostTimeSort.DAY]
+     * @param after The ID of the last post seen. Default is an empty string (ie. no last post)
+     * @param count The amount of posts already retrieved. Default is *0* (ie. no posts already)
+     * @param limit The amount of posts to retrieve
+     */
+    private suspend fun <T : RedditListing> listings(
+            what: ListingType,
+            postSort: SortingMethods = SortingMethods.HOT,
+            timeSort: PostTimeSort = PostTimeSort.DAY,
+            after: String = "",
+            count: Int = 0,
+            limit: Int = 25,
+    ) : ApiResponse<List<T>> {
+        return try {
+            val resp = api.getListingsFromUser<T>(
+                    username,
+                    what.value,
+                    postSort.value,
+                    timeSort.value,
+                    after,
+                    count,
+                    limit
+            )
+
+            val listings = resp.body()?.getListings()
+
+            if (listings != null) {
+                // Load third party for the posts in the listings
+                val posts = listings.filterIsInstance<RedditPost>()
+                thirdPartyRequest.loadAll(posts)
+                ApiResponse.Success(listings)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
+
+    /**
+     * Retrieves posts from the user. This requires the username to be set, even for logged in users.
      *
      * OAuth scope required: *read*
      *
@@ -69,30 +122,105 @@ class UserRequests(
      * @param count The amount of posts already retrieved. Default is *0* (ie. no posts already)
      * @param limit The amount of posts to retrieve
      */
-    suspend fun posts(postSort: SortingMethods = SortingMethods.HOT, timeSort: PostTimeSort = PostTimeSort.DAY, after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditPost>> {
-        return try {
-            val resp = api.getListingsFromUser<RedditPost>(
-                    username,
-                    "submitted",
-                    postSort.value,
-                    timeSort.value,
-                    after,
-                    count,
-                    limit
-            )
-
-            val posts = resp.body()?.getListings()
-
-            if (posts != null) {
-                imgurRequest.loadAll(posts)
-                ApiResponse.Success(posts)
-            } else {
-                apiError(resp)
-            }
-        } catch (e: Exception) {
-            ApiResponse.Error(GenericError(-1), e)
-        }
+    suspend fun posts(
+            postSort: SortingMethods = SortingMethods.HOT,
+            timeSort: PostTimeSort = PostTimeSort.DAY,
+            after: String = "",
+            count: Int = 0,
+            limit: Int = 25,
+    ) : ApiResponse<List<RedditPost>> {
+        return listings(ListingType.POSTS, postSort, timeSort, after, count, limit)
     }
+
+    /**
+     * Retrieves comments from the user. This requires the username to be set, even for logged in users.
+     *
+     * OAuth scope required: *read*
+     *
+     * @param postSort sort for the comments (new, hot, top, or controversial). Default is [SortingMethods.HOT]
+     * @param timeSort How the comments should be time sorted. This only has an affect on top and controversial.
+     * Default is [PostTimeSort.DAY]
+     * @param after The ID of the last post seen. Default is an empty string (ie. no last comment)
+     * @param count The amount of comments already retrieved. Default is *0* (ie. no comments already)
+     * @param limit The amount of comments to retrieve
+     */
+    suspend fun comments(
+            postSort: SortingMethods = SortingMethods.HOT,
+            timeSort: PostTimeSort = PostTimeSort.DAY,
+            after: String = "",
+            count: Int = 0,
+            limit: Int = 25,
+    )
+    : ApiResponse<List<RedditComment>> {
+        return listings(ListingType.COMMENTS, postSort, timeSort, after, count, limit)
+    }
+
+    /**
+     * Retrieves posts and comments the user has saved. This is only available for the logged in user
+     *
+     * OAuth scope required: *read*
+     *
+     * @param postSort sort for the posts/comments (new, hot, top, or controversial). Default is [SortingMethods.HOT]
+     * @param timeSort How the posts/comments should be time sorted. This only has an affect on top and controversial.
+     * Default is [PostTimeSort.DAY]
+     * @param after The ID of the last post/comment seen. Default is an empty string (ie. no last post/comment)
+     * @param count The amount of posts/comments already retrieved. Default is *0* (ie. no posts/comments already)
+     * @param limit The amount of posts/comments to retrieve
+     */
+    suspend fun saved(
+            postSort: SortingMethods = SortingMethods.HOT,
+            timeSort: PostTimeSort = PostTimeSort.DAY,
+            after: String = "",
+            count: Int = 0,
+            limit: Int = 25,
+    ): ApiResponse<List<RedditListing>> {
+        return listings(ListingType.SAVED, postSort, timeSort, after, count, limit)
+    }
+
+    /**
+     * Retrieves comments and posts the user has upvoted. This is only available for the logged in user
+     *
+     * OAuth scope required: *read*
+     *
+     * @param postSort sort for the posts/comments (new, hot, top, or controversial). Default is [SortingMethods.HOT]
+     * @param timeSort How the posts/comments should be time sorted. This only has an affect on top and controversial.
+     * Default is [PostTimeSort.DAY]
+     * @param after The ID of the post/comment post seen. Default is an empty string (ie. no post/comment comment)
+     * @param count The amount of posts/comments already retrieved. Default is *0* (ie. no posts/comments already)
+     * @param limit The amount of posts/comments to retrieve
+     */
+    suspend fun upvoted(
+            postSort: SortingMethods = SortingMethods.HOT,
+            timeSort: PostTimeSort = PostTimeSort.DAY,
+            after: String = "",
+            count: Int = 0,
+            limit: Int = 25,
+    ): ApiResponse<List<RedditListing>> {
+        return listings(ListingType.UPVOTED, postSort, timeSort, after, count, limit)
+    }
+
+    /**
+     * Retrieves posts/comments the user has downvoted. This is only available for the logged in user
+     *
+     * OAuth scope required: *read*
+     *
+     * @param postSort sort for the posts/comments (new, hot, top, or controversial). Default is [SortingMethods.HOT]
+     * @param timeSort How the comments should be time sorted. This only has an affect on top and controversial.
+     * Default is [PostTimeSort.DAY]
+     * @param after The ID of the post/comment post seen. Default is an empty string (ie. no post/comment comment)
+     * @param count The amount of posts/comments already retrieved. Default is *0* (ie. no posts/comments already)
+     * @param limit The amount of posts/comments to retrieve
+     */
+    suspend fun downvoted(
+            postSort: SortingMethods = SortingMethods.HOT,
+            timeSort: PostTimeSort = PostTimeSort.DAY,
+            after: String = "",
+            count: Int = 0,
+            limit: Int = 25,
+    ): ApiResponse<List<RedditListing>> {
+        return listings(ListingType.DOWNVOTED, postSort, timeSort, after, count, limit)
+    }
+
 
     /**
      * Blocks a user. If the access token is not valid for a logged in user, or there is no username set,

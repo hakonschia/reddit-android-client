@@ -66,8 +66,9 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
         val func = when {
             post.domain == "gfycat.com" -> this::loadGfycatGif
             post.domain == "redgifs.com" -> this::loadRedgifGif
-            post.url.matches("https://(m\\.)?imgur\\.com/a/.+".toRegex()) -> this::loadImgurAlbum
-            post.url.matches("https://([im])\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
+            // We can use http for this as the http URL itself isn't loaded, it is just used as an identifier
+            post.url.matches("http(s)?://(m\\.)?imgur\\.com/a/.+".toRegex()) -> this::loadImgurAlbum
+            post.url.matches("http(s)?://([im])\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
             else -> null
         } ?: return
 
