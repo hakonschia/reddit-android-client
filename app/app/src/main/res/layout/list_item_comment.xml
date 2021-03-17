@@ -255,7 +255,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
-            android:onLongClick="@{(view) -> adapter.hideCommentsLongClickText(view, comment)}"
             android:textColor="@color/text_color"
             android:textColorLink="@color/link_color"
 

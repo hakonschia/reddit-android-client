@@ -47,6 +47,7 @@ import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditWikiFactory
 import com.example.hakonsreader.views.util.ViewUtil
+import com.example.hakonsreader.views.util.setLongClickToPeekUrl
 import com.example.hakonsreader.views.util.showPopupSortWithTime
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
@@ -872,6 +873,7 @@ class SubredditFragment : Fragment() {
             }
 
             binding.wikiContent.movementMethod = wikiLinkMovementMethod
+            binding.wikiContent.setLongClickToPeekUrl()
             binding.wikiGoBack.setOnClickListener {
                 wikiViewModel.pop()
             }

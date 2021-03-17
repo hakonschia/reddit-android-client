@@ -1,16 +1,12 @@
 package com.example.hakonsreader.views
 
 import android.content.Context
-import android.text.style.URLSpan
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.toSpannable
 import com.example.hakonsreader.App
 import com.example.hakonsreader.databinding.ContentTextBinding
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
-import com.example.hakonsreader.misc.showPeekUrlBottomSheet
+import com.example.hakonsreader.views.util.setLongClickToPeekUrl
 
 /**
  * View for text posts. This only shows the text of the post (with Markwon), but includes an [android.widget.ScrollView]
@@ -22,30 +18,7 @@ class ContentText : Content {
     private val binding = ContentTextBinding.inflate(LayoutInflater.from(context), this, true).apply {
         val movementMethod = InternalLinkMovementMethod()
         content.movementMethod = movementMethod
-        content.setOnLongClickListener {
-            it as TextView
-
-            val start = it.selectionStart
-            val end = it.selectionEnd
-
-            if (start != -1 && end != -1) {
-                movementMethod.ignoreNextClick()
-
-                val spans = it.text.toSpannable().getSpans(start, end, URLSpan::class.java)
-                if (spans.isNotEmpty()) {
-                    val span = spans.first()
-
-                    val text = it.text.subSequence(start, end).toString()
-                    val url = span.url
-
-                    if (context is AppCompatActivity) {
-                        showPeekUrlBottomSheet(context as AppCompatActivity, text, url)
-                    }
-                }
-            }
-
-            true
-        }
+        content.setLongClickToPeekUrl()
     }
 
     constructor(context: Context) : super(context)

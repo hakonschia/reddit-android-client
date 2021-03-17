@@ -4,20 +4,17 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.App
 import com.example.hakonsreader.App.Companion.get
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentImageBinding
-import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
+import com.example.hakonsreader.views.util.cache
 import com.example.hakonsreader.views.util.openImageInFullscreen
 import com.squareup.picasso.Callback
-import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.RequestCreator
 
 /**
  * Content view for Reddit images posts.

@@ -11,8 +11,8 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.VideoYoutubeActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentYoutubeVideoBinding
-import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
+import com.example.hakonsreader.views.util.cache
 import com.squareup.picasso.Picasso
 
 /**

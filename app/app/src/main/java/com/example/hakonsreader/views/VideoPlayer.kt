@@ -17,9 +17,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.misc.createVideoDuration
 import com.example.hakonsreader.views.util.VideoCache
+import com.example.hakonsreader.views.util.cache
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor

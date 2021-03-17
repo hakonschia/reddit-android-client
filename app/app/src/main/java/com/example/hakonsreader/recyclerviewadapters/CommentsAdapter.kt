@@ -4,7 +4,6 @@ import android.graphics.Typeface
 import android.os.Parcelable
 import android.text.Spannable
 import android.text.style.URLSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -12,7 +11,6 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.UiThread
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -30,15 +28,13 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ListItemCommentBinding
 import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding
-import com.example.hakonsreader.fragments.bottomsheets.PeekUrlBottomSheet
 import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener
-import com.example.hakonsreader.misc.InternalLinkMovementMethod
-import com.example.hakonsreader.misc.showPeekUrlBottomSheet
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForComments
 import com.example.hakonsreader.views.LinkPreview
+import com.example.hakonsreader.views.util.setLongClickToPeekUrl
 
 /**
  * Adapter for a RecyclerView populated with [RedditComment] objects. This adapter
@@ -300,7 +296,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      * and all its children will be removed from [comments]
      * @see showComments
      */
-    fun hideComments(start: RedditComment) {
+    private fun hideComments(start: RedditComment) {
         val startPos = comments.indexOf(start)
         if (startPos == -1) {
             return
@@ -398,40 +394,6 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return true
     }
 
-    /**
-     * LongClick listener for text views. Hides a comment chain, or if the long click is on a link
-     * a bottom sheet is shown to display information about the link
-     *
-     * @param view The view clicked. Note this must be a [TextView], or else the function will not
-     * do anything but consume the event
-     * @param comment The comment clicked
-     * @return True (event is always consumed)
-     */
-    fun hideCommentsLongClickText(view: View, comment: RedditComment): Boolean {
-        if (view is TextView) {
-            val start = view.selectionStart
-            val end = view.selectionEnd
-            // Not a hyperlink (even long clicking on the hyperlink would open it, so don't collapse as well)
-            if (start == -1 && end == -1) {
-                hideComments(comment)
-            } else {
-                val movementMethod = view.movementMethod
-                if (movementMethod is InternalLinkMovementMethod) {
-                    movementMethod.ignoreNextClick()
-                    val spans = view.text.toSpannable().getSpans(start, end, URLSpan::class.java)
-                    if (spans.isNotEmpty()) {
-                        val span = spans.first()
-
-                        val text = view.text.subSequence(start, end).toString()
-                        val url = span.url
-
-                        showPeekUrlBottomSheet(view.context as AppCompatActivity, text, url)
-                    }
-                }
-            }
-        }
-        return true
-    }
 
     /**
      * OnClick listener for "2 more comments" comments.
@@ -513,6 +475,11 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     post = this@CommentsAdapter.post
                     onReportsIgnoreChange =  OnReportsIgnoreChangeListener { invalidateAll() }
                     showPeekParentButton = App.get().showPeekParentButtonInComments()
+                    commentContent.setLongClickToPeekUrl {
+                        comment?.let {
+                            hideComments(it)
+                        }
+                    }
                 })
             }
         }

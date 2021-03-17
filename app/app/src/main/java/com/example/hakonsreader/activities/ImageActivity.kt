@@ -10,8 +10,8 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.databinding.ActivityImageBinding
-import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener
+import com.example.hakonsreader.views.util.cache
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface

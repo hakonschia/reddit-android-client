@@ -15,7 +15,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.AwardLayoutBinding
 import com.example.hakonsreader.fragments.bottomsheets.ShowAwardBottomSheet
 import com.example.hakonsreader.misc.dpToPixels
-import com.example.hakonsreader.misc.loadIf
+import com.example.hakonsreader.views.util.loadIf
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 

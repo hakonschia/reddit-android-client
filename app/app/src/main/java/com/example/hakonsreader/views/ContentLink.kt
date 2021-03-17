@@ -16,8 +16,8 @@ import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
-import com.example.hakonsreader.misc.cache
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
+import com.example.hakonsreader.views.util.cache
 import com.squareup.picasso.Picasso
 
 /**
