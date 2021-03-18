@@ -91,4 +91,7 @@
         <item name="mpm_separatorColor">@color/divider</item>
     </style>
 
+    <style name="ToolbarTitle">
+        <item name="android:textSize">25sp</item>
+    </style>
 </resources>

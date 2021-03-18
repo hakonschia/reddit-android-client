@@ -198,13 +198,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         setupNavDrawer()
         checkAccessTokenScopes()
-
-        App.get().registerReceivers()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        App.get().unregisterReceivers()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

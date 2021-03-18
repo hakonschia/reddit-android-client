@@ -51,6 +51,7 @@
                     app:expandedTitleMargin="24dp"
                     app:expandedTitleMarginEnd="84dp"
                     app:expandedTitleMarginBottom="16dp"
+                    app:expandedTitleTextAppearance="@style/ToolbarTitle"
                     app:contentScrim="@color/toolbarBackground"
                     app:toolbarId="@id/profileToolbar"
                     app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">

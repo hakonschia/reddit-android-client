@@ -2,8 +2,9 @@ package com.example.hakonsreader
 
 import android.app.*
 import android.content.*
-import android.net.NetworkInfo
-import android.net.wifi.WifiManager
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -62,10 +63,10 @@ class App : Application() {
          * The key used in SharedPreferences to store if the API should be in private browsing from startup
          */
         private const val PRIVATELY_BROWSING_KEY = "privatelyBrowsing"
-        private lateinit var app: App
-
         const val NOTIFICATION_CHANNEL_INBOX_ID = "notificationChannelInbox"
 
+
+        private lateinit var app: App
         /**
          * Retrieve the instance of the application that can be used to access various methods
          *
@@ -253,6 +254,17 @@ class App : Application() {
 
         createInboxNotificationChannel()
 
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                wifiConnected = cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+            }
+
+            override fun onLost(network: Network) {
+                wifiConnected = cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+            }
+        })
+
         val dm = resources.displayMetrics
         // Technically this could go outdated if the user changes their resolution while the app is running
         // but I highly doubt that would ever be a problem (worst case is posts wouldn't fit the screen)
@@ -332,43 +344,6 @@ class App : Application() {
             else -> null
         }
     }
-
-    /**
-     * Unregisters any receivers that have been registered
-     */
-    fun registerReceivers() {
-        // Register Wi-Fi broadcast receiver to be notified when Wi-Fi is enabled/disabled
-        val intentFilter = IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
-        registerReceiver(wifiStateReceiver, intentFilter)
-    }
-
-    /**
-     * Unregisters any receivers that have been registered
-     */
-    fun unregisterReceivers() {
-        // The receiver might not have been registered, but since there isn't a way to check if
-        // a receiver has been registered this will do
-        try {
-            unregisterReceiver(wifiStateReceiver)
-        } catch (ignored: IllegalArgumentException) {
-            // Ignored
-        }
-    }
-
-    /**
-     * Broadcast receiver for Wi-Fi state
-     */
-    private val wifiStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val action = intent.action
-            if (action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
-                val info = intent.getParcelableExtra<NetworkInfo>(WifiManager.EXTRA_NETWORK_INFO)
-                val connected = info!!.isConnected
-                wifiConnected = connected
-            }
-        }
-    }
-
 
     /**
      * Creates a [Markwon] object with plugins set
