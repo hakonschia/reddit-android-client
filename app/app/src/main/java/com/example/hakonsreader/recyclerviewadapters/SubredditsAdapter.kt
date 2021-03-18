@@ -31,7 +31,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
 
-    private var subreddits: MutableList<Subreddit> = ArrayList()
+    private var subreddits: List<Subreddit> = ArrayList()
 
     /**
      * The listener for when a subreddit in the list has been clicked
@@ -78,39 +78,27 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      */
     fun clear() {
         val size = subreddits.size
-        subreddits.clear()
+        subreddits = ArrayList()
         notifyItemRangeRemoved(0, size)
     }
 
     /**
      * Sorts a list of subreddits
      *
-     * <p>The order of the list will be, sorted alphabetically:
-     * <ol>
-     *     <li>Favorites (for logged in users)</li>
-     *     <li>The rest of the subreddits</li>
-     *     <li>Users the user is following</li>
-     * </ol>
-     * </p>
+     * The order of the list will be, sorted alphabetically:
+     * * Favorites (for logged in users)
+     * * All subreddits, including duplicates of favorites, of the subreddits
+     * * Users the user is following
      *
      * @param list The list so sort
      * @return A new list that is sorted based on the subreddit type
      */
-    private fun sortSubreddits(list: List<Subreddit>) : MutableList<Subreddit> {
-        val sorted = list.stream()
-                .sorted { o1, o2 ->  o1.name.toLowerCase().compareTo(o2.name.toLowerCase())}
-                .collect(Collectors.toList())
+    private fun sortSubreddits(list: List<Subreddit>) : List<Subreddit> {
+        val sorted = list.sortedBy { it.name.toLowerCase(Locale.ROOT) }.toMutableList()
+        val favorites = sorted.filter { s -> s.isFavorited }
+        val users = sorted.filter { s -> s.subredditType == "user"}
 
-        val favorites = sorted.stream()
-                .filter { s -> s.isFavorited }
-                .collect(Collectors.toList())
-
-        val users = sorted.stream()
-                .filter { s -> s.subredditType == "user"}
-                .collect(Collectors.toList())
-
-        // Remove favorites and users so they aren't included twice
-        sorted.removeAll(favorites)
+        // Remove users from this list so they are only at the bottom
         sorted.removeAll(users)
 
         // Return all combined in the correct order
@@ -120,54 +108,6 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             addAll(users)
         }
     }
-
-    /**
-     * Finds the index of where an item should be inserted into the list
-     *
-     * @param subreddit The subreddit to find the index for
-     * @return The index the item should be inserted into
-     */
-    private fun findPosForItem(subreddit: Subreddit) : Int {
-        var posFirstNonFavorite = 0
-
-        for (i in 0 until subreddits.size) {
-            if (!subreddits[i].isFavorited) {
-                posFirstNonFavorite = i
-                break
-            }
-        }
-
-        // Find a sublist of where the item should go (favorite or not)
-        val sublist = if (subreddit.isFavorited) {
-            // Subreddit has been favorited, get the sublist of favorites
-            subreddits.subList(0, posFirstNonFavorite)
-        } else {
-            // Sublist of everything not favorited
-            subreddits.subList(posFirstNonFavorite, subreddits.size)
-        }
-
-        // binarySearch() returns the index of the item, or a negative representing where it would have been
-        // The list will always be sorted on the name, so we don't have to sort it again
-        var newPos = Collections.binarySearch(
-                sublist,
-                subreddit,
-                { s1: Subreddit, s2: Subreddit -> s1.name.toLowerCase().compareTo(s2.name.toLowerCase())}
-        )
-
-        // Add one to the value and invert it to get the actual position
-        // ie. newPos = -5 means it would be in position 5 (index 4)
-        newPos++
-        newPos *= -1
-
-        // The pos is in the sublist, so if we're unfavoriting we need to add the favorites size
-        // as that isn't counted in the sublist of non-favorites
-        if (!subreddit.isFavorited) {
-            newPos += posFirstNonFavorite
-        }
-
-        return newPos
-    }
-
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val sub = subreddits[position]
@@ -212,8 +152,6 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     inner class SimpleViewHolder(val binding: ListItemSubredditSimpleBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             with(binding) {
-                // The listener must be set on both the root view and the description since the description
-                // has movement method and we have to check if the description is clicked on a link
                 root.setOnClickListener {
                     val pos = adapterPosition
 

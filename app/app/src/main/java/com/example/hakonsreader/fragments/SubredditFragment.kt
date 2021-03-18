@@ -599,52 +599,55 @@ class SubredditFragment : Fragment() {
     }
 
     /**
-     * Sets if the banner is loaded on the subreddit
+     * Sets if the banner is loaded on the subreddit. It is safe to call this after [onDestroyView]
      */
     private fun bannerLoaded(loaded: Boolean) {
-        binding.bannerLoaded = loaded
-        if (loaded) {
-            binding.banner.updateLayoutParams {
-                height = resources.getDimension(R.dimen.subredditToolbarBannerLoaded).toInt()
-            }
-            binding.collapsingToolbar.updateLayoutParams {
-                height = resources.getDimension(R.dimen.subredditToolbarWithBanner).toInt()
-            }
-            binding.subredditAppBarLayout.updateLayoutParams {
-                height = resources.getDimension(R.dimen.subredditToolbarWithBanner).toInt()
-            }
-            binding.collapsingToolbar.scrimVisibleHeightTrigger = resources.getDimension(R.dimen.subredditToolbarScrimWithBanner).toInt()
-        } else {
-            val color = when {
-                !subreddit?.bannerBackgroundColor.isNullOrEmpty() -> {
-                    Color.parseColor(subreddit!!.bannerBackgroundColor)
+        // Picasso might be done after the fragment view is destroyed, which would cause a crash here
+        _binding?.let {
+            it.bannerLoaded = loaded
+            if (loaded) {
+                it.banner.updateLayoutParams {
+                    height = resources.getDimension(R.dimen.subredditToolbarBannerLoaded).toInt()
+                }
+                it.collapsingToolbar.updateLayoutParams {
+                    height = resources.getDimension(R.dimen.subredditToolbarWithBanner).toInt()
+                }
+                it.subredditAppBarLayout.updateLayoutParams {
+                    height = resources.getDimension(R.dimen.subredditToolbarWithBanner).toInt()
+                }
+                it.collapsingToolbar.scrimVisibleHeightTrigger = resources.getDimension(R.dimen.subredditToolbarScrimWithBanner).toInt()
+            } else {
+                val color = when {
+                    !subreddit?.bannerBackgroundColor.isNullOrEmpty() -> {
+                        Color.parseColor(subreddit!!.bannerBackgroundColor)
+                    }
+
+                    !subreddit?.primaryColor.isNullOrEmpty() -> {
+                        Color.parseColor(subreddit!!.primaryColor)
+                    }
+
+                    !subreddit?.keyColor.isNullOrEmpty() -> {
+                        Color.parseColor(subreddit!!.keyColor)
+                    }
+
+                    else -> {
+                        ContextCompat.getColor(requireContext(), R.color.secondary_background)
+                    }
                 }
 
-                !subreddit?.primaryColor.isNullOrEmpty() -> {
-                    Color.parseColor(subreddit!!.primaryColor)
+                it.banner.setBackgroundColor(color)
+
+                it.banner.updateLayoutParams {
+                    height = resources.getDimension(R.dimen.subredditToolbarBannerNotLoaded).toInt()
                 }
-
-                !subreddit?.keyColor.isNullOrEmpty() -> {
-                    Color.parseColor(subreddit!!.keyColor)
+                it.collapsingToolbar.updateLayoutParams {
+                    height = resources.getDimension(R.dimen.subredditToolbarWithoutBanner).toInt()
                 }
-
-                else -> {
-                    ContextCompat.getColor(requireContext(), R.color.secondary_background)
+                it.subredditAppBarLayout.updateLayoutParams {
+                    height = resources.getDimension(R.dimen.subredditToolbarWithoutBanner).toInt()
                 }
+                it.collapsingToolbar.scrimVisibleHeightTrigger = resources.getDimension(R.dimen.subredditToolbarScrimWithoutBanner).toInt()
             }
-
-            binding.banner.setBackgroundColor(color)
-
-            binding.banner.updateLayoutParams {
-                height = resources.getDimension(R.dimen.subredditToolbarBannerNotLoaded).toInt()
-            }
-            binding.collapsingToolbar.updateLayoutParams {
-                height = resources.getDimension(R.dimen.subredditToolbarWithoutBanner).toInt()
-            }
-            binding.subredditAppBarLayout.updateLayoutParams {
-                height = resources.getDimension(R.dimen.subredditToolbarWithoutBanner).toInt()
-            }
-            binding.collapsingToolbar.scrimVisibleHeightTrigger = resources.getDimension(R.dimen.subredditToolbarScrimWithoutBanner).toInt()
         }
     }
 
