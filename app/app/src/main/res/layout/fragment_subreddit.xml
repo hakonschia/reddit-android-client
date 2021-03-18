@@ -50,7 +50,6 @@
                     android:fitsSystemWindows="true"
                     android:background="@color/toolbarBackground"
                     app:title="@{subreddit.name.empty ? @string/front_page : subreddit.name, default=@string/front_page}"
-                    app:expandedTitleTextAppearance="@style/ToolbarTitle"
                     app:contentScrim="@color/toolbarBackground"
                     app:expandedTitleMargin="24dp"
                     app:expandedTitleMarginBottom="20dp"

@@ -91,13 +91,4 @@
         <item name="mpm_separatorColor">@color/divider</item>
     </style>
 
-    <!-- Ideally I could just have the background that the other toolbar items have (semi-transparent)
-     to make the text readable on all banner backgrounds, but setting android:background here doesn't work -->
-    <style name="ToolbarTitle">
-        <item name="android:textSize">25sp</item>
-        <item name="android:shadowDy">0</item>
-        <item name="android:shadowDx">0</item>
-        <item name="android:shadowRadius">8</item>
-        <item name="android:shadowColor">@color/blackOrWhite</item>
-    </style>
 </resources>
