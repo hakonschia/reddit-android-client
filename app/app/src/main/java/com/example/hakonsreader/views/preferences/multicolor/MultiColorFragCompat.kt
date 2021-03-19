@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceDialogFragmentCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.databinding.PreferenceListItemColorBinding
@@ -80,12 +81,31 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
     override fun onBindDialogView(view: View?) {
         super.onBindDialogView(view)
 
+        binding.colors.layoutManager = LinearLayoutManager(requireContext())
         val adapter = ColorAdapter().apply {
             val colors = savedColors ?: getColors(preference.sharedPreferences, preference.key).toMutableList()
             submitList(colors)
             binding.colors.adapter = this
         }
-        binding.colors.layoutManager = LinearLayoutManager(requireContext())
+
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                ItemTouchHelper.START or ItemTouchHelper.END
+        ) {
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                val from = viewHolder.adapterPosition
+                val to = target.adapterPosition
+
+                Collections.swap(adapter.colors, from, to)
+                adapter.notifyItemMoved(from, to)
+
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                adapter.removeColor(viewHolder.adapterPosition)
+            }
+        }).attachToRecyclerView(binding.colors)
 
         binding.addColor.setOnClickListener {
             val context = requireContext()
@@ -131,14 +151,15 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
      * Creates a parsed value of a list of hex colors that can be used to store the value
      */
     private fun createParsedValue(colors: List<String>) : String {
-        val builder = StringBuilder("")
-        colors.forEachIndexed { index, value ->
-            builder.append(value)
-            if (index + 1 != colors.size) {
-                builder.append(",")
+        // Parse the list as "color1,color2,color3"
+        return buildString {
+            colors.forEachIndexed { index, value ->
+                append(value)
+                if (index + 1 != colors.size) {
+                    append(",")
+                }
             }
         }
-        return builder.toString()
     }
 
 
@@ -160,12 +181,23 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
             notifyItemInserted(colors.size - 1)
         }
 
+        /**
+         * Updates the color at a given position
+         *
+         * @param position The position to update
+         * @param hex The updated value
+         */
         fun updateColor(position: Int, hex: String) {
             colors.removeAt(position)
             colors.add(position, hex)
             notifyItemChanged(position)
         }
 
+        /**
+         * Removes a color by a position
+         *
+         * @param position The position to remove
+         */
         fun removeColor(position: Int) {
             colors.removeAt(position)
             notifyItemRemoved(position)
