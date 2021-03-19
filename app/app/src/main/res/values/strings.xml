@@ -601,4 +601,8 @@
 
     <string name="postHasNoText">The post has no text</string>
     <string name="multiColorPreferenceAddColor">Add color</string>
+    <plurals name="multiColorPreferenceSummary">
+        <item quantity="one">%d color</item>
+        <item quantity="other">%d colors</item>
+    </plurals>
 </resources>

@@ -426,4 +426,8 @@
     <string name="multiColorPreferenceAddColor">Legg til farge</string>
     <string name="content_description_remove_comment_sidebar_color">Fjern farge</string>
     <string name="prefs_title_comment_sidebar_colors">Sidebar farger</string>
+    <plurals name="multiColorPreferenceSummary">
+        <item quantity="one">%d farge</item>
+        <item quantity="other">%d farger</item>
+    </plurals>
 </resources>
