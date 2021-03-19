@@ -75,8 +75,8 @@
 
     <color name="activeAccountHighlight">#5E001C2C</color>
 
-    <color name="sidebar0">#18A5FD</color>
-    <color name="sidebar1">#048E14</color>
-    <color name="sidebar2">#9516A3</color>
-    <color name="sidebar3">#B14902</color>
+    <color name="sidebar00">#18A5FD</color>
+    <color name="sidebar11">#048E14</color>
+    <color name="sidebar22">#9516A3</color>
+    <color name="sidebar33">#B14902</color>
 </resources>

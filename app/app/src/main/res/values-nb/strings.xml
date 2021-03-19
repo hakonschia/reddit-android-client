@@ -423,4 +423,7 @@
     <string name="peekUrlBottomSheetTextHeader">Tekst</string>
     <string name="peekUrlBottomSheetUrlHeader">URL</string>
     <string name="postHasNoText">Posten har ikke noe tekst</string>
+    <string name="multiColorPreferenceAddColor">Legg til farge</string>
+    <string name="content_description_remove_comment_sidebar_color">Fjern farge</string>
+    <string name="prefs_title_comment_sidebar_colors">Sidebar farger</string>
 </resources>

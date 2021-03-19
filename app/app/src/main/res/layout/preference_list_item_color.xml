@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="@drawable/ripple_main_bg"
+    android:layout_marginBottom="8dp">
+
+    <View
+        android:id="@+id/colorPreview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        android:background="#FF25EA"
+        app:layout_constraintBottom_toBottomOf="@+id/hexColor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/hexColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:textSize="16sp"
+        android:textColor="@color/secondary_text_color"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/colorPreview"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="#FF25EA" />
+
+    <ImageView
+        android:id="@+id/removeColor"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_delete_24dp"
+        android:contentDescription="@string/content_description_remove_comment_sidebar_color"
+        app:layout_constraintBottom_toBottomOf="@+id/hexColor"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

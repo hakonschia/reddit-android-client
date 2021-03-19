@@ -1,11 +1,15 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- TODO this should probably be split into multiple screens, it's gotten quite large -->
-
     <PreferenceCategory
         app:title="@string/prefs_group_appearance"
         app:iconSpaceReserved="false">
+
+        <com.example.hakonsreader.views.preferences.multicolor.MultiColorPreference
+            android:key="multi_color"
+            android:title="Sidebar colors"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false" />
 
         <SwitchPreference
             app:key="@string/prefs_key_theme"

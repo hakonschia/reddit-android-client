@@ -126,6 +126,7 @@
     <string name="prefs_title_send_crash_reports">Send crash reports</string>
     <string name="prefs_title_subreddits_load_banners">Load banners</string>
     <string name="prefs_title_subreddits_warn_nsfw">Show NSFW warning</string>
+    <string name="prefs_title_comment_sidebar_colors">Sidebar colors</string>
 
 
     <!-- Preferences keys -->
@@ -179,6 +180,7 @@
     <string name="prefs_key_send_crash_reports" translatable="false">send_crash_reports</string>
     <string name="prefs_key_subreddits_load_banners" translatable="false">load_banners</string>
     <string name="prefs_key_subreddits_warn_nsfw" translatable="false">warn_nsfw</string>
+    <string name="prefs_key_comment_sidebar_colors" translatable="false">comment_sidebar_colors</string>
 
 
     <plurals name="filteredSubredditsSummary">
@@ -293,6 +295,7 @@
     <string name="content_description_downvote">Downvote</string>
     <string name="content_description_wiki_back">Go back in the wiki</string>
     <string name="content_description_private_browsing_icon">Browsing privately</string>
+    <string name="content_description_remove_comment_sidebar_color">Remove color</string>
 
     <string name="postRemovedTitle">The post has been removed</string>
     <string name="postRemovedGeneric">The post has been removed</string>
@@ -597,4 +600,5 @@
     <string name="peekUrlBottomSheetOpenUrl">Open</string>
 
     <string name="postHasNoText">The post has no text</string>
+    <string name="multiColorPreferenceAddColor">Add color</string>
 </resources>

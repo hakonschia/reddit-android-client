@@ -641,10 +641,10 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 }
 
 val sidebarColors: List<Int> = listOf(
-        R.color.sidebar0,
-        R.color.sidebar1,
-        R.color.sidebar2,
-        R.color.sidebar3,
+        R.color.sidebar00,
+        R.color.sidebar11,
+        R.color.sidebar22,
+        R.color.sidebar33,
 )
 
 /**

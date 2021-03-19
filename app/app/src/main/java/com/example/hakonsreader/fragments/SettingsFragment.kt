@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -12,12 +13,16 @@ import com.example.hakonsreader.App.Companion.get
 import com.example.hakonsreader.R
 import com.example.hakonsreader.interfaces.LanguageListener
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
+import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
+import com.example.hakonsreader.views.preferences.multicolor.MultiColorPreference
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.ktx.Firebase
 
 class SettingsFragment : PreferenceFragmentCompat() {
     companion object {
+        private const val TAG = "SettingsFragment"
+
         /**
          * The String.format() format used for formatting the summary for the link scale
          */
@@ -96,6 +101,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         return super.onPreferenceTreeClick(preference)
+    }
+
+    override fun onDisplayPreferenceDialog(preference: Preference?) {
+        if (preference is MultiColorPreference) {
+            val dialog = MultiColorFragCompat.newInstance(preference.key)
+            dialog.setTargetFragment(this, 0)
+            dialog.show(parentFragmentManager, null)
+        } else {
+            super.onDisplayPreferenceDialog(preference)
+        }
     }
 
 
