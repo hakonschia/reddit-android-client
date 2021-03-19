@@ -5,12 +5,6 @@
         app:title="@string/prefs_group_appearance"
         app:iconSpaceReserved="false">
 
-        <com.example.hakonsreader.views.preferences.multicolor.MultiColorPreference
-            android:key="multi_color"
-            android:title="Sidebar colors"
-            app:iconSpaceReserved="false"
-            app:singleLineTitle="false" />
-
         <SwitchPreference
             app:key="@string/prefs_key_theme"
             app:title="@string/prefs_title_theme"
@@ -230,6 +224,12 @@
             app:defaultValue="@bool/prefs_default_show_all_sidebars"
             app:singleLineTitle="false"
             app:iconSpaceReserved="false" />
+
+        <com.example.hakonsreader.views.preferences.multicolor.MultiColorPreference
+            android:key="@string/prefs_key_comment_sidebar_colors"
+            android:title="@string/prefs_title_comment_sidebar_colors"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false" />
 
         <SwitchPreference
             app:key="@string/prefs_key_show_peek_parent_button_in_comments"

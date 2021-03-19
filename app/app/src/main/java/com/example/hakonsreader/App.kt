@@ -2,6 +2,7 @@ package com.example.hakonsreader
 
 import android.app.*
 import android.content.*
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -29,6 +30,7 @@ import com.example.hakonsreader.markwonplugins.*
 import com.example.hakonsreader.misc.SharedPreferencesManager
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.states.LoggedInState
+import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
 import com.squareup.picasso.Picasso
@@ -50,6 +52,7 @@ import org.commonmark.node.Image
 import java.io.File
 import java.security.SecureRandom
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Entry point for the application. Sets up various static variables used throughout the app
@@ -1049,6 +1052,19 @@ class App : Application() {
                 resources.getBoolean(R.bool.prefs_default_subreddits_warn_nsfw)
         )
     }
+
+    /**
+     * @return The list of parsed colors that should be used for comment sidebars (where the index
+     * of the color corresponds to the comment depth)
+     */
+    fun commentSidebarColors() : List<Int> {
+        val colors = ArrayList<Int>()
+        MultiColorFragCompat.getColors(settings, getString(R.string.prefs_key_comment_sidebar_colors)).forEach {
+            colors.add(Color.parseColor("#$it"))
+        }
+        return colors
+    }
+
 
     /**
      * Handles when the API notifies that the access token is no longer valid, and the user should

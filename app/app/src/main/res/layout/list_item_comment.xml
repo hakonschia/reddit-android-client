@@ -60,8 +60,7 @@
             android:layout_height="wrap_content"
 
             app:barrierDirection="end"
-            app:constraint_referenced_ids="emptyView"
-            app:sidebars="@{comment.depth - adapter.baseDepth}" />
+            app:constraint_referenced_ids="emptyView"/>
 
         <View
             android:id="@+id/emptyView"

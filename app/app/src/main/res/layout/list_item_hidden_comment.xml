@@ -51,8 +51,7 @@
             android:layout_height="wrap_content"
 
             app:constraint_referenced_ids="emptyView"
-            app:barrierDirection="end"
-            app:sidebars="@{comment.depth - adapter.baseDepth}" />
+            app:barrierDirection="end"/>
 
         <View
             android:id="@+id/commentLockedBorder"

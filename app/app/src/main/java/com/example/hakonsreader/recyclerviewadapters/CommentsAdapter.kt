@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters
 
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Parcelable
 import android.text.Spannable
@@ -65,6 +66,13 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
          */
         private const val HIDDEN_COMMENT_TYPE = 2
     }
+
+    /**
+     * The list of colors to use for sidebars
+     */
+    // We only need to get this when loading the adapter, as it will be the same for all comments
+    // and cannot change during the adapters life
+    private val sidebarColors = App.get().commentSidebarColors()
 
     /**
      * The list of comments that should be shown, unless a comment chain is set to be shown.
@@ -532,6 +540,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 commentVoteBar.listing = comment
                 commentVoteBar.enableTickerAnimation(true)
 
+                addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors)
                 // Execute all the bindings now, or else scrolling/changes to the dataset will have a
                 // small, but noticeable delay, causing the old comment to still appear
                 // This needs to be called before the link previews are added, since the previews use
@@ -621,6 +630,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 this.comment = comment
                 this.highlight = highlight
                 isByLoggedInUser = byLoggedInUser
+                addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors)
                 executePendingBindings()
             }
         }
@@ -631,21 +641,15 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      * when clicked
      */
     inner class MoreCommentsViewHolder(private val binding: ListItemMoreCommentBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(comment: RedditComment?) {
+        fun bind(comment: RedditComment) {
             with(binding) {
                 this.comment = comment
+                addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors)
                 executePendingBindings()
             }
         }
     }
 }
-
-val sidebarColors: List<Int> = listOf(
-        R.color.sidebar00,
-        R.color.sidebar11,
-        R.color.sidebar22,
-        R.color.sidebar33,
-)
 
 /**
  * Formats the author text based on whether or not it is posted by an admin or a mod.
@@ -710,12 +714,11 @@ private fun formatAuthorInternal(tv: TextView, comment: RedditComment, italic: B
  *
  * This adds different sidebars based on [App.showAllSidebars]
  */
-@BindingAdapter("sidebars")
-fun addSidebars(barrier: Barrier, depth: Int) {
+fun addSidebars(barrier: Barrier, depth: Int, colors: List<Int>) {
     if (App.get().showAllSidebars()) {
-        addAllSidebars(barrier, depth)
+        addAllSidebars(barrier, depth, colors)
     } else {
-        addOneSidebar(barrier, depth)
+        addOneSidebar(barrier, depth, colors)
     }
 }
 
@@ -726,7 +729,7 @@ fun addSidebars(barrier: Barrier, depth: Int) {
  * @param barrier The barrier to reference the sidebar to
  * @param depth The depth of the comment, if this is 0 then no sidebar is added
  */
-private fun addOneSidebar(barrier: Barrier, depth: Int) {
+private fun addOneSidebar(barrier: Barrier, depth: Int, colors: List<Int>) {
     val parent = barrier.parent as ConstraintLayout
     val res = barrier.context.resources
     val indent = res.getDimension(R.dimen.commentDepthIndent).toInt()
@@ -761,7 +764,7 @@ private fun addOneSidebar(barrier: Barrier, depth: Int) {
         // This has to be set when the view is created, and updated when reused (otherwise the color can be wrong)
         // Use depth - 1 to not skip the first color (the sidebar "belongs" to the comment here, compared to it starting from
         // below the comment it "belongs" to when all are shown)
-        DrawableCompat.setTint(background, ContextCompat.getColor(context, sidebarColors[(depth - 1) % sidebarColors.size]))
+        DrawableCompat.setTint(background, colors[(depth - 1) % colors.size])
     }
 
     // Set constraints
@@ -798,7 +801,7 @@ private fun addOneSidebar(barrier: Barrier, depth: Int) {
  * @param barrier The barrier to reference the sidebar to
  * @param depth The depth of the comment, if this is 0 then no sidebars are added
  */
-private fun addAllSidebars(barrier: Barrier, depth: Int) {
+private fun addAllSidebars(barrier: Barrier, depth: Int, colors: List<Int>) {
     val parent = barrier.parent as ConstraintLayout
     // The contentDescription for the sidebars, this is used to find the sidebars again later
     val contentDescription = "sidebar"
@@ -879,7 +882,7 @@ private fun addAllSidebars(barrier: Barrier, depth: Int) {
         val id = View.generateViewId()
         referenceIds[i] = id
         val view = View(barrier.context).apply {
-            setBackgroundColor(ContextCompat.getColor(barrier.context, sidebarColors[i % sidebarColors.size]))
+            setBackgroundColor(colors[i % colors.size])
             this.contentDescription = contentDescription
             this.id = id
         }

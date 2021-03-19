@@ -1,6 +1,7 @@
 package com.example.hakonsreader.views.preferences.multicolor
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.Preference
 import androidx.preference.PreferenceDialogFragmentCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +28,30 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
                 putString(ARG_KEY, key)
             }
         }
+
+        /**
+         * Gets parsed colors from a SharedPreferences, or default values if the value is empty or not set
+         *
+         * @param preferences The preferences to look in
+         * @param key The key the value is stored with
+         *
+         * @return A list of hex colors. Note that the elements in this list does not include a "#" at the start
+         */
+        fun getColors(preferences: SharedPreferences, key: String) : List<String> {
+            val value = preferences.getString(key, null)
+            return if (value.isNullOrEmpty()) {
+                listOf("FF18A5FD", "FF048E14", "FF9516A3", "FFB14902")
+            } else {
+                parseStoredValue(value)
+            }
+        }
+
+        /**
+         * Parses the stored value into a list of hex strings
+         */
+        private fun parseStoredValue(value: String) : List<String> {
+            return value.split(",")
+        }
     }
 
     private var _binding: PreferenceMultiColorBinding? = null
@@ -42,16 +66,7 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
         super.onBindDialogView(view)
 
         val adapter = ColorAdapter().apply {
-            // Sets are unordered, and we want the order to be the order in which the comments are colored
-            // so we have to store it as a single string and parse it ourselves
-
-            val value = preference.sharedPreferences.getString(requireArguments().getString(ARG_KEY), null)
-            val colors = if (value.isNullOrEmpty()) {
-                getDefaultColors()
-            } else {
-                parseStoredValue(value)
-            }
-            submitList(colors.toMutableList())
+            submitList(getColors(preference.sharedPreferences, preference.key).toMutableList())
             binding.colors.adapter = this
         }
         binding.colors.layoutManager = LinearLayoutManager(requireContext())
@@ -90,13 +105,6 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
     // Should ideally use preference default values, but the values are technically a list but is
     // stored as one string, so dunno how that would work
     private fun getDefaultColors() = listOf("FF18A5FD", "FF048E14", "FF9516A3", "FFB14902")
-
-    /**
-     * Parses the stored value into a list of hex strings
-     */
-    private fun parseStoredValue(value: String) : List<String> {
-        return value.split(",")
-    }
 
     /**
      * Creates a parsed value of a list of hex colors that can be used to store the value
