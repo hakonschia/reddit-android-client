@@ -1,5 +1,6 @@
 package com.example.hakonsreader.views.preferences.multicolor
 
+import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
@@ -22,6 +23,12 @@ import kotlin.collections.ArrayList
 class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
     companion object {
         private const val TAG = "MultiColorFragCompat"
+
+        /**
+         * The key used in [onSaveInstanceState] to save the current colors
+         */
+        private const val SAVE_STATE_COLORS = "savedColors"
+
 
         fun newInstance(key: String) = MultiColorFragCompat().apply {
             arguments = Bundle(1).apply {
@@ -57,6 +64,14 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
     private var _binding: PreferenceMultiColorBinding? = null
     private val binding get() = _binding!!
 
+    private var savedColors: ArrayList<String>? = null
+
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        savedColors = savedInstanceState?.getStringArrayList(SAVE_STATE_COLORS)
+        return super.onCreateDialog(savedInstanceState)
+    }
+
     override fun onCreateDialogView(context: Context?): View {
         _binding = PreferenceMultiColorBinding.inflate(LayoutInflater.from(context))
         return binding.root
@@ -66,7 +81,8 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
         super.onBindDialogView(view)
 
         val adapter = ColorAdapter().apply {
-            submitList(getColors(preference.sharedPreferences, preference.key).toMutableList())
+            val colors = savedColors ?: getColors(preference.sharedPreferences, preference.key).toMutableList()
+            submitList(colors)
             binding.colors.adapter = this
         }
         binding.colors.layoutManager = LinearLayoutManager(requireContext())
@@ -88,6 +104,18 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        _binding?.colors?.adapter.let {
+            outState.putStringArrayList(SAVE_STATE_COLORS, (it as ColorAdapter).colors as ArrayList<String>)
+        }
+    }
+
     override fun onDialogClosed(positiveResult: Boolean) {
         if (positiveResult) {
             // Store new values
@@ -98,13 +126,6 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
                     .apply()
         }
     }
-
-    /**
-     * Gets a list of default colors to use if there is no value stored
-     */
-    // Should ideally use preference default values, but the values are technically a list but is
-    // stored as one string, so dunno how that would work
-    private fun getDefaultColors() = listOf("FF18A5FD", "FF048E14", "FF9516A3", "FFB14902")
 
     /**
      * Creates a parsed value of a list of hex colors that can be used to store the value
