@@ -9,11 +9,11 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 ## Screenshots
 
 <div>
-  <img src="/images/subreddit.mp4" alt="Subreddit" width="275"/>
+  <img src="/images/subreddit.gif" alt="Subreddit" width="275"/>
   <img src="/images/scrolling-in-posts.png" alt="Scrolling posts" width="275"/>
-  <img src="/images/in-post.mp4" alt="In post" width="275"/>
-  <img src="/images/profile.mp4" alt="User profile" width="275"/>
-  <img src="/images/replying.mp4" alt="Replying" width="275"/>
+  <img src="/images/in-post.gif" alt="In post" width="275"/>
+  <img src="/images/profile.gif" alt="User profile" width="275"/>
+  <img src="/images/replying.gif" alt="Replying" width="275"/>
   <img src="/images/search-for-subreddit.png" alt="User profile" width="275"/>
 </div>
 
@@ -54,7 +54,7 @@ See also: [build](#build)
     - Optionally with an animation, with a customizable threshold for how many comments to at most smoothly navigate between.
     - Long press to go to first/last
   - Show [all](images/sidebars-all.png) sidebars, or [only](images/sidebars-only-one.png) one
-    - [Fully customizable colors](images/comment-sidebar-color-dialog.mp4) - [Preview](images/comment-sidebar-color-preview.png)
+    - [Fully customizable colors](images/comment-sidebar-color-dialog.gif) - [Preview](images/comment-sidebar-color-preview.png)
   - [Highlight comments](images/highlight-new-comments.png) added since the last time a post was viewed (can be toggled).
 
 - **Mod support**
