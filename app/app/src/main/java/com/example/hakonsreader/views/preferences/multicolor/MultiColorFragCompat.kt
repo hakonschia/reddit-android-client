@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +20,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
+/**
+ * Preference dialog for selecting multiple colors
+ */
 class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
     companion object {
         private const val TAG = "MultiColorFragCompat"
@@ -29,6 +31,23 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
          * The key used in [onSaveInstanceState] to save the current colors
          */
         private const val SAVE_STATE_COLORS = "savedColors"
+
+        /**
+         * The key used in [onSaveInstanceState] to save the class name [colorPickerState] is currently
+         */
+        private const val SAVE_STATE_COLOR_PICKER_STATE_NAME = "colorPickerStateName"
+
+        /**
+         * The key used in [onSaveInstanceState] to save the current hex color of the active [ColorPicker],
+         * if there is one
+         */
+        private const val SAVE_STATE_COLOR_PICKER_COLOR = "colorPickerColor"
+
+        /**
+         * The key used in [onSaveInstanceState] to save the color position currently being edited, if
+         * [colorPickerState] is [ColorPickerState.Editing]
+         */
+        private const val SAVE_STATE_COLOR_PICKER_EDITING_POSITION = "colorPickerStateEditPos"
 
 
         fun newInstance(key: String) = MultiColorFragCompat().apply {
@@ -62,14 +81,46 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
         }
     }
 
+    /**
+     * Class representing the state of the [ColorPicker]
+     */
+    private sealed class ColorPickerState {
+        /**
+         * No [ColorPicker] is shown
+         */
+        object Nothing : ColorPickerState()
+
+        /**
+         * A color is being added
+         *
+         * @param colorPicker The color picker shown
+         */
+        class Adding(val colorPicker: ColorPicker) : ColorPickerState()
+
+        /**
+         * A color is being edited
+         *
+         * @param position The position of the color being edited
+         * @param colorPicker The color picker shown
+         */
+        class Editing(val position: Int, val colorPicker: ColorPicker) : ColorPickerState()
+    }
+
     private var _binding: PreferenceMultiColorBinding? = null
     private val binding get() = _binding!!
 
-    private var savedColors: ArrayList<String>? = null
+    /**
+     * The current state of the color picker
+     */
+    private var colorPickerState: ColorPickerState = ColorPickerState.Nothing
 
+    /**
+     * THe saved instance state
+     */
+    private var savedInstanceState: Bundle? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        savedColors = savedInstanceState?.getStringArrayList(SAVE_STATE_COLORS)
+        this.savedInstanceState = savedInstanceState
         return super.onCreateDialog(savedInstanceState)
     }
 
@@ -80,6 +131,8 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
 
     override fun onBindDialogView(view: View?) {
         super.onBindDialogView(view)
+
+        val savedColors = savedInstanceState?.getStringArrayList(SAVE_STATE_COLORS)
 
         binding.colors.layoutManager = LinearLayoutManager(requireContext())
         val adapter = ColorAdapter().apply {
@@ -110,30 +163,16 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
         binding.addColor.setOnClickListener {
             val context = requireContext()
             if (context is AppCompatActivity) {
-                // To let the user specify the alpha a starting value must be specified
-                ColorPicker(context, 255, 0, 0, 0).run {
-                    setCallback { color ->
-                        val hex = createPaddedHexString(color)
-                        adapter.addColor(hex)
-                    }
-                    // Automatically close when a color is chosen
-                    enableAutoClose()
-                    show()
-                }
+                createAndShowColorPicker(context, adapter)
             }
         }
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding.colors.adapter = null
-        _binding = null
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        _binding?.colors?.adapter.let {
-            outState.putStringArrayList(SAVE_STATE_COLORS, (it as ColorAdapter).colors as ArrayList<String>)
+        savedInstanceState?.let {
+            // Not sure why this is necessary, but if a color picker is being shown from the save state
+            // it will appear under the dialog for the preference unless there is some sort of delay
+            binding.root.post {
+                restoreColorPickerState(it, adapter)
+            }
         }
     }
 
@@ -145,6 +184,73 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
             preference.sharedPreferences.edit()
                     .putString(requireArguments().getString(ARG_KEY), createParsedValue(colors))
                     .apply()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        saveColorPickerState(colorPickerState, outState)
+
+        _binding?.colors?.adapter.let {
+            outState.putStringArrayList(SAVE_STATE_COLORS, (it as ColorAdapter).colors as ArrayList<String>)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding.colors.adapter = null
+
+        // Ensure the color pickers don't leak
+        colorPickerState = ColorPickerState.Nothing
+
+        _binding = null
+    }
+
+    /**
+     * Creates and shows a [ColorPicker].
+     *
+     * @param activity The activity to create the dialog with
+     * @param adapter The adapter to notify when the color picker has chosen a color
+     * @param startingColor Optionally, the starting hex color to use in the color picker (should not be
+     * prefixed with "#")
+     * @param editPosition Optionally, the position being edited (if a color is being edited)
+     */
+    private fun createAndShowColorPicker(activity: AppCompatActivity, adapter: ColorAdapter, startingColor: String? = null, editPosition: Int = -1) {
+        // To let the user specify the alpha a starting value must be specified, so ensure it is
+        val color = startingColor?.padStart(8, '0') ?: "FF000000"
+        val parsedColor = Color.parseColor("#$color")
+
+        ColorPicker(
+                activity,
+                Color.alpha(parsedColor),
+                Color.red(parsedColor),
+                Color.green(parsedColor),
+                Color.blue(parsedColor)
+        ).apply {
+            setCallback { color ->
+                val hex = createPaddedHexString(color)
+                if (editPosition >= 0) {
+                    adapter.updateColor(editPosition, hex)
+                } else {
+                    adapter.addColor(hex)
+                }
+            }
+
+            setOnShowListener {
+                colorPickerState = if (editPosition >= 0) {
+                    ColorPickerState.Editing(editPosition, this)
+                } else {
+                    ColorPickerState.Adding(this)
+                }
+            }
+
+            setOnDismissListener {
+                colorPickerState = ColorPickerState.Nothing
+            }
+
+            enableAutoClose()
+
+            show()
         }
     }
 
@@ -176,6 +282,59 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
     private fun createPaddedHexString(color: Int) : String {
         return Integer.toHexString(color).toUpperCase(Locale.ROOT).padStart(8, '0')
     }
+
+    /**
+     * Saves the state of a [ColorPickerState] to a bundle. If the state holds a [ColorPicker] then it
+     * will be dismissed after its state is saved
+     *
+     * @param state The state to save
+     * @param outState The bundle to save the state to
+     */
+    private fun saveColorPickerState(state: ColorPickerState, outState: Bundle) {
+        outState.putString(SAVE_STATE_COLOR_PICKER_STATE_NAME, state.javaClass.name)
+
+        when (state) {
+            is ColorPickerState.Adding -> {
+                val color = createPaddedHexString(state.colorPicker.color)
+                outState.putString(SAVE_STATE_COLOR_PICKER_COLOR, color)
+
+                state.colorPicker.dismiss()
+            }
+            is ColorPickerState.Editing -> {
+                val color = createPaddedHexString(state.colorPicker.color)
+                outState.putString(SAVE_STATE_COLOR_PICKER_COLOR, color)
+                outState.putInt(SAVE_STATE_COLOR_PICKER_EDITING_POSITION, state.position)
+
+                state.colorPicker.dismiss()
+            }
+            ColorPickerState.Nothing -> {
+                // Nothing to save
+            }
+        }
+    }
+
+    /**
+     * Restores [ColorPickerState] by showing a new [ColorPicker] based on a saved state
+     *
+     * @param savedInstanceState The bundle with the saved state
+     * @param adapter The adapter to use to add/update when the color picker has chosen a color
+     */
+    private fun restoreColorPickerState(savedInstanceState: Bundle, adapter: ColorAdapter) {
+        when (savedInstanceState.getString(SAVE_STATE_COLOR_PICKER_STATE_NAME)) {
+            ColorPickerState.Adding::class.java.name -> {
+                val color = savedInstanceState.getString(SAVE_STATE_COLOR_PICKER_COLOR)
+
+                createAndShowColorPicker(requireActivity() as AppCompatActivity, adapter, startingColor = color)
+            }
+            ColorPickerState.Editing::class.java.name -> {
+                val pos = savedInstanceState.getInt(SAVE_STATE_COLOR_PICKER_EDITING_POSITION)
+                val color = savedInstanceState.getString(SAVE_STATE_COLOR_PICKER_COLOR)
+
+                createAndShowColorPicker(requireActivity() as AppCompatActivity, adapter, startingColor = color, editPosition = pos)
+            }
+        }
+    }
+
 
     private inner class ColorAdapter : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
         var colors: MutableList<String> = ArrayList()
@@ -246,17 +405,12 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
             init {
                 binding.root.setOnClickListener {
                     if (adapterPosition != RecyclerView.NO_POSITION) {
-                        val current = Color.parseColor("#${colors[adapterPosition]}")
-
-                        ColorPicker(it.context as AppCompatActivity, Color.alpha(current), Color.red(current), Color.green(current), Color.blue(current)).run {
-                            setCallback { color ->
-                                val hex = createPaddedHexString(color)
-                                updateColor(adapterPosition, hex)
-                            }
-                            // Automatically close when a color is chosen
-                            enableAutoClose()
-                            show()
-                        }
+                        createAndShowColorPicker(
+                                it.context as AppCompatActivity,
+                                adapter = this@ColorAdapter,
+                                startingColor = colors[adapterPosition],
+                                editPosition = adapterPosition
+                        )
                     }
                 }
                 binding.removeColor.setOnClickListener {
