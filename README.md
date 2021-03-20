@@ -9,11 +9,11 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 ## Screenshots
 
 <div>
-  <img src="/images/subreddit.gif" alt="Subreddit" width="275"/>
+  <img src="/images/subreddit.mp4" alt="Subreddit" width="275"/>
   <img src="/images/scrolling-in-posts.png" alt="Scrolling posts" width="275"/>
-  <img src="/images/in-post.gif" alt="In post" width="275"/>
-  <img src="/images/profile.png" alt="User profile" width="275"/>
-  <img src="/images/replying.gif" alt="User profile" width="275"/>
+  <img src="/images/in-post.mp4" alt="In post" width="275"/>
+  <img src="/images/profile.mp4" alt="User profile" width="275"/>
+  <img src="/images/replying.mp4" alt="Replying" width="275"/>
   <img src="/images/search-for-subreddit.png" alt="User profile" width="275"/>
 </div>
 
@@ -30,11 +30,17 @@ See also: [build](#build)
   - Light and dark mode (true black)
   - Translated to English and Norwegian (bokmål)
 
-
 - **Private browsing** - While logged in, [enable private browsing](images/enable-private-browsing.png) to temporarily act as an anonymous, non-logged in user. [Disable at any time](images/disable-private-browsing.png) when attempting to do an action that requires a logged in user.
 
 - **Multiple accounts** - Log in with [multiple accounts](images/multiple-accounts.png) and switch whenever you want to
   - Mark account as NSFW to override various NSFW settings, such as how images/thumbnails are blurred
+
+- **Links**
+  - [Show preview of links](images/show-link-previews.png) in comments
+    - Optionally: show entire link (or only 1 line)
+    - Optionally: don't show preview when the link is identical to the text
+  - [Enlarge links](images/enlarge-links.png) to make them easier to click (up to 2.5x the size)
+  - [Long press to show URL of a link](images/peek-url.png)
 
 - **Posts**
   - [Control the size](images/control-size-of-post.png) of post content when opened, based on a percentage of the screen size.
@@ -48,10 +54,7 @@ See also: [build](#build)
     - Optionally with an animation, with a customizable threshold for how many comments to at most smoothly navigate between.
     - Long press to go to first/last
   - Show [all](images/sidebars-all.png) sidebars, or [only](images/sidebars-only-one.png) one
-  - [Enlarge links](images/enlarge-links.png) to make them easier to click (up to 2.5x the size)
-  - [Show preview of links](images/show-link-previews.png)
-    - Optionally: show entire link (or only 1 line)
-    - Optionally: don't show preview when the link is identical to the text
+    - [Fully customizable colors](images/comment-sidebar-color-dialog.mp4) - [Preview](images/comment-sidebar-color-preview.png)
   - [Highlight comments](images/highlight-new-comments.png) added since the last time a post was viewed (can be toggled).
 
 - **Mod support**
