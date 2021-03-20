@@ -178,9 +178,9 @@ class ReplyActivity : BaseActivity() {
             replyingTo.let {
                 it as RedditPost
 
-                // If the post is a selftext post then use that as the summary, otherwise
+                // If the post is a selftext post then use that as the summary if possible, otherwise
                 // use the title
-                if (it.getPostType() == PostType.TEXT) {
+                if (it.getPostType() == PostType.TEXT && it.selftext.isNotEmpty()) {
                     App.get().markwon.setMarkdown(binding.summary, it.selftext)
                 } else {
                     binding.summary.text = it.title
