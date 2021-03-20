@@ -1,23 +1,16 @@
 package com.example.hakonsreader.recyclerviewadapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.hakonsreader.App
-import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.databinding.ListItemSubredditBinding
 import com.example.hakonsreader.databinding.ListItemSubredditSimpleBinding
 import com.example.hakonsreader.interfaces.OnClickListener
 import com.example.hakonsreader.interfaces.OnSubredditSelected
 import com.example.hakonsreader.recyclerviewadapters.diffutils.SubredditsDiffCallback
-import com.example.hakonsreader.views.util.ViewUtil
-import com.example.hakonsreader.views.util.setLongClickToPeekUrl
 import java.util.*
-import java.util.stream.Collectors
 import kotlin.collections.ArrayList
 
 /**
@@ -138,9 +131,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         LayoutInflater.from(parent.context),
                         parent,
                         false
-                ).apply {
-                    subredditDescription.setLongClickToPeekUrl()
-                }
+                )
 
                 StandardViewHolder(binding)
             }

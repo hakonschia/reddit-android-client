@@ -47,7 +47,7 @@ import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
 import com.example.hakonsreader.viewmodels.factories.SubredditWikiFactory
 import com.example.hakonsreader.views.util.ViewUtil
-import com.example.hakonsreader.views.util.setLongClickToPeekUrl
+import com.example.hakonsreader.views.util.setMarkdown
 import com.example.hakonsreader.views.util.showPopupSortWithTime
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
@@ -229,7 +229,6 @@ class SubredditFragment : Fragment() {
 
             subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }
 
-            subredditInfo.description.setLongClickToPeekUrl()
             drawerListener?.let { drawer.addDrawerListener(it) }
             drawer.addDrawerListener(object : DrawerLayout.DrawerListener {
                 override fun onDrawerOpened(drawerView: View) {
@@ -877,7 +876,6 @@ class SubredditFragment : Fragment() {
             }
 
             binding.wikiContent.movementMethod = wikiLinkMovementMethod
-            binding.wikiContent.setLongClickToPeekUrl()
             binding.wikiGoBack.setOnClickListener {
                 wikiViewModel.pop()
             }
@@ -912,9 +910,8 @@ class SubredditFragment : Fragment() {
 
                     // Ensure we're at the top when loading a new page (this might have to be stored in onSaveInstanceState)
                     binding.scroller.scrollTo(0, 0)
-                    val content = App.get().adjuster.adjust(it.content)
 
-                    App.get().markwon.setMarkdown(binding.wikiContent, content)
+                    setMarkdown(binding.wikiContent, it.content)
                 }
 
                 isLoading.observe(viewLifecycleOwner) {
