@@ -656,8 +656,9 @@ fun createAgeText(resources: Resources, time: Duration): String {
             t = time.toMinutes()
             if (t < 1) {
                 resources.getString(R.string.postAgeJustPosted)
+            } else {
+                resources.getQuantityString(R.plurals.postAgeMinutes, t.toInt(),  t.toInt())
             }
-            resources.getQuantityString(R.plurals.postAgeMinutes, t.toInt())
         }
     }
 
@@ -691,8 +692,9 @@ fun createAgeTextShortened(resources: Resources, time: Duration): String {
             t = time.toMinutes()
             if (t < 1) {
                 resources.getString(R.string.postAgeJustPostedShortened)
+            } else {
+                resources.getString(R.string.postAgeMinutesShortened, t.toInt())
             }
-            resources.getString(R.string.postAgeMinutesShortened, t.toInt())
         }
     }
 
