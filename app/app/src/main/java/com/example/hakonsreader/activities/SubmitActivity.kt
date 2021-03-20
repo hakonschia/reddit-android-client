@@ -65,10 +65,8 @@ class SubmitActivity : BaseActivity() {
     private var subredditViewModel: SubredditViewModel? = null
 
     private var flairsViewModel: SubredditFlairsViewModel? = null
-    private var flairsAdapter: RedditFlairAdapter? = null
 
     private val submissionFragments = ArrayList<Fragment>()
-    private var submissionFlairs = ArrayList<RedditFlair>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -183,7 +181,7 @@ class SubmitActivity : BaseActivity() {
                     }
                 }
 
-                flairsAdapter = RedditFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
+                RedditFlairAdapter(this@SubmitActivity, android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).apply {
                     binding.flairSpinner.adapter = this
                 }
             }
@@ -314,7 +312,7 @@ class SubmitActivity : BaseActivity() {
             ""
         } else {
             // The actual list of flairs doesn't include the first "Select flair" item
-            submissionFlairs[selectedItem - 1].id
+            (binding.flairSpinner.adapter as RedditFlairAdapter).flairs[selectedItem - 1].id
         }
     }
 
