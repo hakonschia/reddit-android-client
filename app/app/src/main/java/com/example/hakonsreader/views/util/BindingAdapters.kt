@@ -1,6 +1,8 @@
 package com.example.hakonsreader.views.util
 
+import android.os.Build
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.example.hakonsreader.App
@@ -122,6 +124,19 @@ fun setMarkdown(textView: TextView, markdown: String?) {
         textView.movementMethod = InternalLinkMovementMethod()
     }
     textView.setLongClickToPeekUrl()
+    App.get().markwon.setMarkdown(textView, App.get().adjuster.adjust(markdown))
+}
+
+/**
+ * Identical to [setMarkdown], but does not set the long click listener to peek URLs
+ */
+@BindingAdapter("markdownWithoutLongClick")
+fun setMarkdownWithoutLongClick(textView: TextView, markdown: String?) {
+    markdown ?: return
+
+    if (textView.movementMethod == null) {
+        textView.movementMethod = InternalLinkMovementMethod()
+    }
     App.get().markwon.setMarkdown(textView, App.get().adjuster.adjust(markdown))
 }
 

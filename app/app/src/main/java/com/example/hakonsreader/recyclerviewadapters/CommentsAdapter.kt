@@ -1,6 +1,5 @@
 package com.example.hakonsreader.recyclerviewadapters
 
-import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Parcelable
 import android.text.Spannable

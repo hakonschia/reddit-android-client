@@ -263,7 +263,7 @@
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/commentAuthor"
             app:layout_constraintTop_toBottomOf="@+id/userReportsTitle"
-            app:markdown="@{comment.body}"
+            app:markdownWithoutLongClick="@{comment.body}"
 
             tools:text="@tools:sample/lorem[50]" />
 
