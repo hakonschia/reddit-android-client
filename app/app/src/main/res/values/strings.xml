@@ -597,6 +597,7 @@
 
     <string name="peekUrlBottomSheetTextHeader">Text</string>
     <string name="peekUrlBottomSheetUrlHeader">URL</string>
+    <string name="peekUrlBottomSheetInferredUrlHeader">Inferred URL</string>
     <string name="peekUrlBottomSheetOpenUrl">Open</string>
 
     <string name="postHasNoText">The post has no text</string>

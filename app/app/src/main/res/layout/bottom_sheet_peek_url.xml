@@ -1,66 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/textHeader"
-        android:layout_width="wrap_content"
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="inferredUrlValue"
+            type="String" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/peekUrlBottomSheetTextHeader"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_color"
-        android:textSize="18sp"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textHeader"
-        tools:text="Nrk is a norwegian news site" />
+        <TextView
+            android:id="@+id/textHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/peekUrlBottomSheetTextHeader"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_color"
+            android:textSize="18sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textHeader"
+            tools:text="Nrk is a norwegian news site" />
 
 
-    <TextView
-        android:id="@+id/urlHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/peekUrlBottomSheetUrlHeader"
-        app:layout_constraintTop_toBottomOf="@id/text"
-        app:layout_constraintStart_toStartOf="parent"/>
+        <TextView
+            android:id="@+id/urlHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/peekUrlBottomSheetUrlHeader"
+            app:layout_constraintTop_toBottomOf="@id/text"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-    <TextView
-        android:id="@+id/url"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/url"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-        android:textColor="@color/link_color"
-        android:textSize="18sp"
+            android:textColor="@color/link_color"
+            android:textSize="18sp"
 
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/urlHeader"
-        tools:text="https://nrk.no" />
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/urlHeader"
+            tools:text="https://nrk.no" />
 
-    <Button
-        android:id="@+id/openLink"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/peekUrlBottomSheetOpenUrl"
-        style="@style/ButtonStyleSmall"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/url" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/inferredUrlGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="inferredUrlHeader, inferredUrl"
+            android:visibility="@{inferredUrlValue == null || inferredUrlValue.empty ? View.GONE : View.VISIBLE}"/>
+
+        <TextView
+            android:id="@+id/inferredUrlHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/peekUrlBottomSheetInferredUrlHeader"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/url" />
+
+        <TextView
+            android:id="@+id/inferredUrl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="@{inferredUrlValue}"
+            android:textColor="@color/link_color"
+            android:textSize="18sp"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/inferredUrlHeader"
+            tools:text="https://nrk.no" />
+
+
+        <Button
+            android:id="@+id/openLink"
+            style="@style/ButtonStyleSmall"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/peekUrlBottomSheetOpenUrl"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/inferredUrl" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
