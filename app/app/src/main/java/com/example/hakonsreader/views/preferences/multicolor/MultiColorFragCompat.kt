@@ -110,10 +110,10 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
         binding.addColor.setOnClickListener {
             val context = requireContext()
             if (context is AppCompatActivity) {
+                // To let the user specify the alpha a starting value must be specified
                 ColorPicker(context, 255, 0, 0, 0).run {
                     setCallback { color ->
-                        val hex = Integer.toHexString(color).toUpperCase(Locale.ROOT)
-                        Log.d(TAG, hex)
+                        val hex = createPaddedHexString(color)
                         adapter.addColor(hex)
                     }
                     // Automatically close when a color is chosen
@@ -126,6 +126,7 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.colors.adapter = null
         _binding = null
     }
 
@@ -148,7 +149,9 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
     }
 
     /**
-     * Creates a parsed value of a list of hex colors that can be used to store the value
+     * Creates a parsed value of a list of hex colors that can be used to store the value.
+     *
+     * @return A string with each hex color split with a ","
      */
     private fun createParsedValue(colors: List<String>) : String {
         // Parse the list as "color1,color2,color3"
@@ -162,10 +165,28 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
         }
     }
 
+    /**
+     * Creates a padded hex string that will always be 8 characters long to ensure that all color
+     * parts (ARGB) are explicitly specified. This ensures that parsing hex strings back to colors wont
+     * cause an unknown color exception
+     *
+     * @param color The color to convert to hex
+     * @return A hex representation of [color] that will always be 8 characters long
+     */
+    private fun createPaddedHexString(color: Int) : String {
+        return Integer.toHexString(color).toUpperCase(Locale.ROOT).padStart(8, '0')
+    }
 
     private inner class ColorAdapter : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
         var colors: MutableList<String> = ArrayList()
+            private set
 
+        /**
+         * Submits a list of hex colors to the adapter
+         *
+         * @param colors The list of colors to display. These colors should be raw hex strings (no
+         * "#" at the start)
+         */
         fun submitList(colors: MutableList<String>) {
             this.colors = colors
             notifyDataSetChanged()
@@ -229,7 +250,7 @@ class MultiColorFragCompat : PreferenceDialogFragmentCompat() {
 
                         ColorPicker(it.context as AppCompatActivity, Color.alpha(current), Color.red(current), Color.green(current), Color.blue(current)).run {
                             setCallback { color ->
-                                val hex = Integer.toHexString(color).toUpperCase(Locale.ROOT)
+                                val hex = createPaddedHexString(color)
                                 updateColor(adapterPosition, hex)
                             }
                             // Automatically close when a color is chosen
