@@ -15,11 +15,10 @@ import kotlinx.coroutines.launch
  */
 class SubredditViewModel(
         subredditName: String,
-        api: SubredditRequest,
         dao: RedditSubredditsDao,
         postsDao: RedditPostsDao
 ) : ViewModel() {
-    private val repo = SubredditRepository(subredditName, api, dao, postsDao)
+    private val repo = SubredditRepository(subredditName, dao, postsDao)
 
     val subreddit = repo.getSubreddit()
     val errors = repo.errors

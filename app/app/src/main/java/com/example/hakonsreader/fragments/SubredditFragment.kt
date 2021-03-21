@@ -55,6 +55,8 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import java.lang.RuntimeException
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -127,7 +129,11 @@ class SubredditFragment : Fragment() {
     private var _binding: FragmentSubredditBinding? = null
     private val binding get() = _binding!!
 
-    val subredditName by lazy { arguments?.getString(SUBREDDIT_NAME_KEY) ?: "" }
+    /**
+     * The name of the subreddit. This is typically set by what is given to [newInstance], but might change
+     * if a redirect occurred.
+     */
+    lateinit var subredditName: String
     private val isDefaultSubreddit by lazy { RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase()) }
 
     private var subreddit: Subreddit? = null
@@ -177,6 +183,10 @@ class SubredditFragment : Fragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        subredditName = arguments?.getString(SUBREDDIT_NAME_KEY) ?: throw IllegalStateException("No subreddit name given")
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         if (savedInstanceState != null) {
@@ -366,7 +376,6 @@ class SubredditFragment : Fragment() {
 
         subredditViewModel = ViewModelProvider(this, SubredditFactory(
                 subredditName,
-                api.subreddit(subredditName),
                 database.subreddits(),
                 database.posts()
         )).get(SubredditViewModel::class.java).apply {
@@ -379,6 +388,7 @@ class SubredditFragment : Fragment() {
                 if (it == null) {
                     return@observe
                 }
+                subredditName = it.name
 
                 // If there is no subscribers previously the ticker animation looks very weird
                 // so disable it if it would like weird
@@ -794,7 +804,7 @@ class SubredditFragment : Fragment() {
      * Sets the subreddit description for default subs
      */
     private fun setDefaultSubDescription() {
-        val stringRes = when (subredditName.toLowerCase()) {
+        val stringRes = when (subredditName.toLowerCase(Locale.ROOT)) {
             "" -> R.string.frontPageDescription
             "popular" -> R.string.popularDescription
             "all" -> R.string.allDescription

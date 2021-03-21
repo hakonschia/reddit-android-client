@@ -3,11 +3,11 @@ package com.example.hakonsreader.viewmodels.repositories
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.persistence.RedditSubredditsDao
-import com.example.hakonsreader.api.requestmodels.SubredditRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.viewmodels.ErrorWrapper
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +17,6 @@ import kotlinx.coroutines.withContext
 
 class SubredditRepository(
         private val subredditName: String,
-        private val api: SubredditRequest,
         private val dao: RedditSubredditsDao,
         private val postsDao: RedditPostsDao
 ) {
@@ -49,7 +48,7 @@ class SubredditRepository(
     suspend fun refresh() {
         _isLoading.postValue(true)
 
-        when (val resp = api.info()) {
+        when (val resp = App.get().api.subreddit(subredditNameObservable.value!!).info()) {
             is ApiResponse.Success -> {
                 infoLoaded = true
                 val sub = resp.value
@@ -76,7 +75,7 @@ class SubredditRepository(
      */
     suspend fun subscribe() {
         val subreddit = withContext(IO) {
-            dao.get(subredditName)
+            dao.get(subredditNameObservable.value!!)
         } ?: return
 
         // Assume success
@@ -88,7 +87,7 @@ class SubredditRepository(
             dao.update(subreddit)
         }
 
-        when (val response = api.subscribe(newSubscription)) {
+        when (val response = App.get().api.subreddit(subredditNameObservable.value!!).subscribe(newSubscription)) {
             is ApiResponse.Success -> { }
             is ApiResponse.Error -> {
                 // Revert back
@@ -135,7 +134,7 @@ class SubredditRepository(
             }
         }
 
-        when (val resp = api.selectFlair(username, flair?.id)) {
+        when (val resp = App.get().api.subreddit(subredditNameObservable.value!!).selectFlair(username, flair?.id)) {
             is ApiResponse.Success -> { }
             is ApiResponse.Error -> {
                 _errors.postValue(ErrorWrapper(resp.error, resp.throwable))

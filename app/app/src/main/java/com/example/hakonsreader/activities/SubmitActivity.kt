@@ -138,7 +138,6 @@ class SubmitActivity : BaseActivity() {
     private fun setupSubredditViewModel(subredditName: String) {
         subredditViewModel = ViewModelProvider(this, SubredditFactory(
                 subredditName,
-                api.subreddit(subredditName),
                 database.subreddits(),
                 database.posts()
         )).get(SubredditViewModel::class.java).apply {
