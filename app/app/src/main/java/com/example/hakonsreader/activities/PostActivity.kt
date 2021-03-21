@@ -9,6 +9,7 @@ import android.transition.TransitionListenerAdapter
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
@@ -82,12 +83,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
          */
         const val COMMENT_ID_CHAIN = "commentIdChain"
 
-
-        /**
-         * Request code for opening a reply activity
-         */
-        const val REQUEST_REPLY = 1
-
         /**
          * The bitmap to display when transitioning videos. This should be set just before the
          * activity is started and will be nulled when the activity is destroyed
@@ -128,6 +123,18 @@ class PostActivity : BaseActivity(), OnReplyListener {
      */
     private val maxPostHeightWhenCollapsedDisabled by lazy {
         getHeightForPost(forWhenCollapsedDisabled = true)
+    }
+
+    /**
+     * Handles results when adding replies to the post (only top-level comments, not replies
+     * to other comments in the post)
+     */
+    private val replyActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { uri ->
+        val data = uri.data ?: return@registerForActivityResult
+
+        val newComment = Gson().fromJson(data.getStringExtra(ReplyActivity.LISTING_KEY), RedditComment::class.java)
+        val parent = if (replyingTo is RedditComment) replyingTo as RedditComment else null
+        commentsViewModel.insertComment(newComment, parent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -183,19 +190,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
         binding.post.lifecycleOwner = null
         
         VIDEO_THUMBNAIL_BITMAP = null
-    }
-
-    /**
-     * Handles results for when a reply has been sent
-     */
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_REPLY && resultCode == RESULT_OK && data != null) {
-            val newComment = Gson().fromJson(data.getStringExtra(ReplyActivity.LISTING_KEY), RedditComment::class.java)
-            val parent = if (replyingTo is RedditComment) replyingTo as RedditComment else null
-            commentsViewModel.insertComment(newComment, parent)
-        }
     }
 
     /**
@@ -595,7 +589,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
             putExtra(ReplyActivity.LISTING_KEY, Gson().toJson(listing))
         }
 
-        startActivityForResult(intent, REQUEST_REPLY)
+        replyActivityResult.launch(intent)
         overridePendingTransition(R.anim.slide_up, R.anim.slide_down)
     }
 
