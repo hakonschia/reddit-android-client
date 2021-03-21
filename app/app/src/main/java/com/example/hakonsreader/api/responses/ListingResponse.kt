@@ -22,15 +22,15 @@ class ListingResponse<T> {
         var listings: List<T>? = null
     }
 
-    public fun getListings() : List<T>? {
+    fun getListings() : List<T>? {
         return data?.listings
     }
 
-    public fun hasErrors() : Boolean {
+    fun hasErrors() : Boolean {
         return !errors.isNullOrEmpty()
     }
 
-    public fun getErrors() : List<List<String>>? {
+    fun getErrors() : List<List<String>>? {
         return errors
     }
 }

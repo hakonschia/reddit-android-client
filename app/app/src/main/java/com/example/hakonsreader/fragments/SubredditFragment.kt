@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -25,6 +26,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
+import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.activities.SubmitActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.FlairType
@@ -158,6 +160,23 @@ class SubredditFragment : Fragment() {
      * If set to true, the fragment will call [AppCompatActivity.setSupportActionBar] when the view is created
      */
     var setToolbarOnActivity = true
+
+    /**
+     * Result handler for submitting posts. If a post ID is given back then the post will be opened
+     * automatically
+     */
+    private val submitPostResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { uri ->
+        val data = uri.data ?: return@registerForActivityResult
+
+        // Get the new post ID and open the post
+        val postId = data.getStringExtra(SubmitActivity.RESULT_POST_ID) ?: return@registerForActivityResult
+
+        Intent(requireContext(), PostActivity::class.java).apply {
+            putExtra(PostActivity.POST_ID_KEY, postId)
+            startActivity(this)
+        }
+    }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         if (savedInstanceState != null) {
@@ -514,10 +533,9 @@ class SubredditFragment : Fragment() {
             })
 
             binding.submitPostFab.setOnClickListener {
-                Intent(context, SubmitActivity::class.java).apply {
-                    putExtra(SubmitActivity.SUBREDDIT_KEY, subredditName)
-                    startActivity(this)
-                }
+                submitPostResult.launch(Intent(context, SubmitActivity::class.java).apply {
+                    putExtra(SubmitActivity.SUBREDDIT_KEY, postsFragment.name)
+                })
             }
         }
     }

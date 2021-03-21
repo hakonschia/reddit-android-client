@@ -268,7 +268,7 @@ class SubredditRequest(
                     sendNotifications = receiveNotifications,
                     flairId = flairId
             )
-            val body = resp.body()?.getListings()?.get(0)
+            val body = resp.body()?.getListing()
 
             if (body != null) {
                 ApiResponse.Success(body)
@@ -324,7 +324,7 @@ class SubredditRequest(
                     sendNotifications = receiveNotifications,
                     flairId = flairId
             )
-            val body = resp.body()?.getListings()?.get(0)
+            val body = resp.body()?.getListing()
 
             if (body != null) {
                 ApiResponse.Success(body)
@@ -366,9 +366,6 @@ class SubredditRequest(
             return submissionError
         }
 
-        // TODO optionally take in a RedditPost and copy everything from that (should maybe be its own
-        //  function instead)
-
         // kind = crosspost
         // "crosspost_fullname"
         val fullname = createFullName(Thing.POST, crosspostId)
@@ -378,13 +375,13 @@ class SubredditRequest(
                     subredditName,
                     kind = "crosspost",
                     title = title,
-                    crosspostFullname =
-                    fullname, nsfw = nsfw,
+                    crosspostFullname = fullname,
+                    nsfw = nsfw,
                     spoiler = spoiler,
                     sendNotifications = receiveNotifications,
                     flairId = flairId
             )
-            val body = resp.body()?.getListings()?.get(0)
+            val body = resp.body()?.getListing()
 
             if (body != null) {
                 ApiResponse.Success(body)

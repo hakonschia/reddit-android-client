@@ -87,9 +87,19 @@ class PostsFragment : Fragment(), SortableWithTime {
         }
     }
 
+    /**
+     * The name of the subreddit/user the posts are for
+     */
     val name: String by lazy { arguments?.getString(NAME_KEY) ?: "" }
+
+    /**
+     * If true, the posts are for a user, not a subreddit
+     */
     private val isForUser: Boolean by lazy { arguments?.getBoolean(IS_FOR_USER) ?: false }
 
+    /**
+     * If true, the subreddit is a default subreddit (eg. front page)
+     */
     private var isDefaultSubreddit = false
 
     private var _binding: FragmentPostsBinding? = null

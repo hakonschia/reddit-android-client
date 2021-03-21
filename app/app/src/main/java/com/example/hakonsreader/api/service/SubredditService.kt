@@ -8,6 +8,7 @@ import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.model.internal.SubredditRuleInternal
 import com.example.hakonsreader.api.model.internal.SubredditWikiPageInternal
 import com.example.hakonsreader.api.responses.JsonResponse
+import com.example.hakonsreader.api.responses.SingleJsonResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -121,7 +122,7 @@ interface SubredditService {
 
             @Field("api_type") apiType: String = "json",
             @Field("raw_json") rawJson: Int = 1
-    ) : Response<JsonResponse<Submission>>
+    ) : Response<SingleJsonResponse<Submission>>
 
 
     /**

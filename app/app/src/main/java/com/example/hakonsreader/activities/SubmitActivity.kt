@@ -17,6 +17,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.FlairType
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.model.Submission
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -42,7 +43,8 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
- * Activity for submitting a post to a subreddit
+ * Activity for submitting a post to a subreddit. The ID of the newly created post (if one was created)
+ * will be passed with the key [RESULT_POST_ID]
  */
 class SubmitActivity : BaseActivity() {
 
@@ -53,6 +55,11 @@ class SubmitActivity : BaseActivity() {
          * The key used to tell the name of the subreddit being submitted to
          */
         const val SUBREDDIT_KEY = "submittingToSubredditName"
+
+        /**
+         * The key used in activity results to tell the ID of the post submitted
+         */
+        const val RESULT_POST_ID = "resultPostId"
     }
 
     private val api = App.get().api
@@ -234,7 +241,7 @@ class SubmitActivity : BaseActivity() {
         val text = fragment.getText()
 
         CoroutineScope(IO).launch {
-            api.subreddit(subreddit.name).submitTextPost(
+            val response = api.subreddit(subreddit.name).submitTextPost(
                     title,
                     text,
                     nsfw,
@@ -242,6 +249,10 @@ class SubmitActivity : BaseActivity() {
                     receiveNotifications,
                     flairId = getFlairId()
             )
+
+            withContext(Main) {
+                onSubmitResponse(response)
+            }
         }
     }
 
@@ -262,7 +273,7 @@ class SubmitActivity : BaseActivity() {
         }
 
         CoroutineScope(IO).launch {
-            api.subreddit(subreddit.name).submitLinkPost(
+            val response = api.subreddit(subreddit.name).submitLinkPost(
                     title,
                     fragment.getLink(),
                     nsfw,
@@ -270,8 +281,11 @@ class SubmitActivity : BaseActivity() {
                     receiveNotifications,
                     flairId = getFlairId()
             )
-        }
 
+            withContext(Main) {
+                onSubmitResponse(response)
+            }
+        }
     }
 
     /**
@@ -291,7 +305,7 @@ class SubmitActivity : BaseActivity() {
         }
 
         CoroutineScope(IO).launch {
-            api.subreddit(subreddit.name).submitCrosspost(
+            val response = api.subreddit(subreddit.name).submitCrosspost(
                     title,
                     id,
                     nsfw,
@@ -299,6 +313,28 @@ class SubmitActivity : BaseActivity() {
                     receiveNotifications,
                     flairId = getFlairId()
             )
+
+            withContext(Main) {
+                onSubmitResponse(response)
+            }
+        }
+    }
+
+    /**
+     * Handles responses when a post has been submitted. If a post was successfully submitted then
+     * the activity will be finished and the ID of the newly created post is returned, otherwise a
+     * snackbar is shown.
+     */
+    private fun onSubmitResponse(response: ApiResponse<Submission>) {
+        when (response) {
+            is ApiResponse.Success -> {
+                intent.putExtra(RESULT_POST_ID, response.value.id)
+                setResult(RESULT_OK, intent)
+                finish()
+            }
+            is ApiResponse.Error -> {
+                handleGenericResponseErrors(binding.root, response.error, response.throwable)
+            }
         }
     }
 
