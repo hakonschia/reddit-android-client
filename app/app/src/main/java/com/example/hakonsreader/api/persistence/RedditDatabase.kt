@@ -11,7 +11,7 @@ import com.example.hakonsreader.api.model.flairs.RedditFlair
 /**
  * The global database for the application, holds [RedditPost] and [Subreddit] entities
  */
-@Database(version = 26, exportSchema = false,
+@Database(version = 27, exportSchema = false,
         entities = [
             RedditPost::class,
             Subreddit::class,

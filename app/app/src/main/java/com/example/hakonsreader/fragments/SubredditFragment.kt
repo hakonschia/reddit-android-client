@@ -483,23 +483,35 @@ class SubredditFragment : Fragment() {
                 api.subreddit(name),
                 database.flairs()
         )).get(SubredditFlairsViewModel::class.java).apply {
-            flairs.observe(viewLifecycleOwner) {
-                RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, it as ArrayList<RedditFlair>).run {
+            flairs.observe(viewLifecycleOwner) { flairs ->
+                RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, flairs as ArrayList<RedditFlair>).run {
                     // If/when the flairs are updated the previous listener would trigger, which could
                     // remove the users flair
-                    binding.subredditInfo.selectFlairSpinner.onItemSelectedListener = null
 
-                    binding.subredditInfo.selectFlairSpinner.adapter = this
-                    // Select the first item right away, as this would happen anyways, and would trigger the
-                    // item selected listener, which would call updateUserFlair with null, disabling the users flair
-                    binding.subredditInfo.selectFlairSpinner.setSelection(0, false)
+                    with(binding.subredditInfo.selectFlairSpinner) {
+                        // Ensure there is no listener set as we will manually set the flair, which shouldn't
+                        // update the flair again
+                        onItemSelectedListener = null
 
-                    binding.subredditInfo.selectFlairSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                            updateUserFlair(getFlairAt(position))
+                        adapter = this@run
+
+                        val flairId = subreddit?.userFlairTemplateId
+                        val userFlairPosition = if (flairId != null) {
+                            // The spinner includes one more actual item, so offset by 1
+                            flairs.indexOfFirst { it.id == flairId } + 1
+                        } else {
+                            0
                         }
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
-                            // Not implemented
+
+                        setSelection(userFlairPosition, false)
+
+                        onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                                updateUserFlair(getFlairAt(position))
+                            }
+                            override fun onNothingSelected(parent: AdapterView<*>?) {
+                                // Not implemented
+                            }
                         }
                     }
                 }
@@ -562,6 +574,7 @@ class SubredditFragment : Fragment() {
         ViewUtil.setSubredditIcon(binding.subredditIcon, subreddit)
         setBannerImage()
 
+        // Only recreate if the ViewPager adapter isn't created with this subreddit name
         val pagerAdapter = binding.pager.adapter
         if (pagerAdapter is Adapter && pagerAdapter.subreddit.name == subreddit.name) {
             return

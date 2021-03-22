@@ -238,4 +238,10 @@ class Subreddit : RedditListing() {
      */
     @SerializedName("user_flair_text")
     var userFlairText: String? = null
+
+    /**
+     * The ID of the user flair, if set
+     */
+    @SerializedName("user_flair_template_id")
+    var userFlairTemplateId: String? = null
 }
