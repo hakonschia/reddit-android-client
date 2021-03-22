@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:transitionName="video_player_transition"
         android:layout_centerVertical="true"
+        android:keepScreenOn="true"
         android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>
