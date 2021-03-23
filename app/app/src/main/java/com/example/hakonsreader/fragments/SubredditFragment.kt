@@ -71,22 +71,24 @@ class SubredditFragment : Fragment() {
 
         /**
          * The key stored in [getArguments] saying the name the subreddit is for
+         *
+         * The value for this key should be a [String]
          */
-        private const val SUBREDDIT_NAME_KEY = "subredditName"
+        private const val ARGS_SUBREDDIT_NAME = "args_subredditName"
 
         /**
          * The key used in [getArguments] for how to sort the posts when loading this subreddit
          *
          * The value with this key should be the value of corresponding enum value from [SortingMethods]
          */
-        private const val SORT = "sort"
+        private const val ARGS_SORT = "args_sort"
 
         /**
          * The key used in [getArguments] for the time sort for the posts when loading this subreddit
          *
          * The value with this key should be the value of corresponding enum value from [PostTimeSort]
          */
-        private const val TIME_SORT = "time_sort"
+        private const val ARGS_TIME_SORT = "args_timeSort"
 
 
         /**
@@ -95,30 +97,35 @@ class SubredditFragment : Fragment() {
          *
          * The value with this key should be a [Boolean]
          */
-        private const val SHOW_RULES = "show_rules"
+        private const val ARGS_SHOW_RULES = "args_showRules"
+
 
         /**
          * Key to save [nsfwWarningShown]
          */
-        private const val NSFW_WARNING_SHOWN = "nsfwWarningShown"
+        private const val SAVED_NSFW_WARNING_SHOWN = "saved_nsfwWarningShown"
 
         /**
          * Key to save [nsfwWarningDismissedWithSuccess]
          */
-        private const val NSFW_WARNING_DISMISSED_WITH_SUCCESS = "nsfwWarningDismissedWithSuccess"
+        private const val SAVED_NSFW_WARNING_DISMISSED_WITH_SUCCESS = "saved_nsfwWarningDismissedWithSuccess"
+
 
         /**
          * Creates a new instance of the fragment
          *
          * @param subredditName The name of the subreddit to instantiate
+         * @param sort How to sort the posts
+         * @param timeSort How to time sort the posts
+         * @param showRules If true, the rules (subreddit sidebar info) will be shown when the subreddit view is created
          * @return The newly created fragment
          */
         fun newInstance(subredditName: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null, showRules: Boolean = false) = SubredditFragment().apply {
             arguments = Bundle().apply {
-                putString(SUBREDDIT_NAME_KEY, subredditName)
-                sort?.let { putString(SORT, it.value) }
-                timeSort?.let { putString(TIME_SORT, it.value) }
-                putBoolean(SHOW_RULES, showRules)
+                putString(ARGS_SUBREDDIT_NAME, subredditName)
+                sort?.let { putString(ARGS_SORT, it.value) }
+                timeSort?.let { putString(ARGS_TIME_SORT, it.value) }
+                putBoolean(ARGS_SHOW_RULES, showRules)
             }
         }
     }
@@ -175,23 +182,23 @@ class SubredditFragment : Fragment() {
         val data = uri.data ?: return@registerForActivityResult
 
         // Get the new post ID and open the post
-        val postId = data.getStringExtra(SubmitActivity.RESULT_POST_ID) ?: return@registerForActivityResult
+        val postId = data.getStringExtra(SubmitActivity.EXTRAS_RESULT_POST_ID) ?: return@registerForActivityResult
 
         Intent(requireContext(), PostActivity::class.java).apply {
-            putExtra(PostActivity.POST_ID_KEY, postId)
+            putExtra(PostActivity.EXTRAS_POST_ID_KEY, postId)
             startActivity(this)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        subredditName = arguments?.getString(SUBREDDIT_NAME_KEY) ?: throw IllegalStateException("No subreddit name given")
+        subredditName = arguments?.getString(ARGS_SUBREDDIT_NAME) ?: throw IllegalStateException("No subreddit name given")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         if (savedInstanceState != null) {
-            nsfwWarningShown = savedInstanceState.getBoolean(NSFW_WARNING_SHOWN)
-            nsfwWarningDismissedWithSuccess = savedInstanceState.getBoolean(NSFW_WARNING_DISMISSED_WITH_SUCCESS)
+            nsfwWarningShown = savedInstanceState.getBoolean(SAVED_NSFW_WARNING_SHOWN)
+            nsfwWarningDismissedWithSuccess = savedInstanceState.getBoolean(SAVED_NSFW_WARNING_DISMISSED_WITH_SUCCESS)
         }
 
         setupBinding()
@@ -227,8 +234,8 @@ class SubredditFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.apply {
-            putBoolean(NSFW_WARNING_SHOWN, nsfwWarningShown)
-            putBoolean(NSFW_WARNING_DISMISSED_WITH_SUCCESS, nsfwWarningDismissedWithSuccess)
+            putBoolean(SAVED_NSFW_WARNING_SHOWN, nsfwWarningShown)
+            putBoolean(SAVED_NSFW_WARNING_DISMISSED_WITH_SUCCESS, nsfwWarningDismissedWithSuccess)
         }
     }
 
@@ -556,7 +563,7 @@ class SubredditFragment : Fragment() {
 
             binding.submitPostFab.setOnClickListener {
                 submitPostResult.launch(Intent(context, SubmitActivity::class.java).apply {
-                    putExtra(SubmitActivity.SUBREDDIT_KEY, postsFragment.name)
+                    putExtra(SubmitActivity.EXTRAS_SUBREDDIT, postsFragment.name)
                 })
             }
         }
@@ -803,10 +810,10 @@ class SubredditFragment : Fragment() {
     }
 
     /**
-     * Automatically opens the drawer if [SHOW_RULES] in [getArguments] is set to `true`
+     * Automatically opens the drawer if [ARGS_SHOW_RULES] in [getArguments] is set to `true`
      */
     private fun automaticallyOpenDrawerIfSet() {
-        arguments?.getBoolean(SHOW_RULES)?.let {
+        arguments?.getBoolean(ARGS_SHOW_RULES)?.let {
             if (it) {
                 binding.drawer.openDrawer(GravityCompat.END)
             }
@@ -888,7 +895,7 @@ class SubredditFragment : Fragment() {
                 onRulesLinkClicked?.invoke()
             } else {
                 Intent(context, DispatcherActivity::class.java).apply {
-                    putExtra(DispatcherActivity.URL_KEY, linkText)
+                    putExtra(DispatcherActivity.EXTRAS_URL_KEY, linkText)
                     requireContext().startActivity(this)
                 }
             }
@@ -1001,8 +1008,8 @@ class SubredditFragment : Fragment() {
         override fun createFragment(position: Int) : Fragment {
             return when (position) {
                 0 -> {
-                    val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
-                    val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
+                    val sort = arguments?.getString(ARGS_SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
+                    val timeSort = arguments?.getString(ARGS_TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
                     PostsFragment.newInstance(
                             isForUser = false,
                             name = subreddit.name,

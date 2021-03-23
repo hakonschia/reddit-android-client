@@ -66,16 +66,36 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     companion object {
         private const val TAG = "MainActivity"
 
-        private const val POSTS_FRAGMENT = "postsFragment"
-        private const val ACTIVE_SUBREDDIT_FRAGMENT = "activeSubredditFragment"
-        private const val SELECT_SUBREDDIT_FRAGMENT = "selectSubredditFragment"
-        private const val PROFILE_FRAGMENT = "profileFragment"
-        private const val SETTINGS_FRAGMENT = "settingsFragment"
 
         /**
-         * The saved position of the nav bar
+         * The key used in [onSaveInstanceState] to save the state of the standard sub container fragment
          */
-        private const val ACTIVE_NAV_ITEM = "activeNavItem"
+        private const val SAVED_STANDARD_SUB_CONTAINER_FRAGMENT = "saved_standardSubContainerFragment"
+
+        /**
+         * The key used in [onSaveInstanceState] to save the state of the active subreddit fragment
+         */
+        private const val SAVED_ACTIVE_SUBREDDIT_FRAGMENT = "saved_activeSubredditFragment"
+
+        /**
+         * The key used in [onSaveInstanceState] to save the state of the select subreddit fragment
+         */
+        private const val SAVED_SELECT_SUBREDDIT_FRAGMENT = "saved_selectSubredditFragment"
+
+        /**
+         * The key used in [onSaveInstanceState] to save the state of the profile fragment
+         */
+        private const val SAVED_PROFILE_FRAGMENT = "saved_profileFragment"
+
+        /**
+         * The key used in [onSaveInstanceState] to save the state of the settings fragment
+         */
+        private const val SAVED_SETTINGS_FRAGMENT = "saved_settingsFragment"
+
+        /**
+         * The saved position of the bottom navigation bars active item position
+         */
+        private const val SAVED_ACTIVE_NAV_ITEM = "saved_activeNavItem"
 
         /**
          * The key used to store the name of the subreddit represented in [MainActivity.activeSubreddit]
@@ -84,16 +104,21 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          * at the time the instance was saved, but means that when clicking on the subreddit navbar, this should
          * be shown again instead of the list of subreddits
          */
-        private const val ACTIVE_SUBREDDIT_NAME = "main_activity_active_subreddit_name"
+        private const val ACTIVE_SUBREDDIT_NAME = "saved_main_activity_active_subreddit_name"
 
-        private const val RECREATED_AS_NEW_USER = "recreatedAsNewUser"
+        /**
+         * The key used in [onSaveInstanceState] to store if the activity recreate is because the
+         * application is changing to a new user
+         */
+        private const val SAVED_RECREATED_AS_NEW_USER = "saved_recreatedAsNewUser"
+
 
         /**
          * When creating this activity, set this on the extras to select the subreddit to show by default
          *
          * The value with this key should be a [String]
          */
-        const val START_SUBREDDIT = "startSubreddit"
+        const val EXTRAS_START_SUBREDDIT = "extras_MainActivity_startSubreddit"
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -144,7 +169,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
         Intent(this, DispatcherActivity::class.java).run {
-            putExtra(DispatcherActivity.URL_KEY, "https://www.reddit.com/r/GlobalOffensive/comments/kul6ye/ww2_plane_inspired_skin_for_awp/")
+            putExtra(DispatcherActivity.EXTRAS_URL_KEY, "https://www.reddit.com/r/GlobalOffensive/comments/kul6ye/ww2_plane_inspired_skin_for_awp/")
             //startActivity(this)
         }
 
@@ -170,7 +195,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         attachFragmentChangeListener()
         setupNavBar()
 
-        val recreatedAsNewUser = savedInstanceState?.getBoolean(RECREATED_AS_NEW_USER, false)
+        val recreatedAsNewUser = savedInstanceState?.getBoolean(SAVED_RECREATED_AS_NEW_USER, false)
 
         if (savedInstanceState != null) {
             // recreatedAsNewUser will never be null if we get here
@@ -178,7 +203,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             restoreNavBar(savedInstanceState)
         } else {
             // Use empty string as default (ie. front page)
-            val startSubreddit = intent.extras?.getString(START_SUBREDDIT) ?: ""
+            val startSubreddit = intent.extras?.getString(EXTRAS_START_SUBREDDIT) ?: ""
             // Only setup the start fragment if we have no state to restore (as this is then a new activity)
             setupStartFragment(startSubreddit)
 
@@ -205,11 +230,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // Store state of nav bar
         // TODO this will not store nested items (like subreddits) and therefore wont restore correctly
         //  when recreating as a new user
-        outState.putInt(ACTIVE_NAV_ITEM, binding.bottomNav.selectedItemId)
-        outState.putBoolean(RECREATED_AS_NEW_USER, recreateAsNewUser)
+        outState.putInt(SAVED_ACTIVE_NAV_ITEM, binding.bottomNav.selectedItemId)
+        outState.putBoolean(SAVED_RECREATED_AS_NEW_USER, recreateAsNewUser)
 
         settingsFragment?.let {
-            supportFragmentManager.putFragment(outState, SETTINGS_FRAGMENT, it)
+            supportFragmentManager.putFragment(outState, SAVED_SETTINGS_FRAGMENT, it)
         }
 
         if (recreateAsNewUser) {
@@ -218,22 +243,22 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
 
         standardSubFragment?.let {
-            supportFragmentManager.putFragment(outState, POSTS_FRAGMENT, it)
+            supportFragmentManager.putFragment(outState, SAVED_STANDARD_SUB_CONTAINER_FRAGMENT, it)
         }
 
         activeSubreddit?.let {
             // If there is an active subreddit it won't be null, store the state of it even if it isn't
             // currently added (shown on screen)
             outState.putString(ACTIVE_SUBREDDIT_NAME, it.subredditName)
-            supportFragmentManager.putFragment(outState, ACTIVE_SUBREDDIT_FRAGMENT, it)
+            supportFragmentManager.putFragment(outState, SAVED_ACTIVE_SUBREDDIT_FRAGMENT, it)
         }
 
         profileFragment?.let {
-            supportFragmentManager.putFragment(outState, PROFILE_FRAGMENT, it)
+            supportFragmentManager.putFragment(outState, SAVED_PROFILE_FRAGMENT, it)
         }
 
         selectSubredditFragment?.let {
-            supportFragmentManager.putFragment(outState, SELECT_SUBREDDIT_FRAGMENT, it)
+            supportFragmentManager.putFragment(outState, SAVED_SELECT_SUBREDDIT_FRAGMENT, it)
         }
     }
 
@@ -686,7 +711,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         val pendingIntent = if (message.wasComment) {
             val intent = Intent(this, DispatcherActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                putExtra(DispatcherActivity.URL_KEY, message.context)
+                putExtra(DispatcherActivity.EXTRAS_URL_KEY, message.context)
             }
             PendingIntent.getActivity(this, 0, intent, 0)
         } else {
@@ -774,15 +799,15 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * @param onlyRestoreUserLess If true only fragments that are user less will be restored
      */
     private fun restoreFragmentStates(restoredState: Bundle, onlyRestoreUserLess: Boolean) {
-        settingsFragment = supportFragmentManager.getFragment(restoredState, SETTINGS_FRAGMENT) as SettingsFragment?
+        settingsFragment = supportFragmentManager.getFragment(restoredState, SAVED_SETTINGS_FRAGMENT) as SettingsFragment?
 
         if (onlyRestoreUserLess) {
             return
         }
-        standardSubFragment = supportFragmentManager.getFragment(restoredState, POSTS_FRAGMENT) as StandardSubContainerFragment?
-        activeSubreddit = supportFragmentManager.getFragment(restoredState, ACTIVE_SUBREDDIT_FRAGMENT) as SubredditFragment?
-        selectSubredditFragment = supportFragmentManager.getFragment(restoredState, SELECT_SUBREDDIT_FRAGMENT) as SelectSubredditFragment?
-        profileFragment = supportFragmentManager.getFragment(restoredState, PROFILE_FRAGMENT) as ProfileFragment?
+        standardSubFragment = supportFragmentManager.getFragment(restoredState, SAVED_STANDARD_SUB_CONTAINER_FRAGMENT) as StandardSubContainerFragment?
+        activeSubreddit = supportFragmentManager.getFragment(restoredState, SAVED_ACTIVE_SUBREDDIT_FRAGMENT) as SubredditFragment?
+        selectSubredditFragment = supportFragmentManager.getFragment(restoredState, SAVED_SELECT_SUBREDDIT_FRAGMENT) as SelectSubredditFragment?
+        profileFragment = supportFragmentManager.getFragment(restoredState, SAVED_PROFILE_FRAGMENT) as ProfileFragment?
 
         if (standardSubFragment == null) {
             standardSubFragment = StandardSubContainerFragment.newInstance()
@@ -805,7 +830,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * Restores the state of the nav bar
      */
     private fun restoreNavBar(restoredState: Bundle) {
-        val active = restoredState.getInt(ACTIVE_NAV_ITEM)
+        val active = restoredState.getInt(SAVED_ACTIVE_NAV_ITEM)
 
         // When we're restoring a state we don't want to play an animation, as the user hasn't manually
         // selected a change

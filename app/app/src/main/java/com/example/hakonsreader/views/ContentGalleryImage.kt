@@ -85,7 +85,7 @@ class ContentGalleryImage : FrameLayout {
                 // Setting the movement method to InternalLinkMovementMethod doesn't work for some reason
                 outboundUrl.setOnClickListener { _ ->
                     Intent(context, DispatcherActivity::class.java).apply {
-                        putExtra(DispatcherActivity.URL_KEY, it.outboundUrl)
+                        putExtra(DispatcherActivity.EXTRAS_URL_KEY, it.outboundUrl)
                         context.startActivity(this)
                     }
                 }

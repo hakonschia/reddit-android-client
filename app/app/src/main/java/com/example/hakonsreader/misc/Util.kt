@@ -25,7 +25,7 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.enums.ShowNsfwPreview
-import com.example.hakonsreader.fragments.bottomsheets.PeekUrlBottomSheet
+import com.example.hakonsreader.fragments.bottomsheets.PeekLinkBottomSheet
 import com.example.hakonsreader.states.LoggedInState.PrivatelyBrowsing
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -194,11 +194,11 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
             //  the subreddit will be sent to the navbar subreddit and we wont mess up anything else
             if (subreddit == "popular" || subreddit == "all") {
                 Intent(context, MainActivity::class.java).apply {
-                    putExtra(MainActivity.START_SUBREDDIT, subreddit)
+                    putExtra(MainActivity.EXTRAS_START_SUBREDDIT, subreddit)
                 }
             } else {
                 Intent(context, SubredditActivity::class.java).apply {
-                    putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit)
+                    putExtra(SubredditActivity.EXTRAS_SUBREDDIT_KEY, subreddit)
                 }
             }
         }
@@ -218,11 +218,11 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
             val timeSort = asUri.getQueryParameter("t")
 
             Intent(context, SubredditActivity::class.java).apply {
-                putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit)
+                putExtra(SubredditActivity.EXTRAS_SUBREDDIT_KEY, subreddit)
 
                 // These might be null, but that does not matter
-                putExtra(SubredditActivity.SORT, sort)
-                putExtra(SubredditActivity.TIME_SORT, timeSort)
+                putExtra(SubredditActivity.EXTRAS_SORT, sort)
+                putExtra(SubredditActivity.EXTRAS_TIME_SORT, timeSort)
             }
         }
 
@@ -232,8 +232,8 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
             val subreddit = pathSegments[1]
 
             Intent(context, SubredditActivity::class.java).apply {
-                putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit)
-                putExtra(SubredditActivity.SHOW_RULES, true)
+                putExtra(SubredditActivity.EXTRAS_SUBREDDIT_KEY, subreddit)
+                putExtra(SubredditActivity.EXTRAS_SHOW_RULES, true)
             }
         }
 
@@ -243,7 +243,7 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
             // Same as with subreddits, first is "u", second is the username
             val username = pathSegments[1]
             Intent(context, ProfileActivity::class.java).apply {
-                putExtra(ProfileActivity.USERNAME_KEY, username)
+                putExtra(ProfileActivity.EXTRAS_USERNAME_KEY, username)
             }
         }
 
@@ -253,11 +253,11 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
             val postId = pathSegments[3]
 
             Intent(context, PostActivity::class.java).apply {
-                putExtra(PostActivity.POST_ID_KEY, postId)
+                putExtra(PostActivity.EXTRAS_POST_ID_KEY, postId)
 
                 // Add the ID of the comment chain specified, if available
                 if (pathSegments.size >= 6) {
-                    putExtra(PostActivity.COMMENT_ID_CHAIN, pathSegments[5])
+                    putExtra(PostActivity.EXTRAS_COMMENT_ID_CHAIN, pathSegments[5])
                 }
             }
             // TODO when the post is in a "user" subreddit it doesnt work
@@ -269,7 +269,7 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
             // The URL will look like: reddit.com/comments/<postId>
             val postId = pathSegments[1]
             Intent(context, PostActivity::class.java).apply {
-                putExtra(PostActivity.POST_ID_KEY, postId)
+                putExtra(PostActivity.EXTRAS_POST_ID_KEY, postId)
             }
         }
 
@@ -278,7 +278,7 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
             // The URL will look like: redd.it/<postId>
             val postId = pathSegments[0]
             Intent(context, PostActivity::class.java).apply {
-                putExtra(PostActivity.POST_ID_KEY, postId)
+                putExtra(PostActivity.EXTRAS_POST_ID_KEY, postId)
             }
         }
 
@@ -301,7 +301,7 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
                 // if the format parameter is an image format assume this is an image
                 || IMAGE_FORMATS.contains(asUri.getQueryParameter("format")) -> {
             Intent(context, ImageActivity::class.java).apply {
-                putExtra(ImageActivity.IMAGE_URL, url)
+                putExtra(ImageActivity.EXTRAS_IMAGE_URL, url)
             }
         }
 
@@ -315,8 +315,8 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
             val videoId = youtubeVideoId ?: pathSegments.first()
 
             Intent(context, VideoYoutubeActivity::class.java).apply {
-                putExtra(VideoYoutubeActivity.VIDEO_ID, videoId)
-                putExtra(VideoYoutubeActivity.TIMESTAMP, asUri.getQueryParameter("t")?.toFloat())
+                putExtra(VideoYoutubeActivity.EXTRAS_VIDEO_ID, videoId)
+                putExtra(VideoYoutubeActivity.EXTRAS_TIMESTAMP, asUri.getQueryParameter("t")?.toFloat())
             }
         }
 
@@ -350,7 +350,7 @@ fun createIntentInternal(url: String, options: CreateIntentOptions, context: Con
             // If no activity found and user wants to open links in app, open in WebView (internal browser)
             if (!appActivityFound && options.openLinksInternally) {
                 Intent(context, WebViewActivity::class.java).apply {
-                    putExtra(WebViewActivity.URL, url)
+                    putExtra(WebViewActivity.EXTRAS_URL, url)
                 }
             } else {
                 baseIntent
@@ -768,7 +768,7 @@ fun dpToPixels(dp: Float, res: Resources): Int {
  * @param url The URL
  */
 fun showPeekUrlBottomSheet(activity: AppCompatActivity, text: String, url: String) {
-    PeekUrlBottomSheet.newInstance(text = text, url = url).run {
+    PeekLinkBottomSheet.newInstance(text = text, url = url).run {
         show(activity.supportFragmentManager, "Peek URL")
     }
 }

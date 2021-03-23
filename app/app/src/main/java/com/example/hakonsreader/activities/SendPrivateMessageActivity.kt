@@ -20,21 +20,21 @@ class SendPrivateMessageActivity : BaseActivity() {
          *
          * The value for this key should be a [String]
          */
-        const val EXTRAS_RECIPIENT = "recipient"
+        const val EXTRAS_RECIPIENT = "extras_SendPrivateMessageActivity_recipient"
 
         /**
          * The extras to pre-set the subject of the message
          *
          * The value for this key should be a [String]
          */
-        const val EXTRAS_SUBJECT = "subject"
+        const val EXTRAS_SUBJECT = "extras_SendPrivateMessageActivity_subject"
 
         /**
          * The extras to pre-set the message content of the message
          *
          * The value for this key should be a [String]
          */
-        const val EXTRAS_MESSAGE = "message"
+        const val EXTRAS_MESSAGE = "extras_SendPrivateMessageActivity_message"
     }
 
     private lateinit var binding: ActivitySendPrivateMessageBinding

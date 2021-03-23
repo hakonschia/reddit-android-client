@@ -25,14 +25,14 @@ class VideoYoutubeActivity : BaseActivity() {
          *
          * The value with this key should be a [String]
          */
-        const val VIDEO_ID = "videoId"
+        const val EXTRAS_VIDEO_ID = "extras_VideoYoutubeActivity_videoId"
 
         /**
          * The key used to send to this activity the timestamp, in seconds, of the video
          *
          * The value with this key should be a [Float]
          */
-        const val TIMESTAMP = "videoTimestamp"
+        const val EXTRAS_TIMESTAMP = "extras_VideoYoutubeActivity_videoTimestamp"
 
 
         /**
@@ -40,7 +40,7 @@ class VideoYoutubeActivity : BaseActivity() {
          *
          * The value with this key should be a [Float]
          */
-        private const val SAVED_TIMESTAMP = "savedVideoTimestamp"
+        private const val SAVED_TIMESTAMP = "saved_videoTimestamp"
     }
 
     private var currentTimestamp = 0F
@@ -49,10 +49,10 @@ class VideoYoutubeActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_youtube)
 
-        val videoId = intent.extras?.getString(VIDEO_ID)
+        val videoId = intent.extras?.getString(EXTRAS_VIDEO_ID)
 
         // Prefer the timestamp saved in onSaveInstanceState, then the value passed to the activity
-        val startSeconds = savedInstanceState?.getFloat(SAVED_TIMESTAMP) ?: intent.extras?.getFloat(TIMESTAMP) ?: 0F
+        val startSeconds = savedInstanceState?.getFloat(SAVED_TIMESTAMP) ?: intent.extras?.getFloat(EXTRAS_TIMESTAMP) ?: 0F
 
         if (videoId == null) {
             finish()

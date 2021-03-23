@@ -22,7 +22,7 @@ fun openSubredditInActivity(view: View, subreddit: String) {
 
     // Send some data like what sub it is etc etc so it knows what to load
     Intent(context, SubredditActivity::class.java).run {
-        putExtra(SubredditActivity.SUBREDDIT_KEY, subreddit)
+        putExtra(SubredditActivity.EXTRAS_SUBREDDIT_KEY, subreddit)
         activity.startActivity(this)
 
         // Slide the activity in
@@ -42,7 +42,7 @@ fun openProfileInActivity(view: View, username: String?) {
 
     // Send some data like what sub it is etc etc so it knows what to load
     Intent(context, ProfileActivity::class.java).run {
-        putExtra(ProfileActivity.USERNAME_KEY, username)
+        putExtra(ProfileActivity.EXTRAS_USERNAME_KEY, username)
         activity.startActivity(this)
 
         // Slide the activity in
@@ -63,8 +63,8 @@ fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean) {
 
     // Send some data like what sub it is etc etc so it knows what to load
     Intent(context, ImageActivity::class.java).run {
-        putExtra(ImageActivity.IMAGE_URL, imageUrl)
-        putExtra(ImageActivity.CACHE_IMAGE, cache)
+        putExtra(ImageActivity.EXTRAS_IMAGE_URL, imageUrl)
+        putExtra(ImageActivity.EXTRAS_CACHE_IMAGE, cache)
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image")
         activity.startActivity(this, options.toBundle())
     }

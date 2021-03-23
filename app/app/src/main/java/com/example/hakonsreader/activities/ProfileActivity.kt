@@ -18,14 +18,15 @@ class ProfileActivity : BaseActivity(), LockableSlidr {
         private const val TAG = "ProfileActivity"
 
         /**
-         * The key used to send which username the profile is for
-         */
-        const val USERNAME_KEY = "username"
-
-        /**
          * The key used to save the fragment when the activity has been killed and recreated
          */
-        const val SAVED_FRAGMENT = "savedFragment"
+        private const val SAVED_FRAGMENT = "saved_fragment"
+
+
+        /**
+         * The key used to send which username the profile is for
+         */
+        const val EXTRAS_USERNAME_KEY = "extras_ProfileActivity_username"
     }
 
     private var fragment: ProfileFragment? = null
@@ -36,7 +37,7 @@ class ProfileActivity : BaseActivity(), LockableSlidr {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        val username = intent.extras?.getString(USERNAME_KEY)
+        val username = intent.extras?.getString(EXTRAS_USERNAME_KEY)
 
         if (username == null) {
             finish()
@@ -48,8 +49,6 @@ class ProfileActivity : BaseActivity(), LockableSlidr {
         } else {
             ProfileFragment.newInstance(username)
         }?.apply {
-            retainInstance = true
-
             supportFragmentManager.beginTransaction()
                     .replace(R.id.profileContainer, this)
                     .commit()

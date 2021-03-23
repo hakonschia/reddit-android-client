@@ -12,15 +12,22 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 
+/**
+ * Fragment that serves as a container for the standard subreddits:
+ * * Front page
+ * * Popular
+ * * All
+ */
 class StandardSubContainerFragment : Fragment() {
 
     companion object {
         private const val TAG = "StandardSubContainerFragment"
 
+
         /**
-         * The key used to store the subreddit currently visible on the screen
+         * The key used in [onSaveInstanceState] to store ViewPager position of the subreddit currently active
          */
-        private const val ACTIVE_SUBREDDIT_KEY = "posts_container_active_subreddit"
+        private const val SAVED_ACTIVE_SUBREDDIT_POS = "saved_postsContainerActiveSubreddit"
 
 
         /**
@@ -32,7 +39,7 @@ class StandardSubContainerFragment : Fragment() {
     /**
      * Enum representing the names of the standard subs that this fragment can display.
      *
-     * The enum value represents the subreddit name in lowercase, where front page is represented
+     * [value] represents the subreddit name in lowercase, where front page is represented
      * as an empty string
      */
     enum class StandarSub(val value: String) {
@@ -46,14 +53,21 @@ class StandardSubContainerFragment : Fragment() {
      */
     var defaultSub: StandarSub = StandarSub.FRONT_PAGE
 
+    /**
+     * If not null, this represents the subreddit to display when the view is created
+     */
     private var overridenSub: StandarSub? = null
 
+    /**
+     * The ViewPager displaying the fragments
+     */
     private var viewPager: ViewPager2? = null
 
     /**
      * The currently active item in the ViewPager, or -1 if not yet set
      */
     private var activeItem = -1
+
 
     /**
      * Sets the subreddit to be active. If the view is not currently created, then the value will
@@ -77,7 +91,7 @@ class StandardSubContainerFragment : Fragment() {
                 override fun onPageSelected(position: Int) {
                     setToolbar(position)
 
-                    // Save the active item now, as the viewpager might be nulled by the time saveState is called
+                    // Save the active item now, as the viewpager might be nulled by the time onSaveInstanceState is called
                     activeItem = position
                 }
             })
@@ -90,7 +104,7 @@ class StandardSubContainerFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt(ACTIVE_SUBREDDIT_KEY, activeItem)
+        outState.putInt(SAVED_ACTIVE_SUBREDDIT_POS, activeItem)
     }
 
     override fun onDestroyView() {
@@ -107,7 +121,7 @@ class StandardSubContainerFragment : Fragment() {
         } else {
             when {
                 activeItem >= 0 -> activeItem
-                savedInstanceState != null -> savedInstanceState.getInt(ACTIVE_SUBREDDIT_KEY)
+                savedInstanceState != null -> savedInstanceState.getInt(SAVED_ACTIVE_SUBREDDIT_POS)
                 else -> getDefaultSubPosition()
             }
         }

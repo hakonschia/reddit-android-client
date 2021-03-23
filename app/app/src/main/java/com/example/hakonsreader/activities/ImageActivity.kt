@@ -21,7 +21,7 @@ import com.squareup.picasso.Picasso
 /**
  * Activity to display an image in fullscreen
  *
- * The URL to the image should be passed to the activity with the key [IMAGE_URL]
+ * The URL to the image should be passed to the activity with the key [EXTRAS_IMAGE_URL]
  */
 class ImageActivity : BaseActivity() {
 
@@ -31,14 +31,14 @@ class ImageActivity : BaseActivity() {
          *
          * The value with this key should be a [String]
          */
-        const val IMAGE_URL = "imageUrl"
+        const val EXTRAS_IMAGE_URL = "extras_ImageActivity_imageUrl"
 
         /**
          * The key used for to tell if the image being loaded should be cached
          *
          * The value with this key should be a [Boolean]
          */
-        const val CACHE_IMAGE = "cacheImage"
+        const val EXTRAS_CACHE_IMAGE = "extras_ImageActivity_cacheImage"
     }
 
     private var slidrInterface: SlidrInterface? = null
@@ -73,7 +73,7 @@ class ImageActivity : BaseActivity() {
                 window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                         WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
-            var imageUrl = data.getString(IMAGE_URL)
+            var imageUrl = data.getString(EXTRAS_IMAGE_URL)
 
             val attacher: PhotoViewAttacher = binding.image.attacher
             attacher.maximumScale = 7f
@@ -82,7 +82,7 @@ class ImageActivity : BaseActivity() {
             imageUrl = LinkUtils.convertToDirectUrl(imageUrl)
             binding.loadingIcon.visibility = View.VISIBLE
 
-            val cache = data.getBoolean(CACHE_IMAGE, true)
+            val cache = data.getBoolean(EXTRAS_CACHE_IMAGE, true)
 
             Picasso.get()
                     .load(imageUrl)

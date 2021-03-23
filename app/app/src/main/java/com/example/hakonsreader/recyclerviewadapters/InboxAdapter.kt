@@ -102,7 +102,7 @@ fun openMessageContext(view: View, context: String) {
     val finalContext = "https://reddit.com$context"
 
     val intent = Intent(view.context, DispatcherActivity::class.java)
-    intent.putExtra(DispatcherActivity.URL_KEY, finalContext)
+    intent.putExtra(DispatcherActivity.EXTRAS_URL_KEY, finalContext)
 
     view.context.startActivity(intent)
 }

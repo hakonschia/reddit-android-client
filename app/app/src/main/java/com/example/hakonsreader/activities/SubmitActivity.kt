@@ -44,7 +44,7 @@ import kotlin.collections.HashMap
 
 /**
  * Activity for submitting a post to a subreddit. The ID of the newly created post (if one was created)
- * will be passed with the key [RESULT_POST_ID]
+ * will be passed with the key [EXTRAS_RESULT_POST_ID]
  */
 class SubmitActivity : BaseActivity() {
 
@@ -54,13 +54,14 @@ class SubmitActivity : BaseActivity() {
         /**
          * The key used to tell the name of the subreddit being submitted to
          */
-        const val SUBREDDIT_KEY = "submittingToSubredditName"
+        const val EXTRAS_SUBREDDIT = "extras_SubmitActivity_submittingToSubredditName"
 
         /**
          * The key used in activity results to tell the ID of the post submitted
          */
-        const val RESULT_POST_ID = "resultPostId"
+        const val EXTRAS_RESULT_POST_ID = "extras_SubmitActivity_resultPostId"
     }
+
 
     private val api = App.get().api
     private val database = App.get().database
@@ -79,7 +80,7 @@ class SubmitActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setupBinding()
 
-        subredditName = intent?.extras?.getString(SUBREDDIT_KEY) ?: return
+        subredditName = intent?.extras?.getString(EXTRAS_SUBREDDIT) ?: return
         binding.subredditName = subredditName
 
         setupSubredditViewModel(subredditName)
@@ -327,7 +328,7 @@ class SubmitActivity : BaseActivity() {
     private fun onSubmitResponse(response: ApiResponse<Submission>) {
         when (response) {
             is ApiResponse.Success -> {
-                intent.putExtra(RESULT_POST_ID, response.value.id)
+                intent.putExtra(EXTRAS_RESULT_POST_ID, response.value.id)
                 setResult(RESULT_OK, intent)
                 finish()
             }

@@ -12,7 +12,6 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activities.DispatcherActivity;
@@ -32,7 +31,7 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
         mOnLinkClickedListener = (linkText, context) -> {
             // Let the dispatch activity handle all links
             Intent intent = new Intent(context, DispatcherActivity.class);
-            intent.putExtra(DispatcherActivity.URL_KEY, linkText);
+            intent.putExtra(DispatcherActivity.EXTRAS_URL_KEY, linkText);
             context.startActivity(intent);
             return true;
         };

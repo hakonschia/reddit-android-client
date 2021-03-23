@@ -54,8 +54,8 @@ class ContentYoutubeVideo : Content {
 
         binding.root.setOnClickListener {
             val intent = Intent(context, VideoYoutubeActivity::class.java).apply {
-                putExtra(VideoYoutubeActivity.VIDEO_ID, getVideoId())
-                putExtra(VideoYoutubeActivity.TIMESTAMP, getTimestamp())
+                putExtra(VideoYoutubeActivity.EXTRAS_VIDEO_ID, getVideoId())
+                putExtra(VideoYoutubeActivity.EXTRAS_TIMESTAMP, getTimestamp())
             }
             (context as AppCompatActivity).overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             context.startActivity(intent)

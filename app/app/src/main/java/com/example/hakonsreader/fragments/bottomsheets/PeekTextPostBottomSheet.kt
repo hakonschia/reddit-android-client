@@ -4,12 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.core.widget.NestedScrollView
-import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.views.ContentText
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
@@ -20,7 +17,11 @@ import com.google.gson.Gson
 class PeekTextPostBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
-        private const val POST = "markdown"
+
+        /**
+         * The key used in [getArguments] for the post to peek in the bottom sheet
+         */
+        private const val ARGS_POST = "args_post"
 
         /**
          * Creates a new bottom sheet instance
@@ -35,13 +36,13 @@ class PeekTextPostBottomSheet : BottomSheetDialogFragment() {
             val strippedPost = RedditPost().apply {
                 selftext = post.selftext
             }
-            arguments = bundleOf(Pair(POST, Gson().toJson(strippedPost)))
+            arguments = bundleOf(Pair(ARGS_POST, Gson().toJson(strippedPost)))
         }
     }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val post = Gson().fromJson(requireArguments().getString(POST), RedditPost::class.java)
+        val post = Gson().fromJson(requireArguments().getString(ARGS_POST), RedditPost::class.java)
 
         // ContentText has a ScrollView, but if we change that to a NestedScrollView we can't scroll when
         // opening posts, and without it here we can't scroll back up without dismissing the bottom sheet

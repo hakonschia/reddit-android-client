@@ -13,7 +13,7 @@ import android.view.animation.LinearInterpolator
 import android.webkit.*
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activities.WebViewActivity.Companion.URL
+import com.example.hakonsreader.activities.WebViewActivity.Companion.EXTRAS_URL
 import com.example.hakonsreader.databinding.ActivityWebViewBinding
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -22,11 +22,11 @@ import com.google.android.material.snackbar.Snackbar
 /**
  * Activity that displays a WebView with a given URL
  *
- * Use [URL] to send the URL to load
+ * Use [EXTRAS_URL] to send the URL to load
  */
 class WebViewActivity : BaseActivity() {
     companion object {
-        const val URL = "url"
+        const val EXTRAS_URL = "extras_WebViewActivity_url"
     }
 
     private lateinit var binding: ActivityWebViewBinding
@@ -42,7 +42,7 @@ class WebViewActivity : BaseActivity() {
         binding = ActivityWebViewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val url = intent.extras?.getString(URL)
+        val url = intent.extras?.getString(EXTRAS_URL)
         if (url == null) {
             finish()
             return

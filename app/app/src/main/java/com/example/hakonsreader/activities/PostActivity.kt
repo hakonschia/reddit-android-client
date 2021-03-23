@@ -49,39 +49,42 @@ class PostActivity : BaseActivity(), OnReplyListener {
          * The key used to store the state of the post transition in saved instance states
          *
          * The value stored with this key is a [Float]
-         *
          */
-        private const val TRANSITION_STATE_KEY = "transitionState"
+        private const val SAVED_TRANSITION_STATE_KEY = "saved_transitionState"
+
         /**
-         * The key used to store if the transition is enabled in saved instance states
+         * The key used in [onSaveInstanceState] to store if the transition is enabled
          *
          * The value stored with this key is a [Boolean]. This value being `true` means the transition
          * is enabled (ie. the post collapses automatically)
          */
-        private const val TRANSITION_ENABLED_KEY = "transitionEnabled"
+        private const val SAVED_TRANSITION_ENABLED_KEY = "saved_transitionEnabled"
 
 
         /**
          * The key used for sending the post to this activity
+         *
+         * The value of this key should be a JSON string representing the post
          */
-        const val POST_KEY = "post"
+        const val EXTRAS_POST_KEY = "extras_PostActivity_post"
 
         /**
          * The key used for sending the ID of the post to this activity
          *
          * Use this is the post isn't retrieved when starting the activity
          */
-        const val POST_ID_KEY = "post_id"
+        const val EXTRAS_POST_ID_KEY = "extras_PostActivity_postId"
 
         /**
          * The key used to tell if the post score should be hidden
          */
-        const val HIDE_SCORE_KEY = "hideScore"
+        const val EXTRAS_HIDE_SCORE_KEY = "extras_PostActivity_hideScore"
 
         /**
          * The key used to tell the ID of the comment chain to show
          */
-        const val COMMENT_ID_CHAIN = "commentIdChain"
+        const val EXTRAS_COMMENT_ID_CHAIN = "extras_PostActivity_commentIdChain"
+
 
         /**
          * The bitmap to display when transitioning videos. This should be set just before the
@@ -129,10 +132,11 @@ class PostActivity : BaseActivity(), OnReplyListener {
      * Handles results when adding replies to the post (only top-level comments, not replies
      * to other comments in the post)
      */
-    private val replyActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { uri ->
-        val data = uri.data ?: return@registerForActivityResult
+    private val replyActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val data = result.data ?: return@registerForActivityResult
 
-        val newComment = Gson().fromJson(data.getStringExtra(ReplyActivity.LISTING_KEY), RedditComment::class.java)
+        val newComment = Gson().fromJson(data.getStringExtra(ReplyActivity.EXTRAS_LISTING), RedditComment::class.java)
         val parent = if (replyingTo is RedditComment) replyingTo as RedditComment else null
         commentsViewModel.insertComment(newComment, parent)
     }
@@ -149,9 +153,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
         if (savedInstanceState == null) {
             loadComments()
         } else {
-            binding.parentLayout.progress = savedInstanceState.getFloat(TRANSITION_STATE_KEY)
+            binding.parentLayout.progress = savedInstanceState.getFloat(SAVED_TRANSITION_STATE_KEY)
 
-            val transitionEnabled = savedInstanceState.getBoolean(TRANSITION_ENABLED_KEY, App.get().collapsePostsByDefaultWhenScrollingComments())
+            val transitionEnabled = savedInstanceState.getBoolean(SAVED_TRANSITION_ENABLED_KEY, App.get().collapsePostsByDefaultWhenScrollingComments())
             enableTransition(transitionEnabled, showSnackbar = false, updateHeight = false)
         }
     }
@@ -178,8 +182,8 @@ class PostActivity : BaseActivity(), OnReplyListener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        outState.putFloat(TRANSITION_STATE_KEY, binding.parentLayout.progress)
-        outState.putBoolean(TRANSITION_ENABLED_KEY, binding.parentLayout.getTransition(R.id.postTransition).isEnabled)
+        outState.putFloat(SAVED_TRANSITION_STATE_KEY, binding.parentLayout.progress)
+        outState.putBoolean(SAVED_TRANSITION_ENABLED_KEY, binding.parentLayout.getTransition(R.id.postTransition).isEnabled)
     }
 
     override fun onDestroy() {
@@ -210,7 +214,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
             post.lifecycleOwner = this@PostActivity
 
             post.maxHeight = maxPostHeight
-            post.hideScore = intent.extras?.getBoolean(HIDE_SCORE_KEY, false) == true
+            post.hideScore = intent.extras?.getBoolean(EXTRAS_HIDE_SCORE_KEY, false) == true
 
             // Go to first/last comment on long clicks on navigation buttons
             goToNextTopLevelComment.setOnLongClickListener(this@PostActivity::goToLastComment)
@@ -303,7 +307,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
         with(binding) {
             val adapter = CommentsAdapter().apply {
                 replyListener = this@PostActivity
-                commentIdChain = intent.extras?.getString(COMMENT_ID_CHAIN, "") ?: ""
+                commentIdChain = intent.extras?.getString(EXTRAS_COMMENT_ID_CHAIN, "") ?: ""
                 loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel.loadMoreComments(comment, parent) }
                 onChainShown = Runnable { binding.commentChainShown = true }
             }
@@ -372,7 +376,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
      * from a URI intent and loads the comments for the post
      */
     private fun loadComments() {
-        val postJson = intent.extras?.getString(POST_KEY)
+        val postJson = intent.extras?.getString(EXTRAS_POST_KEY)
 
         // Load 3rd API calls if the post hasn't been loaded already, as we then have to draw
         // the content of the post. If we have a post already the 3rd party calls should have been
@@ -384,7 +388,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
             loadThirdParty = false
             setPostFromJson(postJson)
         } else {
-            intent.extras?.getString(POST_ID_KEY)
+            intent.extras?.getString(EXTRAS_POST_ID_KEY)
         }
 
         if (postId != null) {
@@ -449,7 +453,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
                     content.setOnVideoFullscreenListener { contentVideo ->
                         val intent = Intent(this, VideoActivity::class.java).apply {
-                            putExtra(VideoActivity.EXTRAS, contentVideo.extras)
+                            putExtra(VideoActivity.EXTRAS_EXTRAS, contentVideo.extras)
                         }
 
                         // Pause the video here so it doesn't play both places
@@ -585,8 +589,8 @@ class PostActivity : BaseActivity(), OnReplyListener {
         replyingTo = listing
 
         val intent = Intent(this, ReplyActivity::class.java).apply {
-            putExtra(ReplyActivity.LISTING_KIND_KEY, listing.kind)
-            putExtra(ReplyActivity.LISTING_KEY, Gson().toJson(listing))
+            putExtra(ReplyActivity.EXTRAS_LISTING_KIND, listing.kind)
+            putExtra(ReplyActivity.EXTRAS_LISTING, Gson().toJson(listing))
         }
 
         replyActivityResult.launch(intent)

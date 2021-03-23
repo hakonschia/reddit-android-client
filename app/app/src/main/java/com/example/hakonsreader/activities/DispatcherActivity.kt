@@ -16,10 +16,9 @@ class DispatcherActivity : AppCompatActivity() {
         /**
          * The key used to transfer the URL to dispatch
          *
-         *
-         * Example URL: https://www.reddit.com/r/
+         * The value with should be a [String]
          */
-        const val URL_KEY = "url"
+        const val EXTRAS_URL_KEY = "url"
     }
 
 
@@ -39,7 +38,7 @@ class DispatcherActivity : AppCompatActivity() {
                 finish()
                 return
             }
-            data.getString(URL_KEY)
+            data.getString(EXTRAS_URL_KEY)
         }
 
         if (url == null) {

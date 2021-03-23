@@ -8,15 +8,25 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.databinding.BottomSheetPeekUrlBinding
-import com.example.hakonsreader.misc.CreateIntentOptions
-import com.example.hakonsreader.misc.createIntent
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class PeekUrlBottomSheet : BottomSheetDialogFragment() {
+/**
+ * Bottom sheet for peeking a link by showing the text and the URL it is pointing to
+ */
+class PeekLinkBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
-        private const val TEXT_KEY = "text"
-        private const val URL_KEY = "url"
+
+        /**
+         * The key used in [getArguments] for the text of the link
+         */
+        private const val ARGS_TEXT = "args_text"
+
+        /**
+         * The key used in [getArguments] for the URL of the link
+         */
+        private const val ARGS_URL = "args_url"
+
 
         /**
          * Creates a new bottom sheet
@@ -24,10 +34,10 @@ class PeekUrlBottomSheet : BottomSheetDialogFragment() {
          * @param text The text of the URL. This will be trimmed
          * @param url The URL
          */
-        fun newInstance(text: String, url: String) = PeekUrlBottomSheet().apply {
+        fun newInstance(text: String, url: String) = PeekLinkBottomSheet().apply {
             arguments = Bundle().apply {
-                putString(TEXT_KEY, text.trim())
-                putString(URL_KEY, url)
+                putString(ARGS_TEXT, text.trim())
+                putString(ARGS_URL, url)
             }
         }
     }
@@ -42,12 +52,12 @@ class PeekUrlBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val text = requireArguments().getString(TEXT_KEY)
-        val url = requireArguments().getString(URL_KEY) ?: return
+        val text = requireArguments().getString(ARGS_TEXT)
+        val url = requireArguments().getString(ARGS_URL) ?: return
 
         val openLinkListener = View.OnClickListener {
             Intent(context, DispatcherActivity::class.java).apply {
-                putExtra(DispatcherActivity.URL_KEY, url)
+                putExtra(DispatcherActivity.EXTRAS_URL_KEY, url)
                 requireContext().startActivity(this)
             }
         }

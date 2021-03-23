@@ -68,7 +68,7 @@ class PostInfo : FrameLayout {
      */
     private fun openPost(post: RedditPost) {
         val intent = Intent(context, PostActivity::class.java).apply {
-            putExtra(PostActivity.POST_KEY, Gson().toJson(post))
+            putExtra(PostActivity.EXTRAS_POST_KEY, Gson().toJson(post))
         }
         val activity = context as Activity
         activity.startActivity(intent)

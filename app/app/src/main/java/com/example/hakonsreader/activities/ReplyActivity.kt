@@ -9,8 +9,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.activities.ReplyActivity.Companion.LISTING_KEY
-import com.example.hakonsreader.activities.ReplyActivity.Companion.LISTING_KIND_KEY
+import com.example.hakonsreader.activities.ReplyActivity.Companion.EXTRAS_LISTING
+import com.example.hakonsreader.activities.ReplyActivity.Companion.EXTRAS_LISTING_KIND
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.interfaces.ReplyableListing
@@ -30,41 +30,54 @@ import kotlinx.coroutines.withContext
 /**
  * Activity to reply to a post or comment
  *
- * The post/comment should be passed to the activity with the key [LISTING_KEY] and the
- * what kind of listing it is with [LISTING_KIND_KEY]
+ * The post/comment should be passed to the activity with the key [EXTRAS_LISTING] and the
+ * what kind of listing it is with [EXTRAS_LISTING_KIND]
  */
 class ReplyActivity : BaseActivity() {
-    private val TAG = "ReplyActivity"
 
     companion object {
-        const val LISTING_KEY = "replyingToListing"
+        private const val TAG = "ReplyActivity"
 
-        const val LISTING_KIND_KEY = "replyingToListingKind"
 
         /**
          * The key used used to store if the confirm discard dialog is shown
          */
-        private const val CONFIRM_DIALOG_SHOWN = "confirmDialogShown"
+        private const val SAVED_CONFIRM_DIALOG_SHOWN = "saved_confirmDialogShown"
 
         /**
          * Key used to store the state of the reply text
          */
-        private const val REPLY_TEXT = "replyText"
+        private const val SAVED_REPLY_TEXT = "saved_replyText"
 
         /**
          * Key used to store if the URL dialog is shown
          */
-        private const val LINK_DIALOG_SHOWN = "urlDialogShown"
+        private const val SAVED_LINK_DIALOG_SHOWN = "saved_urlDialogShown"
 
         /**
          * Key used to store the state of the URL dialog link text
          */
-        private const val LINK_DIALOG_TEXT = "urlDialogText"
+        private const val SAVED_LINK_DIALOG_TEXT = "saved_urlDialogText"
 
         /**
          * Key used to store the state of the URL dialog link
          */
-        private const val LINK_DIALOG_LINK = "urlDialogLink"
+        private const val SAVED_LINK_DIALOG_LINK = "saved_urlDialogLink"
+
+
+        /**
+         * The key to send the listing being replied to
+         *
+         * The value of this key should be a JSON string
+         */
+        const val EXTRAS_LISTING = "extras_ReplyActivity_replyingToListing"
+
+        /**
+         * The key to send the kind of listing being replied to ([ReplyableListing.kind])
+         *
+         * The value of this key should be a [String]
+         */
+        const val EXTRAS_LISTING_KIND = "extras_ReplyActivity_replyingToListingKind"
     }
 
 
@@ -107,20 +120,20 @@ class ReplyActivity : BaseActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        outState.putString(REPLY_TEXT, binding.markdownInput.inputText)
+        outState.putString(SAVED_REPLY_TEXT, binding.markdownInput.inputText)
 
         if (binding.markdownInput.isLinkDialogShown) {
-            outState.putBoolean(LINK_DIALOG_SHOWN, true)
+            outState.putBoolean(SAVED_LINK_DIALOG_SHOWN, true)
 
-            outState.putString(LINK_DIALOG_TEXT, binding.markdownInput.linkDialogText)
-            outState.putString(LINK_DIALOG_LINK, binding.markdownInput.linkDialogLink)
+            outState.putString(SAVED_LINK_DIALOG_TEXT, binding.markdownInput.linkDialogText)
+            outState.putString(SAVED_LINK_DIALOG_LINK, binding.markdownInput.linkDialogLink)
 
             // Ensure the dialog is dismissed or else it will cause a leak
             binding.markdownInput.dismissLinkDialog()
         }
 
         if (confirmDiscardDialog?.isShowing == true) {
-            outState.putBoolean(CONFIRM_DIALOG_SHOWN, true)
+            outState.putBoolean(SAVED_CONFIRM_DIALOG_SHOWN, true)
             confirmDiscardDialog?.dismiss()
         }
     }
@@ -147,18 +160,18 @@ class ReplyActivity : BaseActivity() {
      * @param state The state to restore
      */
     private fun restoreInstanceState(state: Bundle) {
-        binding.markdownInput.setText(state.getString(REPLY_TEXT, ""))
+        binding.markdownInput.setText(state.getString(SAVED_REPLY_TEXT, ""))
 
         // Restore the link dialog
-        val showLinkDialog = state.getBoolean(LINK_DIALOG_SHOWN)
+        val showLinkDialog = state.getBoolean(SAVED_LINK_DIALOG_SHOWN)
         if (showLinkDialog) {
-            val text = state.getString(LINK_DIALOG_TEXT, "")
-            val link = state.getString(LINK_DIALOG_LINK, "")
+            val text = state.getString(SAVED_LINK_DIALOG_TEXT, "")
+            val link = state.getString(SAVED_LINK_DIALOG_LINK, "")
             binding.markdownInput.showLinkDialog(text, link)
         }
 
         // Restore the confirmation for discarding dialog
-        val showConfirmDialog = state.getBoolean(CONFIRM_DIALOG_SHOWN)
+        val showConfirmDialog = state.getBoolean(SAVED_CONFIRM_DIALOG_SHOWN)
         if (showConfirmDialog) {
             showConfirmDialog()
         }
@@ -170,8 +183,8 @@ class ReplyActivity : BaseActivity() {
      * @param extras The bundle to set the listing from
      */
     private fun setListingFromExtras(extras: Bundle) {
-        val jsonData = extras.getString(LISTING_KEY)
-        val kind = extras.getString(LISTING_KIND_KEY)
+        val jsonData = extras.getString(EXTRAS_LISTING)
+        val kind = extras.getString(EXTRAS_LISTING_KIND)
 
         if (kind == Thing.POST.value) {
             replyingTo = Gson().fromJson(jsonData, RedditPost::class.java)
@@ -309,7 +322,7 @@ class ReplyActivity : BaseActivity() {
         }
 
         // Pass the new comment back and finish
-        val intent = intent.putExtra(LISTING_KEY, Gson().toJson(comment))
+        val intent = intent.putExtra(EXTRAS_LISTING, Gson().toJson(comment))
 
         // Kind of a bad way to do it, but if we call finish with text in the input a dialog is shown
         // Other option is to create a flag (ie "replySent") and not show the dialog if true

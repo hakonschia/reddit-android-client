@@ -108,7 +108,7 @@ class LinkPreview : FrameLayout {
         if (link.isNotEmpty()) {
             // Open link
             Intent(context, DispatcherActivity::class.java).run {
-                putExtra(DispatcherActivity.URL_KEY, link)
+                putExtra(DispatcherActivity.EXTRAS_URL_KEY, link)
                 context.startActivity(this)
             }
         }

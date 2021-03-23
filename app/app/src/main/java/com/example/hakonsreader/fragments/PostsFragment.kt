@@ -37,15 +37,16 @@ class PostsFragment : Fragment(), SortableWithTime {
     companion object {
         private const val TAG = "PostsFragment"
 
+
         /**
          * The key stored in [getArguments] saying the name the of the subreddit/user the posts are for
          */
-        private const val NAME_KEY = "subredditName"
+        private const val ARGS_NAME = "args_subredditName"
 
         /**
          * The key stored in [getArguments] saying is [name] is for a user or subreddit
          */
-        private const val IS_FOR_USER = "isForUser"
+        private const val ARGS_IS_FOR_USER = "args_isForUser"
 
 
         /**
@@ -53,14 +54,15 @@ class PostsFragment : Fragment(), SortableWithTime {
          *
          * The value with this key should be the value of corresponding enum value from [SortingMethods]
          */
-        private const val SORT = "sort"
+        private const val ARGS_SORT = "args_sort"
 
         /**
          * The key used in [getArguments] for the time sort for the posts when loading this subreddit
          *
          * The value with this key should be the value of corresponding enum value from [PostTimeSort]
          */
-        private const val TIME_SORT = "time_sort"
+        private const val ARGS_TIME_SORT = "args_timeSort"
+
 
         /**
          * The amount of milliseconds that should the used to wait to open more posts after a post has
@@ -76,13 +78,10 @@ class PostsFragment : Fragment(), SortableWithTime {
 
         fun newInstance(isForUser: Boolean, name: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = PostsFragment().apply {
             arguments = Bundle().apply {
-                if (!isForUser) {
-                    println("Creating Posts for subreddits")
-                }
-                putBoolean(IS_FOR_USER, isForUser)
-                putString(NAME_KEY, name)
-                sort?.let { putString(SORT, it.value) }
-                timeSort?.let { putString(TIME_SORT, it.value) }
+                putBoolean(ARGS_IS_FOR_USER, isForUser)
+                putString(ARGS_NAME, name)
+                sort?.let { putString(ARGS_SORT, it.value) }
+                timeSort?.let { putString(ARGS_TIME_SORT, it.value) }
             }
         }
     }
@@ -90,12 +89,12 @@ class PostsFragment : Fragment(), SortableWithTime {
     /**
      * The name of the subreddit/user the posts are for
      */
-    val name: String by lazy { arguments?.getString(NAME_KEY) ?: "" }
+    val name: String by lazy { arguments?.getString(ARGS_NAME) ?: "" }
 
     /**
      * If true, the posts are for a user, not a subreddit
      */
-    private val isForUser: Boolean by lazy { arguments?.getBoolean(IS_FOR_USER) ?: false }
+    private val isForUser: Boolean by lazy { arguments?.getBoolean(ARGS_IS_FOR_USER) ?: false }
 
     /**
      * If true, the subreddit is a default subreddit (eg. front page)
@@ -186,8 +185,8 @@ class PostsFragment : Fragment(), SortableWithTime {
 
         // If the fragment is selected without any posts load posts automatically
         if (adapter?.itemCount == 0) {
-            val sort = arguments?.getString(SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
-            val timeSort = arguments?.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
+            val sort = arguments?.getString(ARGS_SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
+            val timeSort = arguments?.getString(ARGS_TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
 
             postsViewModel.loadPosts(sort, timeSort)
         }
@@ -260,7 +259,7 @@ class PostsFragment : Fragment(), SortableWithTime {
                 postsScrollListener.setPostToIgnore(contentVideo.redditPost?.id)
 
                 val intent = Intent(context, VideoActivity::class.java).apply {
-                    putExtra(VideoActivity.EXTRAS, contentVideo.extras)
+                    putExtra(VideoActivity.EXTRAS_EXTRAS, contentVideo.extras)
                 }
 
                 // Pause the video here so it doesn't play both places
@@ -295,9 +294,9 @@ class PostsFragment : Fragment(), SortableWithTime {
                 }
 
                 val intent = Intent(context, PostActivity::class.java).apply {
-                    putExtra(PostActivity.POST_KEY, Gson().toJson(redditPost))
+                    putExtra(PostActivity.EXTRAS_POST_KEY, Gson().toJson(redditPost))
                     putExtra(Content.EXTRAS, post.extras)
-                    putExtra(PostActivity.HIDE_SCORE_KEY, post.hideScore)
+                    putExtra(PostActivity.EXTRAS_HIDE_SCORE_KEY, post.hideScore)
                 }
 
                 // Only really applicable for videos, as they should be paused

@@ -15,18 +15,14 @@ import com.r0adkll.slidr.Slidr
 class VideoActivity : BaseActivity() {
 
     companion object {
-        /**
-         * The key used for the post the video belongs to
-         */
-        const val POST = "post"
 
         /**
          * The key used to send information about the video playback that this activity should
          * automatically resume.
          *
-         * This should be a [Bundle]
+         * The value sent with this key should be a [Bundle]
          */
-        const val EXTRAS = "extras"
+        const val EXTRAS_EXTRAS = "extras_VideoActivity_extras"
     }
 
     private lateinit var videoPlayer: VideoPlayer
@@ -48,9 +44,9 @@ class VideoActivity : BaseActivity() {
 
             // Restore from the saved state if possible
             val extras = if (savedInstanceState != null) {
-                savedInstanceState.getBundle(EXTRAS)
+                savedInstanceState.getBundle(EXTRAS_EXTRAS)
             } else {
-                data.getBundle(EXTRAS)
+                data.getBundle(EXTRAS_EXTRAS)
             } ?: return
 
             if (!App.get().muteVideoByDefaultInFullscreen()) {
@@ -92,7 +88,7 @@ class VideoActivity : BaseActivity() {
         super.onSaveInstanceState(outState)
         // Store the new extras so that we use that to update the video progress instead of
         // the one passed when the activity was started
-        outState.putBundle(EXTRAS, videoPlayer.getExtras())
+        outState.putBundle(EXTRAS_EXTRAS, videoPlayer.getExtras())
     }
 
     override fun onDestroy() {

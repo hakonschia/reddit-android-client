@@ -91,11 +91,11 @@ class CreateIntentTest {
         // are both in MainActivity as they are "special" types of subreddits
         intent = createIntent("https://reddit.com/r/popular", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, MainActivity.START_SUBREDDIT, "popular")
+        assertIntentHasExtras(intent, MainActivity.EXTRAS_START_SUBREDDIT, "popular")
 
         intent = createIntent("https://reddit.com/r/all", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, MainActivity.START_SUBREDDIT, "all")
+        assertIntentHasExtras(intent, MainActivity.EXTRAS_START_SUBREDDIT, "all")
     }
 
     /**
@@ -108,41 +108,41 @@ class CreateIntentTest {
         val clazz = SubredditActivity::class.java
         var intent: Intent = createIntent("https://reddit.com/r/hakonschia", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, SubredditActivity.SUBREDDIT_KEY, "hakonschia")
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SUBREDDIT_KEY, "hakonschia")
 
         intent = createIntent("https://reddit.com/r/hakonschia/top/?t=year", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, SubredditActivity.SUBREDDIT_KEY, "hakonschia")
-        assertIntentHasExtras(intent, SubredditActivity.SORT, SortingMethods.TOP.value)
-        assertIntentHasExtras(intent, SubredditActivity.TIME_SORT, PostTimeSort.YEAR.value)
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SUBREDDIT_KEY, "hakonschia")
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SORT, SortingMethods.TOP.value)
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_TIME_SORT, PostTimeSort.YEAR.value)
 
         intent = createIntent("https://www.reddit.com/r/hakonschia/top/?t=year", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, SubredditActivity.SUBREDDIT_KEY, "hakonschia")
-        assertIntentHasExtras(intent, SubredditActivity.SORT, SortingMethods.TOP.value)
-        assertIntentHasExtras(intent, SubredditActivity.TIME_SORT, PostTimeSort.YEAR.value)
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SUBREDDIT_KEY, "hakonschia")
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SORT, SortingMethods.TOP.value)
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_TIME_SORT, PostTimeSort.YEAR.value)
 
         // The reddit domain should be appended and dispatched correctly
         intent = createIntent("r/hakonschia/new", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, SubredditActivity.SUBREDDIT_KEY, "hakonschia")
-        assertIntentHasExtras(intent, SubredditActivity.SORT, SortingMethods.NEW.value)
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SUBREDDIT_KEY, "hakonschia")
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SORT, SortingMethods.NEW.value)
         // The first "/" should be added only as needed
         intent = createIntent("/r/hakonschia/new", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, SubredditActivity.SUBREDDIT_KEY, "hakonschia")
-        assertIntentHasExtras(intent, SubredditActivity.SORT, SortingMethods.NEW.value)
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SUBREDDIT_KEY, "hakonschia")
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SORT, SortingMethods.NEW.value)
 
         // The reddit domain should be appended and dispatched correctly
         intent = createIntent("r/hakonschia/about/rules", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, SubredditActivity.SUBREDDIT_KEY, "hakonschia")
-        assertIntentHasExtras(intent, SubredditActivity.SHOW_RULES, true)
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SUBREDDIT_KEY, "hakonschia")
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SHOW_RULES, true)
 
         intent = createIntent("r/GlobalOffensive", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
         // The subreddit will be lowercased
-        assertIntentHasExtras(intent, SubredditActivity.SUBREDDIT_KEY, "globaloffensive")
+        assertIntentHasExtras(intent, SubredditActivity.EXTRAS_SUBREDDIT_KEY, "globaloffensive")
     }
 
     /**
@@ -154,17 +154,17 @@ class CreateIntentTest {
         val clazz = ProfileActivity::class.java
         var intent: Intent = createIntent("https://reddit.com/u/hakonschia", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, ProfileActivity.USERNAME_KEY, "hakonschia")
+        assertIntentHasExtras(intent, ProfileActivity.EXTRAS_USERNAME_KEY, "hakonschia")
 
         // Either /u/ or /user/
         intent = createIntent("https://reddit.com/user/hakonschia", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, ProfileActivity.USERNAME_KEY, "hakonschia")
+        assertIntentHasExtras(intent, ProfileActivity.EXTRAS_USERNAME_KEY, "hakonschia")
 
         // Either /u/ or /user/
         intent = createIntent("https://old.reddit.com/user/hakonschia/", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, ProfileActivity.USERNAME_KEY, "hakonschia")
+        assertIntentHasExtras(intent, ProfileActivity.EXTRAS_USERNAME_KEY, "hakonschia")
     }
 
     /**
@@ -184,31 +184,31 @@ class CreateIntentTest {
         val clazz = PostActivity::class.java
         var intent: Intent = createIntent("https://redd.it/kx3hiz", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, PostActivity.POST_ID_KEY, postId)
+        assertIntentHasExtras(intent, PostActivity.EXTRAS_POST_ID_KEY, postId)
         intent = createIntent("https://redd.it/kx3hiz/", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, PostActivity.POST_ID_KEY, postId)
+        assertIntentHasExtras(intent, PostActivity.EXTRAS_POST_ID_KEY, postId)
 
         intent = createIntent("https://www.reddit.com/r/hakonschia/comments/kx3hiz/stop_wasting_my_moonlight/", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, PostActivity.POST_ID_KEY, postId)
+        assertIntentHasExtras(intent, PostActivity.EXTRAS_POST_ID_KEY, postId)
 
         intent = createIntent("https://www.reddit.com/r/hakonschia/comments/kx3hiz/stop_wasting_my_moonlight/gj8cot6", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, PostActivity.POST_ID_KEY, postId)
-        assertIntentHasExtras(intent, PostActivity.COMMENT_ID_CHAIN, "gj8cot6")
+        assertIntentHasExtras(intent, PostActivity.EXTRAS_POST_ID_KEY, postId)
+        assertIntentHasExtras(intent, PostActivity.EXTRAS_COMMENT_ID_CHAIN, "gj8cot6")
 
         intent = createIntent("/r/hakonschia/comments/kx3hiz/stop_wasting_my_moonlight/", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, PostActivity.POST_ID_KEY, postId)
+        assertIntentHasExtras(intent, PostActivity.EXTRAS_POST_ID_KEY, postId)
 
         intent = createIntent("https://www.reddit.com/comments/kx3hiz", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, PostActivity.POST_ID_KEY, postId)
+        assertIntentHasExtras(intent, PostActivity.EXTRAS_POST_ID_KEY, postId)
 
         intent = createIntent("comments/kx3hiz", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, PostActivity.POST_ID_KEY, postId)
+        assertIntentHasExtras(intent, PostActivity.EXTRAS_POST_ID_KEY, postId)
     }
 
     /**
@@ -258,20 +258,20 @@ class CreateIntentTest {
         val clazz = ImageActivity::class.java
         var intent: Intent = createIntent("https://i.imgur.com/0Uytu2X.jpeg", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, ImageActivity.IMAGE_URL, "https://i.imgur.com/0Uytu2X.jpeg")
+        assertIntentHasExtras(intent, ImageActivity.EXTRAS_IMAGE_URL, "https://i.imgur.com/0Uytu2X.jpeg")
 
         intent = createIntent("https://i.imgur.com/0Uytu2X.jpg", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, ImageActivity.IMAGE_URL, "https://i.imgur.com/0Uytu2X.jpg")
+        assertIntentHasExtras(intent, ImageActivity.EXTRAS_IMAGE_URL, "https://i.imgur.com/0Uytu2X.jpg")
 
         intent = createIntent("https://i.imgur.com/0Uytu2X.png", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, ImageActivity.IMAGE_URL, "https://i.imgur.com/0Uytu2X.png")
+        assertIntentHasExtras(intent, ImageActivity.EXTRAS_IMAGE_URL, "https://i.imgur.com/0Uytu2X.png")
 
         // No file extension, but it has an image format as a query parameter
         intent = createIntent("https://pbs.twimg.com/media/Es_qtWVXEAMKEBd?format=jpg&name=large", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, ImageActivity.IMAGE_URL, "https://pbs.twimg.com/media/Es_qtWVXEAMKEBd?format=jpg&name=large")
+        assertIntentHasExtras(intent, ImageActivity.EXTRAS_IMAGE_URL, "https://pbs.twimg.com/media/Es_qtWVXEAMKEBd?format=jpg&name=large")
     }
 
     /**
@@ -284,21 +284,21 @@ class CreateIntentTest {
         val clazz = VideoYoutubeActivity::class.java
         var intent: Intent = createIntent("https://www.youtube.com/watch?v=dQw4w9WgXcQ", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, VideoYoutubeActivity.VIDEO_ID, "dQw4w9WgXcQ")
+        assertIntentHasExtras(intent, VideoYoutubeActivity.EXTRAS_VIDEO_ID, "dQw4w9WgXcQ")
 
         intent = createIntent("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=86", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, VideoYoutubeActivity.VIDEO_ID, "dQw4w9WgXcQ")
-        assertIntentHasExtras(intent, VideoYoutubeActivity.TIMESTAMP, 86f)
+        assertIntentHasExtras(intent, VideoYoutubeActivity.EXTRAS_VIDEO_ID, "dQw4w9WgXcQ")
+        assertIntentHasExtras(intent, VideoYoutubeActivity.EXTRAS_TIMESTAMP, 86f)
 
         intent = createIntent("https://youtu.be/dQw4w9WgXcQ", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, VideoYoutubeActivity.VIDEO_ID, "dQw4w9WgXcQ")
+        assertIntentHasExtras(intent, VideoYoutubeActivity.EXTRAS_VIDEO_ID, "dQw4w9WgXcQ")
 
         intent = createIntent("https://youtu.be/dQw4w9WgXcQ?t=86", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, VideoYoutubeActivity.VIDEO_ID, "dQw4w9WgXcQ")
-        assertIntentHasExtras(intent, VideoYoutubeActivity.TIMESTAMP, 86f)
+        assertIntentHasExtras(intent, VideoYoutubeActivity.EXTRAS_VIDEO_ID, "dQw4w9WgXcQ")
+        assertIntentHasExtras(intent, VideoYoutubeActivity.EXTRAS_TIMESTAMP, 86f)
     }
 
     /**
@@ -332,12 +332,12 @@ class CreateIntentTest {
         val clazz = WebViewActivity::class.java
         var intent: Intent = createIntent("https://www.nrk.no", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, WebViewActivity.URL, "https://www.nrk.no")
+        assertIntentHasExtras(intent, WebViewActivity.EXTRAS_URL, "https://www.nrk.no")
 
         // We don't (currently) handle this path, so it should not resolve to our app
         intent = createIntent("https://www.reddit.com/r/hakonschia/wiki", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
-        assertIntentHasExtras(intent, WebViewActivity.URL, "https://www.reddit.com/r/hakonschia/wiki")
+        assertIntentHasExtras(intent, WebViewActivity.EXTRAS_URL, "https://www.reddit.com/r/hakonschia/wiki")
     }
 
     /**

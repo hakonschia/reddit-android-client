@@ -19,6 +19,9 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.ktx.Firebase
 
+/**
+ * Fragment for displaying user settings
+ */
 class SettingsFragment : PreferenceFragmentCompat() {
     companion object {
         private const val TAG = "SettingsFragment"

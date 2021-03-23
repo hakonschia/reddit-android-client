@@ -119,7 +119,7 @@ class ContentLink : Content {
      */
     private fun openLink() {
         val intent = Intent(context, DispatcherActivity::class.java)
-        intent.putExtra(DispatcherActivity.URL_KEY, redditPost.url)
+        intent.putExtra(DispatcherActivity.EXTRAS_URL_KEY, redditPost.url)
         context.startActivity(intent)
     }
 

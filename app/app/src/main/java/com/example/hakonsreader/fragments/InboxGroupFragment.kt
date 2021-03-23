@@ -22,10 +22,13 @@ class InboxGroupFragment : Fragment() {
     companion object {
         private const val TAG = "InboxGroupFragment"
 
+
         /**
          * The key used to store the inbox type in saved instance states
+         *
+         * The value for this key should be an [Int] (the enum ordinal)
          */
-        private const val INBOX_TYPE_KEY = "inboxType"
+        private const val SAVED_INBOX_TYPE = "saved_inboxType"
 
         
         fun newInstance(type: InboxFragment.InboxGroupTypes) = InboxGroupFragment().apply {
@@ -48,7 +51,7 @@ class InboxGroupFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         if (savedInstanceState != null) {
-            val type = savedInstanceState.getInt(INBOX_TYPE_KEY)
+            val type = savedInstanceState.getInt(SAVED_INBOX_TYPE)
             inboxType = InboxFragment.InboxGroupTypes.values()[type]
         }
 
@@ -62,7 +65,7 @@ class InboxGroupFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt(INBOX_TYPE_KEY, inboxType.ordinal)
+        outState.putInt(SAVED_INBOX_TYPE, inboxType.ordinal)
     }
 
     override fun onDestroyView() {

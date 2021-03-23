@@ -36,8 +36,8 @@ class ReplyActivityTest {
     @Test
     fun notLoggedInDialogIsShown() {
         val intent = Intent(InstrumentationRegistry.getInstrumentation().targetContext, ReplyActivity::class.java).apply {
-            putExtra(ReplyActivity.LISTING_KIND_KEY, Thing.COMMENT.value)
-            putExtra(ReplyActivity.LISTING_KEY, commentData)
+            putExtra(ReplyActivity.EXTRAS_LISTING_KIND, Thing.COMMENT.value)
+            putExtra(ReplyActivity.EXTRAS_LISTING, commentData)
         }
         ActivityScenario.launch<ReplyActivity>(intent)
 
@@ -53,8 +53,8 @@ class ReplyActivityTest {
     @Test
     fun displaysUsernameAndCommentBeingRepliedTo() {
         val intent = Intent(context, ReplyActivity::class.java).apply {
-            putExtra(ReplyActivity.LISTING_KIND_KEY, Thing.COMMENT.value)
-            putExtra(ReplyActivity.LISTING_KEY, commentData)
+            putExtra(ReplyActivity.EXTRAS_LISTING_KIND, Thing.COMMENT.value)
+            putExtra(ReplyActivity.EXTRAS_LISTING, commentData)
         }
         ActivityScenario.launch<ReplyActivity>(intent)
 
@@ -78,8 +78,8 @@ class ReplyActivityTest {
     @Test
     fun textInsertedIsShownInPreviewDialog() {
         val intent = Intent(context, ReplyActivity::class.java).apply {
-            putExtra(ReplyActivity.LISTING_KIND_KEY, Thing.COMMENT.value)
-            putExtra(ReplyActivity.LISTING_KEY, commentData)
+            putExtra(ReplyActivity.EXTRAS_LISTING_KIND, Thing.COMMENT.value)
+            putExtra(ReplyActivity.EXTRAS_LISTING, commentData)
         }
         ActivityScenario.launch<ReplyActivity>(intent)
 
@@ -112,8 +112,8 @@ class ReplyActivityTest {
     @Test
     fun confirmDismissDialogIsShownWhenTextIsInInput() {
         val intent = Intent(context, ReplyActivity::class.java).apply {
-            putExtra(ReplyActivity.LISTING_KIND_KEY, Thing.COMMENT.value)
-            putExtra(ReplyActivity.LISTING_KEY, commentData)
+            putExtra(ReplyActivity.EXTRAS_LISTING_KIND, Thing.COMMENT.value)
+            putExtra(ReplyActivity.EXTRAS_LISTING, commentData)
         }
         ActivityScenario.launch<ReplyActivity>(intent)
 
@@ -143,8 +143,8 @@ class ReplyActivityTest {
     @Test
     fun activityDoesNotExitWhenConfirmDialogCancelIsClicked() {
         val intent = Intent(context, ReplyActivity::class.java).apply {
-            putExtra(ReplyActivity.LISTING_KIND_KEY, Thing.COMMENT.value)
-            putExtra(ReplyActivity.LISTING_KEY, commentData)
+            putExtra(ReplyActivity.EXTRAS_LISTING_KIND, Thing.COMMENT.value)
+            putExtra(ReplyActivity.EXTRAS_LISTING, commentData)
         }
         ActivityScenario.launch<ReplyActivity>(intent)
 
@@ -183,8 +183,8 @@ class ReplyActivityTest {
     @Test
     fun activityDoesNotExitWhenConfirmDialogIsShownAndBackIsPressed() {
         val intent = Intent(context, ReplyActivity::class.java).apply {
-            putExtra(ReplyActivity.LISTING_KIND_KEY, Thing.COMMENT.value)
-            putExtra(ReplyActivity.LISTING_KEY, commentData)
+            putExtra(ReplyActivity.EXTRAS_LISTING_KIND, Thing.COMMENT.value)
+            putExtra(ReplyActivity.EXTRAS_LISTING, commentData)
         }
         val activityScenario = ActivityScenario.launch<ReplyActivity>(intent)
 
@@ -224,8 +224,8 @@ class ReplyActivityTest {
     @Test
     fun activityExitsWhenConfirmDialogDiscardIsClicked() {
         val intent = Intent(context, ReplyActivity::class.java).apply {
-            putExtra(ReplyActivity.LISTING_KIND_KEY, Thing.COMMENT.value)
-            putExtra(ReplyActivity.LISTING_KEY, commentData)
+            putExtra(ReplyActivity.EXTRAS_LISTING_KIND, Thing.COMMENT.value)
+            putExtra(ReplyActivity.EXTRAS_LISTING, commentData)
         }
         val activityScenario = ActivityScenario.launch<ReplyActivity>(intent)
 
@@ -259,8 +259,8 @@ class ReplyActivityTest {
     @Test
     fun replyingToPost() {
         val intent = Intent(context, ReplyActivity::class.java).apply {
-            putExtra(ReplyActivity.LISTING_KIND_KEY, Thing.POST.value)
-            putExtra(ReplyActivity.LISTING_KEY, postData)
+            putExtra(ReplyActivity.EXTRAS_LISTING_KIND, Thing.POST.value)
+            putExtra(ReplyActivity.EXTRAS_LISTING, postData)
         }
         ActivityScenario.launch<ReplyActivity>(intent)
 

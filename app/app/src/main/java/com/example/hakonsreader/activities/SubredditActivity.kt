@@ -22,28 +22,29 @@ class SubredditActivity : BaseActivity(), LockableSlidr {
         private const val TAG = "SubredditActivity"
 
         /**
-         * The key used to save the subreddit fagment
+         * The key used to save the subreddit fragment
          */
-        private const val SAVED_SUBREDDIT = "subredditFragment"
+        private const val SAVED_SUBREDDIT = "saved_subredditFragment"
+
 
         /**
          * The key used to transfer data about which subreddit the activity is for
          */
-        const val SUBREDDIT_KEY = "subreddit"
+        const val EXTRAS_SUBREDDIT_KEY = "extras_SubredditActivity_subreddit"
 
         /**
          * The key used to send to this activity how to sort the posts when loading this subreddit
          *
          * The value with this key should be the value of corresponding enum value from [SortingMethods]
          */
-        const val SORT = "sort"
+        const val EXTRAS_SORT = "extras_SubredditActivity_sort"
 
         /**
          * The key used to send to this activity the time sort for the posts when loading this subreddit
          *
          * The value with this key should be the value of corresponding enum value from [PostTimeSort]
          */
-        const val TIME_SORT = "time_sort"
+        const val EXTRAS_TIME_SORT = "extras_SubredditActivity_timeSort"
 
         /**
          * The key used to send to this activity if the subreddit rules should automatically be shown
@@ -51,7 +52,7 @@ class SubredditActivity : BaseActivity(), LockableSlidr {
          *
          * The value with this key should be a [Boolean]
          */
-        const val SHOW_RULES = "show_rules"
+        const val EXTRAS_SHOW_RULES = "extras_SubredditActivity_showRules"
     }
 
 
@@ -86,10 +87,10 @@ class SubredditActivity : BaseActivity(), LockableSlidr {
                 val data = intent.extras
 
                 if (data != null) {
-                    val sub = data.getString(SUBREDDIT_KEY)
-                    sort = data.getString(SORT)?.let { s -> SortingMethods.values().find { it.value == s } }
-                    timeSort = data.getString(TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value == s } }
-                    showRules = data.getBoolean(SHOW_RULES)
+                    val sub = data.getString(EXTRAS_SUBREDDIT_KEY)
+                    sort = data.getString(EXTRAS_SORT)?.let { s -> SortingMethods.values().find { it.value == s } }
+                    timeSort = data.getString(EXTRAS_TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value == s } }
+                    showRules = data.getBoolean(EXTRAS_SHOW_RULES)
 
                     if (sub != null) {
                         subreddit = sub

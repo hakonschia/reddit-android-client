@@ -44,15 +44,24 @@ class ProfileFragment : Fragment() {
 
         /**
          * The key set in [getArguments] that says the username the fragment is for
+         *
+         * The value for this key should be a [String]
          */
-        private const val USERNAME_KEY = "username"
+        private const val ARGS_USERNAME = "args_username"
 
         /**
          * The key set in [getArguments] that says if the fragment is for the logged in user
+         *
+         * The value for this key should be a [Boolean]
          */
-        private const val IS_LOGGED_IN_USER_KEY = "isLoggedInUser"
+        private const val ARGS_IS_LOGGED_IN_USER = "args_isLoggedInUser"
 
-        private const val SAVED_POSTS_FRAGMENT = "savedPostsFragment"
+
+        /**
+         * The key used in [onSaveInstanceState] to save the state of the posts fragment
+         */
+        private const val SAVED_POSTS_FRAGMENT = "saved_postsFragment"
+
 
         /**
          * Create a new ProfileFragment for a user by their username
@@ -69,17 +78,18 @@ class ProfileFragment : Fragment() {
 
                 val isLoggedIn = state is LoggedInState.LoggedIn &&
                         (username.equals(App.get().getUserInfo()?.userInfo?.username, ignoreCase = true) ||
+                        // No username given, or "me" should redirect to the logged in users profile
                         username == null || username == "me")
 
-                putBoolean(IS_LOGGED_IN_USER_KEY, isLoggedIn)
+                putBoolean(ARGS_IS_LOGGED_IN_USER, isLoggedIn)
 
                 // No username given and not a logged in user then we have to assume there is a username
                 // stored previously that we can use as the "anonymous" user (this should happen when a user
                 // browsing privately goes to their profile)
                 if (!isLoggedIn && username == null) {
-                    putString(USERNAME_KEY, App.get().getUserInfo()?.userInfo?.username)
+                    putString(ARGS_USERNAME, App.get().getUserInfo()?.userInfo?.username)
                 } else {
-                    putString(USERNAME_KEY, username)
+                    putString(ARGS_USERNAME, username)
                 }
             }
         }
@@ -88,12 +98,12 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
-    private val username by lazy { arguments?.getString(USERNAME_KEY) }
+    private val username by lazy { arguments?.getString(ARGS_USERNAME) }
 
     /**
      * Flag to set if the fragment is for the logged in user or not
      */
-    private val isLoggedInUser by lazy { arguments?.getBoolean(IS_LOGGED_IN_USER_KEY) ?: false }
+    private val isLoggedInUser by lazy { arguments?.getBoolean(ARGS_IS_LOGGED_IN_USER) ?: false }
 
     private val viewModel: RedditUserViewModel by viewModels {
         RedditUserFactory(username, isLoggedInUser)
