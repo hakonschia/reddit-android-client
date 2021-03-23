@@ -6,10 +6,7 @@ import com.example.hakonsreader.api.interceptors.BasicAuthInterceptor
 import com.example.hakonsreader.api.interceptors.UserAgentInterceptor
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.interfaces.VoteableRequest
-import com.example.hakonsreader.api.model.AccessToken
-import com.example.hakonsreader.api.model.RedditListing
-import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.model.RedditComment
+import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -24,15 +21,15 @@ import java.io.IOException
 import java.util.*
 
 /**
- * Android wrapper for the Reddit API for installed applications.
- * For an example application see [reddit-android-client](https://github.com/hakonschia/reddit-android-client)
+ * Interface for communicating with the Reddit API from installed applications. Unless used in a testing scenario, you should
+ * use [RedditApi.create] to create objects
  *
  * When building objects most parameters are optional. Read the documentation to ensure the objects fit
  * your needs.
  *
  * Example creation of an object:
  * ```
- * val api = RedditApi(
+ * val api = RedditApi.create(
  *    // User-Agent and client ID must always be set and cannot be empty
  *    userAgent = "android:package-name v1.0.0 (by /u/hakonschia)",
  *    clientId = "Client-ID",
@@ -101,7 +98,7 @@ import java.util.*
  * Models relating to Reddit specific content (such as posts or comments) inherit from [RedditListing].
  * Most listings will also implement a variety of interfaces depending on what kind of listing it is.
  * For example, [RedditPost] and [RedditComment] implement [VoteableListing]. The respective request models
- * (eg. [PostRequest] for [RedditPost]) will also implement the corresponding interface [VoteableRequest].
+ * (eg. [PostRequestImpl] for [RedditPost]) will also implement the corresponding interface [VoteableRequest].
  * When performing API requests on these listings these interfaces can be taken advantage of to generify the code:
  *
  * ```
@@ -125,71 +122,219 @@ import java.util.*
  *     }
  * }
  * ```
- *
- *
- * @param userAgent The user agent for the application.
- * See [Reddit documentation](https://github.com/reddit-archive/reddit/wiki/API) on creating your user agent
- *
- * @param clientId The client ID of the application. To find your client ID see [Reddit apps](https://www.reddit.com/prefs/apps)
- *
- * @param accessToken Sets the initial access token to use for authorized API calls
- *
- * When new tokens are retrieved the internal value is set automatically. To retrieve the new token
- * register a callback with [onNewToken]
- *
- * @param onNewToken The callback for when new access tokens have been received. If an access token is
- * set a new one is automatically retrieved when a request is attempted with an invalid token.
- * This sets the listener for what to do when a new token is received by the API
- *
- * @param onInvalidToken The callback for when the API attempts to refresh an access token that is no longer valid.
- *
- * This will be called if the access token from [accessToken] wasn't valid (ie. it can't be refreshed
- * anymore), or if the user has revoked the applications access from [reddit.com/prefs/apps](https://reddit.com/prefs/apps)
- *
- * When the API notices an invalid token, an attempt to get a token for a non-logged in user
- * is automatically attempted. If this also fails, an empty access token is set. This change
- * is communicated through [onNewToken] as with other new tokens.
- *
- * @param callbackUrl The callback URL used for OAuth. This is used when retrieving access tokens
- * for logged in users. This must match the callback URL set in [Reddit apps](https://www.reddit.com/prefs/apps)
- *
- * @param deviceId The device ID to use to receive access tokens for non-logged in users
- * If this is null or empty "DO_NOT_TRACK_THIS_DEVICE" will be used. See
- * [Reddit OAuth documentation](https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth)
- *
- * @param imgurClientId The client ID for your Imgur OAuth application. Only public endpoints are used, so
- * an OAuth client for anonymous use is sufficient. If set this will perform certain API calls
- * towards Imgur to load post content directly. Currently albums and gifs are loaded.
- *
- * Typically, an Imgur album will be represented as [PostType.LINK]. With this set the API will
- * automatically call the Imgur API when posts are received and get the individual
- * images and store them so they are accessible through [RedditPost.galleryImages]
- * in the same way as a normal Reddit gallery would. The post type will be [PostType.GALLERY].
- * While Imgur albums are typically for multiple images, these albums sometimes only contain one image.
- * The API will still treat one image albums as a gallery.
- *
- * Note that since this will call the Imgur API loading times for posts will increase.
- *
- * Using this option requires an Imgur OAuth client. Only public endpoints are used, so
- * an OAuth client for anonymous use is sufficient.
- *
- * The Client ID for your Imgur OAuth application. See [imgur.com](https://api.imgur.com/oauth2/addclient)
- *
- * @param cache The cache to use for network requests. This cache will be used for requests sent to
- * Reddit, for third party caching see [thirdPartyCache]. When setting this, you should also set [cacheAge]
- * @param cacheAge The max age for using [cache]
- *
- * @param thirdPartyCache Sets the cache to use for network requests to third party service, such as Gfycat and Imgur.
- * For the cache for reddit requests, see [cache]. When setting this, you should also set [thirdPartyCacheAge]
- * @param thirdPartyCacheAge The max age for the third party cache
- *
- * @param loggerLevel The [HttpLoggingInterceptor.Level] to use for logging of the API calls
- *
- * @throws IllegalStateException If [userAgent] or [clientId] is empty
  */
-class RedditApi constructor(
+interface RedditApi {
+
+    companion object {
+        /**
+         * The list of standard subs: front page (represented as an empty string), popular, all.
+         *
+         * Note: The elements in this list are case sensitive and in this list are all lower case.
+         * When using this list to check against a standard sub you should ensure the string is lower cased, or use
+         * [String.equals] with ignoreCase = true
+         *
+         * Note: This is an unmodifiable list. Attempting to change it will throw an exception
+         */
+        val STANDARD_SUBS: List<String> = Collections.unmodifiableList(listOf("", "popular", "all"))
+
+
+        /**
+         * Creates an API object
+         *
+         * @param userAgent The user agent for the application.
+         * See [Reddit documentation](https://github.com/reddit-archive/reddit/wiki/API) on creating your user agent
+         *
+         * @param clientId The client ID of the application. To find your client ID see [Reddit apps](https://www.reddit.com/prefs/apps)
+         *
+         * @param accessToken Sets the initial access token to use for authorized API calls
+         *
+         * When new tokens are retrieved the internal value is set automatically. To retrieve the new token
+         * register a callback with [onNewToken]
+         *
+         * @param onNewToken The callback for when new access tokens have been received. If an access token is
+         * set a new one is automatically retrieved when a request is attempted with an invalid token.
+         * This sets the listener for what to do when a new token is received by the API
+         *
+         * @param onInvalidToken The callback for when the API attempts to refresh an access token that is no longer valid.
+         *
+         * This will be called if the access token from [accessToken] wasn't valid (ie. it can't be refreshed
+         * anymore), or if the user has revoked the applications access from [reddit.com/prefs/apps](https://reddit.com/prefs/apps)
+         *
+         * When the API notices an invalid token, an attempt to get a token for a non-logged in user
+         * is automatically attempted. If this also fails, an empty access token is set. This change
+         * is communicated through [onNewToken] as with other new tokens.
+         *
+         * @param callbackUrl The callback URL used for OAuth. This is used when retrieving access tokens
+         * for logged in users. This must match the callback URL set in [Reddit apps](https://www.reddit.com/prefs/apps)
+         *
+         * @param deviceId The device ID to use to receive access tokens for non-logged in users
+         * If this is null or empty "DO_NOT_TRACK_THIS_DEVICE" will be used. See
+         * [Reddit OAuth documentation](https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth)
+         *
+         * @param imgurClientId The client ID for your Imgur OAuth application. Only public endpoints are used, so
+         * an OAuth client for anonymous use is sufficient. If set this will perform certain API calls
+         * towards Imgur to load post content directly. Currently albums and gifs are loaded.
+         *
+         * Typically, an Imgur album will be represented as [PostType.LINK]. With this set the API will
+         * automatically call the Imgur API when posts are received and get the individual
+         * images and store them so they are accessible through [RedditPost.galleryImages]
+         * in the same way as a normal Reddit gallery would. The post type will be [PostType.GALLERY].
+         * While Imgur albums are typically for multiple images, these albums sometimes only contain one image.
+         * The API will still treat one image albums as a gallery.
+         *
+         * Note that since this will call the Imgur API loading times for posts will increase.
+         *
+         * Using this option requires an Imgur OAuth client. Only public endpoints are used, so
+         * an OAuth client for anonymous use is sufficient.
+         *
+         * The Client ID for your Imgur OAuth application. See [imgur.com](https://api.imgur.com/oauth2/addclient)
+         *
+         * @param cache The cache to use for network requests. This cache will be used for requests sent to
+         * Reddit, for third party caching see [thirdPartyCache]. When setting this, you should also set [cacheAge]
+         * @param cacheAge The max age for using [cache]
+         *
+         * @param thirdPartyCache Sets the cache to use for network requests to third party service, such as Gfycat and Imgur.
+         * For the cache for reddit requests, see [cache]. When setting this, you should also set [thirdPartyCacheAge]
+         * @param thirdPartyCacheAge The max age for the third party cache
+         *
+         * @param loggerLevel The [HttpLoggingInterceptor.Level] to use for logging of the API calls
+         *
+         * @throws IllegalStateException If [userAgent] or [clientId] is empty
+         */
+        fun create(
+                userAgent: String,
+                clientId: String,
+
+                accessToken: AccessToken? = null,
+                onNewToken: ((AccessToken) -> Unit)? = null,
+                onInvalidToken: ((GenericError, Throwable) -> Unit)? = null,
+
+                callbackUrl: String? = null,
+                deviceId: String? = null,
+                imgurClientId: String? = null,
+
+                cache: Cache? = null,
+                cacheAge: Long = 0L,
+                thirdPartyCache: Cache? = null,
+                thirdPartyCacheAge: Long = 0L,
+
+                loggerLevel: HttpLoggingInterceptor.Level? = null
+        ) : RedditApi {
+            return RedditApiImpl(userAgent, clientId, accessToken, onNewToken, onInvalidToken, callbackUrl, deviceId, imgurClientId, cache, cacheAge, thirdPartyCache, thirdPartyCacheAge, loggerLevel)
+        }
+    }
+
+    /**
+     * Enable or disable private browsing. Enabling private browsing will temporarily set an anonymous
+     * access token to be used for API calls
+     *
+     * @param enable True to enable private browsing, false to disable it
+     * @see isPrivatelyBrowsing
+     */
+    fun enablePrivateBrowsing(enable: Boolean)
+
+    /**
+     * Checks if the API is currently in a private browsing context, meaning that there is a user
+     * logged in, but the API calls should currently not be made on behalf of that user
+     *
+     * @return True if private browsing is enabled
+     * @see enablePrivateBrowsing
+     */
+    fun isPrivatelyBrowsing() : Boolean
+
+    /**
+     * Switches which access token to use. This should only be used to switch which account
+     * the API is now for, and should not be used to manually update the token.
+     *
+     * Calling this will disable private browsing, if enabled
+     *
+     * @param accessToken The token to switch to
+     */
+    fun switchAccessToken(accessToken: AccessToken)
+
+    /**
+     * Removes the access token currently set and sets the API in a context of a logged out user
+     */
+    fun logOut()
+
+
+    /**
+     * Retrieves a [AccessTokenModel] that can be used to make API calls for access tokens
+     * for logged in users.
+     *
+     * Access tokens for non-logged in users are handled automatically and doesn't require any specific code
+     *
+     * @return An object that can perform various access token related API requests
+     * @throws IllegalStateException If the callback URL is null or empty
+     */
+    @Throws(IllegalStateException::class)
+    fun accessToken(): AccessTokenModel
+
+    /**
+     * Retrieve a [PostRequestImpl] object that can be used to make API calls towards posts
+     *
+     * @param postId The ID of the post to make calls towards
+     * @return An object that can perform various post related API requests
+     */
+    fun post(postId: String): PostRequest
+
+    /**
+     * Retrieve a [CommentRequestImpl] object that can be used to make API calls towards comments
+     *
+     * @param commentId The ID of the comment
+     * @return An object that can perform various comment related API requests
+     */
+    fun comment(commentId: String): CommentRequest
+
+    /**
+     * Retrieve a [SubredditRequest] object that can be used to make API calls towards subreddits
+     *
+     * @param subredditName The name of the subreddit to make calls towards
+     * @return An object that can perform various subreddit related API requests
+     */
+    fun subreddit(subredditName: String): SubredditRequest
+
+    /**
+     * Retrieve a [SubredditsRequestImpl] object that can be used to make API calls towards subreddits.
+     * This differs from [subreddit] as this is for multiple subreddits (like getting subreddits
+     * a user is subscribed to), not one specific subreddit
+     *
+     * @return An object that can perform various subreddits related API requests
+     */
+    fun subreditts(): SubredditsRequest
+
+    /**
+     * Retrieve a [UserRequestsImpl] object that can get handle requests for non-logged in users.
+     *
+     * @param username the username to to make calls towards.
+     * @return An object that can perform various user related API requests for non-logged in users
+     */
+    fun user(username: String): UserRequests
+
+    /**
+     * Retrieve a Kotlin based request object that offers API calls for logged in users
+     *
+     * For logged in users use [user]
+     *
+     * @return An object that can perform various user related API requests for logged in users
+     */
+    fun user(): UserRequestsLoggedInUser
+
+    /**
+     * Retrieves a request object that offers API calls towards messages (inbox)
+     *
+     * @return An object that can perform various message related API requests for logged in users
+     */
+    fun messages(): MessagesRequestModel
+}
+
+
+/**
+ * Standard [RedditApi] implementation
+ */
+private class RedditApiImpl constructor(
         private val userAgent: String,
-        private val clientId: String,
+        clientId: String,
 
         private val accessToken: AccessToken? = null,
         private val onNewToken: ((AccessToken) -> Unit)? = null,
@@ -205,19 +350,7 @@ class RedditApi constructor(
         private val thirdPartyCacheAge: Long = 0L,
 
         private val loggerLevel: HttpLoggingInterceptor.Level? = null,
-) {
-    companion object {
-        /**
-         * The list of standard subs: front page (represented as an empty string), popular, all.
-         *
-         * Note: The elements in this list are case sensitive and in this list are all lower case.
-         * When using this list to check against a standard sub you should ensure the string is lower cased, or use
-         * [String.equals] with ignoreCase = true
-         *
-         * Note: This is an unmodifiable list. Attempting to change it will throw an exception
-         */
-        val STANDARD_SUBS: List<String> = Collections.unmodifiableList(listOf("", "popular", "all"))
-    }
+) : RedditApi {
 
     /**
      * The authentication header to use when retrieving access tokens for the first time
@@ -421,53 +554,23 @@ class RedditApi constructor(
     }
 
 
-    /**
-     * Switches which access token to use. This should only be used to switch which account
-     * the API is now for, and should not be used to manually update the token.
-     *
-     * Calling this will disable private browsing, if enabled
-     *
-     * @param accessToken The token to switch to
-     */
-    fun switchAccessToken(accessToken: AccessToken) {
+    override fun switchAccessToken(accessToken: AccessToken) {
         ignoreNextTokenChange = true
         accessTokenInternal = accessToken
         enablePrivateBrowsing(false)
     }
 
-    /**
-     * Removes the access token currently set and sets the API in a context of a logged out user
-     */
-    fun logOut() {
+    override fun logOut() {
         ignoreNextTokenChange = true
         accessTokenInternal = AccessToken()
         enablePrivateBrowsing(false)
     }
 
-    /**
-     * Checks if the API is currently in a private browsing context, meaning that there is a user
-     * logged in, but the API calls should currently not be made on behalf of that user
-     *
-     * @return True if private browsing is enabled
-     * @see enablePrivateBrowsing
-     */
-    fun isPrivatelyBrowsing() : Boolean {
+    override fun isPrivatelyBrowsing() : Boolean {
         return savedToken != null
     }
 
-    /**
-     * Enable or disable private browsing. Enabling private browsing will temporarily set an anonymous
-     * access token to be used for API calls
-     *
-     * When non-logged in access tokens are retrieved, the listener set with
-     * [onNewToken] will NOT be notified
-     *
-     * This operation is idempotent
-     *
-     * @param enable True to enable private browsing, false to disable it
-     * @see isPrivatelyBrowsing
-     */
-    fun enablePrivateBrowsing(enable: Boolean) {
+    override fun enablePrivateBrowsing(enable: Boolean) {
         if (enable) {
             // If we're in a private browsing context already, calling this again would override the stored token
             if (savedToken != null) {
@@ -486,92 +589,40 @@ class RedditApi constructor(
         }
     }
 
-    /**
-     * Retrieves a [AccessTokenModel] that can be used to make API calls for access tokens
-     * for logged in users.
-     *
-     * Access tokens for non-logged in users are handled automatically and doesn't require any specific code
-     *
-     * @return An object that can perform various access token related API requests
-     * @throws IllegalStateException If [callbackUrl] is null or empty
-     */
-    fun accessToken(): AccessTokenModel {
+    override fun accessToken(): AccessTokenModel {
         check(!callbackUrl.isNullOrBlank()) { "RedditApi.callbackUrl cannot be empty" }
-        return AccessTokenModel(accessTokenApi, callbackUrl) { token: AccessToken? ->
+        return AccessTokenModelImpl(accessTokenApi, callbackUrl) { token: AccessToken? ->
             ignoreNextTokenChange = true
             accessTokenInternal = token ?: AccessToken()
         }
     }
 
-    /**
-     * Retrieve a [PostRequest] object that can be used to make API calls towards posts
-     *
-     * @param postId The ID of the post to make calls towards
-     * @return An object that can perform various post related API requests
-     */
-    fun post(postId: String): PostRequest {
-        return PostRequest(accessTokenInternal, postApi, postId, imgurService, gfycatService)
+    override fun post(postId: String): PostRequest {
+        return PostRequestImpl(accessTokenInternal, postApi, postId, imgurService, gfycatService)
     }
 
-    /**
-     * Retrieve a [CommentRequest] object that can be used to make API calls towards comments
-     *
-     * @param commentId The ID of the comment
-     * @return An object that can perform various comment related API requests
-     */
-    fun comment(commentId: String): CommentRequest {
-        return CommentRequest(accessTokenInternal, commentApi, commentId)
+    override fun comment(commentId: String): CommentRequest {
+        return CommentRequestImpl(accessTokenInternal, commentApi, commentId)
     }
 
-    /**
-     * Retrieve a [SubredditRequest] object that can be used to make API calls towards subreddits
-     *
-     * @param subredditName The name of the subreddit to make calls towards
-     * @return An object that can perform various subreddit related API requests
-     */
-    fun subreddit(subredditName: String): SubredditRequest {
-        return SubredditRequest(subredditName, accessTokenInternal, subredditApi, imgurService, gfycatService)
+    override fun subreddit(subredditName: String): SubredditRequest {
+        return SubredditRequestImpl(subredditName, accessTokenInternal, subredditApi, imgurService, gfycatService)
     }
 
-    /**
-     * Retrieve a [SubredditsRequest] object that can be used to make API calls towards subreddits.
-     * This differs from [subreddit] as this is for multiple subreddits (like getting subreddits
-     * a user is subscribed to), not one specific subreddit
-     *
-     * @return An object that can perform various subreddits related API requests
-     */
-    fun subreditts(): SubredditsRequest {
-        return SubredditsRequest(accessTokenInternal, subredditsApi)
+    override fun subreditts(): SubredditsRequest {
+        return SubredditsRequestImpl(accessTokenInternal, subredditsApi)
     }
 
-    /**
-     * Retrieve a [UserRequests] object that can get handle requests for non-logged in users.
-     *
-     * @param username the username to to make calls towards.
-     * @return An object that can perform various user related API requests for non-logged in users
-     */
-    fun user(username: String): UserRequests {
-        return UserRequests(username, accessTokenInternal, userApi, imgurService, gfycatService)
+    override fun user(username: String): UserRequests {
+        return UserRequestsImpl(username, accessTokenInternal, userApi, imgurService, gfycatService)
     }
 
-    /**
-     * Retrieve a Kotlin based request object that offers API calls for logged in users
-     *
-     * For logged in users use [user]
-     *
-     * @return An object that can perform various user related API requests for logged in users
-     */
-    fun user(): UserRequestsLoggedInUser {
-        return UserRequestsLoggedInUser(accessTokenInternal, userApi)
+    override fun user(): UserRequestsLoggedInUser {
+        return UserRequestsLoggedInUserImpl(accessTokenInternal, userApi)
     }
 
-    /**
-     * Retrieves a request object that offers API calls towards messages (inbox)
-     *
-     * @return An object that can perform various message related API requests for logged in users
-     */
-    fun messages(): MessagesRequestModel {
-        return MessagesRequestModel(accessTokenInternal, messageApi)
+    override fun messages(): MessagesRequestModel{
+        return MessagesRequestModelImpl(accessTokenInternal, messageApi)
     }
 
     /* ----------------- Misc ----------------- */

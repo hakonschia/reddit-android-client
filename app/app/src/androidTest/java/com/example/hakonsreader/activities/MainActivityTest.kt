@@ -4,18 +4,29 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.example.hakonsreader.R
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
 
-@RunWith(AndroidJUnit4ClassRunner::class)
+@HiltAndroidTest
 class MainActivityTest {
 
-    @get:Rule
+
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
     val activityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @Before
+    fun init() {
+        hiltRule.inject()
+    }
+
 
     /**
      * Simple test for testing that MainActivity is displayed

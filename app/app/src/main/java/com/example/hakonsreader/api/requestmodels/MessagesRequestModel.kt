@@ -14,13 +14,9 @@ import java.lang.Exception
 import java.lang.StringBuilder
 
 /**
- * Request model for communicating with Reddit messages
+ * Interface for communicating with inbox messages
  */
-class MessagesRequestModel(
-        private val accessToken: AccessToken,
-        private val api: MessageService
-) {
-
+interface MessagesRequestModel {
     /**
      * Gets all messages in the inbox (unread and read messages)
      *
@@ -28,9 +24,7 @@ class MessagesRequestModel(
      *
      * @see unread
      */
-    suspend fun inbox(after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>> {
-        return getInboxMessagesInternal(where = "inbox", after, count, limit)
-    }
+    suspend fun inbox(after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>>
 
     /**
      * Gets the unread messages in the inbox
@@ -39,9 +33,7 @@ class MessagesRequestModel(
      *
      * @see inbox
      */
-    suspend fun unread(after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>> {
-        return getInboxMessagesInternal(where = "unread", after, count, limit)
-    }
+    suspend fun unread(after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>>
 
     /**
      * Gets the sent messages in the inbox
@@ -50,10 +42,63 @@ class MessagesRequestModel(
      *
      * @see inbox
      */
-    suspend fun sent(after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>> {
-        return getInboxMessagesInternal(where = "sent", after, count, limit)
+    suspend fun sent(after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditMessage>>
+
+    /**
+     * Mark inbox messages as read
+     *
+     * OAuth scope required: `privatemessages`
+     *
+     * @param messages The messages to mark as read
+     * @return This will not return any success data
+     *
+     * @see markUnread
+     */
+    suspend fun markRead(vararg messages: RedditMessage) : ApiResponse<Any?>
+
+    /**
+     * Mark inbox messages as unread
+     *
+     * OAuth scope required: `privatemessages`
+     *
+     * @param messages The messages to mark as read
+     * @return This will not return any success data
+     *
+     * @see markRead
+     */
+    suspend fun markUnread(vararg messages: RedditMessage) : ApiResponse<Any?>
+
+    /**
+     * Sends a new private message
+     *
+     * OAuth scope required: `privatemessages`
+     *
+     * @param recipient The recipient of the message
+     * @param subject The subject of the message
+     * @param message The message to send
+     */
+    suspend fun sendMessage(recipient: String, subject: String, message: String) : ApiResponse<Any?>
+}
+
+/**
+ * Standard [MessagesRequestModel] implementation
+ */
+class MessagesRequestModelImpl(
+        private val accessToken: AccessToken,
+        private val api: MessageService
+) : MessagesRequestModel {
+
+    override suspend fun inbox(after: String, count: Int, limit: Int) : ApiResponse<List<RedditMessage>> {
+        return getInboxMessagesInternal(where = "inbox", after, count, limit)
     }
 
+    override suspend fun unread(after: String, count: Int, limit: Int) : ApiResponse<List<RedditMessage>> {
+        return getInboxMessagesInternal(where = "unread", after, count, limit)
+    }
+
+    override suspend fun sent(after: String, count: Int, limit: Int) : ApiResponse<List<RedditMessage>> {
+        return getInboxMessagesInternal(where = "sent", after, count, limit)
+    }
 
     /**
      * Internal helper function for inbox messages
@@ -81,32 +126,11 @@ class MessagesRequestModel(
         }
     }
 
-
-    /**
-     * Mark inbox messages as read
-     *
-     * OAuth scope required: `privatemessages`
-     *
-     * @param messages The messages to mark as read
-     * @return This will not return any success data
-     *
-     * @see markUnread
-     */
-    suspend fun markRead(vararg messages: RedditMessage) : ApiResponse<Any?> {
+    override suspend fun markRead(vararg messages: RedditMessage) : ApiResponse<Any?> {
         return markInternal(markRead = true, *messages)
     }
 
-    /**
-     * Mark inbox messages as unread
-     *
-     * OAuth scope required: `privatemessages`
-     *
-     * @param messages The messages to mark as read
-     * @return This will not return any success data
-     *
-     * @see markRead
-     */
-    suspend fun markUnread(vararg messages: RedditMessage) : ApiResponse<Any?> {
+    override suspend fun markUnread(vararg messages: RedditMessage) : ApiResponse<Any?> {
         return markInternal(markRead = false, *messages)
     }
 
@@ -160,16 +184,8 @@ class MessagesRequestModel(
         }
     }
 
-    /**
-     * Sends a new private message
-     *
-     * OAuth scope required: `privatemessages`
-     *
-     * @param recipient The recipient of the message
-     * @param subject The subject of the message
-     * @param message The message to send
-     */
-    suspend fun sendMessage(recipient: String, subject: String, message: String) : ApiResponse<Any?> {
+
+    override suspend fun sendMessage(recipient: String, subject: String, message: String) : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {

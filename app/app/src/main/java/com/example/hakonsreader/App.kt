@@ -16,11 +16,10 @@ import androidx.preference.PreferenceManager
 import com.example.hakonsreader.activities.InvalidAccessTokenActivity
 import com.example.hakonsreader.activities.MainActivity
 import com.example.hakonsreader.api.RedditApi
-import com.example.hakonsreader.api.model.AccessToken
-import com.example.hakonsreader.api.model.RedditUser
-import com.example.hakonsreader.api.model.RedditUserInfo
+import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.persistence.RedditUserInfoDatabase
+import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.MarkdownAdjuster
 import com.example.hakonsreader.constants.NetworkConstants
@@ -34,6 +33,13 @@ import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompa
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
 import com.squareup.picasso.Picasso
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import io.noties.markwon.*
 import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.core.spans.LinkSpan
@@ -52,11 +58,15 @@ import org.commonmark.node.Image
 import java.io.File
 import java.security.SecureRandom
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.collections.ArrayList
 
+
 /**
- * Entry point for the application. Sets up various static variables used throughout the app
+ * Entry point for the application
  */
+@HiltAndroidApp
 class App : Application() {
 
     companion object {
@@ -114,26 +124,24 @@ class App : Application() {
     private var wifiConnected = false
 
     /**
-     * @return The [RedditApi] object to use for API calls
+     * @return The [RedditApiImpl] object to use for API calls
      */
-    val api: RedditApi by lazy {
-        // This requires SharedPreferencesManager to be set, so lazy initialize it
-        createApi()
-    }
+    //val api: RedditApi by lazy {
+    //    // This requires SharedPreferencesManager to be set, so lazy initialize it
+    //    createApi()
+    //}
+
+    @Inject lateinit var api: RedditApi
 
     /**
      * A [RedditDatabase] instance
      */
-    val database: RedditDatabase by lazy {
-        RedditDatabase.getInstance(this)
-    }
+    @Inject lateinit var database: RedditDatabase
 
     /**
      * A [RedditUserInfoDatabase] instance
      */
-    val userInfoDatabase: RedditUserInfoDatabase by lazy {
-        RedditUserInfoDatabase.getInstance(this)
-    }
+    @Inject lateinit var  userInfoDatabase: RedditUserInfoDatabase
 
     /**
      * The [Markwon] object used to format markdown text. This object has custom plugins for Reddit
@@ -221,8 +229,8 @@ class App : Application() {
         super.onCreate()
         set()
 
-        val prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE)
-        SharedPreferencesManager.create(prefs)
+        val privatelyBrowsing = settings.getBoolean(PRIVATELY_BROWSING_KEY, false)
+        api.enablePrivateBrowsing(privatelyBrowsing)
 
         val token = TokenManager.getToken()
 
@@ -430,9 +438,7 @@ class App : Application() {
             NetworkConstants.IMGUR_CLIENT_ID
         } else null
 
-        val privatelyBrowsing = settings.getBoolean(PRIVATELY_BROWSING_KEY, false)
-
-        return RedditApi(
+        return RedditApi.create(
                 userAgent = NetworkConstants.USER_AGENT,
                 clientId = NetworkConstants.CLIENT_ID,
 
@@ -448,9 +454,7 @@ class App : Application() {
 
                 thirdPartyCache = thirdPartyCache,
                 thirdPartyCacheAge = thirdPartyCacheAge
-        ).apply {
-            enablePrivateBrowsing(privatelyBrowsing)
-        }
+        )
     }
 
     /**
@@ -495,7 +499,7 @@ class App : Application() {
      *
      * @param token The new token
      */
-    private fun onNewToken(token: AccessToken) {
+    fun onNewToken(token: AccessToken) {
         TokenManager.saveToken(token)
         if (token.userId != AccessToken.NO_USER_ID) {
             CoroutineScope(IO).launch {
@@ -1070,7 +1074,7 @@ class App : Application() {
      * Handles when the API notifies that the access token is no longer valid, and the user should
      * be logged out and prompted to log back in.
      */
-    private fun onInvalidAccessToken() {
+    fun onInvalidAccessToken() {
         logOut()
 
         Intent(this, InvalidAccessTokenActivity::class.java).apply {

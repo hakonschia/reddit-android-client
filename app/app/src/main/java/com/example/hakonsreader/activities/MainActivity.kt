@@ -29,6 +29,7 @@ import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.TrendingSubreddits
+import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
@@ -50,6 +51,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -58,9 +60,11 @@ import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.Instant
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.HashMap
 import kotlin.concurrent.fixedRateTimer
 
+@AndroidEntryPoint
 class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
 
     companion object {
@@ -123,15 +127,12 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     private lateinit var binding: ActivityMainBinding
 
-    private val db = App.get().database
-
     /**
      * The amount of unread messages in the inbox
      */
     private var unreadMessages = 0
 
     private var inboxNotificationCounter = 0
-
     private val notifications = HashMap<String, Int>()
 
     /**
@@ -655,7 +656,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                             // TODO this should also remove previous notifications if they are now seen
                             //  Or possibly in observeUnreadMessages?
                             response.value.filter { it.isNew }.forEach { createInboxNotification(it) }
-                            db.messages().insertAll(response.value)
+                            App.get().database.messages().insertAll(response.value)
                         }
                         is ApiResponse.Error -> {
                         }
@@ -669,7 +670,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * Observes the unread messages in the local database and updates the profile navbar accordingly
      */
     private fun observeUnreadMessages() {
-        val unread = db.messages().getUnreadMessages()
+        val unread = App.get().database.messages().getUnreadMessages()
         unread.observe(this, { m ->
             unreadMessages = m.size
 

@@ -11,15 +11,11 @@ import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 /**
- * Request call for API calls related to logged in users
+ * Interface for communication about logged in users
  *
- * @see UserRequests
+ * @see UserRequestsImpl
  */
-class UserRequestsLoggedInUser(
-        private val accessToken: AccessToken,
-        private val api: UserService,
-) {
-
+interface UserRequestsLoggedInUser {
     /**
      * Retrieves information about the logged in user
      *
@@ -27,7 +23,19 @@ class UserRequestsLoggedInUser(
      *
      * @return A [RedditUser] object representing the user if successful
      */
-    suspend fun info() : ApiResponse<RedditUser> {
+    suspend fun info() : ApiResponse<RedditUser>
+}
+
+
+/**
+ * Standard [UserRequestsLoggedInUser] implementation
+ */
+class UserRequestsLoggedInUserImpl(
+        private val accessToken: AccessToken,
+        private val api: UserService,
+) : UserRequestsLoggedInUser {
+
+    override suspend fun info() : ApiResponse<RedditUser> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {

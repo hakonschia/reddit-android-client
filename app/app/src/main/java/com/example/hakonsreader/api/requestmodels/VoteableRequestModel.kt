@@ -14,15 +14,10 @@ import java.lang.Exception
 
 
 /**
- * Request class to cast a vote. This is a convenience class that other request classes that allow
- * for voting can use, and is not exposed outside the API package
+ * Interface for voting on a [Thing]. This is a helper interface and should not be used outside
+ * the API package
  */
-internal class VoteableRequestModel(
-        private val accessToken: AccessToken,
-        private val api: VoteService
-) {
-
-
+interface VoteableRequestModel {
     /**
      * Cast a vote on something
      *
@@ -32,7 +27,18 @@ internal class VoteableRequestModel(
      * @param id The ID of the thing
      * @param type The type of vote to cast
      */
-    suspend fun vote(thing: Thing, id: String, type: VoteType) : ApiResponse<Nothing?> {
+    suspend fun vote(thing: Thing, id: String, type: VoteType) : ApiResponse<Nothing?>
+}
+
+/**
+ * Standard [VoteableRequestModel] implementation
+ */
+internal class VoteableRequestModelImpl(
+        private val accessToken: AccessToken,
+        private val api: VoteService
+) : VoteableRequestModel {
+
+    override suspend fun vote(thing: Thing, id: String, type: VoteType) : ApiResponse<Nothing?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {

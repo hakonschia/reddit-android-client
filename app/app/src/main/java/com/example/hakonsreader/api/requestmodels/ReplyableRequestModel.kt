@@ -14,13 +14,9 @@ import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 /**
- * Request model for communicating with replies
+ * Interface for replying to a [Thing]
  */
-class ReplyableRequestModel(
-        private val accessToken: AccessToken,
-        private val api: ReplyService
-) {
-
+interface ReplyableRequestModel {
     /**
      * Submit a new comment as a reply to another comment. Note: The depth of the new comment for replies is not
      * set (it is -1) and must be set manually with [RedditComment.setDepth] (as the parents depth + 1)
@@ -33,7 +29,18 @@ class ReplyableRequestModel(
      * @param id The ID of the thing being commented on
      * @param commentText The comment to submit, formatted as <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
      */
-    suspend fun postComment(thing: Thing, id: String, commentText: String) : ApiResponse<RedditComment> {
+    suspend fun postComment(thing: Thing, id: String, commentText: String) : ApiResponse<RedditComment>
+}
+
+/**
+ * Standard [ReplyableRequestModel] implementation
+ */
+class ReplyableRequestModelImpl(
+        private val accessToken: AccessToken,
+        private val api: ReplyService
+) : ReplyableRequestModel {
+
+    override suspend fun postComment(thing: Thing, id: String, commentText: String) : ApiResponse<RedditComment> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {

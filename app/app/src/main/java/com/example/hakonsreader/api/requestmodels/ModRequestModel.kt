@@ -14,14 +14,9 @@ import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
 /**
- * Request model for performing various mod related actions
+ * Interface for various moderation related communication
  */
-class ModRequestModel(
-        private val accessToken: AccessToken,
-        private val api: ModService
-) {
-
-
+interface ModRequestModel {
     /**
      * Distinguish a comment as mod, and optionally sticky it
      *
@@ -29,7 +24,71 @@ class ModRequestModel(
      * @param distinguish True to distinguish as mod, false to remove previous distinguish
      * @param sticky True to also sticky the comment. This is only possible on top-level comments
      */
-    suspend fun distinguishAsModComment(id: String, distinguish: Boolean, sticky: Boolean) : ApiResponse<RedditComment> {
+    suspend fun distinguishAsModComment(id: String, distinguish: Boolean, sticky: Boolean) : ApiResponse<RedditComment>
+
+    /**
+     * Distinguish a post as mod
+     *
+     * @param id The ID of the post to distinguish
+     * @param distinguish True to distinguish as mod, false to remove previous distinguish
+     */
+    suspend fun distinguishAsModPost(id: String, distinguish: Boolean) : ApiResponse<RedditPost>
+
+    /**
+     * Sticky or unsticky a post
+     *
+     * @param id The id of the post
+     * @param sticky True to sticky, false to unsticky. If the post is already stickied and this is true,
+     *               a 409 Conflict error will occur
+     * @return No data is returned
+     */
+    suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Any?>
+
+    /**
+     * Ignore reports on a post or comment
+     *
+     * @see unignoreReports
+     */
+    suspend fun ignoreReports(thing: Thing, id: String) : ApiResponse<Any?>
+
+    /**
+     * Unignore reports on a post or comment
+     *
+     * @return No response data is returned
+     * @see ignoreReports
+     */
+    suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Any?>
+
+    /**
+     * Lock a post or comment
+     *
+     * @param id The id of the post/comment
+     * @param isPost True if a post is being locked, false if a comment is being locked
+     * @return No response data is returned
+     * @see unlock
+     */
+    suspend fun lock(id: String, isPost: Boolean) : ApiResponse<Any?>
+
+    /**
+     * Unlock a post or comment
+     *
+     * @param id The id of the post/comment
+     * @param isPost True if a post is being unlocked, false if a comment is being unlocked
+     * @return No response data is returned
+     * @see lock
+     */
+    suspend fun unlock(id: String, isPost: Boolean) : ApiResponse<Any?>
+}
+
+/**
+ * Standard [ModRequestModel] implementation
+ */
+class ModRequestModelImpl(
+        private val accessToken: AccessToken,
+        private val api: ModService
+) : ModRequestModel {
+
+    override suspend fun distinguishAsModComment(id: String, distinguish: Boolean, sticky: Boolean) : ApiResponse<RedditComment> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -54,13 +113,7 @@ class ModRequestModel(
         }
     }
 
-    /**
-     * Distinguish a post as mod
-     *
-     * @param id The ID of the post to distinguish
-     * @param distinguish True to distinguish as mod, false to remove previous distinguish
-     */
-    suspend fun distinguishAsModPost(id: String, distinguish: Boolean) : ApiResponse<RedditPost> {
+    override suspend fun distinguishAsModPost(id: String, distinguish: Boolean) : ApiResponse<RedditPost> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -84,16 +137,7 @@ class ModRequestModel(
         }
     }
 
-
-    /**
-     * Sticky or unsticky a post
-     *
-     * @param id The id of the post
-     * @param sticky True to sticky, false to unsticky. If the post is already stickied and this is true,
-     *               a 409 Conflict error will occur
-     * @return No data is returned
-     */
-    suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Any?> {
+    override suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -116,12 +160,7 @@ class ModRequestModel(
         }
     }
 
-    /**
-     * Ignore reports on a post or comment
-     *
-     * @see unignoreReports
-     */
-    suspend fun ignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
+    override suspend fun ignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -143,13 +182,7 @@ class ModRequestModel(
         }
     }
 
-    /**
-     * Unignore reports on a post or comment
-     *
-     * @return No response data is returned
-     * @see ignoreReports
-     */
-    suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
+    override suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -171,27 +204,12 @@ class ModRequestModel(
         }
     }
 
-    /**
-     * Lock a post or comment
-     *
-     * @param id The id of the post/comment
-     * @param isPost True if a post is being locked, false if a comment is being locked
-     * @return No response data is returned
-     * @see unlock
-     */
-    suspend fun lock(id: String, isPost: Boolean) : ApiResponse<Any?> {
+
+    override suspend fun lock(id: String, isPost: Boolean) : ApiResponse<Any?> {
         return lockInternal(if (isPost) Thing.POST else Thing.COMMENT, id, true)
     }
 
-    /**
-     * Unlock a post or comment
-     *
-     * @param id The id of the post/comment
-     * @param isPost True if a post is being unlocked, false if a comment is being unlocked
-     * @return No response data is returned
-     * @see lock
-     */
-    suspend fun unlock(id: String, isPost: Boolean) : ApiResponse<Any?> {
+    override suspend fun unlock(id: String, isPost: Boolean) : ApiResponse<Any?> {
         return lockInternal(if (isPost) Thing.POST else Thing.COMMENT, id, false)
     }
 

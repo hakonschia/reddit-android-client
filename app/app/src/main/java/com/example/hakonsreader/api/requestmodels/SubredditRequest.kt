@@ -21,25 +21,200 @@ import com.example.hakonsreader.api.utils.apiListingErrors
 import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 
-/**
- * Request model for communicating with a specific subreddit
- */
-class SubredditRequest(
-        private val subredditName: String,
-        private val accessToken: AccessToken,
-        private val api: SubredditService,
-        imgurApi: ImgurService?,
-        gfycatApi: GfycatService
-) {
 
-    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
+/**
+ * Interface for communicating with a subreddit
+ */
+interface SubredditRequest {
 
     /**
      * Retrieve information about the subreddit
      *
      * OAuth scope required: *read*
      */
-    suspend fun info() : ApiResponse<Subreddit> {
+    suspend fun info() : ApiResponse<Subreddit>
+
+    /**
+     * Retrieve subreddit rules
+     *
+     * OAuth scope required: *read*
+     */
+    suspend fun rules() : ApiResponse<List<SubredditRule>>
+
+    /**
+     * Retrieves posts from the subreddit
+     *
+     * If an access token for a user is set posts are customized for the user
+     *
+     * OAuth scope required: *read*
+     *
+     * @param postSort sort for the posts (new, hot, top, or controversial). Default is [SortingMethods.HOT]
+     * @param timeSort How the posts should be time sorted. This only has an affect on top and controversial.
+     * Default is [PostTimeSort.DAY]
+     * @param after The ID of the last post seen. Default is an empty string (ie. no last post)
+     * @param count The amount of posts already retrieved. Default is *0* (ie. no posts already)
+     * @param limit The amount of posts to retrieve. Default is *25*
+     */
+    suspend fun posts(postSort: SortingMethods = SortingMethods.HOT, timeSort: PostTimeSort = PostTimeSort.DAY, after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditPost>>
+
+    /**
+     * Subscribe or unsubscribe to the subreddit
+     *
+     * OAuth scope required: *subscribe*
+     *
+     * @param subscribe True to subscribe, false to unsubscribe
+     * @return If successful no value is returned, so Success will hold *null*
+     */
+    suspend fun subscribe(subscribe: Boolean) : ApiResponse<Nothing?>
+
+    /**
+     * Favorite or un-favorite a subreddit
+     *
+     * @param favorite True if the action should be to favorite, false to un-favorite
+     * @return If successful no value is returned, so Success will hold *null*
+     */
+    suspend fun favorite(favorite: Boolean) : ApiResponse<Nothing?>
+
+    /**
+     * Submit a text post to the subreddit
+     *
+     * OAuth scope required: *submit*
+     *
+     * @param title The title of the post. Max characters is 300
+     * @param text The text of the post. Can be omitted for title-only posts
+     * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
+     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
+     * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
+     * retrieved with [RedditFlair.id]. Default is an empty string (ie. no flair)
+     *
+     * @return An [ApiResponse] holding a [Submission] of the newly created post
+     */
+    suspend fun submitTextPost(
+            title: String,
+            text: String = "",
+
+            nsfw: Boolean = false,
+            spoiler: Boolean = false,
+            receiveNotifications: Boolean = true,
+
+            flairId: String = ""
+    ) : ApiResponse<Submission>
+
+    /**
+     * Submit a link post to the subreddit
+     *
+     * OAuth scope required: *submit*
+     *
+     * @param title The title of the post. Max characters is 300
+     * @param link The link the post is referencing. This should be a valid URL, verification is not done
+     * by the API. Spaces in the link will be converted to *%20*
+     * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
+     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
+     * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
+     * retrieved with [RedditFlair.id]. Default is an empty string (ie. no flair)
+     *
+     * @return An [ApiResponse] holding a [Submission] of the newly created post
+     */
+    suspend fun submitLinkPost(
+            title: String,
+            link: String,
+
+            nsfw: Boolean = false,
+            spoiler: Boolean = false,
+            receiveNotifications: Boolean = true,
+
+            flairId: String = ""
+    ) : ApiResponse<Submission>
+
+    /**
+     * Submit a text post to the subreddit
+     *
+     * OAuth scope required: *submit*
+     *
+     * @param title The title of the post. Max characters is 300
+     * @param crosspostId The ID of the post this post is crossposting
+     * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
+     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
+     * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
+     * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
+     * retrieved with [RedditFlair.id]. Default is an empty string (ie. no flair)
+     *
+     * @return An [ApiResponse] holding a [Submission] of the newly created post
+     */
+    suspend fun submitCrosspost(
+            title: String,
+            crosspostId: String,
+
+            nsfw: Boolean = false,
+            spoiler: Boolean = false,
+            receiveNotifications: Boolean = true,
+
+            flairId: String = ""
+    ) : ApiResponse<Submission>
+
+    /**
+     * Gets the submission flairs for the subreddit
+     *
+     * OAuth scope required: *flair*
+     *
+     * If the subreddit doesn't allow submission flairs, a 403 Forbidden error is returned
+     */
+    suspend fun submissionFlairs() : ApiResponse<List<RedditFlair>>
+
+    /**
+     * Gets the user flairs for the subreddit
+     *
+     * OAuth scope required: *flair*
+     *
+     * If the subreddit doesn't allow submission flairs, a 403 Forbidden error is returned
+     */
+    suspend fun userFlairs() : ApiResponse<List<RedditFlair>>
+
+    /**
+     * Select a flair for a user on the subreddit. If [flairId] is not called with `null`, then
+     * [enableUserFlair] is called with `true` automatically
+     *
+     * OAuth scope required: *flair*
+     *
+     * @param username The username to select a flair for
+     * @param flairId The ID of the flair to select (as from [RedditFlair.id]), or `null` to clear
+     * the users flair
+     */
+    suspend fun selectFlair(username: String, flairId: String?) : ApiResponse<Any?>
+
+    /**
+     * Enables or disables user flairs on the subreddit
+     *
+     * @param enable True to enable flairs, false to disable
+     */
+    suspend fun enableUserFlair(enable: Boolean) : ApiResponse<Any?>
+
+    /**
+     * Gets a wiki page for the subreddit
+     *
+     * OAuth scope required: `wikiread`
+     *
+     * @param page The name of the page to retrieve. Default to `index` (the start of the wiki)
+     */
+    suspend fun wiki(page: String = "index") : ApiResponse<SubredditWikiPage>
+}
+
+/**
+ * Standard [SubredditRequest] implementation
+ */
+class SubredditRequestImpl(
+        private val subredditName: String,
+        private val accessToken: AccessToken,
+        private val api: SubredditService,
+        imgurApi: ImgurService?,
+        gfycatApi: GfycatService
+) : SubredditRequest {
+
+    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
+
+    override suspend fun info() : ApiResponse<Subreddit> {
         if (RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())) {
             return ApiResponse.Error(GenericError(-1), NoSubredditInfoException("The subreddits: " + RedditApi.STANDARD_SUBS.toString() + " do not have any info to retrieve"))
         }
@@ -65,12 +240,7 @@ class SubredditRequest(
         }
     }
 
-    /**
-     * Retrieve subreddit rules
-     *
-     * OAuth scope required: *read*
-     */
-    suspend fun rules() : ApiResponse<List<SubredditRule>>  {
+    override suspend fun rules() : ApiResponse<List<SubredditRule>>  {
         return try {
             val resp = api.getRules(subredditName)
             val rules = resp.body()?.rules
@@ -88,21 +258,7 @@ class SubredditRequest(
         }
     }
 
-    /**
-     * Retrieves posts from the subreddit
-     *
-     * If an access token for a user is set posts are customized for the user
-     *
-     * OAuth scope required: *read*
-     *
-     * @param postSort sort for the posts (new, hot, top, or controversial). Default is [SortingMethods.HOT]
-     * @param timeSort How the posts should be time sorted. This only has an affect on top and controversial.
-     * Default is [PostTimeSort.DAY]
-     * @param after The ID of the last post seen. Default is an empty string (ie. no last post)
-     * @param count The amount of posts already retrieved. Default is *0* (ie. no posts already)
-     * @param limit The amount of posts to retrieve. Default is *25*
-     */
-    suspend fun posts(postSort: SortingMethods = SortingMethods.HOT, timeSort: PostTimeSort = PostTimeSort.DAY, after: String = "", count: Int = 0, limit: Int = 25) : ApiResponse<List<RedditPost>> {
+    override suspend fun posts(postSort: SortingMethods, timeSort: PostTimeSort, after: String, count: Int, limit: Int) : ApiResponse<List<RedditPost>> {
         // If not blank (ie. front page) add "r/" at the start
         val sub = if (subredditName.isBlank()) {
             ""
@@ -160,15 +316,7 @@ class SubredditRequest(
     }
 
 
-    /**
-     * Subscribe or unsubscribe to the subreddit
-     *
-     * OAuth scope required: *subscribe*
-     *
-     * @param subscribe True to subscribe, false to unsubscribe
-     * @return If successful no value is returned, so Success will hold *null*
-     */
-    suspend fun subscribe(subscribe: Boolean) : ApiResponse<Nothing?> {
+    override suspend fun subscribe(subscribe: Boolean) : ApiResponse<Nothing?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -194,13 +342,7 @@ class SubredditRequest(
         }
     }
 
-    /**
-     * Favorite or un-favorite a subreddit
-     *
-     * @param favorite True if the action should be to favorite, false to un-favorite
-     * @return If successful no value is returned, so Success will hold *null*
-     */
-    suspend fun favorite(favorite: Boolean) : ApiResponse<Nothing?> {
+    override suspend fun favorite(favorite: Boolean) : ApiResponse<Nothing?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -227,30 +369,15 @@ class SubredditRequest(
     // TODO submit response: {"json": {"errors": [], "data": {"url": "https://www.reddit.com/r/hakonschia/comments/k1yj0s/hello_reddit/", "drafts_count": 0, "id": "k1yj0s", "name": "t3_k1yj0s"}}}
     //  can probably just return the ID of the post
 
-    /**
-     * Submit a text post to the subreddit
-     *
-     * OAuth scope required: *submit*
-     *
-     * @param title The title of the post. Max characters is 300
-     * @param text The text of the post. Can be omitted for title-only posts
-     * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
-     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
-     * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
-     * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
-     * retrieved with [RedditFlair.id]. Default is an empty string (ie. no flair)
-     *
-     * @return An [ApiResponse] holding a [Submission] of the newly created post
-     */
-    suspend fun submitTextPost(
+    override suspend fun submitTextPost(
             title: String,
-            text: String = "",
+            text: String,
 
-            nsfw: Boolean = false,
-            spoiler: Boolean = false,
-            receiveNotifications: Boolean = true,
+            nsfw: Boolean,
+            spoiler: Boolean,
+            receiveNotifications: Boolean,
 
-            flairId: String = ""
+            flairId: String
     ) : ApiResponse<Submission> {
         val submissionError = verifyGenericSubmission(title)
         if (submissionError != null) {
@@ -280,31 +407,15 @@ class SubredditRequest(
         }
     }
 
-    /**
-     * Submit a link post to the subreddit
-     *
-     * OAuth scope required: *submit*
-     *
-     * @param title The title of the post. Max characters is 300
-     * @param link The link the post is referencing. This should be a valid URL, verification is not done
-     * by the API. Spaces in the link will be converted to *%20*
-     * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
-     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
-     * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
-     * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
-     * retrieved with [RedditFlair.id]. Default is an empty string (ie. no flair)
-     *
-     * @return An [ApiResponse] holding a [Submission] of the newly created post
-     */
-    suspend fun submitLinkPost(
+    override suspend fun submitLinkPost(
             title: String,
             link: String,
 
-            nsfw: Boolean = false,
-            spoiler: Boolean = false,
-            receiveNotifications: Boolean = true,
+            nsfw: Boolean,
+            spoiler: Boolean,
+            receiveNotifications: Boolean,
 
-            flairId: String = ""
+            flairId: String
     ) : ApiResponse<Submission> {
         val submissionError = verifyGenericSubmission(title)
         if (submissionError != null) {
@@ -336,30 +447,15 @@ class SubredditRequest(
         }
     }
 
-    /**
-     * Submit a text post to the subreddit
-     *
-     * OAuth scope required: *submit*
-     *
-     * @param title The title of the post. Max characters is 300
-     * @param crosspostId The ID of the post this post is crossposting
-     * @param nsfw True if the post should be marked as NSFW (18+). Default to *false*
-     * @param spoiler True if the post should be marked as a spoiler. Default to *false*
-     * @param receiveNotifications True if the user wants to receive notifications from the post. Default to *true*
-     * @param flairId The ID of the flair to submit as the link flair for the post. Should be the the value
-     * retrieved with [RedditFlair.id]. Default is an empty string (ie. no flair)
-     *
-     * @return An [ApiResponse] holding a [Submission] of the newly created post
-     */
-    suspend fun submitCrosspost(
+    override suspend fun submitCrosspost(
             title: String,
             crosspostId: String,
 
-            nsfw: Boolean = false,
-            spoiler: Boolean = false,
-            receiveNotifications: Boolean = true,
+            nsfw: Boolean,
+            spoiler: Boolean,
+            receiveNotifications: Boolean,
 
-            flairId: String = ""
+            flairId: String
     ) : ApiResponse<Submission> {
         val submissionError = verifyGenericSubmission(title)
         if (submissionError != null) {
@@ -396,14 +492,6 @@ class SubredditRequest(
         //  {"json": {"errors": [["INVALID_CROSSPOST_THING", "that isn't a valid crosspost url", "crosspost_thing"]]}}
     }
 
-
-    /**
-     * Verifies that a submission is valid on a generic level.
-     *
-     * This verifies that the title is within the allowed character size and that an access token is valid
-     *
-     * @return An [ApiResponse.Error]. If this is null then the submission is verified
-     */
     private fun verifyGenericSubmission(title: String) : ApiResponse.Error? {
         try {
             verifyLoggedInToken(accessToken)
@@ -420,14 +508,8 @@ class SubredditRequest(
         return null
     }
 
-    /**
-     * Gets the submission flairs for the subreddit
-     *
-     * OAuth scope required: *flair*
-     *
-     * If the subreddit doesn't allow submission flairs, a 403 Forbidden error is returned
-     */
-    suspend fun submissionFlairs() : ApiResponse<List<RedditFlair>> {
+
+    override suspend fun submissionFlairs() : ApiResponse<List<RedditFlair>> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -452,14 +534,7 @@ class SubredditRequest(
         }
     }
 
-    /**
-     * Gets the user flairs for the subreddit
-     *
-     * OAuth scope required: *flair*
-     *
-     * If the subreddit doesn't allow submission flairs, a 403 Forbidden error is returned
-     */
-    suspend fun userFlairs() : ApiResponse<List<RedditFlair>> {
+    override suspend fun userFlairs() : ApiResponse<List<RedditFlair>> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -484,18 +559,7 @@ class SubredditRequest(
         }
     }
 
-
-    /**
-     * Select a flair for a user on the subreddit. If [flairId] is not called with `null`, then
-     * [enableUserFlair] is called with `true` automatically
-     *
-     * OAuth scope required: *flair*
-     *
-     * @param username The username to select a flair for
-     * @param flairId The ID of the flair to select (as from [RedditFlair.id]), or `null` to clear
-     * the users flair
-     */
-    suspend fun selectFlair(username: String, flairId: String?) : ApiResponse<Any?> {
+    override suspend fun selectFlair(username: String, flairId: String?) : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -523,12 +587,7 @@ class SubredditRequest(
         }
     }
 
-    /**
-     * Enables or disables user flairs on the subreddit
-     *
-     * @param enable True to enable flairs, false to disable
-     */
-    suspend fun enableUserFlair(enable: Boolean) : ApiResponse<Any?> {
+    override suspend fun enableUserFlair(enable: Boolean) : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -553,14 +612,7 @@ class SubredditRequest(
         }
     }
 
-    /**
-     * Gets a wiki page for the subreddit
-     *
-     * OAuth scope required: `wikiread`
-     *
-     * @param page The name of the page to retrieve. Default to `index` (the start of the wiki)
-     */
-    suspend fun wiki(page: String = "index") : ApiResponse<SubredditWikiPage> {
+    override suspend fun wiki(page: String) : ApiResponse<SubredditWikiPage> {
         return try {
             val response = api.getWikiPage(subredditName, page)
             val body = response.body()?.data

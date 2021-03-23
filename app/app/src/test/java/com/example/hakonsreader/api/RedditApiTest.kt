@@ -9,7 +9,7 @@ class RedditApiTest {
      */
     @Test(expected = IllegalStateException::class)
     fun noUserAgent() {
-        RedditApi(userAgent = "", clientId = "hahuierjioogj")
+        RedditApiImpl(userAgent = "", clientId = "hahuierjioogj")
     }
 
     /**
@@ -17,7 +17,7 @@ class RedditApiTest {
      */
     @Test(expected = IllegalStateException::class)
     fun noClientId() {
-        RedditApi(userAgent = "v0.0.0 by u/hakonschia", clientId = "")
+        RedditApiImpl(userAgent = "v0.0.0 by u/hakonschia", clientId = "")
     }
 
     /**
@@ -25,26 +25,26 @@ class RedditApiTest {
      */
     @Test(expected = IllegalStateException::class)
     fun noUserAgentOrClientId() {
-        RedditApi(userAgent = "", clientId = "")
+        RedditApiImpl(userAgent = "", clientId = "")
     }
 
     /**
-     * Tests that calls to [RedditApi.accessToken] throws an exception if the callback URL isn't given
+     * Tests that calls to [RedditApiImpl.accessToken] throws an exception if the callback URL isn't given
      * when creating the object
      */
     @Test(expected = IllegalStateException::class)
     fun getAccessTokenNoCallbackUrl() {
         // Test with empty callback URL
-        RedditApi(userAgent = "a", clientId = "b").accessToken()
+        RedditApiImpl(userAgent = "a", clientId = "b").accessToken()
     }
 
     /**
-     * Tests that calls to [RedditApi.accessToken] throws an exception if the callback URL is given
+     * Tests that calls to [RedditApiImpl.accessToken] throws an exception if the callback URL is given
      * but is empty when creating the object
      */
     @Test(expected = IllegalStateException::class)
     fun getAccessTokenEmptyCallbackUrl() {
         // Test with empty callback URL
-        RedditApi(userAgent = "a", clientId = "b", callbackUrl = "").accessToken()
+        RedditApiImpl(userAgent = "a", clientId = "b", callbackUrl = "").accessToken()
     }
 }

@@ -10,13 +10,21 @@ import com.example.hakonsreader.api.utils.apiError
 import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
+
 /**
- * Request model for communicating with saveable reddit listings
+ * Interface for saving or unsaving a [Thing]
  */
-class SaveableRequestModel(
-        private val accessToken: AccessToken,
-        private val api: SaveService
-) {
+interface SaveableRequestModel {
+    /**
+     * Unsave a post or comment
+     *
+     * OAuth scope required: *save*
+     *
+     * @param thing The type of thing to unsave
+     * @param id The ID of the thing to unsave
+     * @return The Response returned will not include any data
+     */
+    suspend fun save(thing: Thing, id: String) : ApiResponse<Nothing?>
 
     /**
      * Unsave a post or comment
@@ -27,7 +35,18 @@ class SaveableRequestModel(
      * @param id The ID of the thing to unsave
      * @return The Response returned will not include any data
      */
-    suspend fun save(thing: Thing, id: String) : ApiResponse<Nothing?> {
+    suspend fun unsave(thing: Thing, id: String) : ApiResponse<Nothing?>
+}
+
+/**
+ * Standard [SaveableRequestModel] implementation
+ */
+class SaveableRequestModelImpl(
+        private val accessToken: AccessToken,
+        private val api: SaveService
+) : SaveableRequestModel {
+
+    override suspend fun save(thing: Thing, id: String) : ApiResponse<Nothing?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -47,17 +66,7 @@ class SaveableRequestModel(
         }
     }
 
-
-    /**
-     * Unsave a post or comment
-     *
-     * OAuth scope required: *save*
-     *
-     * @param thing The type of thing to unsave
-     * @param id The ID of the thing to unsave
-     * @return The Response returned will not include any data
-     */
-    suspend fun unsave(thing: Thing, id: String) : ApiResponse<Nothing?>  {
+    override suspend fun unsave(thing: Thing, id: String) : ApiResponse<Nothing?>  {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {

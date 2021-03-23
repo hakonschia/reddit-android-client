@@ -19,26 +19,7 @@ import com.example.hakonsreader.api.utils.createFullName
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
-/**
- * Request model for communicating with Reddit posts
- */
-class PostRequest(
-        private val accessToken: AccessToken,
-        private val api: PostService,
-        private val postId: String,
-        imgurApi: ImgurService?,
-        gfycatApi: GfycatService
-) : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest, LockableRequest, DistinguishableRequest {
-
-    private val voteRequest: VoteableRequestModel = VoteableRequestModel(accessToken, api)
-    private val replyRequest: ReplyableRequestModel = ReplyableRequestModel(accessToken, api)
-    private val saveRequest: SaveableRequestModel = SaveableRequestModel(accessToken, api)
-    private val modRequest: ModRequestModel = ModRequestModel(accessToken, api)
-    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
-
-
-    class CommentsResponse(val comments: List<RedditComment>, val post: RedditPost)
-
+interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, ReportableRequest, LockableRequest, DistinguishableRequest {
     /**
      * Get comments for the post
      *
@@ -51,7 +32,186 @@ class PostRequest(
      * In other words, this should only be set to `true` if the post is loaded for the first time and
      * the content of the post has to be drawn.
      */
-    suspend fun comments(sort: SortingMethods = SortingMethods.HOT, loadThirdParty: Boolean = false) : ApiResponse<CommentsResponse> {
+    suspend fun comments(sort: SortingMethods = SortingMethods.HOT, loadThirdParty: Boolean = false) : ApiResponse<PostRequestImpl.CommentsResponse>
+
+    /**
+     * Retrieves comments initially hidden (from "2 more comments" comments)
+     *
+     * If an access token is set comments are customized for the user (ie. vote status is set)
+     *
+     * OAuth scope required: `read`
+     *
+     * @param children The list of IDs of comments to get (retrieved via [RedditComment.children])
+     * @param parent Optional: The parent comment the new comments belong to. If this sets the new comments
+     * as replies directly. This is the same as calling [RedditComment.addReplies] afterwards.
+     * Note that this is the parent of the new comments, not the comment holding the list children
+     * retrieved with [RedditComment.children].
+     */
+    suspend fun moreComments(children: List<String>, parent: RedditComment? = null) : ApiResponse<List<RedditComment>>
+
+    /**
+     * Vote on the post
+     *
+     * OAuth scope required: `vote`
+     *
+     * @param voteType The type of vote to cast
+     * @return An [ApiResponse] with no success data
+     */
+    override suspend fun vote(voteType: VoteType): ApiResponse<Nothing?>
+
+    /**
+     * Save the post
+     *
+     * OAuth scope required: `save`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see unsave
+     */
+    override suspend fun save(): ApiResponse<Nothing?>
+
+    /**
+     * Unsave the post
+     *
+     * OAuth scope required: `save`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see save
+     */
+    override suspend fun unsave() : ApiResponse<Nothing?>
+
+    /**
+     * Distinguish the post as a moderator.
+     *
+     * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with the updated post
+     * @see removeModDistinguish
+     */
+    override suspend fun distinguishAsMod() : ApiResponse<RedditPost>
+
+    /**
+     * Remove the mod distinguish on the post.
+     *
+     * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with the updated post
+     * @see removeModDistinguish
+     */
+    override suspend fun removeModDistinguish() : ApiResponse<RedditPost>
+
+    /**
+     * Sticky on the post
+     *
+     * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see unsticky
+     */
+    suspend fun sticky() : ApiResponse<Any?>
+
+    /**
+     * Remove the sticky on the post
+     *
+     * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see sticky
+     */
+    suspend fun unsticky() : ApiResponse<Any?>
+
+    /**
+     * Retrieves information about the post
+     *
+     * Retrieving comments also retrieves the post information, only use this if you only want
+     * the post information
+     *
+     * OAuth scope required: `read`
+     *
+     * @return The post will be returned in the response. If the post wasn't found, this will be *null*
+     * @see comments
+     */
+    suspend fun info() : ApiResponse<RedditPost?>
+
+    /**
+     * Mark the post as NSFW
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see unmarkNsfw
+     */
+    suspend fun markNsfw() : ApiResponse<Any?>
+
+    /**
+     * Unmark the post as NSFW
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see markNsfw
+     */
+    suspend fun unmarkNsfw() : ApiResponse<Any?>
+
+    /**
+     * Mark the post as a spoiler
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see unmarkSpoiler
+     */
+    suspend fun markSpoiler() : ApiResponse<Any?>
+
+    /**
+     * Unmark the post as a spoiler
+     *
+     * OAuth scope required: `modposts`
+     *
+     * @return An [ApiResponse] with no success data
+     * @see markSpoiler
+     */
+    suspend fun unmarkSpoiler() : ApiResponse<Any?>
+
+    /**
+     * Delete the post
+     *
+     * OAuth scope required: `edit`
+     *
+     * @return No response data is returned
+     */
+    suspend fun delete() : ApiResponse<Any?>
+}
+
+/**
+ * Request model for communicating with Reddit posts
+ */
+class PostRequestImpl(
+        private val accessToken: AccessToken,
+        private val api: PostService,
+        private val postId: String,
+        imgurApi: ImgurService?,
+        gfycatApi: GfycatService
+) : PostRequest {
+
+    private val voteRequest = VoteableRequestModelImpl(accessToken, api)
+    private val replyRequest = ReplyableRequestModelImpl(accessToken, api)
+    private val saveRequest = SaveableRequestModelImpl(accessToken, api)
+    private val modRequest = ModRequestModelImpl(accessToken, api)
+    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
+
+
+    class CommentsResponse(val comments: List<RedditComment>, val post: RedditPost)
+
+
+    override suspend fun comments(sort: SortingMethods, loadThirdParty: Boolean) : ApiResponse<CommentsResponse> {
         return try {
             val resp = api.getComments(postId, sort.value)
 
@@ -80,20 +240,7 @@ class PostRequest(
     }
 
 
-    /**
-     * Retrieves comments initially hidden (from "2 more comments" comments)
-     *
-     * If an access token is set comments are customized for the user (ie. vote status is set)
-     *
-     * OAuth scope required: `read`
-     *
-     * @param children The list of IDs of comments to get (retrieved via [RedditComment.getChildren])
-     * @param parent Optional: The parent comment the new comments belong to. If this sets the new comments
-     * as replies directly. This is the same as calling [RedditComment.addReplies] afterwards.
-     * Note that this is the parent of the new comments, not the comment holding the list children
-     * retrieved with [RedditComment.getChildren].
-     */
-    suspend fun moreComments(children: List<String>, parent: RedditComment? = null) : ApiResponse<List<RedditComment>> {
+    override suspend fun moreComments(children: List<String>, parent: RedditComment?) : ApiResponse<List<RedditComment>> {
         // If no children are given, just return an empty list as it's not strictly an error but it will cause an API error later on
         if (children.isEmpty()) {
             return ApiResponse.Success(ArrayList())
@@ -121,125 +268,43 @@ class PostRequest(
         }
     }
 
-
-    /**
-     * Vote on the post
-     *
-     * OAuth scope required: `vote`
-     *
-     * @param voteType The type of vote to cast
-     * @return An [ApiResponse] with no success data
-     */
     override suspend fun vote(voteType: VoteType): ApiResponse<Nothing?> {
         return voteRequest.vote(Thing.POST, postId, voteType)
     }
 
-    /**
-     * Submit a new comment as a reply to the post. For replies to other comments use {@link CommentRequest#reply(String, OnResponse, OnFailure)}
-     *
-     * OAuth scope required: `submit`
-     *
-     * @param text The comment to submit, formatted as <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>
-     * @return An [ApiResponse] with the new comment
-     */
     override suspend fun reply(text: String): ApiResponse<RedditComment> {
         return replyRequest.postComment(Thing.POST, postId, text)
     }
 
 
-    /**
-     * Save the post
-     *
-     * OAuth scope required: `save`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see unsave
-     */
     override suspend fun save(): ApiResponse<Nothing?> {
         return saveRequest.save(Thing.POST, postId)
     }
 
-    /**
-     * Unsave the post
-     *
-     * OAuth scope required: `save`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see save
-     */
     override suspend fun unsave() : ApiResponse<Nothing?> {
         return saveRequest.unsave(Thing.POST, postId)
     }
 
 
-    /**
-     * Distinguish the post as a moderator.
-     *
-     * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with the updated post
-     * @see removeModDistinguish
-     */
     override suspend fun distinguishAsMod() : ApiResponse<RedditPost> {
         return modRequest.distinguishAsModPost(postId, true)
     }
 
-    /**
-     * Remove the mod distinguish on the post.
-     *
-     * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with the updated post
-     * @see removeModDistinguish
-     */
     override suspend fun removeModDistinguish() : ApiResponse<RedditPost> {
         return modRequest.distinguishAsModPost(postId, false)
     }
 
-    /**
-     * Sticky on the post
-     *
-     * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see unsticky
-     */
-    suspend fun sticky() : ApiResponse<Any?> {
+
+    override suspend fun sticky() : ApiResponse<Any?> {
         return modRequest.stickyPost(postId, true)
     }
 
-    /**
-     * Remove the sticky on the post
-     *
-     * If the currently logged in user is not a moderator in the subreddit the post is in this will fail
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see sticky
-     */
-    suspend fun unsticky() : ApiResponse<Any?> {
+    override suspend fun unsticky() : ApiResponse<Any?> {
         return modRequest.stickyPost(postId, false)
     }
 
-    /**
-     * Retrieves information about the post
-     *
-     * Retrieving comments also retrieves the post information, only use this if you only want
-     * the post information
-     *
-     * OAuth scope required: `read`
-     *
-     * @return The post will be returned in the response. If the post wasn't found, this will be *null*
-     * @see comments
-     */
-    suspend fun info() : ApiResponse<RedditPost?> {
+
+    override suspend fun info() : ApiResponse<RedditPost?> {
         return try {
             val response = api.getInfo(createFullName(Thing.POST, postId))
             val body = response.body()
@@ -262,51 +327,20 @@ class PostRequest(
         }
     }
 
-    /**
-     * Ignores reports on the post
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see unignoreReports
-     */
+
     override suspend fun ignoreReports() : ApiResponse<Any?> {
         return modRequest.ignoreReports(Thing.POST, postId)
     }
 
-    /**
-     * Unignores reports on the post
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see ignoreReports
-     */
     override suspend fun unignoreReports() : ApiResponse<Any?> {
         return modRequest.unignoreReports(Thing.POST, postId)
     }
 
-    /**
-     * Mark the post as NSFW
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see unmarkNsfw
-     */
-    suspend fun markNsfw() : ApiResponse<Any?> {
+    override suspend fun markNsfw() : ApiResponse<Any?> {
         return markNsfwInternal(true)
     }
 
-    /**
-     * Unmark the post as NSFW
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see markNsfw
-     */
-    suspend fun unmarkNsfw() : ApiResponse<Any?> {
+    override suspend fun unmarkNsfw() : ApiResponse<Any?> {
         return markNsfwInternal(false)
     }
 
@@ -342,27 +376,12 @@ class PostRequest(
         }
     }
 
-    /**
-     * Mark the post as a spoiler
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see unmarkSpoiler
-     */
-    suspend fun markSpoiler() : ApiResponse<Any?> {
+
+    override suspend fun markSpoiler() : ApiResponse<Any?> {
         return markSpoilerInternal(true)
     }
 
-    /**
-     * Unmark the post as a spoiler
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return An [ApiResponse] with no success data
-     * @see markSpoiler
-     */
-    suspend fun unmarkSpoiler() : ApiResponse<Any?> {
+    override suspend fun unmarkSpoiler() : ApiResponse<Any?> {
         return markSpoilerInternal(false)
     }
 
@@ -399,38 +418,15 @@ class PostRequest(
         }
     }
 
-    /**
-     * Lock the post
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return No response data is returned
-     * @see unlock
-     */
     override suspend fun lock() : ApiResponse<Any?> {
         return modRequest.lock(postId, true)
     }
 
-    /**
-     * Unlock the post
-     *
-     * OAuth scope required: `modposts`
-     *
-     * @return No response data is returned
-     * @see lock
-     */
     override suspend fun unlock() : ApiResponse<Any?> {
         return modRequest.unlock(postId, true)
     }
 
-    /**
-     * Delete the post
-     *
-     * OAuth scope required: `edit`
-     *
-     * @return No response data is returned
-     */
-    suspend fun delete() : ApiResponse<Any?> {
+    override suspend fun delete() : ApiResponse<Any?> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {

@@ -11,13 +11,82 @@ import com.example.hakonsreader.api.utils.apiError
 import com.example.hakonsreader.api.utils.verifyLoggedInToken
 import java.lang.Exception
 
+
 /**
- * Request model for communicating with a collection of subreddits
+ * Interface for communicating with a group of subreddits
  */
-class SubredditsRequest(
+interface SubredditsRequest {
+    /**
+     * Retrieves a list of subreddits
+     *
+     * The subreddits retrieved here are either the logged in users subscribed subreddits, or the
+     * default subreddits if no user is logged in
+     *
+     * OAuth scopes required:
+     * 1. For default subreddits: *read*
+     * 2. For subscribed subreddits: *mysubreddits*
+     *
+     * @param after For loading more subreddits, this is the ID of the last subreddit loaded. The new
+     * subreddits will be loaded after this. Default to an empty string
+     * @param count The count of subreddits previously loaded. Default to 0
+     *
+     * @see subscribedSubreddits
+     * @see defaultSubreddits
+     */
+    suspend fun getSubreddits(after: String = "", count: Int = 0) : ApiResponse<List<Subreddit>>
+
+    /**
+     * Retrieves a list of subreddits that a logged in user is subscribed to
+     *
+     * OAuth scope required: *mysubreddits*
+     *
+     * @param after For loading more subreddits, this is the ID of the last subreddit loaded. The new
+     * subreddits will be loaded after this. Default to an empty string
+     * @param count The count of subreddits previously loaded. Default to 0
+     *
+     * @see defaultSubreddits
+     * @see getSubreddits
+     */
+    suspend fun subscribedSubreddits(after: String = "", count: Int = 0) : ApiResponse<List<Subreddit>>
+
+    /**
+     * Retrieves the list of default subreddits
+     *
+     * OAauth scope required: *read*
+     *
+     * @param after For loading more subreddits, this is the ID of the last subreddit loaded. The new
+     * subreddits will be loaded after this. Default to an empty string
+     * @param count The count of subreddits previously loaded. Default to 0
+     *
+     * @see subscribedSubreddits
+     * @see getSubreddits
+     */
+    suspend fun defaultSubreddits(after: String = "", count: Int = 0) : ApiResponse<List<Subreddit>>
+
+    /**
+     * Search for subreddits
+     *
+     * OAuth scope required: *read*
+     *
+     * @param query The search query
+     * @param includeNsfw If set to *true* NSFW search results will be included. Default value is *true*
+     * @return
+     */
+    suspend fun search(query: String, includeNsfw: Boolean = true) : ApiResponse<List<Subreddit>>
+
+    /**
+     * Gets todays trending subreddits
+     */
+    suspend fun trending() : ApiResponse<TrendingSubreddits>
+}
+
+/**
+ * Standard [SubredditsRequest] implementation
+ */
+class SubredditsRequestImpl(
         private val accessToken: AccessToken,
         private val api: SubredditsService
-) {
+) : SubredditsRequest {
 
     /**
      * Retrieves a list of subreddits
@@ -36,7 +105,7 @@ class SubredditsRequest(
      * @see subscribedSubreddits
      * @see defaultSubreddits
      */
-    suspend fun getSubreddits(after: String = "", count: Int = 0) : ApiResponse<List<Subreddit>> {
+    override suspend fun getSubreddits(after: String, count: Int) : ApiResponse<List<Subreddit>> {
         return try {
             subscribedSubreddits(after, count)
         } catch (e: InvalidAccessTokenException) {
@@ -57,7 +126,7 @@ class SubredditsRequest(
      * @see defaultSubreddits
      * @see getSubreddits
      */
-    suspend fun subscribedSubreddits(after: String = "", count: Int = 0) : ApiResponse<List<Subreddit>> {
+    override suspend fun subscribedSubreddits(after: String, count: Int) : ApiResponse<List<Subreddit>> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -90,7 +159,7 @@ class SubredditsRequest(
      * @see subscribedSubreddits
      * @see getSubreddits
      */
-    suspend fun defaultSubreddits(after: String = "", count: Int = 0) : ApiResponse<List<Subreddit>> {
+    override suspend fun defaultSubreddits(after: String, count: Int) : ApiResponse<List<Subreddit>> {
         return try {
             val resp = api.getDefaultSubreddits(after, count, 100)
             val list = resp.body()?.getListings()
@@ -114,7 +183,7 @@ class SubredditsRequest(
      * @param includeNsfw If set to *true* NSFW search results will be included. Default value is *true*
      * @return
      */
-    suspend fun search(query: String, includeNsfw: Boolean = true) : ApiResponse<List<Subreddit>> {
+    override suspend fun search(query: String, includeNsfw: Boolean) : ApiResponse<List<Subreddit>> {
         return try {
             val resp = api.search(query, includeNsfw)
             val subreddits = resp.body()?.getListings()
@@ -133,7 +202,7 @@ class SubredditsRequest(
     /**
      * Gets todays trending subreddits
      */
-    suspend fun trending() : ApiResponse<TrendingSubreddits> {
+    override suspend fun trending() : ApiResponse<TrendingSubreddits> {
         return try {
             val resp = api.getTrendingSubreddits()
             val body = resp.body()
