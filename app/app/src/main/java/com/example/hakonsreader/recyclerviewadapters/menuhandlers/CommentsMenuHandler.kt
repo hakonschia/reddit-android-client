@@ -264,10 +264,7 @@ private fun copyCommentLinkOnClick(view: View, comment: RedditComment) {
  */
 fun peekCommentOnClick(context: Context, comment: RedditComment) {
     context as AppCompatActivity
-    PeekCommentBottomSheet().run {
-        this.comment = comment
-        show(context.supportFragmentManager, "peekParentBottomSheet")
-    }
+    PeekCommentBottomSheet.newInstance(comment).show(context.supportFragmentManager, "peekParentBottomSheet")
 }
 
 /**

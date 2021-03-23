@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import com.example.hakonsreader.api.model.RedditAward
 import com.example.hakonsreader.databinding.BottomSheetShowAwardBinding
 import com.example.hakonsreader.markwonplugins.EnlargeLinkPlugin
 import com.example.hakonsreader.markwonplugins.RedditLinkPlugin
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import io.noties.markwon.Markwon
 
@@ -22,18 +24,30 @@ class ShowAwardBottomSheet : BottomSheetDialogFragment() {
          * The size of the images of the awards the bottom sheet will load
          */
         const val IMAGE_SIZE = 128
+
+
+        /**
+         * The key used in [getArguments] to get the award to display
+         *
+         * The value with this key should be a JSON string representing the award
+         */
+        private const val ARGS_AWARD = "args_award"
+
+        fun newInstance(award: RedditAward) = ShowAwardBottomSheet().apply {
+            arguments = bundleOf(Pair(ARGS_AWARD, Gson().toJson(award)))
+        }
     }
 
     private var _binding: BottomSheetShowAwardBinding? = null
     private val binding get() = _binding!!
 
-    var award: RedditAward? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = BottomSheetShowAwardBinding.inflate(inflater)
 
-        binding.award = award
+        val award = Gson().fromJson(requireArguments().getString(ARGS_AWARD), RedditAward::class.java)
 
+        binding.award = award
         binding.description.movementMethod = InternalLinkMovementMethod()
 
         // Some descriptions have a placeholder for the web version to display an icon, but we don't
@@ -55,9 +69,5 @@ class ShowAwardBottomSheet : BottomSheetDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun updateView() {
-
     }
 }

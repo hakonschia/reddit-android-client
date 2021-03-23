@@ -256,8 +256,7 @@ public class ViewUtil {
         }
         FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
 
-        ReportsBottomSheet bottomSheet = new ReportsBottomSheet();
-        bottomSheet.setListing(listing);
+        ReportsBottomSheet bottomSheet = ReportsBottomSheet.Companion.newInstance(listing);
         bottomSheet.setOnIgnoreChange(onReportsIgnoreChange);
 
         bottomSheet.show(manager, "reportsBottomSheet");
