@@ -3,14 +3,18 @@ package com.example.hakonsreader.activities
 import android.os.Bundle
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.databinding.ActivitySendPrivateMessageBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Activity for sending a private message
  */
+@AndroidEntryPoint
 class SendPrivateMessageActivity : BaseActivity() {
     companion object {
         private const val TAG = "SendPrivateMessage"
@@ -36,6 +40,9 @@ class SendPrivateMessageActivity : BaseActivity() {
          */
         const val EXTRAS_MESSAGE = "extras_SendPrivateMessageActivity_message"
     }
+
+    @Inject
+    lateinit var api: RedditApi
 
     private lateinit var binding: ActivitySendPrivateMessageBinding
 
@@ -109,8 +116,6 @@ class SendPrivateMessageActivity : BaseActivity() {
     }
 
     private fun sendMessage() {
-        val api = App.get().api
-
         CoroutineScope(Dispatchers.IO).launch {
             with(binding) {
                 val recipient = recipientInput.text.toString()

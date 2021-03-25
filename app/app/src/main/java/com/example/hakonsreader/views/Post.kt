@@ -21,13 +21,16 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
 import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
 /**
  * View for displaying a Reddit post, including the post information ([PostInfo]), the content (a subclass
@@ -37,6 +40,7 @@ import java.util.*
  * after the content has been created) which will ensure post does not go above said height. The
  * content of the post will be resized to fit the given height.
  */
+@AndroidEntryPoint
 class Post : Content {
 
     companion object {
@@ -47,6 +51,9 @@ class Post : Content {
          */
         private const val NO_MAX_HEIGHT = -1
     }
+
+    @Inject
+    lateinit var postsDao: RedditPostsDao
 
     private val binding = PostBinding.inflate(LayoutInflater.from(context), this, true).apply {
         setOnLongClickListener {
@@ -488,7 +495,7 @@ class Post : Content {
         // New post set, remove observer on previous LiveData and get a new one from the database to observe
         lifecycleOwner?.let {
             postLiveData?.removeObserver(postObserver)
-            postLiveData = App.get().database.posts().getPostById(redditPost.id).apply { observe(it, postObserver) }
+            postLiveData = postsDao.getPostById(redditPost.id).apply { observe(it, postObserver) }
         }
     }
 

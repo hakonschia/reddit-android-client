@@ -11,6 +11,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.ReplyActivity.Companion.EXTRAS_LISTING
 import com.example.hakonsreader.activities.ReplyActivity.Companion.EXTRAS_LISTING_KIND
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.interfaces.ReplyableListing
@@ -21,11 +22,13 @@ import com.example.hakonsreader.databinding.ActivityReplyBinding
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * Activity to reply to a post or comment
@@ -33,6 +36,7 @@ import kotlinx.coroutines.withContext
  * The post/comment should be passed to the activity with the key [EXTRAS_LISTING] and the
  * what kind of listing it is with [EXTRAS_LISTING_KIND]
  */
+@AndroidEntryPoint
 class ReplyActivity : BaseActivity() {
 
     companion object {
@@ -80,9 +84,10 @@ class ReplyActivity : BaseActivity() {
         const val EXTRAS_LISTING_KIND = "extras_ReplyActivity_replyingToListingKind"
     }
 
+    @Inject
+    lateinit var api: RedditApi
 
     private lateinit var binding: ActivityReplyBinding
-    private val api = App.get().api
 
     /**
      * The listing (comment or post) being replied to

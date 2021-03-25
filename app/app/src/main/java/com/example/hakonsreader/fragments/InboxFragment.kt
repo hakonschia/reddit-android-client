@@ -9,12 +9,15 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.databinding.FragmentInboxBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Fragment for displaying a users inbox
@@ -27,6 +30,12 @@ class InboxFragment : Fragment() {
          */
         fun newInstance() = InboxFragment()
     }
+
+    @Inject
+    lateinit var api: RedditApi
+
+    @Inject
+    lateinit var messagesDao: RedditMessagesDao
 
     private var _binding: FragmentInboxBinding? = null
     private val binding get() = _binding!!
@@ -48,14 +57,10 @@ class InboxFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        // Send API request to mark messages as unread when the view is destroyed
-        val db = App.get().database
-        val api = App.get().api
-
         CoroutineScope(IO).launch {
-            val unread = db.messages().getUnreadMessagesNoObservable()
+            val unread = messagesDao.getUnreadMessagesNoObservable()
             unread.let { api.messages().markRead(*it.toTypedArray()) }
-            db.messages().markRead()
+            messagesDao.markRead()
         }
 
         _binding = null

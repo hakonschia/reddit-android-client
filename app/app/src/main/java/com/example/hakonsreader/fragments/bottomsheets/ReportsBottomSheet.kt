@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.hakonsreader.App
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.interfaces.ReportableListing
-import com.example.hakonsreader.api.jsonadapters.ListingAdapter
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -20,15 +19,18 @@ import com.example.hakonsreader.recyclerviewadapters.ReportsAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * BottomSheet for displaying a list of reports
  */
+@AndroidEntryPoint
 class ReportsBottomSheet : BottomSheetDialogFragment() {
     companion object {
         private const val TAG = "ReportsBottomSheet"
@@ -51,9 +53,11 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    @Inject
+    lateinit var api: RedditApi
+
     private var _binding: BottomSheetReportsBinding? = null
     private val binding get() = _binding!!
-    private val api = App.get().api
 
 
     private lateinit var listing: ReportableListing

@@ -421,9 +421,13 @@ class SubmitActivity : BaseActivity() {
         }
     }
 
+    @AndroidEntryPoint
     class SubmissionCrosspostFragment : Fragment() {
+
+        @Inject
+        lateinit var api: RedditApi
+
         var binding: SubmissionCrosspostBinding? = null
-        val api = App.get().api
         val timer = Timer()
         var timerTask: TimerTask? = null
 
@@ -518,11 +522,11 @@ class SubmitActivity : BaseActivity() {
          * @param id The ID of the post to retrieve information for
          */
         private fun getPostInfo(id: String) {
-            (context as AppCompatActivity).runOnUiThread {
-                binding?.crosspostLoadingIcon?.visibility = VISIBLE
-            }
-
             CoroutineScope(IO).launch {
+                withContext(Main) {
+                    binding?.crosspostLoadingIcon?.visibility = VISIBLE
+                }
+
                 val resp = api.post(id).info()
 
                 withContext(Main) {

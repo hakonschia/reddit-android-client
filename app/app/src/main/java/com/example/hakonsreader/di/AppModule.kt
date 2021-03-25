@@ -107,4 +107,10 @@ object AppModule {
     fun provideRulesDao(database: RedditDatabase) : RedditSubredditRulesDao {
         return database.rules()
     }
+
+    @Singleton
+    @Provides
+    fun provideMessagesDao(database: RedditDatabase) : RedditMessagesDao {
+        return database.messages()
+    }
 }

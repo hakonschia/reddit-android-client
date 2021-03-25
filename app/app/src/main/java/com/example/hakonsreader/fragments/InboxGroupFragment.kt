@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
+import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.databinding.FragmentInboxGroupBinding
 import com.example.hakonsreader.recyclerviewadapters.InboxAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * Class for displaying an inbox group (eg. messages in the unread inbox)
@@ -40,9 +42,11 @@ class InboxGroupFragment : Fragment() {
         }
     }
 
+    @Inject
+    lateinit var messagesDao: RedditMessagesDao
+
     private var _binding: FragmentInboxGroupBinding? = null
     private val binding get() = _binding!!
-    private val db = App.get().database
 
     private var messageAdapter: InboxAdapter? = null
     private var messageLayoutManager: LinearLayoutManager? = null
@@ -96,8 +100,8 @@ class InboxGroupFragment : Fragment() {
     private fun loadMessagesFromDb() {
         CoroutineScope(IO).launch {
             val messages = when (inboxType) {
-                InboxFragment.InboxGroupTypes.ALL -> db.messages().getAllMessages()
-                InboxFragment.InboxGroupTypes.UNREAD -> db.messages().getUnreadMessages()
+                InboxFragment.InboxGroupTypes.ALL -> messagesDao.getAllMessages()
+                InboxFragment.InboxGroupTypes.UNREAD -> messagesDao.getUnreadMessages()
             }
 
             withContext(Main) {

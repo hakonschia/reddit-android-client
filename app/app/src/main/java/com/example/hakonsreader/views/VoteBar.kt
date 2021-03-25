@@ -6,28 +6,32 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.VoteBarBinding
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.robinhood.ticker.TickerUtils
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
 /**
  * View for displaying a vote bar for a [VoteableListing]. This displays one button for upvoting the listing
  * and one button for downvoting the listing, as well as a text with the score of the listing
  */
+@AndroidEntryPoint
 class VoteBar : FrameLayout {
 
     private val binding = VoteBarBinding.inflate(LayoutInflater.from(context), this, true).apply {
@@ -36,6 +40,12 @@ class VoteBar : FrameLayout {
         score.setCharacterLists(TickerUtils.provideAlphabeticalList(), TickerUtils.provideNumberList())
     }
 
+
+    @Inject
+    lateinit var api: RedditApi
+
+    @Inject
+    lateinit var postsDao: RedditPostsDao
 
     /**
      * If set to true, the score of the listing will be hidden
@@ -85,17 +95,14 @@ class VoteBar : FrameLayout {
 
             // Assume it's successful as it feels like the buttons aren't pressed when you have to wait
             // until the colors are updated
-            val db = App.get().database
             it.voteType = actualVote
             updateVoteStatus()
 
             val id = it.id
 
-            val api = App.get().api
-
             CoroutineScope(IO).launch {
                 val resp = if (it is RedditPost) {
-                    db.posts().update(it)
+                    postsDao.update(it)
                     api.post(id)
                 } else {
                     api.comment(id)
@@ -107,7 +114,7 @@ class VoteBar : FrameLayout {
                         // Request failed, set back to default
                         it.voteType = currentVote
                         if (it is RedditPost) {
-                            db.posts().update(it)
+                            postsDao.update(it)
                         }
 
                         withContext(Main) {

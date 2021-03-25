@@ -19,27 +19,19 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.persistence.RedditUserInfoDatabase
-import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.MarkdownAdjuster
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.markwonplugins.*
-import com.example.hakonsreader.misc.SharedPreferencesManager
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
 import com.squareup.picasso.Picasso
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import io.noties.markwon.*
 import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.core.spans.LinkSpan
@@ -59,7 +51,6 @@ import java.io.File
 import java.security.SecureRandom
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.collections.ArrayList
 
 
@@ -124,24 +115,22 @@ class App : Application() {
     private var wifiConnected = false
 
     /**
-     * @return The [RedditApiImpl] object to use for API calls
+     * A [RedditApi] instnace
      */
-    //val api: RedditApi by lazy {
-    //    // This requires SharedPreferencesManager to be set, so lazy initialize it
-    //    createApi()
-    //}
-
-    @Inject lateinit var api: RedditApi
+    @Inject
+    lateinit var api: RedditApi
 
     /**
      * A [RedditDatabase] instance
      */
-    @Inject lateinit var database: RedditDatabase
+    @Inject
+    lateinit var database: RedditDatabase
 
     /**
      * A [RedditUserInfoDatabase] instance
      */
-    @Inject lateinit var  userInfoDatabase: RedditUserInfoDatabase
+    @Inject
+    lateinit var userInfoDatabase: RedditUserInfoDatabase
 
     /**
      * The [Markwon] object used to format markdown text. This object has custom plugins for Reddit

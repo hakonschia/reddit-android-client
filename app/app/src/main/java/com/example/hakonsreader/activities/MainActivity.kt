@@ -29,6 +29,7 @@ import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.TrendingSubreddits
+import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.constants.NetworkConstants
@@ -129,6 +130,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     @Inject
     lateinit var subredditsDao: RedditSubredditsDao
+
+    @Inject
+    lateinit var messagesDao: RedditMessagesDao
 
     private lateinit var binding: ActivityMainBinding
 
@@ -511,8 +515,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         intent.data = null
         intent.flags = 0
 
-        val api = App.get().api
-
         CoroutineScope(IO).launch {
             when (val resp = api.accessToken().get(code)) {
                 is ApiResponse.Success -> {
@@ -537,8 +539,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * Gets user info, if this fails then a snackbar is shown to let the user know and attempt again
      */
     private fun getUserInfo() {
-        val api = App.get().api
-
         CoroutineScope(IO).launch {
             when (val userInfo = api.user().info()) {
                 is ApiResponse.Success -> {
@@ -634,8 +634,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // This runs when the application is minimized, might be bad? Can obviously send notifications this way, but
         // it should probably be done in a different way
 
-        val api = App.get().api
-
         // This wont be updated until the app restarts
         val updateFrequency = App.get().inboxUpdateFrequency()
         Log.d(TAG, "InboxTimer frequency: $updateFrequency minutes")
@@ -661,7 +659,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                             // TODO this should also remove previous notifications if they are now seen
                             //  Or possibly in observeUnreadMessages?
                             response.value.filter { it.isNew }.forEach { createInboxNotification(it) }
-                            App.get().database.messages().insertAll(response.value)
+                            messagesDao.insertAll(response.value)
                         }
                         is ApiResponse.Error -> {
                         }
@@ -675,7 +673,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * Observes the unread messages in the local database and updates the profile navbar accordingly
      */
     private fun observeUnreadMessages() {
-        val unread = App.get().database.messages().getUnreadMessages()
+        val unread = messagesDao.getUnreadMessages()
         unread.observe(this, { m ->
             unreadMessages = m.size
 
