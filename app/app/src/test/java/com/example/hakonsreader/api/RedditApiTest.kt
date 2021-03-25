@@ -9,7 +9,7 @@ class RedditApiTest {
      */
     @Test(expected = IllegalStateException::class)
     fun noUserAgent() {
-        RedditApiImpl(userAgent = "", clientId = "hahuierjioogj")
+        RedditApi.create(userAgent = "", clientId = "hahuierjioogj")
     }
 
     /**
@@ -17,7 +17,7 @@ class RedditApiTest {
      */
     @Test(expected = IllegalStateException::class)
     fun noClientId() {
-        RedditApiImpl(userAgent = "v0.0.0 by u/hakonschia", clientId = "")
+        RedditApi.create(userAgent = "v0.0.0 by u/hakonschia", clientId = "")
     }
 
     /**
@@ -25,7 +25,7 @@ class RedditApiTest {
      */
     @Test(expected = IllegalStateException::class)
     fun noUserAgentOrClientId() {
-        RedditApiImpl(userAgent = "", clientId = "")
+        RedditApi.create(userAgent = "", clientId = "")
     }
 
     /**
@@ -35,7 +35,7 @@ class RedditApiTest {
     @Test(expected = IllegalStateException::class)
     fun getAccessTokenNoCallbackUrl() {
         // Test with empty callback URL
-        RedditApiImpl(userAgent = "a", clientId = "b").accessToken()
+        RedditApi.create(userAgent = "a", clientId = "b").accessToken()
     }
 
     /**
@@ -45,6 +45,6 @@ class RedditApiTest {
     @Test(expected = IllegalStateException::class)
     fun getAccessTokenEmptyCallbackUrl() {
         // Test with empty callback URL
-        RedditApiImpl(userAgent = "a", clientId = "b", callbackUrl = "").accessToken()
+        RedditApi.create(userAgent = "a", clientId = "b", callbackUrl = "").accessToken()
     }
 }
