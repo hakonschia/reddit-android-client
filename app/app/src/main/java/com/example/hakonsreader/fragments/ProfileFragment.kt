@@ -18,6 +18,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.persistence.RedditUserInfoDao
 import com.example.hakonsreader.databinding.FragmentProfileBinding
 import com.example.hakonsreader.databinding.UserIsSuspendedBinding
 import com.example.hakonsreader.interfaces.OnInboxClicked
@@ -101,6 +102,9 @@ class ProfileFragment : Fragment() {
     @Inject
     lateinit var api: RedditApi
 
+    @Inject
+    lateinit var userInfoDao: RedditUserInfoDao
+
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
@@ -154,7 +158,11 @@ class ProfileFragment : Fragment() {
      * Inflates and sets up [binding]
      */
     private fun setupBinding() {
-        _binding = FragmentProfileBinding.inflate(layoutInflater)
+        // The inflate must be an activity as popup menus require an activity context
+        _binding = FragmentProfileBinding.inflate(LayoutInflater.from(requireActivity()))
+
+        binding.api = api
+        binding.userInfoDao = userInfoDao
 
         // We might not have a username at this point (first time loading for logged in user)
         if (username != null) {

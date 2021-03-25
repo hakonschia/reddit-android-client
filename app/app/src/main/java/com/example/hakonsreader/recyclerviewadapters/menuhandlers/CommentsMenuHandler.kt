@@ -10,6 +10,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.fragments.bottomsheets.PeekCommentBottomSheet
@@ -32,7 +33,7 @@ import kotlinx.coroutines.withContext
  * @param comment The comment the popup is for
  * @param adapter The RecyclerView adapter the comment is in
  */
-fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAdapter) {
+fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAdapter, api: RedditApi) {
     val user = App.get().getUserInfo()?.userInfo
     val context = view.context
     val parentComment = adapter.getCommentById(comment.parentId)
@@ -72,20 +73,20 @@ fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAd
                         R.string.saveComment
                     }
                     icon = R.drawable.ic_bookmark_24dp
-                    callback = { saveCommentOnClick(view, comment) }
+                    callback = { saveCommentOnClick(view, comment, api) }
                 }
 
                 if (comment.author == user?.username) {
                     item {
                         labelRes = R.string.menuDeleteComment
                         icon = R.drawable.ic_delete_24dp
-                        callback = { deleteCommentOnClick(view, comment) }
+                        callback = { deleteCommentOnClick(view, comment, api) }
                     }
                 } else {
                     item {
                         label = context.getString(R.string.blockUser, comment.author)
                         icon = R.drawable.ic_baseline_block_24
-                        callback = { blockUserOnClick(view, comment.author) }
+                        callback = { blockUserOnClick(view, comment.author, api) }
                     }
                 }
             }
@@ -101,7 +102,7 @@ fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAd
                         R.string.postDistinguishAsMod
                     }
                     icon = R.drawable.ic_admin_24px
-                    callback = { distinguishAsModOnclick(view, comment, adapter) }
+                    callback = { distinguishAsModOnclick(view, comment, adapter, api) }
                 }
 
                 if (comment.depth == 0) {
@@ -113,7 +114,7 @@ fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAd
                         }
 
                         icon = R.drawable.ic_pin_icon_color_24dp
-                        callback = { stickyOnClick(view, comment, adapter) }
+                        callback = { stickyOnClick(view, comment, adapter, api) }
                     }
                 }
 
@@ -126,7 +127,7 @@ fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAd
                         icon = R.drawable.ic_lock_24dp
                     }
 
-                    callback = { lockListingOnClick(view, comment, adapter) }
+                    callback = { lockListingOnClick(view, comment, api, commentsAdapter = adapter) }
                 }
             }
         }
@@ -137,14 +138,12 @@ fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAd
 /**
  * Listener for delete comment clicks
  */
-private fun deleteCommentOnClick(view: View, comment: RedditComment) {
+private fun deleteCommentOnClick(view: View, comment: RedditComment, api: RedditApi) {
     Dialog(view.context).apply {
         setContentView(R.layout.dialog_confirm_delete_comment)
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         findViewById<Button>(R.id.btnDelete).setOnClickListener {
-            val api = App.get().api
-
             CoroutineScope(IO).launch {
                 val response = api.comment(comment.id).delete()
                 withContext(Main) {
@@ -173,9 +172,7 @@ private fun deleteCommentOnClick(view: View, comment: RedditComment) {
  * @param view The view clicked (used to attach the snackbar with potential error messages)
  * @param comment The comment to save/unsave. This is updated if the request is successful
  */
-private fun saveCommentOnClick(view: View, comment: RedditComment) {
-    val api = App.get().api
-
+private fun saveCommentOnClick(view: View, comment: RedditComment, api: RedditApi) {
     CoroutineScope(IO).launch {
         val save = !comment.isSaved
 
@@ -203,9 +200,7 @@ private fun saveCommentOnClick(view: View, comment: RedditComment) {
  * @param comment The comment to distinguish
  * @param adapter The adapter the comment is in (to notify for updates)
  */
-private fun distinguishAsModOnclick(view: View, comment: RedditComment, adapter: CommentsAdapter) {
-    val api = App.get().api
-
+private fun distinguishAsModOnclick(view: View, comment: RedditComment, adapter: CommentsAdapter, api: RedditApi) {
     CoroutineScope(IO).launch {
         val response = if (comment.isMod()) {
             api.comment(comment.id).removeModDistinguish()
@@ -229,9 +224,7 @@ private fun distinguishAsModOnclick(view: View, comment: RedditComment, adapter:
  * @param comment The comment to sticky
  * @param adapter The adapter the comment is in (to notify for updates)
  */
-private fun stickyOnClick(view: View, comment: RedditComment, adapter: CommentsAdapter) {
-    val api = App.get().api
-
+private fun stickyOnClick(view: View, comment: RedditComment, adapter: CommentsAdapter, api: RedditApi) {
     CoroutineScope(IO).launch {
         val response = if (comment.isStickied) {
             api.comment(comment.id).unsticky()

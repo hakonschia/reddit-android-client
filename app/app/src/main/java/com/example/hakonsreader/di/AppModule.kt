@@ -77,6 +77,12 @@ object AppModule {
         return RedditUserInfoDatabase.getInstance(context)
     }
 
+    @Singleton
+    @Provides
+    fun provideUserInfoDao(database: RedditUserInfoDatabase): RedditUserInfoDao {
+        return database.userInfo()
+    }
+
 
     @Singleton
     @Provides

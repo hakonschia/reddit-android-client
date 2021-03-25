@@ -3,10 +3,12 @@ package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 import android.view.View
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.interfaces.LockableListing
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
@@ -27,8 +29,7 @@ import kotlinx.coroutines.withContext
  * @param view The view to attach the snackbar to
  * @param username The username of the user to block
  */
-fun blockUserOnClick(view: View, username: String) {
-    val api = App.get().api
+fun blockUserOnClick(view: View, username: String, api: RedditApi) {
     val loggedInUser = App.get().getUserInfo()?.userInfo ?: return
 
     CoroutineScope(IO).launch {
@@ -38,7 +39,7 @@ fun blockUserOnClick(view: View, username: String) {
 
                 Snackbar.make(view, userBlockedString, BaseTransientBottomBar.LENGTH_LONG)
                         .setAction(R.string.unblockUser) {
-                            unblockUser(view, username, loggedInUser)
+                            unblockUser(view, username, loggedInUser, api)
                         }
                         .show()
             }
@@ -54,9 +55,7 @@ fun blockUserOnClick(view: View, username: String) {
  * @param username The username to unblock
  * @param loggedInUser The logged in user (the user blocking [username])
  */
-fun unblockUser(view: View, username: String, loggedInUser: RedditUser) {
-    val api = App.get().api
-
+fun unblockUser(view: View, username: String, loggedInUser: RedditUser, api: RedditApi) {
     CoroutineScope(IO).launch {
         when (val response = api.user(username).unblock(loggedInUser.id)) {
             is ApiResponse.Success -> {
@@ -73,18 +72,16 @@ fun unblockUser(view: View, username: String, loggedInUser: RedditUser) {
  *
  * @param view The view to attach the snackbar to
  * @param listing The listing to lock
+ * @param postsDao If the listing is a post, pass the DAO to update the post
  * @param commentsAdapter If this is locking a comment, pass the comments adapter to update the comment
  */
-fun lockListingOnClick(view: View, listing: LockableListing, commentsAdapter: CommentsAdapter? = null) {
-    val api = App.get().api
-    val database = App.get().database
-
+fun lockListingOnClick(view: View, listing: LockableListing, api: RedditApi, postsDao: RedditPostsDao? = null, commentsAdapter: CommentsAdapter? = null) {
     CoroutineScope(IO).launch {
         val newLock = !listing.isLocked
         listing.isLocked = newLock
 
         val request = if (listing is RedditPost) {
-            database.posts().update(listing)
+            postsDao?.update(listing)
             api.post(listing.id)
         } else {
             // Update adapter
@@ -105,7 +102,7 @@ fun lockListingOnClick(view: View, listing: LockableListing, commentsAdapter: Co
             is ApiResponse.Error -> {
                 listing.isLocked = !newLock
                 if (listing is RedditPost) {
-                    database.posts().update(listing)
+                    postsDao?.update(listing)
                 } else {
                     withContext(Main) {
                         commentsAdapter?.notifyItemChanged(listing as RedditComment)

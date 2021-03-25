@@ -6,20 +6,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.databinding.PostBarBinding
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForPost
 import com.robinhood.ticker.TickerUtils
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Wrapper for a full post bar. This view shows the number of comments on the post, as well as
  * a [VoteBar] and a button to open a popup menu for the post
  */
+@AndroidEntryPoint
 class PostBar : FrameLayout {
+
+    @Inject
+    lateinit var api: RedditApi
+
+    @Inject
+    lateinit var postsDao: RedditPostsDao
 
     private val binding = PostBarBinding.inflate(LayoutInflater.from(context), this, true).apply {
         postPopupMenu.setOnClickListener {
-            showPopupForPost(it, post)
+            showPopupForPost(it, post, postsDao, api)
         }
     }
 

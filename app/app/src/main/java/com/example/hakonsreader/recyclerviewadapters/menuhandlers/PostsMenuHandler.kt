@@ -9,7 +9,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
@@ -29,7 +31,7 @@ import kotlinx.coroutines.withContext
  * @param view The view clicked
  * @param post The post the popup is for
  */
-fun showPopupForPost(view: View, post: RedditPost?) {
+fun showPopupForPost(view: View, post: RedditPost?, postsDao: RedditPostsDao, api: RedditApi) {
     // If the menu is clicked before the post loads, it will be passed as null
     if (post == null) {
         return
@@ -73,7 +75,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                         R.string.savePost
                     }
                     icon = R.drawable.ic_bookmark_24dp
-                    callback = { savePostOnClick(view, post) }
+                    callback = { savePostOnClick(view, post, api) }
                 }
 
                 // Post by the logged in user (technically if we failed to get user information this
@@ -83,7 +85,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                     item {
                         labelRes = R.string.deletePost
                         icon = R.drawable.ic_delete_24dp
-                        callback = { deletePostOnClick(view, post) }
+                        callback = { deletePostOnClick(view, post, api) }
                     }
 
                     item {
@@ -96,7 +98,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                         // This would be kind of fun to have a car spoiler, but I'm definitely not going
                         // to create that myself
                         icon = R.drawable.ic_help_24dp
-                        callback = { markSpoilerOnClick(view, post) }
+                        callback = { markSpoilerOnClick(view, post, api, postsDao) }
                     }
 
                     item {
@@ -107,14 +109,14 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                         }
 
                         icon = R.drawable.ic_pin_icon_color_24dp
-                        callback = { markNsfwOnClick(view, post) }
+                        callback = { markNsfwOnClick(view, post, api, postsDao) }
                     }
                 } else {
                     // Post NOT be logged in user
                     item {
                         label = context.getString(R.string.blockUser, post.author)
                         icon = R.drawable.ic_baseline_block_24
-                        callback = { blockUserOnClick(view, post.author) }
+                        callback = { blockUserOnClick(view, post.author, api) }
                     }
                 }
             }
@@ -133,7 +135,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                         R.string.postDistinguishAsMod
                     }
                     icon = R.drawable.ic_admin_24px
-                    callback = { distinguishAsModOnClick(view, post) }
+                    callback = { distinguishAsModOnClick(view, post, api, postsDao) }
                 }
 
                 item {
@@ -144,7 +146,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                     }
 
                     icon = R.drawable.ic_pin_icon_color_24dp
-                    callback = { stickyOnClick(view, post) }
+                    callback = { stickyOnClick(view, post, api, postsDao) }
                 }
 
                 item {
@@ -156,7 +158,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                         icon = R.drawable.ic_lock_24dp
                     }
 
-                    callback = { lockListingOnClick(view, post) }
+                    callback = { lockListingOnClick(view, post, api, postsDao) }
                 }
 
                 // Don't create the nsfw/spoiler items if the user is also the poster, as they will
@@ -174,7 +176,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                         // This would be kind of fun to have a car spoiler, but I'm definitely not going
                         // to create that myself
                         icon = R.drawable.ic_help_24dp
-                        callback = { markSpoilerOnClick(view, post) }
+                        callback = { markSpoilerOnClick(view, post, api, postsDao) }
                     }
 
                     item {
@@ -185,7 +187,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
                         }
 
                         icon = R.drawable.ic_pin_icon_color_24dp
-                        callback = { markNsfwOnClick(view, post) }
+                        callback = { markNsfwOnClick(view, post, api, postsDao) }
                     }
                 }
             }
@@ -194,9 +196,7 @@ fun showPopupForPost(view: View, post: RedditPost?) {
 }
 
 
-private fun savePostOnClick(view: View, post: RedditPost) {
-    val api = App.get().api
-
+private fun savePostOnClick(view: View, post: RedditPost, api: RedditApi) {
     CoroutineScope(IO).launch {
         val save = !post.isSaved
         val response = if (save) {
@@ -220,18 +220,15 @@ private fun savePostOnClick(view: View, post: RedditPost) {
     }
 }
 
-private fun distinguishAsModOnClick(view: View, post: RedditPost) {
-    val api = App.get().api
-    val db = App.get().database
-
+private fun distinguishAsModOnClick(view: View, post: RedditPost, api: RedditApi, postsDao: RedditPostsDao) {
     CoroutineScope(IO).launch {
         val response = if (post.isMod()) {
             post.distinguished = null
-            db.posts().update(post)
+            postsDao.update(post)
             api.post(post.id).removeModDistinguish()
         } else {
             post.distinguished = "moderator"
-            db.posts().update(post)
+            postsDao.update(post)
             api.post(post.id).distinguishAsMod()
         }
 
@@ -244,14 +241,11 @@ private fun distinguishAsModOnClick(view: View, post: RedditPost) {
     }
 }
 
-private fun stickyOnClick(view: View, post: RedditPost) {
-    val api = App.get().api
-    val db = App.get().database
-
+private fun stickyOnClick(view: View, post: RedditPost, api: RedditApi, postsDao: RedditPostsDao) {
     CoroutineScope(IO).launch {
         val newSticky = !post.isStickied
         post.isStickied = newSticky
-        db.posts().update(post)
+        postsDao.update(post)
 
         val response = if (newSticky) {
             api.post(post.id).sticky()
@@ -264,21 +258,18 @@ private fun stickyOnClick(view: View, post: RedditPost) {
             is ApiResponse.Error -> {
                 // Revert back
                 post.isStickied = !post.isStickied
-                db.posts().update(post)
+                postsDao.update(post)
                 handleGenericResponseErrors(view, response.error, response.throwable)
             }
         }
     }
 }
 
-private fun markNsfwOnClick(view: View, post: RedditPost) {
-    val api = App.get().api
-    val db = App.get().database
-
+private fun markNsfwOnClick(view: View, post: RedditPost, api: RedditApi, postsDao: RedditPostsDao) {
     CoroutineScope(IO).launch {
         val newNsfw = !post.isNsfw
         post.isNsfw = newNsfw
-        db.posts().update(post)
+        postsDao.update(post)
 
         val response = if (newNsfw) {
             api.post(post.id).markNsfw()
@@ -291,21 +282,18 @@ private fun markNsfwOnClick(view: View, post: RedditPost) {
             is ApiResponse.Error -> {
                 // Revert back
                 post.isNsfw = !post.isNsfw
-                db.posts().update(post)
+                postsDao.update(post)
                 handleGenericResponseErrors(view, response.error, response.throwable)
             }
         }
     }
 }
 
-private fun markSpoilerOnClick(view: View, post: RedditPost) {
-    val api = App.get().api
-    val db = App.get().database
-
+private fun markSpoilerOnClick(view: View, post: RedditPost, api: RedditApi, postsDao: RedditPostsDao) {
     CoroutineScope(IO).launch {
         val newSpoiler = !post.isSpoiler
         post.isSpoiler = newSpoiler
-        db.posts().update(post)
+        postsDao.update(post)
 
         val response = if (newSpoiler) {
             api.post(post.id).markSpoiler()
@@ -318,7 +306,7 @@ private fun markSpoilerOnClick(view: View, post: RedditPost) {
             is ApiResponse.Error -> {
                 // Revert back
                 post.isSpoiler = !post.isSpoiler
-                db.posts().update(post)
+                postsDao.update(post)
                 handleGenericResponseErrors(view, response.error, response.throwable)
             }
         }
@@ -362,14 +350,12 @@ private fun filterSubredditOnClick(subredditName: String) {
  * @param view The view to attach the snackbar to
  * @param post The post to delete
  */
-private fun deletePostOnClick(view: View, post: RedditPost) {
+private fun deletePostOnClick(view: View, post: RedditPost, api: RedditApi) {
     Dialog(view.context).apply {
         setContentView(R.layout.dialog_confirm_delete_post)
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         findViewById<Button>(R.id.btnDelete).setOnClickListener {
-            val api = App.get().api
-
             CoroutineScope(IO).launch {
                 val response = api.post(post.id).delete()
                 withContext(Main) {

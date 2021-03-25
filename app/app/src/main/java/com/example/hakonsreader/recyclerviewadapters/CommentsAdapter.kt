@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
@@ -35,6 +36,7 @@ import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallb
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForComments
 import com.example.hakonsreader.views.LinkPreview
 import com.example.hakonsreader.views.util.setLongClickToPeekUrl
+import javax.inject.Inject
 
 /**
  * Adapter for a RecyclerView populated with [RedditComment] objects. This adapter
@@ -43,7 +45,9 @@ import com.example.hakonsreader.views.util.setLongClickToPeekUrl
  * * Hidden comments
  * * "More" comments (eg. "2 more comments")
  */
-class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CommentsAdapter constructor(
+        private val api: RedditApi
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         private const val TAG = "CommentsAdapter"
 
@@ -443,7 +447,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             return
         }
 
-        showPopupForComments(view, comment, this)
+        showPopupForComments(view, comment, this, api)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {

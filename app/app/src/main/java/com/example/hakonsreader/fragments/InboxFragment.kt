@@ -47,7 +47,7 @@ class InboxFragment : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) : View? {
-        _binding = FragmentInboxBinding.inflate(layoutInflater)
+        _binding = FragmentInboxBinding.inflate(LayoutInflater.from(requireActivity()))
 
         setupTabs()
 

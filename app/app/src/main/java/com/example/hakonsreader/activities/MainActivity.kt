@@ -31,6 +31,7 @@ import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.TrendingSubreddits
 import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.api.persistence.RedditSubredditsDao
+import com.example.hakonsreader.api.persistence.RedditUserInfoDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
@@ -133,6 +134,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     @Inject
     lateinit var messagesDao: RedditMessagesDao
+
+    @Inject
+    lateinit var userInfoDao: RedditUserInfoDao
 
     private lateinit var binding: ActivityMainBinding
 
@@ -1017,6 +1021,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         with(binding.navDrawer) {
             app = App.get()
             subredditSelected = this@MainActivity
+            api = this@MainActivity.api
+            userInfoDao = this@MainActivity.userInfoDao
 
             profilePicture.setOnClickListener { selectProfileNavBar() }
             username.setOnClickListener { selectProfileNavBar() }

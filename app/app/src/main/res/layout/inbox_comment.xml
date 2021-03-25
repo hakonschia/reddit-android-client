@@ -13,6 +13,14 @@
         <variable
             name="message"
             type="com.example.hakonsreader.api.model.RedditMessage" />
+
+        <variable
+            name="api"
+            type="com.example.hakonsreader.api.RedditApi" />
+
+        <variable
+            name="messagesDao"
+            type="com.example.hakonsreader.api.persistence.RedditMessagesDao" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -88,7 +96,7 @@
 
             android:background="@null"
             android:foreground="@drawable/ripple_main_bg"
-            android:onClick="@{(view) -> InboxMenuHandlerKt.showInboxMenu(view, message)}"
+            android:onClick="@{(view) -> InboxMenuHandlerKt.showInboxMenu(view, message, api, messagesDao)}"
 
             android:contentDescription="@string/content_description_inbox_menu"
             android:src="@drawable/ic_baseline_more_horiz_24"

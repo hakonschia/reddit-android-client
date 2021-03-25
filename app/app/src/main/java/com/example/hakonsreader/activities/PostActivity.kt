@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.interfaces.ReplyableListing
 import com.example.hakonsreader.api.model.RedditComment
@@ -37,6 +38,7 @@ import com.google.gson.Gson
 import com.r0adkll.slidr.Slidr
 import com.squareup.picasso.Callback
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Activity to show a Reddit post with its comments
@@ -94,6 +96,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
          */
         var VIDEO_THUMBNAIL_BITMAP: Bitmap? = null
     }
+
+    @Inject
+    lateinit var api: RedditApi
 
     private lateinit var binding: ActivityPostBinding
 
@@ -307,7 +312,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
      */
     private fun setupCommentsList() {
         with(binding) {
-            val adapter = CommentsAdapter().apply {
+            val adapter = CommentsAdapter(api).apply {
                 replyListener = this@PostActivity
                 commentIdChain = intent.extras?.getString(EXTRAS_COMMENT_ID_CHAIN, "") ?: ""
                 loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel.loadMoreComments(comment, parent) }

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.databinding.FragmentInboxGroupBinding
 import com.example.hakonsreader.recyclerviewadapters.InboxAdapter
@@ -41,6 +42,9 @@ class InboxGroupFragment : Fragment() {
             inboxType = type
         }
     }
+
+    @Inject
+    lateinit var api: RedditApi
 
     @Inject
     lateinit var messagesDao: RedditMessagesDao
@@ -85,7 +89,7 @@ class InboxGroupFragment : Fragment() {
 
     private fun setupMessagesList() {
         messageLayoutManager = LinearLayoutManager(requireContext())
-        messageAdapter = InboxAdapter()
+        messageAdapter = InboxAdapter(api, messagesDao)
 
         binding.messages.layoutManager = messageLayoutManager
         binding.messages.adapter = messageAdapter

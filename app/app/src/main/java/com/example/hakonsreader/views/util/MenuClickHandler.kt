@@ -10,8 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.persistence.RedditSubredditRulesDao
+import com.example.hakonsreader.api.persistence.RedditUserInfoDao
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.PostsFragment
 import com.example.hakonsreader.interfaces.SortableWithTime
@@ -30,16 +33,18 @@ import java.util.*
  * Shows the popup menu for profiles for logged in users
  *
  * @param view The view clicked (where the menu will be attached)
+ * @param user The user represented in the profile popup clicked
+ * @param api The API object to use for API calls
  */
-fun showPopupForProfile(view: View, user: RedditUser?) {
+fun showPopupForProfile(view: View, user: RedditUser?, api: RedditApi, userInfoDao: RedditUserInfoDao) {
     user ?: return
 
     if (App.get().getUserInfo()?.userInfo?.id == user.id) {
-        showPopupForLoggedInUser(view)
+        showPopupForLoggedInUser(view, api, userInfoDao)
     }
 }
 
-private fun showPopupForLoggedInUser(view: View) {
+private fun showPopupForLoggedInUser(view: View, api: RedditApi, userInfoDao: RedditUserInfoDao) {
     val context = view.context
     val privatelyBrowsing = App.get().loggedInState.value is LoggedInState.PrivatelyBrowsing
 
@@ -56,7 +61,7 @@ private fun showPopupForLoggedInUser(view: View) {
             item {
                 labelRes = R.string.menuProfileManageAccounts
                 icon = R.drawable.ic_baseline_person_24
-                callback = { showAccountManagement(view.context) }
+                callback = { showAccountManagement(view.context, api, userInfoDao) }
             }
 
             item {
@@ -80,7 +85,7 @@ private fun showPopupForLoggedInUser(view: View) {
     }.show(context, view)
 }
 
-fun showAccountManagement(context: Context) {
+fun showAccountManagement(context: Context, api: RedditApi, userInfoDao: RedditUserInfoDao) {
     val app = App.get()
 
     Dialog(context).also {
@@ -95,7 +100,7 @@ fun showAccountManagement(context: Context) {
             layoutManager = LinearLayoutManager(context)
             adapter = AccountsAdapter().apply {
                 CoroutineScope(IO).launch {
-                    val accs = app.userInfoDatabase.userInfo().getAllUsers() as MutableList
+                    val accs = userInfoDao.getAllUsers() as MutableList
                     withContext(Main) {
                         accounts = accs
                     }
@@ -128,8 +133,8 @@ fun showAccountManagement(context: Context) {
                     if (currentId != userInfoClicked.accessToken.userId) {
                         removeItem(userInfoClicked)
                         CoroutineScope(IO).launch {
-                            app.userInfoDatabase.userInfo().delete(userInfoClicked)
-                            app.api.accessToken().revoke(userInfoClicked.accessToken)
+                            userInfoDao.delete(userInfoClicked)
+                            api.accessToken().revoke(userInfoClicked.accessToken)
                         }
                     }
                 }
@@ -144,7 +149,7 @@ fun showAccountManagement(context: Context) {
                     if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
                         userInfoClicked.nsfwAccount = nsfwAccount
                         CoroutineScope(IO).launch {
-                            app.userInfoDatabase.userInfo().update(userInfoClicked)
+                            userInfoDao.update(userInfoClicked)
                         }
                     } else {
                         // Update the current account

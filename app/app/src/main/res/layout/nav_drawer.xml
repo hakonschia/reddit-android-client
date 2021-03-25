@@ -12,6 +12,14 @@
             type="com.example.hakonsreader.App" />
 
         <variable
+            name="api"
+            type="com.example.hakonsreader.api.RedditApi" />
+
+        <variable
+            name="userInfoDao"
+            type="com.example.hakonsreader.api.persistence.RedditUserInfoDao" />
+
+        <variable
             name="privatelyBrowsing"
             type="boolean" />
 
@@ -86,7 +94,7 @@
 
                 android:background="@drawable/border_opposite_bg"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:onClick="@{(view) -> MenuClickHandlerKt.showAccountManagement(view.context)}"
+                android:onClick="@{(view) -> MenuClickHandlerKt.showAccountManagement(view.context, api, userInfoDao)}"
                 android:text="@string/menuProfileManageAccounts"
                 android:textColor="@color/text_color"
 

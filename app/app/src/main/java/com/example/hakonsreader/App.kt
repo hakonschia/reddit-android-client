@@ -115,19 +115,19 @@ class App : Application() {
     private var wifiConnected = false
 
     /**
-     * A [RedditApi] instnace
+     * A [RedditApi] instance. Outside classes should inject this themselves
      */
     @Inject
     lateinit var api: RedditApi
 
     /**
-     * A [RedditDatabase] instance
+     * A [RedditDatabase] instance. Outside classes should inject this themselves
      */
     @Inject
     lateinit var database: RedditDatabase
 
     /**
-     * A [RedditUserInfoDatabase] instance
+     * A [RedditUserInfoDatabase] instance. Outside classes should inject this themselves
      */
     @Inject
     lateinit var userInfoDatabase: RedditUserInfoDatabase

@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.BR
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
+import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.databinding.InboxCommentBinding
 import com.example.hakonsreader.databinding.InboxMessageBinding
 import com.example.hakonsreader.misc.createAgeText
@@ -22,7 +24,10 @@ import com.example.hakonsreader.views.ListDivider
 import java.time.Duration
 import java.time.Instant
 
-class InboxAdapter : RecyclerView.Adapter<InboxAdapter.ViewHolder>()  {
+class InboxAdapter(
+        private val api: RedditApi,
+        private val messagesDao: RedditMessagesDao
+) : RecyclerView.Adapter<InboxAdapter.ViewHolder>()  {
     companion object {
         /**
          * The type returned from [getItemViewType] when the item is a message from a comment reply
@@ -57,8 +62,14 @@ class InboxAdapter : RecyclerView.Adapter<InboxAdapter.ViewHolder>()  {
         val layoutInflater = LayoutInflater.from(parent.context)
 
         return when (viewType) {
-            TYPE_COMMENT -> ViewHolder(InboxCommentBinding.inflate(layoutInflater, parent, false))
-            else -> ViewHolder(InboxMessageBinding.inflate(layoutInflater, parent, false))
+            TYPE_COMMENT -> ViewHolder(InboxCommentBinding.inflate(layoutInflater, parent, false).apply {
+                api = this@InboxAdapter.api
+                messagesDao = this@InboxAdapter.messagesDao
+            })
+            else -> ViewHolder(InboxMessageBinding.inflate(layoutInflater, parent, false).apply {
+                api = this@InboxAdapter.api
+                messagesDao = this@InboxAdapter.messagesDao
+            })
         }
     }
 

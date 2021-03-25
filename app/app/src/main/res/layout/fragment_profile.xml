@@ -19,6 +19,14 @@
         <variable
             name="privatelyBrowsing"
             type="boolean" />
+
+        <variable
+            name="api"
+            type="com.example.hakonsreader.api.RedditApi" />
+
+        <variable
+            name="userInfoDao"
+            type="com.example.hakonsreader.api.persistence.RedditUserInfoDao" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -191,7 +199,7 @@
                             app:srcCompat="@drawable/ic_baseline_more_vert_24"
                             android:background="@drawable/ripple_main_bg"
 
-                            android:onClick="@{(view) -> MenuClickHandlerKt.showPopupForProfile(view, user)}"
+                            android:onClick="@{(view) -> MenuClickHandlerKt.showPopupForProfile(view, user, api, userInfoDao)}"
 
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent" />
