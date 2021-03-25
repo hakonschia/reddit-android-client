@@ -1,6 +1,7 @@
 package com.example.hakonsreader.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.api.persistence.RedditSubredditRulesDao
@@ -13,6 +14,17 @@ class SubredditRulesViewModel(
         api: SubredditRequest,
         dao: RedditSubredditRulesDao
 ) : ViewModel() {
+
+    class Factory(
+            private val subredditName: String,
+            private val api: SubredditRequest,
+            private val rulesDao: RedditSubredditRulesDao
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return SubredditRulesViewModel(subredditName, api, rulesDao) as T
+        }
+    }
+
     private val repo = SubredditRulesRepository(subredditName, api, dao)
 
     val rules = repo.getRules().asLiveData()

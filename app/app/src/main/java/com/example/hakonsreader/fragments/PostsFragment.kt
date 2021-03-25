@@ -20,18 +20,24 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentPostsBinding
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
-import com.example.hakonsreader.viewmodels.factories.PostsFactory
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.ContentVideo
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
+/**
+ * Fragment for displaying posts from a user/subreddit
+ */
+@AndroidEntryPoint
 class PostsFragment : Fragment(), SortableWithTime {
 
     companion object {
@@ -104,7 +110,13 @@ class PostsFragment : Fragment(), SortableWithTime {
     private var _binding: FragmentPostsBinding? = null
     private val binding get() = _binding!!
 
-    private val postsViewModel: PostsViewModel by viewModels { PostsFactory(name, isForUser) }
+    @Inject
+    lateinit var api: RedditApi
+
+    @Inject
+    lateinit var postsDao: RedditPostsDao
+
+    private val postsViewModel: PostsViewModel by viewModels { PostsViewModel.Factory(name, isForUser, api, postsDao) }
     private val postsScrollListener: PostScrollListener = PostScrollListener { postsViewModel.loadPosts() }
 
     /**
@@ -142,8 +154,11 @@ class PostsFragment : Fragment(), SortableWithTime {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentPostsBinding.inflate(inflater)
-        return binding.root
+        // Posts in the activity open new activities with a transition, which requires an activity context
+        // the LayoutInflater we get with Hilt isn't with an activity context
+        return FragmentPostsBinding.inflate(LayoutInflater.from(requireActivity())).apply {
+            _binding = this
+        }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

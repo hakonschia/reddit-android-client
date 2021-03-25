@@ -6,18 +6,30 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.App
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class CommentsViewModel: ViewModel() {
 
-    private val api = App.get().api
-    private val database = App.get().database
+/**
+ * ViewModel for loading comments for a Reddit post. The ID of the post to load should be set with
+ * [postId] before an attempt is made, otherwise an exception will be thrown.
+ *
+ * [savedExtras] can be used to store post extras to survive configuration changes
+ */
+@HiltViewModel
+class CommentsViewModel @Inject constructor(
+        private val api: RedditApi,
+        private val postsDao: RedditPostsDao
+) : ViewModel() {
 
     private val _post = MutableLiveData<RedditPost>()
     private val _comments = MutableLiveData<List<RedditComment>>()
@@ -34,14 +46,17 @@ class CommentsViewModel: ViewModel() {
      */
     var postId = ""
 
+    /**
+     * The saved extras for the post, which can be used to survive configuration changes
+     */
     var savedExtras: Bundle? = null
 
 
     /**
      * Loads comments for the post.
      *
-     * This will also fetch the post itself. The post will be updated in [RedditDatabase] and must
-     * be observed from there to receieve changes
+     * This will also fetch the post itself. The post will be updated in the local database and can either
+     * by observed from there, or from [post]
      *
      * @param loadThirdParty If true, third party requests (such as retrieving gifs from Gfycat directly)
      * will be made. This is default to `false`. If only the comments of the post (and potentially updated
@@ -76,7 +91,16 @@ class CommentsViewModel: ViewModel() {
         }
     }
 
-    fun loadMoreComments(comment: RedditComment, parent: RedditComment? = null) {
+    /**
+     * Loads more comments (from "2 more comments" type comments)
+     *
+     * @param comment The "2 more comment" clicked, holding the IDs of the comments to load
+     * @param parent The parent of the comment, or `null` if the comments are top-level comments (ie.
+     * the post is the parent)
+     *
+     * @throws IllegalStateException if [postId] is not set
+     */
+    fun loadMoreComments(comment: RedditComment, parent: RedditComment?) {
         if (postId.isBlank()) {
             throw IllegalStateException("Post ID not set")
         }
@@ -165,6 +189,6 @@ class CommentsViewModel: ViewModel() {
             post.crosspostIds = crosspostIds
         }
 
-        database.posts().insertAll(postsToInsertIntoDb)
+        postsDao.insertAll(postsToInsertIntoDb)
     }
 }

@@ -6,8 +6,7 @@ import android.util.Log
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditUserInfo
-import com.example.hakonsreader.api.persistence.RedditDatabase
-import com.example.hakonsreader.api.persistence.RedditUserInfoDatabase
+import com.example.hakonsreader.api.persistence.*
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
@@ -70,6 +69,15 @@ object AppModule {
         )
     }
 
+
+
+    @Singleton
+    @Provides
+    fun provideUserDatabase(@ApplicationContext context: Context): RedditUserInfoDatabase {
+        return RedditUserInfoDatabase.getInstance(context)
+    }
+
+
     @Singleton
     @Provides
     fun provideDatabase(@ApplicationContext context: Context): RedditDatabase {
@@ -78,7 +86,25 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideUserDatabase(@ApplicationContext context: Context): RedditUserInfoDatabase {
-        return RedditUserInfoDatabase.getInstance(context)
+    fun providePostsDao(database: RedditDatabase) : RedditPostsDao {
+        return database.posts()
+    }
+
+    @Singleton
+    @Provides
+    fun provideSubredditsDao(database: RedditDatabase) : RedditSubredditsDao {
+        return database.subreddits()
+    }
+
+    @Singleton
+    @Provides
+    fun provideFlairsDao(database: RedditDatabase) : RedditFlairsDao {
+        return database.flairs()
+    }
+
+    @Singleton
+    @Provides
+    fun provideRulesDao(database: RedditDatabase) : RedditSubredditRulesDao {
+        return database.rules()
     }
 }

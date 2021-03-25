@@ -1,7 +1,9 @@
 package com.example.hakonsreader.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.persistence.RedditPostsDao
@@ -15,10 +17,23 @@ import kotlinx.coroutines.launch
  */
 class SubredditViewModel(
         subredditName: String,
+        api: RedditApi,
         dao: RedditSubredditsDao,
-        postsDao: RedditPostsDao
+        postsDao: RedditPostsDao,
 ) : ViewModel() {
-    private val repo = SubredditRepository(subredditName, dao, postsDao)
+
+    class Factory(
+            private val subredditName: String,
+            private val api: RedditApi,
+            private val dao: RedditSubredditsDao,
+            private val postsDao: RedditPostsDao
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return SubredditViewModel(subredditName, api, dao, postsDao) as T
+        }
+    }
+
+    private val repo = SubredditRepository(subredditName, api, dao, postsDao)
 
     val subreddit = repo.getSubreddit()
     val errors = repo.errors

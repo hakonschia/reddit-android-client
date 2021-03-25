@@ -15,11 +15,15 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.FlairType
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.Submission
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
+import com.example.hakonsreader.api.persistence.RedditFlairsDao
+import com.example.hakonsreader.api.persistence.RedditPostsDao
+import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.ActivitySubmitBinding
 import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
@@ -29,23 +33,24 @@ import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
 import com.example.hakonsreader.viewmodels.SubredditViewModel
-import com.example.hakonsreader.viewmodels.factories.SubredditFactory
-import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
  * Activity for submitting a post to a subreddit. The ID of the newly created post (if one was created)
- * will be passed with the key [EXTRAS_RESULT_POST_ID]
+ * will be passed to the caller with the key [EXTRAS_RESULT_POST_ID]
  */
+@AndroidEntryPoint
 class SubmitActivity : BaseActivity() {
 
     companion object {
@@ -63,8 +68,17 @@ class SubmitActivity : BaseActivity() {
     }
 
 
-    private val api = App.get().api
-    private val database = App.get().database
+    @Inject
+    lateinit var api: RedditApi
+
+    @Inject
+    lateinit var subredditsDao: RedditSubredditsDao
+
+    @Inject
+    lateinit var postsDao: RedditPostsDao
+
+    @Inject
+    lateinit var flairsDao: RedditFlairsDao
 
     private lateinit var binding: ActivitySubmitBinding
 
@@ -137,10 +151,11 @@ class SubmitActivity : BaseActivity() {
     }
 
     private fun setupSubredditViewModel(subredditName: String) {
-        subredditViewModel = ViewModelProvider(this, SubredditFactory(
+        subredditViewModel = ViewModelProvider(this, SubredditViewModel.Factory(
                 subredditName,
-                database.subreddits(),
-                database.posts()
+                api,
+                subredditsDao,
+                postsDao
         )).get(SubredditViewModel::class.java).apply {
             subreddit.observe(this@SubmitActivity) {
                 // If this is null then it should probably be reflected on the subreddit field in the fragment?
@@ -173,11 +188,11 @@ class SubmitActivity : BaseActivity() {
     }
 
     private fun setupFlairsViewModel(subredditName: String) {
-        flairsViewModel = ViewModelProvider(this, SubredditFlairsFactory(
+        flairsViewModel = ViewModelProvider(this, SubredditFlairsViewModel.Factory(
                 subredditName,
                 FlairType.SUBMISSION,
-                App.get().api.subreddit(subredditName),
-                App.get().database.flairs()
+                api.subreddit(subredditName),
+                flairsDao
         )).get(SubredditFlairsViewModel::class.java).apply {
             flairs.observe(this@SubmitActivity) {
                 // If we get back an empty list always check again (this will happen if we don't already have

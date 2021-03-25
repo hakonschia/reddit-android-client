@@ -36,6 +36,10 @@ import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
+import com.example.hakonsreader.api.persistence.RedditFlairsDao
+import com.example.hakonsreader.api.persistence.RedditPostsDao
+import com.example.hakonsreader.api.persistence.RedditSubredditRulesDao
+import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
@@ -44,18 +48,16 @@ import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.viewmodels.*
-import com.example.hakonsreader.viewmodels.factories.SubredditFactory
-import com.example.hakonsreader.viewmodels.factories.SubredditFlairsFactory
-import com.example.hakonsreader.viewmodels.factories.SubredditRulesFactory
-import com.example.hakonsreader.viewmodels.factories.SubredditWikiFactory
 import com.example.hakonsreader.views.util.ViewUtil
 import com.example.hakonsreader.views.util.setMarkdown
 import com.example.hakonsreader.views.util.showPopupSortWithTime
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
+import dagger.hilt.android.AndroidEntryPoint
 import java.lang.RuntimeException
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 
@@ -64,6 +66,7 @@ import kotlin.collections.ArrayList
  * response for the information is retrieved, and therefore potential redirects for subreddit names
  * is supported
  */
+@AndroidEntryPoint
 class SubredditFragment : Fragment() {
 
     companion object {
@@ -130,8 +133,20 @@ class SubredditFragment : Fragment() {
         }
     }
 
-    private val database = App.get().database
-    private val api = App.get().api
+    @Inject
+    lateinit var api: RedditApi
+
+    @Inject
+    lateinit var postsDao: RedditPostsDao
+
+    @Inject
+    lateinit var subredditsDao: RedditSubredditsDao
+
+    @Inject
+    lateinit var rulesDao: RedditSubredditRulesDao
+
+    @Inject
+    lateinit var flairsDao: RedditFlairsDao
 
     private var _binding: FragmentSubredditBinding? = null
     private val binding get() = _binding!!
@@ -381,10 +396,11 @@ class SubredditFragment : Fragment() {
             return
         }
 
-        subredditViewModel = ViewModelProvider(this, SubredditFactory(
+        subredditViewModel = ViewModelProvider(this, SubredditViewModel.Factory(
                 subredditName,
-                database.subreddits(),
-                database.posts()
+                api,
+                subredditsDao,
+                postsDao
         )).get(SubredditViewModel::class.java).apply {
             subreddit.observe(viewLifecycleOwner) {
                 val old = this@SubredditFragment.subreddit
@@ -456,10 +472,10 @@ class SubredditFragment : Fragment() {
      * @param name The name of the subreddit the ViewModel is for
      */
     private fun setupRulesViewModel(name: String) {
-        rulesViewModel = ViewModelProvider(this, SubredditRulesFactory(
+        rulesViewModel = ViewModelProvider(this, SubredditRulesViewModel.Factory(
                 name,
                 api.subreddit(name),
-                database.rules()
+                rulesDao
         )).get(SubredditRulesViewModel::class.java).apply {
             rules.observe(viewLifecycleOwner) {
                 (binding.subredditInfo.rules.adapter as SubredditRulesAdapter?)?.submitList(it)
@@ -484,11 +500,11 @@ class SubredditFragment : Fragment() {
      * @param name The name of the subreddit the ViewModel is for
      */
     private fun setupFlairsViewModel(name: String) {
-        flairsViewModel = ViewModelProvider(this, SubredditFlairsFactory(
+        flairsViewModel = ViewModelProvider(this, SubredditFlairsViewModel.Factory(
                 name,
                 FlairType.USER,
                 api.subreddit(name),
-                database.flairs()
+                flairsDao
         )).get(SubredditFlairsViewModel::class.java).apply {
             flairs.observe(viewLifecycleOwner) { flairs ->
                 RedditFlairAdapter(requireContext(), android.R.layout.simple_spinner_item, flairs as ArrayList<RedditFlair>).run {
@@ -847,6 +863,7 @@ class SubredditFragment : Fragment() {
         binding.privatelyBrowsing = privatelyBrowsing
     }
 
+    @AndroidEntryPoint
     class WikiFragment : Fragment() {
         companion object {
             private const val WIKI_SUBREDDIT_NAME = "wikiSubredditName"
@@ -858,6 +875,9 @@ class SubredditFragment : Fragment() {
             }
         }
 
+        @Inject
+        lateinit var api: RedditApi
+
         private var _binding: FragmentSubredditWikiBinding? = null
         private val binding get() = _binding!!
 
@@ -866,7 +886,7 @@ class SubredditFragment : Fragment() {
                     ?: throw RuntimeException("No subreddit name given to wiki")
         }
 
-        private val wikiViewModel: SubredditWikiViewModel by viewModels { SubredditWikiFactory(App.get().api.subreddit(name)) }
+        private val wikiViewModel: SubredditWikiViewModel by viewModels { SubredditWikiViewModel.Factory(api.subreddit(name)) }
 
         /**
          * A movement method to be used in the wiki that checks if the clicked link is another wiki page, and

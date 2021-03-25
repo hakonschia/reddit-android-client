@@ -1,17 +1,14 @@
 package com.example.hakonsreader.viewmodels
 
 import android.os.Bundle
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.hakonsreader.App
+import androidx.lifecycle.*
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,12 +24,31 @@ import kotlin.collections.HashMap
  * @param isUser True if the ViewModel is loading posts for a user, false for a subreddit
  */
 class PostsViewModel(
-        var userOrSubredditName: String,
-        private val isUser: Boolean
+        private var userOrSubredditName: String,
+        private val isUser: Boolean,
+        private val api: RedditApi,
+        private val postsDao: RedditPostsDao,
 ) : ViewModel() {
 
-    private val database = App.get().database
-    private val api = App.get().api
+    /**
+     * Factory class for the ViewModel
+     *
+     * @param userOrSubredditName The name of the user or subreddit to load posts for
+     * @param isUser True if [userOrSubredditName] points to a username, false if for a subreddit
+     * @param api The API to use
+     * @param postsDao the DAO to use
+     */
+    class Factory(
+            private val userOrSubredditName: String,
+            private val isUser: Boolean,
+            private val api: RedditApi,
+            private val postsDao: RedditPostsDao,
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return PostsViewModel(userOrSubredditName, isUser, api, postsDao) as T
+        }
+    }
+
 
     private val _posts = MutableLiveData<List<RedditPost>>()
     private val _loadingChange = MutableLiveData<Boolean>()
@@ -178,6 +194,6 @@ class PostsViewModel(
         // Store (or update) the posts in the database
         // We use all the posts here as duplicates will just be updated, which is fine
         // This must be called after the crossposts are set or else the IDs wont be stored
-        database.posts().insertAll(postsToInsertIntoDb)
+        postsDao.insertAll(postsToInsertIntoDb)
     }
 }

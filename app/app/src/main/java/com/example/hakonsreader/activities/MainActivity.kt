@@ -29,7 +29,7 @@ import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.TrendingSubreddits
-import com.example.hakonsreader.api.persistence.RedditDatabase
+import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
@@ -46,7 +46,6 @@ import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.recyclerviewadapters.TrendingSubredditsAdapter
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
-import com.example.hakonsreader.viewmodels.factories.SelectSubredditsFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -125,6 +124,12 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         const val EXTRAS_START_SUBREDDIT = "extras_MainActivity_startSubreddit"
     }
 
+    @Inject
+    lateinit var api: RedditApi
+
+    @Inject
+    lateinit var subredditsDao: RedditSubredditsDao
+
     private lateinit var binding: ActivityMainBinding
 
     /**
@@ -152,7 +157,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     private val navigationViewListener = BottomNavigationViewListener()
 
     private val subredditsViewModel: SelectSubredditsViewModel by viewModels {
-        SelectSubredditsFactory(App.get().loggedInState.value is LoggedInState.LoggedIn)
+        SelectSubredditsViewModel.Factory(api, subredditsDao, App.get().loggedInState.value is LoggedInState.LoggedIn)
     }
     private val trendingSubredditsViewModel: TrendingSubredditsViewModel by viewModels()
 

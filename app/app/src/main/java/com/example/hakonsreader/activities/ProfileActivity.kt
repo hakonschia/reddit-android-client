@@ -8,10 +8,13 @@ import com.example.hakonsreader.fragments.ProfileFragment
 import com.example.hakonsreader.interfaces.LockableSlidr
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 
 /**
  * Activity to show a users profile.
  */
+@AndroidEntryPoint
 class ProfileActivity : BaseActivity(), LockableSlidr {
 
     companion object {

@@ -5,13 +5,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.App
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.TrendingSubreddits
 import com.example.hakonsreader.api.responses.ApiResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TrendingSubredditsViewModel : ViewModel() {
+/**
+ * ViewModel for retrieving trending subreddits
+ */
+@HiltViewModel
+class TrendingSubredditsViewModel @Inject constructor(
+        private val api: RedditApi
+) : ViewModel() {
     // Trending subreddits are updated around 0pm est (I think), so it might be possible to do some
     // sort of optimization to only get once from the network if the last one was retrieved after that
     // Although the request is a very low request so it isn't like it's very data intensive
@@ -28,8 +37,6 @@ class TrendingSubredditsViewModel : ViewModel() {
      * Loads the trending subreddits
      */
     fun loadSubreddits() {
-        val api = App.get().api
-
         viewModelScope.launch {
             _isLoading.postValue(true)
 

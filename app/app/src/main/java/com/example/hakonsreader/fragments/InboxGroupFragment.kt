@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.databinding.FragmentInboxGroupBinding
 import com.example.hakonsreader.recyclerviewadapters.InboxAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -18,6 +19,7 @@ import kotlinx.coroutines.withContext
 /**
  * Class for displaying an inbox group (eg. messages in the unread inbox)
  */
+@AndroidEntryPoint
 class InboxGroupFragment : Fragment() {
     companion object {
         private const val TAG = "InboxGroupFragment"

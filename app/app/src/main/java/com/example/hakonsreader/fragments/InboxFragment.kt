@@ -11,6 +11,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.databinding.FragmentInboxBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 /**
  * Fragment for displaying a users inbox
  */
+@AndroidEntryPoint
 class InboxFragment : Fragment() {
     companion object {
         /**

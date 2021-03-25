@@ -24,6 +24,7 @@ import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.viewmodels.SearchForSubredditsViewModel
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
 /**
@@ -31,6 +32,7 @@ import java.util.*
  * in users subscribed subreddits or a list of default subreddits) and allows the user
  * to search for subreddits by a search field
  */
+@AndroidEntryPoint
 class SelectSubredditFragment : Fragment() {
     companion object {
         private const val TAG = "SelectSubredditFragment"

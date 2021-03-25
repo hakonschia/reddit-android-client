@@ -1,9 +1,6 @@
 package com.example.hakonsreader.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.hakonsreader.api.model.SubredditWikiPage
 import com.example.hakonsreader.api.requestmodels.SubredditRequest
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -17,6 +14,14 @@ import kotlin.collections.HashMap
 class SubredditWikiViewModel(
         private val api: SubredditRequest
 ) : ViewModel() {
+
+    class Factory(
+            private val api: SubredditRequest
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return SubredditWikiViewModel(api) as T
+        }
+    }
 
     private val pageStack = ArrayDeque<String>()
 

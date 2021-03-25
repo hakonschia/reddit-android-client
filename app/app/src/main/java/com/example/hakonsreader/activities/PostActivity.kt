@@ -36,10 +36,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.r0adkll.slidr.Slidr
 import com.squareup.picasso.Callback
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Activity to show a Reddit post with its comments
  */
+@AndroidEntryPoint
 class PostActivity : BaseActivity(), OnReplyListener {
 
     companion object {

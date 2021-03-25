@@ -5,15 +5,23 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.App
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.responses.ApiResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchForSubredditsViewModel : ViewModel() {
+/**
+ * ViewModel for seearching for subreddits
+ */
+@HiltViewModel
+class SearchForSubredditsViewModel @Inject constructor(
+        private val api: RedditApi
+) : ViewModel() {
 
-    private val api = App.get().api
     private val _searchResults = MutableLiveData<List<Subreddit>>()
     private val _isLoading = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<ErrorWrapper>()

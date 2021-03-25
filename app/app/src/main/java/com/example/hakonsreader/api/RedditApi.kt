@@ -56,7 +56,7 @@ import java.util.*
  *
  * Usage example:
  * ```
- * val api = RedditApi()...
+ * val api = RedditApi.create()...
  *
  * // Retrieve information about the "GlobalOffensive" subreddit
  * // The response for this is ApiResponse<Subreddit>

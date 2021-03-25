@@ -3,7 +3,7 @@ package com.example.hakonsreader.viewmodels.repositories
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.example.hakonsreader.App
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.persistence.RedditPostsDao
@@ -17,6 +17,7 @@ import kotlinx.coroutines.withContext
 
 class SubredditRepository(
         private val subredditName: String,
+        private val api: RedditApi,
         private val dao: RedditSubredditsDao,
         private val postsDao: RedditPostsDao
 ) {
@@ -48,7 +49,7 @@ class SubredditRepository(
     suspend fun refresh() {
         _isLoading.postValue(true)
 
-        when (val resp = App.get().api.subreddit(subredditNameObservable.value!!).info()) {
+        when (val resp = api.subreddit(subredditNameObservable.value!!).info()) {
             is ApiResponse.Success -> {
                 infoLoaded = true
                 val sub = resp.value
@@ -87,7 +88,7 @@ class SubredditRepository(
             dao.update(subreddit)
         }
 
-        when (val response = App.get().api.subreddit(subredditNameObservable.value!!).subscribe(newSubscription)) {
+        when (val response = api.subreddit(subredditNameObservable.value!!).subscribe(newSubscription)) {
             is ApiResponse.Success -> { }
             is ApiResponse.Error -> {
                 // Revert back
@@ -134,7 +135,7 @@ class SubredditRepository(
             }
         }
 
-        when (val resp = App.get().api.subreddit(subredditNameObservable.value!!).selectFlair(username, flair?.id)) {
+        when (val resp = api.subreddit(subredditNameObservable.value!!).selectFlair(username, flair?.id)) {
             is ApiResponse.Success -> { }
             is ApiResponse.Error -> {
                 _errors.postValue(ErrorWrapper(resp.error, resp.throwable))

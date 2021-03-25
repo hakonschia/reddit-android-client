@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.databinding.FragmentProfileBinding
@@ -24,19 +25,21 @@ import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.viewmodels.RedditUserViewModel
-import com.example.hakonsreader.viewmodels.factories.RedditUserFactory
 import com.makeramen.roundedimageview.RoundedImageView
 import com.squareup.picasso.Picasso
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Fragment for displaying a Reddit user profile
  */
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
     companion object {
@@ -95,6 +98,9 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    @Inject
+    lateinit var api: RedditApi
+
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
@@ -106,7 +112,7 @@ class ProfileFragment : Fragment() {
     private val isLoggedInUser by lazy { arguments?.getBoolean(ARGS_IS_LOGGED_IN_USER) ?: false }
 
     private val viewModel: RedditUserViewModel by viewModels {
-        RedditUserFactory(username, isLoggedInUser)
+        RedditUserViewModel.Factory(username, isLoggedInUser, api)
     }
 
     var onInboxClicked: OnInboxClicked? = null

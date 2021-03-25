@@ -2,7 +2,10 @@ package com.example.hakonsreader.viewmodels
 
 import androidx.lifecycle.*
 import com.example.hakonsreader.App
+import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.model.RedditAward
 import com.example.hakonsreader.api.model.Subreddit
+import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.states.LoggedInState
 import kotlinx.coroutines.CoroutineScope
@@ -14,15 +17,28 @@ import kotlinx.coroutines.withContext
  * ViewModel for retrieving subreddits. The subreddits retrieved are automatically chosen for
  * a logged in users subscribed subreddits, or for default subreddits for non-logged in users
  */
-class SelectSubredditsViewModel(var isForLoggedInUser: Boolean) : ViewModel() {
-    private val database = App.get().database
-    private val api = App.get().api
+class SelectSubredditsViewModel constructor(
+        private val api: RedditApi,
+        private val subredditsDao: RedditSubredditsDao,
+        var isForLoggedInUser: Boolean
+) : ViewModel() {
+
+    class Factory(
+            private val api: RedditApi,
+            private val subredditsDao: RedditSubredditsDao,
+            private val isForLoggedInUser: Boolean
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return SelectSubredditsViewModel(api, subredditsDao, isForLoggedInUser) as T
+        }
+    }
+
     private var loadedFromApi = false
 
     private val ids = MutableLiveData<List<String>>().apply {
         CoroutineScope(IO).launch {
             postValue(if (isForLoggedInUser) {
-                database.subreddits().getSubscribedSubredditsNoObservable().map { it.id }
+                subredditsDao.getSubscribedSubredditsNoObservable().map { it.id }
             } else {
                 ArrayList()
             })
@@ -34,7 +50,7 @@ class SelectSubredditsViewModel(var isForLoggedInUser: Boolean) : ViewModel() {
 
     val subreddits: LiveData<List<Subreddit>> get() {
         return Transformations.switchMap(ids) {
-            database.subreddits().getSubsById(it)
+            subredditsDao.getSubsById(it)
         }
     }
     val isLoading: LiveData<Boolean> = _isLoading
@@ -80,7 +96,7 @@ class SelectSubredditsViewModel(var isForLoggedInUser: Boolean) : ViewModel() {
                     // Although NSFW subs might be inserted with this, it's fine as if the user
                     // has subscribed to them it's fine (for non-logged in users, default subs don't include NSFW)
                     withContext(IO) {
-                        database.subreddits().insertAll(subreddits)
+                        subredditsDao.insertAll(subreddits)
                     }
                 }
                 is ApiResponse.Error -> {
@@ -100,7 +116,7 @@ class SelectSubredditsViewModel(var isForLoggedInUser: Boolean) : ViewModel() {
 
         viewModelScope.launch {
             withContext(IO) {
-                database.subreddits().update(subreddit)
+                subredditsDao.update(subreddit)
             }
             when (val response = api.subreddit(subreddit.name).favorite(favorite)) {
                 is ApiResponse.Success -> { }
@@ -110,7 +126,7 @@ class SelectSubredditsViewModel(var isForLoggedInUser: Boolean) : ViewModel() {
                     // Request failed, revert
                     subreddit.isFavorited = !favorite
                     withContext(IO) {
-                        database.subreddits().update(subreddit)
+                        subredditsDao.update(subreddit)
                     }
                 }
             }

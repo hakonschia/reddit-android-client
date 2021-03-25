@@ -12,10 +12,13 @@ import com.example.hakonsreader.fragments.SubredditFragment
 import com.example.hakonsreader.interfaces.LockableSlidr
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 
 /**
  * Activity for a subreddit (used when a subreddit is clicked from a post)
  */
+@AndroidEntryPoint
 class SubredditActivity : BaseActivity(), LockableSlidr {
 
     companion object {

@@ -1,6 +1,7 @@
 package com.example.hakonsreader.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.api.enums.FlairType
@@ -18,6 +19,18 @@ class SubredditFlairsViewModel(
         api: SubredditRequest,
         dao: RedditFlairsDao
 ) : ViewModel() {
+
+    class Factory(
+            private val subredditName: String,
+            private val flairType: FlairType,
+            private val api: SubredditRequest,
+            private val dao: RedditFlairsDao
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return SubredditFlairsViewModel(subredditName, flairType, api, dao) as T
+        }
+    }
+
     private val repo = SubredditFlairsRepository(subredditName, flairType, api, dao)
 
     val flairs = repo.getFlairs().asLiveData()

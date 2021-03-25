@@ -1,21 +1,39 @@
 package com.example.hakonsreader.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.hakonsreader.App
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.states.LoggedInState
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for retrieving information about a Reddit user
+ */
 class RedditUserViewModel(
-        val username: String?,
-        private val isForLoggedInUser: Boolean
+        private val username: String?,
+        private val isForLoggedInUser: Boolean,
+        private val api: RedditApi,
 ) : ViewModel() {
 
-    private val api = App.get().api
+    /**
+     * Factory class for the ViewModel
+     *
+     * @param username The username of the user to load information for. This can be `null` if the
+     * ViewModel is for the logged in user
+     * @param isForLoggedInUser
+     * @param api The API to use
+     */
+    class Factory(
+            private val username: String?,
+            private val isForLoggedInUser: Boolean,
+            private val api: RedditApi,
+    ) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return RedditUserViewModel(username, isForLoggedInUser, api) as T
+        }
+    }
 
     private var infoLoaded = false
 
