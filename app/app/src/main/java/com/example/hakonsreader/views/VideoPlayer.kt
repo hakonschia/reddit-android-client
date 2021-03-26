@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createVideoDuration
 import com.example.hakonsreader.views.util.VideoCache
 import com.example.hakonsreader.views.util.cache
@@ -354,7 +355,7 @@ class VideoPlayer : PlayerView {
                 .setTrackSelector(DefaultTrackSelector(context, AdaptiveTrackSelection.Factory()))
                 .build()
 
-        if (App.get().autoLoopVideos()) {
+        if (Settings.autoLoopVideos()) {
             player.repeatMode = Player.REPEAT_MODE_ALL
         }
 

@@ -6,6 +6,7 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.views.VideoPlayer
 import com.r0adkll.slidr.Slidr
 
@@ -49,7 +50,7 @@ class VideoActivity : BaseActivity() {
                 data.getBundle(EXTRAS_EXTRAS)
             } ?: return
 
-            if (!App.get().muteVideoByDefaultInFullscreen()) {
+            if (!Settings.muteVideoByDefaultInFullscreen()) {
                 extras.putBoolean(VideoPlayer.EXTRA_VOLUME, true)
             }
 
@@ -74,7 +75,7 @@ class VideoActivity : BaseActivity() {
         val color = getColor(R.color.imageVideoActivityBackground)
         val alpha = color shr 24 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
-        val config = App.get().getVideoAndImageSlidrConfig()
+        val config = Settings.getVideoAndImageSlidrConfig()
                 // To keep the background the same the entire way the alpha is always the same
                 // Otherwise the background of the activity slides with, which looks weird
                 .scrimStartAlpha(alphaPercentage)

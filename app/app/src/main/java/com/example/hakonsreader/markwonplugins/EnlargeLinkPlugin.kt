@@ -6,6 +6,7 @@ import android.text.style.RelativeSizeSpan
 import android.text.style.URLSpan
 import android.widget.TextView
 import com.example.hakonsreader.App
+import com.example.hakonsreader.misc.Settings
 import io.noties.markwon.AbstractMarkwonPlugin
 
 /**
@@ -18,7 +19,7 @@ class EnlargeLinkPlugin : AbstractMarkwonPlugin() {
     override fun afterSetText(textView: TextView) {
         super.afterSetText(textView)
 
-        val linkScale = App.get().linkScale()
+        val linkScale = Settings.linkScale()
 
         // Default scale, don't do anything
         if (linkScale == 100) {

@@ -10,6 +10,7 @@ import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
+import com.example.hakonsreader.misc.Settings
 
 /**
  * View for displaying in a single gallery item in [ContentGallery]
@@ -50,7 +51,7 @@ class ContentGalleryImage : FrameLayout {
     fun viewSelected() {
         val view = binding.content.getChildAt(0)
 
-        if (view is VideoPlayer && App.get().autoPlayVideos()) {
+        if (view is VideoPlayer && Settings.autoPlayVideos()) {
             view.play()
         }
     }
@@ -58,7 +59,7 @@ class ContentGalleryImage : FrameLayout {
     fun viewUnselected() {
         val view = binding.content.getChildAt(0)
 
-        if (view is VideoPlayer && App.get().autoPlayVideos()) {
+        if (view is VideoPlayer && Settings.autoPlayVideos()) {
             view.pause()
         }
     }

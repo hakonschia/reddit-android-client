@@ -13,6 +13,7 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
 import com.github.zawadz88.materialpopupmenu.popupMenu
@@ -339,7 +340,7 @@ private fun copyPostContentOnClick(view: View, post: RedditPost) {
 }
 
 private fun filterSubredditOnClick(subredditName: String) {
-    App.get().addSubredditToPostFilters(subredditName)
+    Settings.addSubredditToPostFilters(subredditName)
 }
 
 /**

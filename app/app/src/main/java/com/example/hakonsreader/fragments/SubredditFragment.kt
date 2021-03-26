@@ -44,6 +44,7 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
@@ -287,14 +288,14 @@ class SubredditFragment : Fragment() {
                         val rulesCount = binding.subredditInfo.rules.adapter?.itemCount ?: 0
                         // No rules, or we have rules and data saving is not on
                         // Ie. only load rules again from API if we're not on data saving
-                        if (rulesCount == 0 || (rulesCount != 0 && !App.get().dataSavingEnabled())) {
+                        if (rulesCount == 0 || (rulesCount != 0 && !Settings.dataSavingEnabled())) {
                             rulesViewModel?.refresh()
                         }
 
                         val isLoggedIn = App.get().loggedInState.value is LoggedInState.LoggedIn
                         // The adapter will always have one more (for the "Select flair"), so the actual count is one less than the adapter count
                         val flairsCount = binding.subredditInfo.selectFlairSpinner.adapter?.count?.minus(1) ?: 0
-                        if (isLoggedIn && (it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !App.get().dataSavingEnabled()))) {
+                        if (isLoggedIn && (it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !Settings.dataSavingEnabled()))) {
                             flairsViewModel?.refresh()
                         }
                     }
@@ -424,7 +425,7 @@ class SubredditFragment : Fragment() {
 
                 binding.subreddit = it
 
-                if (it.isNsfw && !nsfwWarningDismissedWithSuccess && App.get().warnNsfwSubreddits()) {
+                if (it.isNsfw && !nsfwWarningDismissedWithSuccess && Settings.warnNsfwSubreddits()) {
                     // Only show warning once
                     if (!nsfwWarningShown) {
                         AlertDialog.Builder(requireContext())
@@ -624,9 +625,9 @@ class SubredditFragment : Fragment() {
             val imageView = binding.banner
             val bannerURL = it.bannerBackgroundImage
             if (bannerURL.isNotEmpty()) {
-                if (App.get().loadSubredditBanners()) {
+                if (Settings.loadSubredditBanners()) {
                     // Data saving on, only load if the image is already cached
-                    if (App.get().dataSavingEnabled()) {
+                    if (Settings.dataSavingEnabled()) {
                         Picasso.get()
                                 .load(bannerURL)
                                 .networkPolicy(NetworkPolicy.OFFLINE)

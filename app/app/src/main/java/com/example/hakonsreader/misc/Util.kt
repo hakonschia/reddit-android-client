@@ -74,11 +74,11 @@ private fun getNormal(post: RedditPost) : String? {
 /**
  * Gets the NSFW image to use for a post
  *
- * @return A URL pointing to the image to use for a post, depending on [App.showNsfwPreview]. If this is null
+ * @return A URL pointing to the image to use for a post, depending on [Settings.showNsfwPreview]. If this is null
  * then no image should be shown ([ShowNsfwPreview.NO_IMAGE])
  */
 private fun getNsfw(post: RedditPost) : String? {
-    return when (App.get().showNsfwPreview()) {
+    return when (Settings.showNsfwPreview()) {
         ShowNsfwPreview.NORMAL -> getNormal(post)
         ShowNsfwPreview.BLURRED -> getObfuscated(post)
         ShowNsfwPreview.NO_IMAGE -> null

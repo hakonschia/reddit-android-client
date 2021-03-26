@@ -24,6 +24,7 @@ import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentPostsBinding
 import com.example.hakonsreader.interfaces.SortableWithTime
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
@@ -369,7 +370,7 @@ class PostsFragment : Fragment(), SortableWithTime {
     private fun filterPosts(posts: List<RedditPost>) : List<RedditPost> {
         // TODO this should probably be in the ViewModel
         return if (isDefaultSubreddit) {
-            val subsToFilter = App.get().subredditsToFilterFromDefaultSubreddits()
+            val subsToFilter = Settings.subredditsToFilterFromDefaultSubreddits()
             posts.filter {
                 // Keep the post if the subreddit it is in isn't found in subsToFilter
                 !subsToFilter.contains(it.subreddit.toLowerCase())

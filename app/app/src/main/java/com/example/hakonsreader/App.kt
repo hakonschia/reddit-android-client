@@ -2,10 +2,6 @@ package com.example.hakonsreader
 
 import android.app.*
 import android.content.*
-import android.graphics.Color
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -23,13 +19,10 @@ import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.MarkdownAdjuster
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
-import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.markwonplugins.*
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.TokenManager
 import com.example.hakonsreader.states.LoggedInState
-import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
-import com.r0adkll.slidr.model.SlidrConfig
-import com.r0adkll.slidr.model.SlidrPosition
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.HiltAndroidApp
 import io.noties.markwon.*
@@ -109,10 +102,6 @@ class App : Application() {
         PreferenceManager.getDefaultSharedPreferences(this)
     }
 
-    /**
-     * True if WiFi is currently enabled
-     */
-    private var wifiConnected = false
 
     /**
      * A [RedditApi] instance. Outside classes should inject this themselves
@@ -160,7 +149,7 @@ class App : Application() {
      */
     val markwon: Markwon
         get() {
-            return if (dataSavingEnabled()) {
+            return if (Settings.dataSavingEnabled()) {
                 markwonDataSaving
             } else {
                 markwonNoDataSaving
@@ -198,7 +187,7 @@ class App : Application() {
      */
     val adjuster: MarkdownAdjuster
         get() {
-            return if (dataSavingEnabled()) {
+            return if (Settings.dataSavingEnabled()) {
                 adjusterDataSaving
             } else {
                 adjusterNoDataSaving
@@ -217,6 +206,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         set()
+        Settings.init(this)
 
         val privatelyBrowsing = settings.getBoolean(PRIVATELY_BROWSING_KEY, false)
         api.enablePrivateBrowsing(privatelyBrowsing)
@@ -253,17 +243,6 @@ class App : Application() {
         }
 
         createInboxNotificationChannel()
-
-        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                wifiConnected = cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-            }
-
-            override fun onLost(network: Network) {
-                wifiConnected = cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-            }
-        })
 
         val dm = resources.displayMetrics
         // Technically this could go outdated if the user changes their resolution while the app is running
@@ -660,404 +639,6 @@ class App : Application() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
     }
-
-    /**
-     * Returns if NSFW videos/images should be cached
-     *
-     * @return True if videos/images should be cached
-     */
-    fun dontCacheNSFW(): Boolean {
-        return !settings.getBoolean(applicationContext.getString(R.string.prefs_key_cache_nsfw), resources.getBoolean(R.bool.prefs_default_value_cache_nsfw))
-    }
-
-    /**
-     * Returns if videos should be automatically played or not
-     *
-     *
-     * The value returned here checks based on the setting and Wi-Fi status, so the value
-     * can be used directly
-     *
-     * @return True if videos should be automatically played
-     */
-    fun autoPlayVideos(): Boolean {
-        val value = settings.getString(
-                getString(R.string.prefs_key_auto_play_videos),
-                getString(R.string.prefs_default_value_auto_play_videos)
-        )
-        if (value == getString(R.string.prefs_key_auto_play_videos_always)) {
-            return true
-        } else if (value == getString(R.string.prefs_key_auto_play_videos_never)) {
-            return false
-        }
-
-        // If we get here we are on Wi-Fi only, return true if Wi-Fi is connected, else false
-        return wifiConnected
-    }
-
-    /**
-     * Returns if NSFW videos should be automatically played or not.
-     *
-     * @return True if NSFW videos should be automatically played
-     */
-    fun autoPlayNsfwVideos(): Boolean {
-        return getUserInfo()?.nsfwAccount == true ||
-                settings.getBoolean(getString(R.string.prefs_key_auto_play_nsfw_videos), resources.getBoolean(R.bool.prefs_default_autoplay_nsfw_videos))
-    }
-
-    /**
-     * Returns if videos should be muted by default
-     *
-     * @return True if the video should be muted
-     */
-    fun muteVideoByDefault(): Boolean {
-        return settings.getBoolean(applicationContext.getString(R.string.prefs_key_play_muted_videos), resources.getBoolean(R.bool.prefs_default_play_muted_videos))
-    }
-
-    /**
-     * Returns if videos should be muted by default when viewed in fullscreen
-     *
-     * @return True if the video should be muted
-     */
-    fun muteVideoByDefaultInFullscreen(): Boolean {
-        return settings.getBoolean(
-                applicationContext.getString(R.string.prefs_key_play_muted_videos_fullscreen),
-                resources.getBoolean(R.bool.prefs_default_play_muted_videos_fullscreen)
-        )
-    }
-
-    /**
-     * Returns if videos should be automatically looped when finished
-     *
-     * @return True if videos should be looped
-     */
-    fun autoLoopVideos(): Boolean {
-        return settings.getBoolean(
-                applicationContext.getString(R.string.prefs_key_loop_videos),
-                resources.getBoolean(R.bool.prefs_default_loop_videos)
-        )
-    }
-
-    /**
-     * Retrieves the score threshold for comments to be automatically hidden
-     *
-     * @return An int with the score threshold
-     */
-    fun getAutoHideScoreThreshold(): Int {
-        // The value is stored as a string, not an int
-        val defaultValue = resources.getInteger(R.integer.prefs_default_hide_comments_threshold)
-        val value = settings.getString(
-                getString(R.string.prefs_key_hide_comments_threshold), defaultValue.toString())
-        return value!!.toInt()
-    }
-
-    /**
-     * Retrieves the [SlidrConfig.Builder] to use for to slide away videos and images based
-     * on the users setting. This also adjusts the threshold needed to perform a swipe. This builder can
-     * be continued to set additional values
-     *
-     * @return A SlidrConfig builder that will build the SlidrConfig to be used for videos and images
-     */
-    fun getVideoAndImageSlidrConfig(): SlidrConfig.Builder {
-        val direction = settings.getString(
-                getString(R.string.prefs_key_fullscreen_swipe_direction),
-                getString(R.string.prefs_default_fullscreen_swipe_direction)
-        )
-        // The SlidrPosition is kind of backwards, as SlidrPosition.BOTTOM means to "swipe from bottom" (which is swiping up)
-
-        val pos = when (direction) {
-            getString(R.string.prefs_key_fullscreen_swipe_direction_up) -> SlidrPosition.BOTTOM
-            getString(R.string.prefs_key_fullscreen_swipe_direction_down) -> SlidrPosition.TOP
-            else -> SlidrPosition.LEFT
-        }
-
-        // TODO this doesn't seem to work, if you start by going left, then it works, but otherwise it doesnt
-        /*else {
-            pos = SlidrPosition.RIGHT;
-            Log.d(TAG, "getVideoAndImageSlidrConfig: RIGHT");
-        }
-         */
-        return SlidrConfig.Builder().position(pos).distanceThreshold(0.15f)
-    }
-
-    /**
-     * Retrieve the percentage of the screen a post should at maximum take when opened
-     *
-     * @return The percentage of the screen to take (0-100)
-     */
-    fun getMaxPostSizePercentage(): Int {
-        return settings.getInt(
-                getString(R.string.prefs_key_max_post_size_percentage),
-                resources.getInteger(R.integer.prefs_default_max_post_size_percentage)
-        )
-    }
-
-    /**
-     * Retrieve the percentage of the screen a post should at maximum take when opened and post
-     * collapse has been disabled
-     *
-     * @return The percentage of the screen to take (0-100)
-     */
-    fun getMaxPostSizePercentageWhenCollapseDisabled(): Int {
-        return settings.getInt(
-                getString(R.string.prefs_key_max_post_size_percentage_when_collapsed),
-                resources.getInteger(R.integer.prefs_default_max_post_size_percentage_when_collapsed)
-        )
-    }
-
-    /**
-     * Retrieve the setting for whether or not links should be opened in the app (WebView) or
-     * in the external browser
-     *
-     * @return True to open links in a WebView
-     */
-    fun openLinksInApp(): Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_opening_links_in_app),
-                resources.getBoolean(R.bool.prefs_default_opening_links_in_app)
-        )
-    }
-
-    /**
-     * Checks if data saving is enabled, based on a combination of the users setting and current
-     * Wi-Fi connection
-     *
-     * @return True if data saving is enabled
-     */
-    fun dataSavingEnabled(): Boolean {
-        val value = settings.getString(
-                getString(R.string.prefs_key_data_saving),
-                getString(R.string.prefs_default_data_saving)
-        )
-        if (value == getString(R.string.prefs_key_data_saving_always)) {
-            return true
-        } else if (value == getString(R.string.prefs_key_data_saving_never)) {
-            return false
-        }
-
-        // If we get here we are on Mobile Data only, return false if Wi-Fi is connected, else true
-        return !wifiConnected
-    }
-
-    /**
-     * Retrieves how NSFW images/thumbnails should be filtered
-     *
-     * @return An enum representing how to filter the images/thumbnails
-     */
-    fun showNsfwPreview(): ShowNsfwPreview {
-        if (getUserInfo()?.nsfwAccount == true) {
-            return ShowNsfwPreview.NORMAL
-        }
-
-        return when (settings.getString(getString(R.string.prefs_key_show_nsfw_preview), getString(R.string.prefs_default_show_nsfw))) {
-            getString(R.string.prefs_key_show_nsfw_preview_normal) -> ShowNsfwPreview.NORMAL
-            getString(R.string.prefs_key_show_nsfw_preview_blur) -> ShowNsfwPreview.BLURRED
-            else -> ShowNsfwPreview.NO_IMAGE
-        }
-    }
-
-    /**
-     * Retrieves the user setting for if comments that have been posted after the last time a post was opened
-     * should be highlighted
-     *
-     * @return True if comments should be highlighted
-     */
-    fun highlightNewComments(): Boolean {
-        return settings.getBoolean(getString(R.string.prefs_key_highlight_new_comments), resources.getBoolean(R.bool.prefs_default_highlight_new_comments))
-    }
-
-    /**
-     * Gets the comment threshold for when navigating in comments should smoothly scroll
-     *
-     * @return The max amount of comments for smooth scrolling to happen
-     */
-    fun commentSmoothScrollThreshold(): Int {
-        return settings.getInt(getString(R.string.prefs_key_comment_smooth_scroll_threshold), resources.getInteger(R.integer.prefs_default_comment_smooth_scroll_threshold))
-    }
-
-    /**
-     * Returns the array of subreddits the user has selected to filter from front page/popular/all
-     *
-     * @return An array of lowercased subreddit names
-     * @see addSubredditToPostFilters
-     */
-    fun subredditsToFilterFromDefaultSubreddits(): Array<String> {
-        val asString = settings.getString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), "")
-        return asString!!.toLowerCase().split("\n").toTypedArray()
-    }
-
-    /**
-     * Adds a subreddit to the filters
-     *
-     * @param subreddit The name of the subreddit to add
-     * @see subredditsToFilterFromDefaultSubreddits
-     */
-    fun addSubredditToPostFilters(subreddit: String) {
-        var previous = settings.getString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), "")
-        // Only add newline before if necessary
-        if (previous!!.isNotBlank() && previous.takeLast(1) != "\n") {
-            previous += "\n"
-        }
-        previous += "$subreddit\n"
-
-        settings.edit().putString(getString(R.string.prefs_key_filter_posts_from_default_subreddits), previous).apply()
-    }
-
-    /**
-     * Returns if the user wants to show all sidebars, or just one colored at the last indent
-     *
-     * @return True to show all sidebars, false to show one colored
-     */
-    fun showAllSidebars(): Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_show_all_sidebars),
-                resources.getBoolean(R.bool.prefs_default_show_all_sidebars)
-        )
-    }
-
-    /**
-     * Gets the integer value of the link scale. This should be divided by 100 to get the actual
-     * float scale to use
-     */
-    fun linkScale() : Int {
-        return settings.getInt(
-                getString(R.string.prefs_key_link_scale),
-                resources.getInteger(R.integer.prefs_default_link_scale)
-        )
-    }
-
-    /**
-     * Returns if the icon badge should be shown for unread messages in the navbar
-     */
-    fun showUnreadMessagesBadge() : Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_inbox_show_badge),
-                resources.getBoolean(R.bool.prefs_default_inbox_show_badge)
-        )
-    }
-
-    /**
-     * Gets the update frequency for the inbox
-     *
-     * @return The update frequency in minutes, if this is -1 then the automatic updates are disabled
-     */
-    fun inboxUpdateFrequency() : Int {
-        val updateFrequencySetting = settings.getString(
-                getString(R.string.prefs_key_inbox_update_frequency),
-                getString(R.string.prefs_default_inbox_update_frequency)
-        )
-
-        return when (updateFrequencySetting) {
-            getString(R.string.prefs_key_inbox_update_frequency_5_min) -> 5
-            getString(R.string.prefs_key_inbox_update_frequency_15_min) -> 15
-            getString(R.string.prefs_key_inbox_update_frequency_30_min) -> 30
-            getString(R.string.prefs_key_inbox_update_frequency_60_min) -> 50
-            else -> -1
-        }
-    }
-
-    /**
-     * Returns if the user wants to show a preview of links in comments
-     *
-     * @see showEntireLinkInLinkPreview
-     */
-    fun showLinkPreview() : Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_comment_show_link_preview),
-                resources.getBoolean(R.bool.prefs_default_comment_show_link_preview)
-        )
-    }
-
-    /**
-     * Returns if the entire link should be shown in link previews, or if it should cut off
-     * to save layout space
-     *
-     * @see showLinkPreview
-     */
-    fun showEntireLinkInLinkPreview() : Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_comment_link_preview_show_entire_link),
-                resources.getBoolean(R.bool.prefs_default_comment_link_preview_show_entire_link)
-        )
-    }
-
-    /**
-     * Returns if links with identical text should show a preview for the link
-     *
-     * Eg. if this returns false, a hyperlink with text "https://reddit.com" and link "https://reddit.com"
-     * should not display a preview
-     *
-     * @see showLinkPreview
-     */
-    fun showLinkPreviewForIdenticalLinks() : Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_comment_link_preview_show_identical_links),
-                resources.getBoolean(R.bool.prefs_default_comment_link_preview_show_identical_links)
-        )
-    }
-
-    /**
-     * Returns if posts should automatically be collapsed when scrolling comments
-     */
-    fun collapsePostsByDefaultWhenScrollingComments() : Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_post_collapse_by_default),
-                resources.getBoolean(R.bool.prefs_default_post_collapse_by_default)
-        )
-    }
-
-    /**
-     * @return True if YouTube videos should be opened directly in the app, false to open in YouTube
-     * app/browser
-     */
-    fun openYouTubeVideosInApp() : Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_play_youtube_videos_in_app),
-                resources.getBoolean(R.bool.prefs_default_play_youtube_videos_in_app)
-        )
-    }
-
-    /**
-     * @return True if comments should show a button directly in the layout that peeks the parent comment
-     */
-    fun showPeekParentButtonInComments() : Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_show_peek_parent_button_in_comments),
-                resources.getBoolean(R.bool.prefs_default_show_peek_parent_button_in_comments)
-        )
-    }
-
-    /**
-     * @return True if banners should be loaded on subreddits. This does not take into account data saving
-     */
-    fun loadSubredditBanners() : Boolean {
-        return settings.getBoolean(
-                getString(R.string.prefs_key_subreddits_load_banners),
-                resources.getBoolean(R.bool.prefs_default_subreddits_load_banners)
-        )
-    }
-
-    /**
-     * @return True if a warning should be displayed when opening NSFW subreddits
-     */
-    fun warnNsfwSubreddits() : Boolean {
-        return getUserInfo()?.nsfwAccount != true && settings.getBoolean(
-                getString(R.string.prefs_key_subreddits_warn_nsfw),
-                resources.getBoolean(R.bool.prefs_default_subreddits_warn_nsfw)
-        )
-    }
-
-    /**
-     * @return The list of parsed colors that should be used for comment sidebars (where the index
-     * of the color corresponds to the comment depth)
-     */
-    fun commentSidebarColors() : List<Int> {
-        val colors = ArrayList<Int>()
-        MultiColorFragCompat.getColors(settings, getString(R.string.prefs_key_comment_sidebar_colors)).forEach {
-            colors.add(Color.parseColor("#$it"))
-        }
-        return colors
-    }
-
 
     /**
      * Handles when the API notifies that the access token is no longer valid, and the user should

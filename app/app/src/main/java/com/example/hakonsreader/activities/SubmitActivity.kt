@@ -30,6 +30,7 @@ import com.example.hakonsreader.databinding.SubmissionCrosspostBinding
 import com.example.hakonsreader.databinding.SubmissionLinkBinding
 import com.example.hakonsreader.databinding.SubmissionTextBinding
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.viewmodels.SubredditFlairsViewModel
 import com.example.hakonsreader.viewmodels.SubredditViewModel
@@ -228,7 +229,7 @@ class SubmitActivity : BaseActivity() {
 
             // Load flairs right away if data saving isn't enabled. If the list from the ViewModel
             // is empty, the observer will also trigger a load even if data saving is on
-            if (!App.get().dataSavingEnabled()) {
+            if (!Settings.dataSavingEnabled()) {
                 CoroutineScope(IO).launch {
                     refresh()
                 }

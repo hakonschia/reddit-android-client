@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.CreateIntentOptions
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createIntent
 
 class DispatcherActivity : AppCompatActivity() {
@@ -49,8 +50,8 @@ class DispatcherActivity : AppCompatActivity() {
         Log.d(TAG, "Dispatching $url")
 
         val options = CreateIntentOptions(
-                openLinksInternally = App.get().openLinksInApp(),
-                openYoutubeVideosInternally = App.get().openYouTubeVideosInApp()
+                openLinksInternally = Settings.openLinksInApp(),
+                openYoutubeVideosInternally = Settings.openYouTubeVideosInApp()
         )
 
         val intent = createIntent(url, options,this)

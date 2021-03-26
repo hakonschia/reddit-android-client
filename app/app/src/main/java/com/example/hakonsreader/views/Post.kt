@@ -24,6 +24,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
 import com.google.android.material.snackbar.Snackbar
@@ -373,7 +374,7 @@ class Post : Content {
                         this@Post.onVideoManuallyPaused?.let { setOnVideoManuallyPaused(it) }
                         this@Post.onVideoFullscreenListener?.let { setOnVideoFullscreenListener(it) }
                     }
-                } else if (App.get().openYouTubeVideosInApp()
+                } else if (Settings.openYouTubeVideosInApp()
                         && (redditPost.domain == "youtu.be" || redditPost.domain == "youtube.com")) {
                     ContentYoutubeVideo(context).apply {
                         layoutParams = marginParams

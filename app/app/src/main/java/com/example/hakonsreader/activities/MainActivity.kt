@@ -39,11 +39,8 @@ import com.example.hakonsreader.databinding.ActivityMainBinding
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.*
 import com.example.hakonsreader.interfaces.*
-import com.example.hakonsreader.misc.TokenManager
-import com.example.hakonsreader.misc.handleGenericResponseErrors
-import com.example.hakonsreader.misc.setAgeTextTrendingSubreddits
+import com.example.hakonsreader.misc.*
 import com.example.hakonsreader.states.LoggedInState
-import com.example.hakonsreader.misc.showErrorLoggingInSnackbar
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.recyclerviewadapters.TrendingSubredditsAdapter
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
@@ -639,7 +636,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // it should probably be done in a different way
 
         // This wont be updated until the app restarts
-        val updateFrequency = App.get().inboxUpdateFrequency()
+        val updateFrequency = Settings.inboxUpdateFrequency()
         Log.d(TAG, "InboxTimer frequency: $updateFrequency minutes")
         if (updateFrequency != -1) {
             var counter = 0
@@ -681,7 +678,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         unread.observe(this, { m ->
             unreadMessages = m.size
 
-            if (App.get().showUnreadMessagesBadge()) {
+            if (Settings.showUnreadMessagesBadge()) {
                 val profileItemId = binding.bottomNav.menu.findItem(R.id.navProfile).itemId
 
                 // No unread messages, remove the badge

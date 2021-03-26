@@ -3,6 +3,7 @@ package com.example.hakonsreader.views;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -11,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.api.model.RedditPost;
+import com.example.hakonsreader.misc.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +98,12 @@ public abstract class Content extends FrameLayout {
     public void setRedditPost(@Nullable RedditPost redditPost) {
         this.redditPost = redditPost;
         if (redditPost != null) {
-            cache = !(redditPost.isNsfw() && App.Companion.get().dontCacheNSFW());
+            if (redditPost.isNsfw()) {
+                cache = Settings.INSTANCE.cacheNsfw();
+            } else {
+                // Always cache non-NSFW posts
+                cache = true;
+            }
             this.updateView();
         }
     }

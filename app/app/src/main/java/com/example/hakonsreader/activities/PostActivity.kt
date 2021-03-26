@@ -26,6 +26,7 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityPostBinding
 import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.OnReplyListener
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.example.hakonsreader.viewmodels.CommentsViewModel
@@ -162,7 +163,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
         } else {
             binding.parentLayout.progress = savedInstanceState.getFloat(SAVED_TRANSITION_STATE_KEY)
 
-            val transitionEnabled = savedInstanceState.getBoolean(SAVED_TRANSITION_ENABLED_KEY, App.get().collapsePostsByDefaultWhenScrollingComments())
+            val transitionEnabled = savedInstanceState.getBoolean(SAVED_TRANSITION_ENABLED_KEY, Settings.collapsePostsByDefaultWhenScrollingComments())
             enableTransition(transitionEnabled, showSnackbar = false, updateHeight = false)
         }
     }
@@ -248,7 +249,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
             expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
         }
 
-        val collapsePostByDefault = App.get().collapsePostsByDefaultWhenScrollingComments()
+        val collapsePostByDefault = Settings.collapsePostsByDefaultWhenScrollingComments()
         enableTransition(collapsePostByDefault, showSnackbar = false, updateHeight = !collapsePostByDefault)
     }
 
@@ -574,7 +575,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
         binding.comments.stopScroll()
-        if (App.get().commentSmoothScrollThreshold() >= gapSize) {
+        if (Settings.commentSmoothScrollThreshold() >= gapSize) {
             val smoothScroller = object : LinearSmoothScroller(this) {
                 override fun getVerticalSnapPreference(): Int {
                     return SNAP_TO_START
@@ -666,9 +667,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
         val height = if (portrait) App.get().screenHeight else App.get().screenWidth
 
         return if (forWhenCollapsedDisabled) {
-            (height * (App.get().getMaxPostSizePercentageWhenCollapseDisabled() / 100f)).toInt()
+            (height * (Settings.getMaxPostSizePercentageWhenCollapseDisabled() / 100f)).toInt()
         } else {
-            (height * (App.get().getMaxPostSizePercentage() / 100f)).toInt()
+            (height * (Settings.getMaxPostSizePercentage() / 100f)).toInt()
         }
     }
 

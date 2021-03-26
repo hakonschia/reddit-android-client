@@ -10,6 +10,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.databinding.ContentGalleryBinding
+import com.example.hakonsreader.misc.Settings
 import java.util.*
 import java.util.function.Consumer
 
@@ -70,7 +71,7 @@ class ContentGallery : Content {
         // Keep a maximum of 5 items at a time, or 2 when data saving is enabled. This should probably
         // be enough to make large galleries not all load at once which potentially wastes data, and
         // at the same time not have to load items when going through the gallery (unless data saving is on)
-        val offscreenLimit = if (App.get().dataSavingEnabled()) 2 else 5
+        val offscreenLimit = if (Settings.dataSavingEnabled()) 2 else 5
         binding.galleryImages.offscreenPageLimit = offscreenLimit
 
         binding.galleryImages.registerOnPageChangeCallback(object : OnPageChangeCallback() {

@@ -32,11 +32,11 @@ import com.example.hakonsreader.databinding.ListItemMoreCommentBinding
 import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForComments
 import com.example.hakonsreader.views.LinkPreview
 import com.example.hakonsreader.views.util.setLongClickToPeekUrl
-import javax.inject.Inject
 
 /**
  * Adapter for a RecyclerView populated with [RedditComment] objects. This adapter
@@ -75,7 +75,7 @@ class CommentsAdapter constructor(
      */
     // We only need to get this when loading the adapter, as it will be the same for all comments
     // and cannot change during the adapters life
-    private val sidebarColors = App.get().commentSidebarColors()
+    private val sidebarColors = Settings.commentSidebarColors()
 
     /**
      * The list of comments that should be shown, unless a comment chain is set to be shown.
@@ -215,7 +215,7 @@ class CommentsAdapter constructor(
      */
     private fun checkAndSetHiddenComments() {
         val commentsToRemove: MutableList<RedditComment> = java.util.ArrayList()
-        val hideThreshold = App.get().getAutoHideScoreThreshold()
+        val hideThreshold = Settings.getAutoHideScoreThreshold()
 
         comments.forEach { comment: RedditComment ->
             if (hideThreshold >= comment.score || comment.isCollapsed) {
@@ -455,7 +455,7 @@ class CommentsAdapter constructor(
 
         val highlight = position == 0 && chain.isNotEmpty() // Always highlight first comment in a chain
                 // User wants to highlight new comments, and the comment was added after the last time the post was opened
-                || (App.get().highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
+                || (Settings.highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
 
         val byLoggedInUser = comment.author == App.get().getUserInfo()?.userInfo?.username
 
@@ -485,7 +485,7 @@ class CommentsAdapter constructor(
                     adapter = this@CommentsAdapter
                     post = this@CommentsAdapter.post
                     onReportsIgnoreChange =  OnReportsIgnoreChangeListener { invalidateAll() }
-                    showPeekParentButton = App.get().showPeekParentButtonInComments()
+                    showPeekParentButton = Settings.showPeekParentButtonInComments()
                     commentContent.setLongClickToPeekUrl {
                         comment?.let {
                             hideComments(it)
@@ -550,7 +550,7 @@ class CommentsAdapter constructor(
                 // the spans set with Markwon, and it might not (and probably wont) be set before the previews are added
                 executePendingBindings()
 
-                if (App.get().showLinkPreview()) {
+                if (Settings.showLinkPreview()) {
                     showLinkPreviews()
                     executePendingBindings()
                 }
@@ -591,7 +591,7 @@ class CommentsAdapter constructor(
          * @param spans The array of URLSpans to show previews for
          */
         private fun setLinkPreviews(fullText: Spannable, spans: Array<URLSpan>) {
-            val showPreviewForIdenticalLinks = App.get().showLinkPreviewForIdenticalLinks()
+            val showPreviewForIdenticalLinks = Settings.showLinkPreviewForIdenticalLinks()
 
             spans.forEach { span ->
                 val start = fullText.getSpanStart(span)
@@ -718,7 +718,7 @@ private fun formatAuthorInternal(tv: TextView, comment: RedditComment, italic: B
  * This adds different sidebars based on [App.showAllSidebars]
  */
 fun addSidebars(barrier: Barrier, depth: Int, colors: List<Int>) {
-    if (App.get().showAllSidebars()) {
+    if (Settings.showAllSidebars()) {
         addAllSidebars(barrier, depth, colors)
     } else {
         addOneSidebar(barrier, depth, colors)

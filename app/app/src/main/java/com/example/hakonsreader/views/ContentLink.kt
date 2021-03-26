@@ -16,6 +16,7 @@ import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import com.example.hakonsreader.views.util.cache
 import com.squareup.picasso.Picasso
@@ -37,7 +38,7 @@ class ContentLink : Content {
      * data saving setting
      */
     private fun getCorrectBinding() : ViewBinding {
-        return if (App.get().dataSavingEnabled()) {
+        return if (Settings.dataSavingEnabled()) {
             ContentLinkSimpleBinding.inflate(LayoutInflater.from(context), this, true)
         } else {
             ContentLinkBinding.inflate(LayoutInflater.from(context), this, true)

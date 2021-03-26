@@ -1,16 +1,12 @@
 package com.example.hakonsreader.di
 
-import android.content.Context
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditUser
-import com.example.hakonsreader.api.persistence.RedditDatabase
-import com.example.hakonsreader.api.persistence.RedditUserInfoDatabase
 import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.ApiResponse
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import javax.inject.Singleton
@@ -21,18 +17,6 @@ import javax.inject.Singleton
         replaces = [AppModule::class]
 )
 class TestAppModule {
-
-    @Singleton
-    @Provides
-    fun provideDatabase(@ApplicationContext context: Context): RedditDatabase {
-        return RedditDatabase.getInstance(context)
-    }
-
-    @Singleton
-    @Provides
-    fun provideUserDatabase(@ApplicationContext context: Context): RedditUserInfoDatabase {
-        return RedditUserInfoDatabase.getInstance(context)
-    }
 
     @Singleton
     @Provides

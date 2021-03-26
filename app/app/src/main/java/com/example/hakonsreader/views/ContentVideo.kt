@@ -7,11 +7,11 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.util.Pair
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentVideoBinding
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 
 /**
@@ -48,7 +48,7 @@ class ContentVideo : Content {
 
         player.cacheVideo = cache
 
-        if (App.get().muteVideoByDefault()) {
+        if (Settings.muteVideosByDefault()) {
             player.toggleVolume(false)
         }
 
@@ -126,10 +126,10 @@ class ContentVideo : Content {
             return
         }
         if (redditPost.isNsfw) {
-            if (App.get().autoPlayNsfwVideos()) {
+            if (Settings.autoPlayNsfwVideos()) {
                 player.play()
             }
-        } else if (App.get().autoPlayVideos()) {
+        } else if (Settings.autoPlayVideos()) {
             player.play()
         }
     }

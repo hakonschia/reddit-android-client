@@ -10,6 +10,7 @@ import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.databinding.ActivityImageBinding
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener
 import com.example.hakonsreader.views.util.cache
 import com.github.chrisbanes.photoview.PhotoViewAttacher
@@ -56,7 +57,7 @@ class ImageActivity : BaseActivity() {
         // Offset 3 bytes and get the value there to find the alpha
         val alpha = color shr 8 * 3 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
-        val config = App.get().getVideoAndImageSlidrConfig() // To keep the background the same the entire way the alpha is always the same
+        val config = Settings.getVideoAndImageSlidrConfig() // To keep the background the same the entire way the alpha is always the same
                 // Otherwise the background of the activity slides with, which looks weird
                 .scrimStartAlpha(alphaPercentage)
                 .scrimEndAlpha(alphaPercentage)

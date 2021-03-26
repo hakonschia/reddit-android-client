@@ -13,6 +13,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.databinding.LinkPreviewBinding
 import com.example.hakonsreader.misc.CreateIntentOptions
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createIntent
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -32,7 +33,7 @@ class LinkPreview : FrameLayout {
         setOnClickListener { openLink() }
         setOnLongClickListener { copyLink(); return@setOnLongClickListener true }
 
-        if (!App.get().showEntireLinkInLinkPreview()) {
+        if (!Settings.showEntireLinkInLinkPreview()) {
             linkLink.maxLines = 1
         }
     }
