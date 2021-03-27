@@ -88,14 +88,6 @@ class App : Application() {
         private set
 
     /**
-     * Retrieves the current OAuth state. To generate a new state use [App.generateAndGetOAuthState]
-     *
-     * @return The current OAuth state
-     */
-    var oauthState: String? = null
-        private set
-
-    /**
      * The default [SharedPreferences] that holds the users settings
      */
     private val settings by lazy {
@@ -385,46 +377,6 @@ class App : Application() {
                 .build()
     }
 
-
-    /**
-     * Creates a new [RedditApi] instance.
-     *
-     * [RedditApi.enablePrivateBrowsing] is called based on the value stored in SharedPreferences
-     * with the key [App.PRIVATELY_BROWSING_KEY]
-     */
-    private fun createApi() : RedditApi {
-        // 25MB cache size for network requests to third party
-        val thirdPartyCacheSize = 25 * 1024 * 1024L
-        val thirdPartyCache = Cache(File(cacheDir, "third_party_http_cache"), thirdPartyCacheSize)
-
-        // 1 week cache size (this cache size could really be as long as time itself, the mutable ata
-        // in the requests aren't used anyways)
-        val thirdPartyCacheAge = 60 * 60 * 24 * 7L
-
-        // If the Imgur client ID is omitted from secrets.properties it is parsed as a string with the value "null"
-        val imgurClientId = if (NetworkConstants.IMGUR_CLIENT_ID != "null") {
-            NetworkConstants.IMGUR_CLIENT_ID
-        } else null
-
-        return RedditApi.create(
-                userAgent = NetworkConstants.USER_AGENT,
-                clientId = NetworkConstants.CLIENT_ID,
-
-                accessToken = TokenManager.getToken(),
-                onNewToken = { newToken -> onNewToken(newToken) },
-                onInvalidToken = { _: GenericError?, _: Throwable? -> onInvalidAccessToken() },
-
-                loggerLevel = HttpLoggingInterceptor.Level.BODY,
-
-                callbackUrl = NetworkConstants.CALLBACK_URL,
-                deviceId = UUID.randomUUID().toString(),
-                imgurClientId = imgurClientId,
-
-                thirdPartyCache = thirdPartyCache,
-                thirdPartyCacheAge = thirdPartyCacheAge
-        )
-    }
-
     /**
      * Switches which account is the active account.
      *
@@ -565,39 +517,6 @@ class App : Application() {
                 .build()
     }
 
-    /**
-     * Clears the OAuth state.
-     *
-     * Use this when the state has been verified
-     */
-    fun clearOAuthState() {
-        oauthState = null
-    }
-
-    /**
-     * Generates a random string to use for OAuth requests
-     *
-     * @return A new random string
-     */
-    private fun generateOauthState(): String {
-        val characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-        val rnd: Random = SecureRandom()
-        val state = StringBuilder()
-        for (i in 0..34) {
-            state.append(characters[rnd.nextInt(characters.length)])
-        }
-        return state.toString()
-    }
-
-    /**
-     * Generates a new OAuth state that is used for validation
-     *
-     * @return A random string to use in the request for access
-     */
-    fun generateAndGetOAuthState(): String? {
-        oauthState = generateOauthState()
-        return oauthState
-    }
 
     /**
      * Toggles private browsing. This is just a convenience method for [enablePrivateBrowsing] with

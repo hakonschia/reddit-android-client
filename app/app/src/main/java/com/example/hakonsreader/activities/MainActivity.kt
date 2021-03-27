@@ -494,7 +494,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         val state = uri.getQueryParameter("state")
 
         // Not a match from the state we generated, something weird is happening
-        if (state == null || state != App.get().oauthState) {
+        if (state == null || state != OAuthState.state) {
             showErrorLoggingInSnackbar(binding.mainParentLayout, binding.bottomNav)
             performSetup(null)
             return
@@ -507,7 +507,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             return
         }
 
-        App.get().clearOAuthState()
+        OAuthState.clear()
 
         // This might be bad, but onCreate is called with the same intent when the activity
         // is recreated which would cause this to run again, so we have to clear the intent

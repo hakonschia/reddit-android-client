@@ -110,7 +110,7 @@ private fun getObfuscated(post: RedditPost) : String? {
  */
 fun startLoginIntent(context: Context) {
     // Generate a new state to validate when we get a response back
-    val state = App.get().generateAndGetOAuthState()
+    val state = OAuthState.generateAndGetOAuthState()
 
     val uri = Uri.Builder()
             .scheme("https")
@@ -167,7 +167,7 @@ fun createIntent(url: String, options: CreateIntentOptions, context: Context) : 
  * @param context The context to create the intent with
  * @return An [Intent]
  */
-fun createIntentInternal(url: String, options: CreateIntentOptions, context: Context): Intent {
+private fun createIntentInternal(url: String, options: CreateIntentOptions, context: Context): Intent {
     val asUri = Uri.parse(url)
     val pathSegments = asUri.pathSegments
 
