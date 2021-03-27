@@ -36,14 +36,27 @@ class AppTest {
 
     /**
      * Tests that a fake API is injected to the test, which implicitly tests that a fake API
-     * is injected into activities/fragments/views during tests
+     * is injected into activities/fragments/views during tests.
+     *
+     * Tests some basic information from the implemented API calls to ensure they are read
+     * from the test data files correctly
      */
     @Test
     fun testApiIsSetup(): Unit = runBlocking {
+        // There are some comments in the fake API implementation about the response data that might be of use
+
         when (val userInfo = api.user().info()) {
-            is ApiResponse.Success -> {
-                assertEquals("Hakonschia", userInfo.value.username)
-            }
+            is ApiResponse.Success -> assertEquals("ArneRofinn", userInfo.value.username)
+            is ApiResponse.Error -> fail("Incorrect API response returned")
+        }
+
+        when (val subreddits = api.subreditts().subscribedSubreddits()) {
+            is ApiResponse.Success -> assertEquals(12, subreddits.value.size)
+            is ApiResponse.Error -> fail("Incorrect API response returned")
+        }
+
+        when (val subreddits = api.subreditts().defaultSubreddits()) {
+            is ApiResponse.Success -> assertEquals(10, subreddits.value.size)
             is ApiResponse.Error -> fail("Incorrect API response returned")
         }
     }
@@ -54,6 +67,7 @@ class AppTest {
      */
     @Test
     fun canUseSettings() {
+        // If Settings isn't initialized this will throw a "Variable not initialized" exception which makes the test fail
         val someSetting = Settings.autoLoopVideos()
     }
 }

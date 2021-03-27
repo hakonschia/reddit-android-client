@@ -19,7 +19,7 @@ import com.example.hakonsreader.api.utils.verifyLoggedInToken
 
 /**
  * Interface for communicating with Reddit users. This should only be used for communication
- * about users not the logged in user. For logged in users use [UserRequestsLoggedInUserImpl]
+ * about users not the logged in user. For logged in users use [UserRequestsLoggedInUser]
  */
 interface UserRequests {
     /**
@@ -155,7 +155,7 @@ interface UserRequests {
 
 /**
  * Request model for communicating with Reddit users. This should only be used for communication
- * about users not the logged in user. For logged in users use [UserRequestsLoggedInUserImpl]
+ * about users not the logged in user. For logged in users use [UserRequestsLoggedInUser]
  */
 class UserRequestsImpl(
         private val username: String,
