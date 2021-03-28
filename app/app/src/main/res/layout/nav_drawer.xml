@@ -8,8 +8,8 @@
         <import type="com.example.hakonsreader.views.util.MenuClickHandlerKt"/>
 
         <variable
-            name="app"
-            type="com.example.hakonsreader.App" />
+            name="appState"
+            type="com.example.hakonsreader.states.AppState" />
 
         <variable
             name="api"
@@ -117,7 +117,7 @@
                 android:text="@{privatelyBrowsing ? @string/menuPrivateBrowsingDisable : @string/menuPrivateBrowsingEnable}"
                 android:textColor="@color/text_color"
                 android:textSize="12sp"
-                android:onClick="@{() -> app.togglePrivateBrowsing()}"
+                android:onClick="@{() -> appState.togglePrivateBrowsing()}"
 
                 app:layout_constraintStart_toStartOf="@+id/accountsBtn"
                 app:layout_constraintTop_toBottomOf="@+id/accountsBtn"

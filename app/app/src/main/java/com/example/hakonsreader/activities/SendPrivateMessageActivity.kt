@@ -1,7 +1,6 @@
 package com.example.hakonsreader.activities
 
 import android.os.Bundle
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.databinding.ActivitySendPrivateMessageBinding

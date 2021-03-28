@@ -1,7 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 
 import android.view.View
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage

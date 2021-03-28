@@ -20,7 +20,11 @@ import javax.inject.Inject
  * a [VoteBar] and a button to open a popup menu for the post
  */
 @AndroidEntryPoint
-class PostBar : FrameLayout {
+class PostBar @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     @Inject
     lateinit var api: RedditApi
@@ -46,11 +50,6 @@ class PostBar : FrameLayout {
                 updateView()
             }
         }
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     /**
      * Call this if the score should always be hidden. Must be called before [PostBar.setPost]

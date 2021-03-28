@@ -2,10 +2,10 @@ package com.example.hakonsreader.views
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import com.example.hakonsreader.App
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
@@ -128,7 +128,7 @@ class ContentGalleryImage : FrameLayout {
             // The height will resize accordingly as long as the width matches the screen
             // I think, I'm pretty lost on this, haven't tested if width of the video is larger
             // than the screen, but I imagine it would scale down
-            videoWidth = App.get().screenWidth
+            videoWidth = Resources.getSystem().displayMetrics.widthPixels
 
             // Not sure what to do if this is null
             url = image.mp4Url ?: ""

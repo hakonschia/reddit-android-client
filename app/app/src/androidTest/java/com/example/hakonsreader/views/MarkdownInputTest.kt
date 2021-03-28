@@ -11,16 +11,25 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.hakonsreader.*
 import com.example.hakonsreader.activities.MockActivity
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.hamcrest.CoreMatchers.not
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@HiltAndroidTest
 class MarkdownInputTest {
     private lateinit var markdownInput: MarkdownInput
 
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
     @Before
     fun setup() {
+        hiltRule.inject()
+
         MockActivity.layout = R.layout.x_mock_markdown_input
         val activity = ActivityScenario.launch<MockActivity>(Intent(InstrumentationRegistry.getInstrumentation().targetContext, MockActivity::class.java))
         activity.onActivity {

@@ -81,7 +81,7 @@ class ReportsBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = BottomSheetReportsBinding.inflate(inflater)
+        _binding = BottomSheetReportsBinding.inflate(LayoutInflater.from(requireActivity()))
 
         binding.ignored = listing.ignoreReports == true
         binding.ignoreReports.setOnClickListener { ignoreOnClick() }

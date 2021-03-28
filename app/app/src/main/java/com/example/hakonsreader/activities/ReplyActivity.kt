@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.ReplyActivity.Companion.EXTRAS_LISTING
 import com.example.hakonsreader.activities.ReplyActivity.Companion.EXTRAS_LISTING_KIND
@@ -19,6 +18,7 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.databinding.ActivityReplyBinding
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
 import com.google.gson.Gson
@@ -199,7 +199,7 @@ class ReplyActivity : BaseActivity() {
                 // If the post is a selftext post then use that as the summary if possible, otherwise
                 // use the title
                 if (it.getPostType() == PostType.TEXT && it.selftext.isNotEmpty()) {
-                    App.get().markwon.setMarkdown(binding.summary, it.selftext)
+                    binding.summary.setMarkdown(it.selftext)
                 } else {
                     binding.summary.text = it.title
                 }
@@ -208,7 +208,7 @@ class ReplyActivity : BaseActivity() {
             replyingTo = Gson().fromJson(jsonData, RedditComment::class.java)
             replyingTo.let {
                 it as RedditComment
-                App.get().markwon.setMarkdown(binding.summary, it.body)
+                binding.summary.setMarkdown(it.body)
             }
         }
 
@@ -250,18 +250,18 @@ class ReplyActivity : BaseActivity() {
      * they are not logged in and won't be able to send a reply
      */
     private fun showNotLoggedInDialogIfNotLoggedIn() {
-        if (App.get().loggedInState.value is LoggedInState.LoggedOut) {
+        if (AppState.loggedInState.value is LoggedInState.LoggedOut) {
             AlertDialog.Builder(this)
                     .setTitle(getString(R.string.dialogReplyNotLoggedInTitle))
                     .setMessage(getString(R.string.dialogReplyNotLoggedInContent))
                     .show()
-        } else if (App.get().loggedInState.value is LoggedInState.PrivatelyBrowsing) {
+        } else if (AppState.loggedInState.value is LoggedInState.PrivatelyBrowsing) {
             Dialog(this).apply {
                 setContentView(R.layout.dialog_send_reply_privately_browsing)
                 window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
                 findViewById<Button>(R.id.btnDisable).setOnClickListener {
-                    App.get().enablePrivateBrowsing(false)
+                    AppState.enablePrivateBrowsing(false)
                     dismiss()
                 }
 

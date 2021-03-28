@@ -1,12 +1,12 @@
 package com.example.hakonsreader.activities
 
+import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.databinding.ActivityImageBinding
@@ -87,7 +87,7 @@ class ImageActivity : BaseActivity() {
 
             Picasso.get()
                     .load(imageUrl)
-                    .resize(App.get().screenWidth, 0)
+                    .resize(Resources.getSystem().displayMetrics.widthPixels, 0)
                     .cache(cache)
                     .into(binding.image, object : Callback {
                         override fun onSuccess() {

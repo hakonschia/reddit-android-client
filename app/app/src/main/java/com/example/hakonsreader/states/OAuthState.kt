@@ -1,4 +1,4 @@
-package com.example.hakonsreader.misc
+package com.example.hakonsreader.states
 
 import java.security.SecureRandom
 import java.util.*

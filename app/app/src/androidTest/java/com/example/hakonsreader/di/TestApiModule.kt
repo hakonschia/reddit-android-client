@@ -13,15 +13,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import java.util.*
 import javax.inject.Singleton
 
 @Module
 @TestInstallIn(
         components = [SingletonComponent::class],
-        replaces = [AppModule::class]
+        replaces = [ApiModule::class]
 )
-class TestAppModule {
+class TestApiModule {
 
     @Singleton
     @Provides

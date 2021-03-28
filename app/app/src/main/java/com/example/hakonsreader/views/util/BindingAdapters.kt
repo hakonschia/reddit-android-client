@@ -1,13 +1,9 @@
 package com.example.hakonsreader.views.util
 
-import android.os.Build
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
-import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.misc.createAgeText
 import com.example.hakonsreader.misc.createAgeTextShortened
 import java.text.SimpleDateFormat
@@ -103,41 +99,6 @@ fun setAgeTextEditedShortened(textView: TextView, createdAt: Long) {
         val between = Duration.between(created, now)
         textView.text = "*" + createAgeTextShortened(textView.resources, between)
     }
-}
-
-/**
- * Sets a TextView with markdown text.
- *
- * The markdown will be adjusted with [App.adjuster]
- *
- * If no movement method is set, the TextView will have its movement method set to [InternalLinkMovementMethod].
- * The long click will be set to [setLongClickToPeekUrl] with no default
- *
- * @param textView The TextView to add the markdown to
- * @param markdown The markdown text
- */
-@BindingAdapter("markdown")
-fun setMarkdown(textView: TextView, markdown: String?) {
-    markdown ?: return
-
-    if (textView.movementMethod == null) {
-        textView.movementMethod = InternalLinkMovementMethod()
-    }
-    textView.setLongClickToPeekUrl()
-    App.get().markwon.setMarkdown(textView, App.get().adjuster.adjust(markdown))
-}
-
-/**
- * Identical to [setMarkdown], but does not set the long click listener to peek URLs
- */
-@BindingAdapter("markdownWithoutLongClick")
-fun setMarkdownWithoutLongClick(textView: TextView, markdown: String?) {
-    markdown ?: return
-
-    if (textView.movementMethod == null) {
-        textView.movementMethod = InternalLinkMovementMethod()
-    }
-    App.get().markwon.setMarkdown(textView, App.get().adjuster.adjust(markdown))
 }
 
 /**

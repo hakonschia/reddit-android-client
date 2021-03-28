@@ -7,12 +7,12 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
@@ -38,7 +38,7 @@ fun showPopupForPost(view: View, post: RedditPost?, postsDao: RedditPostsDao, ap
         return
     }
 
-    val user = App.get().getUserInfo()?.userInfo
+    val user = AppState.getUserInfo()?.userInfo
     val context = view.context
 
     popupMenu {
@@ -67,7 +67,7 @@ fun showPopupForPost(view: View, post: RedditPost?, postsDao: RedditPostsDao, ap
 
         // There is a logged in user, show actions that require logged in users
         // Technically this could be null even if there is
-        if (App.get().loggedInState.value is LoggedInState.LoggedIn) {
+        if (AppState.loggedInState.value is LoggedInState.LoggedIn) {
             section {
                 item {
                     labelRes = if (post.isSaved) {

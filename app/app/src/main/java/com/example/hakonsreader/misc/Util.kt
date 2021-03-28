@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -26,7 +25,9 @@ import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.fragments.bottomsheets.PeekLinkBottomSheet
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.states.LoggedInState.PrivatelyBrowsing
+import com.example.hakonsreader.states.OAuthState
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
@@ -59,7 +60,7 @@ fun getImageVariantsForRedditPost(post: RedditPost) : PostImageVariants {
  * Gets the normal
  */
 private fun getNormal(post: RedditPost) : String? {
-    val screenWidth = App.get().screenWidth
+    val screenWidth = Resources.getSystem().displayMetrics.widthPixels
     var imageUrl: String? = null
 
     post.getPreviewImages()?.forEach {
@@ -409,7 +410,7 @@ fun handleGenericResponseErrors(parent: View, error: GenericError, t: Throwable,
         }
 
         t is InvalidAccessTokenException -> {
-            if (App.get().loggedInState.value is PrivatelyBrowsing) {
+            if (AppState.loggedInState.value is PrivatelyBrowsing) {
                 showPrivatelyBrowsingSnackbar(parent, anchor)
             } else {
                 showNotLoggedInSnackbar(parent, anchor)
@@ -490,7 +491,7 @@ fun showPrivatelyBrowsingSnackbar(parent: View, anchor: View? = null) {
     val context = parent.context
     Snackbar.make(parent, R.string.privatelyBrowsingError, BaseTransientBottomBar.LENGTH_LONG)
             .setAnchorView(anchor)
-            .setAction(R.string.disable) { App.get().enablePrivateBrowsing(false) }
+            .setAction(R.string.disable) { AppState.enablePrivateBrowsing(false) }
             .setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent))
             .show()
     }

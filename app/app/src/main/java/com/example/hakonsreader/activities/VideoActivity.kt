@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowInsets
 import android.view.WindowManager
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.views.VideoPlayer

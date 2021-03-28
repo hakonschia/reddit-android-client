@@ -1,5 +1,6 @@
 package com.example.hakonsreader.activities
 
+import android.app.Application
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
@@ -8,13 +9,49 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.persistence.RedditDatabase
+import com.example.hakonsreader.api.persistence.RedditUserInfoDatabase
+import com.example.hakonsreader.constants.SharedPreferencesConstants
+import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.misc.SharedPreferencesManager
+import com.example.hakonsreader.states.AppState
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
-@RunWith(AndroidJUnit4ClassRunner::class)
+@HiltAndroidTest
 class SendPrivateMessageActivityTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var api: RedditApi
+
+    @Inject
+    lateinit var database: RedditDatabase
+
+    @Inject
+    lateinit var userInfoDatabase: RedditUserInfoDatabase
+
+    @Before
+    fun init() {
+        hiltRule.inject()
+
+        // This has to set before AppState.init()
+        SharedPreferencesManager.create(InstrumentationRegistry.getInstrumentation().targetContext
+                .getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, Application.MODE_PRIVATE)
+        )
+        AppState.init(api, database, userInfoDatabase)
+        Settings.init(InstrumentationRegistry.getInstrumentation().targetContext)
+    }
 
 
     /**

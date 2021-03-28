@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.interfaces.ReportableListing;
 import com.example.hakonsreader.api.model.RedditComment;
@@ -20,8 +19,6 @@ import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.fragments.bottomsheets.ReportsBottomSheet;
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener;
 import com.example.hakonsreader.views.Tag;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

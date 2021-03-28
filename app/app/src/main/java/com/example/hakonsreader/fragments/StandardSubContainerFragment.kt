@@ -84,7 +84,7 @@ class StandardSubContainerFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_posts_container, container, false)
+        val view = LayoutInflater.from(requireActivity()).inflate(R.layout.fragment_posts_container, container, false)
 
         viewPager = view.findViewById<ViewPager2>(R.id.postsContainer).apply {
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -155,13 +155,17 @@ class StandardSubContainerFragment : Fragment() {
         // This issue only appears when the nav drawer has been opened from this container fragment
         // and changing the theme, which causes a recreate and some issues occur with setting the toolbar
         val fragments = childFragmentManager.fragments
-        if (fragments.size >= position) {
+        if (fragments.size > position) {
             (fragments[position] as SubredditFragment).getToolbar()?.let {
                 (requireActivity() as AppCompatActivity).setSupportActionBar(it)
             }
         }
     }
 
+    /**
+     * @param startPos The starting position of the adapter. The fragment in this position will be
+     * the only fragment that sets [SubredditFragment.setToolbarOnActivity] to true
+     */
     private inner class Adapter(val startPos: Int, fragment: Fragment) : FragmentStateAdapter(fragment) {
         override fun getItemCount() = 3
         override fun createFragment(position: Int) : Fragment {

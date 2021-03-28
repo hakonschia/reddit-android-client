@@ -46,7 +46,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Submitting to GlobalOffensive" />
 
-            <TextView
+            <com.example.hakonsreader.views.MarkdownTextView
                 android:id="@+id/subredditSubmitText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -55,7 +55,6 @@
                 android:layout_marginEnd="8dp"
 
                 android:textColor="@color/secondary_text_color"
-                app:markdown="@{subreddit.submitText}"
 
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"

@@ -7,11 +7,10 @@ import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.preference.PreferenceManager
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.enums.ShowNsfwPreview
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
@@ -60,8 +59,6 @@ object Settings {
                 isWifiConnected = cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
             }
         })
-
-        Log.d("Settings", "preferences initialized")
     }
 
     /**
@@ -102,7 +99,7 @@ object Settings {
      * @return True if NSFW videos should be automatically played
      */
     fun autoPlayNsfwVideos(): Boolean {
-        return App.get().getUserInfo()?.nsfwAccount == true ||
+        return AppState.getUserInfo()?.nsfwAccount == true ||
                 preferences.getBoolean(resources.getString(R.string.prefs_key_auto_play_nsfw_videos), resources.getBoolean(R.bool.prefs_default_autoplay_nsfw_videos))
     }
 
@@ -245,7 +242,7 @@ object Settings {
      * @return An enum representing how to filter the images/thumbnails
      */
     fun showNsfwPreview(): ShowNsfwPreview {
-        if (App.get().getUserInfo()?.nsfwAccount == true) {
+        if (AppState.getUserInfo()?.nsfwAccount == true) {
             return ShowNsfwPreview.NORMAL
         }
 
@@ -441,7 +438,7 @@ object Settings {
      * @return True if a warning should be displayed when opening NSFW subreddits
      */
     fun warnNsfwSubreddits(): Boolean {
-        return App.get().getUserInfo()?.nsfwAccount != true && preferences.getBoolean(
+        return AppState.getUserInfo()?.nsfwAccount != true && preferences.getBoolean(
                 resources.getString(R.string.prefs_key_subreddits_warn_nsfw),
                 resources.getBoolean(R.bool.prefs_default_subreddits_warn_nsfw)
         )

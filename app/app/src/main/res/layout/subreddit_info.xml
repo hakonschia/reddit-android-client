@@ -120,7 +120,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/subredditSubscribers"
                 tools:text="123 users online" />
 
-            <TextView
+            <com.example.hakonsreader.views.MarkdownTextView
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -130,13 +130,13 @@
 
                 android:layout_marginEnd="16dp"
                 android:textColor="@color/text_color"
+                app:markdown='@{subreddit.publicDescription ?? ""}'
 
                 app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/activeUsers"
-                app:markdown="@{subreddit.publicDescription}"
                 tools:text="@tools:sample/lorem[50]" />
 
             <View

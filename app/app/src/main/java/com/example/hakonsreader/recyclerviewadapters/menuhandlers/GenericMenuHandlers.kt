@@ -1,7 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 
 import android.view.View
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.interfaces.LockableListing
@@ -10,6 +9,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
  * @param username The username of the user to block
  */
 fun blockUserOnClick(view: View, username: String, api: RedditApi) {
-    val loggedInUser = App.get().getUserInfo()?.userInfo ?: return
+    val loggedInUser = AppState.getUserInfo()?.userInfo ?: return
 
     CoroutineScope(IO).launch {
         when (val response = api.user(username).block()) {

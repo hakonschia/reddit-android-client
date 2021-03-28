@@ -1,10 +1,10 @@
 package com.example.hakonsreader.viewmodels
 
 import androidx.lifecycle.*
-import com.example.hakonsreader.App
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.states.LoggedInState
 import kotlinx.coroutines.launch
 
@@ -48,7 +48,7 @@ class RedditUserViewModel(
     init {
         // This is probably a pretty bad way to get the current user info, but whatever
         if (isForLoggedInUser) {
-            App.get().getUserInfo()?.userInfo?.let {
+            AppState.getUserInfo()?.userInfo?.let {
                 _user.postValue(it)
             }
         }
@@ -65,7 +65,7 @@ class RedditUserViewModel(
             // fail with a "You're currently privately browsing"
             // If the user is privately browsing but no name is previously set this would fail since name would be null
             // But that should never happen? A logged in user should always have a user object with name stored
-            val response = if ((isForLoggedInUser && App.get().loggedInState.value !is LoggedInState.PrivatelyBrowsing) || username == null) {
+            val response = if ((isForLoggedInUser && AppState.loggedInState.value !is LoggedInState.PrivatelyBrowsing) || username == null) {
                 api.user().info()
             } else {
                 api.user(username).info()

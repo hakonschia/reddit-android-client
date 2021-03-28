@@ -6,4 +6,10 @@
 
         <attr name="text" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="MarkdownTextView">
+        <attr name="markdown" format="string" />
+        <!-- Sets markdown without changing the onLongClickListener -->
+        <attr name="markdownNoLongClick" format="string" />
+    </declare-styleable>
 </resources>

@@ -36,7 +36,7 @@
 
             tools:text="1. No memes" />
 
-        <TextView
+        <com.example.hakonsreader.views.MarkdownTextView
             android:id="@+id/description"
             android:layout_width="0dp"
             android:layout_height="0dp"

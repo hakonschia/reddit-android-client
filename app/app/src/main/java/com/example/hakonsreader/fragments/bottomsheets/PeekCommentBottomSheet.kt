@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.databinding.BottomSheetPeekParentCommentBinding
+import com.example.hakonsreader.states.AppState
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
 
@@ -45,7 +45,7 @@ class PeekCommentBottomSheet : BottomSheetDialogFragment() {
 
         val comment = Gson().fromJson(requireArguments().getString(ARGS_COMMENTS), RedditComment::class.java)
 
-        binding.isByLoggedInUser = comment?.author == App.get().getUserInfo()?.userInfo?.username
+        binding.isByLoggedInUser = comment?.author == AppState.getUserInfo()?.userInfo?.username
         binding.comment = comment
 
         return binding.root

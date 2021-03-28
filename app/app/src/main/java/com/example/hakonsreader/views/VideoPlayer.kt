@@ -2,6 +2,7 @@ package com.example.hakonsreader.views
 
 import android.animation.LayoutTransition
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.AttributeSet
@@ -15,7 +16,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createVideoDuration
@@ -481,10 +481,11 @@ class VideoPlayer : PlayerView {
      * Updates the size of the view (´this´) by the values in [videoHeight] and [videoWidth]
      */
     private fun updateSize() {
-        val app = App.get()
+        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+        val screenHeight = Resources.getSystem().displayMetrics.heightPixels
 
         // Ensure the video size to screen ratio isn't too large or too small
-        var widthRatio: Float = videoWidth.toFloat() / app.screenWidth
+        var widthRatio: Float = videoWidth.toFloat() / screenWidth
         if (widthRatio > MAX_WIDTH_RATIO) {
             widthRatio = MAX_WIDTH_RATIO
         } else if (widthRatio < MIN_WIDTH_RATIO) {
@@ -492,18 +493,18 @@ class VideoPlayer : PlayerView {
         }
 
         // Calculate and set the new width and height
-        val width = (app.screenWidth * widthRatio).toInt()
+        val width = (screenWidth * widthRatio).toInt()
 
         // Find how much the width was scaled by and use that to find the new height
         val widthScaledBy = videoWidth / width.toFloat()
         var height = (videoHeight / widthScaledBy).toInt()
 
-        var heightRatio: Float = height.toFloat() / app.screenHeight
+        var heightRatio: Float = height.toFloat() / screenHeight
         if (heightRatio > MAX_HEIGHT_RATIO) {
             heightRatio = MAX_HEIGHT_RATIO
         }
 
-        height = (app.screenHeight * heightRatio).toInt()
+        height = (screenHeight * heightRatio).toInt()
 
         actualVideoHeight = height
 
@@ -511,9 +512,9 @@ class VideoPlayer : PlayerView {
         // middle of the screen without being stretched, as I want to, and the controller goes
         // to the screen width, which is also what I want
         val params = layoutParams?.also {
-            it.width = app.screenWidth
+            it.width = screenWidth
             it.height = height
-        } ?: ViewGroup.LayoutParams(app.screenWidth, height)
+        } ?: ViewGroup.LayoutParams(screenWidth, height)
 
         layoutParams = params
     }

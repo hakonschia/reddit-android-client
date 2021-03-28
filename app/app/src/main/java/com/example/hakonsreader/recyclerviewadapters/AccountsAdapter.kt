@@ -3,9 +3,9 @@ package com.example.hakonsreader.recyclerviewadapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.databinding.ListItemAccountBinding
+import com.example.hakonsreader.states.AppState
 
 class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
 
@@ -48,7 +48,7 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.ViewHolder>() {
             this.username = account.userInfo?.username
 
             // Highlight the currently active account
-            this.highlight = App.get().getUserInfo()?.userId == account.userId
+            this.highlight = AppState.getUserInfo()?.userId == account.userId
 
             this.nsfwAccount = account.nsfwAccount
         }

@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters.listeners;
 
+import android.content.res.Resources;
 import android.view.View;
 
 import androidx.lifecycle.Lifecycle;
@@ -8,7 +9,6 @@ import androidx.lifecycle.OnLifecycleEvent;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.views.Content;
 
@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 public class PostScrollListener implements View.OnScrollChangeListener, LifecycleObserver {
     private static final String TAG = "PostScrollListener";
 
-    private static final int SCREEN_HEIGHT = App.Companion.get().getScreenHeight();
+    private final int SCREEN_HEIGHT = Resources.getSystem().getDisplayMetrics().heightPixels;
 
 
     /**

@@ -1,13 +1,11 @@
 package com.example.hakonsreader.viewmodels
 
 import androidx.lifecycle.*
-import com.example.hakonsreader.App
 import com.example.hakonsreader.api.RedditApi
-import com.example.hakonsreader.api.model.RedditAward
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.states.LoggedInState
+import com.example.hakonsreader.states.AppState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -90,7 +88,7 @@ class SelectSubredditsViewModel constructor(
 
                     if (isForLoggedInUser) {
                         // Store the subreddits so they're shown instantly the next time
-                        App.get().updateUserInfo(subreddits = subredditIds)
+                        AppState.updateUserInfo(subreddits = subredditIds)
                     }
 
                     // Although NSFW subs might be inserted with this, it's fine as if the user

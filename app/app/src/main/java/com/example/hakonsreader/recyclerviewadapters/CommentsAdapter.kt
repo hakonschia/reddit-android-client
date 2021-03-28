@@ -20,7 +20,6 @@ import androidx.core.text.toSpannable
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.Thing
@@ -32,6 +31,7 @@ import com.example.hakonsreader.databinding.ListItemMoreCommentBinding
 import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForComments
@@ -457,7 +457,7 @@ class CommentsAdapter constructor(
                 // User wants to highlight new comments, and the comment was added after the last time the post was opened
                 || (Settings.highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
 
-        val byLoggedInUser = comment.author == App.get().getUserInfo()?.userInfo?.username
+        val byLoggedInUser = comment.author == AppState.getUserInfo()?.userInfo?.username
 
         when (holder.itemViewType) {
             MORE_COMMENTS_TYPE -> (holder as MoreCommentsViewHolder).bind(comment)

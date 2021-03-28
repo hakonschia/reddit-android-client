@@ -10,6 +10,9 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 
+/**
+ * Module providing databases and DAOs
+ */
 @InstallIn(SingletonComponent::class)
 @Module
 object DatabaseModule {

@@ -1,12 +1,11 @@
 package com.example.hakonsreader.views
 
 import android.content.Context
+import android.content.res.Resources
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
-import com.example.hakonsreader.App
-import com.example.hakonsreader.App.Companion.get
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentImageBinding
@@ -86,7 +85,7 @@ class ContentImage : Content {
                         .error(R.drawable.ic_wifi_tethering_150dp)
                         .cache(cache)
                         // Scale so the image fits the width of the screen
-                        .resize(get().screenWidth, 0)
+                        .resize(Resources.getSystem().displayMetrics.widthPixels, 0)
                         .into(binding.image, imageLoadedCallback)
             }
         } catch (e: RuntimeException) {

@@ -47,7 +47,7 @@ class PeekLinkBottomSheet : BottomSheetDialogFragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = BottomSheetPeekUrlBinding.inflate(inflater)
+        _binding = BottomSheetPeekUrlBinding.inflate(LayoutInflater.from(requireActivity()))
         return binding.root
     }
 

@@ -74,7 +74,7 @@ class SelectSubredditFragment : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        setupBinding(container)
+        setupBinding()
 
         setupSubredditsList()
         setupSearchSubredditsList()
@@ -101,8 +101,8 @@ class SelectSubredditFragment : Fragment() {
     /**
      * Inflates and sets up [binding]
      */
-    private fun setupBinding(container: ViewGroup?) {
-        _binding = FragmentSelectSubredditBinding.inflate(layoutInflater, container, false)
+    private fun setupBinding() {
+        _binding = FragmentSelectSubredditBinding.inflate(LayoutInflater.from(requireActivity()))
 
         binding.subredditSearch.setOnEditorActionListener(actionDoneListener)
         binding.subredditSearch.addTextChangedListener(automaticSearchListener)

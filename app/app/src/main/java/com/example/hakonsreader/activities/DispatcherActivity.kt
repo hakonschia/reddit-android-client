@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.CreateIntentOptions
 import com.example.hakonsreader.misc.Settings

@@ -2,6 +2,7 @@ package com.example.hakonsreader.activities
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.transition.Transition
@@ -15,7 +16,6 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostType
@@ -664,7 +664,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
     private fun getHeightForPost(forWhenCollapsedDisabled: Boolean) : Int {
         // If we're in landscape the "height" is the width of the screen
         val portrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        val height = if (portrait) App.get().screenHeight else App.get().screenWidth
+        val height = if (portrait) Resources.getSystem().displayMetrics.heightPixels else Resources.getSystem().displayMetrics.widthPixels
 
         return if (forWhenCollapsedDisabled) {
             (height * (Settings.getMaxPostSizePercentageWhenCollapseDisabled() / 100f)).toInt()

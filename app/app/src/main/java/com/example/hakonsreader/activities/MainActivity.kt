@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -43,6 +44,8 @@ import com.example.hakonsreader.misc.*
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.recyclerviewadapters.TrendingSubredditsAdapter
+import com.example.hakonsreader.states.AppState
+import com.example.hakonsreader.states.OAuthState
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -162,7 +165,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     private val navigationViewListener = BottomNavigationViewListener()
 
     private val subredditsViewModel: SelectSubredditsViewModel by viewModels {
-        SelectSubredditsViewModel.Factory(api, subredditsDao, App.get().loggedInState.value is LoggedInState.LoggedIn)
+        SelectSubredditsViewModel.Factory(api, subredditsDao, AppState.loggedInState.value is LoggedInState.LoggedIn)
     }
     private val trendingSubredditsViewModel: TrendingSubredditsViewModel by viewModels()
 
@@ -171,7 +174,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // Switch back to the app theme (from the launcher theme)
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-
+        val prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE)
+        SharedPreferencesManager.create(prefs)
         binding = ActivityMainBinding.inflate(layoutInflater).also {
             setContentView(it.root)
         }
@@ -229,7 +233,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         observeUserState()
 
-        subredditsViewModel.isForLoggedInUser = App.get().loggedInState.value is LoggedInState.LoggedIn
+        subredditsViewModel.isForLoggedInUser = AppState.loggedInState.value is LoggedInState.LoggedIn
         subredditsViewModel.loadSubreddits(force = recreatedAsNewUser == true)
 
         setupNavDrawer()
@@ -419,7 +423,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     private fun observeUserState() {
-        App.get().loggedInState.observe(this) {
+        AppState.loggedInState.observe(this) {
             when (it) {
                 is LoggedInState.LoggedIn -> asLoggedInUser(it.userInfo)
                 is LoggedInState.PrivatelyBrowsing -> asPrivatelyBrowsingUser(it.userInfo)
@@ -519,7 +523,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         CoroutineScope(IO).launch {
             when (val resp = api.accessToken().get(code)) {
                 is ApiResponse.Success -> {
-                    App.get().addNewUser(resp.value)
+                    AppState.addNewUser(resp.value)
                     getUserInfo()
 
                     withContext(Main) {
@@ -543,7 +547,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         CoroutineScope(IO).launch {
             when (val userInfo = api.user().info()) {
                 is ApiResponse.Success -> {
-                    App.get().updateUserInfo(info = userInfo.value)
+                    AppState.updateUserInfo(info = userInfo.value)
                     withContext(Main) {
                         performSetup(null)
                     }
@@ -626,7 +630,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      */
     private fun startInboxListener() {
         // The activity should be recreated when a user logs in, so this should be fine
-        if (App.get().loggedInState.value !is LoggedInState.LoggedIn) {
+        if (AppState.loggedInState.value !is LoggedInState.LoggedIn) {
             return
         }
 
@@ -1016,7 +1020,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         })
 
         with(binding.navDrawer) {
-            app = App.get()
+            appState = AppState
             subredditSelected = this@MainActivity
             api = this@MainActivity.api
             userInfoDao = this@MainActivity.userInfoDao
@@ -1029,7 +1033,12 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     val key = getString(R.string.prefs_key_theme)
                     val darkMode = getBoolean(key, resources.getBoolean(R.bool.prefs_default_theme))
                     edit().putBoolean(key, !darkMode).apply()
-                    App.get().updateTheme()
+
+                    if (!darkMode) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    } else {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    }
                 }
             }
 
@@ -1208,7 +1217,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          */
         private fun onNavBarProfile(): Fragment {
             // If logged in, show profile, otherwise show log in page
-            return if (App.get().loggedInState.value is LoggedInState.LoggedOut) {
+            return if (AppState.loggedInState.value is LoggedInState.LoggedOut) {
                 LogInFragment.newInstance()
             } else {
                 // Go to inbox if there are unread messages

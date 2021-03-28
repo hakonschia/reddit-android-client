@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import com.example.hakonsreader.databinding.ContentTextBinding
-import com.example.hakonsreader.views.util.setMarkdown
 
 /**
  * View for text posts. This only shows the text of the post (with Markwon), but includes an [android.widget.ScrollView]
@@ -22,7 +21,7 @@ class ContentText : Content {
     override fun updateView() {
         val markdown: String = redditPost.selftext
         if (markdown.isNotEmpty()) {
-            setMarkdown(binding.content, markdown)
+            binding.content.setMarkdown(markdown)
         }
     }
 }

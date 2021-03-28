@@ -4,12 +4,11 @@ import android.app.Dialog
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.*
-import com.example.hakonsreader.App.Companion.get
 import com.example.hakonsreader.R
 import com.example.hakonsreader.interfaces.LanguageListener
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
@@ -45,6 +44,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
         settings = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        val themePreference: SwitchPreference? = findPreference(getString(R.string.prefs_key_theme))
+        themePreference?.onPreferenceChangeListener = themeChangeListener
 
         // Set that the auto hide comments preference is only a number (with sign)
         val hideComments: EditTextPreference? = findPreference(getString(R.string.prefs_key_hide_comments_threshold))
@@ -95,17 +97,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    override fun onPreferenceTreeClick(preference: Preference): Boolean {
-        val key = preference.key
-
-        // Update the theme right away
-        if (key == getString(R.string.prefs_key_theme)) {
-            get().updateTheme()
-        }
-
-        return super.onPreferenceTreeClick(preference)
-    }
-
     override fun onDisplayPreferenceDialog(preference: Preference?) {
         if (preference is MultiColorPreference) {
             val dialog = MultiColorFragCompat.newInstance(preference.key)
@@ -116,6 +107,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    /**
+     * Listener for light/dark mode. Automatically updates the theme
+     */
+    private val themeChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+        newValue as Boolean
+        if (newValue) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
+        true
+    }
 
     /**
      * Listener for the threshold for hiding comments. This ensures that if nothing is input into the input

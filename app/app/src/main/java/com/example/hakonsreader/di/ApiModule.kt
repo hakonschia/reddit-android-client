@@ -1,14 +1,12 @@
 package com.example.hakonsreader.di
 
-import android.app.Application
 import android.content.Context
-import android.util.Log
 import com.example.hakonsreader.App
 import com.example.hakonsreader.api.RedditApi
-import com.example.hakonsreader.api.persistence.*
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.SharedPreferencesManager
 import com.example.hakonsreader.misc.TokenManager
 import dagger.Module
@@ -19,21 +17,21 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.Cache
 import okhttp3.logging.HttpLoggingInterceptor
 import java.io.File
-import java.util.*
 import javax.inject.Singleton
 
+
+/**
+ * Module for injecting a [RedditApi] instance. This module should not be used during testing
+ */
 @InstallIn(SingletonComponent::class)
 @Module
-object AppModule {
+object ApiModule {
 
     @Singleton
     @Provides
     fun provideApi(@ApplicationContext context: Context) : RedditApi {
+        // This module is only for production, so the application context will always be App
         context as App
-
-        // Weird to do this in here I guess, but preferences have to be set for TokenManager
-        val prefs = context.getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, Application.MODE_PRIVATE)
-        SharedPreferencesManager.create(prefs)
 
         // 25MB cache size for network requests to third party
         val thirdPartyCacheSize = 25 * 1024 * 1024L
@@ -48,24 +46,26 @@ object AppModule {
             NetworkConstants.IMGUR_CLIENT_ID
         } else null
 
-        Log.d("App", "getApi creating api now")
+        val privatelyBrowsing = SharedPreferencesManager.get(SharedPreferencesConstants.PRIVATELY_BROWSING, Boolean::class.java) ?: false
+
         return RedditApi.create(
                 userAgent = NetworkConstants.USER_AGENT,
                 clientId = NetworkConstants.CLIENT_ID,
 
                 accessToken = TokenManager.getToken(),
-                onNewToken = { newToken -> context.onNewToken(newToken) },
+                onNewToken = { newToken -> AppState.onNewToken(newToken) },
                 onInvalidToken = { _: GenericError?, _: Throwable? -> context.onInvalidAccessToken() },
 
                 loggerLevel = HttpLoggingInterceptor.Level.BODY,
 
                 callbackUrl = NetworkConstants.CALLBACK_URL,
-                deviceId = UUID.randomUUID().toString(),
+                //deviceId = UUID.randomUUID().toString(),
                 imgurClientId = imgurClientId,
 
-                 thirdPartyCache = thirdPartyCache,
-                 thirdPartyCacheAge = thirdPartyCacheAge
-        )
+                thirdPartyCache = thirdPartyCache,
+                thirdPartyCacheAge = thirdPartyCacheAge
+        ).apply {
+            enablePrivateBrowsing(privatelyBrowsing)
+        }
     }
-
 }

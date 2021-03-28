@@ -9,7 +9,6 @@
         <import type="android.graphics.Typeface" />
         <import type="com.example.hakonsreader.views.util.ClickHandlerKt"/>
         <import type="com.example.hakonsreader.views.util.ViewUtil"/>
-        <import type="com.example.hakonsreader.App"/>
         <import type="com.example.hakonsreader.api.model.RedditUser"/>
         <import type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
         <import type="com.example.hakonsreader.recyclerviewadapters.menuhandlers.CommentsMenuHandlerKt" />
@@ -249,7 +248,7 @@
             tools:text="5 user reports"
             tools:visibility="visible" />
 
-        <TextView
+        <com.example.hakonsreader.views.MarkdownTextView
             android:id="@+id/commentContent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -263,7 +262,7 @@
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/commentAuthor"
             app:layout_constraintTop_toBottomOf="@+id/userReportsTitle"
-            app:markdownWithoutLongClick="@{comment.body}"
+            app:markdownNoLongClick='@{comment.body ?? ""}'
 
             tools:text="@tools:sample/lorem[50]" />
 

@@ -16,14 +16,13 @@ import com.google.gson.Gson
 /**
  * View for info about posts (title, author, subreddit etc)
  */
-class PostInfo : FrameLayout {
+class PostInfo @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding = PostInfoBinding.inflate(LayoutInflater.from(context), this, true)
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     /**
      * Sets the post to use in this VoteBar and sets the initial state of the vote status

@@ -16,10 +16,13 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.example.hakonsreader.App;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.databinding.MarkdownInputBinding;
+import com.example.hakonsreader.di.MarkwonWithoutImages;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import io.noties.markwon.Markwon;
 import io.noties.markwon.editor.MarkwonEditor;
 import io.noties.markwon.editor.MarkwonEditorTextWatcher;
@@ -28,9 +31,16 @@ import io.noties.markwon.editor.MarkwonEditorTextWatcher;
  * Class wrapping a text input field with markdown buttons to easily insert markdown formatting
  * into the input field
  */
+@AndroidEntryPoint
 public class MarkdownInput extends FrameLayout {
     private static final String TAG = "MarkdownInput";
 
+    // This markwon is used for previews, and images aren't shown in the preview
+    // This is the raw markdown that is submitted to Reddit, and we don't want to support giving
+    // bad markdown, so don't use any adjuster
+    @MarkwonWithoutImages
+    @Inject
+    Markwon markwon;
 
     private final MarkdownInputBinding binding;
 
@@ -90,11 +100,6 @@ public class MarkdownInput extends FrameLayout {
      */
     private void setTextListeners() {
         // With a MarkwonEditor the text input shows some highlighting for what is markdown
-
-        // Using this markwon instance has the benefit of highlighting reddit links etc. in the preview
-        // Although it doesn't actually add the links around the markdown, reddit doesn't do that
-        // themselves so it's fine
-        final Markwon markwon = App.Companion.get().getMarkwon();
 
         // TODO custom markwon plugins wont affect the edit text
         // Create editor
@@ -189,7 +194,7 @@ public class MarkdownInput extends FrameLayout {
         Dialog previewDialog = new Dialog(getContext());
         previewDialog.setContentView(R.layout.dialog_markdown_preview);
         TextView previewText = previewDialog.findViewById(R.id.previewText);
-        App.Companion.get().getMarkwon().setMarkdown(previewText, binding.replyText.getText().toString());
+        markwon.setMarkdown(previewText, binding.replyText.getText().toString());
 
         previewDialog.show();
         previewDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

@@ -23,7 +23,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.activities.PostActivity
@@ -43,6 +42,7 @@ import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.*
 import com.example.hakonsreader.dialogadapters.RedditFlairAdapter
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.handleGenericResponseErrors
@@ -50,7 +50,6 @@ import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.viewmodels.*
 import com.example.hakonsreader.views.util.ViewUtil
-import com.example.hakonsreader.views.util.setMarkdown
 import com.example.hakonsreader.views.util.showPopupSortWithTime
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
@@ -235,7 +234,7 @@ class SubredditFragment : Fragment() {
             bannerLoaded(false)
         }
 
-        App.get().loggedInState.observe(viewLifecycleOwner) {
+        AppState.loggedInState.observe(viewLifecycleOwner) {
             when (it) {
                 is LoggedInState.LoggedIn -> privateBrowsingStateChanged(false)
                 is LoggedInState.PrivatelyBrowsing -> privateBrowsingStateChanged(true)
@@ -264,7 +263,7 @@ class SubredditFragment : Fragment() {
      * Inflates and sets up [binding]
      */
     private fun setupBinding() {
-        _binding = FragmentSubredditBinding.inflate(layoutInflater)
+        _binding = FragmentSubredditBinding.inflate(LayoutInflater.from(requireActivity()))
 
         with(binding) {
             if (isDefaultSubreddit) {
@@ -292,7 +291,7 @@ class SubredditFragment : Fragment() {
                             rulesViewModel?.refresh()
                         }
 
-                        val isLoggedIn = App.get().loggedInState.value is LoggedInState.LoggedIn
+                        val isLoggedIn = AppState.loggedInState.value is LoggedInState.LoggedIn
                         // The adapter will always have one more (for the "Select flair"), so the actual count is one less than the adapter count
                         val flairsCount = binding.subredditInfo.selectFlairSpinner.adapter?.count?.minus(1) ?: 0
                         if (isLoggedIn && (it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !Settings.dataSavingEnabled()))) {
@@ -727,12 +726,12 @@ class SubredditFragment : Fragment() {
     /**
      * Updates the users flair on the subreddit
      *
-     * If the username ([App.getUserInfo]) is `null` then this will return
+     * If the username ([AppState.getUserInfo]) is `null` then this will return
      *
      * @param flair The flair to update, or `null` to disable the flair on the subreddit
      */
     private fun updateUserFlair(flair: RedditFlair?) {
-        val username = App.get().getUserInfo()?.userInfo?.username ?: return
+        val username = AppState.getUserInfo()?.userInfo?.username ?: return
 
         subredditViewModel?.updateFlair(username, flair)
     }
@@ -937,7 +936,7 @@ class SubredditFragment : Fragment() {
         var onRulesLinkClicked: (() -> Unit)? = null
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-            _binding = FragmentSubredditWikiBinding.inflate(inflater)
+            _binding = FragmentSubredditWikiBinding.inflate(LayoutInflater.from(requireActivity()))
 
             with (binding.wikiContainer.layoutTransition) {
                 setAnimateParentHierarchy(false)
@@ -966,6 +965,8 @@ class SubredditFragment : Fragment() {
         private fun setupViewModel() {
             with (wikiViewModel) {
                 page.observe(viewLifecycleOwner) {
+                    binding.wikiPage = it
+
                     binding.wikiGoBack.visibility = if (canGoBack()) {
                         View.VISIBLE
                     } else {
@@ -979,8 +980,6 @@ class SubredditFragment : Fragment() {
 
                     // Ensure we're at the top when loading a new page (this might have to be stored in onSaveInstanceState)
                     binding.scroller.scrollTo(0, 0)
-
-                    setMarkdown(binding.wikiContent, it.content)
                 }
 
                 isLoading.observe(viewLifecycleOwner) {

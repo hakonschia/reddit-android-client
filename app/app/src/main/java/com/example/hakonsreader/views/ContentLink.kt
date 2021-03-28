@@ -10,7 +10,6 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.viewbinding.ViewBinding
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditPost
@@ -22,16 +21,16 @@ import com.example.hakonsreader.views.util.cache
 import com.squareup.picasso.Picasso
 
 /**
- * View for displaying links from a [RedditPost]. This will display different views depending on [App.dataSavingEnabled]
+ * View for displaying links from a [RedditPost]. This will display different views depending on
+ * [Settings.dataSavingEnabled]
  */
-class ContentLink : Content {
+class ContentLink @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : Content(context, attrs, defStyleAttr) {
 
     val binding: ViewBinding = getCorrectBinding()
-
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     /**
      * Retrieves and inflates the correct binding to use for the layout based on the users

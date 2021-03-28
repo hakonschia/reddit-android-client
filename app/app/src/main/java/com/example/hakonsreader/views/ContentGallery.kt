@@ -1,13 +1,13 @@
 package com.example.hakonsreader.views
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.example.hakonsreader.App
 import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.databinding.ContentGalleryBinding
 import com.example.hakonsreader.misc.Settings
@@ -62,7 +62,7 @@ class ContentGallery : Content {
         }
 
         // Should scale height to fit with the width as the image will be scaled later
-        val screenWidth = App.get().screenWidth
+        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
         val widthScale = screenWidth / maxWidth.toFloat()
         layoutParams = ViewGroup.LayoutParams(screenWidth, (maxHeight * widthScale).toInt())
 

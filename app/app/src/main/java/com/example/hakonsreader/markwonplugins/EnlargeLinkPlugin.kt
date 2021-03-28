@@ -5,7 +5,6 @@ import android.text.Spanned
 import android.text.style.RelativeSizeSpan
 import android.text.style.URLSpan
 import android.widget.TextView
-import com.example.hakonsreader.App
 import com.example.hakonsreader.misc.Settings
 import io.noties.markwon.AbstractMarkwonPlugin
 
@@ -13,7 +12,7 @@ import io.noties.markwon.AbstractMarkwonPlugin
  * Markwon plugin that goes over the entire text and applies a [RelativeSizeSpan] to the text where a
  * [URLSpan] is found.
  *
- * The scale applied is the scale returned by [App.linkScale]
+ * The scale applied is the scale returned by [Settings.linkScale]
  */
 class EnlargeLinkPlugin : AbstractMarkwonPlugin() {
     override fun afterSetText(textView: TextView) {

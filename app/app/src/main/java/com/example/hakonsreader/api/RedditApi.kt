@@ -571,19 +571,17 @@ private class RedditApiImpl constructor(
     }
 
     override fun enablePrivateBrowsing(enable: Boolean) {
+        // Exit if current state is the same as the new
+        if (isPrivatelyBrowsing() == enable) {
+            return
+        }
+
         if (enable) {
-            // If we're in a private browsing context already, calling this again would override the stored token
-            if (savedToken != null) {
-                return
-            }
             savedToken = accessToken
+
+            // Set an empty token. An actual token will be retrieved automatically on the next API call
             accessTokenInternal = AccessToken()
         } else {
-            // Ie. if we weren't in a private browsing context, this shouldn't do anything
-            if (savedToken == null) {
-                return
-            }
-
             accessTokenInternal = savedToken!!
             savedToken = null
         }

@@ -13,7 +13,6 @@ import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -22,6 +21,7 @@ import com.example.hakonsreader.api.persistence.RedditUserInfoDao
 import com.example.hakonsreader.databinding.FragmentProfileBinding
 import com.example.hakonsreader.databinding.UserIsSuspendedBinding
 import com.example.hakonsreader.interfaces.OnInboxClicked
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
@@ -78,10 +78,10 @@ class ProfileFragment : Fragment() {
         fun newInstance(username: String? = null) = ProfileFragment().apply {
             arguments = Bundle().apply {
                 // Must be logged in (ie. not privately browsing)
-                val state = App.get().loggedInState.value
+                val state = AppState.loggedInState.value
 
                 val isLoggedIn = state is LoggedInState.LoggedIn &&
-                        (username.equals(App.get().getUserInfo()?.userInfo?.username, ignoreCase = true) ||
+                        (username.equals(AppState.getUserInfo()?.userInfo?.username, ignoreCase = true) ||
                         // No username given, or "me" should redirect to the logged in users profile
                         username == null || username == "me")
 
@@ -91,7 +91,7 @@ class ProfileFragment : Fragment() {
                 // stored previously that we can use as the "anonymous" user (this should happen when a user
                 // browsing privately goes to their profile)
                 if (!isLoggedIn && username == null) {
-                    putString(ARGS_USERNAME, App.get().getUserInfo()?.userInfo?.username)
+                    putString(ARGS_USERNAME, AppState.getUserInfo()?.userInfo?.username)
                 } else {
                     putString(ARGS_USERNAME, username)
                 }
@@ -133,7 +133,7 @@ class ProfileFragment : Fragment() {
         setupViewModel()
         addFragmentListener()
 
-        App.get().loggedInState.observe(viewLifecycleOwner) {
+        AppState.loggedInState.observe(viewLifecycleOwner) {
             when (it) {
                 is LoggedInState.LoggedIn -> privateBrowsingStateChanged(false)
                 is LoggedInState.PrivatelyBrowsing -> privateBrowsingStateChanged(true)
@@ -268,7 +268,7 @@ class ProfileFragment : Fragment() {
             // Store the updated user information if this profile is for the logged in user
             if (isLoggedInUser) {
                 CoroutineScope(IO).launch {
-                    App.get().updateUserInfo(info = newUser)
+                    AppState.updateUserInfo(info = newUser)
                 }
             }
 

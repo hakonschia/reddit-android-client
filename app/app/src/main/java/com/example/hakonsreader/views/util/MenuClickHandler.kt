@@ -3,23 +3,23 @@ package com.example.hakonsreader.views.util
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.res.Resources
 import android.view.*
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.model.RedditUser
-import com.example.hakonsreader.api.persistence.RedditSubredditRulesDao
 import com.example.hakonsreader.api.persistence.RedditUserInfoDao
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.PostsFragment
 import com.example.hakonsreader.interfaces.SortableWithTime
 import com.example.hakonsreader.misc.*
 import com.example.hakonsreader.recyclerviewadapters.AccountsAdapter
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.states.LoggedInState
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import kotlinx.coroutines.CoroutineScope
@@ -39,14 +39,14 @@ import java.util.*
 fun showPopupForProfile(view: View, user: RedditUser?, api: RedditApi, userInfoDao: RedditUserInfoDao) {
     user ?: return
 
-    if (App.get().getUserInfo()?.userInfo?.id == user.id) {
+    if (AppState.getUserInfo()?.userInfo?.id == user.id) {
         showPopupForLoggedInUser(view, api, userInfoDao)
     }
 }
 
 private fun showPopupForLoggedInUser(view: View, api: RedditApi, userInfoDao: RedditUserInfoDao) {
     val context = view.context
-    val privatelyBrowsing = App.get().loggedInState.value is LoggedInState.PrivatelyBrowsing
+    val privatelyBrowsing = AppState.loggedInState.value is LoggedInState.PrivatelyBrowsing
 
     popupMenu {
         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
@@ -55,7 +55,7 @@ private fun showPopupForLoggedInUser(view: View, api: RedditApi, userInfoDao: Re
             item {
                 labelRes = R.string.logOut
                 icon = R.drawable.ic_signout
-                callback = { App.get().logOut(context) }
+                callback = { AppState.logOut(context) }
             }
 
             item {
@@ -71,7 +71,7 @@ private fun showPopupForLoggedInUser(view: View, api: RedditApi, userInfoDao: Re
                     R.string.menuPrivateBrowsingEnable
                 }
                 icon = R.drawable.ic_incognito
-                callback = { App.get().enablePrivateBrowsing(!privatelyBrowsing) }
+                callback = { AppState.enablePrivateBrowsing(!privatelyBrowsing) }
             }
 
             // TODO find a better icon for this. The idea for a list icon is "this is a list of
@@ -86,7 +86,7 @@ private fun showPopupForLoggedInUser(view: View, api: RedditApi, userInfoDao: Re
 }
 
 fun showAccountManagement(context: Context, api: RedditApi, userInfoDao: RedditUserInfoDao) {
-    val app = App.get()
+    val app = AppState
 
     Dialog(context).also {
         it.setContentView(R.layout.dialog_account_management)
@@ -195,7 +195,7 @@ fun showPopupSortWithTime(postsFragment: PostsFragment, view: View) {
     val finalTitle = sortText + if (timeSortText != null) " - $timeSortText" else ""
 
     // The submenu sizes look weird if they are too small, so set to fixed 40 % of screen width
-    val submenuSize = (App.get().screenWidth * 0.4f).toInt()
+    val submenuSize = (Resources.getSystem().displayMetrics.widthPixels * 0.4f).toInt()
 
     popupMenu {
         style = R.style.Widget_MPM_Menu_Dark_CustomBackground

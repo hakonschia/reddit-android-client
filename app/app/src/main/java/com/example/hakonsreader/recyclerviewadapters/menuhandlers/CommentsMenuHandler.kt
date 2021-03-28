@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.fragments.bottomsheets.PeekCommentBottomSheet
+import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
@@ -34,7 +34,7 @@ import kotlinx.coroutines.withContext
  * @param adapter The RecyclerView adapter the comment is in
  */
 fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAdapter, api: RedditApi) {
-    val user = App.get().getUserInfo()?.userInfo
+    val user = AppState.getUserInfo()?.userInfo
     val context = view.context
     val parentComment = adapter.getCommentById(comment.parentId)
 
@@ -64,7 +64,7 @@ fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAd
         }
 
         // Logged in user section
-        if (App.get().loggedInState.value is LoggedInState.LoggedIn) {
+        if (AppState.loggedInState.value is LoggedInState.LoggedIn) {
             section {
                 item {
                     labelRes = if (comment.isSaved) {

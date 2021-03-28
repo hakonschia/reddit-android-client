@@ -43,7 +43,7 @@ class ShowAwardBottomSheet : BottomSheetDialogFragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = BottomSheetShowAwardBinding.inflate(inflater)
+        _binding = BottomSheetShowAwardBinding.inflate(LayoutInflater.from(requireActivity()))
 
         val award = Gson().fromJson(requireArguments().getString(ARGS_AWARD), RedditAward::class.java)
 
