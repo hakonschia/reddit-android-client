@@ -5,6 +5,7 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -646,11 +647,25 @@ public class MarkdownInput extends FrameLayout {
          */
         private boolean textModified = false;
 
+        private boolean removeSyntax = false;
+
         /**
          * When this is true the next call to afterTextChanged inserts code block formatting
          * at the position specified by {@link MarkdownInsertTextWatcher#posToInsert}
          */
         private boolean insertCodeBlock = false;
+
+        /**
+         * When this is true the next call to afterTextChanged ordered line formatting
+         * at the position specified by {@link MarkdownInsertTextWatcher#posToInsert}
+         */
+        private boolean insertOrderedList = false;
+
+        /**
+         * When this is true the next call to afterTextChanged inserts unordered line formatting
+         * at the position specified by {@link MarkdownInsertTextWatcher#posToInsert}
+         */
+        private boolean insertUnorderedList = false;
 
         /**
          * The position in the editable text in afterTextChanged to insert formatting
@@ -663,15 +678,45 @@ public class MarkdownInput extends FrameLayout {
          */
         @Override
         public void afterTextChanged(Editable s) {
-            if (insertCodeBlock) {
-                // Set that the text has been modified, so the next call to onTextChanged is ignored
+            if (removeSyntax) {
                 textModified = true;
 
-                // Ensure this is reset
-                insertCodeBlock = false;
+                removeSyntax = false;
 
-                // The text has to be inserted as the last thing that happens, otherwise it will cause an infinite loop
-                s.insert(posToInsert, "    ");
+                // posToInsert - 1 will be a '\n', so start at - 2 to not count that position
+                int syntaxStart = s.toString().lastIndexOf('\n', posToInsert - 2);
+                // We can either use posToInsert - 1 and replace with an empty string, or posToInsert and
+                // replace with '\n'
+                s.replace(syntaxStart, posToInsert - 1, "");
+            } else {
+                if (insertCodeBlock) {
+                    // Set that the text has been modified, so the next call to onTextChanged is ignored
+                    textModified = true;
+
+                    // Ensure this is reset
+                    insertCodeBlock = false;
+
+                    // The text has to be inserted as the last thing that happens, otherwise it will cause an infinite loop
+                    s.insert(posToInsert, "    ");
+                } else if (insertOrderedList) {
+                    // Set that the text has been modified, so the next call to onTextChanged is ignored
+                    textModified = true;
+
+                    // Ensure this is reset
+                    insertOrderedList = false;
+
+                    // The text has to be inserted as the last thing that happens, otherwise it will cause an infinite loop
+                    s.insert(posToInsert, "1. ");
+                } else if (insertUnorderedList) {
+                    // Set that the text has been modified, so the next call to onTextChanged is ignored
+                    textModified = true;
+
+                    // Ensure this is reset
+                    insertUnorderedList = false;
+
+                    // The text has to be inserted as the last thing that happens, otherwise it will cause an infinite loop
+                    s.insert(posToInsert, "* ");
+                }
             }
         }
 
@@ -680,9 +725,6 @@ public class MarkdownInput extends FrameLayout {
          */
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // TODO If we're on a code block (4 spaces) and the new character is a newline, add 4 spaces automatically
-            //  if we're in a list (starts with * or 1. (or technically <any digit>. ) then continue the list
-
             // If the text has been modified in afterTextChanged don't do anything as it can cause
             // an infinite loop
             if (textModified) {
@@ -690,48 +732,56 @@ public class MarkdownInput extends FrameLayout {
                 return;
             }
 
-            String text = s.toString();
-            int length = text.length();
+            int subStringStart = start + before;
+            int subStringEnd = start + count;
 
-            // This seems to be correct?
-            // This seemingly gives the same value as "textView.getSelectionStart()"
-            int pos = start + count;
+            // We can safely create a substring, which means text was inserted. We should only
+            // insert something else if text was inserted
+            if (subStringEnd >= subStringStart) {
+                String textAdded = s.subSequence(subStringStart, subStringEnd).toString();
 
-            // So this doesn't really work as intended, since if we're removing a newline instead of adding it
-            // this will still trigger and can insert a code block/list at the start without being able to remove
-            // the newline
-            // TODO We really need to figure out how to check that the character inserted was a newline, not just
-            //  that the previous position is a newline
-            if (length > 0 && pos > 0 && text.charAt(pos - 1) == '\n') {
+                // Newline added, verify if the last line has syntax that should be continued
+                if (textAdded.equals("\n")) {
 
-                // Start at pos - 2 as we don't want to count the newly inserted newline
-                int lastNewline = text.lastIndexOf('\n', pos - 2);
-
-                // If we're at the first line, set to 0 to count the start of the line
-                if (lastNewline == -1) {
-                    lastNewline = 0;
-                } else {
-                    // If we're not on the first line, go one further as the newline is
-                    // actually on the end of the previous line
-                    lastNewline++;
-                }
-
-                // Find the next newline to find the entire line
-                int nextNewLine = text.indexOf('\n', pos);
-                if (nextNewLine == -1) {
-                    nextNewLine = text.length();
-                }
-
-                // substring(begin, end) is end exclusive, so the newline at the end isn't counted
-                String line = text.substring(lastNewline, nextNewLine);
-
-                // If the line starts with a code block, but isn't just the syntax (and a newline)
-                // This makes it so if the user presses enter and it inserts a new code block
-                // and press enter again it doesn't continue the code block, but continues as normal text
-                if (line.startsWith("    ") && !line.equals("    \n")) {
-                    // The pos is on the new line, so that's where the code block syntax should be inserted
+                    // This seems to be correct?
+                    // This seemingly gives the same value as "textView.getSelectionStart()"
+                    int pos = start + count;
                     posToInsert = pos;
-                    insertCodeBlock = true;
+
+                    String text = s.toString();
+
+                    // Start at pos - 2 as we don't want to count the newly inserted newline
+                    int lastNewline = text.lastIndexOf('\n', pos - 2);
+
+                    // If we're at the first line, set to 0 to count the start of the line
+                    if (lastNewline == -1) {
+                        lastNewline = 0;
+                    } else {
+                        // If we're not on the first line, go one further as the newline is
+                        // actually on the end of the previous line
+                        lastNewline++;
+                    }
+
+                    // Find the next newline to find the entire line
+                    int nextNewLine = text.indexOf('\n', pos);
+                    if (nextNewLine == -1) {
+                        nextNewLine = text.length();
+                    }
+
+                    // substring(begin, end) is end exclusive, so the newline at the end isn't counted
+                    String lastLine = text.substring(lastNewline, nextNewLine);
+
+                    // If the line starts with a code block, but isn't just the syntax (and a newline)
+                    // This makes it so if the user presses enter and it inserts a new code block
+                    // and press enter again it doesn't continue the code block, but continues as normal text
+                    if (lineHasNonEmptySyntax(lastLine, "    ")) {
+                        // The pos is on the new line, so that's where the code block syntax should be inserted
+                        insertCodeBlock = true;
+                    } else if (lineHasNonEmptySyntax(lastLine, "1. ")) {
+                        insertOrderedList = true;
+                    } else if (lineHasNonEmptySyntax(lastLine, "* ")) {
+                        insertUnorderedList = true;
+                    }
                 }
             }
         }
@@ -742,7 +792,25 @@ public class MarkdownInput extends FrameLayout {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             // Not implemented
-            // can probably find out here if a newline is added?
+        }
+
+
+        /**
+         * Checks if a line of text matches a given syntax. If the line matches the syntax and a newline after it
+         * {@link #removeSyntax} is set to true as the syntax is empty and should be removed.
+         *
+         * @param line The line to check. A line in this context means that the given string ends with a newline
+         * @param syntax The syntax to check
+         * @return True if the line has the syntax given, as well as not being compromised of only the
+         * syntax
+         */
+        private boolean lineHasNonEmptySyntax(String line, String syntax) {
+            if (line.equals(syntax + "\n")) {
+                removeSyntax = true;
+                return false;
+            }
+
+            return line.startsWith(syntax);
         }
     }
 }

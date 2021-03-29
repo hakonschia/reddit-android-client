@@ -19,6 +19,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+/**
+ * Tests for [MarkdownInput] that tests that the syntax buttons modify the text in the input
+ * field as expected
+ */
 @HiltAndroidTest
 class MarkdownInputTest {
     private lateinit var markdownInput: MarkdownInput
@@ -44,7 +48,7 @@ class MarkdownInputTest {
      * 6 times
      */
     @Test
-    fun syntaxButtonsHeader_addsSyntaxCorrectlyWhenLineIsEmpty() {
+    fun header_addsSyntaxCorrectlyWhenLineIsEmpty() {
         // Ensure the text is empty by default
         assertEquals("", markdownInput.inputText)
 
@@ -92,7 +96,7 @@ class MarkdownInputTest {
      * 6 times
      */
     @Test
-    fun syntaxButtonsHeader_addsSyntaxCorrectlyWhenLineIsNotEmpty() {
+    fun header_addsSyntaxCorrectlyWhenLineIsNotEmpty() {
         onView(withId(R.id.replyText))
                 .check(matches(isDisplayed()))
                 .perform(typeText("Hello"))
@@ -149,7 +153,7 @@ class MarkdownInputTest {
      * empty NOT empty, and a space is already at the start. This should only add "#", without adding a space
      */
     @Test
-    fun syntaxButtonsHeader_addsSyntaxCorrectlyWhenLineIsNotEmptyWithSpaceAlreadyAtStart() {
+    fun header_addsSyntaxCorrectlyWhenLineIsNotEmptyWithSpaceAlreadyAtStart() {
         onView(withId(R.id.replyText))
                 .check(matches(isDisplayed()))
                 .perform(typeText(" Hello"))
@@ -208,7 +212,7 @@ class MarkdownInputTest {
      * that the user can start typing in the bold section
      */
     @Test
-    fun syntaxButtonsBold_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
+    fun bold_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
         onView(withId(R.id.markdownBold))
                 .perform(click())
         onView(withId(R.id.replyText))
@@ -221,7 +225,7 @@ class MarkdownInputTest {
      * that the cursor goes to the middle of the syntax so that the user can start typing in the bold section
      */
     @Test
-    fun syntaxButtonsBold_noSelectionPutsCursorInTheMiddleWithCursorSet() {
+    fun bold_noSelectionPutsCursorInTheMiddleWithCursorSet() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 .perform(click())
@@ -242,7 +246,7 @@ class MarkdownInputTest {
      * can continue typing the other text
      */
     @Test
-    fun syntaxButtonsBold_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
+    fun bold_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 // Select "Hello there"
@@ -263,7 +267,7 @@ class MarkdownInputTest {
      * that the user can start typing in the italic section
      */
     @Test
-    fun syntaxButtonsItalic_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
+    fun italic_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
         onView(withId(R.id.markdownItalic))
                 .perform(click())
         onView(withId(R.id.replyText))
@@ -276,7 +280,7 @@ class MarkdownInputTest {
      * that the cursor goes to the middle of the syntax so that the user can start typing in the italic section
      */
     @Test
-    fun syntaxButtonsItalic_noSelectionPutsCursorInTheMiddleWithCursorSet() {
+    fun italic_noSelectionPutsCursorInTheMiddleWithCursorSet() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 .perform(click())
@@ -297,7 +301,7 @@ class MarkdownInputTest {
      * can continue typing the other text
      */
     @Test
-    fun syntaxButtonsItalic_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
+    fun italic_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 // Select "Hello there"
@@ -318,7 +322,7 @@ class MarkdownInputTest {
      * that the user can start typing in the strikethrough section
      */
     @Test
-    fun syntaxButtonsStrikethrough_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
+    fun strikethrough_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
         onView(withId(R.id.markdownStrikethrough))
                 .perform(click())
         onView(withId(R.id.replyText))
@@ -331,7 +335,7 @@ class MarkdownInputTest {
      * that the cursor goes to the middle of the syntax so that the user can start typing in the strikethrough section
      */
     @Test
-    fun syntaxButtonsStrikethrough_noSelectionPutsCursorInTheMiddleWithCursorSet() {
+    fun strikethrough_noSelectionPutsCursorInTheMiddleWithCursorSet() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 .perform(click())
@@ -352,7 +356,7 @@ class MarkdownInputTest {
      * can continue typing the other text
      */
     @Test
-    fun syntaxButtonsStrikethrough_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
+    fun strikethrough_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 // Select "Hello there"
@@ -371,7 +375,7 @@ class MarkdownInputTest {
      * Tests that a dialog is opened when the link button is pressed
      */
     @Test
-    fun syntaxButtonsLink_linkButtonOpensDialog() {
+    fun link_linkButtonOpensDialog() {
         onView(withId(R.id.markdownLink))
                 .perform(click())
         onView(withId(R.id.addLinkHeader))
@@ -382,7 +386,7 @@ class MarkdownInputTest {
      * Tests that a dialog is opened when the link button is pressed
      */
     @Test
-    fun syntaxButtonsLink_linkDialogCancelButtonClosesDialog() {
+    fun link_linkDialogCancelButtonClosesDialog() {
         onView(withId(R.id.markdownLink))
                 .perform(click())
         onView(withId(R.id.addLinkHeader))
@@ -398,7 +402,7 @@ class MarkdownInputTest {
      * added
      */
     @Test
-    fun syntaxButtonsLink_linkDialogAddButtonIsDisabledWithoutFields() {
+    fun link_linkDialogAddButtonIsDisabledWithoutFields() {
         onView(withId(R.id.markdownLink))
                 .perform(click())
         onView(withId(R.id.addLinkHeader))
@@ -412,7 +416,7 @@ class MarkdownInputTest {
      * Tests that the add link button in the link dialog is disabled when only the text input has text
      */
     @Test
-    fun syntaxButtonsLink_linkDialogAddButtonIsDisabledWithOnlyTextFieldSet() {
+    fun link_linkDialogAddButtonIsDisabledWithOnlyTextFieldSet() {
         onView(withId(R.id.markdownLink))
                 .perform(click())
         onView(withId(R.id.addLinkHeader))
@@ -428,7 +432,7 @@ class MarkdownInputTest {
      * Tests that the add link button in the link dialog is enabled when both input fields have text
      */
     @Test
-    fun syntaxButtonsLink_linkDialogAddButtonIsEnabledWithBothFieldsSet() {
+    fun link_linkDialogAddButtonIsEnabledWithBothFieldsSet() {
         onView(withId(R.id.markdownLink))
                 .perform(click())
         onView(withId(R.id.addLinkHeader))
@@ -446,7 +450,7 @@ class MarkdownInputTest {
      * Tests that adding a link from the link dialog correctly adds the link to the markdown input
      */
     @Test
-    fun syntaxButtonsLink_linkDialogAddsMarkdownCorrectly() {
+    fun link_linkDialogAddsMarkdownCorrectly() {
         onView(withId(R.id.markdownLink))
                 .perform(click())
         onView(withId(R.id.addLinkHeader))
@@ -470,7 +474,7 @@ class MarkdownInputTest {
      * is in the input field
      */
     @Test
-    fun syntaxButtonsQuote_quoteSyntaxIsAddedToTheStartOfTheLineWhenNoText() {
+    fun quote_quoteSyntaxIsAddedToTheStartOfTheLineWhenNoText() {
         onView(withId(R.id.markdownQuote))
                 .perform(click())
 
@@ -483,7 +487,7 @@ class MarkdownInputTest {
      * is in the input field and that the cursor is at the same spot
      */
     @Test
-    fun syntaxButtonsQuote_quoteSyntaxIsAddedToTheStartOfTheLineWithText() {
+    fun quote_quoteSyntaxIsAddedToTheStartOfTheLineWithText() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there"))
                 .check(matches(cursorPosition(11)))
@@ -501,7 +505,7 @@ class MarkdownInputTest {
      * field has multiple lines
      */
     @Test
-    fun syntaxButtonsQuote_quoteSyntaxIsAddedToTheStartOfTheCorrectLineInMultiline() {
+    fun quote_quoteSyntaxIsAddedToTheStartOfTheCorrectLineInMultiline() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there"))
                 .check(matches(cursorPosition(11)))
@@ -522,7 +526,7 @@ class MarkdownInputTest {
      * field has multiple lines and the input has multiple quotes on the different lines
      */
     @Test
-    fun syntaxButtonsQuote_quoteSyntaxIsAddedToTheStartOfTheCorrectLineInMultilineWithMultipleQoutes() {
+    fun quote_quoteSyntaxIsAddedToTheStartOfTheCorrectLineInMultilineWithMultipleQoutes() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there"))
                 .check(matches(cursorPosition(11)))
@@ -553,7 +557,7 @@ class MarkdownInputTest {
      * when later pressed again
      */
     @Test
-    fun syntaxButtonsQuote_quoteSyntaxIsRemovedWhenPressedTwice() {
+    fun quote_quoteSyntaxIsRemovedWhenPressedTwice() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there"))
                 .check(matches(cursorPosition(11)))
@@ -581,7 +585,7 @@ class MarkdownInputTest {
      * when later pressed again
      */
     @Test
-    fun syntaxButtonsQuote_quoteSyntaxIsRemovedWhenPressedTwiceWithMultipleLines() {
+    fun quote_quoteSyntaxIsRemovedWhenPressedTwiceWithMultipleLines() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there\nGeneral Kenobi"))
                 .check(matches(cursorPosition(26)))
@@ -609,7 +613,7 @@ class MarkdownInputTest {
      * that the user can start typing in the spoiler section
      */
     @Test
-    fun syntaxButtonsSpoiler_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
+    fun spoiler_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
         onView(withId(R.id.markdownSpoiler))
                 .perform(scrollTo())
                 .perform(click())
@@ -623,7 +627,7 @@ class MarkdownInputTest {
      * that the cursor goes to the middle of the syntax so that the user can start typing in the spoiler section
      */
     @Test
-    fun syntaxButtonsSpoiler_noSelectionPutsCursorInTheMiddleWithCursorSet() {
+    fun spoiler_noSelectionPutsCursorInTheMiddleWithCursorSet() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 .perform(click())
@@ -645,7 +649,7 @@ class MarkdownInputTest {
      * can continue typing the other text
      */
     @Test
-    fun syntaxButtonsSpoiler_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
+    fun spoiler_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 // Select "Hello there"
@@ -667,7 +671,7 @@ class MarkdownInputTest {
      * that the user can start typing in the superscript section
      */
     @Test
-    fun syntaxButtonsSuperscript_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
+    fun superscript_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
         onView(withId(R.id.markdownSuperscript))
                 .perform(scrollTo())
                 .perform(click())
@@ -681,7 +685,7 @@ class MarkdownInputTest {
      * that the cursor goes to the middle of the syntax so that the user can start typing in the superscript section
      */
     @Test
-    fun syntaxButtonsSuperscript_noSelectionPutsCursorInTheMiddleWithCursorSet() {
+    fun superscript_noSelectionPutsCursorInTheMiddleWithCursorSet() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 .perform(click())
@@ -703,7 +707,7 @@ class MarkdownInputTest {
      * can continue typing the other text
      */
     @Test
-    fun syntaxButtonsSuperscript_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
+    fun superscript_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there general Kenobi"), setCursorPosition(start = 0, end = 11))
 
@@ -722,7 +726,7 @@ class MarkdownInputTest {
      * can continue typing the other text
      */
     @Test
-    fun syntaxButtonsSuperscript_nestedSuperscriptWithSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
+    fun superscript_nestedSuperscriptWithSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there general Kenobi"), setCursorPosition(start = 0, end = 11))
 
@@ -766,24 +770,17 @@ class MarkdownInputTest {
      * Simple test to ensure the unordered list adds the syntax correctly
      */
     @Test
-    fun syntaxButtonsUnorderedList_addsSyntaxCorrectly() {
+    fun unorderedList_addsSyntaxCorrectly() {
         onView(withId(R.id.markdownBulletList))
                 .perform(scrollTo())
                 .perform(click())
 
         onView(withId(R.id.replyText))
                 .check(matches(editTextEqualTo("* ")))
-                .perform(typeTextIntoFocusedView("Hello there\nGeneral\n"))
-
-        onView(withId(R.id.markdownBulletList))
-                .perform(click())
+                .perform(typeTextIntoFocusedView("Hello there General"))
 
         onView(withId(R.id.replyText))
-                .check(matches(editTextEqualTo(textToCheck =
-                "* Hello there\n" +
-                        "General\n" +
-                        "* "
-                )))
+                .check(matches(editTextEqualTo(textToCheck = "* Hello there General")))
     }
 
     /**
@@ -791,17 +788,16 @@ class MarkdownInputTest {
      * list syntax
      */
     @Test
-    fun syntaxButtonsUnorderedList_listContinuesWhenEnterIsPressed() {
+    fun unorderedList_listContinuesWhenEnterIsPressed() {
         onView(withId(R.id.markdownBulletList))
                 .perform(scrollTo())
                 .perform(click())
 
         onView(withId(R.id.replyText))
                 .check(matches(editTextEqualTo("* ")))
-                .perform(typeTextIntoFocusedView("Hello there"))
-                .perform(typeTextIntoFocusedView("\n"))
+                .perform(typeTextIntoFocusedView("Hello there\n"))
                 .check(matches(editTextEqualTo(textToCheck =
-                "* Hello there" +
+                "* Hello there\n" +
                         // Should automatically continue the list
                         "* "
                 )))
@@ -812,7 +808,7 @@ class MarkdownInputTest {
      * list syntax, and then removed if enter is pressed again
      */
     @Test
-    fun syntaxButtonsUnorderedList_listContinuationEndsWhenEnterIsPressedTwice() {
+    fun unorderedList_listContinuationEndsWhenEnterIsPressedTwice() {
         onView(withId(R.id.markdownBulletList))
                 .perform(scrollTo())
                 .perform(click())
@@ -823,7 +819,7 @@ class MarkdownInputTest {
                 // Once should continue
                 .perform(typeTextIntoFocusedView("\n"))
                 .check(matches(editTextEqualTo(textToCheck =
-                "* Hello there" +
+                "* Hello there\n" +
                         // Should automatically continue the list
                         "* "
                 )))
@@ -837,7 +833,7 @@ class MarkdownInputTest {
      * list syntax, and if the syntax is manually removed it does nothing (it does not add the syntax back)
      */
     @Test
-    fun syntaxButtonsUnorderedList_listContinuationWhenBackIsPressedWorks() {
+    fun unorderedList_listContinuationWhenBackIsPressedWorks() {
         onView(withId(R.id.markdownBulletList))
                 .perform(scrollTo())
                 .perform(click())
@@ -848,7 +844,7 @@ class MarkdownInputTest {
                 // Once should continue
                 .perform(typeTextIntoFocusedView("\n"))
                 .check(matches(editTextEqualTo(textToCheck =
-                "* Hello there" +
+                "* Hello there\n" +
                         // Should automatically continue the list
                         "* "
                 )))
@@ -864,7 +860,7 @@ class MarkdownInputTest {
      * Simple test to ensure the unordered list adds the syntax correctly
      */
     @Test
-    fun syntaxButtonsOrderedList_addsSyntaxCorrectly() {
+    fun orderedList_addsSyntaxCorrectly() {
         // Click the input field it to give focus
         onView(withId(R.id.markdownNumberedList))
                 .perform(scrollTo())
@@ -872,18 +868,14 @@ class MarkdownInputTest {
 
         onView(withId(R.id.replyText))
                 .check(matches(editTextEqualTo("1. ")))
-                .perform(typeTextIntoFocusedView("Hello there\nGeneral\n"))
-
-        onView(withId(R.id.markdownNumberedList))
-                .perform(click())
+                .perform(typeTextIntoFocusedView("Hello there\nGeneral"))
 
         onView(withId(R.id.replyText))
                 .check(matches(editTextEqualTo(textToCheck =
                 "1. Hello there\n" +
-                        "General\n" +
                         // Might look weird but which number it is in the raw markdown doesn't matter
                         // and is always "1." for simplicities sake
-                        "1. "
+                        "1. General"
                 )))
     }
 
@@ -892,17 +884,17 @@ class MarkdownInputTest {
      * list syntax
      */
     @Test
-    fun syntaxButtonsOrderedList_listContinuesWhenEnterIsPressed() {
+    fun orderedList_listContinuesWhenEnterIsPressed() {
         onView(withId(R.id.markdownNumberedList))
                 .perform(scrollTo())
                 .perform(click())
 
         onView(withId(R.id.replyText))
-                .check(matches(editTextEqualTo("* ")))
+                .check(matches(editTextEqualTo("1. ")))
                 .perform(typeTextIntoFocusedView("Hello there"))
                 .perform(typeTextIntoFocusedView("\n"))
                 .check(matches(editTextEqualTo(textToCheck =
-                "1. Hello there" +
+                "1. Hello there\n" +
                         // Should automatically continue the list
                         "1. "
                 )))
@@ -913,7 +905,7 @@ class MarkdownInputTest {
      * list syntax
      */
     @Test
-    fun syntaxButtonsOrderedList_listContinuationEndsWhenEnterIsPressedTwice() {
+    fun orderedList_listContinuationEndsWhenEnterIsPressedTwice() {
         onView(withId(R.id.markdownNumberedList))
                 .perform(scrollTo())
                 .perform(click())
@@ -924,13 +916,13 @@ class MarkdownInputTest {
                 // Once should continue
                 .perform(typeTextIntoFocusedView("\n"))
                 .check(matches(editTextEqualTo(textToCheck =
-                "1. Hello there" +
+                "1. Hello there\n" +
                         // Should automatically continue the list
                         "1. "
                 )))
                 // And when enter is pressed again it should now remove the syntax again
                 .perform(typeTextIntoFocusedView("\n"))
-                .check(matches(editTextEqualTo("* Hello there\n")))
+                .check(matches(editTextEqualTo("1. Hello there\n")))
     }
 
     /**
@@ -938,7 +930,7 @@ class MarkdownInputTest {
      * list syntax, and if the syntax is manually removed it does nothing (it does not add the syntax back)
      */
     @Test
-    fun syntaxButtonsOrderedList_listContinuationWhenBackIsPressedWorks() {
+    fun orderedList_listContinuationWhenBackIsPressedWorks() {
         onView(withId(R.id.markdownNumberedList))
                 .perform(scrollTo())
                 .perform(click())
@@ -949,7 +941,7 @@ class MarkdownInputTest {
                 // Once should continue
                 .perform(typeTextIntoFocusedView("\n"))
                 .check(matches(editTextEqualTo(textToCheck =
-                "1. Hello there" +
+                "1. Hello there\n" +
                         // Should automatically continue the list
                         "1. "
                 )))
@@ -959,7 +951,7 @@ class MarkdownInputTest {
                 .perform(pressKey(KeyEvent.KEYCODE_DEL))
                 // Removes the "1"
                 .perform(pressKey(KeyEvent.KEYCODE_DEL))
-                .check(matches(editTextEqualTo("* Hello there\n")))
+                .check(matches(editTextEqualTo("1. Hello there\n")))
     }
 
 
@@ -969,7 +961,7 @@ class MarkdownInputTest {
      * that the user can start typing in the italic section
      */
     @Test
-    fun syntaxButtonsInlineCode_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
+    fun inlineCode_noSelectionAndNoFocusPutsCursorInTheMiddleWithCursorSet() {
         onView(withId(R.id.markdownInlineCode))
                 .perform(scrollTo())
                 .perform(click())
@@ -983,7 +975,7 @@ class MarkdownInputTest {
      * that the cursor goes to the middle of the syntax so that the user can start typing in the inline code section
      */
     @Test
-    fun syntaxButtonsInlineCode_noSelectionPutsCursorInTheMiddleWithCursorSet() {
+    fun inlineCode_noSelectionPutsCursorInTheMiddleWithCursorSet() {
         // Click the input field it to give focus
         onView(withId(R.id.replyText))
                 .perform(click())
@@ -1005,7 +997,7 @@ class MarkdownInputTest {
      * can continue typing the other text
      */
     @Test
-    fun syntaxButtonsInlineCode_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
+    fun inlineCode_withSelectionPutsSyntaxAroundSelectionAndMovesCursorToEnd() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there general Kenobi"), setCursorPosition(start = 0, end = 11))
 
@@ -1023,7 +1015,7 @@ class MarkdownInputTest {
      * Basic test for the code block button to ensure that the syntax is added correctly to an empty input field
      */
     @Test
-    fun syntaxButtonsCodeBlock_addsSyntaxCorrectlyIntoEmptyInputField() {
+    fun codeBlock_addsSyntaxCorrectlyIntoEmptyInputField() {
         onView(withId(R.id.markdownCodeBlock))
                 .perform(scrollTo())
                 .perform(click())
@@ -1038,7 +1030,7 @@ class MarkdownInputTest {
      * field with some text previously typed
      */
     @Test
-    fun syntaxButtonsCodeBlock_addsSyntaxCorrectlyToInputFieldWithText() {
+    fun codeBlock_addsSyntaxCorrectlyToInputFieldWithText() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there"))
 
@@ -1056,7 +1048,7 @@ class MarkdownInputTest {
      * Tests that the code block continues when enter is pressed on inside a code block
      */
     @Test
-    fun syntaxButtonsCodeBlock_continuesSyntaxWhenEnterIsPressed() {
+    fun codeBlock_continuesSyntaxWhenEnterIsPressed() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there"))
 
@@ -1077,7 +1069,7 @@ class MarkdownInputTest {
      * Tests that the code block syntax does not continue when enter is pressed twice
      */
     @Test
-    fun syntaxButtonsCodeBlock_doesNotContinuesSyntaxWhenEnterIsPressedTwice() {
+    fun codeBlock_doesNotContinuesSyntaxWhenEnterIsPressedTwice() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there"))
 
@@ -1094,17 +1086,15 @@ class MarkdownInputTest {
                 .check(matches(editTextEqualTo("Hello there\n\n    if(true)\n    ")))
                 // Type enter again
                 .perform(typeTextIntoFocusedView("\n"))
-                // Should now go to a new line without syntax
-                // This should maybe remove the syntax as well, but it doesn't matter if the spaces are there
-                // as it is rendered the same no mater what
-                .check(matches(editTextEqualTo("Hello there\n\n    if(true)\n    \n")))
+                // Should now remove the syntax, but not the newline
+                .check(matches(editTextEqualTo("Hello there\n\n    if(true)\n")))
     }
 
     /**
      * Tests that the code block syntax does not continue when enter is pressed twice
      */
     @Test
-    fun syntaxButtonsCodeBlock_doesNotAddSyntaxWhenManuallyRemoved() {
+    fun codeBlock_doesNotAddSyntaxWhenManuallyRemoved() {
         onView(withId(R.id.replyText))
                 .perform(typeText("Hello there"))
 
@@ -1120,7 +1110,6 @@ class MarkdownInputTest {
                 .perform(typeTextIntoFocusedView("if(true)\n"))
                 .check(matches(editTextEqualTo("Hello there\n\n    if(true)\n    ")))
                 // Remove the spaces manually, this should not add the syntax back
-                // (which it currently does, or if I've fixed this and not removed the comment, it used to do)
                 .perform(pressKey(KeyEvent.KEYCODE_DEL))
                 .perform(pressKey(KeyEvent.KEYCODE_DEL))
                 .perform(pressKey(KeyEvent.KEYCODE_DEL))
