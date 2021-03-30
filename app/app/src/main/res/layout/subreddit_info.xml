@@ -8,6 +8,10 @@
         <variable
             name="subreddit"
             type="com.example.hakonsreader.api.model.Subreddit" />
+
+        <variable
+            name="userHasSpecialAssignedFlair"
+            type="boolean" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -165,45 +169,49 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider" />
 
+            <!-- This flair is to showcase a users flair that has been assigned by the subreddit
+             moderators, which will be shown when users cannot assign flairs themselves -->
             <com.example.hakonsreader.views.Tag
-                android:id="@+id/userFlair"
+                android:id="@+id/userFlairAssignedByModerator"
                 subredditUserFlair="@{subreddit}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:visibility="@{!subreddit.canAssignUserFlair || userHasSpecialAssignedFlair ? View.VISIBLE : View.GONE}"
                 app:layout_constrainedWidth="true"
-
                 app:layout_constraintBottom_toBottomOf="@+id/flairHeader"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/flairHeader"
                 app:layout_constraintTop_toTopOf="@+id/flairHeader" />
 
+            <Spinner
+                android:id="@+id/selectFlairSpinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:prompt="@string/submitFlairSpinner"
+                android:visibility="@{subreddit.canAssignUserFlair || subreddit.moderator ? View.VISIBLE : View.GONE}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/flairHeader"
+                app:layout_constraintTop_toBottomOf="@id/flairHeader" />
+
             <TextView
-                android:id="@+id/selectFlairHeader"
+                android:id="@+id/flairsNotAllowed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
                 android:layout_marginStart="16dp"
-
                 android:layout_marginTop="4dp"
-                android:text="@{subreddit.canAssignUserFlair || subreddit.moderator ? @string/updateFlair : @string/flairsNotAllowedOnSubreddit}"
 
+                android:text="@string/flairsNotAllowedOnSubreddit"
                 android:textColor="@color/text_color"
                 android:textSize="15sp"
+                android:visibility="@{subreddit.canAssignUserFlair || subreddit.moderator ? View.GONE : View.VISIBLE}"
+
                 app:layout_constraintStart_toStartOf="parent"
-
-                app:layout_constraintTop_toBottomOf="@+id/flairHeader"
-                tools:text="@string/updateFlair" />
-
-            <Spinner
-                android:id="@+id/selectFlairSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:prompt="@string/submitFlairSpinner"
-                android:visibility="@{subreddit.canAssignUserFlair || subreddit.moderator ? View.VISIBLE : View.GONE}"
-                app:layout_constraintStart_toStartOf="@+id/selectFlairHeader"
-                app:layout_constraintTop_toBottomOf="@+id/selectFlairHeader" />
+                app:layout_constraintTop_toBottomOf="@+id/flairHeader" />
 
             <FrameLayout
                 android:id="@+id/selectFlairLoadingIconLayout"
@@ -213,7 +221,7 @@
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@+id/selectFlairSpinner"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/selectFlairSpinner"
+                app:layout_constraintStart_toStartOf="@+id/flairHeader"
                 app:layout_constraintTop_toBottomOf="@+id/selectFlairSpinner"
                 tools:visibility="visible">
 
@@ -231,6 +239,13 @@
                     android:indeterminateOnly="true" />
             </FrameLayout>
 
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/flairBarrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="flairsNotAllowed, selectFlairSpinner"
+                app:barrierDirection="bottom" />
+
             <View
                 android:id="@+id/divider2"
                 android:layout_width="0dp"
@@ -241,7 +256,7 @@
                 android:background="@color/awardsBottomSheetDivider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/selectFlairLoadingIconLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/flairBarrier" />
 
             <TextView
                 android:id="@+id/rulesHeader"

@@ -53,6 +53,8 @@ class SubredditFlairsRepository(
                 is ApiResponse.Success -> {
                     flairsLoaded = true
                     withContext(IO) {
+                        // Remove all previous as a flair might have been removed, and should not be shown
+                        dao.deleteAllFromSubreddit(subredditName)
                         dao.insert(response.value)
                     }
                 }

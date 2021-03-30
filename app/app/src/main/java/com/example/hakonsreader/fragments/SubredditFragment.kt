@@ -520,8 +520,19 @@ class SubredditFragment : Fragment() {
 
                         val flairId = subreddit?.userFlairTemplateId
                         val userFlairPosition = if (flairId != null) {
-                            // The spinner includes one more actual item, so offset by 1
-                            flairs.indexOfFirst { it.id == flairId } + 1
+                            val index = flairs.indexOfFirst { it.id == flairId }
+                            if (index != -1) {
+                                binding.subredditInfo.userHasSpecialAssignedFlair = false
+                                // The spinner includes one more actual item, so offset by 1
+                                index + 1
+                            } else {
+                                // User has a flair, but not in the list of flairs, which means
+                                // the user has a special flair that isn't assignable. Either it was assigned by
+                                // a mod, or the flair is no longer selectable. Show it in the same way that
+                                // the user flair is shown when flairs aren't assignable
+                                binding.subredditInfo.userHasSpecialAssignedFlair = true
+                                0
+                            }
                         } else {
                             0
                         }
