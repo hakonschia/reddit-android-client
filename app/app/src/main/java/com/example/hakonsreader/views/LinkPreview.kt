@@ -14,6 +14,7 @@ import com.example.hakonsreader.databinding.LinkPreviewBinding
 import com.example.hakonsreader.misc.CreateIntentOptions
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createIntent
+import com.example.hakonsreader.misc.getAppIconFromUrl
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
@@ -73,27 +74,8 @@ class LinkPreview : FrameLayout {
      * Sets the link icon to the icon for the installed application the link resolves to
      */
     private fun setIcon(link: String) {
-        // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
-        // and add the full url so that links that our app resolves will be shown correctly
-        val url = if (!link.matches("^http(s)?.*".toRegex())) {
-            "https://reddit.com" + (if (link[0] == '/') "" else "/") + link
-        } else link
-
-        // Create the intent with internal links as false, otherwise any link would show our app
-        // icon as it would resolve to WebViewActivity/VideoYoutubeActivity (if the user had that option enabled)
-        val intent = createIntent(url, CreateIntentOptions(openLinksInternally = false, openYoutubeVideosInternally = false), context)
-
-        // Find all activities this intent would resolve to
-        val intentActivities = context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-
-        // Could potentially check if this matches the default browser and not show icon for that, as
-        // it will always show something in that case
-        if (intentActivities.isNotEmpty()) {
-            val packageName = intentActivities[0].activityInfo.packageName
-            val icon = context.packageManager.getApplicationIcon(packageName)
-
-            // Kind of want this to be set to icon_color/gray, but setting the tint/colorFilter makes the entire
-            // drawable that color
+        val icon = getAppIconFromUrl(context, link)
+        if (icon != null) {
             binding.linkSymbol.setImageDrawable(icon)
         }
     }

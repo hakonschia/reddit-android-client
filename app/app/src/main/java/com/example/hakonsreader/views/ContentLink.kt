@@ -2,6 +2,7 @@ package com.example.hakonsreader.views
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
 import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.misc.getAppIconFromUrl
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import com.example.hakonsreader.views.util.cache
 import com.squareup.picasso.Picasso
@@ -46,10 +48,12 @@ class ContentLink @JvmOverloads constructor(
 
 
     override fun updateView() {
+        val icon = getAppIconFromUrl(context, redditPost.url)
+
         if (binding is ContentLinkBinding) {
-            this.updateViewNormal()
+            this.updateViewNormal(icon)
         } else {
-            this.updateViewSimple()
+            this.updateViewSimple(icon)
         }
 
         setOnClickListener { openLink() }
@@ -64,7 +68,7 @@ class ContentLink @JvmOverloads constructor(
     /**
      * Updates the view for the normal
      */
-    private fun updateViewNormal() {
+    private fun updateViewNormal(icon: Drawable?) {
         binding as ContentLinkBinding
 
         val variants = getImageVariantsForRedditPost(redditPost)
@@ -86,6 +90,12 @@ class ContentLink @JvmOverloads constructor(
             binding.thumbnail.layoutParams = params
         }
 
+        if (icon != null) {
+            binding.linkImage.setImageDrawable(icon)
+        } else {
+            binding.linkImage.setImageResource(R.drawable.ic_baseline_link_24)
+        }
+
         binding.link.text = redditPost.url
     }
 
@@ -93,7 +103,7 @@ class ContentLink @JvmOverloads constructor(
      * Updates the view for a simple view. This view uses only the thumbnail for the post, which
      * will be a smaller image and use less data
      */
-    private fun updateViewSimple() {
+    private fun updateViewSimple(icon: Drawable?) {
         binding as ContentLinkSimpleBinding
 
         val thumbnail = redditPost.thumbnail
@@ -108,6 +118,12 @@ class ContentLink @JvmOverloads constructor(
             // This should only be centered, not cropped to fit (as this would stretch the icon)
             binding.thumbnail.scaleType = ImageView.ScaleType.CENTER
             binding.thumbnail.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_link_24))
+        }
+
+        if (icon != null) {
+            binding.linkImage.setImageDrawable(icon)
+        } else {
+            binding.linkImage.setImageResource(R.drawable.ic_baseline_link_24)
         }
 
         binding.link.text = redditPost.url

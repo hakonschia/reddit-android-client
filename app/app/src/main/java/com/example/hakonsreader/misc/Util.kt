@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.TypedValue
 import android.view.View
@@ -135,6 +136,35 @@ private val IMAGE_FORMATS = Collections.unmodifiableList(listOf("png", "jpg", "j
  * Options class used for [createIntent]. All values for this class has a default of `true`
  */
 class CreateIntentOptions(val openLinksInternally: Boolean = true, val openYoutubeVideosInternally: Boolean = true)
+
+
+/**
+ * Gets an apps icon based on what a URL resolves to
+ *
+ * @param context The context to retrieve application info from
+ * @param url The URL to resolve. If this does not match http/https then "https://reddit.com" is assumed
+ */
+fun getAppIconFromUrl(context: Context, url: String) : Drawable? {
+    // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
+    // and add the full url so that links that our app resolves will be shown correctly
+    val link = if (!url.matches("^http(s)?.*".toRegex())) {
+        "https://reddit.com" + (if (url[0] == '/') "" else "/") + url
+    } else url
+
+    // Create the intent with internal links as false, otherwise any link would show our app
+    // icon as it would resolve to WebViewActivity/VideoYoutubeActivity (if the user had that option enabled)
+    val intent = createIntent(link, CreateIntentOptions(openLinksInternally = false, openYoutubeVideosInternally = false), context)
+
+    // Find all activities this intent would resolve to
+    val intentActivities = context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+
+    // Could potentially check if this matches the default browser and not show icon for that, as
+    // it will always show something in that case
+    return if (intentActivities.isNotEmpty()) {
+        val packageName = intentActivities[0].activityInfo.packageName
+        context.packageManager.getApplicationIcon(packageName)
+    } else null
+}
 
 /**
  * Creates an intent based on the passed URL

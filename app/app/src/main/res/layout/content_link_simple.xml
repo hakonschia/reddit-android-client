@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:transitionName="content_link_root_view">
 
+
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView2"
         android:layout_width="@dimen/contentLinkSimpleThumbnailWidth"
         android:layout_height="@dimen/contentLinkSimpleThumbnailHeight"
         app:cardBackgroundColor="@color/secondary_background"
-        app:cardCornerRadius="8dp" >
+        app:cardCornerRadius="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/thumbnail"
@@ -25,19 +28,32 @@
             tools:src="@tools:sample/avatars" />
     </androidx.cardview.widget.CardView>
 
+    <ImageView
+        android:id="@+id/linkImage"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:elevation="2dp"
+        android:src="@drawable/ic_baseline_link_24"
+        android:contentDescription="@string/content_description_link_image"
+        app:layout_constraintBottom_toBottomOf="@+id/cardView2"
+        app:layout_constraintEnd_toEndOf="@+id/cardView2" />
+
     <TextView
         android:id="@+id/link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/defaultIndent"
-
-        android:layout_gravity="center"
         android:layout_marginEnd="8dp"
+        android:layout_gravity="center"
         android:ellipsize="end"
         android:maxLines="3"
 
         android:textColor="@color/link_color"
+        app:layout_constrainedWidth="true"
 
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/cardView2"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="https://www.reddit.com/r/GlobalOffensive/comments/jvb73a/just_finished_the_usps_hush_and_glock18/gcim3kr?utm_source=shareutm_medium=web2xcontext=3" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

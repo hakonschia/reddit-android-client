@@ -371,11 +371,6 @@ class Post : Content {
                         this@Post.onVideoManuallyPaused?.let { setOnVideoManuallyPaused(it) }
                         this@Post.onVideoFullscreenListener?.let { setOnVideoFullscreenListener(it) }
                     }
-                } else if (Settings.openYouTubeVideosInApp()
-                        && (redditPost.domain == "youtu.be" || redditPost.domain == "youtube.com")) {
-                    ContentYoutubeVideo(context).apply {
-                        layoutParams = marginParams
-                    }
                 } else {
                     ContentLink(context).apply {
                         layoutParams = marginParams
