@@ -30,6 +30,7 @@ class RedditUserViewModel(
             private val isForLoggedInUser: Boolean,
             private val api: RedditApi,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return RedditUserViewModel(username, isForLoggedInUser, api) as T
         }

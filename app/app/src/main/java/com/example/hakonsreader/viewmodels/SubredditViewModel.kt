@@ -28,6 +28,7 @@ class SubredditViewModel(
             private val dao: RedditSubredditsDao,
             private val postsDao: RedditPostsDao
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return SubredditViewModel(subredditName, api, dao, postsDao) as T
         }

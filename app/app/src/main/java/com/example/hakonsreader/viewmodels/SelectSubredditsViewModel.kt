@@ -26,6 +26,7 @@ class SelectSubredditsViewModel constructor(
             private val subredditsDao: RedditSubredditsDao,
             private val isForLoggedInUser: Boolean
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return SelectSubredditsViewModel(api, subredditsDao, isForLoggedInUser) as T
         }

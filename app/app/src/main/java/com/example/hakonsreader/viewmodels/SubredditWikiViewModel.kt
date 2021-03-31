@@ -18,6 +18,7 @@ class SubredditWikiViewModel(
     class Factory(
             private val api: SubredditRequest
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return SubredditWikiViewModel(api) as T
         }

@@ -249,7 +249,14 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         outState.putBoolean(SAVED_RECREATED_AS_NEW_USER, recreateAsNewUser)
 
         settingsFragment?.let {
-            supportFragmentManager.putFragment(outState, SAVED_SETTINGS_FRAGMENT, it)
+            // The fragments will sometimes fail to save their state because they aren't added,
+            // but by using it.isAdded the state of a fragment will ONLY be saved in configuration changes
+            // if the fragment is the one on the screen (ie. only one fragment will ever save its state)
+            // These crashes only seem to occur when the app is in the background, but those crashes
+            // might cause the app to have to restart more often after being closed (but not killed)
+            try {
+                supportFragmentManager.putFragment(outState, SAVED_SETTINGS_FRAGMENT, it)
+            } catch (e: IllegalStateException) { }
         }
 
         if (recreateAsNewUser) {
@@ -258,22 +265,30 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
 
         standardSubFragment?.let {
-            supportFragmentManager.putFragment(outState, SAVED_STANDARD_SUB_CONTAINER_FRAGMENT, it)
+            try {
+                supportFragmentManager.putFragment(outState, SAVED_STANDARD_SUB_CONTAINER_FRAGMENT, it)
+            } catch (e: IllegalStateException) { }
         }
 
         activeSubreddit?.let {
             // If there is an active subreddit it won't be null, store the state of it even if it isn't
             // currently added (shown on screen)
             outState.putString(ACTIVE_SUBREDDIT_NAME, it.subredditName)
-            supportFragmentManager.putFragment(outState, SAVED_ACTIVE_SUBREDDIT_FRAGMENT, it)
+            try {
+                supportFragmentManager.putFragment(outState, SAVED_ACTIVE_SUBREDDIT_FRAGMENT, it)
+            } catch (e: IllegalStateException) { }
         }
 
         profileFragment?.let {
-            supportFragmentManager.putFragment(outState, SAVED_PROFILE_FRAGMENT, it)
+            try {
+                supportFragmentManager.putFragment(outState, SAVED_PROFILE_FRAGMENT, it)
+            } catch (e: IllegalStateException) { }
         }
 
         selectSubredditFragment?.let {
-            supportFragmentManager.putFragment(outState, SAVED_SELECT_SUBREDDIT_FRAGMENT, it)
+            try {
+                supportFragmentManager.putFragment(outState, SAVED_SELECT_SUBREDDIT_FRAGMENT, it)
+            } catch (e: IllegalStateException) { }
         }
     }
 
