@@ -1,7 +1,9 @@
 package com.example.hakonsreader.viewmodels
 
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.*
+import androidx.savedstate.SavedStateRegistryOwner
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -9,10 +11,16 @@ import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.api.utils.createFullName
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
@@ -23,36 +31,52 @@ import kotlin.collections.HashMap
  * it shouldn't go from a user to a subreddit)
  * @param isUser True if the ViewModel is loading posts for a user, false for a subreddit
  */
-class PostsViewModel(
-        private var userOrSubredditName: String,
-        private val isUser: Boolean,
+class PostsViewModel @AssistedInject constructor (
+        @Assisted private var userOrSubredditName: String,
+        @Assisted private val isUser: Boolean,
+        @Assisted private val savedStateHandle: SavedStateHandle,
         private val api: RedditApi,
         private val postsDao: RedditPostsDao,
 ) : ViewModel() {
 
-    /**
-     * Factory class for the ViewModel
-     *
-     * @param userOrSubredditName The name of the user or subreddit to load posts for
-     * @param isUser True if [userOrSubredditName] points to a username, false if for a subreddit
-     * @param api The API to use
-     * @param postsDao the DAO to use
-     */
-    class Factory(
-            private val userOrSubredditName: String,
-            private val isUser: Boolean,
-            private val api: RedditApi,
-            private val postsDao: RedditPostsDao,
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return PostsViewModel(userOrSubredditName, isUser, api, postsDao) as T
-        }
+    companion object {
+        private const val TAG = "PostsViewModel"
+
+        private const val SAVED_POST_IDS = "saved_postIds"
     }
 
+    @AssistedFactory
+    interface Factory {
+        /**
+         * Factory for the ViewModel
+         *
+         * @param userOrSubredditName The name of the user or subreddit to load posts for
+         * @param isUser True if [userOrSubredditName] points to a username, false if for a subreddit
+         */
+        fun create(
+                userOrSubredditName: String,
+                isUser: Boolean,
+                savedStateHandle: SavedStateHandle
+        ) : PostsViewModel
+    }
+
+    private var arePostsBeingRestored = false
 
     private val _posts = MutableLiveData<List<RedditPost>>()
     private val _loadingChange = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<ErrorWrapper>()
+
+    init {
+        val savedPostIds: ArrayList<String>? = savedStateHandle[SAVED_POST_IDS]
+        if (savedPostIds != null) {
+            Log.d(TAG, "name=$userOrSubredditName, postIds.size=${savedPostIds.size}")
+            restorePosts(savedPostIds)
+        }
+    }
+
+    val posts: LiveData<List<RedditPost>> = _posts
+    val onLoadingCountChange: LiveData<Boolean> = _loadingChange
+    val error: LiveData<ErrorWrapper> = _error
 
     /**
      * The saved states of the posts
@@ -69,9 +93,6 @@ class PostsViewModel(
      */
     var postIds = mutableListOf<String>()
 
-    val posts: LiveData<List<RedditPost>> = _posts
-    val onLoadingCountChange: LiveData<Boolean> = _loadingChange
-    val error: LiveData<ErrorWrapper> = _error
 
 
     /**
@@ -79,7 +100,7 @@ class PostsViewModel(
      */
     fun restart() {
         postIds.clear()
-        _posts.value = ArrayList<RedditPost>()
+        _posts.value = ArrayList()
         loadPosts(sort, timeSort)
     }
 
@@ -98,7 +119,9 @@ class PostsViewModel(
 
     /**
      * Loads posts continuing from the current posts, or starting from scratch if there are no
-     * posts loaded
+     * posts loaded.
+     *
+     * If posts are currently being restored from a [SavedStateHandle] then this will not call the API.
      *
      * @param sort How to sort the posts. To change the sort after the first load, use [restart]
      * @param timeSort How to sort the posts based on time. Only applicable for *top* and *controversial*.
@@ -110,7 +133,7 @@ class PostsViewModel(
         val count = postIds.size
 
         val after = if (count > 0) {
-            Thing.POST.value + "_" + postIds.last()
+            createFullName(Thing.POST, postIds.last())
         } else {
             ""
         }
@@ -125,6 +148,9 @@ class PostsViewModel(
      * @param count The amount of posts already seen
      */
     private fun load(after: String, count: Int) {
+        if (arePostsBeingRestored) {
+            return
+        }
         _loadingChange.value = true
 
         viewModelScope.launch {
@@ -155,6 +181,8 @@ class PostsViewModel(
                 false
             }
         }
+
+        savedStateHandle[SAVED_POST_IDS] = postIds
 
         val postsData: List<RedditPost> = if (posts.value != null) {
             val list = posts.value as MutableList
@@ -195,5 +223,32 @@ class PostsViewModel(
         // We use all the posts here as duplicates will just be updated, which is fine
         // This must be called after the crossposts are set or else the IDs wont be stored
         postsDao.insertAll(postsToInsertIntoDb)
+    }
+
+    /**
+     * Restores posts from the local database
+     *
+     * @param ids The IDs to restore
+     */
+    private fun restorePosts(ids: List<String>) {
+        // TODO this wont restore third party
+        arePostsBeingRestored = true
+        _loadingChange.value = true
+        // Posts are saved for 2 days, so if the user hasn't opened the app for a long time they might
+        // have been removed (not sure if SavedStateHandle saves for an infinite amount of time?)
+        CoroutineScope(IO).launch {
+            val posts = postsDao.getPostsById(ids)
+            posts.forEach {
+                if (!it.crosspostIds.isNullOrEmpty()) {
+                    it.crossposts = postsDao.getPostsById(it.crosspostIds!!)
+                }
+            }
+
+            withContext(Main) {
+                _posts.value = posts
+                _loadingChange.value = false
+            }
+            arePostsBeingRestored = false
+        }
     }
 }

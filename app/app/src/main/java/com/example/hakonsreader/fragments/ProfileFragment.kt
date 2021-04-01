@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.viewModels
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -26,6 +25,7 @@ import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.viewmodels.RedditUserViewModel
+import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.makeramen.roundedimageview.RoundedImageView
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
@@ -115,8 +115,11 @@ class ProfileFragment : Fragment() {
      */
     private val isLoggedInUser by lazy { arguments?.getBoolean(ARGS_IS_LOGGED_IN_USER) ?: false }
 
-    private val viewModel: RedditUserViewModel by viewModels {
-        RedditUserViewModel.Factory(username, isLoggedInUser, api)
+    @Inject
+    lateinit var userViewModelFactory: RedditUserViewModel.Factory
+
+    private val viewModel: RedditUserViewModel by assistedViewModel {
+        userViewModelFactory.create(username, isLoggedInUser, it)
     }
 
     var onInboxClicked: OnInboxClicked? = null

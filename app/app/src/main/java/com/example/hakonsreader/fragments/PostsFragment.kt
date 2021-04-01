@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.activities.VideoActivity
@@ -19,7 +19,6 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentPostsBinding
 import com.example.hakonsreader.interfaces.SortableWithTime
@@ -27,6 +26,7 @@ import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
+import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.ContentVideo
 import com.google.gson.Gson
@@ -111,12 +111,9 @@ class PostsFragment : Fragment(), SortableWithTime {
     private val binding get() = _binding!!
 
     @Inject
-    lateinit var api: RedditApi
+    lateinit var postsViewModelFactory: PostsViewModel.Factory
 
-    @Inject
-    lateinit var postsDao: RedditPostsDao
-
-    private val postsViewModel: PostsViewModel by viewModels { PostsViewModel.Factory(name, isForUser, api, postsDao) }
+    private val postsViewModel: PostsViewModel by assistedViewModel { postsViewModelFactory.create(name, isForUser, it) }
     private val postsScrollListener: PostScrollListener = PostScrollListener { postsViewModel.loadPosts() }
 
     /**

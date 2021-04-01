@@ -6,35 +6,42 @@ import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.states.LoggedInState
+import com.google.gson.Gson
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel for retrieving information about a Reddit user
  */
-class RedditUserViewModel(
-        private val username: String?,
-        private val isForLoggedInUser: Boolean,
+class RedditUserViewModel @AssistedInject constructor(
+        @Assisted private val username: String?,
+        @Assisted private val isForLoggedInUser: Boolean,
+        @Assisted private val savedStateHandle: SavedStateHandle,
         private val api: RedditApi,
 ) : ViewModel() {
 
-    /**
-     * Factory class for the ViewModel
-     *
-     * @param username The username of the user to load information for. This can be `null` if the
-     * ViewModel is for the logged in user
-     * @param isForLoggedInUser
-     * @param api The API to use
-     */
-    class Factory(
-            private val username: String?,
-            private val isForLoggedInUser: Boolean,
-            private val api: RedditApi,
-    ) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return RedditUserViewModel(username, isForLoggedInUser, api) as T
-        }
+    companion object {
+        private const val SAVED_USER_INFO = "saved_userInfo"
     }
+
+    @AssistedFactory
+    interface Factory {
+        /**
+         * Factory for the ViewModel
+         *
+         * @param username The username of the user to load information for. This can be `null` if the
+         * ViewModel is for the logged in user
+         * @param isForLoggedInUser Set to true if the ViewModel is for the logged in user
+         */
+        fun create(
+                username: String?,
+                isForLoggedInUser: Boolean,
+                savedStateHandle: SavedStateHandle
+        ): RedditUserViewModel
+    }
+
 
     private var infoLoaded = false
 
@@ -47,8 +54,11 @@ class RedditUserViewModel(
     val error: LiveData<ErrorWrapper> = _error
 
     init {
-        // This is probably a pretty bad way to get the current user info, but whatever
-        if (isForLoggedInUser) {
+        val userInfo: String? = savedStateHandle.get(SAVED_USER_INFO)
+        if (userInfo != null) {
+            val user = Gson().fromJson(userInfo, RedditUser::class.java)
+            _user.postValue(user)
+        } else if (isForLoggedInUser) {
             AppState.getUserInfo()?.userInfo?.let {
                 _user.postValue(it)
             }
@@ -78,6 +88,7 @@ class RedditUserViewModel(
                 is ApiResponse.Success -> {
                     infoLoaded = true
                     _user.postValue(response.value!!)
+                    savedStateHandle.set(SAVED_USER_INFO, Gson().toJson(response.value))
                 }
                 is ApiResponse.Error -> _error.postValue(ErrorWrapper(response.error, response.throwable))
             }

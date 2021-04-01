@@ -48,6 +48,7 @@ import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.states.OAuthState
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
+import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -164,9 +165,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     private var lastShownFragment: Fragment? = null
     private val navigationViewListener = BottomNavigationViewListener()
 
-    private val subredditsViewModel: SelectSubredditsViewModel by viewModels {
-        SelectSubredditsViewModel.Factory(api, subredditsDao, AppState.loggedInState.value is LoggedInState.LoggedIn)
+    @Inject
+    lateinit var selectSubredditsViewModelFactory: SelectSubredditsViewModel.Factory
+    private val subredditsViewModel: SelectSubredditsViewModel by assistedViewModel {
+        // Currently we don't care about the saved state handle here
+        selectSubredditsViewModelFactory.create(AppState.loggedInState.value is LoggedInState.LoggedIn)
     }
+
     private val trendingSubredditsViewModel: TrendingSubredditsViewModel by viewModels()
 
 

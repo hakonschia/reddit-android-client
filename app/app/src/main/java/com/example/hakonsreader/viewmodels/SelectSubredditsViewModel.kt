@@ -6,6 +6,9 @@ import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.states.AppState
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -15,21 +18,23 @@ import kotlinx.coroutines.withContext
  * ViewModel for retrieving subreddits. The subreddits retrieved are automatically chosen for
  * a logged in users subscribed subreddits, or for default subreddits for non-logged in users
  */
-class SelectSubredditsViewModel constructor(
+class SelectSubredditsViewModel @AssistedInject constructor(
         private val api: RedditApi,
         private val subredditsDao: RedditSubredditsDao,
-        var isForLoggedInUser: Boolean
+        @Assisted var isForLoggedInUser: Boolean
 ) : ViewModel() {
 
-    class Factory(
-            private val api: RedditApi,
-            private val subredditsDao: RedditSubredditsDao,
-            private val isForLoggedInUser: Boolean
-    ) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return SelectSubredditsViewModel(api, subredditsDao, isForLoggedInUser) as T
-        }
+    @AssistedFactory
+    interface Factory {
+        /**
+         * Factory for the ViewModel
+         *
+         * @param isForLoggedInUser Set to true if the ViewModel is for the logged in user. This will
+         * make the ViewModel load the users subscribed subreddits
+         */
+        fun create(
+                isForLoggedInUser: Boolean
+        ): SelectSubredditsViewModel
     }
 
     private var loadedFromApi = false
