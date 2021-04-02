@@ -1,9 +1,7 @@
 package com.example.hakonsreader.viewmodels
 
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.*
-import androidx.savedstate.SavedStateRegistryOwner
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -69,7 +67,6 @@ class PostsViewModel @AssistedInject constructor (
     init {
         val savedPostIds: ArrayList<String>? = savedStateHandle[SAVED_POST_IDS]
         if (savedPostIds != null) {
-            Log.d(TAG, "name=$userOrSubredditName, postIds.size=${savedPostIds.size}")
             restorePosts(savedPostIds)
         }
     }
@@ -244,8 +241,13 @@ class PostsViewModel @AssistedInject constructor (
                 }
             }
 
+            // Map the ID to its position
+            val order = ids.withIndex().associate { it.value to it.index }
+            // Sort based on the original ID order
+            val sortedPosts = posts.sortedBy { order[it.id] }
+
             withContext(Main) {
-                _posts.value = posts
+                _posts.value = sortedPosts
                 _loadingChange.value = false
             }
             arePostsBeingRestored = false

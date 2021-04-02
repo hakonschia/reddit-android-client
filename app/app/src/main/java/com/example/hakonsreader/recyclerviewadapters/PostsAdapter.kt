@@ -30,7 +30,7 @@ import java.time.Instant
  */
 class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     
-    private var posts = ArrayList<RedditPost>()
+    private var posts: List<RedditPost> = ArrayList()
 
     /**
      * A list of the view holders this adapter has
@@ -109,13 +109,9 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
                     true
             )
 
-            posts = list as ArrayList<RedditPost>
+            posts = list
             diffResults.dispatchUpdatesTo(this)
         }
-    }
-
-    fun getPosts() : List<RedditPost> {
-        return posts
     }
 
     /**
@@ -123,7 +119,7 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
      */
     fun clearPosts() {
         val size = posts.size
-        posts.clear()
+        posts = ArrayList()
         notifyItemRangeRemoved(0, size)
     }
 
