@@ -1,6 +1,8 @@
 package com.example.hakonsreader.viewmodels
 
 import android.os.Bundle
+import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -10,6 +12,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.utils.createFullName
+import com.example.hakonsreader.misc.Settings
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -40,7 +43,17 @@ class PostsViewModel @AssistedInject constructor (
     companion object {
         private const val TAG = "PostsViewModel"
 
+
+        /**
+         * The key used to store the IDs of the posts the ViewModel is holding
+         *
+         */
         private const val SAVED_POST_IDS = "saved_postIds"
+
+        /**
+         * The key used to store the layout state passed to [saveLayoutState]
+         */
+        private const val SAVED_LAYOUT_STATE = "saved_LayoutState"
     }
 
     @AssistedFactory
@@ -59,6 +72,7 @@ class PostsViewModel @AssistedInject constructor (
     }
 
     private var arePostsBeingRestored = false
+    private val isDefaultSubreddit = !isUser && RedditApi.STANDARD_SUBS.contains(userOrSubredditName.toLowerCase())
 
     private val _posts = MutableLiveData<List<RedditPost>>()
     private val _loadingChange = MutableLiveData<Boolean>()
@@ -166,31 +180,20 @@ class PostsViewModel @AssistedInject constructor (
     }
 
     private fun onPostsRetrieved(newPosts: List<RedditPost>) {
-        val filtered = newPosts.filter {
-            val id = it.id
-            // If the ID isn't in the list, add it and keep it in the filtered list
-            // TODO this has crashed from ArrayIndexOutOfBoundsException with length=19, index= 26
-            //  which makes no sense?
-            if (!postIds.contains(id)) {
-                postIds.add(id)
-                true
-            } else {
-                false
+        val filteredPosts = filterPosts(newPosts)
+
+        val postsData = if (posts.value != null) {
+            ArrayList<RedditPost>().apply {
+                addAll(posts.value!!)
+                addAll(filteredPosts)
             }
-        }
-
-        savedStateHandle[SAVED_POST_IDS] = postIds
-
-        val postsData: List<RedditPost> = if (posts.value != null) {
-            val list = posts.value as MutableList
-            list.addAll(filtered)
-            list
         } else {
-            // If there is no previous list then we can safely return all new posts
-            newPosts
+            filteredPosts
         }
 
         _posts.postValue(postsData)
+
+        savedStateHandle[SAVED_POST_IDS] = postIds
 
         // Inserting posts sometimes causes ConcurrentModificationException, so only insert posts
         // at the end instead of in the loop and at the end to try and fix it
@@ -223,6 +226,40 @@ class PostsViewModel @AssistedInject constructor (
     }
 
     /**
+     * Filters out posts from subreddits the user has chosen to filter, and duplicates based on
+     * [postIds]. [postIds] is also updated from this
+     */
+    private fun filterPosts(postsToFilter: List<RedditPost>): List<RedditPost> {
+        return filterUserSelectedSubreddits(postsToFilter).filter {
+            val id = it.id
+            // If the ID isn't in the list, add it and keep it in the filtered list
+            if (!postIds.contains(id)) {
+                postIds.add(id)
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    /**
+     * Filters out posts from subreddits the user has selected to filter, based on [Settings.subredditsToFilterFromDefaultSubreddits]
+     *
+     * Only filters posts from default subreddits (if [isDefaultSubreddit] is true)
+     */
+    private fun filterUserSelectedSubreddits(postsToFilter: List<RedditPost>): List<RedditPost> {
+        return if (isDefaultSubreddit) {
+            val subsToFilter = Settings.subredditsToFilterFromDefaultSubreddits()
+            postsToFilter.filter {
+                // Keep the post if the subreddit it is in isn't found in subsToFilter
+                !subsToFilter.contains(it.subreddit.toLowerCase())
+            }
+        } else {
+            postsToFilter
+        }
+    }
+
+    /**
      * Restores posts from the local database
      *
      * @param ids The IDs to restore
@@ -252,5 +289,26 @@ class PostsViewModel @AssistedInject constructor (
             }
             arePostsBeingRestored = false
         }
+    }
+
+    /**
+     * Saves a layout manager state. This can be used to persist the state of the layout holding
+     * the posts across process death. Retrieve the layout again with [getSavedLayoutState]
+     */
+    fun saveLayoutState(layoutManagerState: Parcelable) {
+        savedStateHandle[SAVED_LAYOUT_STATE] = layoutManagerState
+    }
+
+    /**
+     * Gets the layout manager state saved with [saveLayoutState]
+     *
+     * Note: this can only be used once.
+     */
+    fun getSavedLayoutState(): Parcelable? {
+        // By nulling this observers don't have to implement any logic of their own to ensure
+        // this is only used once when posts are restored
+        val state: Parcelable? = savedStateHandle[SAVED_LAYOUT_STATE]
+        savedStateHandle[SAVED_LAYOUT_STATE] = null
+        return state
     }
 }

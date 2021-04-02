@@ -175,6 +175,10 @@ class PostsFragment : Fragment(), SortableWithTime {
         // If the layout is refreshing when the fragment is paused it can cause a leak (at least it used to)
         binding.postsRefreshLayout.isEnabled = false
 
+        binding.posts.layoutManager?.onSaveInstanceState()?.let {
+            postsViewModel.saveLayoutState(it)
+        }
+
         (binding.posts.adapter as PostsAdapter?)?.let {
             // Tell all the view holders to save their extras and then deselect them (primarily to pause videos)
             it.viewHolders.forEach { viewHolder ->
@@ -342,7 +346,11 @@ class PostsFragment : Fragment(), SortableWithTime {
                     return@observe
                 }
 
-                adapter?.submitList(filterPosts(posts))
+                getSavedLayoutState()?.let {
+                    binding.posts.layoutManager?.onRestoreInstanceState(it)
+                }
+
+                adapter?.submitList(posts)
             })
 
             onLoadingCountChange.observe(viewLifecycleOwner, { onLoadingChange?.invoke(it) })
@@ -352,27 +360,6 @@ class PostsFragment : Fragment(), SortableWithTime {
                 postsScrollListener.resetOnEndOfList()
                 onError?.invoke(error.error, error.throwable)
             })
-        }
-    }
-
-    /**
-     * Filters a list of posts based on [App.subredditsToFilterFromDefaultSubreddits]
-     *
-     * If [isDefaultSubreddit] is false, then the original list is returned
-     *
-     * @param posts The posts to filter
-     * @return The filtered posts, or [posts] if this is not a default subreddit
-     */
-    private fun filterPosts(posts: List<RedditPost>) : List<RedditPost> {
-        // TODO this should probably be in the ViewModel
-        return if (isDefaultSubreddit) {
-            val subsToFilter = Settings.subredditsToFilterFromDefaultSubreddits()
-            posts.filter {
-                // Keep the post if the subreddit it is in isn't found in subsToFilter
-                !subsToFilter.contains(it.subreddit.toLowerCase())
-            }
-        } else {
-            posts
         }
     }
 
