@@ -2,7 +2,6 @@ package com.example.hakonsreader.viewmodels
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.*
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -63,6 +62,7 @@ class PostsViewModel @AssistedInject constructor (
          *
          * @param userOrSubredditName The name of the user or subreddit to load posts for
          * @param isUser True if [userOrSubredditName] points to a username, false if for a subreddit
+         * @param savedStateHandle The saved state handle for the ViewModel
          */
         fun create(
                 userOrSubredditName: String,
@@ -99,18 +99,11 @@ class PostsViewModel @AssistedInject constructor (
     var timeSort: PostTimeSort = PostTimeSort.DAY
         private set
 
-    /**
-     * The post IDs refer to the IDs of the posts this ViewModel is currently tracking.
-     */
-    var postIds = mutableListOf<String>()
-
-
 
     /**
      * Restarts posts from start based on the previous sorting
      */
     fun restart() {
-        postIds.clear()
         _posts.value = ArrayList()
         loadPosts(sort, timeSort)
     }
@@ -141,10 +134,11 @@ class PostsViewModel @AssistedInject constructor (
     fun loadPosts(sort: SortingMethods? = SortingMethods.HOT, timeSort: PostTimeSort? = PostTimeSort.DAY) {
         sort?.let { this.sort = it }
         timeSort?.let { this.timeSort = it }
-        val count = postIds.size
+        val postsData = posts.value
+        val count = postsData?.size ?: 0
 
         val after = if (count > 0) {
-            createFullName(Thing.POST, postIds.last())
+            createFullName(Thing.POST, postsData!!.last().id)
         } else {
             ""
         }
@@ -193,7 +187,7 @@ class PostsViewModel @AssistedInject constructor (
 
         _posts.postValue(postsData)
 
-        savedStateHandle[SAVED_POST_IDS] = postIds
+        savedStateHandle[SAVED_POST_IDS] = postsData.map { it.id }
 
         // Inserting posts sometimes causes ConcurrentModificationException, so only insert posts
         // at the end instead of in the loop and at the end to try and fix it
@@ -227,19 +221,11 @@ class PostsViewModel @AssistedInject constructor (
 
     /**
      * Filters out posts from subreddits the user has chosen to filter, and duplicates based on
-     * [postIds]. [postIds] is also updated from this
+     * the IDs of the posts in [posts]
      */
     private fun filterPosts(postsToFilter: List<RedditPost>): List<RedditPost> {
-        return filterUserSelectedSubreddits(postsToFilter).filter {
-            val id = it.id
-            // If the ID isn't in the list, add it and keep it in the filtered list
-            if (!postIds.contains(id)) {
-                postIds.add(id)
-                true
-            } else {
-                false
-            }
-        }
+        val postIds = posts.value?.map { it.id } ?: return postsToFilter
+        return filterUserSelectedSubreddits(postsToFilter).filter { !postIds.contains(it.id) }
     }
 
     /**
@@ -279,7 +265,7 @@ class PostsViewModel @AssistedInject constructor (
             }
 
             // Map the ID to its position
-            val order = ids.withIndex().associate { it.value to it.index }
+            val order: Map<String, Int> = ids.withIndex().associate { it.value to it.index }
             // Sort based on the original ID order
             val sortedPosts = posts.sortedBy { order[it.id] }
 
@@ -301,14 +287,8 @@ class PostsViewModel @AssistedInject constructor (
 
     /**
      * Gets the layout manager state saved with [saveLayoutState]
-     *
-     * Note: this can only be used once.
      */
     fun getSavedLayoutState(): Parcelable? {
-        // By nulling this observers don't have to implement any logic of their own to ensure
-        // this is only used once when posts are restored
-        val state: Parcelable? = savedStateHandle[SAVED_LAYOUT_STATE]
-        savedStateHandle[SAVED_LAYOUT_STATE] = null
-        return state
+        return savedStateHandle[SAVED_LAYOUT_STATE]
     }
 }

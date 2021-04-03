@@ -346,8 +346,13 @@ class PostsFragment : Fragment(), SortableWithTime {
                     return@observe
                 }
 
-                getSavedLayoutState()?.let {
-                    binding.posts.layoutManager?.onRestoreInstanceState(it)
+                // The layout state should only be restored when posts have been restored, which will
+                // only happen when the adapter has no posts. If there are no posts since no posts
+                // have been loaded yet, then there won't be a saved layout state
+                if (adapter?.itemCount == 0) {
+                    getSavedLayoutState()?.let {
+                        binding.posts.layoutManager?.onRestoreInstanceState(it)
+                    }
                 }
 
                 adapter?.submitList(posts)
