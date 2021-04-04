@@ -444,6 +444,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     private fun observeUserState() {
         AppState.loggedInState.observe(this) {
+            // PrivatelyBrowsing and LoggedIn are both treated as having a user
+            binding.navDrawer.hasUser = it !is LoggedInState.LoggedOut
+
             when (it) {
                 is LoggedInState.LoggedIn -> asLoggedInUser(it.userInfo)
                 is LoggedInState.PrivatelyBrowsing -> asPrivatelyBrowsingUser(it.userInfo)

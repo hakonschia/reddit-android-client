@@ -6,6 +6,8 @@
     <data>
         <import type="android.view.View" />
         <import type="com.example.hakonsreader.views.util.MenuClickHandlerKt"/>
+        <import type="com.example.hakonsreader.states.AppState"/>
+        <import type="com.example.hakonsreader.states.LoggedInState"/>
 
         <variable
             name="appState"
@@ -21,6 +23,10 @@
 
         <variable
             name="privatelyBrowsing"
+            type="boolean" />
+
+        <variable
+            name="hasUser"
             type="boolean" />
 
         <variable
@@ -44,6 +50,8 @@
                 android:id="@+id/profilePicture"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+
+                android:visibility="@{hasUser ? View.VISIBLE : View.GONE}"
 
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
@@ -84,44 +92,114 @@
                 app:layout_constraintTop_toTopOf="@+id/profilePicture"
                 tools:text="Hakonschiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" />
 
+            <ImageView
+                android:id="@+id/accountsIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_baseline_person_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profilePicture"
+                app:layout_constraintVertical_bias="0.0" />
+
             <TextView
-                android:id="@+id/accountsBtn"
+                android:id="@+id/accountsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
 
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
+                android:ellipsize="end"
 
-                android:background="@drawable/border_opposite_bg"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:onClick="@{(view) -> MenuClickHandlerKt.showAccountManagement(view.context, api, userInfoDao)}"
+                android:maxLines="1"
                 android:text="@string/menuProfileManageAccounts"
                 android:textColor="@color/text_color"
+                android:textSize="16sp"
 
-                android:textSize="12sp"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="@+id/accountsIcon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/profilePicture"
-                app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
+                app:layout_constraintStart_toEndOf="@+id/accountsIcon"
+                app:layout_constraintTop_toTopOf="@+id/accountsIcon" />
 
-            <!-- Using '!privatelyBrowsing' in the onClick doesn't work as the data binding fails to build -->
-            <TextView
-                android:id="@+id/privateBrowsingBtn"
+            <View
+                android:id="@+id/accountsClicker"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+
+                android:layout_marginEnd="16dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick="@{(view) -> MenuClickHandlerKt.showAccountManagement(view.context, api, userInfoDao)}"
+
+                app:layout_constraintBottom_toBottomOf="@id/accountsIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/accountsIcon"
+                app:layout_constraintTop_toTopOf="@id/accountsIcon" />
+
+
+            <!-- Visibility group that is responsible for removing the private browsing option
+             when not logged in -->
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/privateBrowsingToggleGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:constraint_referenced_ids="privateBrowsingText, privateBrowsingClicker, privateBrowsingToggleIcon"
+                android:visibility="@{hasUser ? View.VISIBLE : View.GONE}" />
 
-                android:layout_marginTop="4dp"
-                android:background="@drawable/border_opposite_bg"
-                android:foreground="?android:attr/selectableItemBackground"
+            <ImageView
+                android:id="@+id/privateBrowsingToggleIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
 
+                android:layout_marginTop="8dp"
+
+                android:src="@drawable/ic_incognito"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/accountsIcon"
+                app:layout_constraintTop_toBottomOf="@+id/accountsIcon"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/privateBrowsingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+
+                android:maxLines="1"
                 android:text="@{privatelyBrowsing ? @string/menuPrivateBrowsingDisable : @string/menuPrivateBrowsingEnable}"
                 android:textColor="@color/text_color"
-                android:textSize="12sp"
+                android:textSize="16sp"
+
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="@+id/privateBrowsingToggleIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/privateBrowsingToggleIcon"
+                app:layout_constraintTop_toTopOf="@+id/privateBrowsingToggleIcon"
+                tools:text="@string/menuPrivateBrowsingEnable" />
+
+            <!-- Using '!privatelyBrowsing' in the onClick doesn't work as the data binding fails to build -->
+            <View
+                android:id="@+id/privateBrowsingClicker"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+
+                android:layout_marginEnd="16dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:onClick="@{() -> appState.togglePrivateBrowsing()}"
 
-                app:layout_constraintStart_toStartOf="@+id/accountsBtn"
-                app:layout_constraintTop_toBottomOf="@+id/accountsBtn"
-                tools:text="@string/menuPrivateBrowsingEnable"/>
+                app:layout_constraintBottom_toBottomOf="@id/privateBrowsingToggleIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/privateBrowsingToggleIcon"
+                app:layout_constraintTop_toTopOf="@id/privateBrowsingToggleIcon" />
+
 
             <View
                 android:id="@+id/divider"
@@ -134,7 +212,7 @@
                 android:background="@color/divider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/privateBrowsingBtn" />
+                app:layout_constraintTop_toBottomOf="@+id/privateBrowsingClicker" />
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/settingsIcon"
