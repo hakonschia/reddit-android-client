@@ -1,5 +1,8 @@
 package com.example.hakonsreader.fragments.bottomsheets
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
@@ -66,13 +69,18 @@ class PeekLinkBottomSheet : BottomSheetDialogFragment() {
         binding.url.text = url
 
         // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
-        if (!url.matches("^http(s)?.*".toRegex())) {
-            binding.inferredUrlValue = "https://reddit.com" + (if (url[0] == '/') "" else "/") + url
+        val copyUrl = if (!url.matches("^http(s)?.*".toRegex())) {
+            ("https://reddit.com" + (if (url[0] == '/') "" else "/") + url).also {
+                binding.inferredUrlValue = it
+            }
+        } else {
+            url
         }
 
         binding.openLink.setOnClickListener(openLinkListener)
         binding.url.setOnClickListener(openLinkListener)
         binding.inferredUrl.setOnClickListener(openLinkListener)
+        binding.copyLink.setOnClickListener { copyLink(copyUrl) }
 
         binding.url.paintFlags = binding.url.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         binding.inferredUrl.paintFlags = binding.url.paintFlags or Paint.UNDERLINE_TEXT_FLAG
@@ -81,5 +89,16 @@ class PeekLinkBottomSheet : BottomSheetDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    /**
+     * Copies a link to the clipboard
+     *
+     * @param url The URL to copy
+     */
+    private fun copyLink(url: String) {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("URL", url)
+        clipboard.setPrimaryClip(clip)
     }
 }

@@ -431,4 +431,5 @@
         <item quantity="other">%d farger</item>
     </plurals>
     <string name="peekUrlBottomSheetInferredUrlHeader">Antatt URL</string>
+    <string name="peekUrlBottomSheetCopyUrl">Kopier</string>
 </resources>
