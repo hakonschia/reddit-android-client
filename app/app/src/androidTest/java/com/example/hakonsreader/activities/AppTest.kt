@@ -47,17 +47,43 @@ class AppTest {
 
         when (val userInfo = api.user().info()) {
             is ApiResponse.Success -> assertEquals("ArneRofinn", userInfo.value.username)
-            is ApiResponse.Error -> fail("Incorrect API response returned")
+            is ApiResponse.Error -> fail("Incorrect API response returned from #user.info()")
         }
 
         when (val subreddits = api.subreditts().subscribedSubreddits()) {
-            is ApiResponse.Success -> assertEquals(12, subreddits.value.size)
-            is ApiResponse.Error -> fail("Incorrect API response returned")
+            is ApiResponse.Success -> {
+                assertEquals(12, subreddits.value.size)
+                assertEquals("pics", subreddits.value.first().name)
+                assertEquals("PrequelMemes", subreddits.value.last().name)
+            }
+            is ApiResponse.Error -> fail("Incorrect API response returned from #subscribedSubreddits()")
         }
 
         when (val subreddits = api.subreditts().defaultSubreddits()) {
-            is ApiResponse.Success -> assertEquals(10, subreddits.value.size)
+            is ApiResponse.Success -> {
+                assertEquals(10, subreddits.value.size)
+                assertEquals("gadgets", subreddits.value.first().name)
+                assertEquals("funny", subreddits.value.last().name)
+            }
             is ApiResponse.Error -> fail("Incorrect API response returned")
+        }
+
+        when (val subreddits = api.subreditts().search("dogs")) {
+            is ApiResponse.Success -> {
+                assertEquals(5, subreddits.value.size)
+                assertEquals("dogs", subreddits.value.first().name)
+                assertEquals("woofbarkwoof", subreddits.value.last().name)
+            }
+            is ApiResponse.Error -> fail("Incorrect API response returned from #search()")
+        }
+
+        when (val posts = api.subreddit("").posts()) {
+            is ApiResponse.Success -> {
+                assertEquals(15, posts.value.size)
+                assertEquals("Albino Indians", posts.value.first().title)
+                assertEquals("I couldn’t come up with a good title for this genius.", posts.value.last().title)
+            }
+            is ApiResponse.Error -> fail("Incorrect API response returned from #subreddit.posts()")
         }
     }
 

@@ -40,6 +40,7 @@ class MainActivityTest {
 
     @Inject
     lateinit var userInfoDatabase: RedditUserInfoDatabase
+
     @Before
     fun init() {
         hiltRule.inject()

@@ -1,10 +1,10 @@
 package com.example.hakonsreader.di
 
 import com.example.hakonsreader.api.RedditApi
-import com.example.hakonsreader.api.model.AccessToken
-import com.example.hakonsreader.api.model.RedditUser
-import com.example.hakonsreader.api.model.Subreddit
-import com.example.hakonsreader.api.model.TrendingSubreddits
+import com.example.hakonsreader.api.enums.PostTimeSort
+import com.example.hakonsreader.api.enums.SortingMethods
+import com.example.hakonsreader.api.model.*
+import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.google.gson.Gson
@@ -41,7 +41,66 @@ class TestApiModule {
             }
 
             override fun subreddit(subredditName: String): SubredditRequest {
-                TODO("Not yet implemented")
+                return object : SubredditRequest {
+                    override suspend fun info(): ApiResponse<Subreddit> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun rules(): ApiResponse<List<SubredditRule>> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun posts(postSort: SortingMethods, timeSort: PostTimeSort, after: String, count: Int, limit: Int): ApiResponse<List<RedditPost>> {
+                        val listTypeToken = object : TypeToken<List<RedditPost>>(){}.type
+                        // This file includes a raw response from "https://www.reddit.com/.json?raw_json=1&limit=15" (only the "children: []" list)
+                        // There are 15 posts in the list
+                        val postsData = javaClass.classLoader!!.getResource("api/subreddit-request/posts-default-no-user.json").readText()
+                        val posts: List<RedditPost> = Gson().fromJson(postsData, listTypeToken)
+
+                        return ApiResponse.Success(posts)
+                    }
+
+                    override suspend fun subscribe(subscribe: Boolean): ApiResponse<Nothing?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun favorite(favorite: Boolean): ApiResponse<Nothing?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun submitTextPost(title: String, text: String, nsfw: Boolean, spoiler: Boolean, receiveNotifications: Boolean, flairId: String): ApiResponse<Submission> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun submitLinkPost(title: String, link: String, nsfw: Boolean, spoiler: Boolean, receiveNotifications: Boolean, flairId: String): ApiResponse<Submission> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun submitCrosspost(title: String, crosspostId: String, nsfw: Boolean, spoiler: Boolean, receiveNotifications: Boolean, flairId: String): ApiResponse<Submission> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun submissionFlairs(): ApiResponse<List<RedditFlair>> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun userFlairs(): ApiResponse<List<RedditFlair>> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun selectFlair(username: String, flairId: String?): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun enableUserFlair(enable: Boolean): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun wiki(page: String): ApiResponse<SubredditWikiPage> {
+                        TODO("Not yet implemented")
+                    }
+
+                }
             }
 
             override fun subreditts(): SubredditsRequest {
@@ -77,7 +136,7 @@ class TestApiModule {
                         val listTypeToken = object : TypeToken<List<Subreddit>>(){}.type
                         // This file includes a raw response from "/subreddits/search.json?q=dogs&raw_json=1&limit=5" (only the "children: []" list)
                         // The response was retrieved without a user context
-                        // There are 10 subreddits in the list
+                        // There are 5 subreddits in the list
                         val subredditsData = javaClass.classLoader!!.getResource("api/subreddits-request/search.json").readText()
                         val subreddits: List<Subreddit> = Gson().fromJson(subredditsData, listTypeToken)
 
