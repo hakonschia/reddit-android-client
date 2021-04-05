@@ -105,6 +105,7 @@ class PostsViewModel @AssistedInject constructor (
      */
     fun restart() {
         _posts.value = ArrayList()
+        savedStateHandle[SAVED_LAYOUT_STATE] = null
         loadPosts(sort, timeSort)
     }
 
