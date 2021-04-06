@@ -99,6 +99,21 @@ class CreateIntentTest {
     }
 
     /**
+     * Tests that URLs with "reddit.com" as a query parameter, or otherwise in the URL, does not
+     * dispatch to MainActivity/our app
+     */
+    @Test
+    fun urlWithRedditAsParameterDoesNotDispatchToMainActivity() {
+        val options = CreateIntentOptions()
+        val clazz = WebViewActivity::class.java
+        var intent: Intent = createIntent("https://www.independent.co.uk/news/world/australasia/new-zealand-raises-minimum-wage-to-20-an-hour-b1825634.html?utm_source=reddit.com&utm_source=reddit.com", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+
+        intent = createIntent("https://www.somedomain.com/somepath?someparameter=reddit.com/somemore/reddit.com", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+    }
+
+    /**
      * Tests that [createIntent] dispatches links for subreddits (reddit.com/r/hakonschia) and that
      * parameters, such as sorting, is passed correctly
      */

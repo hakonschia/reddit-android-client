@@ -212,7 +212,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
     return when {
         // "reddit.com", which is in a sense front page, but it makes more sense to treat this
         // as a "start the app" intent
-        url.matches("^http(s)?://(.*)?reddit\\.com(/)?$".toRegex()) || url.matches("^http(s)?://(www.)?redd.it(/)?$".toRegex()) -> {
+        url.matches("^http(s)?://(.*\\.)?reddit\\.com(/)?$".toRegex()) || url.matches("^http(s)?://(.*\\.)?redd.it(/)?$".toRegex()) -> {
             Intent(context, MainActivity::class.java)
         }
 
