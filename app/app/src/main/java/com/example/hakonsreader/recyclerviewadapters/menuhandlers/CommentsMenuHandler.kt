@@ -95,26 +95,31 @@ fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAd
         if (comment.isUserMod) {
             section {
                 title = context.getString(R.string.commentMenuSectionModeration)
-                item {
-                    labelRes = if (comment.isMod()) {
-                        R.string.postRemoveModDistinguish
-                    } else {
-                        R.string.postDistinguishAsMod
-                    }
-                    icon = R.drawable.ic_admin_24px
-                    callback = { distinguishAsModOnclick(view, comment, adapter, api) }
-                }
 
-                if (comment.depth == 0) {
+                // If the comment is by the logged in user
+                // Moderators can only sticky/distinguish their own comments, not other mods' comments
+                if (comment.author == AppState.getUserInfo()?.userInfo?.username) {
                     item {
-                        labelRes = if (comment.isStickied) {
-                            R.string.commentRemoveSticky
+                        labelRes = if (comment.isMod()) {
+                            R.string.postRemoveModDistinguish
                         } else {
-                            R.string.commentSticky
+                            R.string.postDistinguishAsMod
                         }
+                        icon = R.drawable.ic_admin_24px
+                        callback = { distinguishAsModOnclick(view, comment, adapter, api) }
+                    }
 
-                        icon = R.drawable.ic_pin_icon_color_24dp
-                        callback = { stickyOnClick(view, comment, adapter, api) }
+                    if (comment.depth == 0) {
+                        item {
+                            labelRes = if (comment.isStickied) {
+                                R.string.commentRemoveSticky
+                            } else {
+                                R.string.commentSticky
+                            }
+
+                            icon = R.drawable.ic_pin_icon_color_24dp
+                            callback = { stickyOnClick(view, comment, adapter, api) }
+                        }
                     }
                 }
 
