@@ -107,6 +107,13 @@ public class PostScrollListener implements View.OnScrollChangeListener, Lifecycl
     }
 
     /**
+     * @return The ID of the post currently being ignored by the listener
+     */
+    public String getPostToIgnore() {
+        return postToIgnore;
+    }
+
+    /**
      * Resets the onEndOfList runnable to be called again. This should be used to re-call the runnable
      * passed to the constructor
      */

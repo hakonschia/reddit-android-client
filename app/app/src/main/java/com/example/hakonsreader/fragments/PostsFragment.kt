@@ -11,18 +11,15 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.activities.VideoActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
-import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentPostsBinding
 import com.example.hakonsreader.interfaces.SortableWithTime
-import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
@@ -68,6 +65,12 @@ class PostsFragment : Fragment(), SortableWithTime {
          * The value with this key should be the value of corresponding enum value from [PostTimeSort]
          */
         private const val ARGS_TIME_SORT = "args_timeSort"
+
+
+        /**
+         * The key used to save the ID of the post that should be ignored when scrolling
+         */
+        private const val SAVED_POST_TO_IGNORE = "saved_postToIgnore"
 
 
         /**
@@ -162,6 +165,10 @@ class PostsFragment : Fragment(), SortableWithTime {
         // Must not be a user to be a default subreddit (eg. /u/popular is an actual user)
         isDefaultSubreddit = !isForUser && RedditApi.STANDARD_SUBS.contains(name.toLowerCase())
 
+        if (savedInstanceState != null) {
+            postsScrollListener.postToIgnore = savedInstanceState.getString(SAVED_POST_TO_IGNORE, "")
+        }
+
         setupBinding()
         setupPostsList()
         setupPostsViewModel()
@@ -216,6 +223,11 @@ class PostsFragment : Fragment(), SortableWithTime {
 
         _binding = null
         super.onDestroyView()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(SAVED_POST_TO_IGNORE, postsScrollListener.postToIgnore)
     }
 
     /**
