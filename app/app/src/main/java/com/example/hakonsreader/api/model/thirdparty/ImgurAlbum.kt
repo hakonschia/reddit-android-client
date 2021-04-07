@@ -1,5 +1,6 @@
-package com.example.hakonsreader.api.model
+package com.example.hakonsreader.api.model.thirdparty
 
+import com.example.hakonsreader.api.model.Image
 import com.google.gson.annotations.SerializedName
 
 /**

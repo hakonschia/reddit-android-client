@@ -4,12 +4,12 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.TypeConverters
 import com.example.hakonsreader.api.enums.PostType
-import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.*
 import com.example.hakonsreader.api.jsonadapters.BooleanAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.ThirdPartyObjectAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
+import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
 import com.example.hakonsreader.api.persistence.PostConverter
 import com.google.gson.Gson
 import com.google.gson.annotations.JsonAdapter
@@ -500,8 +500,7 @@ class RedditPost : RedditListing(),
             return PostType.VIDEO
         } else if (isSelf) {
             return PostType.TEXT
-        } else if (isGallery || !galleryImages.isNullOrEmpty()) {
-            // If the gallery images are set from imgurRequest isGallery would be false
+        } else if (isGallery || thirdPartyObject is ImgurAlbum) {
             return PostType.GALLERY
         }
 

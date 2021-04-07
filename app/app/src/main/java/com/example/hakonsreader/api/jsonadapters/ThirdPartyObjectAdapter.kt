@@ -1,10 +1,10 @@
 package com.example.hakonsreader.api.jsonadapters
 
+import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
 import com.example.hakonsreader.api.model.thirdparty.GfycatGif
 import com.example.hakonsreader.api.model.thirdparty.ImgurGif
 import com.example.hakonsreader.api.utils.thirdPartyObjectFromJsonString
 import com.google.gson.Gson
-import com.google.gson.JsonParser
 import com.google.gson.TypeAdapter
 import com.google.gson.internal.LinkedTreeMap
 import com.google.gson.stream.JsonReader
@@ -24,6 +24,10 @@ class ThirdPartyObjectAdapter : TypeAdapter<Any>() {
         val type = when {
             value is ImgurGif -> {
                 ImgurGif::class.java.typeName
+            }
+
+            value is ImgurAlbum -> {
+                ImgurAlbum::class.java.typeName
             }
 
             value is GfycatGif -> {

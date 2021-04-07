@@ -7,6 +7,7 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.exceptions.RateLimitException
 import com.example.hakonsreader.api.exceptions.ThreadLockedException
 import com.example.hakonsreader.api.model.AccessToken
+import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
 import com.example.hakonsreader.api.model.thirdparty.GfycatGif
 import com.example.hakonsreader.api.model.thirdparty.ImgurGif
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -100,6 +101,10 @@ fun thirdPartyObjectFromJsonString(jsonString: String?) : Any? {
     val type = when (asJsonObject?.get("type")?.asString) {
         ImgurGif::class.java.typeName -> {
             ImgurGif::class.java
+        }
+
+        ImgurAlbum::class.java.typeName -> {
+            ImgurAlbum::class.java
         }
 
         GfycatGif::class.java.typeName -> {

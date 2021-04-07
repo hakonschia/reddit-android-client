@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.hakonsreader.api.model.Image
+import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
 import com.example.hakonsreader.databinding.ContentGalleryBinding
 import com.example.hakonsreader.misc.Settings
 import java.util.*
@@ -17,7 +18,11 @@ import java.util.function.Consumer
 /**
  * Class for gallery posts. A gallery post is simply a collection of multiple images or videos
  */
-class ContentGallery : Content {
+class ContentGallery @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : Content(context, attrs, defStyleAttr) {
     companion object {
         private const val TAG = "ContentGallery"
 
@@ -42,12 +47,12 @@ class ContentGallery : Content {
     private var maxHeight = -1
     private var maxWidth = -1
 
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-
     override fun updateView() {
-        images = redditPost.galleryImages ?: return
+        images = if (redditPost.thirdPartyObject is ImgurAlbum) {
+            (redditPost.thirdPartyObject as ImgurAlbum).images!!
+        } else {
+            redditPost.galleryImages ?: return
+        }
 
         // Find the largest height and width and set the layout to that
         for (image in images) {

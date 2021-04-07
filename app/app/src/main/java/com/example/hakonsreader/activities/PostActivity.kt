@@ -390,11 +390,13 @@ class PostActivity : BaseActivity(), OnReplyListener {
         // the content of the post. If we have a post already the 3rd party calls should have been
         // made already
         var loadThirdParty = true
+        var post: RedditPost? = null
 
         // Started from inside the app (post already loaded from before)
         val postId = if (postJson != null) {
             loadThirdParty = false
-            setPostFromJson(postJson)
+            post = setPostFromJson(postJson)
+            post?.id
         } else {
             intent.extras?.getString(EXTRAS_POST_ID_KEY)
         }
@@ -404,7 +406,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
                 it.postId = postId
 
                 try {
-                    it.loadComments(loadThirdParty)
+                    it.loadComments(loadThirdParty, post?.thirdPartyObject)
                 } catch (e: IllegalStateException) {
                     finish()
                 }
@@ -418,9 +420,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
      * If the post is an image post, then the enter transition is delayed until the image has loaded
      *
      * @param json The JSON to set the post from
-     * @return The ID of the post, or null if the json is invalid
+     * @return The parsed post, or null if the json is invalid
      */
-    private fun setPostFromJson(json: String) : String? {
+    private fun setPostFromJson(json: String) : RedditPost? {
         val redditPost = Gson().fromJson(json, RedditPost::class.java)
 
         return if (redditPost != null) {
@@ -428,7 +430,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
             when (redditPost.getPostType()) {
                 // Postpone the enter transition until the image is loaded
-                // TODO this doesn't work perfectly as the "loading" image is still shown sometimes for a split second
                 PostType.IMAGE -> {
                     postponeEnterTransition()
                     binding.post.imageLoadedCallback = object : Callback {
@@ -492,7 +493,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
                 else -> onNewPostInfo(redditPost, postExtras)
             }
 
-            redditPost.id
+            redditPost
         } else {
             null
         }

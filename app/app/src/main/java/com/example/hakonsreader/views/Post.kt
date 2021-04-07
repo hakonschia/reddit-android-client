@@ -21,7 +21,6 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
-import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
 import com.google.android.material.snackbar.Snackbar
@@ -39,7 +38,11 @@ import javax.inject.Inject
  * content of the post will be resized to fit the given height.
  */
 @AndroidEntryPoint
-class Post : Content {
+class Post @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : Content(context, attrs, defStyleAttr) {
 
     companion object {
         private const val TAG = "Post"
@@ -166,11 +169,6 @@ class Post : Content {
      * based on [maxHeight]
      */
     private lateinit var contentOnGlobalLayoutListener: OnGlobalLayoutListener
-
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
 
     // Thank god this is a one person project, because I would feel really bad for anyone having

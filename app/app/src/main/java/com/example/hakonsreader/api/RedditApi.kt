@@ -7,6 +7,7 @@ import com.example.hakonsreader.api.interceptors.UserAgentInterceptor
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.interfaces.VoteableRequest
 import com.example.hakonsreader.api.model.*
+import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
 import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -175,12 +176,11 @@ interface RedditApi {
          * an OAuth client for anonymous use is sufficient. If set this will perform certain API calls
          * towards Imgur to load post content directly. Currently albums and gifs are loaded.
          *
-         * Typically, an Imgur album will be represented as [PostType.LINK]. With this set the API will
-         * automatically call the Imgur API when posts are received and get the individual
-         * images and store them so they are accessible through [RedditPost.galleryImages]
-         * in the same way as a normal Reddit gallery would. The post type will be [PostType.GALLERY].
-         * While Imgur albums are typically for multiple images, these albums sometimes only contain one image.
-         * The API will still treat one image albums as a gallery.
+         * Typically, an Imgur album will be represented as [PostType.LINK], where the post is only a link post
+         * to the album. With this set the API will automatically call the Imgur API when posts are
+         * received and get the album with the images directly. The post type will be [PostType.GALLERY], with
+         * [RedditPost.thirdPartyObject] being set to a [ImgurAlbum]. While Imgur albums are typically for
+         * multiple images, these albums sometimes only contain one image. The API will still treat one image albums as a gallery.
          *
          * Note that since this will call the Imgur API loading times for posts will increase.
          *

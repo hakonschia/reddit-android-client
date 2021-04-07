@@ -61,11 +61,13 @@ class CommentsViewModel @Inject constructor(
      * post information) is needed, consider keeping this to `false` to not make unnecessary API calls.
      * In other words, this should only be set to `true` if the post is loaded for the first time and
      * the content of the post has to be drawn.
+     * @param thirdPartyObject If the post already has a third party object it can be passed here so
+     * the object will survive configuration changes without having to JSON the post
      *
      * @throws IllegalStateException if [postId] is not set
      */
     @Throws(IllegalStateException::class)
-    fun loadComments(loadThirdParty: Boolean = false) {
+    fun loadComments(loadThirdParty: Boolean = false, thirdPartyObject: Any? = null) {
         if (postId.isBlank()) {
             throw IllegalStateException("Post ID not set")
         }
@@ -78,6 +80,9 @@ class CommentsViewModel @Inject constructor(
 
             when (resp) {
                 is ApiResponse.Success -> {
+                    if (thirdPartyObject != null) {
+                        resp.value.post.thirdPartyObject = thirdPartyObject
+                    }
                     _post.postValue(resp.value.post)
                     _comments.postValue(resp.value.comments)
                     withContext(IO) {

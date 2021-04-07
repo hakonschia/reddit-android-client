@@ -97,10 +97,9 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
                 return
             }
 
-            val images = album.images
-            post.galleryImages = images as MutableList<Image>?
+            post.thirdPartyObject = album
             post.crossposts?.forEach {
-                it.galleryImages = images
+                it.thirdPartyObject = album
             }
         } catch (e: URISyntaxException) {
             // This really should never happen but worst case is the album would be loaded as a link
@@ -129,7 +128,6 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             val gif = imgurApi.getImage(id).body()?.gif
 
             post.thirdPartyObject = gif
-            post.crossposts?.get(0)?.thirdPartyObject = gif
             post.crossposts?.forEach {
                 it.thirdPartyObject = gif
             }
