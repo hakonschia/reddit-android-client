@@ -66,6 +66,10 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             post.domain == "gfycat.com" -> this::loadGfycatGif
             post.domain == "redgifs.com" -> this::loadRedgifGif
             // We can use http for this as the http URL itself isn't loaded, it is just used as an identifier
+
+            // The difference between a gallery and album? Except the URL, no idea. They seemingly contain
+            // the same type of image items
+            post.url.matches("http(s)?://(m\\.)?imgur\\.com/gallery/.+".toRegex()) -> this::loadImgurGalleryAlbum
             post.url.matches("http(s)?://(m\\.)?imgur\\.com/a/.+".toRegex()) -> this::loadImgurAlbum
             post.url.matches("http(s)?://([im])\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
             else -> null
@@ -90,6 +94,45 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
             val albumHash = paths[paths.size - 1]
 
             val response = imgurApi.getAlbum(albumHash)
+            val album = response.body()
+
+            if (!response.isSuccessful || album == null) {
+                return
+            }
+
+            post.thirdPartyObject = album
+            post.crossposts?.forEach {
+                it.thirdPartyObject = album
+            }
+        } catch (e: URISyntaxException) {
+            // This really should never happen but worst case is the album would be loaded as a link
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Loads content for Imgur gallery albums
+     *
+     * @param post The post to load the album for
+     */
+    suspend fun loadImgurGalleryAlbum(post: RedditPost) {
+        imgurApi ?: return
+
+        try {
+            // android.Uri I miss you :(
+            val uri = URI(post.url)
+
+            // Example url: https://imgur.com/gallery/00jqM06
+            // The first element in this list will for some reason be an empty string
+            // Ie.: ["", "gallery", "00jqM06"]
+            val paths = uri.path.split("/".toRegex()).toTypedArray()
+            val albumHash = if (paths.size >= 3) {
+                paths[2]
+            } else return
+
+            val response = imgurApi.getGalleryAlbum(albumHash)
             val album = response.body()
 
             if (!response.isSuccessful || album == null) {

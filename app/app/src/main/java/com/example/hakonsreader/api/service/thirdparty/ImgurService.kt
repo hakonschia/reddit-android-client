@@ -23,6 +23,17 @@ interface ImgurService {
     ): Response<ImgurAlbum>
 
     /**
+     * Loads information about an Imgur gallery album
+     *
+     * @param albumHash The hash of the album to retrieve
+     * @return
+     */
+    @GET("3/gallery/album/{albumHash}")
+    suspend fun getGalleryAlbum(
+            @Path("albumHash") albumHash: String
+    ): Response<ImgurAlbum>
+
+    /**
      * Loads information about an Imgur image (this can be a Gif)
      *
      * @param imageHash The hash of the image to retrieve information for
