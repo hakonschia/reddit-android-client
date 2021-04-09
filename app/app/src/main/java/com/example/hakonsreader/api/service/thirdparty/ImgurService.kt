@@ -1,7 +1,7 @@
 package com.example.hakonsreader.api.service.thirdparty
 
-import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
-import com.example.hakonsreader.api.model.thirdparty.ImgurGifOuter
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGifOuter
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

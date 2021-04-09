@@ -19,7 +19,7 @@ import com.example.hakonsreader.api.exceptions.ArchivedException
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.exceptions.RateLimitException
 import com.example.hakonsreader.api.exceptions.ThreadLockedException
-import com.example.hakonsreader.api.model.Image
+import com.example.hakonsreader.api.model.images.RedditImage
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.api.utils.LinkUtils
@@ -64,7 +64,7 @@ private fun getNormal(post: RedditPost) : String? {
     val screenWidth = Resources.getSystem().displayMetrics.widthPixels
     var imageUrl: String? = null
 
-    post.getPreviewImages()?.forEach {
+    post.preview?.images?.firstOrNull()?.resolutions?.forEach {
         if (it.width <= screenWidth) {
             imageUrl = it.url
         }
@@ -93,7 +93,7 @@ private fun getNsfw(post: RedditPost) : String? {
  * @return A URL pointing to an obfuscated image, or null if no image is available
  */
 private fun getObfuscated(post: RedditPost) : String? {
-    val obfuscatedPreviews: List<Image>? = post.getObfuscatedPreviewImages()
+    val obfuscatedPreviews: List<RedditImage>? = post.getObfuscatedPreviewImages()
 
     return if (obfuscatedPreviews?.isNotEmpty() == true) {
         // Obfuscated previews that are high res are still fairly showing sometimes, so

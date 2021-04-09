@@ -1,4 +1,4 @@
-package com.example.hakonsreader.api.model.thirdparty
+package com.example.hakonsreader.api.model.thirdparty.gfycat
 
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.google.gson.annotations.SerializedName

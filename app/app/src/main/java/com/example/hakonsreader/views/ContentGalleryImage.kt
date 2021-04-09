@@ -5,9 +5,13 @@ import android.content.Intent
 import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import com.example.hakonsreader.activities.DispatcherActivity
-import com.example.hakonsreader.api.model.Image
+import com.example.hakonsreader.api.interfaces.GalleryImage
+import com.example.hakonsreader.api.interfaces.Image
+import com.example.hakonsreader.api.model.images.RedditGalleryImage
+import com.example.hakonsreader.api.model.images.RedditGalleryItem
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
 import com.example.hakonsreader.misc.Settings
@@ -15,21 +19,23 @@ import com.example.hakonsreader.misc.Settings
 /**
  * View for displaying in a single gallery item in [ContentGallery]
  */
-class ContentGalleryImage : FrameLayout {
+class ContentGalleryImage @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
+
     companion object {
         private const val TAG = "ContentGalleryImage"
     }
 
     private val binding = ContentGalleryImageBinding.inflate(LayoutInflater.from(context), this, true)
 
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     /**
      * The Image to display
      */
-    var image: Image? = null
+    var image: GalleryImage? = null
         set(value) {
             field = value
             updateView()
@@ -69,36 +75,48 @@ class ContentGalleryImage : FrameLayout {
         binding.content.removeAllViews()
 
         image?.let {
-            val view = if (it.isGif) {
-                asGif(it)
-            } else {
-                asImage(it)
+            val view = when (it) {
+                is RedditGalleryItem -> asRedditGalleryImage(it)
+                is Image -> asImage(it)
+
+                // It is really an error if this happens, should potentially throw an exception
+                else -> return@let
             }
 
+            binding.content.addView(view)
+        }
+    }
+
+    private fun asRedditGalleryImage(galleryItem: RedditGalleryItem): View {
+        val image = galleryItem.source
+        return if (image.mp4Url != null) {
+            asGif(image)
+        } else {
             with (binding) {
-                caption.text = it.caption
-                caption.visibility = if (it.caption != null) {
+                caption.text = galleryItem.caption
+                caption.visibility = if (galleryItem.caption != null) {
                     VISIBLE
                 } else {
                     GONE
                 }
 
                 // Setting the movement method to InternalLinkMovementMethod doesn't work for some reason
-                outboundUrl.setOnClickListener { _ ->
+                outboundUrl.setOnClickListener {
                     Intent(context, DispatcherActivity::class.java).apply {
-                        putExtra(DispatcherActivity.EXTRAS_URL_KEY, it.outboundUrl)
+                        putExtra(DispatcherActivity.EXTRAS_URL_KEY, galleryItem.outboundUrl)
                         context.startActivity(this)
                     }
                 }
-                outboundUrl.text = it.outboundUrl
-                outboundUrl.visibility = if (it.outboundUrl != null) {
+
+                outboundUrl.text = galleryItem.outboundUrl
+                outboundUrl.visibility = if (galleryItem.outboundUrl != null) {
                     VISIBLE
                 } else {
                     GONE
                 }
-
-                content.addView(view)
             }
+
+            asImage(image)
         }
     }
 
@@ -123,15 +141,15 @@ class ContentGalleryImage : FrameLayout {
      * @return A [VideoPlayer]
      * @see asImage
      */
-    private fun asGif(image: Image) : VideoPlayer {
+    private fun asGif(image: RedditGalleryImage) : VideoPlayer {
         return VideoPlayer(context).apply {
             // The height will resize accordingly as long as the width matches the screen
             // I think, I'm pretty lost on this, haven't tested if width of the video is larger
             // than the screen, but I imagine it would scale down
             videoWidth = Resources.getSystem().displayMetrics.widthPixels
 
-            // Not sure what to do if this is null
-            url = image.mp4Url ?: ""
+            // This should only be called if the gallery image has an MP4 URL, otherwise it is an error
+            url = image.mp4Url!!
         }
     }
 

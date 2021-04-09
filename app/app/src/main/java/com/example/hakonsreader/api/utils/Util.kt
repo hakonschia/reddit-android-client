@@ -7,9 +7,9 @@ import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.exceptions.RateLimitException
 import com.example.hakonsreader.api.exceptions.ThreadLockedException
 import com.example.hakonsreader.api.model.AccessToken
-import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
-import com.example.hakonsreader.api.model.thirdparty.GfycatGif
-import com.example.hakonsreader.api.model.thirdparty.ImgurGif
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
+import com.example.hakonsreader.api.model.thirdparty.gfycat.GfycatGif
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
 import com.google.gson.Gson

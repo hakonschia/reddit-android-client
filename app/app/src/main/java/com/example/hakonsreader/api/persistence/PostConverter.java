@@ -2,13 +2,13 @@ package com.example.hakonsreader.api.persistence;
 
 import androidx.room.TypeConverter;
 
-import com.example.hakonsreader.api.model.Image;
 import com.example.hakonsreader.api.model.RedditAward;
+import com.example.hakonsreader.api.model.images.RedditGalleryItem;
 import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.api.model.flairs.RichtextFlair;
+import com.example.hakonsreader.api.model.internal.GalleryData;
 import com.example.hakonsreader.api.utils.UtilKt;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.internal.LinkedTreeMap;
@@ -30,12 +30,23 @@ public class PostConverter {
 
 
     @TypeConverter
-    public static List<String> fromListString(String value) {
+    public static List<String> toListString(String value) {
         Type listType = new TypeToken<ArrayList<String>>() {}.getType();
         return gson.fromJson(value, listType);
     }
     @TypeConverter
-    public static String fromList(List<String> list) {
+    public static String fromListString(List<String> list) {
+        return gson.toJson(list);
+    }
+
+
+    @TypeConverter
+    public static List<RedditGalleryItem> toGalleryItemListString(String value) {
+        Type listType = new TypeToken<ArrayList<RedditGalleryItem>>() {}.getType();
+        return gson.fromJson(value, listType);
+    }
+    @TypeConverter
+    public static String fromGalleryItemListString(List<RedditGalleryItem> list) {
         return gson.toJson(list);
     }
 
@@ -63,11 +74,11 @@ public class PostConverter {
     }
 
     @TypeConverter
-    public static RedditPost.GalleryDataOuter galleryDataFromString(String value) {
-        return gson.fromJson(value, RedditPost.GalleryDataOuter.class);
+    public static GalleryData galleryDataFromString(String value) {
+        return gson.fromJson(value, GalleryData.class);
     }
     @TypeConverter
-    public static String fromGalleryData(RedditPost.GalleryDataOuter data) {
+    public static String fromGalleryData(GalleryData data) {
         return gson.toJson(data);
     }
 
@@ -80,18 +91,6 @@ public class PostConverter {
     public static String fromPreview(RedditPost.Preview preview) {
         return gson.toJson(preview);
     }
-
-
-    @TypeConverter
-    public static List<Image> galleryImagesFromString(String value) {
-        Type listType = new TypeToken<ArrayList<Image>>() {}.getType();
-        return gson.fromJson(value, listType);
-    }
-    @TypeConverter
-    public static String fromGalleryImages(List<Image> images) {
-        return gson.toJson(images);
-    }
-
 
     @TypeConverter
     public static ArrayList<RichtextFlair> richTextFlairListFromString(String value) {

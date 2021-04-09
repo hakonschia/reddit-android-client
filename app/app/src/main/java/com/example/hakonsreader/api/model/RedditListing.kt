@@ -1,7 +1,6 @@
 package com.example.hakonsreader.api.model
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.example.hakonsreader.api.enums.Thing

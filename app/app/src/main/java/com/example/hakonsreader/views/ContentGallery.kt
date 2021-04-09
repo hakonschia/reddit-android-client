@@ -8,12 +8,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.example.hakonsreader.api.model.Image
-import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
+import com.example.hakonsreader.api.interfaces.GalleryImage
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
 import com.example.hakonsreader.databinding.ContentGalleryBinding
 import com.example.hakonsreader.misc.Settings
 import java.util.*
 import java.util.function.Consumer
+import kotlin.collections.ArrayList
 
 /**
  * Class for gallery posts. A gallery post is simply a collection of multiple images or videos
@@ -40,7 +41,6 @@ class ContentGallery @JvmOverloads constructor(
 
     // This file and ContentImage is really coupled together, should be fixed to not be so terrible
     private val binding: ContentGalleryBinding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true)
-    private lateinit var images: List<Image>
     private val galleryViews: MutableList<ContentGalleryImage> = ArrayList()
     private var currentView: ContentGalleryImage? = null
 
@@ -48,10 +48,10 @@ class ContentGallery @JvmOverloads constructor(
     private var maxWidth = -1
 
     override fun updateView() {
-        images = if (redditPost.thirdPartyObject is ImgurAlbum) {
+        val images: List<GalleryImage> = if (redditPost.thirdPartyObject is ImgurAlbum) {
             (redditPost.thirdPartyObject as ImgurAlbum).images!!
         } else {
-            redditPost.galleryImages ?: return
+            redditPost.galleryImages!!
         }
 
         // Find the largest height and width and set the layout to that
@@ -105,10 +105,11 @@ class ContentGallery @JvmOverloads constructor(
     private fun setActiveImageText(activeImagePos: Int) {
         // Imgur albums are also handled as galleries, and they might only contain one image, so make it
         // look like only one image by removing the text
-        if (images.size == 1) {
+        val size = binding.galleryImages.adapter?.itemCount
+        if (size == 1) {
             binding.activeImageText.visibility = GONE
         } else {
-            binding.activeImageText.text = String.format(Locale.getDefault(), "%d / %d", activeImagePos + 1, images.size)
+            binding.activeImageText.text = String.format(Locale.getDefault(), "%d / %d", activeImagePos + 1, size)
         }
     }
 
@@ -120,7 +121,7 @@ class ContentGallery @JvmOverloads constructor(
 
     override fun setExtras(extras: Bundle) {
         super.setExtras(extras)
-        val activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, images.size)
+        val activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, 0)
         binding.galleryImages.setCurrentItem(activeImage, false)
     }
 
@@ -147,7 +148,7 @@ class ContentGallery @JvmOverloads constructor(
         currentView = null
     }
 
-    private inner class Adapter(private val images: List<Image>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+    private inner class Adapter(private val images: List<GalleryImage>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             with (holder.image) {
                 // Destroy previous image

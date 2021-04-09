@@ -1,4 +1,4 @@
-package com.example.hakonsreader.api.model.thirdparty
+package com.example.hakonsreader.api.model.thirdparty.imgur
 
 import com.google.gson.annotations.SerializedName
 

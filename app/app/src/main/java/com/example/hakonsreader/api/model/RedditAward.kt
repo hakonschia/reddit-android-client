@@ -1,5 +1,6 @@
 package com.example.hakonsreader.api.model
 
+import com.example.hakonsreader.api.model.images.RedditImage
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -47,7 +48,7 @@ class RedditAward {
      * A list of resized icons for the award
      */
     @SerializedName("resized_icons")
-    var resizedIcons: List<Image>? = null
+    var resizedIcons: List<RedditImage>? = null
 
     /**
      * True if this award is marked as a new award

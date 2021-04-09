@@ -9,7 +9,11 @@ import com.example.hakonsreader.api.jsonadapters.BooleanAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.NullAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.ThirdPartyObjectAdapter
 import com.example.hakonsreader.api.model.flairs.RichtextFlair
-import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
+import com.example.hakonsreader.api.model.images.RedditGalleryItem
+import com.example.hakonsreader.api.model.images.RedditImage
+import com.example.hakonsreader.api.model.internal.GalleryData
+import com.example.hakonsreader.api.model.internal.ImagesWrapper
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
 import com.example.hakonsreader.api.persistence.PostConverter
 import com.google.gson.Gson
 import com.google.gson.annotations.JsonAdapter
@@ -275,7 +279,6 @@ class RedditPost : RedditListing(),
         val redditVideo: RedditVideo? = null
     }
 
-
     /**
      * Don't use this directly, use [galleryImages]
      *
@@ -291,58 +294,58 @@ class RedditPost : RedditListing(),
      * Internal gallery data
      */
     @SerializedName("gallery_data")
-    var galleryData: GalleryDataOuter? = null
+    var galleryData: GalleryData? = null
 
-    var galleryImages: MutableList<Image>? = null
+    var galleryImages: List<RedditGalleryItem>? = null
         get() {
             // Return the field directly if it already has been created
             if (field != null) {
                 return field
             }
 
-            mediaMetadata?.let { meta ->
-                field = java.util.ArrayList(meta.size)
+            // JSON structure for galleries:
+
+            /*
+            At the top level "gallery_data" is given which is a simple list of what gallery images there
+            are, where "media_id" references the ID in the part where the actual data is
+            This also holds any potential caption/URL for the item
+            "gallery_data": {
+                "items": [
+                    {
+                        "media_id": "..."",
+                        "id": 123
+                ]
+            }
+
+            "media_metadata" is a top level object which itself holds other objects. This is really an
+            array which for some reason holds objects with anonymous names. The name of an object is "media_id"
+            from the "gallery_data" items
+            "media_metadata" {
+                "<media_id>": { // The name from the "gallery_data" items
+                    // The actual gallery item data
+                }
+            }
+             */
+
+            // The outer object which holds objects
+            mediaMetadata?.let { metaData ->
+                field = ArrayList(metaData.size)
 
                 val gson = Gson()
 
-                galleryData?.data?.forEach {
-                    val metaData = meta[it.mediaId]
+                galleryData?.data?.forEach { galleryItem ->
+                    val jsonTree = gson.toJsonTree(metaData[galleryItem.mediaId] as LinkedTreeMap<String, Any>)
+                    val image = gson.fromJson(jsonTree, RedditGalleryItem::class.java)
 
-                    val converted = metaData as LinkedTreeMap<String, Any>
-                    // TODO this always gets the source, we should redo this so a GalleryItem
-                    //  class exposes all the possible resolutions (which is basically a wrapper for a list of Image)
-                    val asJson = gson.toJson(converted["s"])
+                    image.caption = galleryItem.caption
+                    image.outboundUrl = galleryItem.outboundUrl
 
-                    val image = gson.fromJson(asJson, Image::class.java)
-
-                    image.caption = it.caption
-                    image.outboundUrl = it.outboundUrl
-
-                    (field as java.util.ArrayList<Image>).add(image)
+                    (field as ArrayList<RedditGalleryItem>).add(image)
                 }
             }
 
             return field
         }
-
-    class GalleryDataOuter {
-        @SerializedName("items")
-        var data: List<GalleryData>? = null
-    }
-
-    class GalleryData {
-        @SerializedName("media_id")
-        var mediaId = ""
-
-        @SerializedName("id")
-        var id = 0
-
-        @SerializedName("caption")
-        var caption: String? = null
-
-        @SerializedName("outbound_url")
-        var outboundUrl: String? = null
-    }
 
     @SerializedName("preview")
     var preview: Preview? = null
@@ -362,23 +365,22 @@ class RedditPost : RedditListing(),
         return media?.redditVideo
     }
 
-    fun getSourcePreview() : Image? {
+    fun getSourcePreview() : RedditImage? {
         return preview?.images?.get(0)?.source
     }
 
-    fun getPreviewImages() : List<Image>? {
+    fun getPreviewImages() : List<RedditImage>? {
         return preview?.images?.get(0)?.resolutions
     }
 
-    fun getObfuscatedPreviewImages() : List<Image>? {
+    fun getObfuscatedPreviewImages() : List<RedditImage>? {
         return preview?.images?.get(0)?.variants?.obfuscated?.resolutions
     }
 
     /**
      * Retrieves the video for GIF posts from sources such as Gfycat
      *
-     *
-     * Note: not all GIFs will be found here. Some GIFs will be returned as a [Image]
+     * Note: not all GIFs will be found here. Some GIFs will be returned as a [RedditImage]
      * with a link to the external URL. See [RedditPost.getMp4Source] and [RedditPost.getMp4Previews]
      *
      * @return The [RedditVideo] holding the data for GIF posts
@@ -391,7 +393,6 @@ class RedditPost : RedditListing(),
      * Gets the MP4 source for the post. Note that this is only set when the post is a GIF
      * uploaded to reddit directly.
      *
-     *
      * Note: Some GIF posts will be as a separate [RedditVideo] that is retrieved with
      * [RedditPost.getVideoGif]
      *
@@ -399,7 +400,7 @@ class RedditPost : RedditListing(),
      *
      * @return The source MP4
      */
-    fun getMp4Source(): Image? {
+    fun getMp4Source(): RedditImage? {
         return preview?.images?.get(0)?.variants?.mp4?.source
     }
 
@@ -407,12 +408,11 @@ class RedditPost : RedditListing(),
      * Gets the list of MP4 resolutions for the post. Note that this is only set when the post is a GIF
      * uploaded to reddit directly.
      *
-     *
      * For the source resolution see [RedditPost.getMp4Source]
      *
      * @return The list of MP4 resolutions
      */
-    fun getMp4Previews(): List<Image?>? {
+    fun getMp4Previews(): List<RedditImage?>? {
         return preview?.images?.get(0)?.variants?.mp4?.resolutions
     }
 

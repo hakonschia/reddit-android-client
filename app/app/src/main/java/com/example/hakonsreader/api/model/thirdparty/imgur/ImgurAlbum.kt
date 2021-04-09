@@ -1,6 +1,5 @@
-package com.example.hakonsreader.api.model.thirdparty
+package com.example.hakonsreader.api.model.thirdparty.imgur
 
-import com.example.hakonsreader.api.model.Image
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -12,12 +11,12 @@ class ImgurAlbum {
 
     private class Data {
         @SerializedName("images")
-        val images: List<Image>? = null
+        val images: List<ImgurImage>? = null
     }
 
     /**
      * @return The list of images in this album (this size can be 1)
      */
-    val images: List<Image>?
+    val images: List<ImgurImage>?
         get() = data?.images
 }

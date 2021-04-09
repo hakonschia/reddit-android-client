@@ -7,7 +7,7 @@ import com.example.hakonsreader.api.interceptors.UserAgentInterceptor
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.interfaces.VoteableRequest
 import com.example.hakonsreader.api.model.*
-import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
 import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError

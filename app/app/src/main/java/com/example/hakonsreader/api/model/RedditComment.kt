@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.model
 
-import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.interfaces.*
 import com.example.hakonsreader.api.jsonadapters.BooleanAsIntAdapter
 import com.example.hakonsreader.api.jsonadapters.EmptyStringAsNullAdapter

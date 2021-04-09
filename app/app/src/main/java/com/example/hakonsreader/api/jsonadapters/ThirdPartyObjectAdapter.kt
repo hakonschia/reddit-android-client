@@ -1,8 +1,8 @@
 package com.example.hakonsreader.api.jsonadapters
 
-import com.example.hakonsreader.api.model.thirdparty.ImgurAlbum
-import com.example.hakonsreader.api.model.thirdparty.GfycatGif
-import com.example.hakonsreader.api.model.thirdparty.ImgurGif
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
+import com.example.hakonsreader.api.model.thirdparty.gfycat.GfycatGif
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
 import com.example.hakonsreader.api.utils.thirdPartyObjectFromJsonString
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter

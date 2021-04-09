@@ -1,16 +1,24 @@
-package com.example.hakonsreader.api.model
+package com.example.hakonsreader.api.model.internal
 
+import com.example.hakonsreader.api.model.images.RedditImage
 import com.google.gson.annotations.SerializedName
 
 /**
  * Wrapper class for "preview.images" in JSON posts responses
  */
 class ImagesWrapper {
-    @SerializedName("source")
-    var source: Image? = null
 
+    /**
+     * The source image
+     */
+    @SerializedName("source")
+    var source: RedditImage? = null
+
+    /**
+     * The different resolutions for the images
+     */
     @SerializedName("resolutions")
-    var resolutions: List<Image>? = null
+    var resolutions: List<RedditImage>? = null
 
     /**
      * For posts such as gifs there is a object called "variants" with links to mp4 and gif URLs

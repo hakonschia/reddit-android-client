@@ -17,8 +17,6 @@ import com.squareup.picasso.Picasso
 
 /**
  * Content view for Reddit images posts.
- *
- * Images for NSFW posts are automatically blurred or not shown according to the setting from [App.showNsfwPreview]
  */
 class ContentImage : Content {
     private val binding: ContentImageBinding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true)

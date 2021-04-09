@@ -1,6 +1,5 @@
 package com.example.hakonsreader.api.requestmodels.thirdparty
 
-import com.example.hakonsreader.api.model.Image
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
