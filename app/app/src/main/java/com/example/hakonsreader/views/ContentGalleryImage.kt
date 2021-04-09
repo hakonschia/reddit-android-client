@@ -176,7 +176,8 @@ class ContentGalleryImage @JvmOverloads constructor(
             // The height will resize accordingly as long as the width matches the screen
             // I think, I'm pretty lost on this, haven't tested if width of the video is larger
             // than the screen, but I imagine it would scale down
-            videoWidth = Resources.getSystem().displayMetrics.widthPixels
+            videoWidth = imgurGif.width
+            videoHeight = imgurGif.height
 
             // This should only be called if the gallery image has an MP4 URL, otherwise it is an error
             url = imgurGif.mp4Url

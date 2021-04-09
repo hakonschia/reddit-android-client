@@ -9,8 +9,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.hakonsreader.api.interfaces.GalleryImage
+import com.example.hakonsreader.api.model.images.RedditGalleryItem
 import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
 import com.example.hakonsreader.databinding.ContentGalleryBinding
+import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
 import java.util.*
 import java.util.function.Consumer
@@ -45,7 +48,6 @@ class ContentGallery @JvmOverloads constructor(
     private var currentView: ContentGalleryImage? = null
 
     private var maxHeight = -1
-    private var maxWidth = -1
 
     override fun updateView() {
         val images: List<GalleryImage> = if (redditPost.thirdPartyObject is ImgurAlbum) {
@@ -54,17 +56,8 @@ class ContentGallery @JvmOverloads constructor(
             redditPost.galleryImages!!
         }
 
-        // Find the largest height and width and set the layout to that
-        for (image in images) {
-            val height = image.height
-            val width = image.width
-            if (height > maxHeight) {
-                maxHeight = height
-            }
-            if (width > maxWidth) {
-                maxWidth = width
-            }
-        }
+        val (maxWidth, maxHeight) = getMaxWidthAndHeight(images)
+        this.maxHeight = maxHeight
 
         // Should scale height to fit with the width as the image will be scaled later
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
@@ -84,7 +77,7 @@ class ContentGallery @JvmOverloads constructor(
                 super.onPageSelected(position)
                 setActiveImageText(position)
 
-                // Unselect the previous and
+                // Unselect the previous
                 currentView?.viewUnselected()
 
                 // Set new and select that
@@ -95,6 +88,34 @@ class ContentGallery @JvmOverloads constructor(
 
         // Set initial state
         setActiveImageText(0)
+    }
+
+    private fun getMaxWidthAndHeight(galleryImages: List<GalleryImage>): Coordinates {
+        var maxHeight = -1
+        var maxWidth = -1
+        var hasVideo = false
+
+        // Find the largest height and width and set the layout to that
+        for (image in galleryImages) {
+            if (image is ImgurGif || (image is RedditGalleryItem && image.source.mp4Url != null)) {
+                hasVideo = true
+            }
+
+            val height = image.height
+            val width = image.width
+            if (height > maxHeight) {
+                maxHeight = height
+            }
+            if (width > maxWidth) {
+                maxWidth = width
+            }
+        }
+
+        return if (hasVideo) {
+            VideoPlayer.createResizedVideoSize(maxWidth, maxHeight)
+        } else {
+            Coordinates(maxWidth, maxHeight)
+        }
     }
 
     /**

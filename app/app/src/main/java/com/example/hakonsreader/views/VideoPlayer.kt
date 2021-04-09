@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
 import com.example.hakonsreader.R
+import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createVideoDuration
 import com.example.hakonsreader.views.util.VideoCache
@@ -132,6 +133,43 @@ class VideoPlayer @JvmOverloads constructor(
          * The value stored with this key will be an `int`
          */
         const val EXTRA_VIDEO_SIZE = "videoSize"
+
+
+        /**
+         * Retrieve the resized size the video player will use if set with given values. Videos are
+         * resized to ensure the entire video fits the screen, and this function generate those values
+         *
+         * @param potentialWidth The width of the potential video (what [videoWidth] would be set to)
+         * @param potentialHeight The height of the potential video (what [videoHeight] would be set to)
+         */
+        fun createResizedVideoSize(potentialWidth: Int, potentialHeight: Int): Coordinates {
+            val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+
+            // Ensure the video size to screen ratio isn't too large or too small
+            var widthRatio: Float = potentialWidth.toFloat() / screenWidth
+            if (widthRatio > MAX_WIDTH_RATIO) {
+                widthRatio = MAX_WIDTH_RATIO
+            } else if (widthRatio < MIN_WIDTH_RATIO) {
+                widthRatio = MIN_WIDTH_RATIO
+            }
+
+            // Calculate and set the new width and height
+            val width = (screenWidth * widthRatio).toInt()
+
+            // Find how much the width was scaled by and use that to find the new height
+            val widthScaledBy = potentialWidth / width.toFloat()
+            var height = (potentialHeight / widthScaledBy).toInt()
+
+            var heightRatio: Float = height.toFloat() / screenHeight
+            if (heightRatio > MAX_HEIGHT_RATIO) {
+                heightRatio = MAX_HEIGHT_RATIO
+            }
+
+            height = (screenHeight * heightRatio).toInt()
+
+            return Coordinates(width, height)
+        }
     }
 
     /**
@@ -481,30 +519,8 @@ class VideoPlayer @JvmOverloads constructor(
      */
     private fun updateSize() {
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-        val screenHeight = Resources.getSystem().displayMetrics.heightPixels
-
-        // Ensure the video size to screen ratio isn't too large or too small
-        var widthRatio: Float = videoWidth.toFloat() / screenWidth
-        if (widthRatio > MAX_WIDTH_RATIO) {
-            widthRatio = MAX_WIDTH_RATIO
-        } else if (widthRatio < MIN_WIDTH_RATIO) {
-            widthRatio = MIN_WIDTH_RATIO
-        }
-
-        // Calculate and set the new width and height
-        val width = (screenWidth * widthRatio).toInt()
-
-        // Find how much the width was scaled by and use that to find the new height
-        val widthScaledBy = videoWidth / width.toFloat()
-        var height = (videoHeight / widthScaledBy).toInt()
-
-        var heightRatio: Float = height.toFloat() / screenHeight
-        if (heightRatio > MAX_HEIGHT_RATIO) {
-            heightRatio = MAX_HEIGHT_RATIO
-        }
-
-        height = (screenHeight * heightRatio).toInt()
-
+        val (_, height) = createResizedVideoSize(videoWidth, videoHeight)
+        
         actualVideoHeight = height
 
         // I don't even really know why this works, but the actual video player will be in the

@@ -17,7 +17,11 @@ import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 /**
  * View for displaying videos from a [RedditPost]
  */
-class ContentVideo : Content {
+class ContentVideo @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+): Content(context, attrs, defStyleAttr) {
     companion object {
         private const val TAG = "PostContentVideo"
 
@@ -36,11 +40,6 @@ class ContentVideo : Content {
     }
 
     private val player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
-
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun updateView() {
         setThumbnailUrl()
@@ -69,10 +68,7 @@ class ContentVideo : Content {
      */
     private fun setVideo() {
         // Get either the video, or the GIF
-        var video = redditPost.getVideo()
-        if (video == null) {
-            video = redditPost.getVideoGif()
-        }
+        val video = redditPost.getVideo() ?: redditPost.getVideoGif()
 
         val thirdParty = redditPost.thirdPartyObject
         var url: String? = null
