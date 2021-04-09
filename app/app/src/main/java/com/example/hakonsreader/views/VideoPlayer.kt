@@ -52,7 +52,11 @@ import com.squareup.picasso.Picasso
  * The thumbnail can also be a drawable set with [thumbnailDrawable]. By default, a drawable for
  * "No thumbnail" is shown if no thumbnail URL or drawable is given
  */
-class VideoPlayer : PlayerView {
+class VideoPlayer @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : PlayerView(context, attrs, defStyleAttr) {
     companion object {
         private const val TAG = "VideoPlayer"
 
@@ -319,12 +323,7 @@ class VideoPlayer : PlayerView {
      */
     private var isPrepared = false
 
-
-    constructor(context: Context) : super(context) { init() }
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) { init() }
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) { init() }
-
-    private fun init() {
+    init {
         controllerShowTimeoutMs = CONTROLLER_TIMEOUT
 
         // By default assume we don't know the duration, so use the default ExoPlayer duration which is

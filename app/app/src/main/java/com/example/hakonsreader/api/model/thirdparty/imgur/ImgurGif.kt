@@ -3,7 +3,10 @@ package com.example.hakonsreader.api.model.thirdparty.imgur
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.google.gson.annotations.SerializedName
 
-class ImgurGif : ThirdPartyGif {
+/**
+ * A GIF/MP4 from Imgur. Typically, [url] will point to the same as [mp4Url]
+ */
+class ImgurGif : ImgurImage(), ThirdPartyGif {
 
     /**
      * The link to the MP4 URL of the GIF
@@ -22,18 +25,6 @@ class ImgurGif : ThirdPartyGif {
      */
     @SerializedName("has_sound")
     override var hasAudio = false
-
-    /**
-     * The width of the GIF
-     */
-    @SerializedName("width")
-    override var width = 0
-
-    /**
-     * The width of the GIF
-     */
-    @SerializedName("height")
-    override var height = 0
 
     /**
      * Imgur gifs do not give a thumbnail, so this will be empty

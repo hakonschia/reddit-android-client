@@ -10,9 +10,11 @@ import android.widget.FrameLayout
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.interfaces.GalleryImage
 import com.example.hakonsreader.api.interfaces.Image
-import com.example.hakonsreader.api.model.images.RedditGalleryImage
 import com.example.hakonsreader.api.model.images.RedditGalleryItem
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.model.images.RedditGalleryImage
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
+import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurImage
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
 import com.example.hakonsreader.misc.Settings
 
@@ -77,6 +79,7 @@ class ContentGalleryImage @JvmOverloads constructor(
         image?.let {
             val view = when (it) {
                 is RedditGalleryItem -> asRedditGalleryImage(it)
+                is ImgurImage -> asImgurGalleryImage(it)
                 is Image -> asImage(it)
 
                 // It is really an error if this happens, should potentially throw an exception
@@ -90,7 +93,7 @@ class ContentGalleryImage @JvmOverloads constructor(
     private fun asRedditGalleryImage(galleryItem: RedditGalleryItem): View {
         val image = galleryItem.source
         return if (image.mp4Url != null) {
-            asGif(image)
+            asVideo(image)
         } else {
             with (binding) {
                 caption.text = galleryItem.caption
@@ -120,14 +123,22 @@ class ContentGalleryImage @JvmOverloads constructor(
         }
     }
 
+    private fun asImgurGalleryImage(image: ImgurImage) : View {
+        return if (image is ImgurGif) {
+            asImgurVideo(image)
+        } else {
+            asImage(image)
+        }
+    }
+
     /**
-     * Returns a [ContentImage] for a given [Image]. The image should be a image
+     * Returns a [ContentImage] for a given [Image]. The image should be a image (not a video)
      *
      * @param image The image to create an image view for
      * @return A [ContentImage]
-     * @see asGif
+     * @see asVideo
      */
-    private fun asImage(image: Image) : ContentImage {
+    private fun asImage(image: Image): ContentImage {
         // Use ContentImage as that already has listeners, NSFW caching etc already
         return ContentImage(context).apply {
             setWithImageUrl(post, image.url)
@@ -135,13 +146,13 @@ class ContentGalleryImage @JvmOverloads constructor(
     }
 
     /**
-     * Returns a [VideoPlayer] for a given [Image]. The image should be a video
+     * Returns a [VideoPlayer] for a given [RedditGalleryImage]. The image should be a video
      *
      * @param image The image to create a video for
      * @return A [VideoPlayer]
      * @see asImage
      */
-    private fun asGif(image: RedditGalleryImage) : VideoPlayer {
+    private fun asVideo(image: RedditGalleryImage) : VideoPlayer {
         return VideoPlayer(context).apply {
             // The height will resize accordingly as long as the width matches the screen
             // I think, I'm pretty lost on this, haven't tested if width of the video is larger
@@ -150,6 +161,26 @@ class ContentGalleryImage @JvmOverloads constructor(
 
             // This should only be called if the gallery image has an MP4 URL, otherwise it is an error
             url = image.mp4Url!!
+        }
+    }
+
+    /**
+     * Returns a [VideoPlayer] for a given [ImgurGif]
+     *
+     * @param imgurGif The imgur gif to create a video for
+     * @return A [VideoPlayer]
+     * @see asImage
+     */
+    private fun asImgurVideo(imgurGif: ImgurGif): VideoPlayer {
+        return VideoPlayer(context).apply {
+            // The height will resize accordingly as long as the width matches the screen
+            // I think, I'm pretty lost on this, haven't tested if width of the video is larger
+            // than the screen, but I imagine it would scale down
+            videoWidth = Resources.getSystem().displayMetrics.widthPixels
+
+            // This should only be called if the gallery image has an MP4 URL, otherwise it is an error
+            url = imgurGif.mp4Url
+            videoSize = imgurGif.mp4Size
         }
     }
 
