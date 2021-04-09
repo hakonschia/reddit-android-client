@@ -96,14 +96,18 @@ class ImageActivity : BaseActivity() {
                         }
 
                         override fun onError(e: Exception) {
-                            binding.loadingIcon.visibility = View.GONE
-                            e.printStackTrace()
-                            AlertDialog.Builder(this@ImageActivity)
-                                    .setTitle(R.string.imageLoadFailedDialogTitle)
-                                    .setMessage(R.string.imageLoadFailedDialogContent)
-                                    .setOnDismissListener { finish() }
-                                    .show()
-                        }
+                            // If the user exits the activity we cannot show a dialog, which would cause a crash
+                            if (!isDestroyed) {
+                                binding.loadingIcon.visibility = View.GONE
+                                e.printStackTrace()
+                                AlertDialog.Builder(this@ImageActivity)
+                                        .setTitle(R.string.imageLoadFailedDialogTitle)
+                                        .setMessage(R.string.imageLoadFailedDialogContent)
+                                        .setOnDismissListener { finish() }
+                                        .show()
+                                }
+                            }
+
                     })
         } else {
             finish()
