@@ -1,6 +1,7 @@
 package com.example.hakonsreader.views.util
 
 import android.text.style.URLSpan
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,32 @@ import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
 
+
+/**
+ * Sets a views visibility to [View.GONE] if a given predicate is true, otherwise it is set to [View.VISIBLE]
+ *
+ * @see invisibleIf
+ */
+fun View.goneIf(predicate: Boolean) {
+    visibility = if (predicate) {
+        View.GONE
+    } else {
+        View.VISIBLE
+    }
+}
+
+/**
+ * Sets a views visibility to [View.INVISIBLE] if a given predicate is true, otherwise it is set to [View.VISIBLE]
+ *
+ * @see goneIf
+ */
+fun View.invisibleIf(predicate: Boolean) {
+    visibility = if (predicate) {
+        View.INVISIBLE
+    } else {
+        View.VISIBLE
+    }
+}
 
 /**
  * Sets a long click listener on a TextView that opens a bottom sheet to peek a URL long pressed, if
