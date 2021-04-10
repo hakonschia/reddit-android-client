@@ -57,6 +57,14 @@ See also: [build](#build)
     - [Fully customizable colors](images/comment-sidebar-color-dialog.gif) - [Preview](images/comment-sidebar-color-preview.png)
   - [Highlight comments](images/highlight-new-comments.png) added since the last time a post was viewed (can be toggled).
 
+- **Misc**
+  - [Slide away](images/slide-away.gif) opened posts, subreddits, user, images and so on
+
+- **Third party integration**
+  - Imgur albums/galleries [are shown as](images/imgur-album-as-gallery.png) other Reddit galleries
+  - Gfycat and Imgur videos are [loaded directly](images/gfycat-imgur-videos.png) from the source to always provide audio when possible (and show the size of the video), as the video URLs
+  provided by Reddit [do not include any audio](images/gfycat-imgur-videos-not-loaded-directly.png).
+
 - **Mod support**
   - Sticky posts and comments
   - Distinguish posts and comments as a moderator
