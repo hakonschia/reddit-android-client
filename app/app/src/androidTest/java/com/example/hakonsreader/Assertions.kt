@@ -1,13 +1,16 @@
 package com.example.hakonsreader
 
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.view.View
 import android.widget.EditText
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
-import androidx.test.espresso.matcher.ViewMatchers.*
-import org.hamcrest.CoreMatchers.allOf
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
+import com.robinhood.ticker.TickerView
 import org.hamcrest.Description
-import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
 
 
@@ -67,28 +70,65 @@ fun cursorPosition(start: Int, end: Int = -1) : TypeSafeMatcher<View> {
 }
 
 /**
- * Sets the cursor position for an EditText
+ * Matcher for verifying if a view has a given text color.
  *
- * @param start The start selection
- * @param end Optional: The end selection
+ * This matcher allows for any [View] to be passed. This is to allow to verify a [TickerView] as well
+ * as [TextView], but it is an error to pass anything else and will always cause a fail
+ *
+ * @param color The color resource to verify
  */
-// Taken from (with some modification): https://stackoverflow.com/a/63660118/7750841
-fun setCursorPosition(start: Int, end: Int = -1) : ViewAction {
-    return object : ViewAction {
-        override fun getConstraints(): Matcher<View> {
-            return allOf(isDisplayed(), isAssignableFrom(EditText::class.java))
+fun hasTextColorWithTicker(@ColorRes color: Int) = object : TypeSafeMatcher<View>() {
+    override fun describeTo(description: Description) {
+        description.appendText("verifies that a View has a given text color")
+    }
+
+    override fun matchesSafely(item: View): Boolean {
+        val resolvedColor = ContextCompat.getColor(item.context, color)
+        return when (item) {
+            is TickerView -> resolvedColor == item.textColor
+            is TextView -> resolvedColor == item.currentTextColor
+            else -> false
+        }
+    }
+}
+
+/**
+ * Matcher for verifying that a [TickerView] has a given text set.
+ */
+fun tickerViewHasText(text: String) = object : TypeSafeMatcher<View>() {
+    override fun describeTo(description: Description) {
+        description.appendText("verifies that a TickerView has a given text")
+    }
+
+    override fun matchesSafely(item: View): Boolean {
+        if (item !is TickerView) {
+            return false
+        }
+        return item.text == text
+    }
+}
+
+/**
+ * Verifies that an [ImageView] has a given [ColorFilter] set.
+ *
+ * This assumes the default color filter used by [ImageView.setColorFilter] by passing only a color is set
+ *
+ * @param color The color resource on the color filter
+ */
+fun imageHasColorInColorFilter(@ColorRes color: Int) = object : TypeSafeMatcher<View>() {
+    override fun describeTo(description: Description) {
+        description.appendText("verifies that an ImageView has a given color filter set")
+    }
+
+    override fun matchesSafely(item: View): Boolean {
+        if (item !is ImageView) {
+            return false
         }
 
-        override fun getDescription(): String {
-            return "set selection to start=$start, end=$end"
-        }
+        val resolvedColor = ContextCompat.getColor(item.context, color)
 
-        override fun perform(uiController: UiController, view: View) {
-            if (end == -1) {
-                (view as EditText).setSelection(start)
-            } else {
-                (view as EditText).setSelection(start, end)
-            }
-        }
+        // Kind of bad as this relies on implementation details of it being a PorterDuffColorFilter
+        // but dunno how else to get the color
+        return item.colorFilter == PorterDuffColorFilter(resolvedColor, PorterDuff.Mode.SRC_ATOP)
     }
 }

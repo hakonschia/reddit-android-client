@@ -3,10 +3,12 @@ package com.example.hakonsreader.di
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
+import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.model.flairs.RedditFlair
 import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.api.responses.GenericError
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.Module
@@ -21,6 +23,13 @@ import javax.inject.Singleton
         replaces = [ApiModule::class]
 )
 class TestApiModule {
+    companion object {
+        /**
+         * If this is passed a listing ID, a vote will return an error instead of success
+         */
+        const val VOTE_FAIL = "vote_fail"
+    }
+
 
     @Singleton
     @Provides
@@ -33,7 +42,92 @@ class TestApiModule {
             }
 
             override fun post(postId: String): PostRequest {
-                TODO("Not yet implemented")
+                return object : PostRequest {
+                    override suspend fun comments(sort: SortingMethods, loadThirdParty: Boolean): ApiResponse<PostRequestImpl.CommentsResponse> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun moreComments(children: List<String>, parent: RedditComment?): ApiResponse<List<RedditComment>> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun vote(voteType: VoteType): ApiResponse<Nothing?> {
+                        return if (postId == VOTE_FAIL) {
+                            ApiResponse.Error(GenericError(403), Throwable("'$VOTE_FAIL' was passed as listing ID"))
+                        } else {
+                            ApiResponse.Success(null)
+                        }
+                    }
+
+                    override suspend fun save(): ApiResponse<Nothing?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun unsave(): ApiResponse<Nothing?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun distinguishAsMod(): ApiResponse<RedditPost> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun removeModDistinguish(): ApiResponse<RedditPost> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun sticky(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun unsticky(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun info(): ApiResponse<RedditPost?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun markNsfw(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun unmarkNsfw(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun markSpoiler(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun unmarkSpoiler(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun delete(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun reply(text: String): ApiResponse<RedditComment> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun ignoreReports(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun unignoreReports(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun lock(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                    override suspend fun unlock(): ApiResponse<Any?> {
+                        TODO("Not yet implemented")
+                    }
+
+                }
             }
 
             override fun comment(commentId: String): CommentRequest {

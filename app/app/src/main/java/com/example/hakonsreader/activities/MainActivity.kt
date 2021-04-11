@@ -177,10 +177,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch back to the app theme (from the launcher theme)
+        // This has to be here and not in the manifest, otherwise the launcher theme won't be active
+        // during the startup (for the splash screen)
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
-        val prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE)
-        SharedPreferencesManager.create(prefs)
+
         binding = ActivityMainBinding.inflate(layoutInflater).also {
             setContentView(it.root)
         }

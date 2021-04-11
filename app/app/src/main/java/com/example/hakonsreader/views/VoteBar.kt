@@ -32,7 +32,11 @@ import javax.inject.Inject
  * and one button for downvoting the listing, as well as a text with the score of the listing
  */
 @AndroidEntryPoint
-class VoteBar : FrameLayout {
+class VoteBar @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding = VoteBarBinding.inflate(LayoutInflater.from(context), this, true).apply {
         upvote.setOnClickListener { vote(VoteType.UPVOTE) }
@@ -63,11 +67,6 @@ class VoteBar : FrameLayout {
                 updateVoteStatus()
             }
         }
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
 
     /**
@@ -167,16 +166,19 @@ class VoteBar : FrameLayout {
                 }
             }
 
-            if (it.isScoreHidden || hideScore) {
-                binding.score.text = resources.getString(R.string.scoreHidden)
-            } else {
-                val scoreCount = it.score
-
-                // For scores over 10000 show as "10.5k"
-                binding.score.text = if (scoreCount >= 10000) {
-                    resources.getString(R.string.scoreThousands, scoreCount / 1000f)
+            // In tests setting the text (binding.score.text = "") fails since it is not on the UI thread for some reason
+            Handler(Looper.getMainLooper()).post {
+                if (it.isScoreHidden || hideScore) {
+                    binding.score.text = resources.getString(R.string.scoreHidden)
                 } else {
-                   scoreCount.toString()
+                    val scoreCount = it.score
+
+                    // For scores over 10000 show as "10.5k"
+                    binding.score.text = if (scoreCount >= 10000) {
+                        resources.getString(R.string.scoreThousands, scoreCount / 1000f)
+                    } else {
+                        scoreCount.toString()
+                    }
                 }
             }
         }

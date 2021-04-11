@@ -14,7 +14,7 @@ import org.junit.Assert.*
 /**
  * Tests for view extension functions
  */
-class ViewExtensions {
+class ViewExtensionsTest {
     lateinit var context: Context
 
     @Before
@@ -38,7 +38,7 @@ class ViewExtensions {
         assertEquals(View.GONE, view.visibility)
 
         view.goneIf(false)
-        // Should now be VISIBLE able
+        // Should now be VISIBLE
         assertEquals(View.VISIBLE, view.visibility)
     }
 
@@ -57,7 +57,7 @@ class ViewExtensions {
         assertEquals(View.INVISIBLE, view.visibility)
 
         view.invisibleIf(false)
-        // Should now be VISIBLE able
+        // Should now be VISIBLE
         assertEquals(View.VISIBLE, view.visibility)
     }
 }

@@ -20,10 +20,6 @@
             android:value="false" />
 
 
-        <!-- This activity is solely for testing purposes -->
-        <activity android:name=".activities.MockActivity" />
-
-
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
