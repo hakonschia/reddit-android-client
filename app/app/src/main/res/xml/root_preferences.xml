@@ -309,4 +309,30 @@
             app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_subreddits_warn_nsfw" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/prefs_group_third_party"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="@string/prefs_key_third_party_load_gfycat_gifs"
+            app:title="@string/prefs_title_third_party_load_gfycat_gifs"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_third_party_load_gfycat_gifs" />
+
+        <SwitchPreference
+            app:key="@string/prefs_key_third_party_load_imgur_gifs"
+            app:title="@string/prefs_title_third_party_load_imgur_gifs"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_third_party_load_imgur_gifs" />
+
+        <SwitchPreference
+            app:key="@string/prefs_key_third_party_load_imgur_albums"
+            app:title="@string/prefs_title_third_party_load_imgur_albums"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_third_party_load_imgur_albums" />
+    </PreferenceCategory>
 </PreferenceScreen>

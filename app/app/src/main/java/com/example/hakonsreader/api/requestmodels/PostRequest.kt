@@ -8,6 +8,7 @@ import com.example.hakonsreader.api.interfaces.*
 import com.example.hakonsreader.api.model.AccessToken
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.model.thirdparty.ThirdPartyOptions
 import com.example.hakonsreader.api.requestmodels.thirdparty.ThirdPartyRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -198,14 +199,15 @@ class PostRequestImpl(
         private val api: PostService,
         private val postId: String,
         imgurApi: ImgurService?,
-        gfycatApi: GfycatService
+        gfycatApi: GfycatService,
+        thirdPartyOptions: ThirdPartyOptions
 ) : PostRequest {
 
     private val voteRequest = VoteableRequestModelImpl(accessToken, api)
     private val replyRequest = ReplyableRequestModelImpl(accessToken, api)
     private val saveRequest = SaveableRequestModelImpl(accessToken, api)
     private val modRequest = ModRequestModelImpl(accessToken, api)
-    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
+    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi, thirdPartyOptions)
 
 
     class CommentsResponse(val comments: List<RedditComment>, val post: RedditPost)

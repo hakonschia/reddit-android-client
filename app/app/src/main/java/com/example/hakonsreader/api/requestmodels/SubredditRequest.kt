@@ -10,6 +10,7 @@ import com.example.hakonsreader.api.exceptions.NoSubredditInfoException
 import com.example.hakonsreader.api.exceptions.SubredditNotFoundException
 import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.model.flairs.RedditFlair
+import com.example.hakonsreader.api.model.thirdparty.ThirdPartyOptions
 import com.example.hakonsreader.api.requestmodels.thirdparty.ThirdPartyRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -209,10 +210,11 @@ class SubredditRequestImpl(
         private val accessToken: AccessToken,
         private val api: SubredditService,
         imgurApi: ImgurService?,
-        gfycatApi: GfycatService
+        gfycatApi: GfycatService,
+        thirdPartyOptions: ThirdPartyOptions
 ) : SubredditRequest {
 
-    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
+    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi, thirdPartyOptions)
 
     override suspend fun info() : ApiResponse<Subreddit> {
         if (RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase())) {

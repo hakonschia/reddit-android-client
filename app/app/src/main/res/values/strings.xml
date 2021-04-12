@@ -70,6 +70,7 @@
     <string name="prefs_group_links">Links</string>
     <string name="prefs_group_inbox">Inbox</string>
     <string name="prefs_group_subreddits">Subreddits</string>
+    <string name="prefs_group_third_party">Third party</string>
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark mode</string>
@@ -127,6 +128,9 @@
     <string name="prefs_title_subreddits_load_banners">Load banners</string>
     <string name="prefs_title_subreddits_warn_nsfw">Show NSFW warning</string>
     <string name="prefs_title_comment_sidebar_colors">Sidebar colors</string>
+    <string name="prefs_title_third_party_load_gfycat_gifs">Load Gfycat/Redgifs gifs</string>
+    <string name="prefs_title_third_party_load_imgur_gifs">Load Imgur gifs</string>
+    <string name="prefs_title_third_party_load_imgur_albums">Load Imgur albums/galleries</string>
 
 
     <!-- Preferences keys -->
@@ -181,6 +185,9 @@
     <string name="prefs_key_subreddits_load_banners" translatable="false">load_banners</string>
     <string name="prefs_key_subreddits_warn_nsfw" translatable="false">warn_nsfw</string>
     <string name="prefs_key_comment_sidebar_colors" translatable="false">comment_sidebar_colors</string>
+    <string name="prefs_key_third_party_load_gfycat_gifs" translatable="false">third_party_load_gfycat_gifs</string>
+    <string name="prefs_key_third_party_load_imgur_gifs" translatable="false">third_party_load_imgur_gifs</string>
+    <string name="prefs_key_third_party_load_imgur_albums" translatable="false">third_party_load_imgur_albums</string>
 
 
     <plurals name="filteredSubredditsSummary">

@@ -5,6 +5,7 @@ import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.model.*
+import com.example.hakonsreader.api.model.thirdparty.ThirdPartyOptions
 import com.example.hakonsreader.api.requestmodels.thirdparty.ThirdPartyRequest
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -163,6 +164,7 @@ class UserRequestsImpl(
         private val api: UserService,
         imgurApi: ImgurService?,
         gfycatApi: GfycatService,
+        thirdPartyOptions: ThirdPartyOptions
 ) : UserRequests {
 
     /**
@@ -176,7 +178,7 @@ class UserRequestsImpl(
         SAVED("saved");
     }
 
-    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi)
+    private val thirdPartyRequest = ThirdPartyRequest(imgurApi, gfycatApi, thirdPartyOptions)
 
 
     override suspend fun info() : ApiResponse<RedditUser> {

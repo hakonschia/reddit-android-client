@@ -30,5 +30,8 @@
     <bool name="prefs_default_send_crash_reports">false</bool>
     <bool name="prefs_default_subreddits_load_banners">true</bool>
     <bool name="prefs_default_subreddits_warn_nsfw">true</bool>
+    <bool name="prefs_default_third_party_load_gfycat_gifs">true</bool>
+    <bool name="prefs_default_third_party_load_imgur_gifs">true</bool>
+    <bool name="prefs_default_third_party_load_imgur_albums">true</bool>
 
 </resources>

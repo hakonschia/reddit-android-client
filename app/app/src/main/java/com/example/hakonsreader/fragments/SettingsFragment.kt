@@ -10,6 +10,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.*
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.interfaces.LanguageListener
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
@@ -17,10 +18,13 @@ import com.example.hakonsreader.views.preferences.multicolor.MultiColorPreferenc
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Fragment for displaying user settings
  */
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
     companion object {
         private const val TAG = "SettingsFragment"
@@ -35,6 +39,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
          */
         fun newInstance() = SettingsFragment()
     }
+
+    // The API won't be used to make any calls here, but is needed to adjust third party options
+    @Inject
+    lateinit var api: RedditApi
 
     private lateinit var settings: SharedPreferences
 
@@ -94,6 +102,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val crashReportPreference: SwitchPreference? = findPreference(getString(R.string.prefs_key_send_crash_reports))
         crashReportPreference?.let {
             it.onPreferenceChangeListener = crashReportsChangeListener
+        }
+
+        // Third party options all use the same listener
+        findPreference<SwitchPreference>(getString(R.string.prefs_key_third_party_load_gfycat_gifs))?.let {
+            it.onPreferenceChangeListener = thirdPartyOptionsListener
+        }
+        findPreference<SwitchPreference>(getString(R.string.prefs_key_third_party_load_imgur_gifs))?.let {
+            it.onPreferenceChangeListener = thirdPartyOptionsListener
+        }
+        findPreference<SwitchPreference>(getString(R.string.prefs_key_third_party_load_imgur_albums))?.let {
+            it.onPreferenceChangeListener = thirdPartyOptionsListener
         }
     }
 
@@ -245,6 +264,22 @@ class SettingsFragment : PreferenceFragmentCompat() {
             // https://firebase.google.com/docs/projects/manage-installations#delete-fid
             FirebaseInstallations.getInstance().delete()
             Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
+        }
+
+        true
+    }
+
+    /**
+     * Generic listener for third party options changes (only for boolean options)
+     */
+    private val thirdPartyOptionsListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+        // It is an error to use this listener on anything else than a SwitchPreference
+        newValue as Boolean
+
+        when (preference.key) {
+            getString(R.string.prefs_key_third_party_load_gfycat_gifs) -> api.thirdPartyOptions.loadGfycatGifs = newValue
+            getString(R.string.prefs_key_third_party_load_imgur_gifs) -> api.thirdPartyOptions.loadImgurGifs = newValue
+            getString(R.string.prefs_key_third_party_load_imgur_albums) ->  api.thirdPartyOptions.loadImgurAlbums = newValue
         }
 
         true

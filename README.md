@@ -61,6 +61,9 @@ See also: [build](#build)
   - [Slide away](images/slide-away.gif) opened posts, subreddits, user, images and so on
 
 - **Third party integration**
+
+All these options can be [toggled indepedently](images/settings-load-third-party.png)
+
   - Imgur albums/galleries [are shown as](images/imgur-album-as-gallery.png) other Reddit galleries
   - Gfycat and Imgur videos are [loaded directly](images/gfycat-imgur-videos.png) from the source to always provide audio when possible (and show the size of the video), as the video URLs
   provided by Reddit [do not include any audio](images/gfycat-imgur-videos-not-loaded-directly.png).
@@ -88,7 +91,7 @@ KEY_PASSWORD = <The key password>
 Note: The signing values cannot be omitted. If you are not building a release version assign empty strings to these values (ie. `FILE_PATH = ""`)
 
 
-Optionally, create an [Imgur app](https://api.imgur.com/oauth2/addclient) and pass the client ID to make requests towards the Imgur API. Some communication is done with Imgur, but these calls are optional and the app will be functional if this is omitted. Only userless/anonymous endpoints are used for Imgur.
+Optionally, create an [Imgur app](https://api.imgur.com/oauth2/addclient) and pass the client ID to make requests towards the Imgur API. Some communication is done with Imgur, but these calls are optional and the app will be functional if this is omitted. Only userless/anonymous endpoints are used.
 ```
 IMGUR_CLIENT_ID = <The Imgur client ID>
 ```

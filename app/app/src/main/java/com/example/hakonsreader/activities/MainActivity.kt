@@ -180,6 +180,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // This has to be here and not in the manifest, otherwise the launcher theme won't be active
         // during the startup (for the splash screen)
         setTheme(R.style.AppTheme)
+        val prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE)
+        SharedPreferencesManager.create(prefs)
+
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater).also {

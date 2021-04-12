@@ -432,4 +432,8 @@
     </plurals>
     <string name="peekUrlBottomSheetInferredUrlHeader">Antatt URL</string>
     <string name="peekUrlBottomSheetCopyUrl">Kopier</string>
+    <string name="prefs_group_third_party">Eksterne tjenester</string>
+    <string name="prefs_title_third_party_load_gfycat_gifs">Last Gfycat/Redgifs gifer</string>
+    <string name="prefs_title_third_party_load_imgur_gifs">Last Imgur gifer</string>
+    <string name="prefs_title_third_party_load_imgur_albums">Last Imgur albumer/gallerier</string>
 </resources>

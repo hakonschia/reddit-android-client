@@ -1,6 +1,7 @@
 package com.example.hakonsreader.api.requestmodels.thirdparty
 
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.api.model.thirdparty.ThirdPartyOptions
 import com.example.hakonsreader.api.service.thirdparty.GfycatService
 import com.example.hakonsreader.api.service.thirdparty.ImgurService
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +14,11 @@ import java.net.URISyntaxException
 /**
  * Request model for communicating with third party services, such as Imgur and Gfycat
  */
-class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatApi: GfycatService) {
+class ThirdPartyRequest(
+        private val imgurApi: ImgurService?,
+        private val gfycatApi: GfycatService,
+        private val options: ThirdPartyOptions
+) {
 
     /**
      * Loads all third party contents for a list of posts.
@@ -63,15 +68,15 @@ class ThirdPartyRequest(private val imgurApi: ImgurService?, private val gfycatA
      */
     suspend fun loadAll(post: RedditPost) {
         val func = when {
-            post.domain == "gfycat.com" -> this::loadGfycatGif
-            post.domain == "redgifs.com" -> this::loadRedgifGif
+            options.loadGfycatGifs && post.domain == "gfycat.com" -> this::loadGfycatGif
+            options.loadGfycatGifs && post.domain == "redgifs.com" -> this::loadRedgifGif
             // We can use http for this as the http URL itself isn't loaded, it is just used as an identifier
 
             // The difference between a gallery and album? Except the URL, no idea. They seemingly contain
             // the same type of image items
-            post.url.matches("http(s)?://(m\\.)?imgur\\.com/gallery/.+".toRegex()) -> this::loadImgurGalleryAlbum
-            post.url.matches("http(s)?://(m\\.)?imgur\\.com/a/.+".toRegex()) -> this::loadImgurAlbum
-            post.url.matches("http(s)?://([im])\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
+            options.loadImgurAlbums && post.url.matches("http(s)?://(m\\.)?imgur\\.com/gallery/.+".toRegex()) -> this::loadImgurGalleryAlbum
+            options.loadImgurAlbums && post.url.matches("http(s)?://(m\\.)?imgur\\.com/a/.+".toRegex()) -> this::loadImgurAlbum
+            options.loadImgurGifs && post.url.matches("http(s)?://([im])\\.imgur\\.com/.+(\\.(gif(v)?|mp4))".toRegex()) -> this::loadImgurGif
             else -> null
         } ?: return
 

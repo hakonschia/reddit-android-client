@@ -7,6 +7,7 @@ import com.example.hakonsreader.api.interceptors.UserAgentInterceptor
 import com.example.hakonsreader.api.interfaces.VoteableListing
 import com.example.hakonsreader.api.interfaces.VoteableRequest
 import com.example.hakonsreader.api.model.*
+import com.example.hakonsreader.api.model.thirdparty.ThirdPartyOptions
 import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
 import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.ApiResponse
@@ -197,6 +198,11 @@ interface RedditApi {
          * For the cache for reddit requests, see [cache]. When setting this, you should also set [thirdPartyCacheAge]
          * @param thirdPartyCacheAge The max age for the third party cache
          *
+         * @param thirdPartyOptions The options for which third party API calls to make. By default a standard
+         * object with default values defined by the class is set.
+         * Note that even if the imgur values in this class are set to true, you still need to provide a client ID
+         * with [imgurClientId] to make these calls.
+         *
          * @param loggerLevel The [HttpLoggingInterceptor.Level] to use for logging of the API calls
          *
          * @throws IllegalStateException If [userAgent] or [clientId] is empty
@@ -218,11 +224,19 @@ interface RedditApi {
                 thirdPartyCache: Cache? = null,
                 thirdPartyCacheAge: Long = 0L,
 
+                thirdPartyOptions: ThirdPartyOptions = ThirdPartyOptions(),
+
                 loggerLevel: HttpLoggingInterceptor.Level? = null
         ) : RedditApi {
-            return RedditApiImpl(userAgent, clientId, accessToken, onNewToken, onInvalidToken, callbackUrl, deviceId, imgurClientId, cache, cacheAge, thirdPartyCache, thirdPartyCacheAge, loggerLevel)
+            return RedditApiImpl(userAgent, clientId, accessToken, onNewToken, onInvalidToken, callbackUrl,
+                    deviceId, imgurClientId, cache, cacheAge, thirdPartyCache, thirdPartyCacheAge, thirdPartyOptions, loggerLevel)
         }
     }
+
+    /**
+     * The options for which third party API calls to make
+     */
+    val thirdPartyOptions: ThirdPartyOptions
 
     /**
      * Enable or disable private browsing. Enabling private browsing will temporarily set an anonymous
@@ -348,6 +362,8 @@ private class RedditApiImpl constructor(
         private val cacheAge: Long = 0L,
         private val thirdPartyCache: Cache? = null,
         private val thirdPartyCacheAge: Long = 0L,
+
+        override val thirdPartyOptions: ThirdPartyOptions,
 
         private val loggerLevel: HttpLoggingInterceptor.Level? = null,
 ) : RedditApi {
@@ -596,7 +612,7 @@ private class RedditApiImpl constructor(
     }
 
     override fun post(postId: String): PostRequest {
-        return PostRequestImpl(accessTokenInternal, postApi, postId, imgurService, gfycatService)
+        return PostRequestImpl(accessTokenInternal, postApi, postId, imgurService, gfycatService, thirdPartyOptions)
     }
 
     override fun comment(commentId: String): CommentRequest {
@@ -604,7 +620,7 @@ private class RedditApiImpl constructor(
     }
 
     override fun subreddit(subredditName: String): SubredditRequest {
-        return SubredditRequestImpl(subredditName, accessTokenInternal, subredditApi, imgurService, gfycatService)
+        return SubredditRequestImpl(subredditName, accessTokenInternal, subredditApi, imgurService, gfycatService, thirdPartyOptions)
     }
 
     override fun subreditts(): SubredditsRequest {
@@ -612,7 +628,7 @@ private class RedditApiImpl constructor(
     }
 
     override fun user(username: String): UserRequests {
-        return UserRequestsImpl(username, accessTokenInternal, userApi, imgurService, gfycatService)
+        return UserRequestsImpl(username, accessTokenInternal, userApi, imgurService, gfycatService, thirdPartyOptions)
     }
 
     override fun user(): UserRequestsLoggedInUser {

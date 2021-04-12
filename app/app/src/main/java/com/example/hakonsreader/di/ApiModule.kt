@@ -1,8 +1,12 @@
 package com.example.hakonsreader.di
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 import com.example.hakonsreader.App
+import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.model.thirdparty.ThirdPartyOptions
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
@@ -63,9 +67,28 @@ object ApiModule {
                 imgurClientId = imgurClientId,
 
                 thirdPartyCache = thirdPartyCache,
-                thirdPartyCacheAge = thirdPartyCacheAge
+                thirdPartyCacheAge = thirdPartyCacheAge,
+
+                thirdPartyOptions = getThirdPartyOptions(PreferenceManager.getDefaultSharedPreferences(context), context)
         ).apply {
             enablePrivateBrowsing(privatelyBrowsing)
         }
+    }
+
+    private fun getThirdPartyOptions(preferences: SharedPreferences, context: Context): ThirdPartyOptions {
+        return ThirdPartyOptions(
+                loadGfycatGifs = preferences.getBoolean(
+                        context.getString(R.string.prefs_key_third_party_load_gfycat_gifs),
+                        context.resources.getBoolean(R.bool.prefs_default_third_party_load_gfycat_gifs)
+                ),
+                loadImgurGifs = preferences.getBoolean(
+                        context.getString(R.string.prefs_key_third_party_load_imgur_gifs),
+                        context.resources.getBoolean(R.bool.prefs_default_third_party_load_imgur_gifs)
+                ),
+                loadImgurAlbums = preferences.getBoolean(
+                        context.getString(R.string.prefs_key_third_party_load_imgur_albums),
+                        context.resources.getBoolean(R.bool.prefs_default_third_party_load_imgur_albums)
+                )
+        )
     }
 }
