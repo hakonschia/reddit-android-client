@@ -276,12 +276,13 @@ class VideoPlayer @JvmOverloads constructor(
         }
 
     /**
-     * The size of the video in Megabytes. This will show a text in the overlay with the size in MB,
+     * The size of the video amount of in bytes. This will show a text in the overlay with the size in MB,
      * if the size given is larger than 0 bytes
      */
     var videoSize = -1
         set(value) {
             field = value
+            setVideoSizeView()
 
             if (field > 0) {
                 val videoSizeView: TextView = findViewById(R.id.videoSize)
@@ -294,6 +295,16 @@ class VideoPlayer @JvmOverloads constructor(
                     GONE
                 }
             }
+        }
+
+    /**
+     * If [videoSize] is set by an estimation rather than a precise value, this should be set to true
+     * to give an indicator to the user
+     */
+    var isVideoSizeEstimated = false
+        set(value) {
+            field = value
+            setVideoSizeView()
         }
 
     /**
@@ -486,6 +497,24 @@ class VideoPlayer @JvmOverloads constructor(
 
             ProgressiveMediaSource.Factory(dataSourceFactory, extractor)
         }.createMediaSource(mediaItem)
+    }
+
+    /**
+     * Sets the video size on the view based on [videoSize] and [isVideoSizeEstimated]
+     */
+    private fun setVideoSizeView() {
+        val videoSizeView: TextView = findViewById(R.id.videoSize)
+        videoSizeView.visibility = if (videoSize > 0) {
+            val sizeInMb = videoSize / (1024 * 1024f)
+            videoSizeView.text = if (isVideoSizeEstimated) {
+                context.getString(R.string.videoSizeEstimated, sizeInMb)
+            } else {
+                context.getString(R.string.videoSize, sizeInMb)
+            }
+            VISIBLE
+        } else {
+            GONE
+        }
     }
 
     /**

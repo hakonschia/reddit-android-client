@@ -10,7 +10,7 @@ class RedditVideo {
      * Gets the fallback URL for the video
      */
     @SerializedName("fallback_url")
-    val fallbackURL: String? = null
+    val fallbackUrl: String? = null
 
     /**
      * Gets the url to the DASH (Dynamic Adaptive Streaming over HTTP) video for the post
@@ -22,7 +22,7 @@ class RedditVideo {
      * Gets the URL to the HLS (HTTP Live Streaming) video for the post
      */
     @SerializedName("hls_url")
-    val hlsURL: String? = null
+    val hlsUrl: String? = null
 
     /**
      * Gets the height of the video
@@ -41,4 +41,10 @@ class RedditVideo {
      */
     @SerializedName("is_gif")
     val isGif = false
+
+    /**
+     * The bitrate of the video in kilobits per second (kbps)
+     */
+    @SerializedName("bitrate_kbps")
+    val bitrate = 0
 }

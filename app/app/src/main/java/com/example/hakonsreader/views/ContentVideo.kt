@@ -88,6 +88,10 @@ class ContentVideo @JvmOverloads constructor(
             player.dashVideo = true
             player.videoWidth = video.width
             player.videoHeight = video.height
+
+            // bitrate is given in kilobits, so get to kilobytes and then to bytes
+            player.videoSize = video.duration * (video.bitrate / 8 * 1024)
+            player.isVideoSizeEstimated = true
         } else {
             val gif = redditPost.getMp4Source()
             if (gif != null) {

@@ -542,6 +542,7 @@
     <string name="notificationInboxCommentReplyTitle">New comment reply from %s</string>
 
     <string name="videoSize" translatable="false">%.2f MB</string>
+    <string name="videoSizeEstimated" translatable="false">~ %.2f MB</string>
 
     <plurals name="awardsCount">
         <item quantity="one">%d award</item>
