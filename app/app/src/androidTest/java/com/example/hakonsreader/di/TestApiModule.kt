@@ -6,6 +6,7 @@ import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.enums.VoteType
 import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.model.flairs.RedditFlair
+import com.example.hakonsreader.api.model.thirdparty.ThirdPartyOptions
 import com.example.hakonsreader.api.requestmodels.*
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -270,6 +271,9 @@ class TestApiModule {
             override fun messages(): MessagesRequestModel {
                 TODO("Not yet implemented")
             }
+
+            override val thirdPartyOptions: ThirdPartyOptions
+                get() = ThirdPartyOptions()
 
             override fun enablePrivateBrowsing(enable: Boolean) {
                 isPrivatelyBrowsing = enable

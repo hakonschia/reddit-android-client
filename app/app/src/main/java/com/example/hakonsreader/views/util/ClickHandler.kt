@@ -59,14 +59,16 @@ fun openProfileInActivity(view: View, username: String?) {
  * with usage in XML layouts
  * @param imageUrl The URL to the image
  * @param cache True to cache the image once opened
+ * @param useBitmapFromView If set to true [ImageActivity.BITMAP] will be set to the bitmap [view] holds,
+ * if [view] is an ImageView with a BitmapDrawable
  */
-fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean) {
+fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean, useBitmapFromView: Boolean) {
     val context = view.context
     val activity = context as Activity
 
     // Send some data like what sub it is etc etc so it knows what to load
     Intent(context, ImageActivity::class.java).run {
-        if (view is ImageView) {
+        if (useBitmapFromView && view is ImageView) {
             val drawable = view.drawable
             if (drawable is BitmapDrawable) {
                 ImageActivity.BITMAP = drawable.bitmap
