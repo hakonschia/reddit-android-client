@@ -2,7 +2,9 @@ package com.example.hakonsreader.views.util
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityOptionsCompat
 import com.example.hakonsreader.R
@@ -53,7 +55,8 @@ fun openProfileInActivity(view: View, username: String?) {
 /**
  * Opens an image in fullscreen with a SharedElementTransition
  *
- * @param view The view itself is ignored, but this cannot be null as the context is needed
+ * @param view The view to use. This should be an ImageView, but is defined as a View to be compatible
+ * with usage in XML layouts
  * @param imageUrl The URL to the image
  * @param cache True to cache the image once opened
  */
@@ -63,6 +66,13 @@ fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean) {
 
     // Send some data like what sub it is etc etc so it knows what to load
     Intent(context, ImageActivity::class.java).run {
+        if (view is ImageView) {
+            val drawable = view.drawable
+            if (drawable is BitmapDrawable) {
+                ImageActivity.BITMAP = drawable.bitmap
+            }
+        }
+
         putExtra(ImageActivity.EXTRAS_IMAGE_URL, imageUrl)
         putExtra(ImageActivity.EXTRAS_CACHE_IMAGE, cache)
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image")

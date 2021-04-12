@@ -1,8 +1,10 @@
 package com.example.hakonsreader.activities
 
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
@@ -40,11 +42,21 @@ class ImageActivity : BaseActivity() {
          * The value with this key should be a [Boolean]
          */
         const val EXTRAS_CACHE_IMAGE = "extras_ImageActivity_cacheImage"
+
+        /**
+         * The bitmap to display. This can be used instead of passing an URL if the image has already
+         * been loaded and is in memory.
+         *
+         * Using this when possible has the benefit of not asking Picasso to reload the image, which can
+         * have a small (and very noticeable) delay even without having to do a network request
+         *
+         * This should be set just before the activity is started and will be nulled when the activity finishes
+         */
+        var BITMAP: Bitmap? = null
     }
 
     private var slidrInterface: SlidrInterface? = null
     private lateinit var binding: ActivityImageBinding
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,41 +86,17 @@ class ImageActivity : BaseActivity() {
                 window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                         WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
-            var imageUrl = data.getString(EXTRAS_IMAGE_URL)
 
             val attacher: PhotoViewAttacher = binding.image.attacher
             attacher.maximumScale = 7f
 
             binding.image.setOnDoubleTapListener(PhotoViewDoubleTapListener(attacher, slidrInterface))
-            imageUrl = LinkUtils.convertToDirectUrl(imageUrl)
-            binding.loadingIcon.visibility = View.VISIBLE
 
-            val cache = data.getBoolean(EXTRAS_CACHE_IMAGE, true)
-
-            Picasso.get()
-                    .load(imageUrl)
-                    .resize(Resources.getSystem().displayMetrics.widthPixels, 0)
-                    .cache(cache)
-                    .into(binding.image, object : Callback {
-                        override fun onSuccess() {
-                            binding.loadingIcon.visibility = View.VISIBLE
-                            binding.loadingIcon.visibility = View.GONE
-                        }
-
-                        override fun onError(e: Exception) {
-                            // If the user exits the activity we cannot show a dialog, which would cause a crash
-                            if (!isDestroyed) {
-                                binding.loadingIcon.visibility = View.GONE
-                                e.printStackTrace()
-                                AlertDialog.Builder(this@ImageActivity)
-                                        .setTitle(R.string.imageLoadFailedDialogTitle)
-                                        .setMessage(R.string.imageLoadFailedDialogContent)
-                                        .setOnDismissListener { finish() }
-                                        .show()
-                                }
-                            }
-
-                    })
+            if (BITMAP != null) {
+                binding.image.setImageBitmap(BITMAP)
+            } else {
+                loadImageByUrl(data)
+            }
         } else {
             finish()
         }
@@ -116,6 +104,39 @@ class ImageActivity : BaseActivity() {
 
     override fun finish() {
         super.finish()
+        BITMAP = null
         overridePendingTransition(R.anim.fade_out, R.anim.fade_out)
+    }
+
+    private fun loadImageByUrl(data: Bundle) {
+        var imageUrl = data.getString(EXTRAS_IMAGE_URL)
+        imageUrl = LinkUtils.convertToDirectUrl(imageUrl)
+        binding.loadingIcon.visibility = View.VISIBLE
+
+        val cache = data.getBoolean(EXTRAS_CACHE_IMAGE, true)
+
+        Picasso.get()
+                .load(imageUrl)
+                .resize(Resources.getSystem().displayMetrics.widthPixels, 0)
+                .cache(cache)
+                .into(binding.image, object : Callback {
+                    override fun onSuccess() {
+                        binding.loadingIcon.visibility = View.GONE
+                    }
+
+                    override fun onError(e: Exception) {
+                        // If the user exits the activity we cannot show a dialog, which would cause a crash
+                        if (!isDestroyed) {
+                            binding.loadingIcon.visibility = View.GONE
+                            e.printStackTrace()
+                            AlertDialog.Builder(this@ImageActivity)
+                                    .setTitle(R.string.imageLoadFailedDialogTitle)
+                                    .setMessage(R.string.imageLoadFailedDialogContent)
+                                    .setOnDismissListener { finish() }
+                                    .show()
+                        }
+                    }
+
+                })
     }
 }
