@@ -36,6 +36,10 @@
         <variable
             name="subredditSelected"
             type="com.example.hakonsreader.interfaces.OnSubredditSelected" />
+
+        <variable
+            name="userIsModerator"
+            type="boolean" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -471,6 +475,64 @@
                 app:layout_constraintStart_toStartOf="@id/allIcon"
                 app:layout_constraintTop_toTopOf="@id/allIcon" />
 
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/modGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:visibility="@{userIsModerator ? View.VISIBLE : View.GONE}"
+                app:constraint_referenced_ids="mod, modIcon, modClicker" />
+
+            <ImageView
+                android:id="@+id/modIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_admin_24px"
+                app:tint="@color/modTextColor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/allIcon"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/mod"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+
+                android:maxLines="1"
+                android:text="@string/mod"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"
+
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="@+id/modIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/modIcon"
+                app:layout_constraintTop_toTopOf="@+id/modIcon" />
+
+            <View
+                android:id="@+id/modClicker"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+
+                android:layout_marginEnd="16dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick='@{(view) -> subredditSelected.subredditSelected("mod")}'
+
+                app:layout_constraintBottom_toBottomOf="@id/modIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/modIcon"
+                app:layout_constraintTop_toTopOf="@id/modIcon" />
+
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/randomIcon"
                 android:layout_width="24dp"
@@ -481,7 +543,7 @@
                 android:src="@drawable/ic_help_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/allIcon"
+                app:layout_constraintTop_toBottomOf="@id/modIcon"
                 app:layout_constraintVertical_bias="0.0" />
 
             <TextView

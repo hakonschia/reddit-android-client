@@ -2,7 +2,6 @@ package com.example.hakonsreader.activities
 
 import android.app.AlertDialog
 import android.app.PendingIntent
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -49,6 +48,7 @@ import com.example.hakonsreader.states.OAuthState
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
 import com.example.hakonsreader.viewmodels.assistedViewModel
+import com.example.hakonsreader.views.util.goneIf
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -359,6 +359,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     override fun setSupportActionBar(toolbar: Toolbar?) {
         super.setSupportActionBar(toolbar)
+
+        // Enable the icon on the toolbar as a menu icon, as it opens the nav drawer
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeAsUpIndicator(R.drawable.ic_round_menu_24)
@@ -375,9 +377,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     /**
-     * Called when a subreddit has been selected from a [SelectSubredditFragment] fragment
-     *
-     * A new instance of [SubredditFragment] is created and shown
+     * Called when a subreddit has been selected. An instance of [SubredditFragment] will be shown.
+     * If the selected subreddit is a default subreddit (not including "mod") then the subreddit will
+     * be selected in the home nav bar (the default sub container). Otherwise, the subreddit will be
+     * shown in the subreddit nav bar, and if [activeSubreddit] points to the same name as given here
+     * it will be reused instead of creating a new one.
      *
      * This will hide the keyboard, if shown
      *
@@ -405,12 +409,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         } else {
             // If the current subreddit is the same, use the old instead of creating a new one
             // If we're going to "r/random" we should recreate it, as that isn't really a specific subreddit
-            // (SubredditFragment should probably just change the subredditName tbh)
             if (subredditName.equals("random", ignoreCase = true) || activeSubreddit?.subredditName != subredditName) {
                 activeSubreddit = SubredditFragment.newInstance(subredditName)
             }
 
-            // Already in the subreddit navbar, open subreddit with opening
+            // Already in the subreddit nav bar, open subreddit with opening transition
             if (binding.bottomNav.selectedItemId == R.id.navSubreddit) {
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainer, activeSubreddit!!)
@@ -418,7 +421,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                         .addToBackStack(null)
                         .commit()
             } else {
-                // Otherwise select the subreddit navbar, which will use activeSubreddit and deal with animations
+                // Otherwise select the subreddit nav bar, which will use activeSubreddit and deal with animations
                 binding.bottomNav.selectedItemId = R.id.navSubreddit
             }
         }
@@ -991,14 +994,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             subreddits.observe(this@MainActivity) { subreddits ->
                 (binding.navDrawer.subreddits.adapter as SubredditsAdapter)
                         .submitList(subreddits as MutableList<Subreddit>, true)
+
+                // At least one sub where the user is a moderator
+                binding.navDrawer.userIsModerator =  subreddits.find { sub -> sub.isModerator } != null
             }
 
-            isLoading.observe(this@MainActivity) {
-                binding.navDrawer.subredditsLoaderLayout.visibility = if (it) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
+            isLoading.observe(this@MainActivity) { loading ->
+                binding.navDrawer.subredditsLoaderLayout.goneIf(!loading)
             }
 
             error.observe(this@MainActivity) { error ->
@@ -1015,12 +1017,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 setTrendingSubredditsLastUpdated(trending)
             }
 
-            isLoading.observe(this@MainActivity) {
-                binding.navDrawer.trendingSubredditsLoaderLayout.visibility = if (it) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
+            isLoading.observe(this@MainActivity) { loading ->
+                binding.navDrawer.trendingSubredditsLoaderLayout.goneIf(!loading)
             }
 
             error.observe(this@MainActivity) { error ->

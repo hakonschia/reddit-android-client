@@ -249,6 +249,7 @@
     <string name="front_page">Front page</string>
     <string name="popular" translatable="false">Popular</string>
     <string name="all" translatable="false">All</string>
+    <string name="mod" translatable="false">Mod</string>
     <string name="random">Random</string>
 
     <string name="content_description_link_image">Link to website</string>
