@@ -71,7 +71,7 @@ class PostBar @JvmOverloads constructor(
      * Updates the view based on the post set with [PostBar.post]
      */
     private fun updateView() {
-        binding.voteBar.updateVoteStatus()
+        binding.voteBar.updateVoteStatus(animate = true)
 
         val comments = post!!.amountOfComments.toFloat()
 
@@ -100,13 +100,4 @@ class PostBar @JvmOverloads constructor(
         binding.numComments.animationDuration = if (enable) resources.getInteger(R.integer.tickerAnimationDefault).toLong() else 0
     }
 
-    /**
-     * Check if the TickerViews have animation enabled
-     *
-     * @return True if animation is enabled
-     */
-    fun tickerAnimationEnabled(): Boolean {
-        // Technically voteBar and numComments can have different values, but assume they're always synced
-        return binding.voteBar.tickerAnimationEnabled()
-    }
 }

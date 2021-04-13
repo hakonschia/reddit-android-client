@@ -64,7 +64,7 @@ class VoteBar @JvmOverloads constructor(
         set(value) {
             field = value
             if (value != null) {
-                updateVoteStatus()
+                updateVoteStatus(animate = false)
             }
         }
 
@@ -95,7 +95,7 @@ class VoteBar @JvmOverloads constructor(
             // Assume it's successful as it feels like the buttons aren't pressed when you have to wait
             // until the colors are updated
             it.voteType = actualVote
-            updateVoteStatus()
+            updateVoteStatus(animate = true)
 
             val id = it.id
 
@@ -117,7 +117,7 @@ class VoteBar @JvmOverloads constructor(
                         }
 
                         withContext(Main) {
-                            updateVoteStatus()
+                            updateVoteStatus(animate = true)
                             handleGenericResponseErrors(this@VoteBar, resp.error, resp.throwable)
                         }
                     }
@@ -140,8 +140,10 @@ class VoteBar @JvmOverloads constructor(
 
     /**
      * Updates the colors of the vote text/buttons and the vote count
+     *
+     * @param animate If set to false the ticker will not animate the change
      */
-    fun updateVoteStatus() {
+    fun updateVoteStatus(animate: Boolean) {
         if (listing == null) {
             return
         }
@@ -174,11 +176,11 @@ class VoteBar @JvmOverloads constructor(
                     val scoreCount = it.score
 
                     // For scores over 10000 show as "10.5k"
-                    binding.score.text = if (scoreCount >= 10000) {
+                    binding.score.setText(if (scoreCount >= 10000) {
                         resources.getString(R.string.scoreThousands, scoreCount / 1000f)
                     } else {
                         scoreCount.toString()
-                    }
+                    }, animate)
                 }
             }
         }
@@ -197,15 +199,6 @@ class VoteBar @JvmOverloads constructor(
         else {
             0
         }
-    }
-
-    /**
-     * Check if the TickerView for the score has animation enabled
-     *
-     * @return True if the animation is enabled
-     */
-    fun tickerAnimationEnabled(): Boolean {
-        return binding.score.animationDuration != 0L
     }
 
     /**

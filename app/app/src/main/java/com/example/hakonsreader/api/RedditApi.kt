@@ -134,7 +134,7 @@ interface RedditApi {
 
     companion object {
         /**
-         * The list of standard subs: front page (represented as an empty string), popular, all.
+         * The list of standard subs (front page represented as an empty string)
          *
          * Note: The elements in this list are case sensitive and in this list are all lower case.
          * When using this list to check against a standard sub you should ensure the string is lower cased, or use
@@ -290,7 +290,7 @@ interface RedditApi {
     fun accessToken(): AccessTokenModel
 
     /**
-     * Retrieve a [PostRequestImpl] object that can be used to make API calls towards posts
+     * Retrieve a [PostRequest] object that can be used to make API calls towards posts
      *
      * @param postId The ID of the post to make calls towards
      * @return An object that can perform various post related API requests
@@ -298,7 +298,7 @@ interface RedditApi {
     fun post(postId: String): PostRequest
 
     /**
-     * Retrieve a [CommentRequestImpl] object that can be used to make API calls towards comments
+     * Retrieve a [CommentRequest] object that can be used to make API calls towards comments
      *
      * @param commentId The ID of the comment
      * @return An object that can perform various comment related API requests
@@ -314,7 +314,7 @@ interface RedditApi {
     fun subreddit(subredditName: String): SubredditRequest
 
     /**
-     * Retrieve a [SubredditsRequestImpl] object that can be used to make API calls towards subreddits.
+     * Retrieve a [SubredditsRequest] object that can be used to make API calls towards subreddits.
      * This differs from [subreddit] as this is for multiple subreddits (like getting subreddits
      * a user is subscribed to), not one specific subreddit
      *
@@ -323,7 +323,7 @@ interface RedditApi {
     fun subreditts(): SubredditsRequest
 
     /**
-     * Retrieve a [UserRequestsImpl] object that can get handle requests for non-logged in users.
+     * Retrieve a [UserRequests] object that can handle requests for non-logged in users.
      *
      * @param username the username to to make calls towards.
      * @return An object that can perform various user related API requests for non-logged in users
@@ -331,7 +331,7 @@ interface RedditApi {
     fun user(username: String): UserRequests
 
     /**
-     * Retrieve a Kotlin based request object that offers API calls for logged in users
+     * Retrieve a [UserRequestsLoggedInUser] object that can handle requests for non-logged in users.
      *
      * For logged in users use [user]
      *
@@ -700,7 +700,7 @@ private class RedditApiImpl constructor(
                 ).execute()
 
                 // If we get a 400 Bad Request when attempting to refresh the token, the token has been
-                // invalidated outside of the control of the API (ie. the applications access from reddit.com/prefs/apps
+                // invalidated outside of the control of our API (ie. the applications access from reddit.com/prefs/apps
                 // was revoked), or the access token set was never valid
                 // Call the listener registered when the API object was built to notify that the token isn't valid anymore
                 val code = call.code()
@@ -719,8 +719,6 @@ private class RedditApiImpl constructor(
                     // https://www.reddit.com/r/redditdev/comments/kvzaot/oauth2_api_changes_upcoming/?sort=new
                     if (refreshToken == null) {
                         refreshToken = accessTokenInternal.refreshToken
-                    } else {
-                        println("RedditApi.refreshToken: new refresh token was retrieved from the request")
                     }
                 }
             } catch (e: IOException) {

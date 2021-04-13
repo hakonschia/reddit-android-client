@@ -537,11 +537,7 @@ class CommentsAdapter constructor(
                 isByLoggedInUser = byLoggedInUser
                 awards.listing = comment
 
-                // If the ticker has animation enabled it will animate from the previous comment to this one
-                // which is very weird behaviour, so disable the animation and enable it again when we have set the comment
-                commentVoteBar.enableTickerAnimation(false)
                 commentVoteBar.listing = comment
-                commentVoteBar.enableTickerAnimation(true)
 
                 addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors)
                 // Execute all the bindings now, or else scrolling/changes to the dataset will have a
