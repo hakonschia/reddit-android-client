@@ -40,6 +40,10 @@
         <variable
             name="userIsModerator"
             type="boolean" />
+
+        <variable
+            name="isDarkMode"
+            type="boolean" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -280,6 +284,7 @@
                 app:layout_constraintTop_toBottomOf="@id/settingsIcon"
                 app:layout_constraintVertical_bias="0.0" />
 
+            <!-- The text on this is opposite of what the mode is, since it's a "select the opposite" button -->
             <TextView
                 android:id="@+id/darkMode"
                 android:layout_width="wrap_content"
@@ -290,7 +295,7 @@
                 android:ellipsize="end"
 
                 android:maxLines="1"
-                android:text="@string/prefs_title_theme"
+                android:text="@{isDarkMode ? @string/lightMode : @string/darkMode}"
                 android:textColor="@color/text_color"
                 android:textSize="16sp"
 

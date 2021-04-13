@@ -617,4 +617,7 @@
         <item quantity="one">%d color</item>
         <item quantity="other">%d colors</item>
     </plurals>
+
+    <string name="darkMode">Dark mode</string>
+    <string name="lightMode">Light mode</string>
 </resources>

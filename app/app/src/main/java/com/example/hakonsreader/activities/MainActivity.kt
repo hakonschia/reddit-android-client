@@ -1051,6 +1051,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             subredditSelected = this@MainActivity
             api = this@MainActivity.api
             userInfoDao = this@MainActivity.userInfoDao
+            isDarkMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
 
             profilePicture.setOnClickListener { selectProfileNavBar() }
             username.setOnClickListener { selectProfileNavBar() }
