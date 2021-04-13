@@ -583,6 +583,7 @@
     <string name="frontPageDescription">The front page contains posts from all your subscribed subreddits</string>
     <string name="popularDescription">Popular contains trending posts from the most popular subreddits</string>
     <string name="allDescription">All is a collection of the most active posts from all subreddits</string>
+    <string name="modDescription">Mod contains posts from subreddits you are moderating</string>
 
     <string name="subreddits">Subreddits</string>
     <string name="trendingSubreddits">Trending subreddits</string>

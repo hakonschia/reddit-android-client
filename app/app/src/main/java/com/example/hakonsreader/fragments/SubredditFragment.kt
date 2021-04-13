@@ -855,6 +855,7 @@ class SubredditFragment : Fragment() {
             "" -> R.string.frontPageDescription
             "popular" -> R.string.popularDescription
             "all" -> R.string.allDescription
+            "mod" -> R.string.modDescription
             else -> null
         } ?: return
 

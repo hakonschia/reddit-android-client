@@ -436,4 +436,5 @@
     <string name="prefs_title_third_party_load_gfycat_gifs">Last Gfycat/Redgifs gifer</string>
     <string name="prefs_title_third_party_load_imgur_gifs">Last Imgur gifer</string>
     <string name="prefs_title_third_party_load_imgur_albums">Last Imgur albumer/gallerier</string>
+    <string name="modDescription">Mod inneholder poster fra subredditer du modererer</string>
 </resources>

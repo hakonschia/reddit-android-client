@@ -384,12 +384,14 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * @param subredditName The subreddit selected
      */
     override fun subredditSelected(subredditName: String) {
-        val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
 
-        val lowerCased = subredditName.toLowerCase()
+        val lowerCased = subredditName.toLowerCase(Locale.ROOT)
+
         // If default sub, use the home nav bar instead
-        if (RedditApi.STANDARD_SUBS.contains(lowerCased)) {
+        // Currently, we don't show "mod" in the default sub container
+        if (RedditApi.STANDARD_SUBS.contains(lowerCased) && lowerCased != "mod") {
             val sub = StandardSubContainerFragment.StandarSub.values().find { it.value == lowerCased }
                     ?: StandardSubContainerFragment.StandarSub.FRONT_PAGE
 

@@ -44,7 +44,7 @@ import java.util.*
  * ```
  *
  * API endpoints are grouped together based on functionality, and are exposed through request models.
- * The request models are returned from functions in this class, such as [subreddit] returning a
+ * The request models are returned from functions in this interface, such as [subreddit] returning a
  * [SubredditRequest] object.
  *
  * The API endpoints are suspended using Kotlin coroutines to make the network requests. The functions
@@ -53,12 +53,12 @@ import java.util.*
  *
  * On successful requests, [ApiResponse.Success] will be populated with with the response data,
  * retrieved with [ApiResponse.Success.value]. On failed requests, [ApiResponse.Error] will be populated
- * with a [GenericError] and a [Throwable].The error code in [GenericError] will be the HTTP error code,
+ * with a [GenericError] and a [Throwable]. The error code in [GenericError] will be the HTTP error code,
  * or if another type of error occurred this will be -1 and the throwable will hold the information needed to identify the issue.
  *
  * Usage example:
  * ```
- * val api = RedditApi.create()...
+ * val api = RedditApi.create(...)
  *
  * // Retrieve information about the "GlobalOffensive" subreddit
  * // The response for this is ApiResponse<Subreddit>
@@ -68,9 +68,11 @@ import java.util.*
  *     when (response) {
  *         is ApiResponse.Success -> {
  *             val subreddit = response.value
- *             val subredditName = subreddit.name
+ *
+ *             val name = subreddit.name
  *             val subscribers = subreddit.subscribers
  *         }
+ *
  *         is ApiResponse.Error {
  *             val errorCode = response.error.code
  *             responses.throwable.printStackTrace()
@@ -87,11 +89,13 @@ import java.util.*
  *             // Some endpoints won't have a return value (they return ApiResponse<Any?>)
  *             // For these endpoints "response" will still be "ApiResponse.Success", but
  *             // "response.value" will be null
+ *
  *             val isNull = response.value == null // true
  *         }
+ *
  *         is ApiResponse.Error -> {
  *              val errorCode = response.error.code
- *              responses.throwable.printStackTrace()
+ *              response.throwable.printStackTrace()
  *         }
  *     }
  * }
@@ -99,9 +103,10 @@ import java.util.*
  *
  * Models relating to Reddit specific content (such as posts or comments) inherit from [RedditListing].
  * Most listings will also implement a variety of interfaces depending on what kind of listing it is.
- * For example, [RedditPost] and [RedditComment] implement [VoteableListing]. The respective request models
- * (eg. [PostRequestImpl] for [RedditPost]) will also implement the corresponding interface [VoteableRequest].
- * When performing API requests on these listings these interfaces can be taken advantage of to generify the code:
+ * For example, [RedditPost] and [RedditComment] implement [VoteableListing] as they can be voted on.
+ * The respective request models (eg. [PostRequest] for [RedditPost]) will also implement the
+ * corresponding interface [VoteableRequest]. When performing API requests on these listings these
+ * interfaces can be taken advantage of to generify the code:
  *
  * ```
  * val api = ...
@@ -137,7 +142,7 @@ interface RedditApi {
          *
          * Note: This is an unmodifiable list. Attempting to change it will throw an exception
          */
-        val STANDARD_SUBS: List<String> = Collections.unmodifiableList(listOf("", "popular", "all"))
+        val STANDARD_SUBS: List<String> = Collections.unmodifiableList(listOf("", "popular", "all", "mod"))
 
 
         /**
