@@ -1,20 +1,16 @@
 package com.example.hakonsreader.activities
 
 import android.app.AlertDialog
-import android.app.PendingIntent
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -22,10 +18,11 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.hakonsreader.App
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
-import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.TrendingSubreddits
@@ -49,6 +46,7 @@ import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
 import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.example.hakonsreader.views.util.goneIf
+import com.example.hakonsreader.workers.InboxCheckerWorker
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -62,9 +60,8 @@ import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.Instant
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.collections.HashMap
-import kotlin.concurrent.fixedRateTimer
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
@@ -120,6 +117,12 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
 
         /**
+         * The name of the Worker responsible for checking inbox messages
+         */
+        private const val WORKER_INBOX = "worker_inbox"
+
+
+        /**
          * When creating this activity, set this on the extras to select the subreddit to show by default
          *
          * The value with this key should be a [String]
@@ -145,9 +148,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * The amount of unread messages in the inbox
      */
     private var unreadMessages = 0
-
-    private var inboxNotificationCounter = 0
-    private val notifications = HashMap<String, Int>()
 
     /**
      * If set to true the first call to [onSaveInstanceState] will ignore the fragment states and only
@@ -231,16 +231,14 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             // Only setup the start fragment if we have no state to restore (as this is then a new activity)
             setupStartFragment(startSubreddit)
 
-            // Only start the inbox listener once, or else every configuration change would start another timer
-            // TODO this has to be improved as now it leaks and doesn't really work at all
-            //  it should probably be some sort of service or something and not just this naively done
-            //startInboxListener()
-
             // Trending subreddits aren't user specific so they don't have to be retrieved again
             trendingSubredditsViewModel.loadSubreddits()
+
+            startInboxWorker()
         }
 
         observeUserState()
+        observeUnreadMessages()
 
         subredditsViewModel.isForLoggedInUser = AppState.loggedInState.value is LoggedInState.LoggedIn
         subredditsViewModel.loadSubreddits(force = recreatedAsNewUser == true)
@@ -319,7 +317,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     selectSubredditFragment = SelectSubredditFragment.newInstance()
                 }
 
-                // Since we are in a way going back in the same navbar item, use the close transition
+                // Since we are in a way going back in the same nav bar item, use the close transition
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainer, selectSubredditFragment!!)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
@@ -655,55 +653,19 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
 
     /**
-     * Starts a timer that runs at a given interval. Each run will make an API call for the users inbox
-     * to retrieve new messages
+     * Enqueues a periodic request to [WorkManager] that runs an [InboxCheckerWorker].
      *
-     * If there is no user logged in then the timer is not started
+     * The interval will be [Settings.inboxUpdateFrequency]. If this returns a negative value then
+     * no work will be enqueued.
      */
-    private fun startInboxListener() {
-        // The activity should be recreated when a user logs in, so this should be fine
-        if (AppState.loggedInState.value !is LoggedInState.LoggedIn) {
-            return
-        }
-
-        observeUnreadMessages()
-
-        // This runs when the application is minimized, might be bad? Can obviously send notifications this way, but
-        // it should probably be done in a different way
-
-        // This wont be updated until the app restarts
+    private fun startInboxWorker() {
         val updateFrequency = Settings.inboxUpdateFrequency()
-        Log.d(TAG, "InboxTimer frequency: $updateFrequency minutes")
-        if (updateFrequency != -1) {
-            var counter = 0
+        if (updateFrequency < 0) return
 
-            fixedRateTimer("inboxTimer", false, 0L, updateFrequency * 60 * 1000L) {
-                Log.d(TAG, "InboxTimer running")
+        val inboxRequest = PeriodicWorkRequestBuilder<InboxCheckerWorker>(updateFrequency.toLong(), TimeUnit.MINUTES)
+                .build()
 
-                CoroutineScope(IO).launch {
-                    // Get all messages every 10th request, in case a message has been seen outside the
-                    // application then it won't be in the unread messages, so get all every once in a while
-                    val response = if (counter % 10 == 0) {
-                        api.messages().inbox()
-                    } else {
-                        api.messages().unread()
-                    }
-
-                    counter++
-
-                    when (response) {
-                        is ApiResponse.Success -> {
-                            // TODO this should also remove previous notifications if they are now seen
-                            //  Or possibly in observeUnreadMessages?
-                            response.value.filter { it.isNew }.forEach { createInboxNotification(it) }
-                            messagesDao.insertAll(response.value)
-                        }
-                        is ApiResponse.Error -> {
-                        }
-                    }
-                }
-            }
-        }
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(WORKER_INBOX, ExistingPeriodicWorkPolicy.REPLACE, inboxRequest)
     }
 
     /**
@@ -729,50 +691,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
             }
         })
-    }
-
-    /**
-     * Creates a notification for an inbox message
-     *
-     * @param message The message to show the notification for
-     */
-    private fun createInboxNotification(message: RedditMessage) {
-        // Only show if this message doesn't have a shown notification already
-        if (notifications[message.id] != null) {
-            return
-        }
-
-        val title = if (message.wasComment) {
-            getString(R.string.notificationInboxCommentReplyTitle, message.author)
-        } else {
-            getString(R.string.notificationInboxMessageTitle, message.author)
-        }
-
-        // Only open messages, we don't have anything to do for messages
-        val pendingIntent = if (message.wasComment) {
-            val intent = Intent(this, DispatcherActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                putExtra(DispatcherActivity.EXTRAS_URL_KEY, message.context)
-            }
-            PendingIntent.getActivity(this, 0, intent, 0)
-        } else {
-            null
-        }
-
-        val builder = NotificationCompat.Builder(this@MainActivity, App.NOTIFICATION_CHANNEL_INBOX_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(title)
-                // TODO this should show the "raw" text, without any markdown formatting
-                .setContentText(message.body)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
-        with(NotificationManagerCompat.from(this@MainActivity)) {
-            val id = inboxNotificationCounter++
-            notify(id, builder.build())
-            notifications[message.id] = id
-        }
     }
 
     /**
@@ -884,14 +802,14 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      *
      * @param startSubreddit The name of the subreddit to display. If this is a standard subreddit
      * [standardSubFragment] will be shown with the corresponding subreddit selected. Otherwise,
-     * the [activeSubreddit] is set with the subreddit and is shown in the subreddit navbar
+     * the [activeSubreddit] is set with the subreddit and is shown in the subreddit nav bar
      */
     private fun setupStartFragment(startSubreddit: String) {
         if (standardSubFragment == null) {
             standardSubFragment = StandardSubContainerFragment.newInstance()
         }
 
-        val defaultSub = StandardSubContainerFragment.StandarSub.values().find { it.value == startSubreddit.toLowerCase() }
+        val defaultSub = StandardSubContainerFragment.StandarSub.values().find { it.value == startSubreddit.toLowerCase(Locale.ROOT) }
 
         if (defaultSub != null) {
             standardSubFragment!!.apply {

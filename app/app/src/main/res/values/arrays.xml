@@ -59,14 +59,12 @@
 
     <string-array name="inbox_update_frequency_entries">
         <item>@string/prefs_title_inbox_update_frequency_dont_update</item>
-        <item>@string/prefs_title_inbox_update_frequency_5_min</item>
         <item>@string/prefs_title_inbox_update_frequency_15_min</item>
         <item>@string/prefs_title_inbox_update_frequency_30_min</item>
         <item>@string/prefs_title_inbox_update_frequency_60_min</item>
     </string-array>
     <string-array name="inbox_update_frequency_values">
         <item>@string/prefs_key_inbox_update_frequency_dont_update</item>
-        <item>@string/prefs_key_inbox_update_frequency_5_min</item>
         <item>@string/prefs_key_inbox_update_frequency_15_min</item>
         <item>@string/prefs_key_inbox_update_frequency_30_min</item>
         <item>@string/prefs_key_inbox_update_frequency_60_min</item>

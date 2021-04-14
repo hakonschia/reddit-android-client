@@ -111,4 +111,13 @@ class RedditMessage : RedditListing() {
      * @see distinguished
      */
     fun isAdmin() : Boolean = distinguished == "admin"
+
+
+    /**
+     * Set to true if this message has been seen by the user and should not recreate notifications
+     * or other messages to the user, even if [isNew] is true
+     *
+     * This must be set manually
+     */
+    var isSeen = false
 }

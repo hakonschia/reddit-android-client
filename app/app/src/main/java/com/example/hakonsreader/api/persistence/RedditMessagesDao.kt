@@ -77,4 +77,10 @@ interface RedditMessagesDao {
      */
     @Query("UPDATE messages SET isNew=0")
     fun markRead()
+
+    /**
+     * Retrieve a list of message based on a list of IDs
+     */
+    @Query("SELECT * FROM messages WHERE id in (:ids)")
+    fun getMessagesById(ids: List<String>): List<RedditMessage>
 }

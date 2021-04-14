@@ -5,7 +5,9 @@ import android.content.*
 import android.os.Build
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.preference.PreferenceManager
+import androidx.work.Configuration
 import com.example.hakonsreader.activities.InvalidAccessTokenActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.*
@@ -32,7 +34,7 @@ import javax.inject.Inject
  * Entry point for the application
  */
 @HiltAndroidApp
-class App : Application() {
+class App : Application(), Configuration.Provider {
 
     companion object {
         private const val TAG = "App"
@@ -62,6 +64,8 @@ class App : Application() {
     @Inject
     lateinit var userInfoDatabase: RedditUserInfoDatabase
 
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         // This has to be before super.onCreate() as the injections happen then, and this
@@ -198,5 +202,11 @@ class App : Application() {
                 }
             }
         }
+    }
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder()
+                .setWorkerFactory(workerFactory)
+                .build()
     }
 }

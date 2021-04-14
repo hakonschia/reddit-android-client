@@ -114,7 +114,6 @@
     <string name="prefs_title_inbox_show_badge">Show badge in navbar</string>
     <string name="prefs_title_inbox_update_frequency">Update frequency</string>
     <string name="prefs_title_inbox_update_frequency_dont_update">Don\'t update automatically</string>
-    <string name="prefs_title_inbox_update_frequency_5_min">5 minutes</string>
     <string name="prefs_title_inbox_update_frequency_15_min">15 minutes</string>
     <string name="prefs_title_inbox_update_frequency_30_min">30 minutes</string>
     <string name="prefs_title_inbox_update_frequency_60_min">60 minutes</string>
@@ -171,7 +170,6 @@
     <string name="prefs_key_inbox_show_badge" translatable="false">inbox_show_badge</string>
     <string name="prefs_key_inbox_update_frequency" translatable="false">inbox_update_frequency</string>
     <string name="prefs_key_inbox_update_frequency_dont_update" translatable="false">inbox_dont_update_automatically</string>
-    <string name="prefs_key_inbox_update_frequency_5_min" translatable="false">inbox_update_5_minutes</string>
     <string name="prefs_key_inbox_update_frequency_15_min" translatable="false">inbox_update_15_minutes</string>
     <string name="prefs_key_inbox_update_frequency_30_min" translatable="false">inbox_update_30_minutes</string>
     <string name="prefs_key_inbox_update_frequency_60_min" translatable="false">inbox_update_60_minutes</string>

@@ -19,6 +19,11 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
 
+        <provider
+            android:name="androidx.work.impl.WorkManagerInitializer"
+            android:authorities="${applicationId}.workmanager-init"
+            tools:node="remove"
+            android:exported="false" />
 
         <activity android:name=".activities.MainActivity">
             <intent-filter>

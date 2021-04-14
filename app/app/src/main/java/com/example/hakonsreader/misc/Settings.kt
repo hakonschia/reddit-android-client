@@ -345,7 +345,6 @@ object Settings {
         )
 
         return when (updateFrequencySetting) {
-            resources.getString(R.string.prefs_key_inbox_update_frequency_5_min) -> 5
             resources.getString(R.string.prefs_key_inbox_update_frequency_15_min) -> 15
             resources.getString(R.string.prefs_key_inbox_update_frequency_30_min) -> 30
             resources.getString(R.string.prefs_key_inbox_update_frequency_60_min) -> 50
