@@ -18,9 +18,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditUserInfo
@@ -30,6 +27,7 @@ import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.persistence.RedditUserInfoDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.broadcastreceivers.InboxWorkerStartReceiver
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityMainBinding
@@ -46,7 +44,6 @@ import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
 import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.example.hakonsreader.views.util.goneIf
-import com.example.hakonsreader.workers.InboxCheckerWorker
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -60,7 +57,6 @@ import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.Instant
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -114,13 +110,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          * application is changing to a new user
          */
         private const val SAVED_RECREATED_AS_NEW_USER = "saved_recreatedAsNewUser"
-
-
-        /**
-         * The name of the Worker responsible for checking inbox messages
-         */
-        private const val WORKER_INBOX = "worker_inbox"
-
 
         /**
          * When creating this activity, set this on the extras to select the subreddit to show by default
@@ -223,6 +212,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         if (savedInstanceState != null) {
             // recreatedAsNewUser will never be null if we get here
+            // Restart any potential workers to update the inbox for the new user
+            if (recreatedAsNewUser!!) {
+                InboxWorkerStartReceiver.startInboxWorker(this)
+            }
             restoreFragmentStates(savedInstanceState, recreatedAsNewUser!!)
             restoreNavBar(savedInstanceState)
         } else {
@@ -234,7 +227,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             // Trending subreddits aren't user specific so they don't have to be retrieved again
             trendingSubredditsViewModel.loadSubreddits()
 
-            startInboxWorker()
+            InboxWorkerStartReceiver.startInboxWorker(this)
         }
 
         observeUserState()
@@ -649,23 +642,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     }
                     .show()
         }
-    }
-
-
-    /**
-     * Enqueues a periodic request to [WorkManager] that runs an [InboxCheckerWorker].
-     *
-     * The interval will be [Settings.inboxUpdateFrequency]. If this returns a negative value then
-     * no work will be enqueued.
-     */
-    private fun startInboxWorker() {
-        val updateFrequency = Settings.inboxUpdateFrequency()
-        if (updateFrequency < 0) return
-
-        val inboxRequest = PeriodicWorkRequestBuilder<InboxCheckerWorker>(updateFrequency.toLong(), TimeUnit.MINUTES)
-                .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(WORKER_INBOX, ExistingPeriodicWorkPolicy.REPLACE, inboxRequest)
     }
 
     /**

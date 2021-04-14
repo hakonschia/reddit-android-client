@@ -19,6 +19,14 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
 
+        <!-- TODO Doesn't work on my phone :) -->
+        <receiver android:name=".broadcastreceivers.InboxWorkerStartReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
             android:authorities="${applicationId}.workmanager-init"

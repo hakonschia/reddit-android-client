@@ -82,6 +82,8 @@ class InboxCheckerWorker @AssistedInject constructor(
     private fun filterNewAndNotSeenMessages(old: List<RedditMessage>, new: List<RedditMessage>): List<RedditMessage> {
         // Group together both lists. This gives a list where the old messages will appear
         // before the new, and distinct will always select the first appearing message
+        // This is done to get a list of all messages in `old` and in `new` without duplicates, where the
+        // old ones are preferred over new
         return (old + new).distinctBy { it.id }.filter { it.isNew && !it.isSeen }
     }
 
@@ -115,10 +117,14 @@ class InboxCheckerWorker @AssistedInject constructor(
 
         val builder = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_INBOX_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
+                // Expected time is milliseconds, createdAt is in seconds. This gives the notification
+                // the time the comment was posted, not when the notification was created
+                .setWhen(message.createdAt * 1000L)
                 .setContentTitle(title)
                 // TODO this should show the "raw" text, without any markdown formatting
                 .setContentText(message.body)
                 .setContentIntent(pendingIntent)
+                // Removes the notification when clicked
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
