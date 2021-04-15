@@ -3,6 +3,7 @@ package com.example.hakonsreader.workers
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.text.Html
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
@@ -34,13 +35,20 @@ class InboxCheckerWorker @AssistedInject constructor(
      */
     private var counter = 0
 
-    private var inboxNotificationCounter = 0
-    private val notifications = HashMap<String, Int>()
+    /**
+     * The counter for the notification IDs
+     */
+    private var inboxIdNotificationCounter = 0
+
+    /**
+     * Map mapping a comment ID ([RedditMessage.id]) to its notification ID
+     */
+    private val notifications: MutableMap<String, Int> = HashMap()
 
     override suspend fun doWork(): Result {
         // Get all messages every 10 times. This is to ensure that our local inbox isn't too much out
-        // of sync, as if we always only get the unread messages then messages that read somewhere else
-        // won't be retrieved
+        // of sync, as if we always only get the unread messages then messages read somewhere else
+        // won't be retrieved/appear in the inbox
         val response = if (counter % 10 == 0) {
             api.messages().inbox()
         } else {
@@ -49,6 +57,7 @@ class InboxCheckerWorker @AssistedInject constructor(
 
         counter++
 
+        // "Unreachable code", well clearly it isn't, Android Studio
         return when (response) {
             is ApiResponse.Success -> {
                 // TODO this should also remove previous notifications if they are now seen?
@@ -93,11 +102,6 @@ class InboxCheckerWorker @AssistedInject constructor(
      * @param message The message to show the notification for
      */
     private fun createInboxNotification(message: RedditMessage) {
-        // Only show if this message doesn't have a shown notification already
-        if (notifications[message.id] != null) {
-            return
-        }
-
         val title = if (message.wasComment) {
             applicationContext.getString(R.string.notificationInboxCommentReplyTitle, message.author)
         } else {
@@ -105,9 +109,12 @@ class InboxCheckerWorker @AssistedInject constructor(
         }
 
         // Only open comments, we don't have anything to do for messages
+        // How I want this to work:
+        // 1. When using the app, this should open a new activity to display the post. When back is pressed
+        // or swiped away it should resume where we were when we opened it (on the emulator this works, not on my phone)
+        // 2. When app is not open, just open the activity and when you exit you exit completely (it is like this now)
         val pendingIntent = if (message.wasComment) {
             val intent = Intent(applicationContext, DispatcherActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 putExtra(DispatcherActivity.EXTRAS_URL_KEY, message.context)
             }
             PendingIntent.getActivity(applicationContext, 0, intent, 0)
@@ -115,22 +122,29 @@ class InboxCheckerWorker @AssistedInject constructor(
             null
         }
 
-        val builder = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_INBOX_ID)
+        val htmlMessage = Html.fromHtml(message.bodyHtml, Html.FROM_HTML_MODE_COMPACT)
+
+        val notification = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_INBOX_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                // If the message is short then the big text won't be shown until expanded, which just
+                // looks weird, so set it on the context text as well
+                .setContentText(htmlMessage)
+                .setStyle(NotificationCompat.BigTextStyle()
+                        .bigText(htmlMessage))
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
                 // Expected time is milliseconds, createdAt is in seconds. This gives the notification
                 // the time the comment was posted, not when the notification was created
                 .setWhen(message.createdAt * 1000L)
-                .setContentTitle(title)
-                // TODO this should show the "raw" text, without any markdown formatting
-                .setContentText(message.body)
-                .setContentIntent(pendingIntent)
-                // Removes the notification when clicked
-                .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .build()
 
         with(NotificationManagerCompat.from(applicationContext)) {
-            val id = inboxNotificationCounter++
-            notify(id, builder.build())
+            // If this message already has an ID it will be updated, otherwise create a new ID
+            val id = notifications[message.id] ?: inboxIdNotificationCounter++
+            notify(id, notification)
             notifications[message.id] = id
         }
     }
