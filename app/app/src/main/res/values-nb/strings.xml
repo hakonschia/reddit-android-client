@@ -439,4 +439,6 @@
     <string name="darkMode">Nattmodus</string>
     <string name="lightMode">Dagsmodus</string>
     <string name="inboxNotificationMarkReadFailed">Kunne ikke markere melding som lest</string>
+    <string name="developerModeEnabled">Du er nå en utvikler!</string>
+    <string name="developerModeDisabled">Utviklermodus deaktivert</string>
 </resources>

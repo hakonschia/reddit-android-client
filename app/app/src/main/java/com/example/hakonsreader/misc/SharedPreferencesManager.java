@@ -2,6 +2,8 @@ package com.example.hakonsreader.misc;
 
 import android.content.SharedPreferences;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.Gson;
 
 
@@ -49,8 +51,9 @@ public class SharedPreferencesManager {
      * @param key The key to retrieve
      * @param type The type of value the key refers to
      * @param <T> The type
-     * @return The value associated with the key
+     * @return The value associated with the key, or null
      */
+    @Nullable
     public static <T> T get(String key, Class<T> type) {
         if (prefs == null) {
             throw new IllegalStateException(PREFERENCES_NOT_SET_ERROR_MESSAGE);

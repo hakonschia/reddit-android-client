@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
@@ -49,11 +50,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -162,6 +161,16 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     private val trendingSubredditsViewModel: TrendingSubredditsViewModel by viewModels()
+
+    /**
+     * The counter for toggling developer mode
+     */
+    private var devModeCounter = 0
+
+    /**
+     * The job responsible for resetting [devModeCounter]
+     */
+    private var devModeJob: Job? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -858,6 +867,23 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
                             .addToBackStack(null)
                             .commit()
+                }
+
+                R.id.navSettings -> {
+                    devModeJob?.cancel()
+                    // Reset counter after 2.5 seconds
+                    devModeJob = CoroutineScope(Main).launch {
+                        delay(2500)
+                        devModeCounter = 0
+                    }
+
+                    if (++devModeCounter == 5) {
+                        if (AppState.toggleDeveloperMode()) {
+                            Toast.makeText(this, R.string.developerModeEnabled, Toast.LENGTH_LONG).show()
+                        } else {|
+                            Toast.makeText(this, R.string.developerModeDisabled, Toast.LENGTH_LONG).show()
+                        }
+                    }
                 }
             }
         }

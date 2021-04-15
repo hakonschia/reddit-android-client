@@ -620,4 +620,7 @@
     <string name="lightMode">Light mode</string>
 
     <string name="inboxNotificationMarkReadFailed">Failed to mark message as read</string>
+
+    <string name="developerModeEnabled">You are now a developer!</string>
+    <string name="developerModeDisabled">Developer mode disabled</string>
 </resources>

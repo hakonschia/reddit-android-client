@@ -22,9 +22,14 @@ public class SharedPreferencesConstants {
     public static final String ACCESS_TOKEN = "accessToken";
 
     /**
-     * The key to store if the app is browsing privately in the SharedPreferences
+     * The key to store if the app is browsing privately in SharedPreferences
      */
     public static final String PRIVATELY_BROWSING = "privatelyBrowsing";
+
+    /**
+     * The key to store if the app is currently in developer mode in SharedPreferences
+     */
+    public static final String DEVELOPER_MODE_ENABLED = "developerModeEnabled";
 
     /**
      * The key used to store information about when a post was last opened. This key is a general

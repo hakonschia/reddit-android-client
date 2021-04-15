@@ -38,6 +38,14 @@ object AppState {
     val loggedInState: LiveData<LoggedInState> = _loggedInState
 
     /**
+     * True if the user has put the application in developer mode
+     *
+     * This can be toggled with [toggleDeveloperMode]
+     */
+    var isDevMode = false
+        private set
+
+    /**
      * Initialize the app state. This will update [loggedInState]
      *
      * This should only be called during startup
@@ -47,12 +55,12 @@ object AppState {
         AppState.userInfoDatabase = userInfoDatabase
         AppState.api = api
 
+        isDevMode = SharedPreferencesManager.get(SharedPreferencesConstants.DEVELOPER_MODE_ENABLED, Boolean::class.java) ?: false
 
         val token = TokenManager.getToken()
 
         // We have a token, and it is for a user
         val state = if (token != null && token.userId != AccessToken.NO_USER_ID) {
-
             // This database allows for main thread queries, since this has to be set before anything
             // is started to ensure that the state is correct (this might be kind of bad, but the query
             // should be fast enough that it doesn't impact startup by any noticeable amount)
@@ -280,5 +288,16 @@ object AppState {
                 }
             }
         }
+    }
+
+    /**
+     * Toggles developer mode
+     *
+     * @return The new state
+     */
+    fun toggleDeveloperMode(): Boolean {
+        isDevMode = !isDevMode
+        SharedPreferencesManager.put(SharedPreferencesConstants.DEVELOPER_MODE_ENABLED, isDevMode)
+        return isDevMode
     }
 }
