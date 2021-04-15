@@ -16,6 +16,7 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.broadcastreceivers.InboxNotificationReceiver
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -108,20 +109,10 @@ class InboxCheckerWorker @AssistedInject constructor(
             applicationContext.getString(R.string.notificationInboxMessageTitle, message.author)
         }
 
-        // Only open comments, we don't have anything to do for messages
-        // How I want this to work:
-        // 1. When using the app, this should open a new activity to display the post. When back is pressed
-        // or swiped away it should resume where we were when we opened it (on the emulator this works, not on my phone)
-        // 2. When app is not open, just open the activity and when you exit you exit completely (it is like this now)
-        val pendingIntent = if (message.wasComment) {
-            val intent = Intent(applicationContext, DispatcherActivity::class.java).apply {
-                putExtra(DispatcherActivity.EXTRAS_URL_KEY, message.context)
-            }
-            PendingIntent.getActivity(applicationContext, 0, intent, 0)
-        } else {
-            null
-        }
+        // If this message already has an ID it will be updated, otherwise create a new ID
+        val id = notifications[message.id] ?: inboxIdNotificationCounter++
 
+        val (contentIntent, actionIntent) = createIntents(message, id)
         val htmlMessage = Html.fromHtml(message.bodyHtml, Html.FROM_HTML_MODE_COMPACT)
 
         val notification = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_INBOX_ID)
@@ -132,7 +123,9 @@ class InboxCheckerWorker @AssistedInject constructor(
                 .setContentText(htmlMessage)
                 .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(htmlMessage))
-                .setContentIntent(pendingIntent)
+                .setContentIntent(contentIntent)
+                .addAction(R.drawable.ic_markunread_mailbox_24dp, "Mark read", actionIntent)
+                .setOnlyAlertOnce(true)
                 .setAutoCancel(true)
                 // Expected time is milliseconds, createdAt is in seconds. This gives the notification
                 // the time the comment was posted, not when the notification was created
@@ -142,10 +135,46 @@ class InboxCheckerWorker @AssistedInject constructor(
                 .build()
 
         with(NotificationManagerCompat.from(applicationContext)) {
-            // If this message already has an ID it will be updated, otherwise create a new ID
-            val id = notifications[message.id] ?: inboxIdNotificationCounter++
             notify(id, notification)
             notifications[message.id] = id
+        }
+    }
+
+    /**
+     * Wrapper class for a content intent and an action intent
+     */
+    private data class Intents(
+            val contentIntent: PendingIntent?,
+            val actionIntent: PendingIntent?
+    )
+
+    /**
+     * Create intents for a message
+     */
+    private fun createIntents(message: RedditMessage, notificationId: Int): Intents {
+        val actionIntent = Intent(applicationContext, InboxNotificationReceiver::class.java).apply {
+            putExtra(InboxNotificationReceiver.EXTRAS_MESSAGE_ID, message.id)
+            putExtra(InboxNotificationReceiver.EXTRAS_WAS_COMMENT, message.wasComment)
+            putExtra(InboxNotificationReceiver.EXTRAS_NOTIFICATION_ID, notificationId)
+        }
+        val pendingActionIntent = PendingIntent.getBroadcast(applicationContext, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        return if (message.wasComment) {
+            // Only open comments, we don't have anything to do for messages
+            // How I want this to work:
+            // 1. When using the app, this should open a new activity to display the post. When back is pressed
+            // or swiped away it should resume where we were when we opened it (on the emulator this works, not on my phone)
+            // 2. When app is not open, just open the activity and when you exit you exit completely (it is like this now)
+            val contentIntent = Intent(applicationContext, DispatcherActivity::class.java).apply {
+                putExtra(DispatcherActivity.EXTRAS_URL_KEY, message.context)
+            }
+
+            Intents(
+                    PendingIntent.getActivity(applicationContext, 0, contentIntent, 0),
+                    pendingActionIntent
+            )
+        } else {
+            Intents(null, pendingActionIntent)
         }
     }
 }

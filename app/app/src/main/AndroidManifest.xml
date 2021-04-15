@@ -27,6 +27,8 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".broadcastreceivers.InboxNotificationReceiver" />
+
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
             android:authorities="${applicationId}.workmanager-init"

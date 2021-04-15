@@ -76,7 +76,13 @@ interface RedditMessagesDao {
      * Marks all messages in the database as read
      */
     @Query("UPDATE messages SET isNew=0")
-    fun markRead()
+    fun markAllRead()
+
+    /**
+     * Marks a message as read
+     */
+    @Query("UPDATE messages SET isNew=0 WHERE id=:id")
+    fun markRead(id: String)
 
     /**
      * Retrieve a list of message based on a list of IDs

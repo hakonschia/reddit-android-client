@@ -59,7 +59,7 @@ class InboxFragment : Fragment() {
         CoroutineScope(IO).launch {
             val unread = messagesDao.getUnreadMessagesNoObservable()
             unread.let { api.messages().markRead(*it.toTypedArray()) }
-            messagesDao.markRead()
+            messagesDao.markAllRead()
         }
 
         _binding = null

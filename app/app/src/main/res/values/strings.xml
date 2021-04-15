@@ -618,4 +618,6 @@
 
     <string name="darkMode">Dark mode</string>
     <string name="lightMode">Light mode</string>
+
+    <string name="inboxNotificationMarkReadFailed">Failed to mark message as read</string>
 </resources>
