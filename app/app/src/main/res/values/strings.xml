@@ -540,6 +540,12 @@
     <string name="notificationInboxMessageTitle">New message from %s</string>
     <string name="notificationInboxCommentReplyTitle">New comment reply from %s</string>
 
+    <string name="notificationChannelDeveloper">Developer</string>
+    <string name="notificationChannelDeveloperDescription">Notifications for developer stuff</string>
+
+    <string name="notificationDeveloperMessagesRetrievedTitle">Dev: Messages retrieved</string>
+    <string name="notificationDeveloperMessagesRetrievedContent">Messages were last retrieved %s</string>
+
     <string name="videoSize" translatable="false">%.2f MB</string>
     <string name="videoSizeEstimated" translatable="false">~ %.2f MB</string>
 
@@ -621,6 +627,6 @@
 
     <string name="inboxNotificationMarkReadFailed">Failed to mark message as read</string>
 
-    <string name="developerModeEnabled">You are now a developer!</string>
+    <string name="developerModeEnabled">You are now a developer! (Restart the app)</string>
     <string name="developerModeDisabled">Developer mode disabled</string>
 </resources>

@@ -43,6 +43,11 @@ class App : Application(), Configuration.Provider {
          * The ID of the inbox notification channel
          */
         const val NOTIFICATION_CHANNEL_INBOX_ID = "notificationChannelInbox"
+
+        /**
+         * The ID of the developer notification channel
+         */
+        const val NOTIFICATION_CHANNEL_DEVELOPER_ID = "notificationChannelDeveloper"
     }
 
 
@@ -79,6 +84,8 @@ class App : Application(), Configuration.Provider {
         AppState.init(api, database, userInfoDatabase)
 
         createInboxNotificationChannel()
+        createDeveloperNotificationChannel()
+
         updateTheme()
         removeOldValues()
     }
@@ -100,8 +107,28 @@ class App : Application(), Configuration.Provider {
             }
 
             // Register the channel with the system
-            val notificationManager =
-                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    /**
+     * Creates the developer notification channel, if the build version allows it and [AppState.isDevMode] is true
+     */
+    private fun createDeveloperNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (AppState.isDevMode && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.notificationChannelDeveloper)
+            val descriptionText = getString(R.string.notificationChannelDeveloperDescription)
+            val importance = NotificationManager.IMPORTANCE_HIGH
+
+            val channel = NotificationChannel(NOTIFICATION_CHANNEL_DEVELOPER_ID, name, importance).apply {
+                description = descriptionText
+            }
+
+            // Register the channel with the system
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }

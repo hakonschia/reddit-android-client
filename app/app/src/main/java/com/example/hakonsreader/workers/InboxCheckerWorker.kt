@@ -17,8 +17,12 @@ import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.broadcastreceivers.InboxNotificationReceiver
+import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.states.AppState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * A Worker that checks a users inbox messages.
@@ -31,37 +35,49 @@ class InboxCheckerWorker @AssistedInject constructor(
         private val messagesDao: RedditMessagesDao
 ) : CoroutineWorker(context, workerParams) {
 
-    /**
-     * The amount of times this worker has checked an inbox
-     */
-    private var counter = 0
+    companion object {
 
-    /**
-     * The counter for the notification IDs
-     */
-    private var inboxIdNotificationCounter = 0
+        /**
+         * The counter for how many times the inbox has been checked
+         */
+        private var counter = 0
 
-    /**
-     * Map mapping a comment ID ([RedditMessage.id]) to its notification ID
-     */
-    private val notifications: MutableMap<String, Int> = HashMap()
+        /**
+         * The counter for the notification IDs
+         */
+        private var inboxIdNotificationCounter = 0
+
+        /**
+         * The notification ID used to display a developer notification for the inbox checker
+         */
+        const val DEVELOPER_NOTIFICATION_ID = 1
+
+        /**
+         * The notification tag used to display a developer notification for the inbox checker
+         */
+        const val DEVELOPER_NOTIFICATION_TAG = "developer_inbox_tag"
+    }
+
 
     override suspend fun doWork(): Result {
         // Get all messages every 10 times. This is to ensure that our local inbox isn't too much out
         // of sync, as if we always only get the unread messages then messages read somewhere else
         // won't be retrieved/appear in the inbox
-        val response = if (counter % 10 == 0) {
+        // Never get the full inbox if data saving is on
+        val response = if (counter++ % 10 == 0 && !Settings.dataSavingEnabled()) {
             api.messages().inbox()
         } else {
             api.messages().unread()
         }
 
-        counter++
-
         // "Unreachable code", well clearly it isn't, Android Studio
         return when (response) {
             is ApiResponse.Success -> {
                 // TODO this should also remove previous notifications if they are now seen?
+
+                if (AppState.isDevMode) {
+                    createDeveloperNotification()
+                }
 
                 val messages = response.value
                 val previousMessages = messagesDao.getMessagesById(messages.map { it.id })
@@ -109,8 +125,7 @@ class InboxCheckerWorker @AssistedInject constructor(
             applicationContext.getString(R.string.notificationInboxMessageTitle, message.author)
         }
 
-        // If this message already has an ID it will be updated, otherwise create a new ID
-        val id = notifications[message.id] ?: inboxIdNotificationCounter++
+        val id = inboxIdNotificationCounter++
 
         val (contentIntent, actionIntent) = createIntents(message, id)
         val htmlMessage = Html.fromHtml(message.bodyHtml, Html.FROM_HTML_MODE_COMPACT)
@@ -136,7 +151,6 @@ class InboxCheckerWorker @AssistedInject constructor(
 
         with(NotificationManagerCompat.from(applicationContext)) {
             notify(id, notification)
-            notifications[message.id] = id
         }
     }
 
@@ -175,6 +189,29 @@ class InboxCheckerWorker @AssistedInject constructor(
             )
         } else {
             Intents(null, pendingActionIntent)
+        }
+    }
+
+
+    /**
+     * Creates, or updates, a notification in the developer mode channel to say when the last time
+     * the messages were retrieved
+     */
+    private fun createDeveloperNotification() {
+        // Format as "17:45"
+        val format = SimpleDateFormat("kk:mm", Locale.getDefault())
+        val date = Date(System.currentTimeMillis())
+
+        val notification = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_DEVELOPER_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(applicationContext.getString(R.string.notificationDeveloperMessagesRetrievedContent, format.format(date)))
+                .setContentText("Counter = $counter")
+                .setOngoing(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .build()
+
+        with(NotificationManagerCompat.from(applicationContext)) {
+            notify(DEVELOPER_NOTIFICATION_TAG, DEVELOPER_NOTIFICATION_ID, notification)
         }
     }
 }

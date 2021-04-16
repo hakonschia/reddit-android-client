@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -45,6 +46,7 @@ import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
 import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.example.hakonsreader.views.util.goneIf
+import com.example.hakonsreader.workers.InboxCheckerWorker
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -880,7 +882,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     if (++devModeCounter == 5) {
                         if (AppState.toggleDeveloperMode()) {
                             Toast.makeText(this, R.string.developerModeEnabled, Toast.LENGTH_LONG).show()
-                        } else {|
+                        } else {
+                            NotificationManagerCompat.from(this)
+                                    .cancel(InboxCheckerWorker.DEVELOPER_NOTIFICATION_TAG, InboxCheckerWorker.DEVELOPER_NOTIFICATION_ID)
                             Toast.makeText(this, R.string.developerModeDisabled, Toast.LENGTH_LONG).show()
                         }
                     }
