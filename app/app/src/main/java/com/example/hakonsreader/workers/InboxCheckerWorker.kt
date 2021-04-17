@@ -17,6 +17,8 @@ import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.broadcastreceivers.InboxNotificationReceiver
+import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_ID_INBOX_STATUS
+import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_TAG_INBOX_STATUS
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.states.AppState
 import dagger.assisted.Assisted
@@ -46,16 +48,6 @@ class InboxCheckerWorker @AssistedInject constructor(
          * The counter for the notification IDs
          */
         private var inboxIdNotificationCounter = 0
-
-        /**
-         * The notification ID used to display a developer notification for the inbox checker
-         */
-        const val DEVELOPER_NOTIFICATION_ID = 1
-
-        /**
-         * The notification tag used to display a developer notification for the inbox checker
-         */
-        const val DEVELOPER_NOTIFICATION_TAG = "developer_inbox_tag"
     }
 
 
@@ -76,7 +68,7 @@ class InboxCheckerWorker @AssistedInject constructor(
                 // TODO this should also remove previous notifications if they are now seen?
 
                 if (AppState.isDevMode) {
-                    createDeveloperNotification()
+                    createDeveloperNotification(false)
                 }
 
                 val messages = response.value
@@ -92,6 +84,9 @@ class InboxCheckerWorker @AssistedInject constructor(
             }
 
             is ApiResponse.Error -> {
+                if (AppState.isDevMode) {
+                    createDeveloperNotification(true)
+                }
                 return Result.failure()
             }
         }
@@ -197,21 +192,26 @@ class InboxCheckerWorker @AssistedInject constructor(
      * Creates, or updates, a notification in the developer mode channel to say when the last time
      * the messages were retrieved
      */
-    private fun createDeveloperNotification() {
+    private fun createDeveloperNotification(failed: Boolean) {
         // Format as "17:45"
         val format = SimpleDateFormat("kk:mm", Locale.getDefault())
         val date = Date(System.currentTimeMillis())
 
+        val content = StringBuilder()
+                .append(if (failed) "Request failed. " else " ")
+                .append("Counter = $counter")
+                .toString()
+
         val notification = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_DEVELOPER_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(applicationContext.getString(R.string.notificationDeveloperMessagesRetrievedContent, format.format(date)))
-                .setContentText("Counter = $counter")
+                .setContentText(content)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()
 
         with(NotificationManagerCompat.from(applicationContext)) {
-            notify(DEVELOPER_NOTIFICATION_TAG, DEVELOPER_NOTIFICATION_ID, notification)
+            notify(DEVELOPER_NOTIFICATION_TAG_INBOX_STATUS, DEVELOPER_NOTIFICATION_ID_INBOX_STATUS, notification)
         }
     }
 }

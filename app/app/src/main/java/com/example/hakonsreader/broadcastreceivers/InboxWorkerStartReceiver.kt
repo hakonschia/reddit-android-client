@@ -3,11 +3,7 @@ package com.example.hakonsreader.broadcastreceivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
-import android.widget.Toast.LENGTH_LONG
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.workers.InboxCheckerWorker
 import java.util.concurrent.TimeUnit
@@ -35,6 +31,10 @@ class InboxWorkerStartReceiver : BroadcastReceiver() {
                 WorkManager.getInstance(context).cancelUniqueWork(WORKER_INBOX)
             } else {
                 val inboxRequest = PeriodicWorkRequestBuilder<InboxCheckerWorker>(updateFrequency.toLong(), TimeUnit.MINUTES)
+                        .setConstraints(Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build()
+                        )
                         .build()
 
                 WorkManager.getInstance(context).enqueueUniquePeriodicWork(WORKER_INBOX, ExistingPeriodicWorkPolicy.REPLACE, inboxRequest)

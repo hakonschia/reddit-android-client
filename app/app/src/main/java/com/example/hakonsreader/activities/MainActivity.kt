@@ -30,6 +30,8 @@ import com.example.hakonsreader.api.persistence.RedditSubredditsDao
 import com.example.hakonsreader.api.persistence.RedditUserInfoDao
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.broadcastreceivers.InboxWorkerStartReceiver
+import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_ID_INBOX_STATUS
+import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_TAG_INBOX_STATUS
 import com.example.hakonsreader.constants.NetworkConstants
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityMainBinding
@@ -46,7 +48,6 @@ import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
 import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.example.hakonsreader.views.util.goneIf
-import com.example.hakonsreader.workers.InboxCheckerWorker
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -884,7 +885,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                             Toast.makeText(this, R.string.developerModeEnabled, Toast.LENGTH_LONG).show()
                         } else {
                             NotificationManagerCompat.from(this)
-                                    .cancel(InboxCheckerWorker.DEVELOPER_NOTIFICATION_TAG, InboxCheckerWorker.DEVELOPER_NOTIFICATION_ID)
+                                    .cancel(DEVELOPER_NOTIFICATION_TAG_INBOX_STATUS, DEVELOPER_NOTIFICATION_ID_INBOX_STATUS)
                             Toast.makeText(this, R.string.developerModeDisabled, Toast.LENGTH_LONG).show()
                         }
                     }
