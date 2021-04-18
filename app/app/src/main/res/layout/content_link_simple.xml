@@ -53,6 +53,7 @@
 
         app:layout_constraintBottom_toBottomOf="@+id/cardView2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/cardView2"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="https://www.reddit.com/r/GlobalOffensive/comments/jvb73a/just_finished_the_usps_hush_and_glock18/gcim3kr?utm_source=shareutm_medium=web2xcontext=3" />
