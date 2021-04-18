@@ -68,12 +68,13 @@ class InboxCheckerWorker @AssistedInject constructor(
                 // TODO this should also remove previous notifications if they are now seen?
 
                 if (AppState.isDevMode) {
-                    createDeveloperNotification(false)
+                    createDeveloperNotification()
                 }
 
                 val messages = response.value
                 val previousMessages = messagesDao.getMessagesById(messages.map { it.id })
 
+                // Create notification for those messages not already seen
                 filterNewAndNotSeenMessages(previousMessages, messages).forEach { createInboxNotification(it) }
 
                 // Mark all new messages as now seen
@@ -85,7 +86,7 @@ class InboxCheckerWorker @AssistedInject constructor(
 
             is ApiResponse.Error -> {
                 if (AppState.isDevMode) {
-                    createDeveloperNotification(true)
+                    createDeveloperNotification(response.throwable)
                 }
                 return Result.failure()
             }
@@ -191,21 +192,21 @@ class InboxCheckerWorker @AssistedInject constructor(
     /**
      * Creates, or updates, a notification in the developer mode channel to say when the last time
      * the messages were retrieved
+     *
+     * @param failCause The reason the request failed. If the request did not fail this can be omitted
      */
-    private fun createDeveloperNotification(failed: Boolean) {
+    private fun createDeveloperNotification(failCause: Throwable? = null) {
         // Format as "17:45"
         val format = SimpleDateFormat("kk:mm", Locale.getDefault())
         val date = Date(System.currentTimeMillis())
 
-        val content = StringBuilder()
-                .append(if (failed) "Request failed. " else " ")
-                .append("Counter = $counter")
-                .toString()
-
         val notification = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_DEVELOPER_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(applicationContext.getString(R.string.notificationDeveloperMessagesRetrievedContent, format.format(date)))
-                .setContentText(content)
+                .setStyle(NotificationCompat.BigTextStyle()
+                        .setSummaryText("Couner = $counter")
+                        .bigText(if (failCause != null) "Request failed:\n ${failCause.printStackTrace()}" else "Counter = $counter")
+                )
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()
