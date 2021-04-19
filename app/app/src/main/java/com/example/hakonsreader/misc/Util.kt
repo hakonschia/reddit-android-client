@@ -9,6 +9,7 @@ import android.net.Uri
 import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
@@ -351,35 +352,45 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
             }
         }
 
-        // No direct handling, redirect to an app if found, otherwise to WebViewActivity/browser
+        // No direct handling, redirect to an external app if found, otherwise to WebViewActivity/browser
         else -> {
             val baseIntent = Intent(Intent.ACTION_VIEW, asUri)
 
             // Find all activities context intent would resolve to
             val intentActivities = context.packageManager.queryIntentActivities(baseIntent, PackageManager.MATCH_DEFAULT_ONLY)
 
-            // To check if the intent matches an app we need to find the default browser as that
-            // will usually be in the list of intent activities
-            val defaultBrowserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://"))
-            val defaultBrowserInfo = context.packageManager.resolveActivity(defaultBrowserIntent, PackageManager.MATCH_DEFAULT_ONLY)
+            // To check if the intent matches an app we need to find the default browser
+            val defaultBrowserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://plsdontesolvetoarealapp.com"))
+            val defaultBrowserPackageName = context.packageManager.queryIntentActivities(defaultBrowserIntent, PackageManager.MATCH_DEFAULT_ONLY)
+                    // There might be more browsers, so I'm assuming the list is ordered based on how
+                    // they would resolve, so that the first is the default that it actually resolves to
+                    .first().activityInfo.packageName
 
-            var appActivityFound = false
+            // The package name for our app
             val appPackageName = context.applicationContext.packageName
+            var externalAppFound = false
 
             // Check if there are intents not leading to a browser
             for (intentActivity in intentActivities) {
                 val packageName = intentActivity.activityInfo.packageName
 
-                // Don't match our own app, as that would cause an infinite loop
-                if (packageName != defaultBrowserInfo!!.activityInfo.packageName
-                        && packageName != appPackageName) {
-                    appActivityFound = true
+                // If the this intents package name:
+                // 1. Doesn't match the default browser
+                // 2. Doesn't match our own app (as that would cause an infinite loop)
+                // 3. Doesn't match a "webview" type package (on some devices, maybe only emulators, there
+                // is some sort of webview testing thing which browser intents would also resolve to)
+                // Then we found a separate activity to handle this intent (an app that can open it)
+                if (packageName != defaultBrowserPackageName
+                        && packageName != appPackageName
+                        && !packageName.matches(".*webview.*".toRegex())
+                ) {
+                    externalAppFound = true
                     break
                 }
             }
 
-            // If no activity found and user wants to open links in app, open in WebView (internal browser)
-            if (!appActivityFound && options.openLinksInternally) {
+            // If no external app was found and the user wants to open links in app, open in WebView (internal browser)
+            if (!externalAppFound && options.openLinksInternally) {
                 Intent(context, WebViewActivity::class.java).apply {
                     putExtra(WebViewActivity.EXTRAS_URL, url)
                 }
