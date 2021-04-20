@@ -1,8 +1,11 @@
 package com.example.hakonsreader.workers
 
+import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.text.Html
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -65,14 +68,14 @@ class InboxCheckerWorker @AssistedInject constructor(
         // "Unreachable code", well clearly it isn't, Android Studio
         return when (response) {
             is ApiResponse.Success -> {
-                // TODO this should also remove previous notifications if they are now seen?
+                val messages = response.value
+                val previousMessages = messagesDao.getMessagesById(messages.map { it.id })
 
                 if (AppState.isDevMode) {
                     createDeveloperNotification()
                 }
 
-                val messages = response.value
-                val previousMessages = messagesDao.getMessagesById(messages.map { it.id })
+                removeNonNewNotifications(messages)
 
                 // Create notification for those messages not already seen
                 filterNewAndNotSeenMessages(previousMessages, messages).forEach { createInboxNotification(it) }
@@ -90,6 +93,38 @@ class InboxCheckerWorker @AssistedInject constructor(
                 }
                 return Result.failure()
             }
+        }
+    }
+
+    /**
+     * Removes notifications that are now marked as not new ([RedditMessage.isNew] is false)
+     *
+     * Only works on API >= 23
+     *
+     * @param messages The list of messages to check
+     */
+    @SuppressLint("ObsoleteSdkInt")
+    private fun removeNonNewNotifications(messages: List<RedditMessage>) {
+        // minSdk is currently 26, but if I at some point actually try to lower it I might as well start adding these
+        if (Build.VERSION.SDK_INT >= 23) {
+            val notificationManager = applicationContext.getSystemService(
+                    Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            notificationManager.activeNotifications
+                    .filter {
+                        // This is probably not strictly necessary, but just to be sure that if we later
+                        // add other channels which also use IDs as tags we don't want to remove those
+                        it.notification.channelId == App.NOTIFICATION_CHANNEL_INBOX_ID
+                    }
+                    .forEach { notification ->
+                        val message = messages.find { it.id == notification.tag }
+
+                        // message != null means there is a notification for the message
+                        // !.isNew means it is now seen, so remove the notification
+                        if (message != null && !message.isNew) {
+                            notificationManager.cancel(message.id, notification.id)
+                        }
+                    }
         }
     }
 
@@ -123,7 +158,7 @@ class InboxCheckerWorker @AssistedInject constructor(
 
         val id = inboxIdNotificationCounter++
 
-        val (contentIntent, actionIntent) = createIntents(message, id)
+        val (contentIntent, markAsReadActionIntent) = createIntents(message, id)
         val htmlMessage = Html.fromHtml(message.bodyHtml, Html.FROM_HTML_MODE_COMPACT)
 
         val notification = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_INBOX_ID)
@@ -135,7 +170,7 @@ class InboxCheckerWorker @AssistedInject constructor(
                 .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(htmlMessage))
                 .setContentIntent(contentIntent)
-                .addAction(R.drawable.ic_markunread_mailbox_24dp, "Mark read", actionIntent)
+                .addAction(R.drawable.ic_markunread_mailbox_24dp, "Mark read", markAsReadActionIntent)
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(true)
                 // Expected time is milliseconds, createdAt is in seconds. This gives the notification
@@ -146,16 +181,22 @@ class InboxCheckerWorker @AssistedInject constructor(
                 .build()
 
         with(NotificationManagerCompat.from(applicationContext)) {
-            notify(id, notification)
+            // Use the message ID as the tag. Ideally we would just convert this from base36 to base10
+            // and use it as the ID itself, but the value is above Int.MAX_VALUE
+            notify(message.id, id, notification)
         }
     }
 
     /**
      * Wrapper class for a content intent and an action intent
+     *
+     * @param contentIntent The intent for the content of the notification (when the notification is clicked)
+     * @param markAsReadActionIntent The action intent for marking a message as read through a notification
+     * action
      */
     private data class Intents(
             val contentIntent: PendingIntent?,
-            val actionIntent: PendingIntent?
+            val markAsReadActionIntent: PendingIntent?
     )
 
     /**
