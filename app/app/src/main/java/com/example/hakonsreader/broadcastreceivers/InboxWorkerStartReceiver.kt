@@ -37,7 +37,7 @@ class InboxWorkerStartReceiver : BroadcastReceiver() {
                         )
                         .build()
 
-                //WorkManager.getInstance(context).enqueueUniquePeriodicWork(WORKER_INBOX, ExistingPeriodicWorkPolicy.REPLACE, inboxRequest)
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(WORKER_INBOX, ExistingPeriodicWorkPolicy.REPLACE, inboxRequest)
             }
         }
     }

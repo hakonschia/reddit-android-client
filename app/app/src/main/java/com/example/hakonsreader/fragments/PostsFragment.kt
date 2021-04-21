@@ -279,12 +279,12 @@ class PostsFragment : Fragment(), SortableWithTime {
 
             onVideoManuallyPaused = { contentVideo ->
                 // Ignore post when scrolling if manually paused
-                postsScrollListener.setPostToIgnore(contentVideo.redditPost?.id)
+                postsScrollListener.postToIgnore = contentVideo.redditPost?.id
             }
 
             onVideoFullscreenListener = { contentVideo ->
                 // Ignore post when scrolling if it has been fullscreened
-                postsScrollListener.setPostToIgnore(contentVideo.redditPost?.id)
+                postsScrollListener.postToIgnore = contentVideo.redditPost?.id
 
                 val intent = Intent(context, VideoActivity::class.java).apply {
                     putExtra(VideoActivity.EXTRAS_EXTRAS, contentVideo.extras)
@@ -313,13 +313,10 @@ class PostsFragment : Fragment(), SortableWithTime {
                 // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
                 // autoplay the video
                 val redditPost = post.redditPost
-                postsScrollListener.setPostToIgnore(redditPost?.id)
+                postsScrollListener.postToIgnore = redditPost?.id
 
-                val content = post.getContent()
-                if (content is ContentVideo) {
-                    val currentFrame = content.getCurrentFrame()
-                    PostActivity.VIDEO_THUMBNAIL_BITMAP = currentFrame
-                }
+                val b = post.getContent()?.bitmap
+                PostActivity.BITMAP = b
 
                 val intent = Intent(context, PostActivity::class.java).apply {
                     putExtra(PostActivity.EXTRAS_POST_KEY, Gson().toJson(redditPost))
@@ -336,8 +333,7 @@ class PostsFragment : Fragment(), SortableWithTime {
             }
         }
 
-        LinearLayoutManager(context).apply { binding.posts.layoutManager = this }
-       // binding.posts.setOnScrollChangeListener(postsScrollListener)
+        binding.posts.layoutManager = LinearLayoutManager(context)
         binding.posts.addOnScrollListener(postsScrollListener)
     }
 

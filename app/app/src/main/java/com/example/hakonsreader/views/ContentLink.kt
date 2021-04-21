@@ -2,6 +2,7 @@ package com.example.hakonsreader.views
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.util.Pair
 import androidx.viewbinding.ViewBinding
 import com.example.hakonsreader.R
@@ -65,6 +67,14 @@ class ContentLink @JvmOverloads constructor(
         }
     }
 
+    override fun getBitmap(): Bitmap? {
+        return when (binding) {
+            is ContentLinkBinding -> binding.thumbnail.drawable.toBitmap()
+            is ContentLinkSimpleBinding -> binding.thumbnail.drawable.toBitmap()
+            else -> null
+        }
+    }
+
     /**
      * Updates the view for the normal
      */
@@ -79,15 +89,23 @@ class ContentLink @JvmOverloads constructor(
             else -> variants.normal
         }
 
-        if (url != null) {
-            Picasso.get()
-                    .load(url)
-                    .cache(cache)
-                    .into(binding.thumbnail)
-        } else {
-            val params: ViewGroup.LayoutParams = binding.thumbnail.layoutParams
-            params.height = resources.getDimension(R.dimen.contentLinkNoThumbnailSize).toInt()
-            binding.thumbnail.layoutParams = params
+        when {
+            bitmap != null -> {
+                binding.thumbnail.setImageBitmap(bitmap)
+            }
+
+            url != null -> {
+                Picasso.get()
+                        .load(url)
+                        .cache(cache)
+                        .into(binding.thumbnail)
+            }
+
+            else -> {
+                val params: ViewGroup.LayoutParams = binding.thumbnail.layoutParams
+                params.height = resources.getDimension(R.dimen.contentLinkNoThumbnailSize).toInt()
+                binding.thumbnail.layoutParams = params
+            }
         }
 
         if (icon != null) {
@@ -105,19 +123,28 @@ class ContentLink @JvmOverloads constructor(
      */
     private fun updateViewSimple(icon: Drawable?) {
         binding as ContentLinkSimpleBinding
+        binding.thumbnail.scaleType = ImageView.ScaleType.CENTER_CROP
 
         val thumbnail = redditPost.thumbnail
-        // If no thumbnail is given, reddit might give it as "default"
-        if (thumbnail.isNotBlank() && thumbnail != "default") {
-            binding.thumbnail.scaleType = ImageView.ScaleType.CENTER_CROP
-            Picasso.get()
-                    .load(thumbnail)
-                    .into(binding.thumbnail)
-        } else {
-            // No thumbnail, set default link symbol
-            // This should only be centered, not cropped to fit (as this would stretch the icon)
-            binding.thumbnail.scaleType = ImageView.ScaleType.CENTER
-            binding.thumbnail.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_link_24))
+
+        when {
+            bitmap != null -> {
+                binding.thumbnail.setImageBitmap(bitmap)
+            }
+
+            // If no thumbnail is given, reddit might give it as "default"
+            thumbnail.isNotBlank() && thumbnail != "default" -> {
+                Picasso.get()
+                        .load(thumbnail)
+                        .into(binding.thumbnail)
+            }
+
+            else -> {
+                // No thumbnail, set default link symbol
+                // This should only be centered, not cropped to fit (as this would stretch the icon)
+                binding.thumbnail.scaleType = ImageView.ScaleType.CENTER
+                binding.thumbnail.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_link_24))
+            }
         }
 
         if (icon != null) {
@@ -138,6 +165,4 @@ class ContentLink @JvmOverloads constructor(
         intent.putExtra(DispatcherActivity.EXTRAS_URL_KEY, redditPost.url)
         context.startActivity(intent)
     }
-
-
 }

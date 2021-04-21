@@ -65,7 +65,7 @@ class Post @JvmOverloads constructor(
 
                     if (markdown.isNotEmpty()) {
                         if (context is AppCompatActivity) {
-                            PeekTextPostBottomSheet.newInstance(post).show((context as AppCompatActivity).supportFragmentManager, "Text post")
+                            PeekTextPostBottomSheet.newInstance(post).show(context.supportFragmentManager, "Text post")
                         } else {
                             // Not sure if this will ever happen, but in case it does
                             // This would make the peek url in the post not work though, as it uses bottom sheet as well
@@ -89,11 +89,6 @@ class Post @JvmOverloads constructor(
      * If set to false, text posts will not show the content of the post, only the post info/post bar
      */
     var showTextContent = true
-
-    /**
-     * The callback for when an image post has been loaded
-     */
-    var imageLoadedCallback: Callback? = null
 
     /**
      * The callback for when a video post has been manually paused
@@ -356,9 +351,7 @@ class Post @JvmOverloads constructor(
 
         return when (post.getPostType()) {
             PostType.IMAGE -> {
-                ContentImage(context).apply {
-                    imageLoadedCallback = this@Post.imageLoadedCallback
-                }
+                ContentImage(context)
             }
 
             PostType.VIDEO, PostType.GIF, PostType.RICH_VIDEO -> {
@@ -401,6 +394,7 @@ class Post @JvmOverloads constructor(
 
             else -> null
         }?.apply {
+            setBitmap(this@Post.bitmap)
             setRedditPost(post)
             transitionName = context.getString(R.string.transition_post_content)
        }
@@ -459,8 +453,8 @@ class Post @JvmOverloads constructor(
     /**
      * Gets the content view displayed in the post
      */
-    fun getContent(): View? {
-        return binding.content.getChildAt(0)
+    fun getContent(): Content? {
+        return binding.content.getChildAt(0) as? Content
     }
 
 

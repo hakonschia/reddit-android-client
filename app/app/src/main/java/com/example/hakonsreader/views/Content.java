@@ -1,6 +1,7 @@
 package com.example.hakonsreader.views;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -47,6 +48,10 @@ public abstract class Content extends FrameLayout {
      */
     @NonNull
     protected Bundle extras = new Bundle();
+
+    @Nullable
+    protected Bitmap bitmap;
+
 
     public Content(Context context) {
         super(context);
@@ -149,5 +154,22 @@ public abstract class Content extends FrameLayout {
         // of the subclasses, so instead this is an easy way of fixing the issue as they
         // can directly say what the value would be (if it is known to the class)
         return ViewGroup.LayoutParams.WRAP_CONTENT;
+    }
+
+    /**
+     * Sets a bitmap on the content. By default this has an empty implementation and does nothing.
+     *
+     * @param bitmap The bitmap to set
+     */
+    public void setBitmap(@org.jetbrains.annotations.Nullable Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    /**
+     * @return The bitmap passed to {@link #setBitmap(Bitmap)}
+     */
+    @Nullable
+    public Bitmap getBitmap() {
+        return bitmap;
     }
 }

@@ -5,8 +5,6 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.transition.Transition
-import android.transition.TransitionListenerAdapter
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -34,11 +32,11 @@ import com.example.hakonsreader.viewmodels.CommentsViewModel
 import com.example.hakonsreader.views.Content
 import com.example.hakonsreader.views.ContentVideo
 import com.example.hakonsreader.views.VideoPlayer
+import com.example.hakonsreader.views.util.goneIf
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.r0adkll.slidr.Slidr
-import com.squareup.picasso.Callback
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -93,10 +91,10 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
 
         /**
-         * The bitmap to display when transitioning videos. This should be set just before the
+         * A Bitmap which can be used to hold an already loaded image. This should be set just before the
          * activity is started and will be nulled when the activity is destroyed
          */
-        var VIDEO_THUMBNAIL_BITMAP: Bitmap? = null
+        var BITMAP: Bitmap? = null
     }
 
     @Inject
@@ -202,7 +200,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
         binding.post.cleanUpContent()
         binding.post.lifecycleOwner = null
         
-        VIDEO_THUMBNAIL_BITMAP = null
+        BITMAP = null
     }
 
     /**
@@ -218,6 +216,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
             noComments = false
             commentChainShown = false
 
+            post.bitmap = BITMAP
             post.enableLayoutAnimations(false)
 
             post.lifecycleOwner = this@PostActivity
@@ -295,18 +294,13 @@ class PostActivity : BaseActivity(), OnReplyListener {
             }
 
             isLoading.observe(this@PostActivity, { isLoading ->
-                binding.progressBarLayout.visibility = if (isLoading) {
-                    VISIBLE
-                } else {
-                    GONE
-                }
+                binding.progressBarLayout.goneIf(!isLoading)
             })
 
             error.observe(this@PostActivity, { error ->
                 handleGenericResponseErrors(binding.parentLayout, error.error, error.throwable)
             })
         }
-
     }
 
     /**
@@ -430,21 +424,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
             val postExtras: Bundle? = intent.extras?.getBundle(Content.EXTRAS)
 
             when (redditPost.getPostType()) {
-                // Postpone the enter transition until the image is loaded
-                PostType.IMAGE -> {
-                    postponeEnterTransition()
-                    binding.post.imageLoadedCallback = object : Callback {
-                        override fun onSuccess() {
-                            startPostponedEnterTransition()
-                        }
-                        override fun onError(e: Exception) {
-                            startPostponedEnterTransition()
-                        }
-                    }
-
-                    onNewPostInfo(redditPost, postExtras)
-                }
-
                 // Add a transition listener that sets the extras for videos after the enter transition is done,
                 // so that the video doesn't play during the transition (which looks odd since it's very choppy)
                 PostType.VIDEO -> {
@@ -453,11 +432,12 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
                     val content = binding.post.getContent() as ContentVideo
 
-                    // If a thumbnail was passed to the activity then use that as the thumbnail during
+                    // If a thumbnail was passed to the activity it will be used as the thumbnail during
                     // the transition
-                    VIDEO_THUMBNAIL_BITMAP?.let {
-                        content.setThumbnailBitmap(it)
-                    } ?: content.loadThumbnail()
+                    // Otherwise we should love the default thumbnail
+                    if (BITMAP == null) {
+                        content.loadThumbnail()
+                    }
 
                     content.enableControllerTransitions(true)
 

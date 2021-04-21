@@ -1,7 +1,6 @@
 package com.example.hakonsreader.views
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -21,7 +20,7 @@ class ContentVideo @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
-): Content(context, attrs, defStyleAttr) {
+) : Content(context, attrs, defStyleAttr) {
     companion object {
         private const val TAG = "PostContentVideo"
 
@@ -42,7 +41,7 @@ class ContentVideo @JvmOverloads constructor(
     private val player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
 
     override fun updateView() {
-        setThumbnailUrl()
+        setThumbnail()
         setVideo()
 
         player.cacheVideo = cache
@@ -163,6 +162,11 @@ class ContentVideo @JvmOverloads constructor(
     override fun getWantedHeight() = player.actualVideoHeight
 
     /**
+     * Gets a bitmap of the current frame displayed, or null if the video hasn't yet been loaded
+     */
+    override fun getBitmap() = player.getCurrentFrame()
+
+    /**
      * Sets the callback for when a video post has been manually paused
      *
      * @param onVideoManuallyPaused The callback
@@ -203,20 +207,6 @@ class ContentVideo @JvmOverloads constructor(
     }
 
     /**
-     * Gets a bitmap of the current frame displayed, or null if the video hasn't yet been loaded
-     */
-    fun getCurrentFrame(): Bitmap {
-        return player.getCurrentFrame()
-    }
-
-    /**
-     * Sets a bitmap to the thumbnail
-     */
-    fun setThumbnailBitmap(bitmap: Bitmap) {
-        player.setThumbnailBitmap(bitmap)
-    }
-
-    /**
      * Loads the default thumbnail on the video
      */
     fun loadThumbnail() {
@@ -233,19 +223,27 @@ class ContentVideo @JvmOverloads constructor(
         player.hasAudio = show
     }
 
-    private fun setThumbnailUrl() {
-        val variants = getImageVariantsForRedditPost(redditPost)
-
-        val url = when {
-            redditPost.isNsfw -> variants.nsfw
-            redditPost.isSpoiler -> variants.spoiler
-            else -> variants.normal
-        }
-
-        if (url != null) {
-            player.thumbnailUrl = url
+    /**
+     * Sets the thumbnail on the player. [bitmap] will be used if not null, otherwise the image
+     * variants for the post will be used
+     */
+    private fun setThumbnail() {
+        if (bitmap != null) {
+            player.setThumbnailBitmap(bitmap!!)
         } else {
-            player.thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
+            val variants = getImageVariantsForRedditPost(redditPost)
+
+            val url = when {
+                redditPost.isNsfw -> variants.nsfw
+                redditPost.isSpoiler -> variants.spoiler
+                else -> variants.normal
+            }
+
+            if (url != null) {
+                player.thumbnailUrl = url
+            } else {
+                player.thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
+            }
         }
     }
 }

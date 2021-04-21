@@ -1,12 +1,20 @@
 package com.example.hakonsreader.views
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
+import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activities.ImageActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentImageBinding
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
@@ -18,20 +26,18 @@ import com.squareup.picasso.Picasso
 /**
  * Content view for Reddit images posts.
  */
-class ContentImage : Content {
+class ContentImage @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : Content(context, attrs, defStyleAttr) {
+
+    companion object {
+        private const val TAG = "ContentImage"
+    }
+
     private val binding: ContentImageBinding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true)
     private var imageUrl: String? = null
-
-    /**
-     * The [Callback] to use for when the post is an image and the image has finished loading
-     *
-     * This must be set before [Post.setRedditPost]
-     */
-    var imageLoadedCallback: Callback? = null
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     /**
      * Sets the post with a different image URL than the one retrieved with [RedditPost.url].
@@ -46,9 +52,54 @@ class ContentImage : Content {
     }
 
     /**
+     * Gets a bitmap representation of the image being displayed
+     */
+    override fun getBitmap(): Bitmap? {
+        return binding.image.drawable?.toBitmap()
+    }
+
+    /**
      * Updates the view with the url from [ContentImage.post]
      */
     override fun updateView() {
+        if (bitmap != null) {
+            withBitmap(bitmap!!)
+        } else {
+            withUrls()
+        }
+    }
+
+    /**
+     * Loads the image with a bitmap
+     */
+    private fun withBitmap(b: Bitmap) {
+        binding.image.setImageBitmap(b)
+
+        setOnClickListener {
+            ImageActivity.BITMAP = b
+
+            Intent(context, ImageActivity::class.java).run {
+                putExtra(ImageActivity.EXTRAS_CACHE_IMAGE, cache)
+
+                if (context is AppCompatActivity) {
+                    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            context as AppCompatActivity,
+                            binding.image,
+                            "image"
+                    )
+                    context.startActivity(this, options.toBundle())
+                } else {
+                    context.startActivity(this)
+                }
+            }
+        }
+    }
+
+    /**
+     * Loags the image with URLs, either with [imageUrl] or with the image URLs found in [redditPost]
+     */
+    private fun withUrls() {
+
         val (normal, nsfw, spoiler) = getImageVariantsForRedditPost(redditPost)
         val url: String? = when {
             imageUrl != null -> imageUrl
@@ -92,16 +143,11 @@ class ContentImage : Content {
                         .cache(cache)
                         // Scale so the image fits the width of the screen
                         .resize(Resources.getSystem().displayMetrics.widthPixels, 0)
-                        .into(binding.image, imageLoadedCallback)
+                        .into(binding.image)
             }
         } catch (e: RuntimeException) {
             e.printStackTrace()
             Log.d(TAG, "\n\n\n--------- ERROR LOADING IMAGE ${redditPost.subreddit}, ${redditPost.title} ---------\n\n\n")
         }
     }
-
-    companion object {
-        private const val TAG = "ContentImage"
-    }
-
 }
