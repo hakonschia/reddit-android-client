@@ -71,7 +71,7 @@ class InboxNotificationReceiver : BroadcastReceiver() {
             when (response) {
                 is ApiResponse.Success -> {
                     with(NotificationManagerCompat.from(context)) {
-                        cancel(notificationId)
+                        cancel(inboxMessageId, notificationId)
                     }
                     messagesDao.markRead(inboxMessageId)
                 }
