@@ -11,8 +11,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.*
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.broadcastreceivers.InboxWorkerStartReceiver
 import com.example.hakonsreader.interfaces.LanguageListener
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorPreference
 import com.google.firebase.crashlytics.ktx.crashlytics
@@ -113,6 +115,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
         findPreference<SwitchPreference>(getString(R.string.prefs_key_third_party_load_imgur_albums))?.let {
             it.onPreferenceChangeListener = thirdPartyOptionsListener
+        }
+
+        findPreference<ListPreference>(getString(R.string.prefs_key_inbox_update_frequency))?.let {
+            it.onPreferenceChangeListener = inboxFrequnecyListener
         }
     }
 
@@ -281,6 +287,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
             getString(R.string.prefs_key_third_party_load_imgur_gifs) -> api.thirdPartyOptions.loadImgurGifs = newValue
             getString(R.string.prefs_key_third_party_load_imgur_albums) ->  api.thirdPartyOptions.loadImgurAlbums = newValue
         }
+
+        true
+    }
+
+    private val inboxFrequnecyListener = Preference.OnPreferenceChangeListener { _, newValue ->
+        val freq = when (newValue as String) {
+            getString(R.string.prefs_key_inbox_update_frequency_15_min) -> 15
+            getString(R.string.prefs_key_inbox_update_frequency_30_min) -> 30
+            getString(R.string.prefs_key_inbox_update_frequency_60_min) -> 60
+            else -> -1
+        }
+
+        InboxWorkerStartReceiver.startInboxWorker(requireContext(), freq, replace = true)
 
         true
     }

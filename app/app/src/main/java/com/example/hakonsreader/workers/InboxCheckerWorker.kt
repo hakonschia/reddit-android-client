@@ -18,6 +18,7 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.broadcastreceivers.InboxNotificationReceiver
 import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_ID_INBOX_STATUS
 import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_TAG_INBOX_STATUS
@@ -161,7 +162,12 @@ class InboxCheckerWorker @AssistedInject constructor(
         val id = inboxIdNotificationCounter++
 
         val (contentIntent, markAsReadActionIntent) = createIntents(message, id)
-        val htmlMessage = Html.fromHtml(message.bodyHtml, Html.FROM_HTML_MODE_COMPACT)
+
+        val htmlMessage = if (Build.VERSION.SDK_INT >= 24) {
+            Html.fromHtml(message.bodyHtml, Html.FROM_HTML_MODE_COMPACT)
+        } else {
+            Html.fromHtml(message.bodyHtml)
+        }
 
         val notification = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_INBOX_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)

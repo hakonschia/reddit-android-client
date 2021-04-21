@@ -226,9 +226,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             // recreatedAsNewUser will never be null if we get here
             // Restart any potential workers to update the inbox for the new user
             if (recreatedAsNewUser!!) {
-                InboxWorkerStartReceiver.startInboxWorker(this)
+                InboxWorkerStartReceiver.startInboxWorker(this, Settings.inboxUpdateFrequency(), replace = true)
             }
-            restoreFragmentStates(savedInstanceState, recreatedAsNewUser!!)
+
+            restoreFragmentStates(savedInstanceState, recreatedAsNewUser)
             restoreNavBar(savedInstanceState)
         } else {
             // Use empty string as default (ie. front page)
@@ -238,8 +239,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
             // Trending subreddits aren't user specific so they don't have to be retrieved again
             trendingSubredditsViewModel.loadSubreddits()
-
-            InboxWorkerStartReceiver.startInboxWorker(this)
         }
 
         observeUserState()

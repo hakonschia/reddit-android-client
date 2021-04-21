@@ -13,6 +13,7 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.*
 import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.persistence.RedditUserInfoDatabase
+import com.example.hakonsreader.broadcastreceivers.InboxWorkerStartReceiver
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.markwonplugins.*
 import com.example.hakonsreader.states.AppState
@@ -85,6 +86,8 @@ class App : Application(), Configuration.Provider {
 
         createInboxNotificationChannel()
         createDeveloperNotificationChannel()
+
+        InboxWorkerStartReceiver.startInboxWorker(this, Settings.inboxUpdateFrequency(), replace = false)
 
         updateTheme()
         removeOldValues()
