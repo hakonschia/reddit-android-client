@@ -471,6 +471,11 @@ class VideoPlayer @JvmOverloads constructor(
     }
 
     private fun createMediaSource() : MediaSource {
+        // TODO on API 21 emulators, only videos directly from imgur load. Not sure if it's a problem
+        //  on physical devices, as the ExoPlayer documentation says some emulators don't work.
+        //  The official emulator don't support on API < 23
+        //  https://google.github.io/ExoPlayer/supported-devices.html
+
         // Data source is constant for all media sources
         val dataSourceFactory = if (cacheVideo) {
             CacheDataSource.Factory()

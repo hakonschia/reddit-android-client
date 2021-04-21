@@ -22,7 +22,11 @@ import com.squareup.picasso.Picasso
 /**
  * Layout that wraps around Reddit awards and shows all
  */
-class AwardLayout : FrameLayout {
+class AwardLayout @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+): FrameLayout(context, attrs, defStyleAttr) {
     companion object {
         private const val TAG = "AwardLayout"
     }
@@ -39,11 +43,6 @@ class AwardLayout : FrameLayout {
             field = value
             updateView()
         }
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
     private fun updateView() {
         // Sort awards by descending price (so the most expensive awards are shown first)
@@ -66,8 +65,6 @@ class AwardLayout : FrameLayout {
             val preferredUrl = award.resizedIcons?.find { image -> image.height == ShowAwardBottomSheet.IMAGE_SIZE }?.url
             val backupUrl = award.resizedIcons?.find { image -> image.height == 48 }?.url
 
-            // TODO some images are animated gifs, which would be cool to have (although as a setting)
-            //  Although I don't know how to check if it's animated before loading the image
             ImageView(context).apply {
                 layoutParams = MarginLayoutParams(awardIconSize, awardIconSize).apply {
                     // If we only have 1 award we don't want to margin at the start as it looks weird

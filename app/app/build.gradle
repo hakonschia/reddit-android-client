@@ -25,7 +25,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.hakonsreader"
-        minSdkVersion 26
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -52,6 +52,9 @@ android {
     }
 
     compileOptions {
+        // To use Java 8 features (streams etc.) on API < 24
+        coreLibraryDesugaringEnabled true
+
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -78,6 +81,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "android.arch.lifecycle:extensions:1.1.1"
     annotationProcessor "com.android.databinding:compiler:3.1.4"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     // Room
     final def room_version = '2.2.6'

@@ -144,7 +144,7 @@ public class PostConverter {
             // Since this is a generic converter for any type of object, add the class name so it can be
             // restored correctly later
             JsonObject json = gson.toJsonTree(object).getAsJsonObject();
-            json.addProperty("type", object.getClass().getTypeName());
+            json.addProperty("type", object.getClass().getSimpleName());
             return json.toString();
         } catch (IllegalStateException | JsonParseException e) {
             return null;

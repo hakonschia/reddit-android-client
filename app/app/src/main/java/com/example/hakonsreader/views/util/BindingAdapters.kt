@@ -25,9 +25,8 @@ import java.util.*
 @BindingAdapter("createdAt")
 fun setAgeText(textView: TextView, createdAt: Long) {
     if (createdAt >= 0) {
-        val created = Instant.ofEpochSecond(createdAt)
-        val now = Instant.now()
-        val between = Duration.between(created, now)
+        val now = System.currentTimeMillis() / 1000L
+        val between = now - createdAt
         textView.text = createAgeText(textView.resources, between)
     }
 }
@@ -60,9 +59,8 @@ fun setCreatedAtFullText(textView: TextView, createdAt: Long) {
 @BindingAdapter("editedAt")
 fun setAgeTextEdited(textView: TextView, createdAt: Long) {
     if (createdAt >= 0) {
-        val created = Instant.ofEpochSecond(createdAt)
-        val now = Instant.now()
-        val between = Duration.between(created, now)
+        val now = System.currentTimeMillis() / 1000L
+        val between = now - createdAt
         textView.text = "*" + createAgeText(textView.resources, between)
     }
 }
@@ -77,9 +75,8 @@ fun setAgeTextEdited(textView: TextView, createdAt: Long) {
 @BindingAdapter("createdAtShortened")
 fun setAgeTextShortened(textView: TextView, createdAt: Long) {
     if (createdAt >= 0) {
-        val created = Instant.ofEpochSecond(createdAt)
-        val now = Instant.now()
-        val between = Duration.between(created, now)
+        val now = System.currentTimeMillis() / 1000L
+        val between = now - createdAt
         textView.text = createAgeTextShortened(textView.resources, between)
     }
 }
@@ -94,9 +91,8 @@ fun setAgeTextShortened(textView: TextView, createdAt: Long) {
 @BindingAdapter("editedAtShortened")
 fun setAgeTextEditedShortened(textView: TextView, createdAt: Long) {
     if (createdAt >= 0) {
-        val created = Instant.ofEpochSecond(createdAt)
-        val now = Instant.now()
-        val between = Duration.between(created, now)
+        val now = System.currentTimeMillis() / 1000L
+        val between = now - createdAt
         textView.text = "*" + createAgeTextShortened(textView.resources, between)
     }
 }

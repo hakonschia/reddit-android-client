@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.activities.DispatcherActivity;
@@ -85,7 +86,12 @@ public class InternalLinkMovementMethod extends LinkMovementMethod {
 
             if (action == MotionEvent.ACTION_DOWN) {
                 // Set background span to show what is being clicked
-                buffer.setSpan(new CustomBackgroundColorSpan(widget.getContext().getColor(R.color.linkColorPressedBackground)), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                buffer.setSpan(new CustomBackgroundColorSpan(
+                        ContextCompat.getColor(widget.getContext(), R.color.linkColorPressedBackground)),
+                        start,
+                        end,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
             } else if (action == MotionEvent.ACTION_UP) {
                 // Even if we ignore the click we have to return true, otherwise the system will
                 // handle the click (which probably opens the URL in a browser)

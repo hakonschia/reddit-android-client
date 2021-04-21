@@ -4,11 +4,11 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.databinding.ActivityImageBinding
@@ -64,7 +64,7 @@ class ImageActivity : BaseActivity() {
         setContentView(binding.root)
 
         // The color retrieved is "0x<alpha><red><green><blue>" (each one byte, 8 bits)
-        val color = getColor(R.color.imageVideoActivityBackground)
+        val color = ContextCompat.getColor(this, R.color.imageVideoActivityBackground)
 
         // Offset 3 bytes and get the value there to find the alpha
         val alpha = color shr 8 * 3 and 0xFF
@@ -136,7 +136,6 @@ class ImageActivity : BaseActivity() {
                                     .show()
                         }
                     }
-
                 })
     }
 }

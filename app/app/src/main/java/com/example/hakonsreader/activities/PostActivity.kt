@@ -13,6 +13,7 @@ import android.view.View.VISIBLE
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.app.SharedElementCallback
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -478,10 +479,8 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
                     // For videos we don't want to set the extras right away. If a video is playing during the
                     // animation the animation looks very choppy, so it should only be played at the end
-                    window.sharedElementEnterTransition.addListener(object : TransitionListenerAdapter() {
-                        override fun onTransitionEnd(transition: Transition?) {
-                            super.onTransitionEnd(transition)
-
+                    setEnterSharedElementCallback(object : SharedElementCallback() {
+                        override fun onSharedElementEnd(sharedElementNames: MutableList<String>?, sharedElements: MutableList<View>?, sharedElementSnapshots: MutableList<View>?) {
                             if (postExtras != null) {
                                 binding.post.extras = postExtras
                             }

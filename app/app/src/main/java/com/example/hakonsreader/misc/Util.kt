@@ -679,23 +679,23 @@ fun showRequiresRedditPremiumSnackbar(parent: View, anchor: View? = null) {
  * Formats to make sure that it says 3 hours, 5 minutes etc. based on what makes sense
  *
  * @param resources Resources to retrieve strings from
- * @param time The time to format as
+ * @param time The amount of seconds for the age
  * @return The time formatted as a string
  */
-fun createAgeText(resources: Resources, time: Duration): String {
+fun createAgeText(resources: Resources, time: Long): String {
     var t: Long
 
     val format = when {
-        time.toDays().also { t = it } > 0L -> {
+        toDays(time).also { t = it } > 0L -> {
             resources.getQuantityString(R.plurals.postAgeDays, t.toInt())
         }
 
-        time.toHours().also { t = it } > 0 -> {
+        toHours(time).also { t = it } > 0 -> {
             resources.getQuantityString(R.plurals.postAgeHours, t.toInt())
         }
 
         else -> {
-            t = time.toMinutes()
+            t = toMinutes(time)
             if (t < 1) {
                 resources.getString(R.string.postAgeJustPosted)
             } else {
@@ -718,20 +718,20 @@ fun createAgeText(resources: Resources, time: Duration): String {
  * @param time The time to format as
  * @return The time formatted as a string
  */
-fun createAgeTextShortened(resources: Resources, time: Duration): String {
+fun createAgeTextShortened(resources: Resources, time: Long): String {
     var t: Long
 
     val format = when {
-        time.toDays().also { t = it } > 0L -> {
+        toDays(time).also { t = it } > 0L -> {
             resources.getString(R.string.postAgeDaysShortened, t.toInt())
         }
 
-        time.toHours().also { t = it } > 0 -> {
+        toHours(time).also { t = it } > 0 -> {
             resources.getString(R.string.postAgeHoursShortened, t.toInt())
         }
 
         else -> {
-            t = time.toMinutes()
+            t = toMinutes(time)
             if (t < 1) {
                 resources.getString(R.string.postAgeJustPostedShortened)
             } else {
@@ -751,21 +751,21 @@ fun createAgeTextShortened(resources: Resources, time: Duration): String {
  * @param tv The text view to set the text on
  * @param time The time to format as
  */
-fun setAgeTextTrendingSubreddits(tv: TextView, time: Duration) {
+fun setAgeTextTrendingSubreddits(tv: TextView, time: Long) {
     val resources = tv.resources
     var t: Long
 
     val format = when {
-        time.toDays().also { t = it } > 0L -> {
+        toDays(time).also { t = it } > 0L -> {
             resources.getQuantityString(R.plurals.postAgeDays, t.toInt())
         }
 
-        time.toHours().also { t = it } > 0 -> {
+        toHours(time).also { t = it } > 0 -> {
             resources.getQuantityString(R.plurals.postAgeHours, t.toInt())
         }
 
         else -> {
-            t = time.toMinutes()
+            t = toMinutes(time)
             if (t < 1) {
                 tv.setText(R.string.trendingSubredditsLastUpdatedNow)
                 return
@@ -813,4 +813,27 @@ fun showPeekUrlBottomSheet(activity: AppCompatActivity, text: String, url: Strin
     PeekLinkBottomSheet.newInstance(text = text, url = url).run {
         show(activity.supportFragmentManager, "Peek URL")
     }
+}
+
+/**
+ * Converts a timestamp from seconds to minutes
+ */
+fun toMinutes(time: Long): Long {
+    return time / 60
+}
+
+/**
+ * Converts a timestamp from seconds to hours
+ */
+fun toHours(time: Long): Long {
+    // 60 * 60
+    return time / 3600
+}
+
+/**
+ * Converts a timestamp from seconds to days
+ */
+fun toDays(time: Long): Long {
+    // 60 * 60 * 24
+    return time / 86400
 }

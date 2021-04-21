@@ -20,33 +20,33 @@ class ThirdPartyObjectAdapter : TypeAdapter<Any>() {
 
         val jsonObj = Gson().toJsonTree(value).asJsonObject
 
-        val typeName = value::class.java.typeName
+        val typeName = value::class.java.simpleName
         val type = when {
             value is ImgurGif -> {
-                ImgurGif::class.java.typeName
+                ImgurGif::class.java.simpleName
             }
 
             value is ImgurAlbum -> {
-                ImgurAlbum::class.java.typeName
+                ImgurAlbum::class.java.simpleName
             }
 
             value is GfycatGif -> {
-                GfycatGif::class.java.typeName
+                GfycatGif::class.java.simpleName
             }
 
-            typeName == LinkedTreeMap<String, Any>()::class.java.typeName -> {
+            typeName == LinkedTreeMap<String, Any>()::class.java.simpleName -> {
                 value as LinkedTreeMap<String, Any>
                 // The code above will not check for generics, so we either have this unchecked cast warning, or
                 // cast it as LinkedTreeMap<*, *>
                 when {
                     // Imgur uses "mp4"
                     value.containsKey("mp4") -> {
-                        ImgurGif::class.java.typeName
+                        ImgurGif::class.java.simpleName
                     }
 
                     // Gfycat/redgifs uses "mp4Url"
                     value.containsKey("mp4Url") -> {
-                        GfycatGif::class.java.typeName
+                        GfycatGif::class.java.simpleName
                     }
 
                     else -> null

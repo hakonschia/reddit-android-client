@@ -337,7 +337,8 @@ class PostsFragment : Fragment(), SortableWithTime {
         }
 
         LinearLayoutManager(context).apply { binding.posts.layoutManager = this }
-        binding.posts.setOnScrollChangeListener(postsScrollListener)
+       // binding.posts.setOnScrollChangeListener(postsScrollListener)
+        binding.posts.addOnScrollListener(postsScrollListener)
     }
 
     /**

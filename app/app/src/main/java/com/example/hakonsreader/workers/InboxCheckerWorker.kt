@@ -103,9 +103,7 @@ class InboxCheckerWorker @AssistedInject constructor(
      *
      * @param messages The list of messages to check
      */
-    @SuppressLint("ObsoleteSdkInt")
     private fun removeNonNewNotifications(messages: List<RedditMessage>) {
-        // minSdk is currently 26, but if I at some point actually try to lower it I might as well start adding these
         if (Build.VERSION.SDK_INT >= 23) {
             val notificationManager = applicationContext.getSystemService(
                     Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -114,7 +112,12 @@ class InboxCheckerWorker @AssistedInject constructor(
                     .filter {
                         // This is probably not strictly necessary, but just to be sure that if we later
                         // add other channels which also use IDs as tags we don't want to remove those
-                        it.notification.channelId == App.NOTIFICATION_CHANNEL_INBOX_ID
+                        return@filter if (Build.VERSION.SDK_INT >= 26) {
+                            it.notification.channelId == App.NOTIFICATION_CHANNEL_INBOX_ID
+                        } else {
+                            // Channels are only a thing on >= 26, so on lower devices this won't filter anything
+                            true
+                        }
                     }
                     .forEach { notification ->
                         val message = messages.find { it.id == notification.tag }

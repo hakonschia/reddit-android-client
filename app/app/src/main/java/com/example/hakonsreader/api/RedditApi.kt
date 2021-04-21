@@ -378,7 +378,7 @@ private class RedditApiImpl constructor(
      *
      * This is formatted as "Basic <value>" and can be used directly as a header value
      */
-    private val basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString("$clientId:".toByteArray())
+    private val basicAuthHeader = "Basic " + String(android.util.Base64.encode("$clientId:".toByteArray(), android.util.Base64.NO_WRAP))
 
     init {
         check(userAgent.isNotBlank()) { "User-Agent must not be empty" }

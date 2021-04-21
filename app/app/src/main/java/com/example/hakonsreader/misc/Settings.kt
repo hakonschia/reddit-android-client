@@ -7,9 +7,12 @@ import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.os.Build
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.R
 import com.example.hakonsreader.enums.ShowNsfwPreview
+import com.example.hakonsreader.misc.Settings.init
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
 import com.r0adkll.slidr.model.SlidrConfig
@@ -41,24 +44,45 @@ object Settings {
         preferences = PreferenceManager.getDefaultSharedPreferences(context)
         resources = context.resources
 
-        // This might show an error saying it requires network state permissions, but we have permission
-        // to check WiFi and that is the only thing we check, so it will work
+        registerNetworkCallbacks(context)
+    }
 
+    /**
+     * Registers network callbacks that modify [isWifiConnected] with API level in mind
+     */
+    private fun registerNetworkCallbacks(context: Context) {
         // Might have to be calling unregisterNetworkCallback to not cause leaks here
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+
+        val callback = object : ConnectivityManager.NetworkCallback() {
 
             // onAvailable and onLost are called for any network, not just WiFi, so when one of them
             // is triggered we check if WiFi is still here
 
             override fun onAvailable(network: Network) {
-                isWifiConnected = cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+                isWifiConnected = if (Build.VERSION.SDK_INT > 23) {
+                    cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+                } else {
+                    cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI)?.isConnected == true
+                }
             }
 
             override fun onLost(network: Network) {
-                isWifiConnected = cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+                isWifiConnected = if (Build.VERSION.SDK_INT > 23) {
+                    cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+                } else {
+                    cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI)?.isConnected == true
+                }
             }
-        })
+        }
+
+        if (Build.VERSION.SDK_INT >= 24) {
+            cm.registerDefaultNetworkCallback(callback)
+        } else {
+            val request = NetworkRequest.Builder()
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
+            cm.registerNetworkCallback(request, callback)
+        }
     }
 
     /**

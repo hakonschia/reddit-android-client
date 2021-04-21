@@ -3,6 +3,7 @@ package com.example.hakonsreader.recyclerviewadapters.listeners;
 import android.content.res.Resources;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * This listener implements {@link LifecycleObserver} and will listen to {@link Lifecycle.Event#ON_RESUME} and
  * {@link Lifecycle.Event#ON_PAUSE} which will ensure the listener never listens to anything in a paused state
  */
-public class PostScrollListener implements View.OnScrollChangeListener, LifecycleObserver {
+public class PostScrollListener extends RecyclerView.OnScrollListener implements LifecycleObserver {
     private static final String TAG = "PostScrollListener";
 
     private final int SCREEN_HEIGHT = Resources.getSystem().getDisplayMetrics().heightPixels;
@@ -132,12 +133,11 @@ public class PostScrollListener implements View.OnScrollChangeListener, Lifecycl
     }
 
     @Override
-    public void onScrollChange(View v, int scrollX, int scrollY, int oldX, int oldY) {
+    public void onScrolled(@NonNull RecyclerView posts, int dx, int dy) {
         if (paused) {
             return;
         }
-        // If these aren't set correctly they will crash, which is fine as it would be a development crash
-        RecyclerView posts = (RecyclerView) v;
+
         // Currently this listener only supports a LinearLayoutManager. This will cause issues later
         // if we want to use a different one for future layouts, but currently it will work fine
         LinearLayoutManager layoutManager = (LinearLayoutManager) posts.getLayoutManager();
@@ -156,7 +156,7 @@ public class PostScrollListener implements View.OnScrollChangeListener, Lifecycl
             onEndOfList.run();
         }
 
-        this.checkSelectedPost(posts, posFirstItem, posLastItem, oldY > 0);
+        this.checkSelectedPost(posts, posFirstItem, posLastItem, dy < 0);
     }
 
     /**

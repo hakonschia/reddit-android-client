@@ -95,9 +95,8 @@ class InboxAdapter(
 
 @BindingAdapter("inboxSentAgo")
 fun setSentAgoText(textView: TextView, createdAt: Long) {
-    val created = Instant.ofEpochSecond(createdAt)
-    val now = Instant.now()
-    val between = Duration.between(created, now)
+    val now = System.currentTimeMillis() / 1000L
+    val between = now - createdAt
     val createdAtText = createAgeText(textView.resources, between)
 
     textView.text = textView.resources.getString(R.string.inboxSent, createdAtText)

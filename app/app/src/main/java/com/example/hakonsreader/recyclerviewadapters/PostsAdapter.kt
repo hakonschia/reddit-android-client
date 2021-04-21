@@ -12,12 +12,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.misc.toMinutes
 import com.example.hakonsreader.recyclerviewadapters.diffutils.PostsDiffCallback
 import com.example.hakonsreader.views.ContentVideo
 import com.example.hakonsreader.views.ListDivider
 import com.example.hakonsreader.views.Post
-import java.time.Duration
-import java.time.Instant
 
 /**
  * Adapter for recycler view of [RedditPost].
@@ -140,10 +139,9 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
         // one post to another
         holder.post.enableLayoutAnimations(false)
 
-        val created = Instant.ofEpochSecond(post.createdAt)
-        val now = Instant.now()
-        val between = Duration.between(created, now)
-        holder.post.hideScore = hideScoreTime > between.toMinutes()
+        val now = System.currentTimeMillis() / 1000L
+        val between = now - post.createdAt
+        holder.post.hideScore = hideScoreTime > toMinutes(between)
 
         holder.post.redditPost = post
 

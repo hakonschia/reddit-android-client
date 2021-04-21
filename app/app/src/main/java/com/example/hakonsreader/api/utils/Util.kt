@@ -99,15 +99,15 @@ fun thirdPartyObjectFromJsonString(jsonString: String?) : Any? {
     }
 
     val type = when (asJsonObject?.get("type")?.asString) {
-        ImgurGif::class.java.typeName -> {
+        ImgurGif::class.java.simpleName -> {
             ImgurGif::class.java
         }
 
-        ImgurAlbum::class.java.typeName -> {
+        ImgurAlbum::class.java.simpleName -> {
             ImgurAlbum::class.java
         }
 
-        GfycatGif::class.java.typeName -> {
+        GfycatGif::class.java.simpleName -> {
             GfycatGif::class.java
         }
 

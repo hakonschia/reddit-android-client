@@ -6,6 +6,7 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.VoteType
@@ -150,21 +151,25 @@ class VoteBar @JvmOverloads constructor(
 
         // Reset both buttons as at least one will change
         // (to avoid keeping the color if going from upvote to downvote and vice versa)
-        binding.upvote.setColorFilter(context.getColor(R.color.noVote))
-        binding.downvote.setColorFilter(context.getColor(R.color.noVote))
+        binding.upvote.setColorFilter(ContextCompat.getColor(context, R.color.noVote))
+        binding.downvote.setColorFilter(ContextCompat.getColor(context, R.color.noVote))
 
         listing?.let {
             binding.score.textColor = when (it.voteType) {
                 VoteType.UPVOTE -> {
-                    binding.upvote.setColorFilter(context.getColor(R.color.upvoted))
-                    context.getColor(R.color.upvoted)
+                    ContextCompat.getColor(context, R.color.upvoted).also { color ->
+                        binding.upvote.setColorFilter(color)
+                    }
                 }
                 VoteType.DOWNVOTE -> {
-                    binding.downvote.setColorFilter(context.getColor(R.color.downvoted))
-                    context.getColor(R.color.downvoted)
+                    ContextCompat.getColor(context, R.color.downvoted).also { color ->
+                        binding.upvote.setColorFilter(color)
+                    }
                 }
                 VoteType.NO_VOTE -> {
-                    context.getColor(R.color.text_color)
+                    ContextCompat.getColor(context, R.color.text_color).also { color ->
+                        binding.upvote.setColorFilter(color)
+                    }
                 }
             }
 

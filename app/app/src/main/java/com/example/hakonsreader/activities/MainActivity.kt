@@ -1016,9 +1016,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      * @param trendingSubreddits The trending subreddits object to use for the text
      */
     private fun setTrendingSubredditsLastUpdated(trendingSubreddits: TrendingSubreddits) {
-        val created = Instant.ofEpochSecond(trendingSubreddits.retrieved)
-        val now = Instant.now()
-        val between = Duration.between(created, now)
+        val now = System.currentTimeMillis() / 1000L
+        val between = now - trendingSubreddits.retrieved
         setAgeTextTrendingSubreddits(binding.navDrawer.trendingSubredditsLastUpdated, between)
     }
 
