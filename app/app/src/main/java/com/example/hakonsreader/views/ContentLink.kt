@@ -69,8 +69,8 @@ class ContentLink @JvmOverloads constructor(
 
     override fun getBitmap(): Bitmap? {
         return when (binding) {
-            is ContentLinkBinding -> binding.thumbnail.drawable.toBitmap()
-            is ContentLinkSimpleBinding -> binding.thumbnail.drawable.toBitmap()
+            is ContentLinkBinding -> binding.thumbnail.drawable?.toBitmap()
+            is ContentLinkSimpleBinding -> binding.thumbnail.drawable?.toBitmap()
             else -> null
         }
     }
