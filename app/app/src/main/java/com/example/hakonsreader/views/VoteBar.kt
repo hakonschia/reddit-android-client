@@ -176,7 +176,7 @@ class VoteBar @JvmOverloads constructor(
             // In tests setting the text (binding.score.text = "") fails since it is not on the UI thread for some reason
             Handler(Looper.getMainLooper()).post {
                 if (it.isScoreHidden || hideScore) {
-                    binding.score.text = resources.getString(R.string.scoreHidden)
+                    binding.score.setText(resources.getString(R.string.scoreHidden), animate)
                 } else {
                     val scoreCount = it.score
 
