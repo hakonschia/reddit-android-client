@@ -325,9 +325,9 @@ class Post @JvmOverloads constructor(
      * @return A view with the content of the post
      */
     private fun generatePostContent(post: RedditPost, context: Context): Content? {
-        val margin8 = dpToPixels(8f, resources)
+        val margin = resources.getDimension(R.dimen.postMargin).toInt()
         val marginParams = MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-            setMargins(margin8, 0, margin8, 0)
+            setMargins(margin, 0, margin, 0)
         }
 
         // If the post has been removed don't try to render the content as it can cause a crash later

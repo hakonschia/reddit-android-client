@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,8 @@ import com.example.hakonsreader.databinding.ContentImageBinding
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import com.example.hakonsreader.views.util.cache
 import com.example.hakonsreader.views.util.openImageInFullscreen
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
@@ -141,8 +144,7 @@ class ContentImage @JvmOverloads constructor(
                         .placeholder(R.drawable.ic_wifi_tethering_150dp)
                         .error(R.drawable.ic_wifi_tethering_150dp)
                         .cache(cache)
-                        // Scale so the image fits the width of the screen
-                        .resize(Resources.getSystem().displayMetrics.widthPixels, 0)
+                        .fit()
                         .into(binding.image)
             }
         } catch (e: RuntimeException) {
