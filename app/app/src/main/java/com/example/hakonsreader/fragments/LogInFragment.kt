@@ -7,11 +7,21 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.persistence.RedditUserInfoDao
+import com.example.hakonsreader.databinding.FragmentLogInBinding
 import com.example.hakonsreader.misc.startLoginIntent
+import com.example.hakonsreader.views.util.showAccountManagement
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Fragment for logging in
  */
+@AndroidEntryPoint
 class LogInFragment : Fragment() {
     companion object {
         /**
@@ -20,9 +30,35 @@ class LogInFragment : Fragment() {
         fun newInstance() = LogInFragment()
     }
 
+    private var _binding: FragmentLogInBinding? = null
+    private val binding get() = _binding!!
+
+
+    @Inject
+    lateinit var userInfoDao: RedditUserInfoDao
+    @Inject
+    lateinit var api: RedditApi
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_log_in, container, false).apply {
-            findViewById<Button>(R.id.btnLogIn).setOnClickListener { startLoginIntent(context) }
+        return FragmentLogInBinding.inflate(inflater).also {
+            _binding = it
+        }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            binding.hasUsers = userInfoDao.getAllUsers().isNotEmpty()
         }
+
+        binding.btnAccountManagement.setOnClickListener {
+            showAccountManagement(requireContext(), api, userInfoDao)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
