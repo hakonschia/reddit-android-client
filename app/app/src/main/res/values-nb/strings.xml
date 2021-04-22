@@ -445,4 +445,5 @@
     <string name="notificationChannelDeveloperDescription">Notifikasjoner for utviklings relaterte ting</string>
     <string name="notificationDeveloperMessagesRetrievedTitle">Dev: Meldinger hentet</string>
     <string name="notificationDeveloperMessagesRetrievedContent">Meldinger sist hentet %s</string>
+    <string name="accountManagementNoUsers">Fant ingen brukere</string>
 </resources>

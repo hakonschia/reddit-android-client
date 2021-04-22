@@ -584,6 +584,7 @@
     <string name="dialogAccountManagementAddAccount">Add account</string>
     <string name="accountManagementNoUsername">No username</string>
     <string name="accountManagementRemoveAccount">Remove account</string>
+    <string name="accountManagementNoUsers">No accounts found</string>
 
     <string name="frontPageDescription">The front page contains posts from all your subscribed subreddits</string>
     <string name="popularDescription">Popular contains trending posts from the most popular subreddits</string>

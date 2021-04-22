@@ -14,6 +14,7 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.persistence.RedditUserInfoDao
+import com.example.hakonsreader.databinding.DialogAccountManagementBinding
 import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.PostsFragment
 import com.example.hakonsreader.interfaces.SortableWithTime
@@ -89,19 +90,21 @@ fun showAccountManagement(context: Context, api: RedditApi, userInfoDao: RedditU
     val app = AppState
 
     Dialog(context).also {
-        it.setContentView(R.layout.dialog_account_management)
+        val binding = DialogAccountManagementBinding.inflate(LayoutInflater.from(context))
+        it.setContentView(binding.root)
         it.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-        it.findViewById<Button>(R.id.addAccount).setOnClickListener {
+        binding.addAccount.setOnClickListener {
             startLoginIntent(context)
         }
 
-        it.findViewById<RecyclerView>(R.id.accounts).apply {
+        binding.accounts.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = AccountsAdapter().apply {
                 CoroutineScope(IO).launch {
                     val accs = userInfoDao.getAllUsers() as MutableList
                     withContext(Main) {
+                        binding.hasUsers = accs.isNotEmpty()
                         accounts = accs
                     }
                 }
