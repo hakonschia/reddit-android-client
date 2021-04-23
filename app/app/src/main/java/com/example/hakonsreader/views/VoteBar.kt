@@ -66,6 +66,17 @@ class VoteBar @JvmOverloads constructor(
             field = value
             if (value != null) {
                 updateVoteStatus(animate = false)
+
+                // Deleted comments/posts will always give a 404 error
+                // Kind of hardcoding values, but unless reddit change their API I don't know how else
+                // to check if a comment/post is deleted before sending an API request
+                if (value.author == "[deleted]") {
+                    binding.upvote.isEnabled = false
+                    binding.downvote.isEnabled = false
+                } else {
+                    binding.upvote.isEnabled = true
+                    binding.downvote.isEnabled = true
+                }
             }
         }
 

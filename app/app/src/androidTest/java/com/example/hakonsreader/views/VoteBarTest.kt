@@ -470,4 +470,36 @@ class VoteBarTest {
         onView(withId(R.id.downvote))
                 .perform(click())
     }
+
+
+    /**
+     * Tests that the vote buttons on a listing are disabled when the listing has been removed
+     */
+    @Test
+    fun voteButtonsAreDisabledWhenListingIsRemoved() {
+        voteBar.listing = RedditComment().apply {
+            // This is how deleted comments/posts are given
+            author = "[deleted]"
+        }
+
+        onView(withId(R.id.upvote))
+                .check(matches(not(isEnabled())))
+        onView(withId(R.id.downvote))
+                .check(matches(not(isEnabled())))
+    }
+
+    /**
+     * Tests that the vote buttons on a listing are enabled when the listing is not removed
+     */
+    @Test
+    fun voteButtonsAreEnabledWhenListingIsNotRemoved() {
+        voteBar.listing = RedditComment().apply {
+            author = "hakonschia"
+        }
+
+        onView(withId(R.id.upvote))
+                .check(matches(isEnabled()))
+        onView(withId(R.id.downvote))
+                .check(matches(isEnabled()))
+    }
 }

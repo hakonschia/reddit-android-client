@@ -33,6 +33,11 @@ interface VoteableListing {
     var liked: Boolean?
 
     /**
+     * The author/poster of the listing
+     */
+    var author: String
+
+    /**
      * The vote type of the listing. Setting this value will automatically update [score]
      */
     var voteType: VoteType
