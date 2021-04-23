@@ -78,6 +78,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         autoPlayVideos?.let {
             it.onPreferenceChangeListener = autoPlayVideosChangeListener
             autoPlayNsfwVideos?.isEnabled = !it.isChecked
+            if (it.isChecked) {
+                autoPlayNsfwVideos?.isEnabled = true
+            } else {
+                autoPlayNsfwVideos?.isEnabled = false
+                autoPlayNsfwVideos?.isChecked = false
+            }
         }
 
         val filteredSubreddits: EditTextPreference? = findPreference(getString(R.string.prefs_key_filter_posts_from_default_subreddits))
@@ -202,7 +208,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             // would be saved, but when retrieving the value and the preference is disabled it would always return false
             // But this works fine enough
             autoPlayNsfw.isEnabled = false
-            autoPlayNsfw.isChecked = false }
+            autoPlayNsfw.isChecked = false
+        }
         true
     }
 
