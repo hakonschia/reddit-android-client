@@ -373,6 +373,13 @@ class RedditPost : RedditListing(),
         return preview?.images?.get(0)?.resolutions
     }
 
+    fun getObfuscatedSource() : RedditImage? {
+        return preview?.images?.get(0)?.variants?.obfuscated?.source
+    }
+
+    /**
+     * The list of obfuscated images for the post. This might be empty if the image is a very low resolution
+     */
     fun getObfuscatedPreviewImages() : List<RedditImage>? {
         return preview?.images?.get(0)?.variants?.obfuscated?.resolutions
     }

@@ -194,7 +194,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
         Intent(this, DispatcherActivity::class.java).run {
-            putExtra(DispatcherActivity.EXTRAS_URL_KEY, "https://www.reddit.com/r/GlobalOffensive/comments/kul6ye/ww2_plane_inspired_skin_for_awp/")
+            // Reddit gallery with video: https://www.reddit.com/r/GlobalOffensive/comments/lvv9dm/hey_hey_new_clear_polymer_skin_made_its_way_in/
+            putExtra(DispatcherActivity.EXTRAS_URL_KEY, "https://reddit.com/r/hakonschia/comments/k22ft8/dw4423/")
             //startActivity(this)
         }
 

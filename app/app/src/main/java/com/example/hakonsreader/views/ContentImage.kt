@@ -193,9 +193,9 @@ class ContentImage @JvmOverloads constructor(
             if (url == null) {
                 binding.image.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_image_not_supported_200dp))
             } else {
-                val openBitmap = url == normal || url == normalLowRes || url == redditPost.url
+                // This is for NSFW/spoiler posts, which should not open the bitmap directly (since it is potentially blurred)
+                val openBitmap = url != nsfw || url != spoiler
 
-                // This is for NSFW/spoiler posts, which should not open the bitmap (which is potentially blurred)
                 if (!openBitmap) {
                     extras.putString(EXTRAS_URL_TO_OPEN, normal)
                 }

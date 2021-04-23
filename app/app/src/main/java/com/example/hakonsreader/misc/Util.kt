@@ -9,7 +9,6 @@ import android.net.Uri
 import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
@@ -34,7 +33,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
 import java.net.SocketTimeoutException
-import java.time.Duration
 import java.util.*
 
 /**
@@ -65,9 +63,13 @@ fun getImageVariantsForRedditPost(post: RedditPost) : PostImageVariants {
 private fun getNormal(post: RedditPost, lowRes: Boolean) : String? {
     val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
-    var index = -1
     val images = post.preview?.images?.firstOrNull()?.resolutions ?: return null
+    if (images.isEmpty()) {
+        // If there are images, but the resolutions are empty, then it's a low quality so just give the source
+        return post.getSourcePreview()?.url
+    }
 
+    var index = 0
     images.forEachIndexed { i, image ->
         if (image.width <= screenWidth) {
             index = i
@@ -107,9 +109,10 @@ private fun getObfuscated(post: RedditPost) : String? {
     return if (obfuscatedPreviews?.isNotEmpty() == true) {
         // Obfuscated previews that are high res are still fairly showing sometimes, so
         // get the lowest quality one as that will not be very easy to tell what it is
-        obfuscatedPreviews[0].url!!
+        obfuscatedPreviews[0].url
     } else {
-        null
+        // If there are no previews, it's a small image, so we can show the source
+        post.getObfuscatedSource()?.url
     }
 }
 

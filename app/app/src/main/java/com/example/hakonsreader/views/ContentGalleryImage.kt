@@ -17,6 +17,7 @@ import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
 import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurImage
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
 import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.views.util.goneIf
 
 /**
  * View for displaying in a single gallery item in [ContentGallery]
@@ -91,17 +92,13 @@ class ContentGalleryImage @JvmOverloads constructor(
     }
 
     private fun asRedditGalleryImage(galleryItem: RedditGalleryItem): View {
-        val image = galleryItem.source
+        val image = getGalleryImage(galleryItem)
         return if (image.mp4Url != null) {
             asVideo(image)
         } else {
             with (binding) {
                 caption.text = galleryItem.caption
-                caption.visibility = if (galleryItem.caption != null) {
-                    VISIBLE
-                } else {
-                    GONE
-                }
+                caption.goneIf(galleryItem.caption == null)
 
                 // Setting the movement method to InternalLinkMovementMethod doesn't work for some reason
                 outboundUrl.setOnClickListener {
@@ -112,11 +109,7 @@ class ContentGalleryImage @JvmOverloads constructor(
                 }
 
                 outboundUrl.text = galleryItem.outboundUrl
-                outboundUrl.visibility = if (galleryItem.outboundUrl != null) {
-                    VISIBLE
-                } else {
-                    GONE
-                }
+                outboundUrl.goneIf(galleryItem.outboundUrl == null)
             }
 
             asImage(image)
@@ -183,4 +176,26 @@ class ContentGalleryImage @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Gets a gallery where the image width isn't higher than the screen of the device
+     */
+    private fun getGalleryImage(galleryItem: RedditGalleryItem): RedditGalleryImage {
+        // For videos only the source will actually provide an MP4 URL
+        if (galleryItem.source.mp4Url != null) {
+            return galleryItem.source
+        }
+
+        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
+
+        var index = -1
+        val images = galleryItem.resolutions
+
+        images.forEachIndexed { i, image ->
+            if (image.width <= screenWidth) {
+                index = i
+            }
+        }
+
+        return images[index]
+    }
 }
