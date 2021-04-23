@@ -2,7 +2,7 @@
 <resources>
     <bool name="prefs_default_theme">true</bool>
     <bool name="prefs_default_value_cache_nsfw">true</bool>
-    <string name="prefs_default_value_auto_play_videos" translatable="false">@string/prefs_key_auto_play_videos_wifi_only</string>
+    <bool name="prefs_default_value_auto_play_videos">true</bool>
     <bool name="prefs_default_play_muted_videos">true</bool>
     <bool name="prefs_default_play_muted_videos_fullscreen">true</bool>
     <bool name="prefs_default_loop_videos">false</bool>

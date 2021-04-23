@@ -14,7 +14,6 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.broadcastreceivers.InboxWorkerStartReceiver
 import com.example.hakonsreader.interfaces.LanguageListener
 import com.example.hakonsreader.interfaces.OnUnreadMessagesBadgeSettingChanged
-import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorPreference
 import com.google.firebase.crashlytics.ktx.crashlytics
@@ -71,17 +70,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
             it.onPreferenceChangeListener = languageChangeListener
         }
 
-        val autoPlayVideos: ListPreference? = findPreference(getString(R.string.prefs_key_auto_play_videos))
-        autoPlayVideos?.let {
-            it.onPreferenceChangeListener = autoPlayVideosChangeListener
-        }
-
-        // The enabled state isn't stored, so if never auto playing videos is set then disable the nsfw auto play
+        // The enabled state isn't stored, so if auto playing videos is disabled then disable the nsfw auto play
         // (this is the same functionality as is done in autoPlayVideosChangeListener)
         val autoPlayNsfwVideos: SwitchPreference? = findPreference(getString(R.string.prefs_key_auto_play_nsfw_videos))
-        val neverAutoPlayVideos = (settings.getString(getString(R.string.prefs_key_auto_play_videos), getString(R.string.prefs_default_value_auto_play_videos))
-                == getString(R.string.prefs_key_auto_play_videos_never))
-        autoPlayNsfwVideos?.isEnabled = !neverAutoPlayVideos
+
+        val autoPlayVideos: SwitchPreference? = findPreference(getString(R.string.prefs_key_auto_play_videos_switch))
+        autoPlayVideos?.let {
+            it.onPreferenceChangeListener = autoPlayVideosChangeListener
+            autoPlayNsfwVideos?.isEnabled = !it.isChecked
+        }
 
         val filteredSubreddits: EditTextPreference? = findPreference(getString(R.string.prefs_key_filter_posts_from_default_subreddits))
         filteredSubreddits?.let {
@@ -194,20 +191,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
      * If normal auto play is set to "Never", NSFW auto play should be disabled as well
      */
     private val autoPlayVideosChangeListener = Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
-        val asString = newValue as String
         val autoPlayNsfw: SwitchPreference = findPreference(getString(R.string.prefs_key_auto_play_nsfw_videos))
                 ?: return@OnPreferenceChangeListener true
 
         // TODO this isnt updated when going into the settings, only when changing. Have to enable this in onCreatePreferences as well
-        if (asString == getString(R.string.prefs_key_auto_play_videos_never)) {
+        if (newValue as Boolean) {
+            autoPlayNsfw.isEnabled = true
+        } else {
             // Ideally I wouldn't have to manually call setChecked(false) as it would be ideal if the actual value
             // would be saved, but when retrieving the value and the preference is disabled it would always return false
             // But this works fine enough
             autoPlayNsfw.isEnabled = false
-            autoPlayNsfw.isChecked = false
-        } else {
-            autoPlayNsfw.isEnabled = true
-        }
+            autoPlayNsfw.isChecked = false }
         true
     }
 

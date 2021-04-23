@@ -76,9 +76,6 @@
     <string name="prefs_title_theme">Dark mode</string>
     <string name="prefs_title_cache_nsfw">Cache NSFW videos and images</string>
     <string name="prefs_title_auto_play_videos">Automatically play videos</string>
-    <string name="prefs_title_auto_play_videos_always">Always</string>
-    <string name="prefs_title_auto_play_videos_never">Never</string>
-    <string name="prefs_title_auto_play_videos_wifi_only">Wi-Fi only</string>
     <string name="prefs_title_auto_play_nsfw_videos">Automatically play NSFW videos</string>
     <string name="prefs_title_play_muted_videos">Start videos muted</string>
     <string name="prefs_title_play_muted_videos_fullscreen">Start videos muted in fullscreen</string>
@@ -135,10 +132,8 @@
     <!-- Preferences keys -->
     <string name="prefs_key_theme" translatable="false">theme</string>
     <string name="prefs_key_cache_nsfw" translatable="false">cache_nsfw</string>
-    <string name="prefs_key_auto_play_videos" translatable="false">auto_play_videos</string>
-    <string name="prefs_key_auto_play_videos_always" translatable="false">auto_play_videos_always</string>
-    <string name="prefs_key_auto_play_videos_never" translatable="false">auto_play_videos_never</string>
-    <string name="prefs_key_auto_play_videos_wifi_only" translatable="false">auto_play_videos_wifi_only</string>
+    <!-- This used to be a list preference, now is a switch (hence the 'weird' name)-->
+    <string name="prefs_key_auto_play_videos_switch" translatable="false">auto_play_videos_switch</string>
     <string name="prefs_key_auto_play_nsfw_videos" translatable="false">auto_play_nsfw_videos</string>
     <string name="prefs_key_play_muted_videos" translatable="false">play_muted_videos</string>
     <string name="prefs_key_play_muted_videos_fullscreen" translatable="false">play_muted_videos_fullscreen</string>

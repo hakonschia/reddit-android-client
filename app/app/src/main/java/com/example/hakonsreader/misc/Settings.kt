@@ -97,24 +97,14 @@ object Settings {
     /**
      * Returns if videos should be automatically played or not
      *
-     * The value returned here checks based on the setting and Wi-Fi status, so the value
+     * The value returned here checks based on the setting and data saving, so the value
      * can be used directly
-     *
-     * @return True if videos should be automatically played
      */
     fun autoPlayVideos(): Boolean {
-        val value = preferences.getString(
-                resources.getString(R.string.prefs_key_auto_play_videos),
-                resources.getString(R.string.prefs_default_value_auto_play_videos)
-        )
-        if (value == resources.getString(R.string.prefs_key_auto_play_videos_always)) {
-            return true
-        } else if (value == resources.getString(R.string.prefs_key_auto_play_videos_never)) {
-            return false
-        }
-
-        // If we get here we are on Wi-Fi only, return true if Wi-Fi is connected, else false
-        return isWifiConnected
+        return preferences.getBoolean(
+                resources.getString(R.string.prefs_key_auto_play_videos_switch),
+                resources.getBoolean(R.bool.prefs_default_value_auto_play_videos)
+        ) && !dataSavingEnabled()
     }
 
     /**

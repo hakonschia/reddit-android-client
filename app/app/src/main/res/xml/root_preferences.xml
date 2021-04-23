@@ -252,15 +252,13 @@
             app:singleLineTitle="false"
             app:iconSpaceReserved="false" />
 
-        <ListPreference
-            app:key="@string/prefs_key_auto_play_videos"
+        <SwitchPreference
+            app:key="@string/prefs_key_auto_play_videos_switch"
             app:title="@string/prefs_title_auto_play_videos"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true"
-            app:defaultValue="@string/prefs_default_value_auto_play_videos"
-            app:entries="@array/auto_play_entries"
-            app:singleLineTitle="false"
-            app:entryValues="@array/auto_play_values" />
+            app:defaultValue="@bool/prefs_default_value_auto_play_videos"
+            app:singleLineTitle="false" />
 
         <SwitchPreference
             app:key="@string/prefs_key_auto_play_nsfw_videos"
