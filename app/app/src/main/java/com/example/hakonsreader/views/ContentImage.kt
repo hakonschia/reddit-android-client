@@ -204,7 +204,8 @@ class ContentImage @JvmOverloads constructor(
                 setOnClickListener {
                     openImageInFullscreen(
                             binding.image,
-                            normal,
+                            // Prefer the overridden URL as if it is given, "normal" might be null
+                            imageUrl ?: normal,
                             cache,
                             // If the URL is for nsfw/spoiler we want to load the actual image
                             // when opened, not the blurred one
