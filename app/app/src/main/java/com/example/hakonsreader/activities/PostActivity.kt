@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -361,11 +362,12 @@ class PostActivity : BaseActivity(), OnReplyListener {
      */
     private fun onPostLoaded(newPost: RedditPost, extras: Bundle? = null) {
         binding.setPost(newPost)
-        binding.post.redditPost = newPost
 
         if (extras != null) {
             binding.post.extras = extras
         }
+
+        binding.post.redditPost = newPost
 
         // Enable animation after first time the post has loaded (it looks weird if animates when it goes
         // from nothing to something)
@@ -422,6 +424,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         return if (redditPost != null) {
             val postExtras: Bundle? = intent.extras?.getBundle(Content.EXTRAS)
+            postExtras?.keySet()?.forEach {
+                Log.d(TAG, "setPostFromJson: $it")
+            }
 
             when (redditPost.getPostType()) {
                 // Add a transition listener that sets the extras for videos after the enter transition is done,

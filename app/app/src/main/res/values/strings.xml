@@ -188,68 +188,6 @@
     <string name="prefs_key_third_party_load_imgur_albums" translatable="false">third_party_load_imgur_albums</string>
 
 
-    <plurals name="filteredSubredditsSummary">
-        <item quantity="zero">No subreddits filtered</item>
-        <item quantity="one">%d subreddit filtered</item>
-        <item quantity="other">%d subreddits filtered</item>
-    </plurals>
-
-    <!-- String for post ages that are "just posted", ie. < 1 minute -->
-    <string name="postAgeJustPosted">Just posted</string>
-    <plurals name="postAgeMinutes">
-        <item quantity="one">%d minute ago</item>
-        <item quantity="other">%d minutes ago</item>
-    </plurals>
-    <plurals name="postAgeHours">
-        <item quantity="one">%d hour ago</item>
-        <item quantity="other">%d hours ago</item>
-    </plurals>
-    <plurals name="postAgeDays">
-        <item quantity="one">%d day ago</item>
-        <item quantity="other">%d days ago</item>
-    </plurals>
-
-    <!-- Shortened versions of the strings above to take less space-->
-    <string name="postAgeJustPostedShortened">Now</string>
-    <string name="postAgeDaysShortened">%dd</string>
-    <string name="postAgeHoursShortened">%dh</string>
-    <string name="postAgeMinutesShortened">%dm</string>
-
-    <!-- Error messages -->
-    <string name="notLoggedInError">Please log in to do that</string>
-    <string name="privatelyBrowsingError">You are currently browsing privately</string>
-    <string name="genericServerError">Can\'t connect to Reddit servers</string>
-    <string name="tooManyRequestsError">Too many request sent. Try again in a few seconds</string>
-    <string name="errorLoggingIn">Error logging in</string>
-    <string name="noInternetConnection">No internet connection</string>
-    <string name="networkTimeout">The network timed out</string>
-    <string name="forbiddenError">Not allowed by Reddit. Try to log out and in again</string>
-    <string name="threadLockedError">The thread has been locked</string>
-    <string name="unknownError">An unknown error occurred</string>
-    <string name="badRequestError">Something went wrong</string>
-    <string name="listingArchivedError">The listing has been archived</string>
-    <string name="requiresRedditPremium">That action requires Reddit premium</string>
-
-    <string name="log_in">Log in</string>
-
-    <string name="btnAddComment">Add comment</string>
-
-    <string name="tagNSFW">NSFW</string>
-    <string name="tagSpoiler">Spoiler</string>
-
-    <string name="searchForSubredditHint">Search for subreddit</string>
-    <string name="subredditMustBeBetweenLength">Subreddit name must be between 3 and 21 characters</string>
-
-    <string name="transition_post_info" translatable="false">post_info</string>
-    <string name="transition_post_content" translatable="false">post_content</string>
-    <string name="transition_post_full_bar" translatable="false">post_full_bar</string>
-
-    <string name="front_page">Front page</string>
-    <string name="popular" translatable="false">Popular</string>
-    <string name="all" translatable="false">All</string>
-    <string name="mod" translatable="false">Mod</string>
-    <string name="random">Random</string>
-
     <string name="content_description_link_image">Link to website</string>
     <string name="content_description_reply_to_post">Reply to post</string>
     <string name="content_description_reply_to_comment">Reply to comment</string>
@@ -302,6 +240,75 @@
     <string name="content_description_wiki_back">Go back in the wiki</string>
     <string name="content_description_private_browsing_icon">Browsing privately</string>
     <string name="content_description_remove_comment_sidebar_color">Remove color</string>
+    <string name="content_description_load_hd_image">Load HD image</string>
+
+
+    <string name="transition_post_info" translatable="false">transition_post_info</string>
+    <string name="transition_post_content" translatable="false">transition_post_content</string>
+    <string name="transition_post_full_bar" translatable="false">transition_post_full_bar</string>
+    <string name="transition_content_image_image" translatable="false">transition_content_image_image</string>
+    <string name="transition_content_image_hd_icon" translatable="false">transition_content_image_hd_icon</string>
+    <string name="transition_image_fullscreen" translatable="false">transition_image_fullscreen</string>
+
+
+    <plurals name="filteredSubredditsSummary">
+        <item quantity="zero">No subreddits filtered</item>
+        <item quantity="one">%d subreddit filtered</item>
+        <item quantity="other">%d subreddits filtered</item>
+    </plurals>
+
+    <!-- String for post ages that are "just posted", ie. < 1 minute -->
+    <string name="postAgeJustPosted">Just posted</string>
+    <plurals name="postAgeMinutes">
+        <item quantity="one">%d minute ago</item>
+        <item quantity="other">%d minutes ago</item>
+    </plurals>
+    <plurals name="postAgeHours">
+        <item quantity="one">%d hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+    <plurals name="postAgeDays">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+
+    <!-- Shortened versions of the strings above to take less space-->
+    <string name="postAgeJustPostedShortened">Now</string>
+    <string name="postAgeDaysShortened">%dd</string>
+    <string name="postAgeHoursShortened">%dh</string>
+    <string name="postAgeMinutesShortened">%dm</string>
+
+    <!-- Error messages -->
+    <string name="notLoggedInError">Please log in to do that</string>
+    <string name="privatelyBrowsingError">You are currently browsing privately</string>
+    <string name="genericServerError">Can\'t connect to Reddit servers</string>
+    <string name="tooManyRequestsError">Too many request sent. Try again in a few seconds</string>
+    <string name="errorLoggingIn">Error logging in</string>
+    <string name="noInternetConnection">No internet connection</string>
+    <string name="networkTimeout">The network timed out</string>
+    <string name="forbiddenError">Not allowed by Reddit. Try to log out and in again</string>
+    <string name="threadLockedError">The thread has been locked</string>
+    <string name="unknownError">An unknown error occurred</string>
+    <string name="badRequestError">Something went wrong</string>
+    <string name="listingArchivedError">The listing has been archived</string>
+    <string name="requiresRedditPremium">That action requires Reddit premium</string>
+
+    <string name="log_in">Log in</string>
+
+    <string name="btnAddComment">Add comment</string>
+
+    <string name="tagNSFW">NSFW</string>
+    <string name="tagSpoiler">Spoiler</string>
+
+    <string name="searchForSubredditHint">Search for subreddit</string>
+    <string name="subredditMustBeBetweenLength">Subreddit name must be between 3 and 21 characters</string>
+
+
+    <string name="front_page">Front page</string>
+    <string name="popular" translatable="false">Popular</string>
+    <string name="all" translatable="false">All</string>
+    <string name="mod" translatable="false">Mod</string>
+    <string name="random">Random</string>
 
     <string name="postRemovedTitle">The post has been removed</string>
     <string name="postRemovedGeneric">The post has been removed</string>
@@ -630,4 +637,6 @@
 
     <string name="developerModeEnabled">You are now a developer! (Restart the app)</string>
     <string name="developerModeDisabled">Developer mode disabled</string>
+
+    <string name="failedToLoadImage">Failed to load image</string>
 </resources>

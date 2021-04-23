@@ -41,12 +41,13 @@ import java.util.*
  * Class for holding image URL variants for a [RedditPost]
  *
  * @param normal The URL pointing to the normal URL. If this is null, no image was found
+ * @param normalLowRes The URL pointing to a low resolution of the normal image. If this is null, no image was found
  * @param nsfw The URL pointing to the NSFW image to use. If this is null, no image should be shown
  * as either chosen by the user, or because no image was found
  * @param spoiler The URL pointing to the spoiler image to use. If this is null, no image was found and no image
  * should be used
  */
-data class PostImageVariants(var normal: String?, var nsfw: String?, var spoiler: String?)
+data class PostImageVariants(val normal: String?, val normalLowRes: String?, val nsfw: String?, val spoiler: String?)
 
 /**
  * Gets image variants for a reddit post
@@ -55,23 +56,30 @@ data class PostImageVariants(var normal: String?, var nsfw: String?, var spoiler
  * @return A [PostImageVariants] that holds the images to use for if the post is normal, nsfw, or spoiler
  */
 fun getImageVariantsForRedditPost(post: RedditPost) : PostImageVariants {
-    return PostImageVariants(getNormal(post), getNsfw(post), getObfuscated(post))
+    return PostImageVariants(getNormal(post, lowRes = false), getNormal(post, lowRes = true), getNsfw(post), getObfuscated(post))
 }
 
 /**
  * Gets the normal
  */
-private fun getNormal(post: RedditPost) : String? {
+private fun getNormal(post: RedditPost, lowRes: Boolean) : String? {
     val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-    var imageUrl: String? = null
 
-    post.preview?.images?.firstOrNull()?.resolutions?.forEach {
-        if (it.width <= screenWidth) {
-            imageUrl = it.url
+    var index = -1
+    val images = post.preview?.images?.firstOrNull()?.resolutions ?: return null
+
+    images.forEachIndexed { i, image ->
+        if (image.width <= screenWidth) {
+            index = i
         }
     }
 
-    return imageUrl
+    // The resolutions are stored in ascending order
+    return if (lowRes) {
+        images[index / 2].url
+    } else {
+        images[index].url
+    }
 }
 
 /**
@@ -82,7 +90,7 @@ private fun getNormal(post: RedditPost) : String? {
  */
 private fun getNsfw(post: RedditPost) : String? {
     return when (Settings.showNsfwPreview()) {
-        ShowNsfwPreview.NORMAL -> getNormal(post)
+        ShowNsfwPreview.NORMAL -> getNormal(post, lowRes = false)
         ShowNsfwPreview.BLURRED -> getObfuscated(post)
         ShowNsfwPreview.NO_IMAGE -> null
     }

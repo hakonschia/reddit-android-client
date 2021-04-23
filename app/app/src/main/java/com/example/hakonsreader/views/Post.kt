@@ -21,10 +21,8 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
-import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.Callback
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -52,6 +50,8 @@ class Post @JvmOverloads constructor(
          */
         private const val NO_MAX_HEIGHT = -1
     }
+
+    private var postExtras: Bundle? = null
 
     @Inject
     lateinit var postsDao: RedditPostsDao
@@ -394,6 +394,13 @@ class Post @JvmOverloads constructor(
 
             else -> null
         }?.apply {
+            postExtras?.let {
+                setExtras(it)
+
+                // This should only be for one post, so ensure that if this view is recycled
+                // it doesn't set extras for another post
+                postExtras = null
+            }
             setBitmap(this@Post.bitmap)
             setRedditPost(post)
             transitionName = context.getString(R.string.transition_post_content)
@@ -498,16 +505,18 @@ class Post @JvmOverloads constructor(
     }
 
     /**
-     * Sets a bundle of information to restore the state of the post
-     *
-     *
-     * Currently only restores state for video posts
+     * Sets a bundle of information to restore the state of the post. If the post content has not yet been
+     * generated then the bundle will be saved and passed when it is created.
      *
      * @param data The data to use for restoring the state
      */
     override fun setExtras(data: Bundle) {
         val c = binding.content.getChildAt(0) as Content?
-        c?.setExtras(data)
+        if (c != null) {
+            c.setExtras(data)
+        } else {
+            postExtras = data
+        }
     }
 
     /**

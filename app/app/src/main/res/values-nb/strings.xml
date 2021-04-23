@@ -446,4 +446,6 @@
     <string name="notificationDeveloperMessagesRetrievedTitle">Dev: Meldinger hentet</string>
     <string name="notificationDeveloperMessagesRetrievedContent">Meldinger sist hentet %s</string>
     <string name="accountManagementNoUsers">Fant ingen brukere</string>
+    <string name="content_description_load_hd_image">Last HD bilde</string>
+    <string name="failedToLoadImage">Kunne ikke laste inn bildet</string>
 </resources>

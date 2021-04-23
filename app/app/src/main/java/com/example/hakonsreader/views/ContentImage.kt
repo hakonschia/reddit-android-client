@@ -4,27 +4,27 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
-import android.widget.ImageView
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.util.Pair
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.ImageActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentImageBinding
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import com.example.hakonsreader.views.util.cache
 import com.example.hakonsreader.views.util.openImageInFullscreen
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import java.lang.Exception
 
 /**
  * Content view for Reddit images posts.
@@ -35,11 +35,33 @@ class ContentImage @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : Content(context, attrs, defStyleAttr) {
 
+    // TODO if an image is low res in a list of post, and the post is opened and the HD image
+    //  is loaded there, then we should also set that here in the list. Now the old low res image is shown
+
     companion object {
         private const val TAG = "ContentImage"
+
+        /**
+         * The key for the extras that gives the HD image URL, if a low res image is shown
+         *
+         * The value with this key is a [String]
+         */
+        const val EXTRAS_HD_IMAGE_URL = "extras_hdImageUrl"
+
+        /**
+         * The key for the extras that gives the URL that should be opened in fullscreen. This is used
+         * to give a different URL to load when a bitmap is given
+         *
+         * The value with this key is a [String]
+         */
+        const val EXTRAS_URL_TO_OPEN = "extras_urlToOpen"
     }
 
     private val binding: ContentImageBinding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true)
+
+    /**
+     * The overridden image URL set with [setWithImageUrl]
+     */
     private var imageUrl: String? = null
 
     /**
@@ -72,23 +94,53 @@ class ContentImage @JvmOverloads constructor(
         }
     }
 
+    override fun getTransitionViews(): MutableList<Pair<View, String>> {
+        return super.getTransitionViews().also {
+            it.add(Pair(binding.image, binding.image.transitionName))
+
+            // If we add this when it is not visible it will become visible again, which
+            // makes the icon flash for a split second, and will appear again when you exit
+            if (binding.hdImage.visibility == View.VISIBLE) {
+                it.add(Pair(binding.hdImage, binding.hdImage.transitionName))
+            }
+        }
+    }
+
+
     /**
      * Loads the image with a bitmap
      */
     private fun withBitmap(b: Bitmap) {
         binding.image.setImageBitmap(b)
 
+        val hdUrl = extras.getString(EXTRAS_HD_IMAGE_URL, null)
+
+        // If no HD URL is given, then it is already loaded and showing
+        binding.showingHdImage = hdUrl == null
+
+        hdUrl?.let {
+            setHdImageClickListener(it)
+        }
+
+        // TODO add delay (like with posts) so it doesn't open multiple images when clicked fast
         setOnClickListener {
-            ImageActivity.BITMAP = b
+            val urlToOpen = extras.getString(EXTRAS_URL_TO_OPEN)
 
             Intent(context, ImageActivity::class.java).run {
                 putExtra(ImageActivity.EXTRAS_CACHE_IMAGE, cache)
+
+                if (urlToOpen != null) {
+                    putExtra(ImageActivity.EXTRAS_IMAGE_URL, urlToOpen)
+                } else {
+                    // "b" might be out-of-date at this point, if it pointed to a low res image and an HD was loaded later
+                    ImageActivity.BITMAP = getBitmap() ?: b
+                }
 
                 if (context is AppCompatActivity) {
                     val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                             context as AppCompatActivity,
                             binding.image,
-                            "image"
+                            context.getString(R.string.transition_image_fullscreen)
                     )
                     context.startActivity(this, options.toBundle())
                 } else {
@@ -99,16 +151,30 @@ class ContentImage @JvmOverloads constructor(
     }
 
     /**
-     * Loags the image with URLs, either with [imageUrl] or with the image URLs found in [redditPost]
+     * Loads the image with URLs, either with [imageUrl] or with the image URLs found in [redditPost]
      */
     private fun withUrls() {
+        val (normal, normalLowRes, nsfw, spoiler) = getImageVariantsForRedditPost(redditPost)
 
-        val (normal, nsfw, spoiler) = getImageVariantsForRedditPost(redditPost)
+        binding.showingHdImage = true
+
         val url: String? = when {
             imageUrl != null -> imageUrl
 
             redditPost.isNsfw -> nsfw
             redditPost.isSpoiler -> spoiler
+
+            // If the normal and low res are the same we can treat it as an HD image
+            Settings.dataSavingEnabled() && normal != normalLowRes -> {
+                binding.showingHdImage = false
+
+                val hdUrl = normal ?: redditPost.url
+
+                setHdImageClickListener(hdUrl)
+                extras.putString(EXTRAS_HD_IMAGE_URL, hdUrl)
+
+                normalLowRes
+            }
 
             // Use the post URL as a fallback (since this is an image it will point to an image)
             else -> normal ?: redditPost.url
@@ -127,29 +193,87 @@ class ContentImage @JvmOverloads constructor(
             if (url == null) {
                 binding.image.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_image_not_supported_200dp))
             } else {
+                val openBitmap = url == normal || url == normalLowRes || url == redditPost.url
+
+                // This is for NSFW/spoiler posts, which should not open the bitmap (which is potentially blurred)
+                if (!openBitmap) {
+                    extras.putString(EXTRAS_URL_TO_OPEN, normal)
+                }
+
                 // When opening the image we always want to open the normal
                 setOnClickListener {
                     openImageInFullscreen(
                             binding.image,
-                            imageUrl ?: normal,
+                            normal,
                             cache,
                             // If the URL is for nsfw/spoiler we want to load the actual image
                             // when opened, not the blurred one
-                            useBitmapFromView = url == normal || url == redditPost.url)
+                            useBitmapFromView = openBitmap
+                    )
                 }
 
-                // If we have an obfuscated image, load that here instead
-                Picasso.get()
-                        .load(url)
-                        .placeholder(R.drawable.ic_wifi_tethering_150dp)
-                        .error(R.drawable.ic_wifi_tethering_150dp)
-                        .cache(cache)
-                        .fit()
-                        .into(binding.image)
+                loadImage(url)
             }
         } catch (e: RuntimeException) {
             e.printStackTrace()
             Log.d(TAG, "\n\n\n--------- ERROR LOADING IMAGE ${redditPost.subreddit}, ${redditPost.title} ---------\n\n\n")
+        }
+    }
+
+    /**
+     * Sets the listener for the HD image button
+     */
+    private fun setHdImageClickListener(imageUrl: String) {
+        binding.hdImage.setOnClickListener {
+            loadHdImage(imageUrl)
+        }
+    }
+
+    /**
+     * Loads an image from a URL
+     */
+    private fun loadImage(url: String) {
+        Picasso.get()
+                .load(url)
+                .placeholder(R.drawable.ic_wifi_tethering_150dp)
+                .error(R.drawable.ic_wifi_tethering_150dp)
+                .cache(cache)
+                .into(binding.image)
+    }
+
+    /**
+     * Loads a high definition image
+     */
+    private fun loadHdImage(url: String) {
+        binding.showingHdImage = true
+
+        val width = binding.image.width
+        val height = binding.image.height
+
+        val bitmap = getBitmap()
+
+        Picasso.get()
+                .load(url)
+                .cache(cache)
+                .into(binding.image, object : Callback {
+                    override fun onSuccess() {
+                        extras.remove(EXTRAS_HD_IMAGE_URL)
+                    }
+
+                    override fun onError(e: Exception?) {
+                        binding.showingHdImage = false
+                        Snackbar.make(this@ContentImage, R.string.failedToLoadImage, Snackbar.LENGTH_SHORT).show()
+                    }
+                })
+
+        // This is kind of weird, but if we don't set the size and bitmap to what it was, the old image will
+        // be removed and the size set to 0,0 until the image is loaded. If we use a custom Target to load into
+        // and just set the bitmap there I think there might be issues with recycling the bitmaps (documentation of Target
+        // says something)
+        with (binding.image) {
+            setImageBitmap(bitmap)
+            layoutParams.width = width
+            layoutParams.height = height
         }
     }
 }

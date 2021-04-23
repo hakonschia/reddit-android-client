@@ -236,6 +236,7 @@ class ContentVideo @JvmOverloads constructor(
             val url = when {
                 redditPost.isNsfw -> variants.nsfw
                 redditPost.isSpoiler -> variants.spoiler
+                Settings.dataSavingEnabled() -> variants.normalLowRes
                 else -> variants.normal
             }
 

@@ -77,7 +77,7 @@ fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean, useBitm
 
         putExtra(ImageActivity.EXTRAS_IMAGE_URL, imageUrl)
         putExtra(ImageActivity.EXTRAS_CACHE_IMAGE, cache)
-        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, "image")
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, context.getString(R.string.transition_image_fullscreen))
         activity.startActivity(this, options.toBundle())
     }
 }
