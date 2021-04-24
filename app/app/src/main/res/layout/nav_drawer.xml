@@ -46,6 +46,8 @@
             type="boolean" />
     </data>
 
+    <!-- This layout file is pretty bad as it repeats the same layouts over and over,
+     but I cba to generalize it as the layout is simple and generalizing is more effort than it is worth -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -586,6 +588,60 @@
                 app:layout_constraintStart_toStartOf="@id/randomIcon"
                 app:layout_constraintTop_toTopOf="@id/randomIcon" />
 
+
+            <TextView
+                android:id="@+id/multisHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/multisHeader"
+                android:textColor="@color/text_color"
+                android:textSize="17sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/random" />
+
+            <FrameLayout
+                android:id="@+id/multisLoaderLayout"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/horizontalProgressBarHeight"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/multisHeader"
+                app:layout_constraintTop_toBottomOf="@+id/multisHeader"
+
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!-- The height of this has to be some arbitrary large value, otherwise the actual
+                 progress bar will be very thin and the width will be tiny. It doesn't actually affect
+                 the height of progress bar since the FrameLayout is smaller -->
+                <ProgressBar
+                    android:id="@+id/multisLoader"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_gravity="center"
+
+                    android:indeterminateOnly="true" />
+            </FrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/multis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/multisHeader"
+                tools:itemCount="5"
+                tools:listitem="@layout/list_item_reddit_multi" />
+
+
             <TextView
                 android:id="@+id/subredditsHeader"
                 android:layout_width="wrap_content"
@@ -596,7 +652,7 @@
                 android:textColor="@color/text_color"
                 android:textSize="17sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/random" />
+                app:layout_constraintTop_toBottomOf="@id/multis" />
 
             <FrameLayout
                 android:id="@+id/subredditsLoaderLayout"
@@ -610,9 +666,6 @@
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <!-- The height of this has to be some arbitrary large value, otherwise the actual
-                 progress bar will be very thin and the width will be tiny. It doesn't actually affect
-                 the height of progress bar since the FrameLayout is smaller -->
                 <ProgressBar
                     android:id="@+id/subredditsLoader"
                     android:layout_width="match_parent"

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="multi"
+            type="com.example.hakonsreader.api.model.RedditMulti" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="?android:selectableItemBackground">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+
+            app:riv_border_color="@color/opposite_background"
+            app:riv_corner_radius="12dp"
+            app:riv_border_width="1dp"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            tools:src="@drawable/ic_emoji_emotions_24dp" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+
+            android:maxLines="1"
+            android:text="@{multi.name}"
+            android:textColor="@color/text_color"
+            android:textSize="16sp"
+
+            app:layout_constrainedWidth="true"
+
+            app:layout_constraintBottom_toBottomOf="@+id/icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/nsfwTag"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/icon"
+            app:layout_constraintTop_toTopOf="@+id/icon"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            tools:text="GlobalOffensiveReallyLongMultiName" />
+
+        <com.example.hakonsreader.views.Tag
+            android:id="@id/nsfwTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:visibility="@{multi.nsfw ? View.VISIBLE : View.GONE}"
+            app:fillColor="@color/tagNSFWFill"
+            app:layout_constraintBottom_toBottomOf="@+id/name"
+            app:layout_constraintEnd_toStartOf="@+id/favoriteMulti"
+
+            app:layout_constraintStart_toEndOf="@id/name"
+            app:layout_constraintTop_toTopOf="@+id/name"
+            app:text="@string/tagNSFW"
+            app:textColor="@color/tagNSFWText" />
+
+        <!-- TODO subscribed OR is the owner of the multi -->
+        <ImageButton
+            android:id="@+id/favoriteMulti"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|end"
+
+            android:contentDescription="@string/content_description_favorite_subreddit"
+            android:visibility="@{multi.subscribed ? View.VISIBLE : View.GONE}"
+            android:tint="@{multi.favorited ? @color/subredditFavorited : @color/iconColor}"
+
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_star_24dp"
+            app:layout_constraintBottom_toBottomOf="@+id/name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/name" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

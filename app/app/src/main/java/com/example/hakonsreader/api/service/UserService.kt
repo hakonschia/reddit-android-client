@@ -3,8 +3,9 @@ package com.example.hakonsreader.api.service
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditListing
-import com.example.hakonsreader.api.model.RedditMulti
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.RedditUser
+import com.example.hakonsreader.api.model.internal.RedditMultiWrapper
 import com.example.hakonsreader.api.responses.ListingResponse
 import retrofit2.Response
 import retrofit2.http.*
@@ -46,7 +47,7 @@ interface UserService {
      * 5. *downvoted* - Posts/comments downvoted by the user. This is only accessible for the user itself</li>
      * 6. *hidden* - Posts/comments hidden by the user. This is only accessible for the user itself</li>
      * 7. *saved* - Posts/comments saved by the user. This is only accessible for the user itself</li>
-     * @param after The fullname of the last post retrieved
+     * @param after The fullname of the last listing retrieved
      * @param count The amount of items already fetched
      * @param limit The amount of posts to retrieve
      * @param sort How to sort the post (new, best etc.). This should use [SortingMethods] and its
@@ -100,7 +101,7 @@ interface UserService {
      * Get multis from the logged in user
      */
     @GET("api/multi/mine")
-    suspend fun getMultisLoggedInUser(): Response<List<RedditMulti>>
+    suspend fun getMultisLoggedInUser(): Response<List<RedditMultiWrapper>>
 
     /**
      * Get multis from a user
@@ -108,5 +109,19 @@ interface UserService {
      * @param username The username to retrieve mutlis from
      */
     @GET("/api/multi/user/{username}")
-    suspend fun getMultisFromUser(@Path("username") username: String): Response<List<RedditMulti>>
+    suspend fun getMultisFromUser(@Path("username") username: String): Response<List<RedditMultiWrapper>>
+
+    /**
+     * Get posts from a multi
+     */
+    @GET("user/{username}/m/{multiName}")
+    suspend fun getPostsFromMulti(
+            @Path("username") username: String,
+            @Path("multiName") multiName: String,
+            @Query("sort") sort: String,
+            @Query("t") timeSort: String,
+            @Query("after") after: String,
+            @Query("count") count: Int,
+            @Query("limit") limit: Int
+    ): Response<List<RedditPost>>
 }

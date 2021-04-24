@@ -67,15 +67,15 @@ class UserRequestsLoggedInUserImpl(
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
-            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't get user information without access token for a logged in user", e))
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't get user multis without access token for a logged in user", e))
         }
 
         return try {
             val resp = api.getMultisLoggedInUser()
-            val multis = resp.body()
+            val multisWrapper = resp.body()
 
-            if (multis != null) {
-                ApiResponse.Success(multis)
+            if (multisWrapper != null) {
+                ApiResponse.Success(multisWrapper.map { it.mutli })
             } else {
                 apiError(resp)
             }

@@ -39,11 +39,13 @@ import com.example.hakonsreader.dialogadapters.OAuthScopeAdapter
 import com.example.hakonsreader.fragments.*
 import com.example.hakonsreader.interfaces.*
 import com.example.hakonsreader.misc.*
+import com.example.hakonsreader.recyclerviewadapters.RedditMultiAdapter
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.recyclerviewadapters.TrendingSubredditsAdapter
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.states.OAuthState
+import com.example.hakonsreader.viewmodels.RedditMultiViewModel
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.viewmodels.TrendingSubredditsViewModel
 import com.example.hakonsreader.viewmodels.assistedViewModel
@@ -56,8 +58,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import java.time.Duration
-import java.time.Instant
 import java.util.*
 import javax.inject.Inject
 
@@ -163,6 +163,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         selectSubredditsViewModelFactory.create(AppState.loggedInState.value is LoggedInState.LoggedIn)
     }
 
+    @Inject
+    lateinit var redditMultiViewModelFactory: RedditMultiViewModel.Factory
+    private val redditMultiViewModel: RedditMultiViewModel by assistedViewModel {
+        // Currently we don't care about the saved state handle here
+        redditMultiViewModelFactory.create(AppState.loggedInState.value is LoggedInState.LoggedIn)
+    }
+
     private val trendingSubredditsViewModel: TrendingSubredditsViewModel by viewModels()
 
     /**
@@ -245,8 +252,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         observeUserState()
         observeUnreadMessages()
 
-        subredditsViewModel.isForLoggedInUser = AppState.loggedInState.value is LoggedInState.LoggedIn
+        val forLoggedInUser = AppState.loggedInState.value is LoggedInState.LoggedIn
+
+        subredditsViewModel.isForLoggedInUser = forLoggedInUser
         subredditsViewModel.loadSubreddits(force = recreatedAsNewUser == true)
+
+        redditMultiViewModel.isForLoggedInUser = forLoggedInUser
+        redditMultiViewModel.loadMultis(force = recreatedAsNewUser == true)
 
         setupNavDrawer()
         checkAccessTokenScopes()
@@ -951,6 +963,21 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
         }
 
+        with (redditMultiViewModel) {
+            multis.observe(this@MainActivity) { multis ->
+                (binding.navDrawer.multis.adapter as RedditMultiAdapter)
+                        .submitList(multis)
+            }
+
+            isLoading.observe(this@MainActivity) { loading ->
+                binding.navDrawer.multisLoaderLayout.goneIf(!loading)
+            }
+
+            error.observe(this@MainActivity) { error ->
+                handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable, binding.bottomNav)
+            }
+        }
+
         binding.mainParentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerOpened(drawerView: View) {
                 trendingSubredditsViewModel.trendingSubreddits.value?.let {
@@ -1007,6 +1034,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 subredditSelected = this@MainActivity
             }
             trendingSubreddits.layoutManager = LinearLayoutManager(this@MainActivity)
+
+            multis.adapter = RedditMultiAdapter()
+            multis.layoutManager = LinearLayoutManager(this@MainActivity)
         }
     }
 

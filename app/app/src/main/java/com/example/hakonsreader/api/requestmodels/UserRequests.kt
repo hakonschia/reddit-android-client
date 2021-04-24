@@ -155,6 +155,8 @@ interface UserRequests {
 
     /**
      * Get a list of Multis the user has
+     *
+     * OAuth scope required: *read*
      */
     suspend fun multis(): ApiResponse<List<RedditMulti>>
 
@@ -356,10 +358,40 @@ class UserRequestsImpl(
     }
 
     override suspend fun multis(): ApiResponse<List<RedditMulti>> {
-        TODO("Not yet implemented")
+        return try {
+            val resp = api.getMultisFromUser(username)
+            val multisWrapper = resp.body()
+
+            if (multisWrapper != null) {
+                ApiResponse.Success(multisWrapper.map { it.mutli })
+            } else {
+                apiError(resp)
+            }
+        } catch (e: java.lang.Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
     }
 
     override suspend fun multi(multiName: String, postSort: SortingMethods, timeSort: PostTimeSort, after: String, count: Int, limit: Int): ApiResponse<List<RedditPost>> {
-        TODO("Not yet implemented")
+        return try {
+            val resp = api.getPostsFromMulti(
+                    username,
+                    multiName,
+                    postSort.value,
+                    timeSort.value,
+                    after,
+                    count,
+                    limit
+            )
+            val posts = resp.body()
+
+            if (posts != null) {
+                ApiResponse.Success(posts)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: java.lang.Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
     }
 }
