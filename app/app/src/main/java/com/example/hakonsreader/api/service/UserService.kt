@@ -3,6 +3,7 @@ package com.example.hakonsreader.api.service
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditListing
+import com.example.hakonsreader.api.model.RedditMulti
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ListingResponse
 import retrofit2.Response
@@ -93,4 +94,19 @@ interface UserService {
             @Field("container") fullname: String,
             @Field("type") type: String = "enemy"
     ) : Response<Void>
+
+
+    /**
+     * Get multis from the logged in user
+     */
+    @GET("api/multi/mine")
+    suspend fun getMultisLoggedInUser(): Response<List<RedditMulti>>
+
+    /**
+     * Get multis from a user
+     *
+     * @param username The username to retrieve mutlis from
+     */
+    @GET("/api/multi/user/{username}")
+    suspend fun getMultisFromUser(@Path("username") username: String): Response<List<RedditMulti>>
 }

@@ -2,6 +2,7 @@ package com.example.hakonsreader.api.requestmodels
 
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
 import com.example.hakonsreader.api.model.AccessToken
+import com.example.hakonsreader.api.model.RedditMulti
 import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.api.responses.GenericError
@@ -24,6 +25,12 @@ interface UserRequestsLoggedInUser {
      * @return A [RedditUser] object representing the user if successful
      */
     suspend fun info() : ApiResponse<RedditUser>
+
+    /**
+     * Get a list of Multis the user has. This only retrieves the information about the multis. To
+     * retrieve the posts from a multi use [UserRequests.multi]
+     */
+    suspend fun multis(): ApiResponse<List<RedditMulti>>
 }
 
 
@@ -56,4 +63,24 @@ class UserRequestsLoggedInUserImpl(
         }
     }
 
+    override suspend fun multis(): ApiResponse<List<RedditMulti>> {
+        try {
+            verifyLoggedInToken(accessToken)
+        } catch (e: InvalidAccessTokenException) {
+            return ApiResponse.Error(GenericError(-1), InvalidAccessTokenException("Can't get user information without access token for a logged in user", e))
+        }
+
+        return try {
+            val resp = api.getMultisLoggedInUser()
+            val multis = resp.body()
+
+            if (multis != null) {
+                ApiResponse.Success(multis)
+            } else {
+                apiError(resp)
+            }
+        } catch (e: Exception) {
+            ApiResponse.Error(GenericError(-1), e)
+        }
+    }
 }

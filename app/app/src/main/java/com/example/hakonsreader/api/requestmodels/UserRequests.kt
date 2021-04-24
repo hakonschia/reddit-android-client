@@ -141,7 +141,7 @@ interface UserRequests {
      *
      * @return Successful requests return no data
      */
-    suspend fun block() : ApiResponse<Nothing?>
+    suspend fun block(): ApiResponse<Nothing?>
 
     /**
      * Unblocks a user
@@ -151,7 +151,24 @@ interface UserRequests {
      * @param loggedInUserId The ID of the user currently logged in (the user who is blocked another user)
      * @return Successful requests return no data
      */
-    suspend fun unblock(loggedInUserId: String) : ApiResponse<Nothing?>
+    suspend fun unblock(loggedInUserId: String): ApiResponse<Nothing?>
+
+    /**
+     * Get a list of Multis the user has
+     */
+    suspend fun multis(): ApiResponse<List<RedditMulti>>
+
+    /**
+     * Get posts from a Multi from the user
+     */
+    suspend fun multi(
+            multiName: String,
+            postSort: SortingMethods = SortingMethods.HOT,
+            timeSort: PostTimeSort = PostTimeSort.DAY,
+            after: String = "",
+            count: Int = 0,
+            limit: Int = 25,
+    ): ApiResponse<List<RedditPost>>
 }
 
 /**
@@ -336,5 +353,13 @@ class UserRequestsImpl(
         } catch (e: Exception) {
             ApiResponse.Error(GenericError(-1), e)
         }
+    }
+
+    override suspend fun multis(): ApiResponse<List<RedditMulti>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun multi(multiName: String, postSort: SortingMethods, timeSort: PostTimeSort, after: String, count: Int, limit: Int): ApiResponse<List<RedditPost>> {
+        TODO("Not yet implemented")
     }
 }
