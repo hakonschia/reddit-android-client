@@ -210,9 +210,8 @@ class ProfileFragment : Fragment() {
         val fragment = if (postsFragment != null) {
             postsFragment!!
         } else {
-            PostsFragment.newInstance(
-                isForUser = true,
-                name = name,
+            PostsFragment.newUser(
+                username = name,
                 sort = SortingMethods.NEW
             )
         }

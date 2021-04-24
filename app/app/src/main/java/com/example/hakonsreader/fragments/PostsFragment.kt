@@ -44,7 +44,12 @@ class PostsFragment : Fragment(), SortableWithTime {
         /**
          * The key stored in [getArguments] saying the name the of the subreddit/user the posts are for
          */
-        private const val ARGS_NAME = "args_subredditName"
+        private const val ARGS_NAME = "args_name"
+
+        /**
+         * The key stored in [getArguments] saying the name the of the multi the posts are for
+         */
+        private const val ARGS_MULTI_NAME = "args_multiName"
 
         /**
          * The key stored in [getArguments] saying is [name] is for a user or subreddit
@@ -85,10 +90,38 @@ class PostsFragment : Fragment(), SortableWithTime {
         private const val POST_OPEN_TIMEOUT = 1250L
 
 
-        fun newInstance(isForUser: Boolean, name: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = PostsFragment().apply {
+        /**
+         * Creates a new fragment for user posts
+         */
+        fun newUser(username: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = PostsFragment().apply {
             arguments = Bundle().apply {
-                putBoolean(ARGS_IS_FOR_USER, isForUser)
-                putString(ARGS_NAME, name)
+                putBoolean(ARGS_IS_FOR_USER, true)
+                putString(ARGS_NAME, username)
+                sort?.let { putString(ARGS_SORT, it.value) }
+                timeSort?.let { putString(ARGS_TIME_SORT, it.value) }
+            }
+        }
+
+        /**
+         * Creates a new fragment for subreddit posts
+         */
+        fun newSubreddit(subredditName: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = PostsFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(ARGS_IS_FOR_USER, false)
+                putString(ARGS_NAME, subredditName)
+                sort?.let { putString(ARGS_SORT, it.value) }
+                timeSort?.let { putString(ARGS_TIME_SORT, it.value) }
+            }
+        }
+
+        /**
+         * Creates a new fragment for multi posts
+         */
+        fun newMulti(username: String, multiName: String, sort: SortingMethods? = null, timeSort: PostTimeSort? = null) = PostsFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(ARGS_IS_FOR_USER, true)
+                putString(ARGS_NAME, username)
+                putString(ARGS_MULTI_NAME, multiName)
                 sort?.let { putString(ARGS_SORT, it.value) }
                 timeSort?.let { putString(ARGS_TIME_SORT, it.value) }
             }
@@ -106,6 +139,11 @@ class PostsFragment : Fragment(), SortableWithTime {
     private val isForUser: Boolean by lazy { arguments?.getBoolean(ARGS_IS_FOR_USER) ?: false }
 
     /**
+     * If true the posts are for a multi
+     */
+    private val isMulti: Boolean by lazy { arguments?.getString(ARGS_MULTI_NAME) != null }
+
+    /**
      * If true, the subreddit is a default subreddit (eg. front page)
      */
     private var isDefaultSubreddit = false
@@ -115,8 +153,8 @@ class PostsFragment : Fragment(), SortableWithTime {
 
     @Inject
     lateinit var postsViewModelFactory: PostsViewModel.Factory
-
     private val postsViewModel: PostsViewModel by assistedViewModel { postsViewModelFactory.create(name, isForUser, it) }
+
     private val postsScrollListener: PostScrollListener = PostScrollListener { postsViewModel.loadPosts() }
 
     /**

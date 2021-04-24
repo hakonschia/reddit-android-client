@@ -1042,9 +1042,8 @@ class SubredditFragment : Fragment() {
                 0 -> {
                     val sort = arguments?.getString(ARGS_SORT)?.let { s -> SortingMethods.values().find { it.value.equals(s, ignoreCase = true) } }
                     val timeSort = arguments?.getString(ARGS_TIME_SORT)?.let { s -> PostTimeSort.values().find { it.value.equals(s, ignoreCase = true) } }
-                    PostsFragment.newInstance(
-                            isForUser = false,
-                            name = subreddit.name,
+                    PostsFragment.newSubreddit(
+                            subredditName = subreddit.name,
                             sort = sort,
                             timeSort = timeSort
                     )
