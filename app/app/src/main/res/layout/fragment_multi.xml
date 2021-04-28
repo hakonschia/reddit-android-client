@@ -156,7 +156,7 @@
                     <!-- titleMarginEnd = 16dp + refresh(24dp) + sort(24dp) + 16dp
                      so that it doesn't overlap with the buttons-->
                     <com.google.android.material.appbar.MaterialToolbar
-                        android:id="@+id/subredditToolbar"
+                        android:id="@+id/multiToolbar"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
                         app:titleMarginEnd="84dp"

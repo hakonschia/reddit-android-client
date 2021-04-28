@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -80,6 +81,8 @@ class MultiFragment : Fragment() {
         if (savedInstanceState != null) {
             postsFragment = childFragmentManager.getFragment(savedInstanceState, SAVED_POSTS_FRAGMENT) as PostsFragment?
         }
+
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.multiToolbar)
 
         val multi = Gson().fromJson(requireArguments().getString(ARGS_MULTI)!!, RedditMulti::class.java)
 
