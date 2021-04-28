@@ -383,9 +383,10 @@ class UserRequestsImpl(
                     count,
                     limit
             )
-            val posts = resp.body()
+            val posts = resp.body()?.getListings()
 
             if (posts != null) {
+                thirdPartyRequest.loadAll(posts)
                 ApiResponse.Success(posts)
             } else {
                 apiError(resp)

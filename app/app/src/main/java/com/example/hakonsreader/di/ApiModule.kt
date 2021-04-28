@@ -60,7 +60,7 @@ object ApiModule {
                 onNewToken = { newToken -> AppState.onNewToken(newToken) },
                 onInvalidToken = { _: GenericError?, _: Throwable? -> context.onInvalidAccessToken() },
 
-                loggerLevel = HttpLoggingInterceptor.Level.HEADERS,
+                loggerLevel = HttpLoggingInterceptor.Level.BODY,
 
                 callbackUrl = NetworkConstants.CALLBACK_URL,
                 //deviceId = UUID.randomUUID().toString(),

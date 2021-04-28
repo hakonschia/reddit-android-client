@@ -123,5 +123,5 @@ interface UserService {
             @Query("after") after: String,
             @Query("count") count: Int,
             @Query("limit") limit: Int
-    ): Response<List<RedditPost>>
+    ): Response<ListingResponse<RedditPost>>
 }

@@ -139,11 +139,6 @@ class PostsFragment : Fragment(), SortableWithTime {
     private val isForUser: Boolean by lazy { arguments?.getBoolean(ARGS_IS_FOR_USER) ?: false }
 
     /**
-     * If true the posts are for a multi
-     */
-    private val isMulti: Boolean by lazy { arguments?.getString(ARGS_MULTI_NAME) != null }
-
-    /**
      * If true, the subreddit is a default subreddit (eg. front page)
      */
     private var isDefaultSubreddit = false
@@ -380,6 +375,8 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     private fun setupPostsViewModel() {
         with (postsViewModel) {
+            multiName = arguments?.getString(ARGS_MULTI_NAME)
+
             posts.observe(viewLifecycleOwner, { posts ->
                 val adapter = binding.posts.adapter as PostsAdapter?
                 postsViewModel.savedPostStates?.let {

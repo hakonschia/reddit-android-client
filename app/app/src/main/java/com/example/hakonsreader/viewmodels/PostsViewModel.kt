@@ -72,6 +72,13 @@ class PostsViewModel @AssistedInject constructor (
         ) : PostsViewModel
     }
 
+    /**
+     * The name of the Multi to load, if this is ViewModel is for a Multi. The ViewModel must be for
+     * a user for this to have an affect
+     */
+    // I can't inject multiple strings into the constructor (even with naming them)
+    var multiName: String? = null
+
     private var arePostsBeingRestored = false
     private val isDefaultSubreddit = !isUser && RedditApi.STANDARD_SUBS.contains(userOrSubredditName.toLowerCase())
 
@@ -162,7 +169,11 @@ class PostsViewModel @AssistedInject constructor (
 
         viewModelScope.launch {
             val resp = if (isUser) {
-                api.user(userOrSubredditName).posts(sort, timeSort, after, count)
+                if (!multiName.isNullOrEmpty()) {
+                    api.user(userOrSubredditName).multi(multiName!!, sort, timeSort, after, count)
+                } else {
+                    api.user(userOrSubredditName).posts(sort, timeSort, after, count)
+                }
             } else {
                 api.subreddit(userOrSubredditName).posts(sort, timeSort, after, count)
             }
