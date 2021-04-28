@@ -988,6 +988,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             multis.observe(this@MainActivity) { multis ->
                 (binding.navDrawer.multis.adapter as RedditMultiAdapter)
                         .submitList(multis)
+
+                binding.navDrawer.hasMultis = multis.isNotEmpty()
             }
 
             isLoading.observe(this@MainActivity) { loading ->

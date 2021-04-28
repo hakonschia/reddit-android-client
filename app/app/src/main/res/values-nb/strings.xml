@@ -446,4 +446,5 @@
     <string name="content_description_load_hd_image">Last HD bilde</string>
     <string name="failedToLoadImage">Kunne ikke laste inn bildet</string>
     <string name="multisHeader">Multier</string>
+    <string name="noMultis">Ingen Multier funnet</string>
 </resources>
