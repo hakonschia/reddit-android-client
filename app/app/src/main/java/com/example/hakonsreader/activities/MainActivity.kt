@@ -80,6 +80,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         private const val SAVED_ACTIVE_SUBREDDIT_FRAGMENT = "saved_activeSubredditFragment"
 
         /**
+         * The key used in [onSaveInstanceState] to save the state of the active multi fragment
+         */
+        private const val SAVED_ACTIVE_MULTI_FRAGMENT = "saved_activeMultiFragment"
+
+        /**
          * The key used in [onSaveInstanceState] to save the state of the select subreddit fragment
          */
         private const val SAVED_SELECT_SUBREDDIT_FRAGMENT = "saved_selectSubredditFragment"
@@ -302,6 +307,12 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             outState.putString(ACTIVE_SUBREDDIT_NAME, it.subredditName)
             try {
                 supportFragmentManager.putFragment(outState, SAVED_ACTIVE_SUBREDDIT_FRAGMENT, it)
+            } catch (e: IllegalStateException) { }
+        }
+
+        activeMulti?.let {
+            try {
+                supportFragmentManager.putFragment(outState, SAVED_ACTIVE_MULTI_FRAGMENT, it)
             } catch (e: IllegalStateException) { }
         }
 
@@ -786,6 +797,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
         standardSubFragment = supportFragmentManager.getFragment(restoredState, SAVED_STANDARD_SUB_CONTAINER_FRAGMENT) as StandardSubContainerFragment?
         activeSubreddit = supportFragmentManager.getFragment(restoredState, SAVED_ACTIVE_SUBREDDIT_FRAGMENT) as SubredditFragment?
+        activeMulti = supportFragmentManager.getFragment(restoredState, SAVED_ACTIVE_MULTI_FRAGMENT) as MultiFragment?
         selectSubredditFragment = supportFragmentManager.getFragment(restoredState, SAVED_SELECT_SUBREDDIT_FRAGMENT) as SelectSubredditFragment?
         profileFragment = supportFragmentManager.getFragment(restoredState, SAVED_PROFILE_FRAGMENT) as ProfileFragment?
 
