@@ -22,6 +22,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.model.RedditMulti
 import com.example.hakonsreader.api.model.RedditUserInfo
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.TrendingSubreddits
@@ -149,6 +150,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     // The fragments to show in the nav bar
     private var standardSubFragment: StandardSubContainerFragment? = null
     private var activeSubreddit: SubredditFragment? = null
+    private var activeMulti: MultiFragment? = null
     private var selectSubredditFragment: SelectSubredditFragment? = null
     private var profileFragment: ProfileFragment? = null
     private var inboxFragment: InboxFragment? = null
@@ -464,6 +466,25 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     override fun showUnreadMessagesBadge(show: Boolean) {
         val badge = binding.bottomNav.getBadge(binding.bottomNav.menu.findItem(R.id.navProfile).itemId)
         badge?.isVisible = show
+    }
+
+    private fun multiSelected(multi: RedditMulti) {
+        activeMulti = MultiFragment.newInstance(multi)
+
+        // Already in the subreddit nav bar, open Multi with opening transition
+        if (binding.bottomNav.selectedItemId == R.id.navSubreddit) {
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, activeMulti!!)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .addToBackStack(null)
+                    .commit()
+        } else {
+            // Otherwise select the subreddit nav bar, which will use activeSubreddit and deal with animations
+            binding.bottomNav.selectedItemId = R.id.navSubreddit
+        }
+
+        // If this was called from a drawer it should close (otherwise the drawer already is closed)
+        binding.mainParentLayout.closeDrawer(GravityCompat.START)
     }
 
     private fun observeUserState() {
@@ -1035,7 +1056,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
             trendingSubreddits.layoutManager = LinearLayoutManager(this@MainActivity)
 
-            multis.adapter = RedditMultiAdapter()
+            multis.adapter = RedditMultiAdapter().apply {
+                onMultiSelected = {
+                    multiSelected(it)
+                }
+            }
             multis.layoutManager = LinearLayoutManager(this@MainActivity)
         }
     }
@@ -1053,6 +1078,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
     /**
      * Custom BottomNavigationView item selection listener
+     *
+     * The nav bar items work as following:
+     * 1. "Home": Holds the standard sub container (front page, popular etc.)
+     * 2. "Subreddit": If
      */
     inner class BottomNavigationViewListener : BottomNavigationView.OnNavigationItemSelectedListener {
         private var playAnimationForNextChange = true
@@ -1179,7 +1208,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          */
         private fun onNavBarSubreddit(): Fragment {
             // No subreddit created (first time here), or we in a subreddit looking to get back
-            return if (activeSubreddit == null) {
+            return if (activeMulti != null) {
+                activeMulti!!
+            } else if (activeSubreddit == null) {
                 if (selectSubredditFragment == null) {
                     selectSubredditFragment = SelectSubredditFragment.newInstance().also {
                         it.subredditSelected = this@MainActivity

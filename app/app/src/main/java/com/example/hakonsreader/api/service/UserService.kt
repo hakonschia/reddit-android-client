@@ -100,7 +100,7 @@ interface UserService {
     /**
      * Get multis from the logged in user
      */
-    @GET("api/multi/mine")
+    @GET("api/multi/mine?raw_json=1")
     suspend fun getMultisLoggedInUser(): Response<List<RedditMultiWrapper>>
 
     /**
@@ -108,13 +108,13 @@ interface UserService {
      *
      * @param username The username to retrieve mutlis from
      */
-    @GET("/api/multi/user/{username}")
+    @GET("/api/multi/user/{username}?raw_json=1")
     suspend fun getMultisFromUser(@Path("username") username: String): Response<List<RedditMultiWrapper>>
 
     /**
      * Get posts from a multi
      */
-    @GET("user/{username}/m/{multiName}")
+    @GET("user/{username}/m/{multiName}?raw_json=1")
     suspend fun getPostsFromMulti(
             @Path("username") username: String,
             @Path("multiName") multiName: String,

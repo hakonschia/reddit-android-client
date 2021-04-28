@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.example.hakonsreader.views.util.MenuClickHandlerKt"/>
+
+        <variable
+            name="standardSub"
+            type="boolean" />
+
+        <variable
+            name="multi"
+            type="com.example.hakonsreader.api.model.RedditMulti" />
+
+        <variable
+            name="privatelyBrowsing"
+            type="boolean" />
+
+        <variable
+            name="bannerLoaded"
+            type="boolean" />
+
+    </data>
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/parentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/subredditAppBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/subredditToolbarWithoutBanner">
+
+                <!-- titleMarginEnd = 16dp + refresh(24dp) + sort(24dp) + 16dp
+                 so that it doesn't overlap with the buttons-->
+                <com.google.android.material.appbar.CollapsingToolbarLayout
+                    android:id="@+id/collapsingToolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/subredditToolbarWithoutBanner"
+                    android:fitsSystemWindows="true"
+                    android:background="@color/toolbarBackground"
+                    app:title="@{multi.name}"
+                    app:expandedTitleTextAppearance="@style/ToolbarTitle"
+                    app:contentScrim="@color/toolbarBackground"
+                    app:expandedTitleMargin="16dp"
+                    app:expandedTitleMarginBottom="20dp"
+                    app:expandedTitleMarginEnd="84dp"
+                    app:toolbarId="@id/subredditToolbar"
+                    app:scrimVisibleHeightTrigger="@dimen/subredditToolbarScrimWithBanner"
+                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_collapseMode="parallax">
+
+                        <ImageView
+                            android:id="@+id/banner"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/subredditToolbarBannerNotLoaded"
+
+                            android:scaleType="centerCrop"
+                            android:contentDescription="@string/content_description_subreddit_banner"
+
+                            android:background="@color/secondary_background"
+
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+
+                            tools:src="@tools:sample/avatars"/>
+
+                        <com.makeramen.roundedimageview.RoundedImageView
+                            android:id="@+id/multiIcon"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+
+                            android:layout_gravity="center"
+                            android:layout_marginStart="16dp"
+
+                            android:background="@color/background"
+                            android:src="@drawable/ic_emoji_emotions_200dp"
+
+                            app:layout_constraintBottom_toBottomOf="@+id/multiName"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/banner"
+                            app:layout_constraintVertical_bias="0.43"
+                            app:riv_border_color="@color/opposite_background"
+                            app:riv_border_width="2dp"
+                            app:riv_corner_radius="30dp"
+                            app:riv_mutate_background="true" />
+
+                        <TextView
+                            android:id="@+id/multiName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginStart="4dp"
+                            android:layout_marginEnd="16dp"
+
+                            android:textColor="@color/text_color"
+                            android:textSize="20sp"
+                            android:text='@{multi.name ?? ""}'
+                            android:maxLines="1"
+                            android:ellipsize="end"
+
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.0"
+                            app:layout_constraintStart_toEndOf="@+id/multiIcon"
+                            app:layout_constraintTop_toBottomOf="@+id/banner"
+                            tools:text="This is a Multi" />
+
+                        <ImageView
+                            android:id="@+id/privateBrowsingIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:contentDescription="@string/content_description_private_browsing_icon"
+                            android:src="@drawable/ic_incognito"
+
+                            android:visibility="@{privatelyBrowsing ? View.VISIBLE : View.GONE, default=gone}"
+                            tools:visibility="visible"
+                            app:layout_constraintBottom_toBottomOf="@+id/multiIcon"
+                            app:layout_constraintStart_toStartOf="@+id/multiIcon" />
+
+
+                        <com.robinhood.ticker.TickerView
+                            android:id="@+id/subredditSubscribers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_marginStart="4dp"
+
+                            android:text="@{@plurals/amountOfSubscribers(multi.subscribers, multi.subscribers)}"
+                            android:textColor="@color/text_color"
+
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintStart_toEndOf="@+id/multiIcon"
+                            app:layout_constraintTop_toBottomOf="@+id/multiName"
+                            app:ticker_animationDuration="@integer/tickerAnimationDefault"
+                            app:ticker_defaultCharacterList="number"
+                            tools:text="523 123 231 subscribers" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- titleMarginEnd = 16dp + refresh(24dp) + sort(24dp) + 16dp
+                     so that it doesn't overlap with the buttons-->
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/subredditToolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        app:titleMarginEnd="84dp"
+                        app:layout_collapseMode="pin" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom">
+
+                        <ImageButton
+                            android:id="@+id/subredditRefresh"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/ripple_main_bg"
+                            android:src="@drawable/ic_refresh_24dp"
+                            android:tint="@color/text_color"
+                            android:contentDescription="@string/content_description_refresh_posts"
+
+                            app:layout_constraintBottom_toBottomOf="@id/subredditSort"
+                            app:layout_constraintEnd_toStartOf="@id/subredditSort" />
+
+                        <ImageButton
+                            android:id="@+id/subredditSort"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="16dp"
+                            android:background="@drawable/ripple_main_bg"
+                            android:tint="@color/text_color"
+                            android:contentDescription="@string/content_description_sort_posts"
+
+                            android:src="@drawable/ic_sort_24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.appbar.CollapsingToolbarLayout>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/postsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+            <FrameLayout
+                android:id="@+id/progressBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/horizontalProgressBarHeight"
+                app:layout_anchor="@id/subredditAppBarLayout"
+                app:layout_anchorGravity="bottom"
+
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!-- The height of this has to be some arbitrary large value, otherwise the actual
+                 progress bar will be very thin and the width will be tiny. It doesn't actually affect
+                 the height of progress bar since the FrameLayout is smaller -->
+                <ProgressBar
+                    android:id="@+id/loadingIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_gravity="center"
+
+                    android:indeterminateOnly="true" />
+            </FrameLayout>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
+</layout>
