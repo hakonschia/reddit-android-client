@@ -1,10 +1,12 @@
 package com.example.hakonsreader.fragments
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -75,7 +77,6 @@ class MultiFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return FragmentMultiBinding.inflate(inflater).also {
             _binding = it
-            setupBinding()
         }.root
     }
 
@@ -88,7 +89,7 @@ class MultiFragment : Fragment() {
 
         val multi = Gson().fromJson(requireArguments().getString(ARGS_MULTI)!!, RedditMulti::class.java)
 
-        binding.multi = multi
+        setupBinding(multi)
 
         addFragmentListener()
         createAndAddPostsFragment(multi)
@@ -115,7 +116,15 @@ class MultiFragment : Fragment() {
         _binding = null
     }
 
-    private fun setupBinding() {
+    private fun setupBinding(multi: RedditMulti) {
+        binding.multi = multi
+
+        if (multi.keyColor.isNullOrEmpty()) {
+            binding.banner.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.secondary_background))
+        } else {
+            binding.banner.setBackgroundColor(Color.parseColor(multi.keyColor))
+        }
+
         binding.multiRefresh.setOnClickListener { postsFragment?.refreshPosts() }
         binding.multiSort.setOnClickListener { view ->
             postsFragment?.let {

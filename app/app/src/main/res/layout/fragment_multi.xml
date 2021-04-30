@@ -72,8 +72,6 @@
                             android:scaleType="centerCrop"
                             android:contentDescription="@string/content_description_subreddit_banner"
 
-                            android:background="@color/secondary_background"
-
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
