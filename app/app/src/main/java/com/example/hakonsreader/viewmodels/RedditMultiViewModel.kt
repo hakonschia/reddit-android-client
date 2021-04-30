@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
  */
 class RedditMultiViewModel @AssistedInject constructor(
         private val api: RedditApi,
-        @Assisted var isForLoggedInUser: Boolean
+        @Assisted var username: String?
 ) : ViewModel() {
 
     @AssistedFactory
@@ -25,10 +25,10 @@ class RedditMultiViewModel @AssistedInject constructor(
         /**
          * Factory for the ViewModel
          *
-         * @param isForLoggedInUser Set to true if the ViewModel is for the logged in user
+         * @param username The username of the user to retrieve multis from, or null if for the logged in user
          */
         fun create(
-                isForLoggedInUser: Boolean
+                username: String?
         ): RedditMultiViewModel
     }
 
@@ -44,7 +44,7 @@ class RedditMultiViewModel @AssistedInject constructor(
 
     /**
      * Load multis. If a user is logged in their own multis subreddits are loaded, otherwise
-     * mutlis for the given username are loaded
+     * multis for the given username are loaded
      *
      * @param force If true then multis will be forced to load, even if previously loaded
      */
@@ -55,10 +55,10 @@ class RedditMultiViewModel @AssistedInject constructor(
         _isLoading.value = true
 
         viewModelScope.launch {
-            val response = if (isForLoggedInUser) {
-                api.user().multis()
+            val response = if (username != null) {
+                api.user(username!!).multis()
             } else {
-                api.user("hakonschia").multis()
+                api.user().multis()
             }
             _isLoading.postValue(false)
 

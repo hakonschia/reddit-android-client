@@ -174,7 +174,15 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     lateinit var redditMultiViewModelFactory: RedditMultiViewModel.Factory
     private val redditMultiViewModel: RedditMultiViewModel by assistedViewModel {
         // Currently we don't care about the saved state handle here
-        redditMultiViewModelFactory.create(AppState.loggedInState.value is LoggedInState.LoggedIn)
+
+        val loggedInState = AppState.loggedInState.value
+
+        val username = if (loggedInState is LoggedInState.LoggedIn) {
+            loggedInState.userInfo.userInfo?.username
+        } else {
+            null
+        }
+        redditMultiViewModelFactory.create(username)
     }
 
     private val trendingSubredditsViewModel: TrendingSubredditsViewModel by viewModels()
@@ -264,8 +272,13 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         subredditsViewModel.isForLoggedInUser = forLoggedInUser
         subredditsViewModel.loadSubreddits(force = recreatedAsNewUser == true)
 
-        redditMultiViewModel.isForLoggedInUser = forLoggedInUser
-        redditMultiViewModel.loadMultis(force = recreatedAsNewUser == true)
+        if (forLoggedInUser) {
+            // Could have been recreated as a new user, so ensure the username is updated
+            val loggedInState = AppState.loggedInState.value
+
+            redditMultiViewModel.username = (loggedInState as LoggedInState.LoggedIn).userInfo.userInfo?.username
+            redditMultiViewModel.loadMultis(force = recreatedAsNewUser == true)
+        }
 
         setupNavDrawer()
         checkAccessTokenScopes()
