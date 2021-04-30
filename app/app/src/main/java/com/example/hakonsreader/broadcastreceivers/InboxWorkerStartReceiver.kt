@@ -23,12 +23,10 @@ class InboxWorkerStartReceiver : BroadcastReceiver() {
          * Enqueues a unique periodic request to [WorkManager] that runs an [InboxCheckerWorker].
          *
          * @param updateFrequency The update frequency of the worker, if this is 0 or negative no
-         * work will be initiated
+         * work will be initiated, and any potentially active workers will be cancelled
          * @param replace If true any active worker will be replaced, if false the active worker will be kept
          */
         fun startInboxWorker(context: Context, updateFrequency: Int, replace: Boolean) {
-            WorkManager.getInstance(context).cancelUniqueWork(WORKER_INBOX)
-
             if (updateFrequency > 0) {
                 val inboxRequest = PeriodicWorkRequestBuilder<InboxCheckerWorker>(updateFrequency.toLong(), TimeUnit.MINUTES)
                         .setConstraints(Constraints.Builder()
@@ -40,6 +38,8 @@ class InboxWorkerStartReceiver : BroadcastReceiver() {
                 val policy = if (replace) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP
 
                 WorkManager.getInstance(context).enqueueUniquePeriodicWork(WORKER_INBOX, policy, inboxRequest)
+            } else {
+                WorkManager.getInstance(context).cancelUniqueWork(WORKER_INBOX)
             }
         }
     }

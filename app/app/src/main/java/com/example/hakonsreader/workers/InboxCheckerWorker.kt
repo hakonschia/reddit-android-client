@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.text.Html
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
@@ -18,11 +19,9 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.broadcastreceivers.InboxNotificationReceiver
 import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_ID_INBOX_STATUS
 import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_TAG_INBOX_STATUS
-import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.states.AppState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -41,38 +40,40 @@ class InboxCheckerWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
+        /**
+         * The name of the SharedPreferences used to persist values for this Worker
+         */
+        private const val PREFS_NAME = "inboxWorkerPreferences"
 
         /**
-         * The counter for how many times the inbox has been checked
+         * The key used to store the counter of the inbox in SharedPreferences
          */
-        private var counter = 0
-
-        /**
-         * The counter for the notification IDs
-         */
-        private var inboxIdNotificationCounter = 0
+        private const val PREFS_COUNTER = "prefs_counter"
     }
 
 
     override suspend fun doWork(): Result {
+        val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val counter = prefs.getInt(PREFS_COUNTER, 0)
+
         // Get all messages every 10 times. This is to ensure that our local inbox isn't too much out
         // of sync, as if we always only get the unread messages then messages read somewhere else
         // won't be retrieved/appear in the inbox
-        // Never get the full inbox if data saving is on
-        val response = if (counter++ % 10 == 0 && !Settings.dataSavingEnabled()) {
+        val response = if (counter % 10 == 0) {
             api.messages().inbox()
         } else {
             api.messages().unread()
         }
 
-        // "Unreachable code", well clearly it isn't, Android Studio
+        prefs.edit().putInt(PREFS_COUNTER, counter + 1).apply()
+
         return when (response) {
             is ApiResponse.Success -> {
                 val messages = response.value
                 val previousMessages = messagesDao.getMessagesById(messages.map { it.id })
 
                 if (AppState.isDevMode) {
-                    createDeveloperNotification()
+                    createDeveloperNotification(counter)
                 }
 
                 removeNonNewNotifications(messages)
@@ -84,14 +85,14 @@ class InboxCheckerWorker @AssistedInject constructor(
                 messages.forEach { it.isSeen = true }
                 messagesDao.insertAll(messages)
 
-                return Result.success()
+                Result.success()
             }
 
             is ApiResponse.Error -> {
                 if (AppState.isDevMode) {
-                    createDeveloperNotification(response.throwable)
+                    createDeveloperNotification(counter, response.throwable)
                 }
-                return Result.failure()
+                Result.failure()
             }
         }
     }
@@ -159,9 +160,7 @@ class InboxCheckerWorker @AssistedInject constructor(
             applicationContext.getString(R.string.notificationInboxMessageTitle, message.author)
         }
 
-        val id = inboxIdNotificationCounter++
-
-        val (contentIntent, markAsReadActionIntent) = createIntents(message, id)
+        val (contentIntent, markAsReadActionIntent) = createIntents(message)
 
         val htmlMessage = if (Build.VERSION.SDK_INT >= 24) {
             Html.fromHtml(message.bodyHtml, Html.FROM_HTML_MODE_COMPACT)
@@ -191,7 +190,8 @@ class InboxCheckerWorker @AssistedInject constructor(
         with(NotificationManagerCompat.from(applicationContext)) {
             // Use the message ID as the tag. Ideally we would just convert this from base36 to base10
             // and use it as the ID itself, but the value is above Int.MAX_VALUE
-            notify(message.id, id, notification)
+            // When using a tag it doesn't look like we need an actual unique ID
+            notify(message.id, 0, notification)
         }
     }
 
@@ -210,11 +210,11 @@ class InboxCheckerWorker @AssistedInject constructor(
     /**
      * Create intents for a message
      */
-    private fun createIntents(message: RedditMessage, notificationId: Int): Intents {
+    private fun createIntents(message: RedditMessage): Intents {
         val actionIntent = Intent(applicationContext, InboxNotificationReceiver::class.java).apply {
             putExtra(InboxNotificationReceiver.EXTRAS_MESSAGE_ID, message.id)
             putExtra(InboxNotificationReceiver.EXTRAS_WAS_COMMENT, message.wasComment)
-            putExtra(InboxNotificationReceiver.EXTRAS_NOTIFICATION_ID, notificationId)
+            putExtra(InboxNotificationReceiver.EXTRAS_NOTIFICATION_ID, 0)
         }
         val pendingActionIntent = PendingIntent.getBroadcast(applicationContext, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
@@ -244,7 +244,7 @@ class InboxCheckerWorker @AssistedInject constructor(
      *
      * @param failCause The reason the request failed. If the request did not fail this can be omitted
      */
-    private fun createDeveloperNotification(failCause: Throwable? = null) {
+    private fun createDeveloperNotification(counter: Int, failCause: Throwable? = null) {
         // Format as "17:45"
         val format = SimpleDateFormat("kk:mm", Locale.getDefault())
         val date = Date(System.currentTimeMillis())
