@@ -50,6 +50,7 @@ import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.viewmodels.*
 import com.example.hakonsreader.views.util.ViewUtil
+import com.example.hakonsreader.views.util.invisibleIf
 import com.example.hakonsreader.views.util.showPopupSortWithTime
 import com.squareup.picasso.Callback
 import com.squareup.picasso.NetworkPolicy
@@ -70,6 +71,7 @@ import kotlin.collections.ArrayList
 class SubredditFragment : Fragment() {
 
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "SubredditFragment"
 
         /**
@@ -484,12 +486,8 @@ class SubredditFragment : Fragment() {
                 handleErrors(it.error, it.throwable)
             }
 
-            isLoading.observe(viewLifecycleOwner) {
-                binding.subredditInfo.rulesloadingIconLayout.visibility = if (it) {
-                    View.VISIBLE
-                } else {
-                    View.INVISIBLE
-                }
+            isLoading.observe(viewLifecycleOwner) { loading ->
+                binding.subredditInfo.rulesloadingIconLayout.invisibleIf(!loading)
             }
         }
     }
@@ -555,12 +553,8 @@ class SubredditFragment : Fragment() {
                 handleErrors(it.error, it.throwable)
             }
             // There won't be anything else causing this to loader to load so this is safe
-            isLoading.observe(viewLifecycleOwner) {
-                binding.subredditInfo.selectFlairLoadingIconLayout.visibility = if (it) {
-                    View.VISIBLE
-                } else {
-                    View.INVISIBLE
-                }
+            isLoading.observe(viewLifecycleOwner) { loading ->
+                binding.subredditInfo.selectFlairLoadingIconLayout.invisibleIf(!loading)
             }
         }
     }

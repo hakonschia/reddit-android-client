@@ -114,11 +114,11 @@ interface UserService {
     /**
      * Get posts from a multi
      */
-    @GET("user/{username}/m/{multiName}?raw_json=1")
+    @GET("user/{username}/m/{multiName}/{sort}?raw_json=1")
     suspend fun getPostsFromMulti(
             @Path("username") username: String,
             @Path("multiName") multiName: String,
-            @Query("sort") sort: String,
+            @Path("sort") sort: String,
             @Query("t") timeSort: String,
             @Query("after") after: String,
             @Query("count") count: Int,

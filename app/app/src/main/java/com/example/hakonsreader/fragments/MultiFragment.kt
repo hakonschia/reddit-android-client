@@ -17,6 +17,7 @@ import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.views.util.goneIf
+import com.example.hakonsreader.views.util.showPopupSortWithTime
 import com.google.gson.Gson
 
 /**
@@ -74,6 +75,7 @@ class MultiFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return FragmentMultiBinding.inflate(inflater).also {
             _binding = it
+            setupBinding()
         }.root
     }
 
@@ -111,6 +113,15 @@ class MultiFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setupBinding() {
+        binding.multiRefresh.setOnClickListener { postsFragment?.refreshPosts() }
+        binding.multiSort.setOnClickListener { view ->
+            postsFragment?.let {
+                showPopupSortWithTime(it, view)
+            }
+        }
     }
 
     /**

@@ -55,7 +55,7 @@
                     app:expandedTitleMargin="16dp"
                     app:expandedTitleMarginBottom="20dp"
                     app:expandedTitleMarginEnd="84dp"
-                    app:toolbarId="@id/subredditToolbar"
+                    app:toolbarId="@id/multiToolbar"
                     app:scrimVisibleHeightTrigger="@dimen/subredditToolbarScrimWithBanner"
                     app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
@@ -168,7 +168,7 @@
                         android:layout_gravity="end|bottom">
 
                         <ImageButton
-                            android:id="@+id/subredditRefresh"
+                            android:id="@+id/multiRefresh"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
 
@@ -178,11 +178,11 @@
                             android:tint="@color/text_color"
                             android:contentDescription="@string/content_description_refresh_posts"
 
-                            app:layout_constraintBottom_toBottomOf="@id/subredditSort"
-                            app:layout_constraintEnd_toStartOf="@id/subredditSort" />
+                            app:layout_constraintBottom_toBottomOf="@id/multiSort"
+                            app:layout_constraintEnd_toStartOf="@id/multiSort" />
 
                         <ImageButton
-                            android:id="@+id/subredditSort"
+                            android:id="@+id/multiSort"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
 
