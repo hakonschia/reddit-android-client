@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Named
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -102,8 +101,15 @@ class PostsViewModel @AssistedInject constructor (
      */
     var savedPostStates: HashMap<String, Bundle>? = null
 
+    /**
+     * The sorting method for the posts
+     */
     var sort: SortingMethods = SortingMethods.HOT
         private set
+
+    /**
+     * The time sort method for the posts
+     */
     var timeSort: PostTimeSort = PostTimeSort.DAY
         private set
 
@@ -121,8 +127,8 @@ class PostsViewModel @AssistedInject constructor (
      * Updates how to sort posts and restarts the posts from start
      *
      * @param sort How to sort the posts
-     * @param timeSort How to sort the posts based on time. Only applicable for *top* and *controversial*.
-     * Default is [PostTimeSort.DAY]
+     * @param timeSort How to sort the posts based on time. Only applicable for [SortingMethods.TOP] and
+     * [SortingMethods.CONTROVERSIAL]. Default is [PostTimeSort.DAY]
      */
     fun restart(sort: SortingMethods, timeSort: PostTimeSort = PostTimeSort.DAY) {
         this.sort = sort
@@ -140,7 +146,7 @@ class PostsViewModel @AssistedInject constructor (
      * @param timeSort How to sort the posts based on time. Only applicable for *top* and *controversial*.
      * Default is [PostTimeSort.DAY]. To change the sort after the first load, use [restart]
      */
-    fun loadPosts(sort: SortingMethods? = SortingMethods.HOT, timeSort: PostTimeSort? = PostTimeSort.DAY) {
+    fun loadPosts(sort: SortingMethods? = null, timeSort: PostTimeSort? = null) {
         sort?.let { this.sort = it }
         timeSort?.let { this.timeSort = it }
         val postsData = posts.value
