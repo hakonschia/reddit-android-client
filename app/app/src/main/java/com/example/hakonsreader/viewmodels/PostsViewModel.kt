@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -79,9 +80,9 @@ class PostsViewModel @AssistedInject constructor (
     var multiName: String? = null
 
     private var arePostsBeingRestored = false
-    private val isDefaultSubreddit = !isUser && RedditApi.STANDARD_SUBS.contains(userOrSubredditName.toLowerCase())
+    private val isDefaultSubreddit = !isUser && RedditApi.STANDARD_SUBS.contains(userOrSubredditName.toLowerCase(Locale.ROOT))
 
-    private val _posts = MutableLiveData<List<RedditPost>>()
+    private val _posts = MutableLiveData<List<RedditPost>>(ArrayList())
     private val _loadingChange = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<ErrorWrapper>()
 
@@ -243,8 +244,14 @@ class PostsViewModel @AssistedInject constructor (
      * the IDs of the posts in [posts]
      */
     private fun filterPosts(postsToFilter: List<RedditPost>): List<RedditPost> {
-        val postIds = posts.value?.map { it.id } ?: return postsToFilter
-        return filterUserSelectedSubreddits(postsToFilter).filter { !postIds.contains(it.id) }
+        // Get the IDs of the posts currently in the ViewModel, to filter duplicates
+        val currentPostIds = posts.value?.map { it.id } ?: return postsToFilter
+
+        // Filter out duplicates
+        val duplicatesFiltered = postsToFilter.filter { post -> !currentPostIds.contains(post.id) }
+
+        // Filter out the user selected subs out of the duplicates
+        return filterUserSelectedSubreddits(duplicatesFiltered)
     }
 
     /**
@@ -255,11 +262,14 @@ class PostsViewModel @AssistedInject constructor (
     private fun filterUserSelectedSubreddits(postsToFilter: List<RedditPost>): List<RedditPost> {
         return if (isDefaultSubreddit) {
             val subsToFilter = Settings.subredditsToFilterFromDefaultSubreddits()
-            postsToFilter.filter {
+
+            postsToFilter.filter { post ->
                 // Keep the post if the subreddit it is in isn't found in subsToFilter
-                !subsToFilter.contains(it.subreddit.toLowerCase())
+                !subsToFilter.contains(post.subreddit.toLowerCase(Locale.ROOT))
             }
         } else {
+            // Not a default sub, don't filter. Imagine if "r/hakonschia" was filtered and the sub is
+            // "r/hakonschia", then all posts would be filtered
             postsToFilter
         }
     }
