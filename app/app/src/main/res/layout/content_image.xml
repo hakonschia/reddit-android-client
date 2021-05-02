@@ -32,7 +32,7 @@
             android:contentDescription="@string/content_description_load_hd_image"
             android:src="@drawable/ic_round_hd_32"
             android:transitionName="@string/transition_content_image_hd_icon"
-            android:visibility="visible"
+            android:visibility="@{showingHdImage ? View.GONE : View.VISIBLE}"
 
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
