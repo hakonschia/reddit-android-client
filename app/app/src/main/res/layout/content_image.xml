@@ -11,20 +11,16 @@
             type="boolean" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/image"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:transitionName="@string/transition_content_image_image"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/avatars" />
 
         <ImageView
@@ -36,12 +32,14 @@
             android:contentDescription="@string/content_description_load_hd_image"
             android:src="@drawable/ic_round_hd_32"
             android:transitionName="@string/transition_content_image_hd_icon"
-            android:visibility="@{showingHdImage ? View.GONE : View.VISIBLE}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/image"
+            android:visibility="visible"
+
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+
             app:tint="#888"
             tools:visibility="visible" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 
 </layout>

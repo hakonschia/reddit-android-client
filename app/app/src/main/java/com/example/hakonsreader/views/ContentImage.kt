@@ -2,8 +2,8 @@ package com.example.hakonsreader.views
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
 import android.graphics.Bitmap
+import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -55,6 +55,15 @@ class ContentImage @JvmOverloads constructor(
          * The value with this key is a [String]
          */
         const val EXTRAS_URL_TO_OPEN = "extras_urlToOpen"
+
+        /**
+         * This extra says the height of the actual ImageView at the time [getExtras] was called.
+         * This can differ from the height of the image (the bitmap size) shown, as the images might be
+         * scaled to fit the width of the container it is in.
+         *
+         * The value with this key is an [Int]
+         */
+        const val EXTRAS_IMAGE_VIEW_HEIGHT = "extras_imageViewHeight"
     }
 
     private val binding: ContentImageBinding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true)
@@ -106,6 +115,30 @@ class ContentImage @JvmOverloads constructor(
         }
     }
 
+    override fun getExtras(): Bundle {
+        // The other extras for this Content are set throughout the class, which will be
+        // returned from super.getExtras()
+        return super.getExtras().apply {
+            putInt(EXTRAS_IMAGE_VIEW_HEIGHT, binding.image.height)
+        }
+    }
+
+    override fun getWantedHeight(): Int {
+        // If the extras specifies a height we should use that
+        // If a low res image is shown, this value will give the height of the ImageView, which is
+        // likely to be scaled up since we use adjustViewBounds=true to fit the image to the container.
+        // If we don't give back this value here, expanding a post will likely produce a WRAP_CONTENT
+        // value that is lower than this, which is the wrong value
+        // TODO this still won't work as expected if the post is opened without being opened from a list
+        //  where the image is already shown though :(
+        val heightFromExtras = extras.getInt(EXTRAS_IMAGE_VIEW_HEIGHT, -1)
+
+        return if (heightFromExtras > 0) {
+            heightFromExtras
+        } else {
+            super.getWantedHeight()
+        }
+    }
 
     /**
      * Loads the image with a bitmap
@@ -248,13 +281,10 @@ class ContentImage @JvmOverloads constructor(
     private fun loadHdImage(url: String) {
         binding.showingHdImage = true
 
-        val width = binding.image.width
-        val height = binding.image.height
-
-        val bitmap = getBitmap()
-
         Picasso.get()
                 .load(url)
+                // Don't use a placeholder as we don't want to remove the previous image
+                .noPlaceholder()
                 .cache(cache)
                 .into(binding.image, object : Callback {
                     override fun onSuccess() {
@@ -266,15 +296,5 @@ class ContentImage @JvmOverloads constructor(
                         Snackbar.make(this@ContentImage, R.string.failedToLoadImage, Snackbar.LENGTH_SHORT).show()
                     }
                 })
-
-        // This is kind of weird, but if we don't set the size and bitmap to what it was, the old image will
-        // be removed and the size set to 0,0 until the image is loaded. If we use a custom Target to load into
-        // and just set the bitmap there I think there might be issues with recycling the bitmaps (documentation of Target
-        // says something)
-        with (binding.image) {
-            setImageBitmap(bitmap)
-            layoutParams.width = width
-            layoutParams.height = height
-        }
     }
 }
