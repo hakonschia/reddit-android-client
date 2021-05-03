@@ -55,15 +55,35 @@ class DispatcherActivity : AppCompatActivity() {
 
         val intent = createIntent(url, options,this)
 
-        startActivity(intent)
+        /**
+         * Starts the activity with the local intent
+         */
+        fun start() {
+            startActivity(intent)
 
-        // Fade in/out videos and images
-        val fadeActivityNames = listOf<String>(VideoYoutubeActivity::class.java.name, VideoActivity::class.java.name, ImageActivity::class.java.name)
-        val packageName = intent.component?.className
-        if (fadeActivityNames.contains(packageName)) {
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            // Fade in/out videos and images
+            val fadeActivityNames = listOf<String>(VideoYoutubeActivity::class.java.name, VideoActivity::class.java.name, ImageActivity::class.java.name)
+            val packageName = intent.component?.className
+            if (fadeActivityNames.contains(packageName)) {
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            }
+        }
+
+        // This activity is the root, always start a new activity
+        if (isTaskRoot) {
+            start()
+        } else {
+            // Not root, if the intent is for MainActivity we only want to finish, as this is a "reddit.com" intent
+            // which should open the app, not restart it (as it otherwise would if we call startActivity() with MainActivity)
+            // The functionality for this is kind of the same as open
+            if (intent.component?.className == MainActivity::class.java.name) {
+                finish()
+            } else {
+                start()
+            }
         }
     }
+
 
     // onResume is called when activity is returned to by exiting another, and when it starts initially
     // onPause is only called when the activity pauses, such as when starting another activity, so if
