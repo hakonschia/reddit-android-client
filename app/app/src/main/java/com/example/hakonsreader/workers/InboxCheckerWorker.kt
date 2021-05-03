@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.text.Html
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
@@ -15,6 +14,7 @@ import androidx.work.WorkerParameters
 import com.example.hakonsreader.App
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
+import com.example.hakonsreader.activities.MainActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditMessagesDao
@@ -36,7 +36,7 @@ class InboxCheckerWorker @AssistedInject constructor(
         @Assisted context: Context,
         @Assisted workerParams: WorkerParameters,
         private val api: RedditApi,
-        private val messagesDao: RedditMessagesDao
+        private val messagesDao: RedditMessagesDao,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -204,7 +204,7 @@ class InboxCheckerWorker @AssistedInject constructor(
      */
     private data class Intents(
             val contentIntent: PendingIntent?,
-            val markAsReadActionIntent: PendingIntent?
+            val markAsReadActionIntent: PendingIntent?,
     )
 
     /**
@@ -218,14 +218,16 @@ class InboxCheckerWorker @AssistedInject constructor(
         }
         val pendingActionIntent = PendingIntent.getBroadcast(applicationContext, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
+        // Only open comments, we don't have anything to do for messages yet
         return if (message.wasComment) {
-            // Only open comments, we don't have anything to do for messages
-            // How I want this to work:
-            // 1. When using the app, this should open a new activity to display the post. When back is pressed
-            // or swiped away it should resume where we were when we opened it (on the emulator this works, not on my phone)
-            // 2. When app is not open, just open the activity and when you exit you exit completely (it is like this now)
             val contentIntent = Intent(applicationContext, DispatcherActivity::class.java).apply {
                 putExtra(DispatcherActivity.EXTRAS_URL_KEY, message.context)
+
+                // Opens the activity so that it either starts the app (if not opened) or opens the
+                // activity "above" the current, so that we can swipe it away/press back
+                action = Intent.ACTION_MAIN
+                addCategory(Intent.CATEGORY_LAUNCHER)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
 
             Intents(
@@ -249,6 +251,17 @@ class InboxCheckerWorker @AssistedInject constructor(
         val format = SimpleDateFormat("kk:mm", Locale.getDefault())
         val date = Date(System.currentTimeMillis())
 
+        // This intent will simply open the app without restarting the active activity, or start the app
+        // as normal if it isn't opened (ie. this provides the same functionality as clicking the app
+        // from a launcher)
+        val notificationIntent = Intent(applicationContext, MainActivity::class.java).apply {
+            action = Intent.ACTION_MAIN
+            addCategory(Intent.CATEGORY_LAUNCHER)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+        val intent = PendingIntent.getActivity(applicationContext, 0, notificationIntent, 0)
+
         val notification = NotificationCompat.Builder(applicationContext, App.NOTIFICATION_CHANNEL_DEVELOPER_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(applicationContext.getString(R.string.notificationDeveloperMessagesRetrievedContent, format.format(date)))
@@ -256,6 +269,7 @@ class InboxCheckerWorker @AssistedInject constructor(
                         .setSummaryText("Couner = $counter")
                         .bigText(if (failCause != null) "Request failed:\n ${failCause.printStackTrace()}" else "Counter = $counter")
                 )
+                .setContentIntent(intent)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()
