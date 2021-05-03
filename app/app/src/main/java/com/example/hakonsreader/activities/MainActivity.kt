@@ -66,6 +66,7 @@ import javax.inject.Inject
 class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
 
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "MainActivity"
 
 
@@ -1048,7 +1049,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
 
         with(binding.navDrawer) {
             appState = AppState
-            subredditSelected = this@MainActivity
             api = this@MainActivity.api
             userInfoDao = this@MainActivity.userInfoDao
             isDarkMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
@@ -1056,7 +1056,14 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             profilePicture.setOnClickListener { selectProfileNavBar() }
             username.setOnClickListener { selectProfileNavBar() }
             settingsClicker.setOnClickListener { selectSettingsNavBar() }
-            darkModeClicker.setOnClickListener {
+
+            frontPageClicker.setOnClickListener { subredditSelected("") }
+            popularClicker.setOnClickListener { subredditSelected("popular") }
+            allClicker.setOnClickListener { subredditSelected("all") }
+            modClicker.setOnClickListener { subredditSelected("mod") }
+            randomClicker.setOnClickListener { subredditSelected("random") }
+
+            darkModeIcon.setOnClickListener {
                 PreferenceManager.getDefaultSharedPreferences(this@MainActivity).run {
                     val key = getString(R.string.prefs_key_theme)
                     val darkMode = getBoolean(key, resources.getBoolean(R.bool.prefs_default_theme))
@@ -1077,7 +1084,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
             subreddits.layoutManager = LinearLayoutManager(this@MainActivity)
 
-            trendingSubredditsLastUpdated.setOnClickListener { trendingSubredditsViewModel.loadSubreddits() }
+            trendingSubredditsRefresh.setOnClickListener { trendingSubredditsViewModel.loadSubreddits() }
             trendingSubreddits.adapter = TrendingSubredditsAdapter().apply {
                 subredditSelected = this@MainActivity
             }
