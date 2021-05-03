@@ -52,6 +52,10 @@ class LogInFragment : Fragment() {
             binding.hasUsers = userInfoDao.getAllUsers().isNotEmpty()
         }
 
+        binding.btnLogIn.setOnClickListener {
+            startLoginIntent(requireContext())
+        }
+
         binding.btnAccountManagement.setOnClickListener {
             showAccountManagement(requireContext(), api, userInfoDao)
         }

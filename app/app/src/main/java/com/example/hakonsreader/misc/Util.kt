@@ -117,7 +117,7 @@ private fun getObfuscated(post: RedditPost) : String? {
 }
 
 /**
- * Opens an intent to allow the user to log in. The OAuth state is generated with [App.generateAndGetOAuthState]
+ * Opens an intent to allow the user to log in. The OAuth state is generated with [OAuthState.generateAndGetOAuthState]
  * and will be stored there
  *
  * @param context The context to start the intent with

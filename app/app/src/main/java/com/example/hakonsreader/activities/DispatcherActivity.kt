@@ -75,7 +75,8 @@ class DispatcherActivity : AppCompatActivity() {
         } else {
             // Not root, if the intent is for MainActivity we only want to finish, as this is a "reddit.com" intent
             // which should open the app, not restart it (as it otherwise would if we call startActivity() with MainActivity)
-            // The functionality for this is kind of the same as open
+            // The functionality for this is the same as opening the app from a launcher, if the app is opened
+            // it should continue where it is, otherwise open the app
             if (intent.component?.className == MainActivity::class.java.name) {
                 finish()
             } else {
