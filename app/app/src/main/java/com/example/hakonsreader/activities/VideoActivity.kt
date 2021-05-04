@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowInsets
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.views.VideoPlayer
@@ -17,6 +18,11 @@ class VideoActivity : BaseActivity() {
     companion object {
 
         /**
+         * The key used to save [videoPlayingWhenActivityPaused]
+         */
+        private const val SAVED_VIDEO_PLAYING_WHEN_ACTIVITY_PAUSED = "saved_videoPlayingWhenActivityPaused"
+
+        /**
          * The key used to send information about the video playback that this activity should
          * automatically resume.
          *
@@ -26,18 +32,20 @@ class VideoActivity : BaseActivity() {
     }
 
     private lateinit var videoPlayer: VideoPlayer
+    private var videoPlayingWhenActivityPaused = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video)
+
+        videoPlayingWhenActivityPaused = savedInstanceState?.getBoolean(SAVED_VIDEO_PLAYING_WHEN_ACTIVITY_PAUSED) == true
 
         videoPlayer = findViewById(R.id.videoPlayer)
 
         val data = intent.extras
         if (data != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val controller = window.insetsController
-                controller?.hide(WindowInsets.Type.statusBars())
+                window.insetsController?.hide(WindowInsets.Type.statusBars())
             } else {
                 window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
             }
@@ -71,7 +79,7 @@ class VideoActivity : BaseActivity() {
             finish()
         }
 
-        val color = getColor(R.color.imageVideoActivityBackground)
+        val color = ContextCompat.getColor(this, R.color.imageVideoActivityBackground)
         val alpha = color shr 24 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
         val config = Settings.getVideoAndImageSlidrConfig()
@@ -89,6 +97,20 @@ class VideoActivity : BaseActivity() {
         // Store the new extras so that we use that to update the video progress instead of
         // the one passed when the activity was started
         outState.putBundle(EXTRAS_EXTRAS, videoPlayer.getExtras())
+        outState.putBoolean(SAVED_VIDEO_PLAYING_WHEN_ACTIVITY_PAUSED, videoPlayingWhenActivityPaused)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        videoPlayingWhenActivityPaused = videoPlayer.isPlaying()
+        videoPlayer.pause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (videoPlayingWhenActivityPaused) {
+            videoPlayer.play()
+        }
     }
 
     override fun onDestroy() {
