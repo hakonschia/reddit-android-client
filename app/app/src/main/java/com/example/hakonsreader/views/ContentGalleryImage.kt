@@ -68,7 +68,7 @@ class ContentGalleryImage @JvmOverloads constructor(
     fun viewUnselected() {
         val view = binding.content.getChildAt(0)
 
-        if (view is VideoPlayer && Settings.autoPlayVideos()) {
+        if (view is VideoPlayer) {
             view.pause()
         }
     }
