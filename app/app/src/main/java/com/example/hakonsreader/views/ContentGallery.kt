@@ -87,7 +87,8 @@ class ContentGallery @JvmOverloads constructor(
         })
 
         // Set initial state
-        setActiveImageText(0)
+        val activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, 0)
+        binding.galleryImages.setCurrentItem(activeImage, false)
     }
 
     private fun getMaxWidthAndHeight(galleryImages: List<GalleryImage>): Coordinates {
