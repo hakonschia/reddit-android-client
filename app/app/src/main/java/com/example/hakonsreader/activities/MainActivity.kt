@@ -5,8 +5,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -992,7 +991,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
         }
 
-        with(trendingSubredditsViewModel) {
+        with (trendingSubredditsViewModel) {
             trendingSubreddits.observe(this@MainActivity) { trending ->
                 trending.subreddits?.let {
                     (binding.navDrawer.trendingSubreddits.adapter as TrendingSubredditsAdapter).submitList(it)
@@ -1027,27 +1026,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
         }
 
-        binding.mainParentLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
-            override fun onDrawerOpened(drawerView: View) {
-                trendingSubredditsViewModel.trendingSubreddits.value?.let {
-                    setTrendingSubredditsLastUpdated(it)
-                }
-            }
-
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-                // Not implemented
-            }
-
-            override fun onDrawerClosed(drawerView: View) {
-                // Not implemented
-            }
-
-            override fun onDrawerStateChanged(newState: Int) {
-                // Not implemented
-            }
-        })
-
-        with(binding.navDrawer) {
+        with (binding.navDrawer) {
             appState = AppState
             api = this@MainActivity.api
             userInfoDao = this@MainActivity.userInfoDao
@@ -1090,9 +1069,16 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             }
             trendingSubreddits.layoutManager = LinearLayoutManager(this@MainActivity)
 
+            trendingSubredditsLastUpdated.start()
+            trendingSubredditsLastUpdated.setOnChronometerTickListener {
+                trendingSubredditsViewModel.trendingSubreddits.value?.let { trending ->
+                    setTrendingSubredditsLastUpdated(trending)
+                }
+            }
+
             multis.adapter = RedditMultiAdapter().apply {
-                onMultiSelected = {
-                    multiSelected(it)
+                onMultiSelected = { multi ->
+                    multiSelected(multi)
                 }
             }
             multis.layoutManager = LinearLayoutManager(this@MainActivity)
@@ -1115,7 +1101,11 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
      *
      * The nav bar items work as following:
      * 1. "Home": Holds the standard sub container (front page, popular etc.)
-     * 2. "Subreddit": If
+     * 2. "Subreddit": [activeMulti] is chosen if not null, otherwise [activeSubreddit] is chosen, otherwise
+     * [selectSubredditFragment] is chosen
+     * 3. "Profile": If there are unread messages, an inbox fragment is shown. If the last fragment in the profile navbar
+     * was shown, then it is shown again, otherwise the profile is shown, or a login fragment if no user is logged in
+     * 4. "Settings": Only a settings fragment will be shown here
      */
     inner class BottomNavigationViewListener : BottomNavigationView.OnNavigationItemSelectedListener {
         private var playAnimationForNextChange = true
@@ -1233,7 +1223,6 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         /**
          * Retrieves the correct fragment for when subreddit is clicked in the nav bar
          *
-         *
          * If this is the first time clicking the icon the subreddit list is shown.
          * If clicked when already in the subreddit nav bar the subreddit list is shown.
          * If clicked when not already in the subreddit, the previous subreddit fragment selected is shown
@@ -1241,18 +1230,17 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          * @return The correct fragment to show
          */
         private fun onNavBarSubreddit(): Fragment {
-            // No subreddit created (first time here), or we in a subreddit looking to get back
-            return if (activeMulti != null) {
-                activeMulti!!
-            } else if (activeSubreddit == null) {
-                if (selectSubredditFragment == null) {
-                    selectSubredditFragment = SelectSubredditFragment.newInstance().also {
-                        it.subredditSelected = this@MainActivity
+            return when {
+                activeMulti != null -> activeMulti!!
+                activeSubreddit != null -> activeSubreddit!!
+                else -> {
+                    if (selectSubredditFragment == null) {
+                        selectSubredditFragment = SelectSubredditFragment.newInstance().also {
+                            it.subredditSelected = this@MainActivity
+                        }
                     }
+                    selectSubredditFragment!!
                 }
-                selectSubredditFragment!!
-            } else {
-                activeSubreddit!!
             }
         }
 
