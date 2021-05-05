@@ -15,7 +15,6 @@ import com.example.hakonsreader.api.persistence.RedditDatabase
 import com.example.hakonsreader.api.persistence.RedditUserInfoDatabase
 import com.example.hakonsreader.broadcastreceivers.InboxWorkerStartReceiver
 import com.example.hakonsreader.constants.SharedPreferencesConstants
-import com.example.hakonsreader.markwonplugins.*
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.SharedPreferencesManager

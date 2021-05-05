@@ -14,6 +14,7 @@
         android:layout_height="@dimen/contentLinkSimpleThumbnailHeight"
         app:cardBackgroundColor="@color/secondary_background"
         app:cardCornerRadius="8dp"
+        android:foreground="@drawable/ripple_main_bg"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
