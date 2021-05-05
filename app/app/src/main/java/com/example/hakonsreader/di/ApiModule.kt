@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.App
+import com.example.hakonsreader.BuildConfig
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.thirdparty.ThirdPartyOptions
@@ -60,7 +61,7 @@ object ApiModule {
                 onNewToken = { newToken -> AppState.onNewToken(newToken) },
                 onInvalidToken = { _: GenericError?, _: Throwable? -> context.onInvalidAccessToken() },
 
-                loggerLevel = HttpLoggingInterceptor.Level.BODY,
+                loggerLevel = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE,
 
                 callbackUrl = NetworkConstants.CALLBACK_URL,
                 //deviceId = UUID.randomUUID().toString(),
