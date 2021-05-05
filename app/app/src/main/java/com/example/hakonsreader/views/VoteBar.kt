@@ -63,9 +63,11 @@ class VoteBar @JvmOverloads constructor(
      */
     var listing: VoteableListing? = null
         set(value) {
+            val oldId = field?.id
             field = value
             if (value != null) {
-                updateVoteStatus(animate = false)
+                // If the listing has been "updated" then we should animate the change
+                updateVoteStatus(animate = oldId == value.id)
 
                 // Deleted comments/posts will always give a 404 error
                 // Kind of hardcoding values, but unless reddit change their API I don't know how else
