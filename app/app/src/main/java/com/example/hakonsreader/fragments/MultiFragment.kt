@@ -2,10 +2,12 @@ package com.example.hakonsreader.fragments
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -14,7 +16,9 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.enums.PostTimeSort
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.model.RedditMulti
+import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentMultiBinding
+import com.example.hakonsreader.databinding.MultiNotAuthorizedOrNotFoundBinding
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.states.LoggedInState
@@ -171,6 +175,22 @@ class MultiFragment : Fragment() {
         _binding?.progressBarLayout?.goneIf(count <= 0)
     }
 
+    private fun onError(error: GenericError, throwable: Throwable) {
+        _binding?.let {
+            // 404 Not found occurs when you go to a Multi you don't have access to
+            // I guess this returns a 404 instead of a 401 since you shouldn't be able to find out
+            // if a user has a private Multi with a given name
+            if (error.code == 404) {
+                MultiNotAuthorizedOrNotFoundBinding.inflate(layoutInflater, binding.parentLayout, true).apply {
+                    (root.layoutParams as CoordinatorLayout.LayoutParams).gravity = Gravity.CENTER
+                    root.requestLayout()
+                }
+            } else {
+                handleGenericResponseErrors(it.root, error, throwable)
+            }
+        }
+    }
+
     /**
      * Adds a fragment lifecycle listener to [getChildFragmentManager] that sets [PostsFragment] and
      * as well as setting listeners on the fragment
@@ -189,6 +209,9 @@ class MultiFragment : Fragment() {
                         }
                         onLoadingChange = {
                             checkLoadingStatus()
+                        }
+                        onError = { error, throwable ->
+                            onError(error, throwable)
                         }
                         postsFragment = this
                     }

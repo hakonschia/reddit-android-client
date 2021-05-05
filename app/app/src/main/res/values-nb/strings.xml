@@ -447,4 +447,5 @@
     <string name="failedToLoadImage">Kunne ikke laste inn bildet</string>
     <string name="multisHeader">Multier</string>
     <string name="noMultis">Ingen Multier funnet</string>
+    <string name="multiNotAuthorized">Hvis en Multi med dette navnet eksisterer har du ikke tillatelse til å se den</string>
 </resources>
