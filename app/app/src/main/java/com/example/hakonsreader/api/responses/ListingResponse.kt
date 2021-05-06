@@ -20,6 +20,13 @@ class ListingResponse<T> {
         @SerializedName(value = "children", alternate = ["things"])
         @JsonAdapter(ListingListAdapter::class)
         var listings: List<T>? = null
+
+        @SerializedName("after")
+        var after: String? = null
+    }
+
+    fun getAfter(): String? {
+        return data?.after
     }
 
     fun getListings() : List<T>? {
