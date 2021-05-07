@@ -55,15 +55,6 @@ class ContentImage @JvmOverloads constructor(
          * The value with this key is a [String]
          */
         const val EXTRAS_URL_TO_OPEN = "extras_urlToOpen"
-
-        /**
-         * This extra says the height of the actual ImageView at the time [getExtras] was called.
-         * This can differ from the height of the image (the bitmap size) shown, as the images might be
-         * scaled to fit the width of the container it is in.
-         *
-         * The value with this key is an [Int]
-         */
-        const val EXTRAS_IMAGE_VIEW_HEIGHT = "extras_imageViewHeight"
     }
 
     private val binding: ContentImageBinding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true)
@@ -115,29 +106,21 @@ class ContentImage @JvmOverloads constructor(
         }
     }
 
-    override fun getExtras(): Bundle {
-        // The other extras for this Content are set throughout the class, which will be
-        // returned from super.getExtras()
-        return super.getExtras().apply {
-            putInt(EXTRAS_IMAGE_VIEW_HEIGHT, binding.image.height)
-        }
-    }
-
     override fun getWantedHeight(): Int {
-        // If the extras specifies a height we should use that
-        // If a low res image is shown, this value will give the height of the ImageView, which is
-        // likely to be scaled up since we use adjustViewBounds=true to fit the image to the container.
-        // If we don't give back this value here, expanding a post will likely produce a WRAP_CONTENT
-        // value that is lower than this, which is the wrong value
-        // TODO this still won't work as expected if the post is opened without being opened from a list
-        //  where the image is already shown though :(
-        val heightFromExtras = extras.getInt(EXTRAS_IMAGE_VIEW_HEIGHT, -1)
+        val source = redditPost.getSourcePreview()
+        val personWhoBroughtMeIntoTheWorld = parent
 
-        return if (heightFromExtras > 0) {
-            heightFromExtras
-        } else {
-            super.getWantedHeight()
+        if (source == null || personWhoBroughtMeIntoTheWorld !is View) {
+            return super.getWantedHeight()
         }
+
+        // This is how Picasso will scale it, which scales it to the match the width of the parent
+        // Ie. layout_width=match_parent, and scale with the same aspect ratio to fit that
+        val width = source.width
+        val height = source.height
+        val widthRatio: Float = width.toFloat() / personWhoBroughtMeIntoTheWorld.width
+        
+        return (height / widthRatio).toInt()
     }
 
     /**
