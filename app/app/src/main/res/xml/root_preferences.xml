@@ -188,6 +188,7 @@
             app:defaultValue="@bool/prefs_default_comment_link_preview_show_entire_link"
             app:dependency="@string/prefs_key_comment_show_link_preview"
             app:singleLineTitle="false"
+            app:summary="@string/prefs_summary_comment_link_preview_show_entire_link"
             app:iconSpaceReserved="false"/>
 
         <SwitchPreference
