@@ -46,7 +46,6 @@
         android:id="@+id/parentLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@{highlight ? @color/commentHighlightBackground : @color/background}"
 
         android:onLongClick="@{view -> adapter.hideCommentsLongClick(view, comment)}"
         android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}">
@@ -68,6 +67,18 @@
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/highlightBackgroundView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:background="@{highlight ? @color/commentHighlightBackground : @color/background}"
+
+            app:layout_constraintStart_toEndOf="@id/sideBarsBarrier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <View
             android:id="@+id/commentLockedBorder"
