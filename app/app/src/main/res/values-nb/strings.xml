@@ -448,4 +448,9 @@
     <string name="multisHeader">Multier</string>
     <string name="noMultis">Ingen Multier funnet</string>
     <string name="multiNotAuthorized">Hvis en Multi med dette navnet eksisterer har du ikke tillatelse til å se den</string>
+    <string name="content_description_nav_drawer_accounts">Vis dine kontoer</string>
+    <string name="content_description_nav_drawer_toggle_private_browsing">Veksle privat surfing</string>
+    <string name="content_description_nav_drawer_mod">Vis subredditer du modererer</string>
+    <string name="content_description_nav_drawer_subreddit_refresh">Oppdater subredditer</string>
+    <string name="content_description_nav_drawer_trending_subreddit_refresh">Oppdater trending subredditer</string>
 </resources>

@@ -110,6 +110,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:src="@drawable/ic_baseline_person_24"
+                android:contentDescription="@string/content_description_nav_drawer_accounts"
+
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profilePicture"
@@ -170,6 +172,8 @@
                 android:layout_marginTop="8dp"
 
                 android:src="@drawable/ic_incognito"
+                android:contentDescription="@string/content_description_nav_drawer_toggle_private_browsing"
+
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/accountsIcon"
                 app:layout_constraintStart_toStartOf="@+id/accountsIcon"
@@ -452,6 +456,8 @@
                 android:layout_marginTop="8dp"
                 android:src="@drawable/ic_admin_24px"
                 app:tint="@color/modTextColor"
+                android:contentDescription="@string/content_description_nav_drawer_mod"
+
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/allIcon"
@@ -644,6 +650,8 @@
 
                 android:foreground="?attr/selectableItemBackground"
                 android:src="@drawable/ic_refresh_24dp"
+                android:contentDescription="@string/content_description_nav_drawer_subreddit_refresh"
+
                 app:layout_constraintTop_toTopOf="@id/subredditsHeader"
                 app:layout_constraintBottom_toBottomOf="@id/subredditsHeader"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -717,6 +725,8 @@
 
                 android:foreground="?attr/selectableItemBackground"
                 android:src="@drawable/ic_refresh_24dp"
+                android:contentDescription="@string/content_description_nav_drawer_trending_subreddit_refresh"
+
                 app:layout_constraintTop_toTopOf="@id/trendingSubredditsHeader"
                 app:layout_constraintBottom_toBottomOf="@id/trendingSubredditsHeader"
                 app:layout_constraintEnd_toEndOf="parent" />
