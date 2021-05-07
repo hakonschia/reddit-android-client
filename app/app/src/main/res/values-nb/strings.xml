@@ -110,7 +110,7 @@
     <string name="replyConfirmBackPressDialogHeader">Du har tekst som ikke er sendt</string>
     <string name="replyConfirmBackPressDialogContent">Det er tekst i skrivefeltet. Er du sikker på at du vil forkaste det?</string>
     <string name="discard">Forkast</string>
-    <string name="prefs_title_fullscreen_swipe_direction">Retning å sveipe bort fullskjerm poster</string>
+    <string name="prefs_title_fullscreen_swipe_direction">Retning å sveipe bort fullskjerm ting</string>
     <string name="prefs_title_fullscreen_swipe_direction_up">Opp</string>
     <string name="prefs_title_fullscreen_swipe_direction_down">Ned</string>
     <string name="prefs_title_fullscreen_swipe_direction_left">Venstre</string>
@@ -140,7 +140,7 @@
     <string name="subredditsSearchResult">Søkeresultater</string>
     <string name="prefs_group_comments">Kommentarer</string>
     <string name="scoreWithText">%d poeng</string>
-    <string name="prefs_title_hide_comments_threshold">Automatisk gjem kommentar med poengsum mindre enn</string>
+    <string name="prefs_title_hide_comments_threshold">Poeng terskel for å gjemme kommentarer</string>
     <string name="scoreHiddenText">Poengsum gjemt</string>
     <string name="saveComment">Lagre kommentar</string>
     <string name="unsaveComment">Glem kommentar</string>
@@ -169,8 +169,8 @@
     <string name="postRemoveModDistinguish">Ikke vis som moderator</string>
     <string name="postRemoveSticky">Fjern feste</string>
     <string name="prefs_group_posts">Poster</string>
-    <string name="prefs_title_max_post_size_percentage">Maks prosent av skjermhøyden poster vil ta</string>
-    <string name="prefs_title_max_post_size_percentage_when_collapsed">Maks prosent av skjermhøyden poster vil ta når kollaps er skrudd av</string>
+    <string name="prefs_title_max_post_size_percentage">Maks skjermhøyde</string>
+    <string name="prefs_title_max_post_size_percentage_when_collapsed">Maks skjermhøyde, uten kollaps</string>
     <string name="commentShowChain">Vis kommentar tråd</string>
     <string name="commentCopyLink">Kopier kommentar lenke</string>
     <string name="subredditNotFound">r/%s finnes ikke</string>
@@ -185,7 +185,7 @@
     <string name="prefs_title_data_saving_always">Alltid</string>
     <string name="prefs_title_data_saving_never">Aldri</string>
     <string name="prefs_title_auto_play_nsfw_videos">Start NSFW videoer automatisk</string>
-    <string name="prefs_title_show_nsfw_preview">Vis NSFW (video miniatyrbilder, bilder under skrolling)</string>
+    <string name="prefs_title_show_nsfw_preview">Vis NSFW</string>
     <string name="prefs_title_show_nsfw_preview_normal">Normal</string>
     <string name="prefs_title_show_nsfw_preview_blur">Uklart</string>
     <string name="prefs_title_show_nsfw_preview_no_image">Ingen bilde</string>
@@ -271,7 +271,7 @@
     <string name="prefs_title_comment_link_preview_show_identical_links">Vis forhåndsvisning for lenker med identisk tekst</string>
     <string name="postTransitionEnabled">Post kollaps skrudd på</string>
     <string name="postTransitionDisabled">Post kollaps skrudd av</string>
-    <string name="prefs_title_post_collapse_by_default">Kollaps post ved skrolling i kommentarer</string>
+    <string name="prefs_title_post_collapse_by_default">Kollaps post</string>
     <string name="content_description_markdown_btn_header">Header</string>
     <plurals name="userReportsTitle">
         <item quantity="one">%d brukerrapportering</item>
@@ -305,7 +305,7 @@
     <string name="awardSubredditReward">Subredditen blir belønnet %d Reddit coins</string>
     <string name="requiresRedditPremium">Handlingen krever Reddit premium</string>
     <string name="subredditRequiresPremium">Du trenger Reddit premium for å aksessere r/%s</string>
-    <string name="prefs_title_show_peek_parent_button_in_comments">Vis knapp for å vise foreldrekommentar i kommentarbar</string>
+    <string name="prefs_title_show_peek_parent_button_in_comments">Vis knapp for å vise foreldrekommentar</string>
     <plurals name="subredditActiveUsers">
         <item quantity="one">%d bruker online</item>
         <item quantity="other">%,d brukere online</item>
@@ -453,4 +453,9 @@
     <string name="content_description_nav_drawer_mod">Vis subredditer du modererer</string>
     <string name="content_description_nav_drawer_subreddit_refresh">Oppdater subredditer</string>
     <string name="content_description_nav_drawer_trending_subreddit_refresh">Oppdater trending subredditer</string>
+    <string name="prefs_summary_max_post_size_percentage">Prosentandelen av skjermhøyden som poster vil ta når åpnet</string>
+    <string name="prefs_summary_max_post_size_percentage_when_collapsed">Prosentandelen av skjermhøyden som poster vil ta når åpnet, når posten ikke blir kollapset</string>
+    <string name="prefs_summary_post_collapse_by_default">Dette kan bli skrudd av/på for hver post ved å holde inne kollapsknappen</string>
+    <string name="prefs_summary_show_peek_parent_button_in_comments">Dette kan også gjøres fra kommentarmenyen</string>
+    <string name="prefs_summary_comment_link_preview_show_entire_link">Når dette er skrudd av vil kun én linje bli vist</string>
 </resources>

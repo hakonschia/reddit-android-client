@@ -80,7 +80,7 @@
     <string name="prefs_title_play_muted_videos">Start videos muted</string>
     <string name="prefs_title_play_muted_videos_fullscreen">Start videos muted in fullscreen</string>
     <string name="prefs_title_loop_videos">Loop videos</string>
-    <string name="prefs_title_fullscreen_swipe_direction">Direction to swipe away fullscreen posts</string>
+    <string name="prefs_title_fullscreen_swipe_direction">Direction to swipe away fullscreen items</string>
     <string name="prefs_title_fullscreen_swipe_direction_up">Up</string>
     <string name="prefs_title_fullscreen_swipe_direction_down">Down</string>
     <string name="prefs_title_fullscreen_swipe_direction_left">Left</string>
@@ -90,20 +90,22 @@
      language they represent -->
     <string name="prefs_title_language_en" translatable="false">English</string>
     <string name="prefs_title_language_nb" translatable="false">Norsk (bokmål)</string>
-    <string name="prefs_title_hide_comments_threshold">Automatically hide comments with score less than</string>
-    <string name="prefs_title_max_post_size_percentage">Max percentage of the screen height posts will take</string>
-    <string name="prefs_title_max_post_size_percentage_when_collapsed">Max percentage of the screen height posts will take when collapse is disabled</string>
+    <string name="prefs_title_hide_comments_threshold">Score threshold to hide comments</string>
+    <string name="prefs_title_max_post_size_percentage">Max screen height</string>
+    <string name="prefs_summary_max_post_size_percentage">The percentage of the screen height that posts will take when opened</string>
+    <string name="prefs_title_max_post_size_percentage_when_collapsed">Max screen height, without collapse</string>
+    <string name="prefs_summary_max_post_size_percentage_when_collapsed">The percentage of the screen height that posts will take when opened, when post collapse is disabled</string>
     <string name="prefs_title_opening_links_in_app">Open links in internal browser</string>
     <string name="prefs_title_data_saving">Data saving</string>
     <string name="prefs_title_data_saving_mobile_only">Only on mobile data</string>
     <string name="prefs_title_data_saving_always">Always</string>
     <string name="prefs_title_data_saving_never">Never</string>
-    <string name="prefs_title_show_nsfw_preview">Show NSFW previews (video thumbnail, image posts while scrolling)</string>
+    <string name="prefs_title_show_nsfw_preview">Show NSFW</string>
     <string name="prefs_title_show_nsfw_preview_normal">Normal</string>
     <string name="prefs_title_show_nsfw_preview_blur">Blurred</string>
     <string name="prefs_title_show_nsfw_preview_no_image">No image</string>
     <string name="prefs_title_highlight_new_comments">Highlight new comments</string>
-    <string name="prefs_title_comment_smooth_scroll_threshold">Threshold for smooth scroll comment navigation</string>
+    <string name="prefs_title_comment_smooth_scroll_threshold">Threshold for smooth scrolling</string>
     <string name="prefs_title_filter_posts_from_default_subreddits">Filter posts</string>
     <string name="prefs_dialog_message_filter_posts_from_default_subreddits">Filter posts from subreddits from appearing in front page, popular, and all. One subreddit per line</string>
     <string name="prefs_title_show_all_sidebars">Show all sidebars (or just one)</string>
@@ -116,10 +118,13 @@
     <string name="prefs_title_inbox_update_frequency_60_min">60 minutes</string>
     <string name="prefs_title_comment_show_link_preview">Show link previews in comments</string>
     <string name="prefs_title_comment_link_preview_show_entire_link">Show entire link in link previews</string>
+    <string name="prefs_summary_comment_link_preview_show_entire_link">With this disabled only one line will be shown</string>
     <string name="prefs_title_comment_link_preview_show_identical_links">Show preview for links with identical text</string>
-    <string name="prefs_title_post_collapse_by_default">Collapse posts when scrolling comments by default</string>
+    <string name="prefs_title_post_collapse_by_default">Collapse posts</string>
+    <string name="prefs_summary_post_collapse_by_default">This can be toggled for each post by long pressing the collapse button</string>
     <string name="prefs_title_play_youtube_videos_in_app">Open YouTube videos in app</string>
-    <string name="prefs_title_show_peek_parent_button_in_comments">Show button to peek parent in comments bar</string>
+    <string name="prefs_title_show_peek_parent_button_in_comments">Show button to peek parent</string>
+    <string name="prefs_summary_show_peek_parent_button_in_comments">This can also be done from the comments menu</string>
     <string name="prefs_title_send_crash_reports">Send crash reports</string>
     <string name="prefs_title_subreddits_load_banners">Load banners</string>
     <string name="prefs_title_subreddits_warn_nsfw">Show NSFW warning</string>
