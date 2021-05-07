@@ -134,7 +134,7 @@ class SubredditsRequestImpl(
                     api.getSubscribedSubreddits(
                         lastResponse?.getAfter() ?: after,
                         count = subs.size,
-                        limit = 10
+                        limit = 100
                     ) } else {
                     api.getDefaultSubreddits(
                         lastResponse?.getAfter() ?: after,
@@ -153,7 +153,7 @@ class SubredditsRequestImpl(
             } catch (e: Exception) {
                 return ApiResponse.Error(GenericError(-1), e)
             }
-        // "aft" will be null if there are no more subs to retrieve
+        // "aft" will be null if there are no more subs to retrieve (and just in case it isn't and is empty)
         } while (!aft.isNullOrEmpty() && fetchAll)
 
         return ApiResponse.Success(subs)

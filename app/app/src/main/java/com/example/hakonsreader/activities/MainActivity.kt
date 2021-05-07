@@ -512,13 +512,16 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     }
 
     private fun observeUserState() {
-        AppState.loggedInState.observe(this) {
+        AppState.loggedInState.observe(this) { state ->
             // PrivatelyBrowsing and LoggedIn are both treated as having a user
-            binding.navDrawer.hasUser = it !is LoggedInState.LoggedOut
+            binding.navDrawer.hasUser = state !is LoggedInState.LoggedOut
 
-            when (it) {
-                is LoggedInState.LoggedIn -> asLoggedInUser(it.userInfo)
-                is LoggedInState.PrivatelyBrowsing -> asPrivatelyBrowsingUser(it.userInfo)
+            // This requires actually being as logged in, as it will potentially make API calls
+            subredditsViewModel.isForLoggedInUser = state is LoggedInState.LoggedIn
+
+            when (state) {
+                is LoggedInState.LoggedIn -> asLoggedInUser(state.userInfo)
+                is LoggedInState.PrivatelyBrowsing -> asPrivatelyBrowsingUser(state.userInfo)
                 LoggedInState.LoggedOut -> asLoggedOutUser()
             }
         }
@@ -1056,6 +1059,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
             }
 
+            subredditsRefresh.setOnClickListener { subredditsViewModel.loadSubreddits(force = true) }
             subreddits.adapter = SubredditsAdapter().apply {
                 viewType = SubredditsAdapter.SubredditViewType.SIMPLE
                 subredditSelected = this@MainActivity
