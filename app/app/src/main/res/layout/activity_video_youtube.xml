@@ -9,7 +9,5 @@
         android:id="@+id/youtubePlayer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:keepScreenOn="true"
-        app:showFullScreenButton="false"/>
+        android:layout_gravity="center"/>
 </LinearLayout>

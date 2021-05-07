@@ -4,10 +4,13 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowInsets
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.Settings
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.r0adkll.slidr.Slidr
 
@@ -15,8 +18,9 @@ import com.r0adkll.slidr.Slidr
 /**
  * Activity for displaying a YouTube video in fullscreen
  */
-class VideoYoutubeActivity : BaseActivity() {
+class VideoYoutubeActivity : AppCompatActivity() {
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "VideoYoutubeActivity"
 
 
@@ -33,26 +37,14 @@ class VideoYoutubeActivity : BaseActivity() {
          * The value with this key should be a [Float]
          */
         const val EXTRAS_TIMESTAMP = "extras_VideoYoutubeActivity_videoTimestamp"
-
-
-        /**
-         * The key used to store the timestamp of the video when the activity was recreated
-         *
-         * The value with this key should be a [Float]
-         */
-        private const val SAVED_TIMESTAMP = "saved_videoTimestamp"
     }
-
-    private var currentTimestamp = 0F
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_youtube)
 
         val videoId = intent.extras?.getString(EXTRAS_VIDEO_ID)
-
-        // Prefer the timestamp saved in onSaveInstanceState, then the value passed to the activity
-        val startSeconds = savedInstanceState?.getFloat(SAVED_TIMESTAMP) ?: intent.extras?.getFloat(EXTRAS_TIMESTAMP) ?: 0F
+        val startSeconds = intent.extras?.getFloat(EXTRAS_TIMESTAMP) ?: 0F
 
         if (videoId == null) {
             finish()
@@ -60,29 +52,22 @@ class VideoYoutubeActivity : BaseActivity() {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val controller = window.insetsController
-            controller?.hide(WindowInsets.Type.statusBars())
+            window.insetsController?.hide(WindowInsets.Type.statusBars())
         } else {
-            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
-        
+
         findViewById<YouTubePlayerView>(R.id.youtubePlayer).run {
             lifecycle.addObserver(this)
 
             addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
                 override fun onReady(youTubePlayer: YouTubePlayer) {
-                    youTubePlayer.loadVideo(videoId, startSeconds)
-                }
-
-                override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
-                    super.onCurrentSecond(youTubePlayer, second)
-                    currentTimestamp = second
+                    youTubePlayer.loadOrCueVideo(lifecycle, videoId, startSeconds)
                 }
             })
         }
 
-        val color = getColor(R.color.imageVideoActivityBackground)
+        val color = ContextCompat.getColor(this, R.color.imageVideoActivityBackground)
         val alpha = color shr 24 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
         val config = Settings.getVideoAndImageSlidrConfig()
@@ -92,12 +77,8 @@ class VideoYoutubeActivity : BaseActivity() {
                 .scrimEndAlpha(alphaPercentage)
                 .scrimColor(color)
                 .build()
-        Slidr.attach(this, config)
-    }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putFloat(SAVED_TIMESTAMP, currentTimestamp)
+        Slidr.attach(this, config)
     }
 
     override fun finish() {

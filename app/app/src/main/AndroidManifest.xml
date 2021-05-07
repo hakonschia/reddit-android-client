@@ -74,6 +74,7 @@
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
             android:name=".activities.VideoYoutubeActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
 
         <activity
@@ -101,9 +102,14 @@
             android:name=".activities.InvalidAccessTokenActivity"
             android:theme="@style/AppTheme.DispatcherTheme"/>
 
+        <!-- The dispatcher shouldn't recreate itself on config changes as it would possibly recreate the
+         activity it itself started. As an example, if you open a YouTube video for VideoYoutubeActivity then
+          changing the orientation would create a new activity over the current, which plays the videos two places.
+           Or if you open a subreddit from a link, then the changing the orientation will open two subreddits -->
         <activity
             android:name=".activities.DispatcherActivity"
-            android:theme="@style/AppTheme.DispatcherTheme">
+            android:theme="@style/AppTheme.DispatcherTheme"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout">
 
             <!--
             TODO it's kind of annoying to have to have a trailing slash on these. Since it's not a proper regex
