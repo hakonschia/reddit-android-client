@@ -59,7 +59,9 @@ class InboxCheckerWorker @AssistedInject constructor(
         // Get all messages every 10 times. This is to ensure that our local inbox isn't too much out
         // of sync, as if we always only get the unread messages then messages read somewhere else
         // won't be retrieved/appear in the inbox
-        val response = if (counter % 10 == 0) {
+        val fetchAll = counter % 10 == 0
+
+        val response = if (fetchAll) {
             api.messages().inbox()
         } else {
             api.messages().unread()
@@ -84,6 +86,16 @@ class InboxCheckerWorker @AssistedInject constructor(
                 // Mark all new messages as now seen
                 messages.forEach { it.isSeen = true }
                 messagesDao.insertAll(messages)
+
+                // If we only fetch unread, and it is empty, we can safely mark all messages as now read
+                // We can only safely do this if we only got the unread, as if we got the inbox it has a
+                // limit to how many messages are retrieved (25 by default), and in the case that all
+                // those are read/unread how do we know if the messages before those are read/unread? If we have those
+                // in the db they might be marked incorrectly
+                val allMessagesRead = !fetchAll && messages.none { it.isNew }
+                if (allMessagesRead) {
+                    messagesDao.markAllRead()
+                }
 
                 Result.success()
             }

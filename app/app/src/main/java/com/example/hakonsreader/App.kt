@@ -86,7 +86,7 @@ class App : Application(), Configuration.Provider {
         createInboxNotificationChannel()
         createDeveloperNotificationChannel()
 
-        InboxWorkerStartReceiver.startInboxWorker(this, Settings.inboxUpdateFrequency(), replace = false)
+        InboxWorkerStartReceiver.startInboxWorker(this, Settings.inboxUpdateFrequency(), replace = true)
 
         updateTheme()
         removeOldValues()
