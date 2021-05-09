@@ -552,7 +552,6 @@ class VideoPlayer @JvmOverloads constructor(
      * Updates the size of the view (´this´) by the values in [videoHeight] and [videoWidth]
      */
     private fun updateSize() {
-        val screenWidth = Resources.getSystem().displayMetrics.widthPixels
         val (_, height) = createResizedVideoSize(videoWidth, videoHeight)
         
         actualVideoHeight = height
@@ -560,12 +559,10 @@ class VideoPlayer @JvmOverloads constructor(
         // I don't even really know why this works, but the actual video player will be in the
         // middle of the screen without being stretched, as I want to, and the controller goes
         // to the screen width, which is also what I want
-        val params = layoutParams?.also {
-            it.width = screenWidth
+        layoutParams = layoutParams?.also {
+            it.width = ViewGroup.LayoutParams.MATCH_PARENT
             it.height = height
-        } ?: ViewGroup.LayoutParams(screenWidth, height)
-
-        layoutParams = params
+        } ?: ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height)
     }
 
     /**
