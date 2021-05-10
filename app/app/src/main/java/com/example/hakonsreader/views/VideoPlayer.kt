@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.drawToBitmap
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.Coordinates
@@ -702,8 +703,12 @@ class VideoPlayer @JvmOverloads constructor(
      * Gets a bitmap of the current frame displayed, or the bitmap displayed in the thumbnail
      * if the video hasn't played yet
      */
-    fun getCurrentFrame() : Bitmap {
-        return (videoSurfaceView as TextureView).bitmap ?: thumbnail.drawToBitmap()
+    fun getCurrentFrame(): Bitmap? {
+        val bitmap = if (videoSurfaceView is TextureView) {
+            (videoSurfaceView as TextureView).bitmap
+        } else null
+
+        return bitmap ?: thumbnail.drawable?.toBitmap()
     }
 
     /**

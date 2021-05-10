@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.interfaces.GalleryImage
 import com.example.hakonsreader.api.interfaces.Image
@@ -116,7 +117,7 @@ class ContentGalleryImage @JvmOverloads constructor(
         }
     }
 
-    private fun asImgurGalleryImage(image: ImgurImage) : View {
+    private fun asImgurGalleryImage(image: ImgurImage): View {
         return if (image is ImgurGif) {
             asImgurVideo(image)
         } else {
@@ -145,8 +146,9 @@ class ContentGalleryImage @JvmOverloads constructor(
      * @return A [VideoPlayer]
      * @see asImage
      */
-    private fun asVideo(image: RedditGalleryImage) : VideoPlayer {
-        return VideoPlayer(context).apply {
+    private fun asVideo(image: RedditGalleryImage): VideoPlayer {
+        val player = LayoutInflater.from(context).inflate(R.layout.video_player_texture_view, null) as VideoPlayer
+        return player.apply {
             // The height will resize accordingly as long as the width matches the screen
             // I think, I'm pretty lost on this, haven't tested if width of the video is larger
             // than the screen, but I imagine it would scale down
@@ -165,7 +167,8 @@ class ContentGalleryImage @JvmOverloads constructor(
      * @see asImage
      */
     private fun asImgurVideo(imgurGif: ImgurGif): VideoPlayer {
-        return VideoPlayer(context).apply {
+        val player = LayoutInflater.from(context).inflate(R.layout.video_player_texture_view, null) as VideoPlayer
+        return player.apply {
             videoWidth = imgurGif.width
             videoHeight = imgurGif.height
 
