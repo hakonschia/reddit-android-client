@@ -62,7 +62,7 @@
             android:maxLines="1"
             android:text="@{subreddit.name}"
             android:textColor="@color/text_color"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
 
             app:layout_constrainedWidth="true"
@@ -105,24 +105,27 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.example.hakonsreader.views.MarkdownTextView
+        <TextView
             android:id="@+id/subredditDescription"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
             android:ellipsize="end"
-            android:maxLines="3"
+            android:maxLines="1"
             android:scrollbars="none"
             android:singleLine="false"
-            app:markdown='@{subreddit.publicDescription ?? ""}'
             android:textColor="@color/secondary_text_color"
+
             android:textSize="12sp"
 
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@id/icon"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/name"
             app:layout_constraintTop_toBottomOf="@+id/name"
-            tools:text="@tools:sample/lorem/random" />
+            app:layout_constraintVertical_bias="1.0"
+            tools:text="@tools:sample/lorem[6]" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

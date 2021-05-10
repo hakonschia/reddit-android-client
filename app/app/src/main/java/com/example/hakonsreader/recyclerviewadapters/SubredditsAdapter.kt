@@ -1,5 +1,8 @@
 package com.example.hakonsreader.recyclerviewadapters
 
+import android.os.Build
+import android.text.Html
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -36,6 +39,12 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      */
     var favoriteClicked: OnClickListener<Subreddit>? = null
 
+    /**
+     * The view type to display in this adapter.
+     *
+     * [SubredditViewType.SIMPLE] is a smaller view, showing a smaller icon and no description.
+     * [SubredditViewType.STANDARD] has a larger icon and shows one line of the description. This is the default
+     */
     var viewType = SubredditViewType.STANDARD
 
 
@@ -83,7 +92,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      * * All subreddits, including duplicates of favorites, of the subreddits
      * * Users the user is following
      *
-     * @param list The list so sort
+     * @param list The list to sort
      * @return A new list that is sorted based on the subreddit type
      */
     private fun sortSubreddits(list: List<Subreddit>) : List<Subreddit> {
@@ -144,7 +153,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         init {
             with(binding) {
                 root.setOnClickListener {
-                    val pos = adapterPosition
+                    val pos = absoluteAdapterPosition
 
                     if (pos != RecyclerView.NO_POSITION) {
                         subredditSelected?.subredditSelected(subreddits[pos].name)
@@ -152,7 +161,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 }
 
                 favoriteSub.setOnClickListener {
-                    val pos = adapterPosition
+                    val pos = absoluteAdapterPosition
 
                     if (pos != RecyclerView.NO_POSITION) {
                         favoriteClicked?.onClick(subreddits[pos])
@@ -174,7 +183,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 // The listener must be set on both the root view and the description since the description
                 // has movement method and we have to check if the description is clicked on a link
                 root.setOnClickListener {
-                    val pos = adapterPosition
+                    val pos = absoluteAdapterPosition
 
                     if (pos != RecyclerView.NO_POSITION) {
                         subredditSelected?.subredditSelected(subreddits[pos].name)
@@ -182,7 +191,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 }
 
                 subredditDescription.setOnClickListener {
-                    val pos = adapterPosition
+                    val pos = absoluteAdapterPosition
                     if (pos != RecyclerView.NO_POSITION &&
                             subredditDescription.selectionStart == -1 &&
                             subredditDescription.selectionEnd == -1
@@ -192,7 +201,7 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 }
 
                 favoriteSub.setOnClickListener {
-                    val pos = adapterPosition
+                    val pos = absoluteAdapterPosition
 
                     if (pos != RecyclerView.NO_POSITION) {
                         favoriteClicked?.onClick(subreddits[pos])
@@ -203,6 +212,28 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         fun bind(subreddit: Subreddit) {
             binding.subreddit = subreddit
+
+            val desc = subreddit.publicDescriptionHtml
+            if (desc != null) {
+                val description: Spanned = if (Build.VERSION.SDK_INT >= 24) {
+                    Html.fromHtml(desc, Html.FROM_HTML_MODE_COMPACT)
+                } else {
+                    Html.fromHtml(desc)
+                }
+
+                // Spanned.toString() removes all spans, giving us the raw text
+                // This isn't particularly efficient, as it has to parse the HTML first, but
+                // the sub descriptions generally aren't very long
+                // This has maxLines=1. If there are newlines it can cause the text to be ellipsized where
+                // there shouldn't really be one. The newline might be "incorrect" because 1 newline in Markdown
+                // doesn't mean anything, and if it isn't replaced with a space it will look like "something.else"
+                // See r/videos for an example of this
+                binding.subredditDescription.text = description.toString().replace('\n', ' ')
+            } else {
+                // In case the ViewHolder is being reused
+                binding.subredditDescription.text = ""
+            }
+
             binding.executePendingBindings()
         }
     }

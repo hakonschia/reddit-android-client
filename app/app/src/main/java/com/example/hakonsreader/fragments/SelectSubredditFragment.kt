@@ -23,6 +23,7 @@ import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.SubredditsAdapter
 import com.example.hakonsreader.viewmodels.SearchForSubredditsViewModel
 import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
+import com.example.hakonsreader.views.util.goneIf
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -35,6 +36,7 @@ import java.util.*
 @AndroidEntryPoint
 class SelectSubredditFragment : Fragment() {
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "SelectSubredditFragment"
 
         /**
@@ -73,7 +75,13 @@ class SelectSubredditFragment : Fragment() {
         }
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentSelectSubredditBinding.inflate(LayoutInflater.from(requireActivity())).also {
+            _binding = it
+        }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupBinding()
 
         setupSubredditsList()
@@ -81,8 +89,6 @@ class SelectSubredditFragment : Fragment() {
 
         setupSearchViewModel()
         setupSubredditsViewModel()
-
-        return binding.root
     }
 
     override fun onResume() {
@@ -102,8 +108,6 @@ class SelectSubredditFragment : Fragment() {
      * Inflates and sets up [binding]
      */
     private fun setupBinding() {
-        _binding = FragmentSelectSubredditBinding.inflate(LayoutInflater.from(requireActivity()))
-
         binding.subredditSearch.setOnEditorActionListener(actionDoneListener)
         binding.subredditSearch.addTextChangedListener(automaticSearchListener)
     }
@@ -128,6 +132,8 @@ class SelectSubredditFragment : Fragment() {
     private fun setupSearchSubredditsList() {
         SubredditsAdapter().run {
             this.subredditSelected = this@SelectSubredditFragment.subredditSelected
+            favoriteClicked = OnClickListener { subreddit -> subredditsViewModel.favorite(subreddit) }
+
             binding.searchedSubreddits.adapter = this
         }
 
@@ -144,12 +150,8 @@ class SelectSubredditFragment : Fragment() {
                         ?.submitList(subreddits as MutableList<Subreddit>, true)
             })
 
-            isLoading.observe(viewLifecycleOwner, { isLoading ->
-                binding.loadingIcon.visibility = if (isLoading == true) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
+            isLoading.observe(viewLifecycleOwner, { loading ->
+                binding.loadingIcon.goneIf(!loading)
             })
 
             error.observe(viewLifecycleOwner, { error ->
@@ -177,12 +179,8 @@ class SelectSubredditFragment : Fragment() {
                 }
             })
 
-            isLoading.observe(viewLifecycleOwner, { onCountChange ->
-                binding.loadingIcon.visibility = if (onCountChange == true) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
+            isLoading.observe(viewLifecycleOwner, { loading ->
+                binding.loadingIcon.goneIf(!loading)
             })
 
             error.observe(viewLifecycleOwner, { error ->
@@ -201,7 +199,7 @@ class SelectSubredditFragment : Fragment() {
      * If the subreddit name input isn't in the range 3..21 then a Snackbar is shown, as this is the
      * length requirement for a subreddit
      */
-    private val actionDoneListener = TextView.OnEditorActionListener { v, actionId, event ->
+    private val actionDoneListener = TextView.OnEditorActionListener { v, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             val subredditName = v.text.toString().trim()
 
@@ -242,9 +240,9 @@ class SelectSubredditFragment : Fragment() {
                     val searchQuery = s?.toString()
 
                     if (searchQuery?.isNotBlank() == true) {
-                        searchSubredditsViewModel?.search(searchQuery)
+                        searchSubredditsViewModel.search(searchQuery)
                     } else {
-                        searchSubredditsViewModel?.clearSearchResults()
+                        searchSubredditsViewModel.clearSearchResults()
                     }
                 }
             }

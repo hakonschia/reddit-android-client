@@ -48,7 +48,7 @@ interface SubredditsService {
      * @param query The search query
      * @return A Response holding a list of subreddits
      */
-    @GET("subreddits/search")
+    @GET("subreddits/search?raw_json=1")
     suspend fun search(
             @Query("q") query: String,
             @Query("include_over_18") includeNsfw: Boolean
@@ -58,6 +58,8 @@ interface SubredditsService {
     /**
      * Retrieves a list of the trending subreddits for the day
      * The value for trending subreddits is updated once per day
+     *
+     * @param url DO NOT CHANGE
      */
     // For some reason, using the normal authenticated url with oauth.reddit.com gives
     // 400 errors, so this is the workaround
