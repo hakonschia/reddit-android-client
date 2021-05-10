@@ -155,7 +155,7 @@ class ReplyActivity : BaseActivity() {
         }
 
         // Might not actually finish, but it shouldn't matter
-        overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
+        overridePendingTransition(R.anim.slide_up, R.anim.slide_down)
     }
 
 
@@ -279,7 +279,7 @@ class ReplyActivity : BaseActivity() {
      *
      * @param view Ignored
      */
-    public fun sendReply(view: View) {
+    fun sendReply(@Suppress("UNUSED_PARAMETER") view: View) {
         val text = binding.markdownInput.inputText
 
         // TODO add text change listener and disable button if empty

@@ -21,8 +21,4 @@ public class InvalidAccessTokenException extends Exception {
         super(cause);
     }
 
-    public InvalidAccessTokenException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
 }

@@ -2,6 +2,7 @@ package com.example.hakonsreader.recyclerviewadapters
 
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 
@@ -26,7 +27,7 @@ class ReportsAdapter : RecyclerView.Adapter<ReportsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val text = TextView(parent.context)
-        text.setTextColor(parent.context.getColor(R.color.secondary_text_color))
+        text.setTextColor(ContextCompat.getColor(parent.context, R.color.secondary_text_color))
 
         return ViewHolder(text)
     }

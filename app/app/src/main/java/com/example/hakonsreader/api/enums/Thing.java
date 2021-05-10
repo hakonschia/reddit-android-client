@@ -16,7 +16,7 @@ public enum Thing {
     MORE("more");
 
 
-    private String value;
+    private final String value;
 
     Thing(String value) {
         this.value = value;
