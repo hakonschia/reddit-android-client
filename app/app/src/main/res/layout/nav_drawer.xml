@@ -264,15 +264,16 @@
                 app:layout_constraintStart_toStartOf="@id/settingsIcon"
                 app:layout_constraintTop_toTopOf="@id/settingsIcon" />
 
+            <!-- To make this easier to click it has a bigger width -->
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/darkModeIcon"
-                android:layout_width="24dp"
+                android:layout_width="58dp"
                 android:layout_height="24dp"
 
                 android:src="@{isDarkMode ? @drawable/ic_baseline_wb_sunny_24 : @drawable/ic_dark_mode_24}"
 
                 app:layout_constraintBottom_toBottomOf="@+id/settingsIcon"
-                app:layout_constraintEnd_toEndOf="@+id/settingsClicker"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toEndOf="@+id/settings"
                 app:layout_constraintTop_toTopOf="@+id/settingsIcon"
