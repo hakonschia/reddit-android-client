@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.bundleOf
+import androidx.fragment.app.DialogFragment
 import androidx.preference.*
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
@@ -27,7 +29,9 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
+
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "SettingsFragment"
 
         /**
@@ -121,7 +125,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         findPreference<ListPreference>(getString(R.string.prefs_key_inbox_update_frequency))?.let {
-            it.onPreferenceChangeListener = inboxFrequnecyListener
+            it.onPreferenceChangeListener = inboxFrequencyListener
         }
     }
 
@@ -239,42 +243,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // it also makes sense as the user might not want the previous reports to be sent
         Firebase.crashlytics.deleteUnsentReports()
 
-        if (newValue) {
-            Dialog(requireContext()).apply {
-                setContentView(R.layout.dialog_enable_crashlytics)
-                window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-
-                setCancelable(false)
-                setCanceledOnTouchOutside(false)
-
-                findViewById<Button>(R.id.btnEnable).setOnClickListener {
-                    Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
-                    dismiss()
-                }
-
-                findViewById<Button>(R.id.btnCancel).setOnClickListener {
-                    // This should already be false, but just to be sure
-                    Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
-
-                    // The preference listener always returns true, but if this is called then it was
-                    // canceled by the user afterwards, so the setting has to be set to false again
-                    preference.sharedPreferences.edit()
-                            .putBoolean(preference.key, false)
-                            .apply()
-                    preference.isChecked = false
-
-                    dismiss()
-                }
-
-                show()
-            }
+        return@OnPreferenceChangeListener if (newValue) {
+            CrashReportsConfirmDialog.newInstance(preference.key).show(childFragmentManager, "crash_reports_dialog")
+            // The setting should only be actually enabled by the user confirming in the dialog
+            false
         } else {
             // https://firebase.google.com/docs/projects/manage-installations#delete-fid
             FirebaseInstallations.getInstance().delete()
             Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
-        }
 
-        true
+            // When turning the setting off we should keep the new value
+            true
+        }
     }
 
     /**
@@ -293,7 +273,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         true
     }
 
-    private val inboxFrequnecyListener = Preference.OnPreferenceChangeListener { _, newValue ->
+    private val inboxFrequencyListener = Preference.OnPreferenceChangeListener { _, newValue ->
         val freq = when (newValue as String) {
             getString(R.string.prefs_key_inbox_update_frequency_15_min) -> 15
             getString(R.string.prefs_key_inbox_update_frequency_30_min) -> 30
@@ -346,4 +326,48 @@ class SettingsFragment : PreferenceFragmentCompat() {
         preference.summary = filteredSummary
     }
 
+
+    /**
+     * DialogFragment that ensures the user confirms enabling Firebase crash reports
+     *
+     * Note this fragment MUST be a child fragment of a [PreferenceFragmentCompat], otherwise it will crash
+     */
+    class CrashReportsConfirmDialog : DialogFragment() {
+        companion object {
+            private const val ARGS_PREFERENCE_KEY = "args_preferenceKey"
+
+            fun newInstance(preferenceKey: String) = CrashReportsConfirmDialog().apply {
+                arguments = bundleOf(ARGS_PREFERENCE_KEY to preferenceKey)
+            }
+        }
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            val context = requireContext()
+            return Dialog(context).apply {
+                setContentView(R.layout.dialog_enable_crashlytics)
+                window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+                setCancelable(false)
+                setCanceledOnTouchOutside(false)
+
+                findViewById<Button>(R.id.btnEnable).setOnClickListener {
+                    val parent = requireParentFragment() as PreferenceFragmentCompat
+                    parent.findPreference<SwitchPreference>(requireArguments().getString(ARGS_PREFERENCE_KEY)!!)?.let {
+                        it.sharedPreferences.edit()
+                            .putBoolean(it.key, true)
+                            .apply()
+                        it.isChecked = true
+                    }
+
+                    dismiss()
+                }
+
+                findViewById<Button>(R.id.btnCancel).setOnClickListener {
+                    // This should already be false, but just to be sure
+                    Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
+                    dismiss()
+                }
+            }
+        }
+    }
 }
