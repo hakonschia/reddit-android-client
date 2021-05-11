@@ -459,4 +459,5 @@
     <string name="prefs_summary_show_peek_parent_button_in_comments">Dette kan også gjøres fra kommentarmenyen</string>
     <string name="prefs_summary_comment_link_preview_show_entire_link">Når dette er skrudd av vil kun én linje bli vist</string>
     <string name="prefs_title_inbox_show_notifications">Vis notifikasjoner</string>
+    <string name="trendingSubredditsLastUpdatedFailed">Ingen subredditer hentet</string>
 </resources>

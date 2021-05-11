@@ -610,6 +610,7 @@
     <string name="trendingSubreddits">Trending subreddits</string>
     <string name="trendingSubredditsLastUpdated">Last updated %s</string>
     <string name="trendingSubredditsLastUpdatedNow">Just updated</string>
+    <string name="trendingSubredditsLastUpdatedFailed">No subreddits retrieved</string>
 
     <string name="subredditPostsPageTitle">Posts</string>
     <string name="subredditWikiPageTitle">Wiki</string>

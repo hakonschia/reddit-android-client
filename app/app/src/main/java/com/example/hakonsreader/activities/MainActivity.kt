@@ -1076,7 +1076,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             trendingSubredditsLastUpdated.setOnChronometerTickListener {
                 trendingSubredditsViewModel.trendingSubreddits.value?.let { trending ->
                     setTrendingSubredditsLastUpdated(trending)
-                }
+                } ?: setTrendingSubredditsLastUpdated(null)
             }
 
             multisRefresh.setOnClickListener { redditMultiViewModel.loadMultis(force = true) }
@@ -1092,12 +1092,17 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
     /**
      * Sets the trending subreddits retrieved text in the nav drawer
      *
-     * @param trendingSubreddits The trending subreddits object to use for the text
+     * @param trendingSubreddits The trending subreddits object to use for the text. If this is null
+     * then a message will be shown that no subreddits have been retrieved
      */
-    private fun setTrendingSubredditsLastUpdated(trendingSubreddits: TrendingSubreddits) {
-        val now = System.currentTimeMillis() / 1000L
-        val between = now - trendingSubreddits.retrieved
-        setAgeTextTrendingSubreddits(binding.navDrawer.trendingSubredditsLastUpdated, between)
+    private fun setTrendingSubredditsLastUpdated(trendingSubreddits: TrendingSubreddits?) {
+        if (trendingSubreddits != null) {
+            val now = System.currentTimeMillis() / 1000L
+            val between = now - trendingSubreddits.retrieved
+            setAgeTextTrendingSubreddits(binding.navDrawer.trendingSubredditsLastUpdated, between)
+        } else {
+            binding.navDrawer.trendingSubredditsLastUpdated.text = getString(R.string.trendingSubredditsLastUpdatedFailed)
+        }
     }
 
     /**
