@@ -550,7 +550,7 @@
                 android:id="@+id/multisVisibilityGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="multis, multisHeader"
+                app:constraint_referenced_ids="multis, multisHeader, multisRefresh"
                 android:visibility="@{hasUser ? View.VISIBLE : View.GONE}" />
 
             <!-- This has 16dp bottom margin instead of 8 like subreddits, since the last
@@ -566,6 +566,20 @@
                 android:textSize="17sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/random" />
+
+            <ImageView
+                android:id="@+id/multisRefresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+
+                android:foreground="?attr/selectableItemBackground"
+                android:src="@drawable/ic_refresh_24dp"
+                android:contentDescription="@string/content_description_nav_drawer_subreddit_refresh"
+
+                app:layout_constraintTop_toTopOf="@id/multisHeader"
+                app:layout_constraintBottom_toBottomOf="@id/multisHeader"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <FrameLayout
                 android:id="@+id/multisLoaderLayout"
@@ -636,7 +650,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/subreddits"
                 android:textColor="@color/text_color"
                 android:textSize="17sp"
@@ -700,7 +714,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/trendingSubreddits"
                 android:textColor="@color/text_color"
                 android:textSize="17sp"

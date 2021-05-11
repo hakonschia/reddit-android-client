@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -1080,6 +1079,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 }
             }
 
+            multisRefresh.setOnClickListener { redditMultiViewModel.loadMultis(force = true) }
             multis.adapter = RedditMultiAdapter().apply {
                 onMultiSelected = { multi ->
                     multiSelected(multi)
