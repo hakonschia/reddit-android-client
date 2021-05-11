@@ -22,6 +22,7 @@ import com.example.hakonsreader.api.responses.ApiResponse
 import com.example.hakonsreader.broadcastreceivers.InboxNotificationReceiver
 import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_ID_INBOX_STATUS
 import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_TAG_INBOX_STATUS
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.states.AppState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -71,17 +72,19 @@ class InboxCheckerWorker @AssistedInject constructor(
 
         return when (response) {
             is ApiResponse.Success -> {
-                val messages = response.value
-                val previousMessages = messagesDao.getMessagesById(messages.map { it.id })
-
                 if (AppState.isDevMode) {
                     createDeveloperNotification(counter)
                 }
 
+                val messages = response.value
                 removeNonNewNotifications(messages)
 
-                // Create notification for those messages not already seen
-                filterNewAndNotSeenMessages(previousMessages, messages).forEach { createInboxNotification(it) }
+                if (Settings.showInboxNotifications()) {
+                    // Retrieve the messages that we just retrieved from the local DB (if they have been retrieved earlier)
+                    val previousMessages = messagesDao.getMessagesById(messages.map { it.id })
+                    // Create notification for those messages not already seen
+                    filterNewAndNotSeenMessages(previousMessages, messages).forEach { createInboxNotification(it) }
+                }
 
                 // Mark all new messages as now seen
                 messages.forEach { it.isSeen = true }
@@ -174,7 +177,7 @@ class InboxCheckerWorker @AssistedInject constructor(
 
         val (contentIntent, markAsReadActionIntent) = createIntents(message)
 
-        val htmlMessage = if (Build.VERSION.SDK_INT >= 24) {
+        @Suppress("DEPRECATION") val htmlMessage = if (Build.VERSION.SDK_INT >= 24) {
             Html.fromHtml(message.bodyHtml, Html.FROM_HTML_MODE_COMPACT)
         } else {
             Html.fromHtml(message.bodyHtml)

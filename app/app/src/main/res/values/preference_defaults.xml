@@ -20,6 +20,7 @@
     <bool name="prefs_default_show_all_sidebars">true</bool>
     <integer name="prefs_default_link_scale">100</integer>
     <bool name="prefs_default_inbox_show_badge">true</bool>
+    <bool name="prefs_default_inbox_show_notifications">true</bool>
     <string name="prefs_default_inbox_update_frequency" translatable="false">@string/prefs_key_inbox_update_frequency_30_min</string>
     <bool name="prefs_default_comment_show_link_preview">true</bool>
     <bool name="prefs_default_comment_link_preview_show_entire_link">false</bool>

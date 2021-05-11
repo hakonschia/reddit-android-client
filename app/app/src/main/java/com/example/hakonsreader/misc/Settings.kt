@@ -469,4 +469,14 @@ object Settings {
         return colors
     }
 
+    /**
+     * @return True if the user wants to display notifications for inbox messages
+     */
+    fun showInboxNotifications(): Boolean {
+        return preferences.getBoolean(
+            resources.getString(R.string.prefs_key_inbox_show_notifications),
+            resources.getBoolean(R.bool.prefs_default_inbox_show_notifications)
+        )
+    }
+
 }

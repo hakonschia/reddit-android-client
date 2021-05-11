@@ -95,6 +95,13 @@
             app:iconSpaceReserved="false"
             app:singleLineTitle="false" />
 
+        <SwitchPreference
+            app:key="@string/prefs_key_inbox_show_notifications"
+            app:title="@string/prefs_title_inbox_show_notifications"
+            app:defaultValue="@bool/prefs_default_inbox_show_notifications"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false" />
+
         <ListPreference
             app:key="@string/prefs_key_inbox_update_frequency"
             app:title="@string/prefs_title_inbox_update_frequency"

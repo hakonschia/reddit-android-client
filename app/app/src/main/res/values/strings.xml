@@ -111,6 +111,7 @@
     <string name="prefs_title_show_all_sidebars">Show all sidebars (or just one)</string>
     <string name="prefs_title_link_scale">Link text scale</string>
     <string name="prefs_title_inbox_show_badge">Show badge in navbar</string>
+    <string name="prefs_title_inbox_show_notifications">Show notifications</string>
     <string name="prefs_title_inbox_update_frequency">Update frequency</string>
     <string name="prefs_title_inbox_update_frequency_dont_update">Don\'t update automatically</string>
     <string name="prefs_title_inbox_update_frequency_15_min">15 minutes</string>
@@ -168,6 +169,7 @@
     <string name="prefs_key_show_all_sidebars" translatable="false">show_all_sidebars</string>
     <string name="prefs_key_link_scale" translatable="false">link_scale</string>
     <string name="prefs_key_inbox_show_badge" translatable="false">inbox_show_badge</string>
+    <string name="prefs_key_inbox_show_notifications" translatable="false">inbox_show_notifications</string>
     <string name="prefs_key_inbox_update_frequency" translatable="false">inbox_update_frequency</string>
     <string name="prefs_key_inbox_update_frequency_dont_update" translatable="false">inbox_dont_update_automatically</string>
     <string name="prefs_key_inbox_update_frequency_15_min" translatable="false">inbox_update_15_minutes</string>
