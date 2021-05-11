@@ -10,11 +10,12 @@ import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.RedditMessage
 import com.example.hakonsreader.api.persistence.RedditMessagesDao
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class InboxNotificationReceiver : BroadcastReceiver() {
 
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "InboxNotificationReceiv"
 
 
@@ -71,12 +73,14 @@ class InboxNotificationReceiver : BroadcastReceiver() {
             when (response) {
                 is ApiResponse.Success -> {
                     with(NotificationManagerCompat.from(context)) {
-                        cancel(inboxMessageId, notificationId)
+                        cancel(notificationId)
                     }
                     messagesDao.markRead(inboxMessageId)
                 }
                 is ApiResponse.Error -> {
-                    Toast.makeText(context, R.string.inboxNotificationMarkReadFailed, Toast.LENGTH_LONG).show()
+                    withContext(Main) {
+                        Toast.makeText(context, R.string.inboxNotificationMarkReadFailed, Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }

@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.text.Html
 import androidx.core.app.NotificationCompat
@@ -50,6 +51,11 @@ class InboxCheckerWorker @AssistedInject constructor(
          * The key used to store the counter of the inbox in SharedPreferences
          */
         private const val PREFS_COUNTER = "prefs_counter"
+
+        /**
+         * The key used to store the ID counter of the inbox notifications
+         */
+        private const val PREFS_INBOX_NOTIFICATION_ID = "prefs_inboxNotificationId"
     }
 
 
@@ -83,7 +89,7 @@ class InboxCheckerWorker @AssistedInject constructor(
                     // Retrieve the messages that we just retrieved from the local DB (if they have been retrieved earlier)
                     val previousMessages = messagesDao.getMessagesById(messages.map { it.id })
                     // Create notification for those messages not already seen
-                    filterNewAndNotSeenMessages(previousMessages, messages).forEach { createInboxNotification(it) }
+                    filterNewAndNotSeenMessages(previousMessages, messages).forEach { createInboxNotification(it, prefs) }
                 }
 
                 // Mark all new messages as now seen
@@ -167,15 +173,20 @@ class InboxCheckerWorker @AssistedInject constructor(
      * Creates a notification for an inbox message
      *
      * @param message The message to show the notification for
+     * @param preferences The preferences used to hold the notification ID
      */
-    private fun createInboxNotification(message: RedditMessage) {
+    private fun createInboxNotification(message: RedditMessage, preferences: SharedPreferences) {
         val title = if (message.wasComment) {
             applicationContext.getString(R.string.notificationInboxCommentReplyTitle, message.author)
         } else {
             applicationContext.getString(R.string.notificationInboxMessageTitle, message.author)
         }
 
-        val (contentIntent, markAsReadActionIntent) = createIntents(message)
+        val id = preferences.getInt(PREFS_INBOX_NOTIFICATION_ID, 0)
+        // Lets hope no one gets 2.1 billion messages :)
+        preferences.edit().putInt(PREFS_INBOX_NOTIFICATION_ID, id + 1).apply()
+
+        val (contentIntent, markAsReadActionIntent) = createIntents(message, id)
 
         @Suppress("DEPRECATION") val htmlMessage = if (Build.VERSION.SDK_INT >= 24) {
             Html.fromHtml(message.bodyHtml, Html.FROM_HTML_MODE_COMPACT)
@@ -205,8 +216,7 @@ class InboxCheckerWorker @AssistedInject constructor(
         with(NotificationManagerCompat.from(applicationContext)) {
             // Use the message ID as the tag. Ideally we would just convert this from base36 to base10
             // and use it as the ID itself, but the value is above Int.MAX_VALUE
-            // When using a tag it doesn't look like we need an actual unique ID
-            notify(message.id, 0, notification)
+            notify(id, notification)
         }
     }
 
@@ -224,12 +234,15 @@ class InboxCheckerWorker @AssistedInject constructor(
 
     /**
      * Create intents for a message
+     *
+     * @param message The message to create intents for
+     * @param id The ID of of the notification
      */
-    private fun createIntents(message: RedditMessage): Intents {
+    private fun createIntents(message: RedditMessage, id: Int): Intents {
         val actionIntent = Intent(applicationContext, InboxNotificationReceiver::class.java).apply {
             putExtra(InboxNotificationReceiver.EXTRAS_MESSAGE_ID, message.id)
             putExtra(InboxNotificationReceiver.EXTRAS_WAS_COMMENT, message.wasComment)
-            putExtra(InboxNotificationReceiver.EXTRAS_NOTIFICATION_ID, 0)
+            putExtra(InboxNotificationReceiver.EXTRAS_NOTIFICATION_ID, id)
         }
         val pendingActionIntent = PendingIntent.getBroadcast(applicationContext, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
