@@ -12,7 +12,9 @@ import com.example.hakonsreader.databinding.ListItemSubredditBinding
 import com.example.hakonsreader.databinding.ListItemSubredditSimpleBinding
 import com.example.hakonsreader.interfaces.OnClickListener
 import com.example.hakonsreader.interfaces.OnSubredditSelected
+import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.recyclerviewadapters.diffutils.SubredditsDiffCallback
+import com.example.hakonsreader.views.SpaceDivider
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -145,6 +147,10 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 StandardViewHolder(binding)
             }
         }
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.addItemDecoration(SpaceDivider(dpToPixels(8f, recyclerView.resources)))
     }
 
     override fun getItemCount() = subreddits.size
