@@ -17,7 +17,7 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 
 ## Installation
 
-The downloadable [APK](apk/app-release.apk) contains the application at commit `c7b1891894fc07f0fee2c7805e32de150c42fd7f` (#1663). To install the app download the APK, open it on your phone, and follow the steps shown.
+The downloadable [APK](apk/app-release.apk) contains the application at commit `bc865955c3a66de6fce20a30f40eb3d3da6c139f` (#1666). To install the app download the APK, open it on your phone, and follow the steps shown.
 
 `minSdkVersion` is 21 (Android 5.0), although testing is limited below SDK 26.
 
@@ -29,9 +29,11 @@ See also: [build](#build)
   - Light and dark mode (true black)
   - Translated to English and Norwegian (bokmål)
 
-- **Private browsing** - While logged in, [enable private browsing](images/enable-private-browsing.png) to temporarily act as an anonymous, non-logged in user. [Disable at any time](images/disable-private-browsing.png) when attempting to do an action that requires a logged in user
+- **Private browsing** 
+  - While logged in, [enable private browsing](images/enable-private-browsing.png) to temporarily act as an anonymous, non-logged in user. [Disable at any time](images/disable-private-browsing.png) when attempting to do an action that requires a logged in user
 
-- **Multiple accounts** - Log in with [multiple accounts](images/multiple-accounts.png) and switch whenever you want to
+- **Multiple accounts** 
+  - Log in with [multiple accounts](images/multiple-accounts.png) and switch whenever you want to
   - Mark account as NSFW to override various NSFW settings, such as how images/thumbnails are blurred
 
 - **Links**
