@@ -9,18 +9,17 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 ## Screenshots
 
 <div>
-  <img src="/images/subreddit.gif" alt="Subreddit" width="275"/>
-  <img src="/images/scrolling-in-posts.png" alt="Scrolling posts" width="275"/>
-  <img src="/images/in-post.gif" alt="In post" width="275"/>
+  <img src="/images/everything.gif" alt="Subreddit" width="275"/>
   <img src="/images/profile.gif" alt="User profile" width="275"/>
   <img src="/images/replying.gif" alt="Replying" width="275"/>
-  <img src="/images/search-for-subreddit.png" alt="User profile" width="275"/>
 </div>
 
 
 ## Installation
 
-The downloadable [APK](apk/app-release.apk) contains the application at commit `d6972721adacda7ed6d8fec6db14fca7c001a982` (#1532). To install the app download the APK, open it on your phone, and follow the steps shown.
+The downloadable [APK](apk/app-release.apk) contains the application at commit `c7b1891894fc07f0fee2c7805e32de150c42fd7f` (#1663). To install the app download the APK, open it on your phone, and follow the steps shown.
+
+`minSdkVersion` is 21 (Android 5.0), although testing is limited below SDK 26.
 
 See also: [build](#build)
 
@@ -30,7 +29,7 @@ See also: [build](#build)
   - Light and dark mode (true black)
   - Translated to English and Norwegian (bokmål)
 
-- **Private browsing** - While logged in, [enable private browsing](images/enable-private-browsing.png) to temporarily act as an anonymous, non-logged in user. [Disable at any time](images/disable-private-browsing.png) when attempting to do an action that requires a logged in user.
+- **Private browsing** - While logged in, [enable private browsing](images/enable-private-browsing.png) to temporarily act as an anonymous, non-logged in user. [Disable at any time](images/disable-private-browsing.png) when attempting to do an action that requires a logged in user
 
 - **Multiple accounts** - Log in with [multiple accounts](images/multiple-accounts.png) and switch whenever you want to
   - Mark account as NSFW to override various NSFW settings, such as how images/thumbnails are blurred
@@ -43,27 +42,31 @@ See also: [build](#build)
   - [Long press to show URL of a link](images/peek-url.png)
 
 - **Posts**
-  - [Control the size](images/control-size-of-post.png) of post content when opened, based on a percentage of the screen size.
-  - [Expand post](images/expand-post-content.gif) content at any time when scrolling through the comments.
+  - [Peek text posts](images/peek-text-posts.gif) while scrolling in list of posts by long pressing on the post
+  - [Control the size](images/control-size-of-post.png) of post content when opened, based on a percentage of the screen size
+  - [Expand post](images/expand-post-content.gif) content at any time when scrolling through the comments
   - [Disable post from being collapsed](images/disable-post-collapse.gif) when scrolling in comments, with an independent size compared to when it can be collapsed.
-    - This can be set as the default for all posts
+    - This can be set as the default
   - [Filter posts](images/filter-posts.png) from subreddits from appearing in front page/popular/all
 
 - **Comments**
   - [Navigate](images/navigate-top-level-comments.gif) between top level comments
-    - Optionally with an animation, with a customizable threshold for how many comments to at most smoothly navigate between.
+    - Optionally with an animation, with a customizable threshold for how many comments to at most smoothly navigate between
     - Long press to go to first/last
   - Show [all](images/sidebars-all.png) sidebars, or [only](images/sidebars-only-one.png) one
     - [Fully customizable colors](images/comment-sidebar-color-dialog.gif) - [Preview](images/comment-sidebar-color-preview.png)
-  - [Highlight comments](images/highlight-new-comments.png) added since the last time a post was viewed (can be toggled).
+  - [Highlight comments](images/highlight-new-comments.png) added since the last time a post was viewed (can be toggled)
+
+- **Inbox**
+  - Check inbox for new messages every 15, 30, or 60 minutes (or never)
+  - Optionally:
+    - [Show badge](images/show-inbox-badge.gif) in the bottom bar
+    - Show notifications
 
 - **Misc**
   - [Slide away](images/slide-away.gif) opened posts, subreddits, user, images and so on
 
-- **Third party integration**
-
-All these options can be [toggled indepedently](images/settings-load-third-party.png)
-
+- **Third party integration** (All these options can be [toggled indepedently](images/settings-load-third-party.png))
   - Imgur albums/galleries [are shown as](images/imgur-album-as-gallery.png) other Reddit galleries
   - Gfycat and Imgur videos are [loaded directly](images/gfycat-imgur-videos.png) from the source to always provide audio when possible (and show the size of the video), as the video URLs
   provided by Reddit [do not include any audio](images/gfycat-imgur-videos-not-loaded-directly.png).
@@ -98,7 +101,7 @@ IMGUR_CLIENT_ID = <The Imgur client ID>
 
 ### Crashlytics
 
-The application uses [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/get-started?platform=android) for crash reporting. Set up your Firebase projects and add the `google-services.json` file to [/app/app](/app/app)
+The application uses [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/get-started?platform=android) for crash reporting. Set up your Firebase projects and add the `google-services.json` file to [/app/app](/app/app). This can be omitted, but all Firebase references must be removed manually from the code (from Gradle files and [SettingsFragment](/app/app/src/main/java/com/example/hakonsreader/fragments/SettingsFragment.kt)).
 
 
 ## Acknowledgements
