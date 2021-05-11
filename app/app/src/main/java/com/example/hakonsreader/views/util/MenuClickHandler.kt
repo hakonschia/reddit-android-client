@@ -86,6 +86,12 @@ private fun showPopupForLoggedInUser(view: View, api: RedditApi, userInfoDao: Re
     }.show(context, view)
 }
 
+/**
+ * Shows a Dialog with the list of accounts stored in the application
+ *
+ * @param context The context used. This should be an activity, otherwise the application cannot recreate
+ * itself when a new account is chosen
+ */
 fun showAccountManagement(context: Context, api: RedditApi, userInfoDao: RedditUserInfoDao) {
     val app = AppState
 
@@ -117,8 +123,7 @@ fun showAccountManagement(context: Context, api: RedditApi, userInfoDao: RedditU
                     }
 
                     if (currentId != userInfoClicked.accessToken.userId) {
-                        // Not sure what we would do if not (although I'm not sure how we would get
-                        // here without an activity context)
+                        // Not sure what we would do if not
                         if (context is AppCompatActivity) {
                             app.switchAccount(userInfoClicked.accessToken, context)
                         }

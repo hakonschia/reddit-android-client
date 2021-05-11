@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.fragment.app.Fragment
-import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.persistence.RedditUserInfoDao
 import com.example.hakonsreader.databinding.FragmentLogInBinding
@@ -40,14 +38,12 @@ class LogInFragment : Fragment() {
     lateinit var api: RedditApi
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return FragmentLogInBinding.inflate(inflater).also {
+        return FragmentLogInBinding.inflate(LayoutInflater.from(requireActivity())).also {
             _binding = it
         }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         CoroutineScope(Dispatchers.IO).launch {
             binding.hasUsers = userInfoDao.getAllUsers().isNotEmpty()
         }
@@ -57,7 +53,7 @@ class LogInFragment : Fragment() {
         }
 
         binding.btnAccountManagement.setOnClickListener {
-            showAccountManagement(requireContext(), api, userInfoDao)
+            showAccountManagement(requireActivity(), api, userInfoDao)
         }
     }
 
