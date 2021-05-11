@@ -176,12 +176,13 @@ class VoteBar @JvmOverloads constructor(
                 }
                 VoteType.DOWNVOTE -> {
                     ContextCompat.getColor(context, R.color.downvoted).also { color ->
-                        binding.upvote.setColorFilter(color)
+                        binding.downvote.setColorFilter(color)
                     }
                 }
                 VoteType.NO_VOTE -> {
                     ContextCompat.getColor(context, R.color.text_color).also { color ->
                         binding.upvote.setColorFilter(color)
+                        binding.downvote.setColorFilter(color)
                     }
                 }
             }
