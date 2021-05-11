@@ -26,7 +26,7 @@ class RedditMulti {
     var name = ""
 
     /**
-     * The display name of the Multi
+     * The display name of the Multi. This might be changed after the Multi has been created
      */
     @SerializedName("display_name")
     var displayName = ""

@@ -29,6 +29,7 @@ class RedditMultiDiffCallback(private val oldList: List<RedditMulti>, private va
         val newItem = newList[newItemPosition]
 
         return oldItem.name == newItem.name
+                && oldItem.displayName == newItem.displayName
                 && oldItem.isFavorited == newItem.isFavorited
                 && oldItem.isSubscribed == newItem.isSubscribed
     }

@@ -42,7 +42,7 @@
             android:ellipsize="end"
 
             android:maxLines="1"
-            android:text="@{multi.name}"
+            android:text="@{multi.displayName}"
             android:textColor="@color/text_color"
             android:textSize="16sp"
 
