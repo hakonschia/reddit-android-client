@@ -1,5 +1,6 @@
 package com.example.hakonsreader.viewmodels
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +11,7 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.misc.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
@@ -39,6 +41,11 @@ class CommentsViewModel @Inject constructor(
      * All comments the view model has, independent of the comments passed to [_comments] for chains
      */
     private val allComments: MutableList<RedditComment> = ArrayList()
+
+    /**
+     * The SharedPreferences used to hold the time posts were last opened
+     */
+    var preferences: SharedPreferences? = null
 
     /**
      * The ID of the comment parent coming of the currently show chain, or null if no chain is shown
@@ -94,6 +101,12 @@ class CommentsViewModel @Inject constructor(
                 is ApiResponse.Success -> {
                     if (thirdPartyObject != null) {
                         resp.value.post.thirdPartyObject = thirdPartyObject
+                    }
+
+                    preferences?.let {
+                        // Update the value for when the post was opened
+                        val lastTimeOpenedKey = postId + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP
+                        preferences!!.edit().putLong(lastTimeOpenedKey, System.currentTimeMillis() / 1000L).apply()
                     }
 
                     allComments.clear()
@@ -313,5 +326,17 @@ class CommentsViewModel @Inject constructor(
         }
 
         postsDao.insertAll(postsToInsertIntoDb)
+    }
+
+    /**
+     * @return The time the post was last opened, or -1 if not applicable
+     */
+    fun getLastTimePostOpened(): Long {
+        if (postId.isBlank() || preferences == null) {
+            return -1
+        }
+
+        val lastTimeOpenedKey = postId + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP
+        return preferences!!.getLong(lastTimeOpenedKey, -1)
     }
 }

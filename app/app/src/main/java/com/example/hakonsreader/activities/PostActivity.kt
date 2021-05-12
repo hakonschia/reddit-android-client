@@ -159,6 +159,10 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         // No state saved means we have no comments, so load them
         if (savedInstanceState == null) {
+            // We only want to set this once, as if the chain is removed it shouldn't be set again on config changes
+            intent.extras?.getString(EXTRAS_COMMENT_ID_CHAIN)?.let {
+                commentsViewModel.showChain(it)
+            }
             loadComments()
         } else {
             binding.parentLayout.progress = savedInstanceState.getFloat(SAVED_TRANSITION_STATE_KEY)
@@ -259,9 +263,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
      */
     private fun setupCommentsViewModel() {
         with (commentsViewModel) {
-            intent.extras?.getString(EXTRAS_COMMENT_ID_CHAIN)?.let {
-                showChain(it)
-            }
+            preferences = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME_POST_OPENED, MODE_PRIVATE)
 
             post.observe(this@PostActivity) {
                 if (it != null) {
@@ -282,16 +284,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
                 val adapter = binding.comments.adapter as CommentsAdapter
 
-                val lastTimeOpenedKey = this@PostActivity.post?.id + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP
-                val preferences = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME_POST_OPENED, MODE_PRIVATE)
-                val lastTimeOpened = preferences.getLong(lastTimeOpenedKey, -1)
-
-                // Update the value
-                // TODO this isn't really correct as if this is triggered on config changes which will
-                //  remove new comment highlights
-                preferences.edit().putLong(lastTimeOpenedKey, System.currentTimeMillis() / 1000L).apply()
-
-                adapter.lastTimeOpened = lastTimeOpened
+                adapter.lastTimeOpened = getLastTimePostOpened()
                 adapter.submitList(comments)
 
                 binding.noComments = comments.isEmpty()
