@@ -214,8 +214,18 @@ class CommentsViewModel @Inject constructor(
     fun removeChain() {
         if (chainId != null) {
             chainId = null
-            // TODO this should remove the replies to hidden comments (or else they will be added multiple times when shown again)
-            _comments.postValue(allComments)
+
+            // Set all comments, but remove the replies from hidden comments
+            val all = allComments.toMutableList()
+            val commentsToRemove = mutableListOf<RedditComment>()
+            all.forEach { comment ->
+                if (comment.isCollapsed) {
+                    commentsToRemove.addAll(comment.replies)
+                }
+            }
+
+            all.removeAll(commentsToRemove)
+            _comments.postValue(all)
         }
     }
 

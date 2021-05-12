@@ -51,8 +51,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:onClick="@{view -> viewModel.hideCommentsLongClick(comment)}"
-
         android:onLongClick="@{view -> viewModel.hideCommentsLongClick(comment)}"
         android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}">
 
