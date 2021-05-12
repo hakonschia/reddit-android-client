@@ -20,14 +20,14 @@
             type="boolean" />
 
         <variable
-            name="adapter"
-            type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
+            name="viewModel"
+            type="com.example.hakonsreader.viewmodels.CommentsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{view -> adapter.showComments(comment)}"
+        android:onClick="@{view -> viewModel.showComments(comment)}"
         android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}">
 
         <!-- So if the barrier has no views referenced, it jumps to the middle

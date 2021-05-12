@@ -43,7 +43,7 @@ fun showPopupForComments(
 ) {
     val user = AppState.getUserInfo()?.userInfo
     val context = view.context
-    val parentComment = adapter.getCommentByFullname(comment.parentId)
+    val parentComment = commentsViewModel.getCommentByFullname(comment.parentId)
 
     popupMenu {
         style = R.style.Widget_MPM_Menu_Dark_CustomBackground

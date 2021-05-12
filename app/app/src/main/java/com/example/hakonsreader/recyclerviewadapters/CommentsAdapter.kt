@@ -137,21 +137,6 @@ class CommentsAdapter constructor(
     }
 
     /**
-     * Gets a comment by an ID
-     *
-     * @param fullname The fullname of the comment to get
-     * @return The comment, or null if not found in the adapter
-     */
-    fun getCommentByFullname(fullname: String) : RedditComment? {
-        for (comment in comments) {
-            if (comment.fullname == fullname) {
-                return comment
-            }
-        }
-        return null
-    }
-
-    /**
      * Notifies that a comment has been updated
      *
      * @param comment The comment updated
@@ -162,51 +147,6 @@ class CommentsAdapter constructor(
         if (pos != -1) {
             notifyItemChanged(pos)
         }
-    }
-
-    /**
-     * Shows a comment chain that has previously been hidden
-     *
-     * @param start The start of the chain
-     * @see hideComments
-     */
-    fun showComments(start: RedditComment) {
-        val pos = comments.indexOf(start)
-
-        start.isCollapsed = false
-        notifyItemChanged(pos)
-
-        /*
-        val replies = getShownReplies(start)
-        comments.addAll(pos + 1, replies)
-        notifyItemRangeInserted(pos + 1, replies.size)
-         */
-    }
-
-    /**
-     * Hides comments from being shown
-     *
-     * @param start The comment to start at. This element will be updated to a [HIDDEN_COMMENT_TYPE]
-     * and all its children will be removed from [comments]
-     * @see showComments
-     */
-    private fun hideComments(start: RedditComment) {
-        val startPos = comments.indexOf(start)
-        if (startPos == -1) {
-            return
-        }
-
-        start.isCollapsed = true
-
-        /*
-        val replies = getShownReplies(start)
-        comments.removeAll(replies)
-
-        // The comment explicitly hidden isn't being removed, but its UI is updated
-        // Its children are removed from the list
-        notifyItemChanged(startPos)
-        notifyItemRangeRemoved(startPos + 1, replies.size)
-         */
     }
 
     /**
@@ -253,19 +193,6 @@ class CommentsAdapter constructor(
 
 
     /**
-     * LongClick listener for views
-     *
-     * @param view Ignored
-     * @param comment The comment clicked
-     * @return True (event is always consumed)
-     */
-    fun hideCommentsLongClick(@Suppress("UNUSED_PARAMETER") view: View, comment: RedditComment): Boolean {
-        hideComments(comment)
-        return true
-    }
-
-
-    /**
      * OnClick listener for "2 more comments" comments.
      *
      * [loadMoreCommentsListener] will be called to load the comments
@@ -293,7 +220,6 @@ class CommentsAdapter constructor(
             }
         }
 
-        // Could be null, but that's something we would want to discover when debugging
         loadMoreCommentsListener?.loadMoreComments(comment, parent)
     }
 
@@ -337,18 +263,19 @@ class CommentsAdapter constructor(
             }
             HIDDEN_COMMENT_TYPE -> {
                 HiddenCommentViewHolder(ListItemHiddenCommentBinding.inflate(layoutInflater, parent, false).apply {
-                    adapter = this@CommentsAdapter
+                    viewModel = this@CommentsAdapter.viewModel
                 })
             }
             else -> {
                 NormalCommentViewHolder(ListItemCommentBinding.inflate(layoutInflater, parent, false).apply {
                     adapter = this@CommentsAdapter
+                    viewModel = this@CommentsAdapter.viewModel
                     post = this@CommentsAdapter.post
                     onReportsIgnoreChange =  OnReportsIgnoreChangeListener { invalidateAll() }
                     showPeekParentButton = Settings.showPeekParentButtonInComments()
                     commentContent.setLongClickToPeekUrl {
                         comment?.let {
-                            hideComments(it)
+                            this@CommentsAdapter.viewModel.hideComments(it)
                         }
                     }
                 })
@@ -360,8 +287,8 @@ class CommentsAdapter constructor(
         val comment = comments[position]
 
         return when {
-            comment.kind == Thing.MORE.value -> MORE_COMMENTS_TYPE
             comment.isCollapsed -> HIDDEN_COMMENT_TYPE
+            comment.kind == Thing.MORE.value -> MORE_COMMENTS_TYPE
             else -> NORMAL_COMMENT_TYPE
         }
     }
@@ -474,7 +401,7 @@ class CommentsAdapter constructor(
         fun bind(comment: RedditComment, highlight: Boolean, byLoggedInUser: Boolean) {
             with(binding) {
                 root.setOnClickListener {
-                    showComments(comment)
+                    this@CommentsAdapter.viewModel.showComments(comment)
                 }
                 this.comment = comment
                 this.highlight = highlight

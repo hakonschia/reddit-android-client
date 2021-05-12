@@ -214,6 +214,7 @@ class CommentsViewModel @Inject constructor(
     fun removeChain() {
         if (chainId != null) {
             chainId = null
+            // TODO this should remove the replies to hidden comments (or else they will be added multiple times when shown again)
             _comments.postValue(allComments)
         }
     }
@@ -252,6 +253,78 @@ class CommentsViewModel @Inject constructor(
         commnts.addAll(comment.replies)
 
         _comments.postValue(commnts)
+    }
+
+
+    // TODO showing and hiding comments doesn't update right away if the comment has no replies
+
+    /**
+     * Shows a comment chain that has previously been hidden
+     *
+     * @param start The start of the chain
+     * @see hideComments
+     */
+    fun showComments(start: RedditComment) {
+        val commnts = _comments.value ?: return
+        val pos = commnts.indexOf(start)
+
+        if (pos < 0) {
+            return
+        }
+
+        start.isCollapsed = false
+
+        _comments.value = ArrayList<RedditComment>(commnts).apply {
+            // Insert the replies after the start comment
+            addAll(pos + 1, getShownReplies(start))
+        }
+    }
+
+    /**
+     * Hides comments from being shown
+     *
+     * @param start The comment to start at
+     * @see showComments
+     */
+    fun hideComments(start: RedditComment) {
+        val commnts = _comments.value ?: return
+        val pos = commnts.indexOf(start)
+
+        if (pos < 0) {
+            return
+        }
+
+        start.isCollapsed = true
+        _comments.value = ArrayList<RedditComment>(commnts).apply {
+            removeAll(getShownReplies(start))
+        }
+    }
+
+    /**
+     * Hides comments from being shown (long clickable)
+     *
+     * @param start The comment to start at
+     * @return True
+     * @see showComments
+     */
+    fun hideCommentsLongClick(start: RedditComment): Boolean {
+        hideComments(start)
+        return true
+    }
+
+    /**
+     * Gets a comment by a fullname
+     *
+     * @param fullname The fullname of the comment to get
+     * @return The comment, or null if not found in the adapter
+     */
+    fun getCommentByFullname(fullname: String) : RedditComment? {
+        allComments.forEach { comment ->
+            if (comment.fullname == fullname) {
+                return comment
+            }
+        }
+        return null
     }
 
     /**

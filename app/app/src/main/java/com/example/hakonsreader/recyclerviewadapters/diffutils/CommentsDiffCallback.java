@@ -49,6 +49,10 @@ public class CommentsDiffCallback extends DiffUtil.Callback {
         // There can be a mismatch here with "2 more comments" and normal comments, and these values
         // are null for "2 more comments" so use Objects.equals
         return Objects.equals(oldItem.getAuthor(), newItem.getAuthor()) &&
-                Objects.equals(oldItem.getBody(), newItem.getBody());
+                Objects.equals(oldItem.getBody(), newItem.getBody()) &&
+                oldItem.isCollapsed() == newItem.isCollapsed() &&
+                oldItem.isArchived() == newItem.isArchived() &&
+                oldItem.isLocked() == newItem.isLocked() &&
+                oldItem.isMod() == newItem.isMod();
     }
 }

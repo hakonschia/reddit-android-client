@@ -30,6 +30,10 @@
             type="boolean" />
 
         <variable
+            name="viewModel"
+            type="com.example.hakonsreader.viewmodels.CommentsViewModel" />
+
+        <variable
             name="adapter"
             type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
 
@@ -47,7 +51,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:onLongClick="@{view -> adapter.hideCommentsLongClick(view, comment)}"
+        android:onClick="@{view -> viewModel.hideCommentsLongClick(comment)}"
+
+        android:onLongClick="@{view -> viewModel.hideCommentsLongClick(comment)}"
         android:paddingTop="@{comment.depth == 0 ? @dimen/topLevelCommentTopPadding : 0}">
 
         <!-- The barrier for the side bars. The sidebars are referenced by the barrier, and everything else is
@@ -98,7 +104,7 @@
             android:layout_height="wrap_content"
 
             android:onClick="@{(view) -> ClickHandlerKt.openProfileInActivity(view, comment.author)}"
-            android:onLongClick="@{view -> adapter.hideCommentsLongClick(view, comment)}"
+            android:onLongClick="@{view -> viewModel.hideCommentsLongClick(comment)}"
             android:text='@{comment != null ? @string/author_prefixed(comment.author) : "" }'
 
             app:authorTextColorComment="@{comment}"
@@ -302,7 +308,7 @@
 
             android:background="@null"
             android:foreground="@drawable/ripple_main_bg"
-            android:onClick="@{(view) -> CommentsMenuHandlerKt.peekCommentOnClick(view.context, adapter.getCommentByFullname(comment.parentId))}"
+            android:onClick="@{(view) -> CommentsMenuHandlerKt.peekCommentOnClick(view.context, viewModel.getCommentByFullname(comment.parentId))}"
             android:src="@drawable/ic_visibility_24dp"
             android:visibility="@{showPeekParentButton &amp;&amp; comment.depth != 0 ? View.VISIBLE : View.GONE}"
             android:contentDescription="@string/content_description_comment_peek_parent"
