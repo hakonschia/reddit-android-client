@@ -17,6 +17,7 @@ import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
+import com.example.hakonsreader.viewmodels.CommentsViewModel
 import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -33,10 +34,16 @@ import kotlinx.coroutines.withContext
  * @param comment The comment the popup is for
  * @param adapter The RecyclerView adapter the comment is in
  */
-fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAdapter, api: RedditApi) {
+fun showPopupForComments(
+    view: View,
+    comment: RedditComment,
+    adapter: CommentsAdapter,
+    api: RedditApi,
+    commentsViewModel: CommentsViewModel
+) {
     val user = AppState.getUserInfo()?.userInfo
     val context = view.context
-    val parentComment = adapter.getCommentById(comment.parentId)
+    val parentComment = adapter.getCommentByFullname(comment.parentId)
 
     popupMenu {
         style = R.style.Widget_MPM_Menu_Dark_CustomBackground
@@ -53,7 +60,7 @@ fun showPopupForComments(view: View, comment: RedditComment, adapter: CommentsAd
             item {
                 labelRes = R.string.commentShowChain
                 icon = R.drawable.ic_chain
-                callback = { adapter.commentIdChain = comment.id }
+                callback = { commentsViewModel.showChain(comment) }
             }
 
             item {

@@ -259,6 +259,10 @@ class PostActivity : BaseActivity(), OnReplyListener {
      */
     private fun setupCommentsViewModel() {
         with (commentsViewModel) {
+            intent.extras?.getString(EXTRAS_COMMENT_ID_CHAIN)?.let {
+                showChain(it)
+            }
+
             post.observe(this@PostActivity) {
                 if (it != null) {
                     if (savedExtras != null) {
@@ -274,18 +278,17 @@ class PostActivity : BaseActivity(), OnReplyListener {
             }
 
             comments.observe(this@PostActivity) { comments ->
+                binding.commentChainShown = chainId != null
+
                 val adapter = binding.comments.adapter as CommentsAdapter
-                // New comments are empty, previous comments are not, clear the previous comments
-                if (comments.isEmpty() && adapter.itemCount != 0) {
-                    adapter.clearComments()
-                    return@observe
-                }
 
                 val lastTimeOpenedKey = this@PostActivity.post?.id + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP
                 val preferences = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME_POST_OPENED, MODE_PRIVATE)
                 val lastTimeOpened = preferences.getLong(lastTimeOpenedKey, -1)
 
                 // Update the value
+                // TODO this isn't really correct as if this is triggered on config changes which will
+                //  remove new comment highlights
                 preferences.edit().putLong(lastTimeOpenedKey, System.currentTimeMillis() / 1000L).apply()
 
                 adapter.lastTimeOpened = lastTimeOpened
@@ -309,19 +312,14 @@ class PostActivity : BaseActivity(), OnReplyListener {
      */
     private fun setupCommentsList() {
         with(binding) {
-            val adapter = CommentsAdapter(api).apply {
+            val adapter = CommentsAdapter(api, commentsViewModel).apply {
                 replyListener = this@PostActivity
-                commentIdChain = intent.extras?.getString(EXTRAS_COMMENT_ID_CHAIN, "") ?: ""
                 loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel.loadMoreComments(comment, parent) }
-                onChainShown = Runnable { binding.commentChainShown = true }
             }
 
             comments.adapter = adapter
             comments.layoutManager = LinearLayoutManager(this@PostActivity)
-            showAllComments.setOnClickListener {
-                adapter.commentIdChain = ""
-                commentChainShown = false
-            }
+            showAllComments.setOnClickListener { commentsViewModel.removeChain() }
         }
     }
 

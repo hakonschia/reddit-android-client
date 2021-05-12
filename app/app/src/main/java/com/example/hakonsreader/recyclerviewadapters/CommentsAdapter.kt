@@ -1,7 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters
 
 import android.graphics.Typeface
-import android.os.Parcelable
 import android.text.Spannable
 import android.text.style.URLSpan
 import android.view.LayoutInflater
@@ -35,6 +34,7 @@ import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForComments
+import com.example.hakonsreader.viewmodels.CommentsViewModel
 import com.example.hakonsreader.views.LinkPreview
 import com.example.hakonsreader.views.util.setLongClickToPeekUrl
 
@@ -46,9 +46,15 @@ import com.example.hakonsreader.views.util.setLongClickToPeekUrl
  * * "More" comments (eg. "2 more comments")
  */
 class CommentsAdapter constructor(
-        private val api: RedditApi
+        private val api: RedditApi,
+        private val viewModel: CommentsViewModel
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    // TODO Restore layout state with chains
+
+
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "CommentsAdapter"
 
         /**
@@ -78,24 +84,15 @@ class CommentsAdapter constructor(
     private val sidebarColors = Settings.commentSidebarColors()
 
     /**
-     * The list of comments that should be shown, unless a comment chain is set to be shown.
-     *
-     * This list might not include all comments, as comments that are hidden
-     * ([RedditComment.isCollapsed]) will not have its children in this list
+     * The list of comments shown in the adapter
      */
-    private var comments = ArrayList<RedditComment>()
+    private var comments: MutableList<RedditComment> = ArrayList()
 
     /**
-     * If [commentIdChain] is set, this list will hold the chain of comments
-     * that should be shown
+     * The ID of the chain the adapter is currently showing
      */
-    private var chain = ArrayList<RedditComment>()
-
-    /**
-     * The list of comments shown when a chain is shown. This will be used to go back to the comments
-     * previously shown when the user wants to get out of a chain
-     */
-    private var commentsShownWhenChainSet: ArrayList<RedditComment>? = null
+    var currentChainId: String? = null
+        private set
 
     /**
      * The post the comments are for. This should be set before comments are shown
@@ -108,28 +105,6 @@ class CommentsAdapter constructor(
     var lastTimeOpened = -1L
 
     /**
-     * The ID of the comment to show in a comment chain (the start of the chain)
-     *
-     * Setting the value for this will automatically update the comments shown
-     */
-    var commentIdChain = ""
-        set(value) {
-            // Don't do anything if the id is the same, because why would you
-            if (field.equals(value, ignoreCase = true)) {
-                return
-            }
-            field = value
-
-            setChain(comments)
-        }
-
-    /**
-     * The layout state at the time when a comment chain was set. This can be used to restore
-     * the state when going back to all comments
-     */
-    private var layoutStateWhenChainShown: Parcelable? = null
-
-    /**
      * The listener for when the reply button has been clicked on an item
      */
     var replyListener: OnReplyListener? = null
@@ -140,17 +115,6 @@ class CommentsAdapter constructor(
     var loadMoreCommentsListener: LoadMoreComments? = null
 
     /**
-     * The listener to run when a comment chain has been shown
-     */
-    var onChainShown: Runnable? = null
-
-    /**
-     * The RecyclerView this adapter is attached to
-     */
-    private var recyclerViewAttachedTo: RecyclerView? = null
-
-
-    /**
      * Sets the comments to use in the list
      *
      * @param newComments The comments to add
@@ -159,13 +123,15 @@ class CommentsAdapter constructor(
         val previous = comments
         comments = newComments as ArrayList<RedditComment>
 
-        checkAndSetHiddenComments()
-
-        if (commentIdChain.isNotEmpty()) {
-            setChain(newComments)
+        // If a new chain is being shown we need to update the entire list
+        // This isn't really ideal, but DiffUtil currently doesn't have a way of differentiating the items
+        // since they don't change when a chain is shown, so they won't be updated correctly (depth and highlighting)
+        if (currentChainId != viewModel.chainId) {
+            currentChainId = viewModel.chainId
+            notifyDataSetChanged()
         } else {
             DiffUtil.calculateDiff(
-                    CommentsDiffCallback(previous, comments)
+                CommentsDiffCallback(previous, comments)
             ).dispatchUpdatesTo(this)
         }
     }
@@ -176,7 +142,7 @@ class CommentsAdapter constructor(
      * @param fullname The fullname of the comment to get
      * @return The comment, or null if not found in the adapter
      */
-    fun getCommentById(fullname: String) : RedditComment? {
+    fun getCommentByFullname(fullname: String) : RedditComment? {
         for (comment in comments) {
             if (comment.fullname == fullname) {
                 return comment
@@ -199,91 +165,6 @@ class CommentsAdapter constructor(
     }
 
     /**
-     * Removes all comments from the list
-     */
-    fun clearComments() {
-        val size = comments.size
-        comments.clear()
-        notifyItemRangeRemoved(0, size)
-    }
-
-    /**
-     * Goes through [comments] and checks if a comments score is below the users threshold or if
-     * Reddit has specified that it should be hidden.
-     *
-     * Comments with [RedditComment.isCollapsed] set to true children are removed
-     */
-    private fun checkAndSetHiddenComments() {
-        val commentsToRemove: MutableList<RedditComment> = java.util.ArrayList()
-        val hideThreshold = Settings.getAutoHideScoreThreshold()
-
-        comments.forEach { comment: RedditComment ->
-            if (hideThreshold >= comment.score || comment.isCollapsed) {
-                // If we got here from the score threshold make sure collapsed is set to true
-                comment.isCollapsed = true
-                commentsToRemove.addAll(getShownReplies(comment))
-            }
-        }
-
-        // We can't modify the comments list while looping over it, so we have to store the comments
-        // that should be removed and remove them afterwards
-        comments.removeAll(commentsToRemove)
-    }
-
-    /**
-     * Sets [chain] based on [commentIdChain]
-     *
-     * If the chain is found, the currently shown list is stored in [commentsShownWhenChainSet]
-     *
-     * This function calls [notifyDataSetChanged]
-     *
-     * @param commentsToLookIn The comments to look in
-     */
-    private fun setChain(commentsToLookIn: List<RedditComment>) {
-        // TODO this is bugged when in a chain and going into a new chain
-        // TODO the commentsShownWhenChainSet aren't updated with new comments loaded while in the chain
-
-        if (commentIdChain.isNotEmpty()) {
-            // We have to clear the list here. In case the comment isn't found every comment should be shown
-            val previousChainSize = chain.size
-            chain.clear()
-
-            for (comment in commentsToLookIn) {
-                if (comment.id.equals(commentIdChain, ignoreCase = true)) {
-                    chain = getShownReplies(comment) as ArrayList<RedditComment>
-
-                    // The actual comment must also be added at the start
-                    chain.add(0, comment)
-
-                    // This list should take us back to all the comments, so if we're setting a chain
-                    // from within a chain, don't store the list
-                    if (previousChainSize == 0) {
-                        layoutStateWhenChainShown = recyclerViewAttachedTo?.layoutManager?.onSaveInstanceState()
-                        commentsShownWhenChainSet = comments
-                    }
-                    comments = chain
-                    onChainShown?.run()
-
-                    break
-                }
-            }
-        } else {
-            chain.clear()
-        }
-
-        // Go back to before the chain was set
-        if (chain.isEmpty() && commentsShownWhenChainSet != null) {
-            comments = commentsShownWhenChainSet as ArrayList<RedditComment>
-            if (layoutStateWhenChainShown != null) {
-                recyclerViewAttachedTo?.layoutManager?.onRestoreInstanceState(layoutStateWhenChainShown)
-            }
-        }
-
-        notifyDataSetChanged()
-    }
-
-
-    /**
      * Shows a comment chain that has previously been hidden
      *
      * @param start The start of the chain
@@ -295,9 +176,11 @@ class CommentsAdapter constructor(
         start.isCollapsed = false
         notifyItemChanged(pos)
 
+        /*
         val replies = getShownReplies(start)
         comments.addAll(pos + 1, replies)
         notifyItemRangeInserted(pos + 1, replies.size)
+         */
     }
 
     /**
@@ -315,6 +198,7 @@ class CommentsAdapter constructor(
 
         start.isCollapsed = true
 
+        /*
         val replies = getShownReplies(start)
         comments.removeAll(replies)
 
@@ -322,33 +206,8 @@ class CommentsAdapter constructor(
         // Its children are removed from the list
         notifyItemChanged(startPos)
         notifyItemRangeRemoved(startPos + 1, replies.size)
+         */
     }
-
-    /**
-     * Retrieve the list of replies to a comment that are shown
-     *
-     * @param parent The parent to retrieve replies for
-     * @return The list of children of [parent] that are shown. Children of children are also
-     * included in the list
-     */
-    private fun getShownReplies(parent: RedditComment) : List<RedditComment> {
-        val replies = ArrayList<RedditComment>()
-
-        parent.replies.forEach {
-            // Only add direct children, let the children handle their children
-            if (it.depth - 1 == parent.depth) {
-                replies.add(it)
-
-                // Reply isn't hidden which means it potentially has children to show
-                if (!it.isCollapsed) {
-                    replies.addAll(getShownReplies(it))
-                }
-            }
-        }
-
-        return replies
-    }
-
 
     /**
      * Find the position of the next top level comment
@@ -447,13 +306,14 @@ class CommentsAdapter constructor(
             return
         }
 
-        showPopupForComments(view, comment, this, api)
+        showPopupForComments(view, comment, this, api, viewModel)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val comment = comments[position]
 
-        val highlight = position == 0 && chain.isNotEmpty() // Always highlight first comment in a chain
+        // Highlight the root comment in a chain
+        val highlight = comment.id == viewModel.chainId
                 // User wants to highlight new comments, and the comment was added after the last time the post was opened
                 || (Settings.highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
 
@@ -504,16 +364,6 @@ class CommentsAdapter constructor(
             comment.isCollapsed -> HIDDEN_COMMENT_TYPE
             else -> NORMAL_COMMENT_TYPE
         }
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        recyclerViewAttachedTo = recyclerView
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        recyclerViewAttachedTo = null
     }
 
     override fun getItemCount() = comments.size
@@ -710,8 +560,6 @@ private fun formatAuthorInternal(tv: TextView, comment: RedditComment, italic: B
 
 /**
  * Adds sidebars to a ConstraintLayout
- *
- * This adds different sidebars based on [App.showAllSidebars]
  */
 fun addSidebars(barrier: Barrier, depth: Int, colors: List<Int>) {
     if (Settings.showAllSidebars()) {

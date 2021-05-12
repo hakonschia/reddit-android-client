@@ -10,6 +10,7 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.api.responses.ApiResponse
+import com.example.hakonsreader.misc.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -33,6 +34,17 @@ class CommentsViewModel @Inject constructor(
     private val _comments = MutableLiveData<List<RedditComment>>()
     private val _isLoading = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<ErrorWrapper>()
+
+    /**
+     * All comments the view model has, independent of the comments passed to [_comments] for chains
+     */
+    private val allComments: MutableList<RedditComment> = ArrayList()
+
+    /**
+     * The ID of the comment parent coming of the currently show chain, or null if no chain is shown
+     */
+    var chainId: String? = null
+        private set
 
     val post: LiveData<RedditPost> = _post
     val comments: LiveData<List<RedditComment>> = _comments
@@ -83,8 +95,17 @@ class CommentsViewModel @Inject constructor(
                     if (thirdPartyObject != null) {
                         resp.value.post.thirdPartyObject = thirdPartyObject
                     }
+
+                    allComments.clear()
+                    allComments.addAll(resp.value.comments)
+
+                    if (chainId != null) {
+                        showChain(chainId!!)
+                    } else {
+                        _comments.postValue(checkAndSetHiddenComments(allComments))
+                    }
+
                     _post.postValue(resp.value.post)
-                    _comments.postValue(resp.value.comments)
                     withContext(IO) {
                         insertPostIntoDb(resp.value.post)
                     }
@@ -118,6 +139,8 @@ class CommentsViewModel @Inject constructor(
 
             when (resp) {
                 is ApiResponse.Success -> {
+                    // TODO chain stuff
+
                     val dataSet = ArrayList(comments.value)
 
                     // Find the parent index to know where to insert the new comments
@@ -170,6 +193,103 @@ class CommentsViewModel @Inject constructor(
 
         dataSet.add(posToInsert, newComment)
         _comments.value = dataSet
+    }
+
+    /**
+     * Removes the currently shown chain and shows all comments, if a chain is shown
+     */
+    fun removeChain() {
+        if (chainId != null) {
+            chainId = null
+            _comments.postValue(allComments)
+        }
+    }
+
+    /**
+     * Shows a chain of comments by providing the ID of the root comment. If no comments are currently
+     * shown  then the chain will be set when comments are loaded.
+     *
+     * If the ID is not found in the comments then nothing is done
+     *
+     * @param id The ID of the root comment
+     */
+    fun showChain(id: String) {
+        chainId = id
+
+        val comment = allComments.find { it.id == id }
+        if (comment != null) {
+            showChain(comment)
+        }
+    }
+
+    /**
+     * Shows a chain of comments starting with a given comment as the root
+     *
+     * @param comment The root comment
+     */
+    fun showChain(comment: RedditComment) {
+        chainId = comment.id
+
+        val commnts: MutableList<RedditComment> = ArrayList()
+
+        // Add in the original comment (the start)
+        commnts.add(comment)
+
+        // We have to create a new list of the replies to avoid modifying the comments replies (when adding the start)
+        commnts.addAll(comment.replies)
+
+        _comments.postValue(commnts)
+    }
+
+    /**
+     * Goes through [comments] and checks if a comments score is below the users threshold or if
+     * Reddit has specified that it should be hidden.
+     *
+     * Comments with [RedditComment.isCollapsed] set to true children are removed
+     */
+    private fun checkAndSetHiddenComments(comments: MutableList<RedditComment>): List<RedditComment> {
+        val commentsToRemove: MutableList<RedditComment> = ArrayList()
+        val hideThreshold = Settings.getAutoHideScoreThreshold()
+
+        comments.forEach { comment ->
+            if (hideThreshold >= comment.score || comment.isCollapsed) {
+                // If we got here from the score threshold make sure collapsed is set to true
+                comment.isCollapsed = true
+                commentsToRemove.addAll(getShownReplies(comment))
+            }
+        }
+
+        return comments.apply {
+            // We can't modify the comments list while looping over it, so we have to store the comments
+            // that should be removed and remove them afterwards
+            removeAll(commentsToRemove)
+        }
+    }
+
+
+    /**
+     * Retrieve the list of replies to a comment that are shown
+     *
+     * @param parent The parent to retrieve replies for
+     * @return The list of children of [parent] that are shown. Children of children are also
+     * included in the list
+     */
+    private fun getShownReplies(parent: RedditComment) : List<RedditComment> {
+        val replies = ArrayList<RedditComment>()
+
+        parent.replies.forEach {
+            // Only add direct children, let the children handle their children
+            if (it.depth - 1 == parent.depth) {
+                replies.add(it)
+
+                // Reply isn't hidden which means it potentially has children to show
+                if (!it.isCollapsed) {
+                    replies.addAll(getShownReplies(it))
+                }
+            }
+        }
+
+        return replies
     }
 
     private fun insertPostIntoDb(post: RedditPost) {

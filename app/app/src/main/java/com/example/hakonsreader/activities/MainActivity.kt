@@ -214,10 +214,12 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         // For testing purposes hardcode going into a subreddit/post etc.
         // TODO there are some issues with links, if a markdown link has superscript inside of it, markwon doesnt recognize it (also spaces in links causes issues)
         //  https://www.reddit.com/r/SpeedyDrawings/comments/jgg06k/this_gave_me_a_mild_heart_attack/
-        Intent(this, DispatcherActivity::class.java).run {
-            // Reddit gallery with video: https://www.reddit.com/r/GlobalOffensive/comments/lvv9dm/hey_hey_new_clear_polymer_skin_made_its_way_in/
-            putExtra(DispatcherActivity.EXTRAS_URL_KEY, "https://reddit.com/r/hakonschia/comments/k22ft8/dw4423/")
-            //startActivity(this)
+        if (savedInstanceState == null) {
+            Intent(this, DispatcherActivity::class.java).run {
+                // Reddit gallery with video: https://www.reddit.com/r/GlobalOffensive/comments/lvv9dm/hey_hey_new_clear_polymer_skin_made_its_way_in/
+                putExtra(DispatcherActivity.EXTRAS_URL_KEY, "https://reddit.com/r/hakonschia/comments/k22ft8/dw4423/")
+                //startActivity(this)
+            }
         }
 
         val uri = intent.data
