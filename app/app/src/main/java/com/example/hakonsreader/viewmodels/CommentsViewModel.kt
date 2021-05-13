@@ -164,8 +164,6 @@ class CommentsViewModel @Inject constructor(
 
             when (resp) {
                 is ApiResponse.Success -> {
-                    // TODO chain stuff
-
                     val dataSet = ArrayList(comments.value)
 
                     // Find the parent index to know where to insert the new comments
@@ -175,6 +173,12 @@ class CommentsViewModel @Inject constructor(
                     // comments in its place
                     dataSet.removeAt(commentPos)
                     dataSet.addAll(commentPos, resp.value)
+
+                    // Do the same for allComments to ensure both are up-to-date (in case the comments were
+                    // loaded in a chain)
+                    val commentPosInAllComments = allComments.indexOf(comment)
+                    allComments.removeAt(commentPosInAllComments)
+                    allComments.addAll(commentPosInAllComments, resp.value)
 
                     parent?.removeReply(comment)
 
