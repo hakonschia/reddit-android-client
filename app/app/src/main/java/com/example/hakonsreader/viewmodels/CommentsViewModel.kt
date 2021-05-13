@@ -2,6 +2,7 @@ package com.example.hakonsreader.viewmodels
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -68,6 +69,11 @@ class CommentsViewModel @Inject constructor(
      * The saved extras for the post, which can be used to survive configuration changes
      */
     var savedExtras: Bundle? = null
+
+    /**
+     * A saved layout state
+     */
+    var layoutState: Parcelable? = null
 
     /**
      * This callback is used to notify about the position of the comment that has been shown or hidden

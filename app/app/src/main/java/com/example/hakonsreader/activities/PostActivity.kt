@@ -288,6 +288,20 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
                 val adapter = binding.comments.adapter as CommentsAdapter
 
+                // If the ViewModel has a chain and the adapter doesn't then a chain was just set
+                // and we want to store the layout state. We only want to store this when the adapter doesn't have
+                // a chain, so that if we're in a chain and go into another one then the saved state is still
+                // for the "all comments" state
+                if (chainId != null && adapter.currentChainId == null) {
+                    if (adapter.currentChainId == null) {
+                        layoutState = binding.comments.layoutManager?.onSaveInstanceState()
+                    }
+                } else if (chainId == null && adapter.currentChainId != null && layoutState != null) {
+                    // If the ViewModel no longer has a chain, but the adapter does, then the chain was
+                    // removed and we want to restore the layout state if one was saved
+                    binding.comments.layoutManager?.onRestoreInstanceState(layoutState)
+                }
+
                 adapter.lastTimeOpened = getLastTimePostOpened()
                 adapter.submitList(comments)
 

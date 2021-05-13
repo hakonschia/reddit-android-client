@@ -50,9 +50,6 @@ class CommentsAdapter constructor(
         private val viewModel: CommentsViewModel
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    // TODO Restore layout state with chains
-
-
     companion object {
         @Suppress("UNUSED")
         private const val TAG = "CommentsAdapter"
@@ -89,9 +86,10 @@ class CommentsAdapter constructor(
     private var comments: List<RedditComment> = ArrayList()
 
     /**
-     * The ID of the chain the adapter is currently showing
+     * The ID of the chain the adapter is currently showing. This will be initialized to chain ID
+     * in [viewModel], but is not guaranteed to be synced afterwards
      */
-    var currentChainId: String? = null
+    var currentChainId: String? = viewModel.chainId
         private set
 
     /**
