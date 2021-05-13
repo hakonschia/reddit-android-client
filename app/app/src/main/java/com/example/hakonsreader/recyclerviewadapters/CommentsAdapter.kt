@@ -86,7 +86,7 @@ class CommentsAdapter constructor(
     /**
      * The list of comments shown in the adapter
      */
-    private var comments: MutableList<RedditComment> = ArrayList()
+    private var comments: List<RedditComment> = ArrayList()
 
     /**
      * The ID of the chain the adapter is currently showing
@@ -121,7 +121,7 @@ class CommentsAdapter constructor(
      */
     fun submitList(newComments: List<RedditComment>) {
         val previous = comments
-        comments = newComments as ArrayList<RedditComment>
+        comments = newComments
 
         // If a new chain is being shown we need to update the entire list
         // This isn't really ideal, but DiffUtil currently doesn't have a way of differentiating the items
@@ -131,7 +131,7 @@ class CommentsAdapter constructor(
             notifyDataSetChanged()
         } else {
             DiffUtil.calculateDiff(
-                CommentsDiffCallback(previous, comments)
+                CommentsDiffCallback(previous, newComments)
             ).dispatchUpdatesTo(this)
         }
     }

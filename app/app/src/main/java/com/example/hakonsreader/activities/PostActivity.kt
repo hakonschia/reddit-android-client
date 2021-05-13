@@ -265,6 +265,10 @@ class PostActivity : BaseActivity(), OnReplyListener {
         with (commentsViewModel) {
             preferences = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME_POST_OPENED, MODE_PRIVATE)
 
+            commentShownOrHiddenPositionCallback = { position ->
+                (binding.comments.adapter as CommentsAdapter).notifyItemChanged(position)
+            }
+
             post.observe(this@PostActivity) {
                 if (it != null) {
                     if (savedExtras != null) {

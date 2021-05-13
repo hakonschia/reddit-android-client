@@ -42,8 +42,14 @@ class CommentsViewModel @Inject constructor(
      */
     private val allComments: MutableList<RedditComment> = ArrayList()
 
+    val post: LiveData<RedditPost> = _post
+    val comments: LiveData<List<RedditComment>> = _comments
+    val isLoading: LiveData<Boolean> = _isLoading
+    val error: LiveData<ErrorWrapper> = _error
+
     /**
-     * The SharedPreferences used to hold the time posts were last opened
+     * The SharedPreferences used to hold the time posts were last opened. This should be set before
+     * comments are loaded to provide the expected behaviour
      */
     var preferences: SharedPreferences? = null
 
@@ -52,11 +58,6 @@ class CommentsViewModel @Inject constructor(
      */
     var chainId: String? = null
         private set
-
-    val post: LiveData<RedditPost> = _post
-    val comments: LiveData<List<RedditComment>> = _comments
-    val isLoading: LiveData<Boolean> = _isLoading
-    val error: LiveData<ErrorWrapper> = _error
 
     /**
      * The ID of the post. This must be set before an attempt at loading the comments is made
@@ -67,6 +68,11 @@ class CommentsViewModel @Inject constructor(
      * The saved extras for the post, which can be used to survive configuration changes
      */
     var savedExtras: Bundle? = null
+
+    /**
+     * This callback is used to notify about the position of the comment that has been shown or hidden
+     */
+    var commentShownOrHiddenPositionCallback: ((Int) -> Unit)? = null
 
 
     /**
@@ -265,9 +271,6 @@ class CommentsViewModel @Inject constructor(
         _comments.postValue(commnts)
     }
 
-
-    // TODO showing and hiding comments doesn't update right away if the comment has no replies
-
     /**
      * Shows a comment chain that has previously been hidden
      *
@@ -284,9 +287,22 @@ class CommentsViewModel @Inject constructor(
 
         start.isCollapsed = false
 
-        _comments.value = ArrayList<RedditComment>(commnts).apply {
-            // Insert the replies after the start comment
-            addAll(pos + 1, getShownReplies(start))
+        val replies = getShownReplies(start)
+
+        // When that comment has not replies it won't be redrawn automatically with DiffUtil for some reason
+        // and this callback was originally meant to address that issue, but the comment being shown or hidden
+        // will disappear for a split second if we let DiffUtil do the changes. If we notify the
+        // place the comment to be changed is the observer of this can call notifyItemChanged() manually
+        // which looks better
+        // Kind of bad solution but still kinda good?
+        commentShownOrHiddenPositionCallback?.invoke(pos)
+
+        if (replies.isNotEmpty()) {
+            //shouldRedrawSingleItem?.invoke(pos)
+            _comments.value = ArrayList<RedditComment>(commnts).apply {
+                // Insert the replies after the start comment
+                addAll(pos + 1, getShownReplies(start))
+            }
         }
     }
 
@@ -305,8 +321,15 @@ class CommentsViewModel @Inject constructor(
         }
 
         start.isCollapsed = true
-        _comments.value = ArrayList<RedditComment>(commnts).apply {
-            removeAll(getShownReplies(start))
+
+        val replies = getShownReplies(start)
+
+        commentShownOrHiddenPositionCallback?.invoke(pos)
+
+        if (replies.isNotEmpty()) {
+            _comments.value = ArrayList<RedditComment>(commnts).apply {
+                removeAll(getShownReplies(start))
+            }
         }
     }
 
