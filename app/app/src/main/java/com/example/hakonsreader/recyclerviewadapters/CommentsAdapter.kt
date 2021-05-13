@@ -27,7 +27,6 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ListItemCommentBinding
 import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding
-import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener
 import com.example.hakonsreader.states.AppState
@@ -108,11 +107,6 @@ class CommentsAdapter constructor(
     var replyListener: OnReplyListener? = null
 
     /**
-     * The listener for when a "3 more comments" comment has been clicked
-     */
-    var loadMoreCommentsListener: LoadMoreComments? = null
-
-    /**
      * Sets the comments to use in the list
      *
      * @param newComments The comments to add
@@ -189,38 +183,6 @@ class CommentsAdapter constructor(
      */
     fun getBaseDepth() = comments[0].depth
 
-
-    /**
-     * OnClick listener for "2 more comments" comments.
-     *
-     * [loadMoreCommentsListener] will be called to load the comments
-     *
-     * @param view Ignored
-     * @param comment The comment to load from. This comment has to be a "2 more comments" comment
-     */
-    @BindingAdapter("getMoreComments")
-    fun getMoreComments(@Suppress("UNUSED_PARAMETER") view: View, comment: RedditComment) {
-        val pos = comments.indexOf(comment)
-        val depth = comment.depth
-
-        // The parent is the first comment upwards in the list that has a lower depth
-        var parent: RedditComment? = null
-
-        // On posts with a lot of comments the last comment is often a "771 more comments" which is a
-        // top level comment, which means it won't have a parent so it's no point in trying to find it
-        if (depth != 0) {
-            for (i in pos - 1 downTo 0) {
-                val c = comments[i]
-                if (c.depth < depth) {
-                    parent = c
-                    break
-                }
-            }
-        }
-
-        loadMoreCommentsListener?.loadMoreComments(comment, parent)
-    }
-
     /**
      * OnClick listener for the "more" button on a normal comment. This will show a popup menu with
      * extra options such as saving the comment, or deleting it
@@ -256,7 +218,7 @@ class CommentsAdapter constructor(
         return when (viewType) {
             MORE_COMMENTS_TYPE -> {
                 MoreCommentsViewHolder(ListItemMoreCommentBinding.inflate(layoutInflater, parent, false).apply {
-                    adapter = this@CommentsAdapter
+                    viewModel = this@CommentsAdapter.viewModel
                 })
             }
             HIDDEN_COMMENT_TYPE -> {

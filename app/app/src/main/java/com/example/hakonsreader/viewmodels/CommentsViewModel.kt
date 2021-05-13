@@ -76,10 +76,9 @@ class CommentsViewModel @Inject constructor(
     var layoutState: Parcelable? = null
 
     /**
-     * This callback is used to notify about the position of the comment that has been shown or hidden
+     * This callback is used to notify about the position of the comment that has been updated
      */
-    var commentShownOrHiddenPositionCallback: ((Int) -> Unit)? = null
-
+    var commentUpdatedCallback: ((Int) -> Unit)? = null
 
     /**
      * Loads comments for the post.
@@ -144,15 +143,14 @@ class CommentsViewModel @Inject constructor(
      * Loads more comments (from "2 more comments" type comments)
      *
      * @param comment The "2 more comment" clicked, holding the IDs of the comments to load
-     * @param parent The parent of the comment, or `null` if the comments are top-level comments (ie.
-     * the post is the parent)
-     *
      * @throws IllegalStateException if [postId] is not set
      */
-    fun loadMoreComments(comment: RedditComment, parent: RedditComment?) {
+    fun loadMoreComments(comment: RedditComment) {
         if (postId.isBlank()) {
             throw IllegalStateException("Post ID not set")
         }
+
+        val parent: RedditComment? = findParent(comment)
 
         // Technically this is not a "1 thing loading" since this is something else than the main comments
         // but I don't know how more comments and comments can be loaded at the same time so it's fine
@@ -164,6 +162,8 @@ class CommentsViewModel @Inject constructor(
 
             when (resp) {
                 is ApiResponse.Success -> {
+                    val newComments = resp.value
+
                     val dataSet = ArrayList(comments.value)
 
                     // Find the parent index to know where to insert the new comments
@@ -172,16 +172,23 @@ class CommentsViewModel @Inject constructor(
                     // Remove the original comment (the "2 more comments" comment) and insert the new
                     // comments in its place
                     dataSet.removeAt(commentPos)
-                    dataSet.addAll(commentPos, resp.value)
+                    dataSet.addAll(commentPos, newComments)
 
                     // Do the same for allComments to ensure both are up-to-date (in case the comments were
                     // loaded in a chain)
                     val commentPosInAllComments = allComments.indexOf(comment)
                     allComments.removeAt(commentPosInAllComments)
-                    allComments.addAll(commentPosInAllComments, resp.value)
+                    allComments.addAll(commentPosInAllComments, newComments)
 
                     parent?.removeReply(comment)
 
+                    // TODO if one comment was replaced it SOMETIMES doesn't update automatically
+                    //  :-d
+                    // https://reddit.com/r/aww/comments/nb5bxs/dog_is_deers_best_friend/gxxu4sz/
+                    // load the "1 more comment" for https://reddit.com/r/aww/comments/nb5bxs/dog_is_deers_best_friend/gxyj0c8/
+
+                    // As with showing/hiding comments, it doesn't update instantly for some reason
+                    // if only one comment is updating
                     _comments.postValue(dataSet)
                 }
                 is ApiResponse.Error -> {
@@ -305,7 +312,7 @@ class CommentsViewModel @Inject constructor(
         // place the comment to be changed is the observer of this can call notifyItemChanged() manually
         // which looks better
         // Kind of bad solution but still kinda good?
-        commentShownOrHiddenPositionCallback?.invoke(pos)
+        commentUpdatedCallback?.invoke(pos)
 
         if (replies.isNotEmpty()) {
             //shouldRedrawSingleItem?.invoke(pos)
@@ -334,7 +341,7 @@ class CommentsViewModel @Inject constructor(
 
         val replies = getShownReplies(start)
 
-        commentShownOrHiddenPositionCallback?.invoke(pos)
+        commentUpdatedCallback?.invoke(pos)
 
         if (replies.isNotEmpty()) {
             _comments.value = ArrayList<RedditComment>(commnts).apply {
@@ -454,5 +461,35 @@ class CommentsViewModel @Inject constructor(
 
         val lastTimeOpenedKey = postId + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP
         return preferences!!.getLong(lastTimeOpenedKey, -1)
+    }
+
+    /**
+     * Finds the parent comment of a comment
+     * 
+     * @param comment The comment to find a parent for
+     * @return The parent comment, or null if the comment has no parent
+     */
+    private fun findParent(comment: RedditComment): RedditComment? {
+        val depth = comment.depth
+
+        // On posts with a lot of comments the last comment is often a "771 more comments" which is a
+        // top level comment, which means it won't have a parent so it's no point in trying to find it
+        if (depth == 0) {
+            return null
+        }
+
+        val commnts = comments.value ?: return null
+
+        val pos = commnts.indexOf(comment)
+
+        // The parent is the first comment upwards in the list that has a lower depth
+        for (i in pos - 1 downTo 0) {
+            val c = commnts[i]
+            if (c.depth < depth) {
+                return c
+            }
+        }
+
+        return null
     }
 }

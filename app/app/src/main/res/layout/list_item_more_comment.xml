@@ -12,8 +12,9 @@
             type="com.example.hakonsreader.api.model.RedditComment" />
 
         <variable
-            name="adapter"
-            type="com.example.hakonsreader.recyclerviewadapters.CommentsAdapter" />
+            name="viewModel"
+            type="com.example.hakonsreader.viewmodels.CommentsViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,7 +33,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:onClick="@{(view) -> adapter.getMoreComments(view, comment)}"
+            android:onClick="@{(view) -> viewModel.loadMoreComments(comment)}"
             android:text="@{@plurals/extraComments(comment.extraCommentsCount, comment.extraCommentsCount)}"
 
             android:textColor="@color/link_color"

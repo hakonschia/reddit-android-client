@@ -24,7 +24,6 @@ import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityPostBinding
-import com.example.hakonsreader.interfaces.LoadMoreComments
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.handleGenericResponseErrors
@@ -265,7 +264,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
         with (commentsViewModel) {
             preferences = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME_POST_OPENED, MODE_PRIVATE)
 
-            commentShownOrHiddenPositionCallback = { position ->
+            commentUpdatedCallback = { position ->
                 (binding.comments.adapter as CommentsAdapter).notifyItemChanged(position)
             }
 
@@ -325,7 +324,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
         with(binding) {
             val adapter = CommentsAdapter(api, commentsViewModel).apply {
                 replyListener = this@PostActivity
-                loadMoreCommentsListener = LoadMoreComments { comment, parent -> commentsViewModel.loadMoreComments(comment, parent) }
             }
 
             comments.adapter = adapter
