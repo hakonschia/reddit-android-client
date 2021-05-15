@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hakonsreader.api.RedditApi
+import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditComment
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
@@ -29,8 +30,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CommentsViewModel @Inject constructor(
-        private val api: RedditApi,
-        private val postsDao: RedditPostsDao
+    private val api: RedditApi,
+    private val postsDao: RedditPostsDao
 ) : ViewModel() {
 
     private val _post = MutableLiveData<RedditPost>()
@@ -41,7 +42,7 @@ class CommentsViewModel @Inject constructor(
     /**
      * All comments the view model has, independent of the comments passed to [_comments] for chains
      */
-    private val allComments: MutableList<RedditComment> = ArrayList()
+    private var allComments: List<RedditComment> = ArrayList()
 
     val post: LiveData<RedditPost> = _post
     val comments: LiveData<List<RedditComment>> = _comments
@@ -98,8 +99,8 @@ class CommentsViewModel @Inject constructor(
      */
     @Throws(IllegalStateException::class)
     fun loadComments(loadThirdParty: Boolean = false, thirdPartyObject: Any? = null) {
-        if (postId.isBlank()) {
-            throw IllegalStateException("Post ID not set")
+        check (postId.isNotBlank()) {
+            "postId not set"
         }
 
         _isLoading.value = true
@@ -120,12 +121,12 @@ class CommentsViewModel @Inject constructor(
                         preferences!!.edit().putLong(lastTimeOpenedKey, System.currentTimeMillis() / 1000L).apply()
                     }
 
-                    allComments.clear()
-                    allComments.addAll(resp.value.comments)
+                    allComments = resp.value.comments
 
-                    if (chainId != null) {
-                        showChain(chainId!!)
-                    } else {
+                    // If a chain was set before the comments were loaded then set it now
+                    chainId?.let {
+                        showChain(it)
+                    } ?: run {
                         _comments.postValue(checkAndSetHiddenComments(allComments))
                     }
 
@@ -143,11 +144,14 @@ class CommentsViewModel @Inject constructor(
      * Loads more comments (from "2 more comments" type comments)
      *
      * @param comment The "2 more comment" clicked, holding the IDs of the comments to load
-     * @throws IllegalStateException if [postId] is not set
+     * @throws IllegalStateException if [postId] is not set or if [comment] is not a "more comment" comment
      */
     fun loadMoreComments(comment: RedditComment) {
-        if (postId.isBlank()) {
-            throw IllegalStateException("Post ID not set")
+        check (postId.isNotBlank()) {
+            "postId not set"
+        }
+        check (comment.kind == Thing.MORE.value) {
+            "Comment passed must be a 'more comment' comment (RedditComment.kind=Thing.MORE.value)"
         }
 
         val parent: RedditComment? = findParent(comment)
@@ -163,10 +167,10 @@ class CommentsViewModel @Inject constructor(
             when (resp) {
                 is ApiResponse.Success -> {
                     val newComments = resp.value
-
                     val dataSet = ArrayList(comments.value)
 
                     // Find the parent index to know where to insert the new comments
+                    // As long as the rest of the code is valid, this will never return
                     val commentPos = dataSet.indexOf(comment)
 
                     // Remove the original comment (the "2 more comments" comment) and insert the new
@@ -176,23 +180,20 @@ class CommentsViewModel @Inject constructor(
 
                     // Do the same for allComments to ensure both are up-to-date (in case the comments were
                     // loaded in a chain)
-                    val commentPosInAllComments = allComments.indexOf(comment)
-                    allComments.removeAt(commentPosInAllComments)
-                    allComments.addAll(commentPosInAllComments, newComments)
+                    // We should not reuse the same list objects, as that can cause issues with DiffUtil
+                    // not updating correctly
+                    allComments = allComments.toMutableList().apply {
+                        val commentPosInAllComments = indexOf(comment)
+                        removeAt(commentPosInAllComments)
+                        addAll(commentPosInAllComments, newComments)
+                    }
 
                     parent?.removeReply(comment)
 
-                    // TODO if one comment was replaced it SOMETIMES doesn't update automatically
-                    //  :-d
-                    // https://reddit.com/r/aww/comments/nb5bxs/dog_is_deers_best_friend/gxxu4sz/
-                    // load the "1 more comment" for https://reddit.com/r/aww/comments/nb5bxs/dog_is_deers_best_friend/gxyj0c8/
-
-                    // As with showing/hiding comments, it doesn't update instantly for some reason
-                    // if only one comment is updating
                     _comments.postValue(dataSet)
                 }
+
                 is ApiResponse.Error -> {
-                    resp.throwable.printStackTrace()
                     _error.postValue(ErrorWrapper(resp.error, resp.throwable))
                 }
             }
@@ -306,16 +307,15 @@ class CommentsViewModel @Inject constructor(
 
         val replies = getShownReplies(start)
 
-        // When that comment has not replies it won't be redrawn automatically with DiffUtil for some reason
+        // When the comment has no replies it won't be redrawn automatically with DiffUtil for some reason
         // and this callback was originally meant to address that issue, but the comment being shown or hidden
-        // will disappear for a split second if we let DiffUtil do the changes. If we notify the
-        // place the comment to be changed is the observer of this can call notifyItemChanged() manually
-        // which looks better
+        // will disappear for a split second if we let DiffUtil do the changes. If we notify where the
+        // the comment is, the observer of this can call notifyItemChanged() manually
+        // which looks better as it is updated right away
         // Kind of bad solution but still kinda good?
         commentUpdatedCallback?.invoke(pos)
 
         if (replies.isNotEmpty()) {
-            //shouldRedrawSingleItem?.invoke(pos)
             _comments.value = ArrayList<RedditComment>(commnts).apply {
                 // Insert the replies after the start comment
                 addAll(pos + 1, getShownReplies(start))
@@ -383,7 +383,7 @@ class CommentsViewModel @Inject constructor(
      *
      * Comments with [RedditComment.isCollapsed] set to true children are removed
      */
-    private fun checkAndSetHiddenComments(comments: MutableList<RedditComment>): List<RedditComment> {
+    private fun checkAndSetHiddenComments(comments: List<RedditComment>): List<RedditComment> {
         val commentsToRemove: MutableList<RedditComment> = ArrayList()
         val hideThreshold = Settings.getAutoHideScoreThreshold()
 
@@ -395,7 +395,7 @@ class CommentsViewModel @Inject constructor(
             }
         }
 
-        return comments.apply {
+        return comments.toMutableList().apply {
             // We can't modify the comments list while looping over it, so we have to store the comments
             // that should be removed and remove them afterwards
             removeAll(commentsToRemove)
@@ -465,7 +465,7 @@ class CommentsViewModel @Inject constructor(
 
     /**
      * Finds the parent comment of a comment
-     * 
+     *
      * @param comment The comment to find a parent for
      * @return The parent comment, or null if the comment has no parent
      */
