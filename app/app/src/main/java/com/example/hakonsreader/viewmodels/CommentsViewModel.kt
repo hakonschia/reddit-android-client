@@ -173,10 +173,15 @@ class CommentsViewModel @Inject constructor(
                     // As long as the rest of the code is valid, this will never return
                     val commentPos = dataSet.indexOf(comment)
 
-                    // Remove the original comment (the "2 more comments" comment) and insert the new
-                    // comments in its place
-                    dataSet.removeAt(commentPos)
-                    dataSet.addAll(commentPos, newComments)
+                    // If the rest of the code is proper, this should never happen, but if this is called
+                    // multiple times quickly, the comment might have been removed (if the comment is clicked twice fast)
+                    // Multiple API calls will be made, which is not ideal, but at least it wont crash
+                    if (commentPos >= 0) {
+                        // Remove the original comment (the "2 more comments" comment) and insert the new
+                        // comments in its place
+                        dataSet.removeAt(commentPos)
+                        dataSet.addAll(commentPos, newComments)
+                    }
 
                     // Do the same for allComments to ensure both are up-to-date (in case the comments were
                     // loaded in a chain)
@@ -184,8 +189,10 @@ class CommentsViewModel @Inject constructor(
                     // not updating correctly
                     allComments = allComments.toMutableList().apply {
                         val commentPosInAllComments = indexOf(comment)
-                        removeAt(commentPosInAllComments)
-                        addAll(commentPosInAllComments, newComments)
+                        if (commentPosInAllComments >= 0) {
+                            removeAt(commentPosInAllComments)
+                            addAll(commentPosInAllComments, newComments)
+                        }
                     }
 
                     parent?.removeReply(comment)
