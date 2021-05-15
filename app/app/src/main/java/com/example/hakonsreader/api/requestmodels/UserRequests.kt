@@ -141,7 +141,7 @@ interface UserRequests {
      *
      * @return Successful requests return no data
      */
-    suspend fun block(): ApiResponse<Nothing?>
+    suspend fun block(): ApiResponse<Unit>
 
     /**
      * Unblocks a user
@@ -151,7 +151,7 @@ interface UserRequests {
      * @param loggedInUserId The ID of the user currently logged in (the user who is blocked another user)
      * @return Successful requests return no data
      */
-    suspend fun unblock(loggedInUserId: String): ApiResponse<Nothing?>
+    suspend fun unblock(loggedInUserId: String): ApiResponse<Unit>
 
     /**
      * Get a list of Multis the user has
@@ -314,7 +314,7 @@ class UserRequestsImpl(
     }
 
 
-    override suspend fun block() : ApiResponse<Nothing?> {
+    override suspend fun block() : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -325,7 +325,7 @@ class UserRequestsImpl(
             val resp = api.blockUser(username)
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }
@@ -334,7 +334,7 @@ class UserRequestsImpl(
         }
     }
 
-    override suspend fun unblock(loggedInUserId: String) : ApiResponse<Nothing?> {
+    override suspend fun unblock(loggedInUserId: String) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -348,7 +348,7 @@ class UserRequestsImpl(
             )
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }

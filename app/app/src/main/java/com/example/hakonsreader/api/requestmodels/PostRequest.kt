@@ -58,7 +58,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      * @param voteType The type of vote to cast
      * @return An [ApiResponse] with no success data
      */
-    override suspend fun vote(voteType: VoteType): ApiResponse<Nothing?>
+    override suspend fun vote(voteType: VoteType): ApiResponse<Unit>
 
     /**
      * Save the post
@@ -68,7 +68,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      * @return An [ApiResponse] with no success data
      * @see unsave
      */
-    override suspend fun save(): ApiResponse<Nothing?>
+    override suspend fun save(): ApiResponse<Unit>
 
     /**
      * Unsave the post
@@ -78,7 +78,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      * @return An [ApiResponse] with no success data
      * @see save
      */
-    override suspend fun unsave() : ApiResponse<Nothing?>
+    override suspend fun unsave() : ApiResponse<Unit>
 
     /**
      * Distinguish the post as a moderator.
@@ -114,7 +114,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      * @return An [ApiResponse] with no success data
      * @see unsticky
      */
-    suspend fun sticky() : ApiResponse<Any?>
+    suspend fun sticky() : ApiResponse<Unit>
 
     /**
      * Remove the sticky on the post
@@ -126,7 +126,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      * @return An [ApiResponse] with no success data
      * @see sticky
      */
-    suspend fun unsticky() : ApiResponse<Any?>
+    suspend fun unsticky() : ApiResponse<Unit>
 
     /**
      * Retrieves information about the post
@@ -149,7 +149,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      * @return An [ApiResponse] with no success data
      * @see unmarkNsfw
      */
-    suspend fun markNsfw() : ApiResponse<Any?>
+    suspend fun markNsfw() : ApiResponse<Unit>
 
     /**
      * Unmark the post as NSFW
@@ -159,7 +159,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      * @return An [ApiResponse] with no success data
      * @see markNsfw
      */
-    suspend fun unmarkNsfw() : ApiResponse<Any?>
+    suspend fun unmarkNsfw() : ApiResponse<Unit>
 
     /**
      * Mark the post as a spoiler
@@ -169,7 +169,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      * @return An [ApiResponse] with no success data
      * @see unmarkSpoiler
      */
-    suspend fun markSpoiler() : ApiResponse<Any?>
+    suspend fun markSpoiler() : ApiResponse<Unit>
 
     /**
      * Unmark the post as a spoiler
@@ -179,7 +179,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      * @return An [ApiResponse] with no success data
      * @see markSpoiler
      */
-    suspend fun unmarkSpoiler() : ApiResponse<Any?>
+    suspend fun unmarkSpoiler() : ApiResponse<Unit>
 
     /**
      * Delete the post
@@ -188,7 +188,7 @@ interface PostRequest : VoteableRequest, ReplyableRequest, SaveableRequest, Repo
      *
      * @return No response data is returned
      */
-    suspend fun delete() : ApiResponse<Any?>
+    suspend fun delete() : ApiResponse<Unit>
 }
 
 /**
@@ -270,7 +270,7 @@ class PostRequestImpl(
         }
     }
 
-    override suspend fun vote(voteType: VoteType): ApiResponse<Nothing?> {
+    override suspend fun vote(voteType: VoteType): ApiResponse<Unit> {
         return voteRequest.vote(Thing.POST, postId, voteType)
     }
 
@@ -279,11 +279,11 @@ class PostRequestImpl(
     }
 
 
-    override suspend fun save(): ApiResponse<Nothing?> {
+    override suspend fun save(): ApiResponse<Unit> {
         return saveRequest.save(Thing.POST, postId)
     }
 
-    override suspend fun unsave() : ApiResponse<Nothing?> {
+    override suspend fun unsave() : ApiResponse<Unit> {
         return saveRequest.unsave(Thing.POST, postId)
     }
 
@@ -297,11 +297,11 @@ class PostRequestImpl(
     }
 
 
-    override suspend fun sticky() : ApiResponse<Any?> {
+    override suspend fun sticky() : ApiResponse<Unit> {
         return modRequest.stickyPost(postId, true)
     }
 
-    override suspend fun unsticky() : ApiResponse<Any?> {
+    override suspend fun unsticky() : ApiResponse<Unit> {
         return modRequest.stickyPost(postId, false)
     }
 
@@ -330,19 +330,19 @@ class PostRequestImpl(
     }
 
 
-    override suspend fun ignoreReports() : ApiResponse<Any?> {
+    override suspend fun ignoreReports() : ApiResponse<Unit> {
         return modRequest.ignoreReports(Thing.POST, postId)
     }
 
-    override suspend fun unignoreReports() : ApiResponse<Any?> {
+    override suspend fun unignoreReports() : ApiResponse<Unit> {
         return modRequest.unignoreReports(Thing.POST, postId)
     }
 
-    override suspend fun markNsfw() : ApiResponse<Any?> {
+    override suspend fun markNsfw() : ApiResponse<Unit> {
         return markNsfwInternal(true)
     }
 
-    override suspend fun unmarkNsfw() : ApiResponse<Any?> {
+    override suspend fun unmarkNsfw() : ApiResponse<Unit> {
         return markNsfwInternal(false)
     }
 
@@ -353,7 +353,7 @@ class PostRequestImpl(
      *
      * @return An [ApiResponse] with no success data
      */
-    private suspend fun markNsfwInternal(markNsfw: Boolean) : ApiResponse<Any?> {
+    private suspend fun markNsfwInternal(markNsfw: Boolean) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -369,7 +369,7 @@ class PostRequestImpl(
             }
 
             if (response.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(response)
             }
@@ -379,11 +379,11 @@ class PostRequestImpl(
     }
 
 
-    override suspend fun markSpoiler() : ApiResponse<Any?> {
+    override suspend fun markSpoiler() : ApiResponse<Unit> {
         return markSpoilerInternal(true)
     }
 
-    override suspend fun unmarkSpoiler() : ApiResponse<Any?> {
+    override suspend fun unmarkSpoiler() : ApiResponse<Unit> {
         return markSpoilerInternal(false)
     }
 
@@ -395,7 +395,7 @@ class PostRequestImpl(
      * @param markSpoiler True to mark as spoiler, false to unmark
      * @return An [ApiResponse] with no success data
      */
-    private suspend fun markSpoilerInternal(markSpoiler: Boolean) : ApiResponse<Any?> {
+    private suspend fun markSpoilerInternal(markSpoiler: Boolean) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -411,7 +411,7 @@ class PostRequestImpl(
             }
 
             if (response.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(response)
             }
@@ -420,15 +420,15 @@ class PostRequestImpl(
         }
     }
 
-    override suspend fun lock() : ApiResponse<Any?> {
+    override suspend fun lock() : ApiResponse<Unit> {
         return modRequest.lock(postId, true)
     }
 
-    override suspend fun unlock() : ApiResponse<Any?> {
+    override suspend fun unlock() : ApiResponse<Unit> {
         return modRequest.unlock(postId, true)
     }
 
-    override suspend fun delete() : ApiResponse<Any?> {
+    override suspend fun delete() : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -438,7 +438,7 @@ class PostRequestImpl(
         return try {
             val response = api.delete(createFullName(Thing.POST, postId))
             if (response.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(response)
             }

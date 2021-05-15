@@ -1,5 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters.menuhandlers
 
+import android.util.Log
 import android.view.View
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
@@ -35,6 +36,9 @@ fun blockUserOnClick(view: View, username: String, api: RedditApi) {
     CoroutineScope(IO).launch {
         when (val response = api.user(username).block()) {
             is ApiResponse.Success -> {
+                if (response.value == Unit) {
+                    Log.d("TAG", "blockUserOnClick: response value is Unit")
+                }
                 val userBlockedString = view.context.getString(R.string.userBlocked, username)
 
                 Snackbar.make(view, userBlockedString, BaseTransientBottomBar.LENGTH_LONG)

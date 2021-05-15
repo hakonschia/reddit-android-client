@@ -24,7 +24,7 @@ interface SaveableRequestModel {
      * @param id The ID of the thing to unsave
      * @return The Response returned will not include any data
      */
-    suspend fun save(thing: Thing, id: String) : ApiResponse<Nothing?>
+    suspend fun save(thing: Thing, id: String) : ApiResponse<Unit>
 
     /**
      * Unsave a post or comment
@@ -35,7 +35,7 @@ interface SaveableRequestModel {
      * @param id The ID of the thing to unsave
      * @return The Response returned will not include any data
      */
-    suspend fun unsave(thing: Thing, id: String) : ApiResponse<Nothing?>
+    suspend fun unsave(thing: Thing, id: String) : ApiResponse<Unit>
 }
 
 /**
@@ -46,7 +46,7 @@ class SaveableRequestModelImpl(
         private val api: SaveService
 ) : SaveableRequestModel {
 
-    override suspend fun save(thing: Thing, id: String) : ApiResponse<Nothing?> {
+    override suspend fun save(thing: Thing, id: String) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -57,7 +57,7 @@ class SaveableRequestModelImpl(
             val resp = api.save(createFullName(thing, id))
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }
@@ -66,7 +66,7 @@ class SaveableRequestModelImpl(
         }
     }
 
-    override suspend fun unsave(thing: Thing, id: String) : ApiResponse<Nothing?>  {
+    override suspend fun unsave(thing: Thing, id: String) : ApiResponse<Unit>  {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -77,7 +77,7 @@ class SaveableRequestModelImpl(
             val resp = api.unsave(createFullName(thing, id))
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }

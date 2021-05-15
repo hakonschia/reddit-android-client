@@ -25,7 +25,7 @@ interface CommentRequest : VoteableRequest, ReplyableRequest, SaveableRequest, R
      * @return The response will not hold any data. Note: Even if the comment couldn't be deleted because
      * it didn't belong to the user it will seem successful as Reddit returns a 200 OK for every request
      */
-    suspend fun delete() : ApiResponse<Any?>
+    suspend fun delete() : ApiResponse<Unit>
 
     /**
      * Edit a comment. The comment being edited must be posted by the user the access token represents
@@ -42,7 +42,7 @@ interface CommentRequest : VoteableRequest, ReplyableRequest, SaveableRequest, R
      * @param voteType The type of vote to cast
      * @return An [ApiResponse] with no success data
      */
-    override suspend fun vote(voteType: VoteType): ApiResponse<Any?>
+    override suspend fun vote(voteType: VoteType): ApiResponse<Unit>
 
     /**
      * Submit a new comment as a reply to the post. For replies to other comments use [CommentRequestImpl.reply]
@@ -62,7 +62,7 @@ interface CommentRequest : VoteableRequest, ReplyableRequest, SaveableRequest, R
      * @return An [ApiResponse] with no success data
      * @see unsave
      */
-    override suspend fun save(): ApiResponse<Nothing?>
+    override suspend fun save(): ApiResponse<Unit>
 
     /**
      * Unsave the comment
@@ -72,7 +72,7 @@ interface CommentRequest : VoteableRequest, ReplyableRequest, SaveableRequest, R
      * @return An [ApiResponse] with no success data
      * @see save
      */
-    override suspend fun unsave() : ApiResponse<Nothing?>
+    override suspend fun unsave() : ApiResponse<Unit>
 
     /**
      * Distinguish the comment as mod
@@ -126,7 +126,7 @@ interface CommentRequest : VoteableRequest, ReplyableRequest, SaveableRequest, R
      * @return An [ApiResponse] with no success data
      * @see unignoreReports
      */
-    override suspend fun ignoreReports() : ApiResponse<Any?>
+    override suspend fun ignoreReports() : ApiResponse<Unit>
 
     /**
      * Unignores reports on the comment
@@ -136,7 +136,7 @@ interface CommentRequest : VoteableRequest, ReplyableRequest, SaveableRequest, R
      * @return An [ApiResponse] with no success data
      * @see ignoreReports
      */
-    override suspend fun unignoreReports() : ApiResponse<Any?>
+    override suspend fun unignoreReports() : ApiResponse<Unit>
 
     /**
      * Lock the comment
@@ -146,7 +146,7 @@ interface CommentRequest : VoteableRequest, ReplyableRequest, SaveableRequest, R
      * @return No response data is returned
      * @see unlock
      */
-    override suspend fun lock() : ApiResponse<Any?>
+    override suspend fun lock() : ApiResponse<Unit>
 
     /**
      * Unlock the comment
@@ -156,7 +156,7 @@ interface CommentRequest : VoteableRequest, ReplyableRequest, SaveableRequest, R
      * @return No response data is returned
      * @see lock
      */
-    override suspend fun unlock() : ApiResponse<Any?>
+    override suspend fun unlock() : ApiResponse<Unit>
 }
 
 
@@ -175,7 +175,7 @@ class CommentRequestImpl(
     private val modRequest: ModRequestModelImpl = ModRequestModelImpl(accessToken, api)
 
 
-    override suspend fun delete() : ApiResponse<Any?> {
+    override suspend fun delete() : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -185,7 +185,7 @@ class CommentRequestImpl(
         return try {
             val response = api.delete(createFullName(Thing.COMMENT, commentId))
             if (response.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(response)
             }
@@ -220,7 +220,7 @@ class CommentRequestImpl(
     }
 
 
-    override suspend fun vote(voteType: VoteType): ApiResponse<Any?> {
+    override suspend fun vote(voteType: VoteType): ApiResponse<Unit> {
         return voteRequest.vote(Thing.COMMENT, commentId, voteType)
     }
 
@@ -230,11 +230,11 @@ class CommentRequestImpl(
     }
 
 
-    override suspend fun save(): ApiResponse<Nothing?> {
+    override suspend fun save(): ApiResponse<Unit> {
         return saveRequest.save(Thing.COMMENT, commentId)
     }
 
-    override suspend fun unsave() : ApiResponse<Nothing?> {
+    override suspend fun unsave() : ApiResponse<Unit> {
         return saveRequest.unsave(Thing.COMMENT, commentId)
     }
 
@@ -258,20 +258,20 @@ class CommentRequestImpl(
     }
 
 
-    override suspend fun ignoreReports() : ApiResponse<Any?> {
+    override suspend fun ignoreReports() : ApiResponse<Unit> {
         return modRequest.ignoreReports(Thing.COMMENT, commentId)
     }
 
-    override suspend fun unignoreReports() : ApiResponse<Any?> {
+    override suspend fun unignoreReports() : ApiResponse<Unit> {
         return modRequest.unignoreReports(Thing.COMMENT, commentId)
     }
 
 
-    override suspend fun lock() : ApiResponse<Any?> {
+    override suspend fun lock() : ApiResponse<Unit> {
         return modRequest.lock(commentId, false)
     }
 
-    override suspend fun unlock() : ApiResponse<Any?> {
+    override suspend fun unlock() : ApiResponse<Unit> {
         return modRequest.unlock(commentId, false)
     }
 

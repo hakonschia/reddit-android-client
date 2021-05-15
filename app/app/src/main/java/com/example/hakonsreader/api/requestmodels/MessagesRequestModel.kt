@@ -54,7 +54,7 @@ interface MessagesRequestModel {
      *
      * @see markUnread
      */
-    suspend fun markRead(vararg messages: RedditMessage) : ApiResponse<Any?>
+    suspend fun markRead(vararg messages: RedditMessage) : ApiResponse<Unit>
 
     /**
      * Mark inbox messages as unread
@@ -66,7 +66,7 @@ interface MessagesRequestModel {
      *
      * @see markRead
      */
-    suspend fun markUnread(vararg messages: RedditMessage) : ApiResponse<Any?>
+    suspend fun markUnread(vararg messages: RedditMessage) : ApiResponse<Unit>
 
     /**
      * Sends a new private message
@@ -77,7 +77,7 @@ interface MessagesRequestModel {
      * @param subject The subject of the message
      * @param message The message to send
      */
-    suspend fun sendMessage(recipient: String, subject: String, message: String) : ApiResponse<Any?>
+    suspend fun sendMessage(recipient: String, subject: String, message: String) : ApiResponse<Unit>
 }
 
 /**
@@ -126,11 +126,11 @@ class MessagesRequestModelImpl(
         }
     }
 
-    override suspend fun markRead(vararg messages: RedditMessage) : ApiResponse<Any?> {
+    override suspend fun markRead(vararg messages: RedditMessage) : ApiResponse<Unit> {
         return markInternal(markRead = true, *messages)
     }
 
-    override suspend fun markUnread(vararg messages: RedditMessage) : ApiResponse<Any?> {
+    override suspend fun markUnread(vararg messages: RedditMessage) : ApiResponse<Unit> {
         return markInternal(markRead = false, *messages)
     }
 
@@ -141,9 +141,9 @@ class MessagesRequestModelImpl(
      *
      * @param messages The messages to mark as read
      */
-    private suspend fun markInternal(markRead: Boolean, vararg messages: RedditMessage) : ApiResponse<Any?> {
+    private suspend fun markInternal(markRead: Boolean, vararg messages: RedditMessage) : ApiResponse<Unit> {
         if (messages.isEmpty()) {
-            return ApiResponse.Success(null)
+            return ApiResponse.Success(Unit)
         }
 
         try {
@@ -175,7 +175,7 @@ class MessagesRequestModelImpl(
             }
 
             if (response.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(response)
             }
@@ -185,7 +185,7 @@ class MessagesRequestModelImpl(
     }
 
 
-    override suspend fun sendMessage(recipient: String, subject: String, message: String) : ApiResponse<Any?> {
+    override suspend fun sendMessage(recipient: String, subject: String, message: String) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -196,7 +196,7 @@ class MessagesRequestModelImpl(
             val response = api.sendMessage(recipient, subject, message)
 
             if (response.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(response)
             }

@@ -42,14 +42,14 @@ interface ModRequestModel {
      *               a 409 Conflict error will occur
      * @return No data is returned
      */
-    suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Any?>
+    suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Unit>
 
     /**
      * Ignore reports on a post or comment
      *
      * @see unignoreReports
      */
-    suspend fun ignoreReports(thing: Thing, id: String) : ApiResponse<Any?>
+    suspend fun ignoreReports(thing: Thing, id: String) : ApiResponse<Unit>
 
     /**
      * Unignore reports on a post or comment
@@ -57,7 +57,7 @@ interface ModRequestModel {
      * @return No response data is returned
      * @see ignoreReports
      */
-    suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Any?>
+    suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Unit>
 
     /**
      * Lock a post or comment
@@ -67,7 +67,7 @@ interface ModRequestModel {
      * @return No response data is returned
      * @see unlock
      */
-    suspend fun lock(id: String, isPost: Boolean) : ApiResponse<Any?>
+    suspend fun lock(id: String, isPost: Boolean) : ApiResponse<Unit>
 
     /**
      * Unlock a post or comment
@@ -77,7 +77,7 @@ interface ModRequestModel {
      * @return No response data is returned
      * @see lock
      */
-    suspend fun unlock(id: String, isPost: Boolean) : ApiResponse<Any?>
+    suspend fun unlock(id: String, isPost: Boolean) : ApiResponse<Unit>
 }
 
 /**
@@ -137,7 +137,7 @@ class ModRequestModelImpl(
         }
     }
 
-    override suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Any?> {
+    override suspend fun stickyPost(id: String, sticky: Boolean) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -151,7 +151,7 @@ class ModRequestModelImpl(
             )
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }
@@ -160,7 +160,7 @@ class ModRequestModelImpl(
         }
     }
 
-    override suspend fun ignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
+    override suspend fun ignoreReports(thing: Thing, id: String) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -173,7 +173,7 @@ class ModRequestModelImpl(
             )
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }
@@ -182,7 +182,7 @@ class ModRequestModelImpl(
         }
     }
 
-    override suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Any?> {
+    override suspend fun unignoreReports(thing: Thing, id: String) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -195,7 +195,7 @@ class ModRequestModelImpl(
             )
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }
@@ -205,15 +205,15 @@ class ModRequestModelImpl(
     }
 
 
-    override suspend fun lock(id: String, isPost: Boolean) : ApiResponse<Any?> {
+    override suspend fun lock(id: String, isPost: Boolean) : ApiResponse<Unit> {
         return lockInternal(if (isPost) Thing.POST else Thing.COMMENT, id, true)
     }
 
-    override suspend fun unlock(id: String, isPost: Boolean) : ApiResponse<Any?> {
+    override suspend fun unlock(id: String, isPost: Boolean) : ApiResponse<Unit> {
         return lockInternal(if (isPost) Thing.POST else Thing.COMMENT, id, false)
     }
 
-    private suspend fun lockInternal(thing: Thing, id: String, lock: Boolean) : ApiResponse<Any?> {
+    private suspend fun lockInternal(thing: Thing, id: String, lock: Boolean) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -230,7 +230,7 @@ class ModRequestModelImpl(
             }
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }

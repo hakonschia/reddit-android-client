@@ -64,17 +64,17 @@ interface SubredditRequest {
      * OAuth scope required: *subscribe*
      *
      * @param subscribe True to subscribe, false to unsubscribe
-     * @return If successful no value is returned, so Success will hold *null*
+     * @return If successful no value is returned
      */
-    suspend fun subscribe(subscribe: Boolean) : ApiResponse<Nothing?>
+    suspend fun subscribe(subscribe: Boolean) : ApiResponse<Unit>
 
     /**
      * Favorite or un-favorite a subreddit
      *
      * @param favorite True if the action should be to favorite, false to un-favorite
-     * @return If successful no value is returned, so Success will hold *null*
+     * @return If successful no value is returned
      */
-    suspend fun favorite(favorite: Boolean) : ApiResponse<Nothing?>
+    suspend fun favorite(favorite: Boolean) : ApiResponse<Unit>
 
     /**
      * Submit a text post to the subreddit
@@ -318,7 +318,7 @@ class SubredditRequestImpl(
     }
 
 
-    override suspend fun subscribe(subscribe: Boolean) : ApiResponse<Nothing?> {
+    override suspend fun subscribe(subscribe: Boolean) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -335,7 +335,7 @@ class SubredditRequestImpl(
             val resp = api.subscribeToSubreddit(subAction, subredditName)
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }
@@ -344,7 +344,7 @@ class SubredditRequestImpl(
         }
     }
 
-    override suspend fun favorite(favorite: Boolean) : ApiResponse<Nothing?> {
+    override suspend fun favorite(favorite: Boolean) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -355,7 +355,7 @@ class SubredditRequestImpl(
             val resp = api.favoriteSubreddit(favorite, subredditName)
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }

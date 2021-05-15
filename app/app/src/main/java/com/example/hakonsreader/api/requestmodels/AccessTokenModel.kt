@@ -37,7 +37,7 @@ interface AccessTokenModel {
      * @param type The type of token to revoke (by default this is [TokenType.REFRESH_TOKEN])
      * @return This will not return any data, but should be checked to ensure the request was successful
      */
-    suspend fun revoke(accessToken: AccessToken, type: TokenType = TokenType.REFRESH_TOKEN) : ApiResponse<Any?>
+    suspend fun revoke(accessToken: AccessToken, type: TokenType = TokenType.REFRESH_TOKEN) : ApiResponse<Unit>
 }
 
 
@@ -81,7 +81,7 @@ class AccessTokenModelImpl(
         }
     }
 
-    override suspend fun revoke(accessToken: AccessToken, type: TokenType) : ApiResponse<Any?> {
+    override suspend fun revoke(accessToken: AccessToken, type: TokenType) : ApiResponse<Unit> {
         if (type == TokenType.REFRESH_TOKEN && accessToken.refreshToken.isNullOrEmpty()) {
             // Cant revoke
             return ApiResponse.Error(GenericError(-1), Throwable("No token to revoke"))
@@ -102,7 +102,7 @@ class AccessTokenModelImpl(
 
             if (response.isSuccessful) {
                 onNewToken.invoke(AccessToken())
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(response)
             }

@@ -27,7 +27,7 @@ interface VoteableRequestModel {
      * @param id The ID of the thing
      * @param type The type of vote to cast
      */
-    suspend fun vote(thing: Thing, id: String, type: VoteType) : ApiResponse<Nothing?>
+    suspend fun vote(thing: Thing, id: String, type: VoteType) : ApiResponse<Unit>
 }
 
 /**
@@ -38,7 +38,7 @@ internal class VoteableRequestModelImpl(
         private val api: VoteService
 ) : VoteableRequestModel {
 
-    override suspend fun vote(thing: Thing, id: String, type: VoteType) : ApiResponse<Nothing?> {
+    override suspend fun vote(thing: Thing, id: String, type: VoteType) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -49,7 +49,7 @@ internal class VoteableRequestModelImpl(
             val resp = api.vote(createFullName(thing, id), type.value)
 
             if (resp.isSuccessful) {
-                ApiResponse.Success(null)
+                ApiResponse.Success(Unit)
             } else {
                 apiError(resp)
             }

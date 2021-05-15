@@ -86,11 +86,11 @@ import java.util.*
  *
  *     when (response) {
  *         is ApiResponse.Success -> {
- *             // Some endpoints won't have a return value (they return ApiResponse<Any?>)
+ *             // Some endpoints won't have a return value (they return ApiResponse<Unit>)
  *             // For these endpoints "response" will still be "ApiResponse.Success", but
- *             // "response.value" will be null
+ *             // "response.value" will be Unit
  *
- *             val isNull = response.value == null // true
+ *             val isUnit = response.value == Unit // true
  *         }
  *
  *         is ApiResponse.Error -> {
