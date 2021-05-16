@@ -3,7 +3,6 @@ package com.example.hakonsreader.views
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -55,9 +54,21 @@ class ContentImage @JvmOverloads constructor(
          * The value with this key is a [String]
          */
         const val EXTRAS_URL_TO_OPEN = "extras_urlToOpen"
+
+
+        /**
+         * The amount of milliseconds that should the used to wait to open the image when clicked, to avoid
+         * accidentally open the image twice by clicking fast
+         */
+        private const val OPEN_TIMEOUT = 1250L
     }
 
-    private val binding: ContentImageBinding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true)
+
+    /**
+     * The timestamp the last time the image was opened (or -1 if no image has been opened)
+     */
+    private var imageLastOpened: Long = -1
 
     /**
      * The overridden image URL set with [setWithImageUrl]
@@ -138,8 +149,14 @@ class ContentImage @JvmOverloads constructor(
             setHdImageClickListener(it)
         }
 
-        // TODO add delay (like with posts) so it doesn't open multiple images when clicked fast
         setOnClickListener {
+            val currentTime = System.currentTimeMillis()
+            if (imageLastOpened + OPEN_TIMEOUT > currentTime) {
+                return@setOnClickListener
+            }
+
+            imageLastOpened = currentTime
+
             val urlToOpen = extras.getString(EXTRAS_URL_TO_OPEN)
 
             Intent(context, ImageActivity::class.java).run {
@@ -218,6 +235,13 @@ class ContentImage @JvmOverloads constructor(
 
                 // When opening the image we always want to open the normal
                 setOnClickListener {
+                    val currentTime = System.currentTimeMillis()
+                    if (imageLastOpened + OPEN_TIMEOUT > currentTime) {
+                        return@setOnClickListener
+                    }
+
+                    imageLastOpened = currentTime
+
                     openImageInFullscreen(
                             binding.image,
                             // Prefer the overridden URL as if it is given, "normal" might be null
