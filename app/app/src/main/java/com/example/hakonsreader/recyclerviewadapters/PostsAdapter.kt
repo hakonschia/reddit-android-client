@@ -54,10 +54,6 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
             }
         }
 
-    /**
-     * The amount of minutes scores should be hidden (default to -1 means not specified)
-     */
-    var hideScoreTime = -1
 
     /**
      * Listener for when a post has been clicked
@@ -138,11 +134,6 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
         // Disable any animation to avoid it updating when scrolling, as this would animate changes from
         // one post to another
         holder.post.enableLayoutAnimations(false)
-
-        val now = System.currentTimeMillis() / 1000L
-        val between = now - post.createdAt
-        holder.post.hideScore = hideScoreTime > toMinutes(between)
-
         holder.post.redditPost = post
 
         val savedExtras = postExtras[post.id]

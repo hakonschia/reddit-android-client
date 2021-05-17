@@ -27,7 +27,9 @@ import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.example.hakonsreader.views.Content
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 
 /**
@@ -176,15 +178,6 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     var onLoadingChange: ((Boolean) -> Unit)? = null
 
-    /**
-     * The time, in minutes, the score should be hidden on the posts shown
-     */
-    var hideScoreTime = 0
-        set(value) {
-            field = value
-            (_binding?.posts?.adapter as PostsAdapter?)?.hideScoreTime = value
-        }
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Posts in the activity open new activities with a transition, which requires an activity context
@@ -196,7 +189,7 @@ class PostsFragment : Fragment(), SortableWithTime {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         // Must not be a user to be a default subreddit (eg. /u/popular is an actual user)
-        isDefaultSubreddit = !isForUser && RedditApi.STANDARD_SUBS.contains(name.toLowerCase())
+        isDefaultSubreddit = !isForUser && RedditApi.STANDARD_SUBS.contains(name.lowercase(Locale.getDefault()))
 
         if (savedInstanceState != null) {
             postsScrollListener.postToIgnore = savedInstanceState.getString(SAVED_POST_TO_IGNORE, "")
@@ -306,7 +299,6 @@ class PostsFragment : Fragment(), SortableWithTime {
      */
     private fun setupPostsList() {
         PostsAdapter().apply {
-            hideScoreTime = this@PostsFragment.hideScoreTime
             lifecycleOwner = viewLifecycleOwner
             binding.posts.adapter = this
 

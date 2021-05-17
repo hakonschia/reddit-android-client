@@ -158,7 +158,9 @@ class SubredditFragment : Fragment() {
      * if a redirect occurred.
      */
     lateinit var subredditName: String
-    private val isDefaultSubreddit by lazy { RedditApi.STANDARD_SUBS.contains(subredditName.toLowerCase()) }
+    private val isDefaultSubreddit by lazy { RedditApi.STANDARD_SUBS.contains(subredditName.lowercase(
+        Locale.getDefault()
+    )) }
 
     private var subreddit: Subreddit? = null
     private var subredditViewModel: SubredditViewModel? = null
@@ -340,8 +342,6 @@ class SubredditFragment : Fragment() {
                          onLoadingChange = {
                              checkLoadingStatus()
                          }
-
-                         hideScoreTime = subreddit?.hideScoreTime ?: 0
 
                          setupSubmitPostFab(this)
 
@@ -845,7 +845,7 @@ class SubredditFragment : Fragment() {
      * Sets the subreddit description for default subs
      */
     private fun setDefaultSubDescription() {
-        val stringRes = when (subredditName.toLowerCase(Locale.ROOT)) {
+        val stringRes = when (subredditName.lowercase(Locale.ROOT)) {
             "" -> R.string.frontPageDescription
             "popular" -> R.string.popularDescription
             "all" -> R.string.allDescription

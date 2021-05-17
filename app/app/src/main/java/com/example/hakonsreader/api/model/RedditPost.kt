@@ -433,7 +433,7 @@ class RedditPost : RedditListing(),
     /**
      * True if the score should be hidden
      */
-    @SerializedName("score_hidden")
+    @SerializedName("hide_score")
     override var isScoreHidden = false
 
     /**
