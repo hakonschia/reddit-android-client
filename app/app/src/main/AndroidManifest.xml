@@ -83,6 +83,7 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activities.WebViewActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
             android:name=".activities.LogInActivity"
