@@ -25,7 +25,6 @@ import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListene
 import com.example.hakonsreader.viewmodels.PostsViewModel
 import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.example.hakonsreader.views.Content
-import com.example.hakonsreader.views.ContentVideo
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -38,6 +37,7 @@ import javax.inject.Inject
 class PostsFragment : Fragment(), SortableWithTime {
 
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "PostsFragment"
 
 

@@ -19,7 +19,6 @@ import com.example.hakonsreader.api.model.RedditUser
 import com.example.hakonsreader.api.persistence.RedditUserInfoDao
 import com.example.hakonsreader.databinding.FragmentProfileBinding
 import com.example.hakonsreader.databinding.UserIsSuspendedBinding
-import com.example.hakonsreader.interfaces.OnInboxClicked
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.misc.handleGenericResponseErrors
@@ -122,7 +121,7 @@ class ProfileFragment : Fragment() {
         userViewModelFactory.create(username, isLoggedInUser, it)
     }
 
-    var onInboxClicked: OnInboxClicked? = null
+    var onInboxClicked: (() -> Unit)? = null
 
     private var postsFragment: PostsFragment? = null
 
@@ -177,7 +176,7 @@ class ProfileFragment : Fragment() {
         binding.loggedInUser = isLoggedInUser
 
         binding.inbox.setOnClickListener {
-            onInboxClicked?.onInboxClicked()
+            onInboxClicked?.invoke()
         }
 
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.profileToolbar)

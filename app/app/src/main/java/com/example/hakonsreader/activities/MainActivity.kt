@@ -61,7 +61,7 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnreadMessagesBadgeSettingChanged {
+class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeSettingChanged {
 
     companion object {
         @Suppress("UNUSED")
@@ -433,7 +433,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
 
-        val lowerCased = subredditName.toLowerCase(Locale.ROOT)
+        val lowerCased = subredditName.lowercase(Locale.ROOT)
 
         // If default sub, use the home nav bar instead
         // Currently, we don't show "mod" in the default sub container
@@ -472,7 +472,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         binding.mainParentLayout.closeDrawer(GravityCompat.START)
     }
 
-    override fun onInboxClicked() {
+    /**
+     * Listener for when a fragment has clicked an inbox
+     */
+    private fun onInboxClicked() {
         if (inboxFragment == null) {
             inboxFragment = InboxFragment.newInstance()
         }
@@ -831,7 +834,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         }
 
         // Restore the listeners as it won't be set automatically
-        profileFragment?.onInboxClicked = this
+        profileFragment?.onInboxClicked = { onInboxClicked() }
         selectSubredditFragment?.subredditSelected = this
     }
 
@@ -859,7 +862,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
             standardSubFragment = StandardSubContainerFragment.newInstance()
         }
 
-        val defaultSub = StandardSubContainerFragment.StandarSub.values().find { it.value == startSubreddit.toLowerCase(Locale.ROOT) }
+        val defaultSub = StandardSubContainerFragment.StandarSub.values().find { it.value == startSubreddit.lowercase(Locale.ROOT) }
 
         if (defaultSub != null) {
             standardSubFragment!!.apply {
@@ -891,10 +894,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                     // we just create a new one (if we later want some special functionality we can add it in the else)
                     // This is pretty much just the same functionality as when it is selected as normal
                     if (standardSubFragment == null) {
-                        standardSubFragment = StandardSubContainerFragment.newInstance()
-
                         supportFragmentManager.beginTransaction()
-                                .replace(R.id.fragmentContainer, standardSubFragment!!)
+                                .replace(R.id.fragmentContainer, StandardSubContainerFragment.newInstance().also {
+                                    standardSubFragment = it
+                                })
                                 .addToBackStack(null)
                                 .commit()
                     }
@@ -923,7 +926,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                         profileFragment = ProfileFragment.newInstance()
                     }
 
-                    profileFragment!!.onInboxClicked = this
+                    profileFragment!!.onInboxClicked = { onInboxClicked() }
 
                     navigationViewListener.profileLastShownIsProfile = true
 
@@ -1137,44 +1140,35 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
         var profileLastShownIsProfile: Boolean? = null
 
         /**
-         * Disables the animation for the next nav bar change. Note this only lasts for one change
+         * Disables the animation for the next nav bar change
          */
         fun disableAnimationForNextChange() {
             playAnimationForNextChange = false
         }
 
         override fun onNavigationItemSelected(item: MenuItem): Boolean {
-            val selected: Fragment
             val previousPos = navBarPos
-            when (item.itemId) {
+            val selected: Fragment = when (item.itemId) {
                 R.id.navHome -> {
                     navBarPos = 1
-                    if (standardSubFragment == null) {
-                        standardSubFragment = StandardSubContainerFragment.newInstance()
-                    }
-                    selected = standardSubFragment as StandardSubContainerFragment
+                    onNavBarHome()
                 }
+
                 R.id.navSubreddit -> {
                     navBarPos = 2
-                    selected = onNavBarSubreddit()
+                    onNavBarSubreddit()
                 }
+
                 R.id.navProfile -> {
                     navBarPos = 3
-                    selected = onNavBarProfile()
+                    onNavBarProfile()
                 }
+
                 R.id.navSettings -> {
                     navBarPos = 4
-                    if (settingsFragment == null) {
-                        settingsFragment = SettingsFragment.newInstance().apply {
-                            languageListener
-                        }
-                    }
-                    settingsFragment!!.unreadMessagesBadgeSettingChanged = this@MainActivity
-                    settingsFragment!!.languageListener = LanguageListener {
-                        updateLanguage(it, recreate = true)
-                    }
-                    selected = settingsFragment!!
+                    onNavBarSettings()
                 }
+
                 else -> return false
             }
 
@@ -1216,19 +1210,27 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
          * the animation slides so it makes sense based on the nav bar
          */
         private fun replaceNavBarFragment(fragment: Fragment, goingRight: Boolean) {
-            supportFragmentManager.beginTransaction()
-                    // TODO if there is an ongoing transition and the user selects another nav bar item, the app crashes (need to somehow cancel the ongoing transition or something)
-                    .setCustomAnimations(
-                            if (goingRight) R.anim.slide_in_right else R.anim.slide_in_left,
-                            if (goingRight) R.anim.slide_out_left else R.anim.slide_out_right)
+            val animationDirections: Pair<Int, Int> = if (goingRight) {
+                R.anim.slide_in_right to R.anim.slide_out_left
+            } else {
+                R.anim.slide_in_left to R.anim.slide_out_right
+            }
 
-                    .replace(R.id.fragmentContainer, fragment) // Although we don't use the backstack to pop elements, it is needed to keep the state
+            supportFragmentManager.beginTransaction()
+                    .setCustomAnimations(animationDirections.first, animationDirections.second)
+                    .replace(R.id.fragmentContainer, fragment)
+                    // Although we don't use the backstack to pop elements, it is needed to keep the state
                     // of the fragments (otherwise posts are reloaded when coming back)
-                    // With the use of a local database I can easily restore the state without the back stack
-                    // Not sure whats best to use, with addToBackStack it's smoother as it doesn't have to load
-                    // from db etc. (it doesn't take a long time) but it probably uses more ram to hold everything in memory?
+                    // TODO check how this works, it saves some fragments like subreddits, but not profiles
                     .addToBackStack(null)
                     .commit()
+        }
+
+        /**
+         * Retrieves the home nav bar fragment
+         */
+        private fun onNavBarHome(): Fragment {
+            return standardSubFragment ?: StandardSubContainerFragment.newInstance().also { standardSubFragment = it }
         }
 
         /**
@@ -1245,12 +1247,14 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 activeMulti != null -> activeMulti!!
                 activeSubreddit != null -> activeSubreddit!!
                 else -> {
-                    if (selectSubredditFragment == null) {
-                        selectSubredditFragment = SelectSubredditFragment.newInstance().also {
-                            it.subredditSelected = this@MainActivity
-                        }
+                    (selectSubredditFragment ?: SelectSubredditFragment.newInstance().also {
+                        selectSubredditFragment = it
+                    }).apply {
+                        // We must ensure that the listener is set if selectSubredditFragment was not null and if it was
+                        // If it wasn't null, the listener might have been "deactivated" if a config change
+                        // occurred or something else that caused the fragment to be recreated and not passed here
+                        subredditSelected = this@MainActivity
                     }
-                    selectSubredditFragment!!
                 }
             }
         }
@@ -1270,32 +1274,38 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnInboxClicked, OnUnre
                 // unreadMessages should maybe be synchronized? Dunno tbh
                 if (unreadMessages != 0) {
                     profileLastShownIsProfile = false
-
-                    if (inboxFragment == null) {
-                        inboxFragment = InboxFragment.newInstance()
-                    }
-                    inboxFragment!!
+                    inboxFragment ?: InboxFragment.newInstance().also { inboxFragment = it }
                 } else {
                     when (profileLastShownIsProfile) {
                         // Profile shown last, or first time showing (and no inbox messages), show profile
                         null, true -> {
-                            if (profileFragment == null) {
-                                profileFragment = ProfileFragment.newInstance()
+                            (profileFragment ?: ProfileFragment.newInstance().also {
+                                profileFragment = it
+                            }).apply {
+                                onInboxClicked = { onInboxClicked() }
                             }
-
-                            profileFragment!!.onInboxClicked = this@MainActivity
-                            profileFragment!!
                         }
 
                         // Inbox shown last, show inbox again
                         false -> {
-                            if (inboxFragment == null) {
-                                inboxFragment = InboxFragment.newInstance()
-                            }
-                            inboxFragment!!
+                            inboxFragment ?: InboxFragment.newInstance().also { inboxFragment = it }
                         }
                     }
                 }
+            }
+        }
+
+        /**
+         * Retrieves the settings nav bar fragment
+         */
+        private fun onNavBarSettings(): Fragment {
+            return (settingsFragment ?: SettingsFragment.newInstance().also {
+                settingsFragment = it
+            }).apply {
+                languageListener = LanguageListener { lang ->
+                    updateLanguage(lang, recreate = true)
+                }
+                unreadMessagesBadgeSettingChanged = this@MainActivity
             }
         }
     }
