@@ -359,6 +359,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         it.isChecked = true
                     }
 
+                    Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
                     dismiss()
                 }
 
