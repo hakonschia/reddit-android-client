@@ -71,6 +71,7 @@
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
             android:name=".activities.VideoActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
         <activity
             android:name=".activities.VideoYoutubeActivity"
