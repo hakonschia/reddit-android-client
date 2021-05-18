@@ -231,7 +231,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         // Subreddits: https://reddit.com/r/GlobalOffensive
         url.matches(LinkUtils.SUBREDDIT_REGEX_COMBINED.toRegex(RegexOption.IGNORE_CASE)) -> {
             // First is "r", second is the subreddit
-            val subreddit = pathSegments[1].toLowerCase()
+            val subreddit = pathSegments[1].lowercase(Locale.getDefault())
 
             // TODO if the application is "new" we can also pass the subreddit to MainActivity since
             //  the subreddit will be sent to the navbar subreddit and we wont mess up anything else
@@ -290,8 +290,25 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
             }
         }
 
+        // Private messages: https://reddit.com/message/compose?to=hakonschia&subject=hello
+        url.matches("https://(.*\\.)?reddit.com/message/compose.*".toRegex()) -> {
+            val recipient = asUri.getQueryParameter("to")
+            val subject = asUri.getQueryParameter("subject")
+            val message = asUri.getQueryParameter("message")
+
+            Intent(context, SendPrivateMessageActivity::class.java).apply {
+                putExtra(SendPrivateMessageActivity.EXTRAS_RECIPIENT, recipient)
+                putExtra(SendPrivateMessageActivity.EXTRAS_SUBJECT, subject)
+                putExtra(SendPrivateMessageActivity.EXTRAS_MESSAGE, message)
+            }
+        }
+
+        // TODO the link below shouldn't match here as it can cause a crash (the "fix" so far is just to check
+        //  if it matches /message/compose before this, which is obviously a terrible fix)
+        //  https://www.reddit.com/message/compose/?to=RemindMeBot&subject=Reminder&message=%5Bhttps://www.reddit.com/r/AskHistorians/comments/ne8bcc/when_did_it_stop_being_acceptable_to_openly/%5D%0A%0ARemindMe!%202%20days
+
         // Posts: https://reddit.com/r/GlobalOffensive/comments/gwcxmm/....
-        url.matches(LinkUtils.POST_REGEX.toRegex()) -> {
+        url.matches("^${LinkUtils.POST_REGEX}".toRegex()) -> {
             // The URL will look like: reddit.com/r/<subreddit>/comments/<postId/...
             val postId = pathSegments[3]
 
@@ -322,19 +339,6 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
             val postId = pathSegments[0]
             Intent(context, PostActivity::class.java).apply {
                 putExtra(PostActivity.EXTRAS_POST_ID_KEY, postId)
-            }
-        }
-
-        // Private messages: https://reddit.com/message/compose?to=hakonschia&subject=hello
-        url.matches("https://(.*\\.)?reddit.com/message/compose.*".toRegex()) -> {
-            val recipient = asUri.getQueryParameter("to")
-            val subject = asUri.getQueryParameter("subject")
-            val message = asUri.getQueryParameter("message")
-
-            Intent(context, SendPrivateMessageActivity::class.java).apply {
-                putExtra(SendPrivateMessageActivity.EXTRAS_RECIPIENT, recipient)
-                putExtra(SendPrivateMessageActivity.EXTRAS_SUBJECT, subject)
-                putExtra(SendPrivateMessageActivity.EXTRAS_MESSAGE, message)
             }
         }
 
