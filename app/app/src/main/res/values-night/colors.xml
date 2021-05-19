@@ -5,6 +5,7 @@
     <color name="colorAccent">#088EC8</color>
 
     <color name="toolbarBackground">#000000</color>
+    <color name="navBar">#000</color>
     <color name="blackOrWhite">#000</color>
 
     <color name="background">#000000</color>
