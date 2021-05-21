@@ -4,6 +4,7 @@ import android.animation.LayoutTransition
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
@@ -23,6 +24,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.activities.PostActivity
@@ -52,9 +58,6 @@ import com.example.hakonsreader.viewmodels.*
 import com.example.hakonsreader.views.util.ViewUtil
 import com.example.hakonsreader.views.util.invisibleIf
 import com.example.hakonsreader.views.util.showPopupSortWithTime
-import com.squareup.picasso.Callback
-import com.squareup.picasso.NetworkPolicy
-import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.RuntimeException
 import java.util.*
@@ -630,33 +633,33 @@ class SubredditFragment : Fragment() {
             val bannerURL = it.bannerBackgroundImage
             if (bannerURL.isNotEmpty()) {
                 if (Settings.loadSubredditBanners()) {
-                    // Data saving on, only load if the image is already cached
-                    if (Settings.dataSavingEnabled()) {
-                        Picasso.get()
-                                .load(bannerURL)
-                                .networkPolicy(NetworkPolicy.OFFLINE)
-                                .into(imageView, object : Callback {
-                                    override fun onSuccess() {
-                                        bannerLoaded(true)
-                                    }
+                    Glide.with(this)
+                        .load(bannerURL)
+                        // Data saving on, only load if the image is already cached
+                        .onlyRetrieveFromCache(Settings.dataSavingEnabled())
+                        .listener(object : RequestListener<Drawable> {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                bannerLoaded(false)
+                                return false
+                            }
 
-                                    override fun onError(e: Exception) {
-                                        bannerLoaded(false)
-                                    }
-                                })
-                    } else {
-                        Picasso.get()
-                                .load(bannerURL)
-                                .into(imageView, object : Callback {
-                                    override fun onSuccess() {
-                                        bannerLoaded(true)
-                                    }
-
-                                    override fun onError(e: Exception) {
-                                        bannerLoaded(false)
-                                    }
-                                })
-                    }
+                            override fun onResourceReady(
+                                resource: Drawable?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                bannerLoaded(true)
+                                return false
+                            }
+                        })
+                        .into(imageView)
                 } else {
                     bannerLoaded(false)
                 }

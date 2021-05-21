@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.bumptech.glide.Glide
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.SortingMethods
@@ -26,7 +27,6 @@ import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.viewmodels.RedditUserViewModel
 import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.makeramen.roundedimageview.RoundedImageView
-import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -334,7 +334,7 @@ fun setProfilePicture(imageView: RoundedImageView, user: RedditUser?) {
 
     // Load the users profile picture
     if (url.isNotBlank()) {
-        Picasso.get()
+        Glide.with(imageView)
                 .load(url)
                 .placeholder(R.drawable.ic_baseline_person_100)
                 .error(R.drawable.ic_baseline_person_100)

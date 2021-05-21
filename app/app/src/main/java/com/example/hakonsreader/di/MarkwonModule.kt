@@ -3,7 +3,6 @@ package com.example.hakonsreader.di
 import android.content.Context
 import com.example.hakonsreader.api.utils.MarkdownAdjuster
 import com.example.hakonsreader.markwonplugins.*
-import com.squareup.picasso.Picasso
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +16,7 @@ import io.noties.markwon.core.spans.LinkSpan
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.image.ImageProps
-import io.noties.markwon.image.picasso.PicassoImagesPlugin
+import io.noties.markwon.image.glide.GlideImagesPlugin
 import org.commonmark.node.Image
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -94,7 +93,7 @@ object MarkwonModule {
     @Provides
     fun provideMarkwonWithImages(@ApplicationContext context: Context) : Markwon {
         return baseMarkwon(context)
-                .usePlugin(PicassoImagesPlugin.create(Picasso.get()))
+                .usePlugin(GlideImagesPlugin.create(context))
                 .usePlugin(object : AbstractMarkwonPlugin() {
                     override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
                         builder.appendFactory(Image::class.java) { configuration, props ->

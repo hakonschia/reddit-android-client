@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.interfaces.AwardableListing
 import com.example.hakonsreader.api.model.RedditAward
@@ -15,9 +16,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.AwardLayoutBinding
 import com.example.hakonsreader.fragments.bottomsheets.ShowAwardBottomSheet
 import com.example.hakonsreader.misc.dpToPixels
-import com.example.hakonsreader.views.util.loadIf
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.Picasso
 
 /**
  * Layout that wraps around Reddit awards and shows all
@@ -80,7 +79,10 @@ class AwardLayout @JvmOverloads constructor(
                 adjustViewBounds = true
                 setOnClickListener { showAwardDescription(award) }
 
-                Picasso.get().loadIf(preferredUrl, backupUrl, this)
+                // TODO load preferred in the same way with Glide
+               // Picasso.get().loadIf(preferredUrl, backupUrl, this)
+                Glide.with(this).load(preferredUrl).into(this)
+
                 binding.container.addView(this)
             }
 

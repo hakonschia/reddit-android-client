@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.graphics.drawable.toBitmap
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.ImageActivity
 import com.example.hakonsreader.activities.ProfileActivity
@@ -66,13 +67,9 @@ fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean, useBitm
     val context = view.context
     val activity = context as Activity
 
-    // Send some data like what sub it is etc etc so it knows what to load
     Intent(context, ImageActivity::class.java).run {
         if (useBitmapFromView && view is ImageView) {
-            val drawable = view.drawable
-            if (drawable is BitmapDrawable) {
-                ImageActivity.BITMAP = drawable.bitmap
-            }
+            ImageActivity.BITMAP = view.drawable?.toBitmap()
         }
 
         putExtra(ImageActivity.EXTRAS_IMAGE_URL, imageUrl)

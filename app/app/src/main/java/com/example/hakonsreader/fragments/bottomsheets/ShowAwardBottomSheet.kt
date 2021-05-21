@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import com.bumptech.glide.Glide
 import com.example.hakonsreader.api.model.RedditAward
 import com.example.hakonsreader.databinding.BottomSheetShowAwardBinding
 import com.example.hakonsreader.markwonplugins.EnlargeLinkPlugin
@@ -12,7 +13,6 @@ import com.example.hakonsreader.markwonplugins.RedditLinkPlugin
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
-import com.squareup.picasso.Picasso
 import io.noties.markwon.Markwon
 
 /**
@@ -61,7 +61,7 @@ class ShowAwardBottomSheet : BottomSheetDialogFragment() {
         }
 
         val imageUrl = award?.resizedIcons?.find { image -> image.height == IMAGE_SIZE }?.url
-        Picasso.get().load(imageUrl).into(binding.icon)
+        Glide.with(this).load(imageUrl).into(binding.icon)
 
         return binding.root
     }

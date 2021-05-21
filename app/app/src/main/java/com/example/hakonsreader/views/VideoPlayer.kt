@@ -16,13 +16,15 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.drawToBitmap
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createVideoDuration
 import com.example.hakonsreader.views.util.VideoCache
-import com.example.hakonsreader.views.util.cache
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor
@@ -37,7 +39,6 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
-import com.squareup.picasso.Picasso
 
 /**
  * Class for wrapping an [ExoPlayer] and a [PlayerView] in one class. The size of the video should
@@ -537,13 +538,14 @@ class VideoPlayer @JvmOverloads constructor(
         thumbnail.setOnClickListener(null)
 
         if (thumbnailUrl.isNotEmpty()) {
-            Picasso.get()
+            Glide.with(thumbnail)
                     .load(thumbnailUrl)
-                    // .resize(params.width, params.height)
-                    .cache(cacheVideo)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                // .resize(params.width, params.height)
+                    .diskCacheStrategy(if (cacheVideo) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
                     .into(thumbnail)
         } else if (thumbnailDrawable != -1) {
-            Picasso.get()
+            Glide.with(thumbnail)
                     .load(thumbnailDrawable)
                     .into(thumbnail)
         }

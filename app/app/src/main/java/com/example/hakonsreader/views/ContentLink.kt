@@ -13,6 +13,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.util.Pair
 import androidx.viewbinding.ViewBinding
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.api.model.RedditPost
@@ -21,8 +24,6 @@ import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.getAppIconFromUrl
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
-import com.example.hakonsreader.views.util.cache
-import com.squareup.picasso.Picasso
 
 /**
  * View for displaying links from a [RedditPost]. This will display different views depending on
@@ -95,9 +96,10 @@ class ContentLink @JvmOverloads constructor(
             }
 
             url != null -> {
-                Picasso.get()
+                Glide.with(binding.thumbnail)
                         .load(url)
-                        .cache(cache)
+                        .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
+                        .transition(DrawableTransitionOptions.withCrossFade())
                         .into(binding.thumbnail)
             }
 
@@ -134,8 +136,10 @@ class ContentLink @JvmOverloads constructor(
 
             // If no thumbnail is given, reddit might give it as "default"
             thumbnail.isNotBlank() && thumbnail != "default" -> {
-                Picasso.get()
+                Glide.with(binding.thumbnail)
                         .load(thumbnail)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
                         .into(binding.thumbnail)
             }
 

@@ -1,7 +1,7 @@
 package com.example.hakonsreader.activities
 
-import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -9,17 +9,20 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.databinding.ActivityImageBinding
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener
-import com.example.hakonsreader.views.util.cache
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
 
 /**
  * Activity to display an image in fullscreen
@@ -115,27 +118,43 @@ class ImageActivity : BaseActivity() {
 
         val cache = data.getBoolean(EXTRAS_CACHE_IMAGE, true)
 
-        Picasso.get()
-                .load(imageUrl)
-                .resize(Resources.getSystem().displayMetrics.widthPixels, 0)
-                .cache(cache)
-                .into(binding.image, object : Callback {
-                    override fun onSuccess() {
+        Glide.with(this)
+            .load(imageUrl)
+            .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    binding.loadingIcon.visibility = View.GONE
+                    // If the user exits the activity we cannot show a dialog, which would cause a crash
+                    // ^This was the case with Picasso, not sure if it applies for Glide since it uses the activity
+                    // for the lifecycle already?
+                    if (!isDestroyed) {
                         binding.loadingIcon.visibility = View.GONE
+                        AlertDialog.Builder(this@ImageActivity)
+                            .setTitle(R.string.imageLoadFailedDialogTitle)
+                            .setMessage(R.string.imageLoadFailedDialogContent)
+                            .setOnDismissListener { finish() }
+                            .show()
                     }
+                    return false
+                }
 
-                    override fun onError(e: Exception) {
-                        // If the user exits the activity we cannot show a dialog, which would cause a crash
-                        if (!isDestroyed) {
-                            binding.loadingIcon.visibility = View.GONE
-                            e.printStackTrace()
-                            AlertDialog.Builder(this@ImageActivity)
-                                    .setTitle(R.string.imageLoadFailedDialogTitle)
-                                    .setMessage(R.string.imageLoadFailedDialogContent)
-                                    .setOnDismissListener { finish() }
-                                    .show()
-                        }
-                    }
-                })
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    binding.loadingIcon.visibility = View.GONE
+
+                    return false
+                }
+            })
+            .into(binding.image)
     }
 }

@@ -115,7 +115,7 @@ Thank you to Reddit for making this project possible by providing an open API.
 
 * [Retrofit](https://github.com/square/retrofit) - Used to create the wrapper for the Reddit API
   * [Gson](https://github.com/google/gson) - For API deserialization and other JSON needs
-* [Picasso](https://github.com/square/picasso) - Image processing, downloading, and caching
+* [Glide](https://github.com/bumptech/glide) - Image processing, downloading, and caching
 * [PhotoView](https://github.com/chrisbanes/PhotoView) - For zoomable ImageViews
 * [RoundedImageView](https://github.com/vinc3m1/RoundedImageView) - To create circular ImageViews
 * [Slidr](https://github.com/r0adkll/Slidr) - To easily create swipeable activities

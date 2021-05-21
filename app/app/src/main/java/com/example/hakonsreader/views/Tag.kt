@@ -11,9 +11,10 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.hakonsreader.R
 import com.example.hakonsreader.databinding.TagBinding
-import com.squareup.picasso.Picasso
 
 /**
  * View that displays text/images in a pill-style view. This view will truncate and ellipsize any
@@ -151,9 +152,10 @@ class Tag @JvmOverloads constructor(context: Context, attrs: AttributeSet? = nul
         val size = context.resources.getDimension(R.dimen.tagIconSize).toInt()
 
         ImageView(context).run {
-            Picasso.get()
+            Glide.with(this)
                     .load(imageURL)
-                    .resize(size, size)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .override(size, size)
                     .into(this)
             add(this)
         }

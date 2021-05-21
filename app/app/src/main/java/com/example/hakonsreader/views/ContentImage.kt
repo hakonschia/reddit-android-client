@@ -3,6 +3,7 @@ package com.example.hakonsreader.views
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,18 +13,21 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.util.Pair
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.ImageActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentImageBinding
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
-import com.example.hakonsreader.views.util.cache
 import com.example.hakonsreader.views.util.openImageInFullscreen
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
-import java.lang.Exception
 
 /**
  * Content view for Reddit images posts.
@@ -274,34 +278,52 @@ class ContentImage @JvmOverloads constructor(
      * Loads an image from a URL
      */
     private fun loadImage(url: String) {
-        Picasso.get()
-                .load(url)
-                .placeholder(R.drawable.ic_wifi_tethering_150dp)
-                .error(R.drawable.ic_wifi_tethering_150dp)
-                .cache(cache)
-                .into(binding.image)
+        Glide.with(binding.image)
+            .load(url)
+            .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(binding.image)
     }
 
     /**
      * Loads a high definition image
      */
     private fun loadHdImage(url: String) {
+        // currentBitmap will be the low res image. We need to store this as when we start a new load
+        // of the HD image, the low res will be removed, so save the low res bitmap and set it again
+        // after the load has started so that it isn't removed while the HD is loading
+        val currentBitmap = getBitmap()
+
         binding.showingHdImage = true
 
-        Picasso.get()
-                .load(url)
-                // Don't use a placeholder as we don't want to remove the previous image
-                .noPlaceholder()
-                .cache(cache)
-                .into(binding.image, object : Callback {
-                    override fun onSuccess() {
-                        extras.remove(EXTRAS_HD_IMAGE_URL)
-                    }
+        Glide.with(binding.image)
+            .load(url)
+            .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
+            .listener(object : RequestListener<Drawable>{
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    binding.showingHdImage = false
+                    Snackbar.make(this@ContentImage, R.string.failedToLoadImage, Snackbar.LENGTH_SHORT).show()
+                    return false
+                }
 
-                    override fun onError(e: Exception?) {
-                        binding.showingHdImage = false
-                        Snackbar.make(this@ContentImage, R.string.failedToLoadImage, Snackbar.LENGTH_SHORT).show()
-                    }
-                })
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    extras.remove(EXTRAS_HD_IMAGE_URL)
+                    return false
+                }
+            })
+            .into(binding.image)
+
+        binding.image.setImageBitmap(currentBitmap)
     }
 }

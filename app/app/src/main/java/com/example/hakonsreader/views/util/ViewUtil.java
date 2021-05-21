@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.BindingAdapter;
 import androidx.fragment.app.FragmentManager;
 
+import com.bumptech.glide.Glide;
 import com.example.hakonsreader.R;
 import com.example.hakonsreader.api.interfaces.ReportableListing;
 import com.example.hakonsreader.api.model.RedditComment;
@@ -19,7 +20,6 @@ import com.example.hakonsreader.api.model.flairs.RichtextFlair;
 import com.example.hakonsreader.fragments.bottomsheets.ReportsBottomSheet;
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener;
 import com.example.hakonsreader.views.Tag;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -50,13 +50,13 @@ public class ViewUtil {
         // We use error and placeholder as the default icon. In case no internet it would override
         // the android:src in the layout, and the error isn't shown until the attempt to get the image has been made
         if (iconURL != null && !iconURL.isEmpty()) {
-            Picasso.get()
+            Glide.with(imageView)
                     .load(iconURL)
                     .placeholder(R.drawable.ic_emoji_emotions_200dp)
                     .error(R.drawable.ic_emoji_emotions_200dp)
                     .into(imageView);
         } else if(communityURL != null && !communityURL.isEmpty()) {
-            Picasso.get()
+            Glide.with(imageView)
                     .load(communityURL)
                     .placeholder(R.drawable.ic_emoji_emotions_200dp)
                     .error(R.drawable.ic_emoji_emotions_200dp)

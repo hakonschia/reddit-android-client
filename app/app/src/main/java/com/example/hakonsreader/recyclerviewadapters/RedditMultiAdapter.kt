@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.hakonsreader.api.model.RedditMulti
 import com.example.hakonsreader.databinding.ListItemRedditMultiBinding
 import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.recyclerviewadapters.diffutils.RedditMultiDiffCallback
 import com.example.hakonsreader.views.SpaceDivider
-import com.squareup.picasso.Picasso
 
 class RedditMultiAdapter : RecyclerView.Adapter<RedditMultiAdapter.ViewHolder>() {
 
@@ -35,7 +35,7 @@ class RedditMultiAdapter : RecyclerView.Adapter<RedditMultiAdapter.ViewHolder>()
 
         holder.binding.multi = multi
 
-        Picasso.get()
+        Glide.with(holder.binding.icon)
                 .load(multi.iconUrl)
                 .into(holder.binding.icon)
     }
