@@ -2,6 +2,7 @@ package com.example.hakonsreader.views
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -30,6 +31,11 @@ class AwardLayout @JvmOverloads constructor(
     companion object {
         @Suppress("UNUSED")
         private const val TAG = "AwardLayout"
+
+        /**
+         * The pixel size of the icons to use
+         */
+        private const val AWARD_ICON_SIZE = 32
     }
 
     private val binding = AwardLayoutBinding.inflate(LayoutInflater.from(context), this, true).apply {
@@ -53,15 +59,16 @@ class AwardLayout @JvmOverloads constructor(
         val awardImageStartMargin = dpToPixels(6f, resources)
         val count = getTotalAwardsCount()
         val awardIconSize = resources.getDimension(R.dimen.awardIconSize).toInt()
+        val awardTextSize = resources.getDimension(R.dimen.awardTextSize)
+        val awardTextColor = ContextCompat.getColor(context, R.color.secondary_text_color)
 
         // If the listing is updated the old views will still be there
         binding.container.removeAllViews()
 
         sortedAwards.forEach { award ->
-            // 48 seems to fit fine. This could also be a setting
             // The sizes are: 16, 32, 48, 64, 128 (although some urls actually point to a higher res
-            // image even though it says in the image object it is lower)
-            val backupUrl = award.resizedIcons?.find { image -> image.height == 48 }?.url
+            // image even though it says in the image object it is lower ¯\_(ツ)_/¯)
+            val backupUrl = award.resizedIcons?.find { image -> image.height == AWARD_ICON_SIZE }?.url
 
             ImageView(context).apply {
                 layoutParams = MarginLayoutParams(awardIconSize, awardIconSize).apply {
@@ -75,7 +82,6 @@ class AwardLayout @JvmOverloads constructor(
                     bottomMargin = awardImageTopBottomMargin
                 }
 
-                adjustViewBounds = true
                 setOnClickListener { showAwardDescription(award) }
 
                 Glide.with(this)
@@ -86,11 +92,12 @@ class AwardLayout @JvmOverloads constructor(
                 binding.container.addView(this)
             }
 
-            // Only show "2" text if there are more than 1 award
+            // Only show the award count if there are more than 1 award
             if (award.count > 1) {
                 TextView(context).apply {
                     text = award.count.toString()
-                    setTextColor(ContextCompat.getColor(context, R.color.secondary_text_color))
+                    setTextSize(TypedValue.COMPLEX_UNIT_PX, awardTextSize)
+                    setTextColor(awardTextColor)
                     setOnClickListener { showAwardDescription(award) }
 
                     binding.container.addView(this)

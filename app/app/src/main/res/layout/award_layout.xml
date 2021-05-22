@@ -29,8 +29,9 @@
                 android:layout_marginStart="4dp"
 
                 android:textColor="@color/secondary_text_color"
-                android:textStyle="bold"
+                android:textSize="@dimen/awardTextSize"
 
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="23 awards" />

@@ -72,7 +72,8 @@
     <integer name="submissionTitleMaxLength">300</integer>
     <dimen name="linkPreviewTopMargin">4dp</dimen>
     <dimen name="postBarHeight">24dp</dimen>
-    <dimen name="awardIconSize">14dp</dimen>
+    <dimen name="awardIconSize">10dp</dimen>
+    <dimen name="awardTextSize">10sp</dimen>
     <dimen name="horizontalProgressBarHeight">2.5dp</dimen>
 
     <dimen name="subredditToolbarScrimWithBanner">175dp</dimen>
