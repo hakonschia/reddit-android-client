@@ -61,7 +61,10 @@ class ShowAwardBottomSheet : BottomSheetDialogFragment() {
         }
 
         val imageUrl = award?.resizedIcons?.find { image -> image.height == IMAGE_SIZE }?.url
-        Glide.with(this).load(imageUrl).into(binding.icon)
+        Glide.with(this)
+            .load(imageUrl)
+            .override(IMAGE_SIZE, IMAGE_SIZE)
+            .into(binding.icon)
 
         return binding.root
     }

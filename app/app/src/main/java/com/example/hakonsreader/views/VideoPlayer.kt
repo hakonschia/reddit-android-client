@@ -19,7 +19,6 @@ import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
@@ -541,7 +540,7 @@ class VideoPlayer @JvmOverloads constructor(
             Glide.with(thumbnail)
                     .load(thumbnailUrl)
                     .transition(DrawableTransitionOptions.withCrossFade())
-                // .resize(params.width, params.height)
+                    .override(layoutParams.width, layoutParams.height)
                     .diskCacheStrategy(if (cacheVideo) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
                     .into(thumbnail)
         } else if (thumbnailDrawable != -1) {

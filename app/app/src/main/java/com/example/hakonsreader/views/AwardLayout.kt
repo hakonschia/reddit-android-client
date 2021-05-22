@@ -26,7 +26,9 @@ class AwardLayout @JvmOverloads constructor(
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
 ): FrameLayout(context, attrs, defStyleAttr) {
+
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "AwardLayout"
     }
 
@@ -59,9 +61,6 @@ class AwardLayout @JvmOverloads constructor(
             // 48 seems to fit fine. This could also be a setting
             // The sizes are: 16, 32, 48, 64, 128 (although some urls actually point to a higher res
             // image even though it says in the image object it is lower)
-            // The bottom sheet will show a larger version of the image, so if that has been loaded already
-            // it will be cached and we can use that instead to save some networking (and show a higher res image)
-            val preferredUrl = award.resizedIcons?.find { image -> image.height == ShowAwardBottomSheet.IMAGE_SIZE }?.url
             val backupUrl = award.resizedIcons?.find { image -> image.height == 48 }?.url
 
             ImageView(context).apply {
@@ -79,9 +78,10 @@ class AwardLayout @JvmOverloads constructor(
                 adjustViewBounds = true
                 setOnClickListener { showAwardDescription(award) }
 
-                // TODO load preferred in the same way with Glide
-               // Picasso.get().loadIf(preferredUrl, backupUrl, this)
-                Glide.with(this).load(preferredUrl).into(this)
+                Glide.with(this)
+                    .load(backupUrl)
+                    .override(awardIconSize, awardIconSize)
+                    .into(this)
 
                 binding.container.addView(this)
             }

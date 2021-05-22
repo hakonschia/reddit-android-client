@@ -96,8 +96,11 @@ class ContentLink @JvmOverloads constructor(
             }
 
             url != null -> {
+                val params = binding.thumbnail.layoutParams
                 Glide.with(binding.thumbnail)
                         .load(url)
+                        .override(params.width, params.height)
+                        .centerCrop()
                         .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(binding.thumbnail)
@@ -136,8 +139,11 @@ class ContentLink @JvmOverloads constructor(
 
             // If no thumbnail is given, reddit might give it as "default"
             thumbnail.isNotBlank() && thumbnail != "default" -> {
+                val params = binding.thumbnail.layoutParams
                 Glide.with(binding.thumbnail)
                         .load(thumbnail)
+                        .override(params.width, params.height)
+                        .centerCrop()
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
                         .into(binding.thumbnail)
