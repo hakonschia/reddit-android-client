@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +12,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.util.Pair
+import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -217,51 +217,38 @@ class ContentImage @JvmOverloads constructor(
             else -> normal ?: redditPost.url
         }
 
-        // TODO this (I think) has caused crashes (at least on Samsung devices) because the canvas is trying
-        //  to draw a bitmap too large. It's hard to reproduce since it only seems to happen some times
-        //  and when it happens it might not even happen on the same post (and opening the post in the post itself
-        //  instead of just when scrolling works
-        //  Exception message: java.lang.RuntimeException: Canvas: trying to draw too large(107867520bytes) bitmap.
-        //  Since it's hard to reproduce I'm not even sure if wrapping this section in a try catch works or not
-        //  The issue at least happens with extremely large images (although it didn't happen with large images the first time)
-        //  https://www.reddit.com/r/dataisbeautiful/comments/kji3wx/oc_2020_electoral_map_if_only_voted_breakdown_by/
-        try {
-            // No image to load, set image drawable directly
-            if (url == null) {
-                binding.image.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_image_not_supported_200dp))
-            } else {
-                // This is for NSFW/spoiler posts, which should not open the bitmap directly (since it is potentially blurred)
-                val openBitmap = url != nsfw || url != spoiler
+        // No image to load, set image drawable directly
+        if (url == null) {
+            binding.image.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_image_not_supported_200dp))
+        } else {
+            // This is for NSFW/spoiler posts, which should not open the bitmap directly (since it is potentially blurred)
+            val openBitmap = url != nsfw || url != spoiler
 
-                if (!openBitmap) {
-                    extras.putString(EXTRAS_URL_TO_OPEN, normal)
-                }
-
-                // When opening the image we always want to open the normal
-                setOnClickListener {
-                    val currentTime = System.currentTimeMillis()
-                    if (imageLastOpened + OPEN_TIMEOUT > currentTime) {
-                        return@setOnClickListener
-                    }
-
-                    imageLastOpened = currentTime
-
-                    openImageInFullscreen(
-                            binding.image,
-                            // Prefer the overridden URL as if it is given, "normal" might be null
-                            imageUrl ?: normal,
-                            cache,
-                            // If the URL is for nsfw/spoiler we want to load the actual image
-                            // when opened, not the blurred one
-                            useBitmapFromView = openBitmap
-                    )
-                }
-
-                loadImage(url)
+            if (!openBitmap) {
+                extras.putString(EXTRAS_URL_TO_OPEN, normal)
             }
-        } catch (e: RuntimeException) {
-            e.printStackTrace()
-            Log.d(TAG, "\n\n\n--------- ERROR LOADING IMAGE ${redditPost.subreddit}, ${redditPost.title} ---------\n\n\n")
+
+            // When opening the image we always want to open the normal
+            setOnClickListener {
+                val currentTime = System.currentTimeMillis()
+                if (imageLastOpened + OPEN_TIMEOUT > currentTime) {
+                    return@setOnClickListener
+                }
+
+                imageLastOpened = currentTime
+
+                openImageInFullscreen(
+                        binding.image,
+                        // Prefer the overridden URL as if it is given, "normal" might be null
+                        imageUrl ?: normal,
+                        cache,
+                        // If the URL is for nsfw/spoiler we want to load the actual image
+                        // when opened, not the blurred one
+                        useBitmapFromView = openBitmap
+                )
+            }
+
+            loadImage(url)
         }
     }
 
@@ -278,11 +265,36 @@ class ContentImage @JvmOverloads constructor(
      * Loads an image from a URL
      */
     private fun loadImage(url: String) {
-        Glide.with(binding.image)
-            .load(url)
-            .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(binding.image)
+        fun load(width: Int, height: Int){
+            Glide.with(binding.image)
+                .load(url)
+                .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .placeholder(R.drawable.ic_wifi_tethering_150dp)
+                .error(R.drawable.ic_image_not_supported_200dp)
+                .override(width, height)
+                .into(binding.image)
+        }
+
+        // post will run the runnable after the layout has been laid out, so we will have access to the
+        // width, which can then be used to scale the image correctly
+        val posted = binding.image.post {
+            val height = wantedHeight
+            val width = binding.image.measuredWidth
+
+            // Set the image size now. Not strictly necessary as it will be set be Glide when the image
+            // is loaded, but looks weird if the image just suddenly appears and takes more space in the layout
+            binding.image.updateLayoutParams {
+                this.height = height
+                this.width = width
+            }
+
+            load(width, height)
+        }
+
+        if (!posted) {
+            load(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+        }
     }
 
     /**
@@ -294,11 +306,23 @@ class ContentImage @JvmOverloads constructor(
         // after the load has started so that it isn't removed while the HD is loading
         val currentBitmap = getBitmap()
 
+        val width: Int
+        val height: Int
+
+        if (currentBitmap != null) {
+            width = currentBitmap.width
+            height = currentBitmap.height
+        } else {
+            width = Target.SIZE_ORIGINAL
+            height = Target.SIZE_ORIGINAL
+        }
+
         binding.showingHdImage = true
 
         Glide.with(binding.image)
             .load(url)
             .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
+            .override(width, height)
             .listener(object : RequestListener<Drawable>{
                 override fun onLoadFailed(
                     e: GlideException?,
