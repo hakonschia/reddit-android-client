@@ -33,21 +33,6 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
 
 
     /**
-     * The runnable to run when the end of list has been reached
-     */
-    private final Runnable onEndOfList;
-
-    /**
-     * The amount of items in the list at the last attempt at loading more posts
-     */
-    private int lastLoadAttemptCount;
-
-    /**
-     * The amount of posts left in the list before calling {@link PostScrollListener#onEndOfList}
-     */
-    private int numRemainingPostsBeforeRun = 10;
-
-    /**
      * The ID of the post to ignore when calling {@link PostsAdapter.ViewHolder#onSelected()}
      */
     private String postToIgnore = "";
@@ -56,41 +41,6 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
      * If true the listener is in a paused state and should not listen to scroll changes
      */
     private boolean paused = false;
-
-
-    /**
-     * Scroll listener that can be used for a {@link RecyclerView} with a {@link PostsAdapter} attached to it.
-     * The listener will:
-     * <ol>
-     *     <li>
-     *         Automatically run a {@link Runnable} when the end of the list has (almost) been reached.
-     *         The end of the list is calculated based on the adapters item count and the value set
-     *         with {@link PostScrollListener#setNumRemainingPostsBeforeRun(int)} (default to 5)
-     *     </li>
-     *     <li>
-     *         Automatically calls {@link PostsAdapter.ViewHolder#onSelected()} and
-     *         {@link PostsAdapter.ViewHolder#onUnselected()} based on if a post has been "selected" (ie. is the main
-     *         item on the screen) or "unselected" (ie. no longer the main item)
-     *     </li>
-     *</ol>
-     *
-     * @param onEndOfList The runnable to run when the end of the list has (almost) been reached
-     * @throws IllegalStateException If the {@code RecyclerView} does not have an adapter or layout manager
-     * attached to it
-     */
-    public PostScrollListener(Runnable onEndOfList) {
-        this.onEndOfList = onEndOfList;
-    }
-
-    /**
-     * Sets the amount of posts left in the list before the runnable set in the constructor runs.
-     * This has a default value of 5 posts.
-     *
-     * @param numRemainingPostsBeforeRun The amount of posts left
-     */
-    public void setNumRemainingPostsBeforeRun(int numRemainingPostsBeforeRun) {
-        this.numRemainingPostsBeforeRun = numRemainingPostsBeforeRun;
-    }
 
     /**
      * Sets the ID of a post to ignore when calling {@link PostsAdapter.ViewHolder#onSelected()}, so that
@@ -101,7 +51,7 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
      */
     public void setPostToIgnore(@Nullable String postToIgnore) {
         if (postToIgnore == null) {
-            postToIgnore = "";
+            this.postToIgnore = "";
         } else {
             this.postToIgnore = postToIgnore;
         }
@@ -112,14 +62,6 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
      */
     public String getPostToIgnore() {
         return postToIgnore;
-    }
-
-    /**
-     * Resets the onEndOfList runnable to be called again. This should be used to re-call the runnable
-     * passed to the constructor
-     */
-    public void resetOnEndOfList() {
-        lastLoadAttemptCount = -1;
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -145,16 +87,6 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
         // Find the positions of first and last visible items to find all visible items
         int posFirstItem = layoutManager.findFirstVisibleItemPosition();
         int posLastItem = layoutManager.findLastVisibleItemPosition();
-
-        int listSize = posts.getAdapter().getItemCount();
-
-        // Load more posts before we reach the end to create an "infinite" list
-        // Only load posts if there hasn't been an attempt at loading more posts
-        if (posLastItem + numRemainingPostsBeforeRun > listSize && lastLoadAttemptCount < listSize) {
-            lastLoadAttemptCount = listSize;
-
-            onEndOfList.run();
-        }
 
         this.checkSelectedPost(posts, posFirstItem, posLastItem, dy < 0);
     }

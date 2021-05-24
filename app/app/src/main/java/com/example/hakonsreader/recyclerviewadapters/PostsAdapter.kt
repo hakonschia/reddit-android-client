@@ -1,6 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +13,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
-import com.example.hakonsreader.misc.toMinutes
 import com.example.hakonsreader.recyclerviewadapters.diffutils.PostsDiffCallback
 import com.example.hakonsreader.views.ContentVideo
 import com.example.hakonsreader.views.ListDivider
@@ -26,8 +26,15 @@ import com.example.hakonsreader.views.Post
  * a leak will occur (if there are video posts, or galleries with videos, these ExoPlayer instances
  * might not be released, and if [lifecycleOwner] is set these references will also not be cleared).
  * [postExtras] will be set when this is done to store the states of the ViewHolders
+ *
+ * @param onEndOfListReached The callback that is invoked when the bottom of the list has almost been reached.
+ * The threshold for what is seen as the bottom of the list is determined by [numRemainingPostsBeforeRun]. The
+ * callback will be invoked when the [onBindViewHolder] is called for any position after the given position, and
+ * will only be called once (reset with [resetOnEndOfList])
  */
-class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
+class PostsAdapter(
+    private val onEndOfListReached: () -> Unit
+) : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     
     private var posts: List<RedditPost> = ArrayList()
 
@@ -71,6 +78,16 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     var onVideoFullscreenListener: ((ContentVideo) -> Unit)? = null
 
     /**
+     * The amount of posts left in the list before calling [onEndOfListReached]
+     */
+    var numRemainingPostsBeforeRun = 10
+
+    /**
+     * The amount of items in the list at the last attempt at loading more posts
+     */
+    private var lastLoadAttemptCount = 0
+
+    /**
      * The lifecycle owner of the adapter. If this is set the posts in the adapter will observe
      * the local database for updates to the posts, which will update the post information without
      * redrawing the ViewHolder
@@ -87,6 +104,13 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
             }
         }
 
+
+    /**
+     * Resets the [onEndOfListReached] runnable to be called again
+     */
+    fun resetOnEndOfList() {
+        lastLoadAttemptCount = -1
+    }
 
     /**
      * Submits the list of posts to show in the RecyclerView
@@ -126,6 +150,22 @@ class PostsAdapter : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        // Invoke the callback if the position is almost at the end, and only call it once for
+        // each list size
+
+        // Eg.:
+        // posts.size = 25
+        // position = 3, numRemainingPostsBeforeRun = 10
+        // pos + numRemaining = 13, don't invoke
+
+        // position = 15
+        // pos + numRemaining = 25, invoke it as we're now close to the end (if we haven't already)
+        if (position + numRemainingPostsBeforeRun >= posts.size && lastLoadAttemptCount < posts.size) {
+            lastLoadAttemptCount = posts.size
+            Log.d("PostsAdapter", "onBindViewHolder: invoking onEndOfList")
+            onEndOfListReached.invoke()
+        }
+
         // Save the extras of the previous post
         saveExtras(holder.post)
 

@@ -152,7 +152,7 @@ class PostsFragment : Fragment(), SortableWithTime {
     lateinit var postsViewModelFactory: PostsViewModel.Factory
     private val postsViewModel: PostsViewModel by assistedViewModel { postsViewModelFactory.create(name, isForUser, it) }
 
-    private val postsScrollListener: PostScrollListener = PostScrollListener { postsViewModel.loadPosts() }
+    private val postsScrollListener: PostScrollListener = PostScrollListener()
 
     /**
      * A list of scroll listeners that were set before the fragments view was created, and should
@@ -298,7 +298,7 @@ class PostsFragment : Fragment(), SortableWithTime {
      * layout manager
      */
     private fun setupPostsList() {
-        PostsAdapter().apply {
+        PostsAdapter { postsViewModel.loadPosts() }.apply {
             lifecycleOwner = viewLifecycleOwner
             binding.posts.adapter = this
 
@@ -398,7 +398,7 @@ class PostsFragment : Fragment(), SortableWithTime {
 
             error.observe(viewLifecycleOwner, { error ->
                 // Error loading posts, reset onEndOfList so it tries again when scrolled
-                postsScrollListener.resetOnEndOfList()
+                (binding.posts.adapter as PostsAdapter).resetOnEndOfList()
                 onError?.invoke(error.error, error.throwable)
             })
         }
