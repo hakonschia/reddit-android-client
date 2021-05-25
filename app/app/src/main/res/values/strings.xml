@@ -250,7 +250,26 @@
     <string name="content_description_nav_drawer_trending_subreddit_refresh">Refresh trending subreddits</string>
 
 
-    <string name="transition_post_info" translatable="false">transition_post_info</string>
+    <string name="transition_post_info_posted_in" translatable="false">transition_post_info_posted_in</string>
+    <string name="transition_post_info_posted_in_subreddit" translatable="false">transition_post_info_posted_in_subreddit</string>
+    <string name="transition_post_info_posted_by" translatable="false">transition_post_info_posted_by</string>
+    <string name="transition_post_info_domain" translatable="false">transition_post_info_domain</string>
+    <string name="transition_post_info_age" translatable="false">transition_post_info_age</string>
+    <string name="transition_post_info_stickied" translatable="false">transition_post_info_stickied</string>
+    <string name="transition_post_info_archived" translatable="false">transition_post_info_archived</string>
+    <string name="transition_post_info_locked" translatable="false">transition_post_info_locked</string>
+    <string name="transition_post_info_author" translatable="false">transition_post_info_author</string>
+    <string name="transition_post_info_author_flair" translatable="false">transition_post_info_author_flair</string>
+    <string name="transition_post_info_nsfw_tag" translatable="false">transition_post_info_nsfw_tag</string>
+    <string name="transition_post_info_spoiler_tag" translatable="false">transition_post_info_spoiler_tag</string>
+    <string name="transition_post_info_link_flair" translatable="false">transition_post_info_link_flair</string>
+    <string name="transition_post_info_crosspost_icon" translatable="false">transition_post_info_crosspost_icon</string>
+    <string name="transition_post_info_crosspost_text" translatable="false">transition_post_info_crosspost_text</string>
+    <string name="transition_post_info_crosspost_from" translatable="false">transition_post_info_crosspost_from</string>
+    <string name="transition_post_info_crosspost_subreddit" translatable="false">transition_post_info_crosspost_subreddit</string>
+    <string name="transition_post_info_awards" translatable="false">transition_post_info_awards</string>
+    <string name="transition_post_info_reports" translatable="false">transition_post_info_reports</string>
+    <string name="transition_post_info_title" translatable="false">transition_post_info_title</string>
     <string name="transition_post_content" translatable="false">transition_post_content</string>
     <string name="transition_post_bar_comments_img" translatable="false">transition_post_bar_comments_img</string>
     <string name="transition_post_bar_num_comments" translatable="false">transition_post_bar_num_comments</string>

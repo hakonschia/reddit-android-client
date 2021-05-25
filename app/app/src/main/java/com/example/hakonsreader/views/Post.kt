@@ -3,13 +3,13 @@ package com.example.hakonsreader.views
 import android.animation.ValueAnimator
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.Pair
 import androidx.core.view.children
@@ -17,6 +17,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
@@ -25,7 +26,9 @@ import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForPost
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
+import com.example.hakonsreader.views.util.ViewUtil
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.robinhood.ticker.TickerUtils
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -119,7 +122,6 @@ class Post @JvmOverloads constructor(
      * True if the score on the post is/should be hidden
      */
     var hideScore: Boolean = false
-        get() = true
 
 
     // It is probably quite bad to use LiveData to observe the changes inside here? But it makes it
@@ -253,7 +255,7 @@ class Post @JvmOverloads constructor(
      * @param enable If set to true, layout animations will be enabled
      */
     fun enableLayoutAnimations(enable: Boolean) {
-        binding.postInfo.enableLayoutAnimations(enable)
+       // binding.postInfo.enableLayoutAnimations(enable)
         //binding.postFullBar.enableTickerAnimation(enable)
     }
 
@@ -264,8 +266,24 @@ class Post @JvmOverloads constructor(
      */
     fun updatePostInfo(post: RedditPost) {
         redditPost = post
-        binding.postInfo.setPost(post)
+        updatePostInfo2(post, updateAwards = false)
         updatePostBar(post)
+    }
+
+    private fun updatePostInfo2(post: RedditPost, updateAwards: Boolean) {
+        binding.post = post
+        binding.isCrosspost = post.crosspostParentId != null
+        if (updateAwards) {
+            binding.awards.listing = post
+        }
+        binding.userReportsTitle.setOnClickListener { ViewUtil.openReportsBottomSheet(post, context) { binding.invalidateAll() } }
+
+        val crossposts = post.crossposts
+        if (crossposts != null && crossposts.isNotEmpty()) {
+            val crosspost = crossposts[0]
+            binding.crosspost = crosspost
+            binding.crosspostText.setOnClickListener { openPost(crosspost) }
+        }
     }
 
     private fun updatePostBar(post: RedditPost) {
@@ -286,6 +304,20 @@ class Post @JvmOverloads constructor(
                 post.amountOfComments,
                 post.amountOfComments
             )
+        }
+    }
+
+    /**
+     * Opens a post in a [PostActivity]
+     *
+     * @param post The post to open
+     */
+    private fun openPost(post: RedditPost) {
+        if (context is AppCompatActivity) {
+            val intent = Intent(context, PostActivity::class.java).apply {
+                putExtra(PostActivity.EXTRAS_POST_KEY, Gson().toJson(post))
+            }
+            (context as AppCompatActivity).startActivity(intent)
         }
     }
 
@@ -327,20 +359,6 @@ class Post @JvmOverloads constructor(
                 binding.content.viewTreeObserver.addOnGlobalLayoutListener(contentOnGlobalLayoutListener)
             }
         }
-
-        // TODO update this as its now constraintlayout
-        /*
-        val params = binding.content.layoutParams as RelativeLayout.LayoutParams
-        // Align link and text posts to start of parent, otherwise center
-        if (content is ContentLink || content is ContentText || content is ContentPostRemoved) {
-            params.removeRule(RelativeLayout.CENTER_IN_PARENT)
-            params.addRule(RelativeLayout.ALIGN_PARENT_START)
-        } else {
-            params.removeRule(RelativeLayout.ALIGN_PARENT_START)
-            params.addRule(RelativeLayout.CENTER_IN_PARENT)
-        }
-        binding.content.layoutParams = params
-         */
     }
 
     /**
@@ -496,7 +514,7 @@ class Post @JvmOverloads constructor(
         // Ensure view is fresh if used in a RecyclerView
         cleanUpContent()
 
-        binding.postInfo.setPost(redditPost, updateAwards = true)
+        updatePostInfo2(redditPost, updateAwards = true)
         addContent()
         updatePostBar(redditPost)
     }
@@ -517,7 +535,6 @@ class Post @JvmOverloads constructor(
 
     /**
      * Retrieve a bundle of information that can be useful for saving the state of the post
-     *
      *
      * Currently only saves state for video posts
      *
@@ -553,16 +570,15 @@ class Post @JvmOverloads constructor(
         val context = context
 
         val pairs: MutableList<Pair<View, String>> = ArrayList()
-        //pairs.add(Pair.create(binding.postInfo, context.getString(R.string.transition_post_info)))
 
-        binding.postsParentLayout.children.forEach {
+        binding.postsParentLayout.children.forEach { view ->
             // We want to handle the content below manually
-            if (it !is Content && it.transitionName != null) {
-                pairs.add(Pair(it, it.transitionName))
+            // If the view isn't visible then it will appear in the new activity until it decides itself
+            // that the view actually isn't visible and remove it
+            if (view !is Content && view.transitionName != null && view.visibility == View.VISIBLE) {
+                pairs.add(Pair(view, view.transitionName))
             }
         }
-
-        //pairs.add(Pair.create(binding.postFullBar, context.getString(R.string.transition_post_full_bar)))
 
         val content = binding.content.getChildAt(0) as Content?
 
