@@ -12,24 +12,27 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.Pair
+import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.example.hakonsreader.R
+import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
+import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForPost
 import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
 import com.google.android.material.snackbar.Snackbar
+import com.robinhood.ticker.TickerUtils
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
 
 /**
- * View for displaying a Reddit post, including the post information ([PostInfo]), the content (a subclass
- * of [Content]), and the post bar ([PostBar])
+ * View for displaying a Reddit post, including the post information, the content, and the post bar
  *
  * If wanted, the max height of the post can be set with [maxHeight] (and [updateMaxHeight] to update
  * after the content has been created) which will ensure post does not go above said height. The
@@ -54,9 +57,16 @@ class Post @JvmOverloads constructor(
     private var postExtras: Bundle? = null
 
     @Inject
+    lateinit var api: RedditApi
+
+    @Inject
     lateinit var postsDao: RedditPostsDao
 
     private val binding = PostBinding.inflate(LayoutInflater.from(context), this, true).apply {
+        postPopupMenu.setOnClickListener {
+            showPopupForPost(it, redditPost, postsDao, api)
+        }
+
         setOnLongClickListener {
             redditPost?.let { post ->
                 // If we're already showing text content it's no point in showing this dialog
@@ -108,9 +118,8 @@ class Post @JvmOverloads constructor(
     /**
      * True if the score on the post is/should be hidden
      */
-    var hideScore: Boolean
-        get() = binding.postFullBar.getHideScore()
-        set(value) = binding.postFullBar.setHideScore(value)
+    var hideScore: Boolean = false
+        get() = true
 
 
     // It is probably quite bad to use LiveData to observe the changes inside here? But it makes it
@@ -239,19 +248,13 @@ class Post @JvmOverloads constructor(
     }
 
     /**
-     * @return The height of only the content in the post
-     */
-    fun getContentHeight() = binding.content.getChildAt(0)?.measuredHeight
-
-
-    /**
      * Enables or disables layout animation for various views in the layout
      *
      * @param enable If set to true, layout animations will be enabled
      */
     fun enableLayoutAnimations(enable: Boolean) {
         binding.postInfo.enableLayoutAnimations(enable)
-        binding.postFullBar.enableTickerAnimation(enable)
+        //binding.postFullBar.enableTickerAnimation(enable)
     }
 
     /**
@@ -262,15 +265,34 @@ class Post @JvmOverloads constructor(
     fun updatePostInfo(post: RedditPost) {
         redditPost = post
         binding.postInfo.setPost(post)
-        binding.postFullBar.post = redditPost
+        updatePostBar(post)
+    }
+
+    private fun updatePostBar(post: RedditPost) {
+        // TODO this might be wrong as this function is used to both update only the post info and when creating the post
+        binding.voteBar.listing = post
+        binding.voteBar.updateVoteStatus(animate = true)
+
+        val comments = post.amountOfComments.toFloat()
+
+        binding.numComments.setCharacterLists(TickerUtils.provideNumberList())
+
+        // Above 10k comments, show "1.5k comments" instead
+        binding.numComments.text = if (comments > 1000) {
+            String.format(resources.getString(R.string.numCommentsThousands), comments / 1000f)
+        } else {
+            resources.getQuantityString(
+                R.plurals.numComments,
+                post.amountOfComments,
+                post.amountOfComments
+            )
+        }
     }
 
     /**
      * Adds the post content
      *
-     *
      * If [Post.showTextContent] is `false` and the post type is [PostType.TEXT] nothing happens
-     *
      *
      * The height of the post is resized to match [Post.maxHeight], if needed
      */
@@ -306,6 +328,8 @@ class Post @JvmOverloads constructor(
             }
         }
 
+        // TODO update this as its now constraintlayout
+        /*
         val params = binding.content.layoutParams as RelativeLayout.LayoutParams
         // Align link and text posts to start of parent, otherwise center
         if (content is ContentLink || content is ContentText || content is ContentPostRemoved) {
@@ -316,6 +340,7 @@ class Post @JvmOverloads constructor(
             params.addRule(RelativeLayout.CENTER_IN_PARENT)
         }
         binding.content.layoutParams = params
+         */
     }
 
     /**
@@ -410,7 +435,6 @@ class Post @JvmOverloads constructor(
     /**
      * Releases any relevant resources and removes the content view
      *
-     *
      * If relevant to the type of post, various resources (such as video players) are released
      * when this is called
      */
@@ -474,7 +498,7 @@ class Post @JvmOverloads constructor(
 
         binding.postInfo.setPost(redditPost, updateAwards = true)
         addContent()
-        binding.postFullBar.post = redditPost
+        updatePostBar(redditPost)
     }
 
     override fun setRedditPost(redditPost: RedditPost?) {
@@ -529,8 +553,16 @@ class Post @JvmOverloads constructor(
         val context = context
 
         val pairs: MutableList<Pair<View, String>> = ArrayList()
-        pairs.add(Pair.create(binding.postInfo, context.getString(R.string.transition_post_info)))
-        pairs.add(Pair.create(binding.postFullBar, context.getString(R.string.transition_post_full_bar)))
+        //pairs.add(Pair.create(binding.postInfo, context.getString(R.string.transition_post_info)))
+
+        binding.postsParentLayout.children.forEach {
+            // We want to handle the content below manually
+            if (it !is Content && it.transitionName != null) {
+                pairs.add(Pair(it, it.transitionName))
+            }
+        }
+
+        //pairs.add(Pair.create(binding.postFullBar, context.getString(R.string.transition_post_full_bar)))
 
         val content = binding.content.getChildAt(0) as Content?
 

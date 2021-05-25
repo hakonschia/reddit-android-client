@@ -252,7 +252,10 @@
 
     <string name="transition_post_info" translatable="false">transition_post_info</string>
     <string name="transition_post_content" translatable="false">transition_post_content</string>
-    <string name="transition_post_full_bar" translatable="false">transition_post_full_bar</string>
+    <string name="transition_post_bar_comments_img" translatable="false">transition_post_bar_comments_img</string>
+    <string name="transition_post_bar_num_comments" translatable="false">transition_post_bar_num_comments</string>
+    <string name="transition_post_bar_post_menu" translatable="false">transition_post_bar_post_menu</string>
+    <string name="transition_post_bar_vote_bar" translatable="false">transition_post_bar_vote_bar</string>
     <string name="transition_content_image_image" translatable="false">transition_content_image_image</string>
     <string name="transition_content_image_hd_icon" translatable="false">transition_content_image_hd_icon</string>
     <string name="transition_image_fullscreen" translatable="false">transition_image_fullscreen</string>
