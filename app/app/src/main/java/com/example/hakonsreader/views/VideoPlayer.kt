@@ -263,17 +263,25 @@ class VideoPlayer @JvmOverloads constructor(
 
     /**
      * The duration of the video. This should be set ahead of time if the video duration is known.
-     * If the video duration is not known, the duration will be set when the video is loaded
+     * If the video duration is not known, the duration will be set when the video is loaded. If a negative
+     * value is set then the the same happens
      */
     var videoDuration = -1
         set(value) {
             field = value
 
-            // Use our own view for the duration as we can set it before the video loads
-            findViewById<View>(R.id.exo_duration).visibility = GONE
+            val defaultExoDuration = findViewById<View>(R.id.exo_duration)
             val duration = findViewById<TextView>(R.id.duration)
-            duration.visibility = VISIBLE
-            duration.text = createVideoDuration(field)
+            if (videoDuration > 0) {
+                // Use our own view for the duration as we can set it before the video loads
+                defaultExoDuration.visibility = GONE
+
+                duration.visibility = VISIBLE
+                duration.text = createVideoDuration(field)
+            } else {
+                defaultExoDuration.visibility = VISIBLE
+                duration.visibility = GONE
+            }
         }
 
     /**
@@ -312,6 +320,7 @@ class VideoPlayer @JvmOverloads constructor(
      * The actual video height after it has been resized
      */
     var actualVideoHeight = -1
+        private set
 
     /**
      * If set to true the controller will be animated (primarily by fading in/out).
@@ -386,6 +395,27 @@ class VideoPlayer @JvmOverloads constructor(
         setFullscreenListener()
         setPauseButtonListener()
         setVolumeListener()
+    }
+
+    /**
+     * Prepares the VideoPlayer to be reused with a new video
+     */
+    fun prepareForNewVideo() {
+        isPrepared = false
+        videoSize = -1
+        videoDuration = -1
+        dashVideo = false
+        mp4Video = false
+        hasAudio = true
+        url = ""
+        thumbnailUrl = ""
+        thumbnailDrawable = -1
+        isVideoSizeEstimated = false
+        // This will happen when the player is prepared again, but the bar might be visible before that
+        // It still shows how much the old video was buffered tho
+        exoPlayer.seekTo(0)
+        exoPlayer.playWhenReady = false
+        thumbnail.visibility = VISIBLE
     }
 
     /**
@@ -611,11 +641,11 @@ class VideoPlayer @JvmOverloads constructor(
         }
 
         // Create the media source and prepare the exoPlayer
-        createMediaSource().also {
-            isPrepared = true
-            exoPlayer.setMediaSource(it)
-            exoPlayer.prepare()
-        }
+        val mediaSource = createMediaSource()
+
+        exoPlayer.setMediaSource(mediaSource)
+        exoPlayer.prepare()
+        isPrepared = true
     }
 
 

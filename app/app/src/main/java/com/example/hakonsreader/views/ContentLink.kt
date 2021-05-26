@@ -3,7 +3,6 @@ package com.example.hakonsreader.views
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +21,6 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
 import com.example.hakonsreader.misc.Settings
-import com.example.hakonsreader.misc.getAppIconFromUrl
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 
 /**
@@ -51,12 +49,10 @@ class ContentLink @JvmOverloads constructor(
 
 
     override fun updateView() {
-        val icon = getAppIconFromUrl(context, redditPost.url)
-
         if (binding is ContentLinkBinding) {
-            this.updateViewNormal(icon)
+            this.updateViewNormal()
         } else {
-            this.updateViewSimple(icon)
+            this.updateViewSimple()
         }
 
         setOnClickListener { openLink() }
@@ -79,7 +75,7 @@ class ContentLink @JvmOverloads constructor(
     /**
      * Updates the view for the normal
      */
-    private fun updateViewNormal(icon: Drawable?) {
+    private fun updateViewNormal() {
         binding as ContentLinkBinding
 
         val variants = getImageVariantsForRedditPost(redditPost)
@@ -90,6 +86,10 @@ class ContentLink @JvmOverloads constructor(
             else -> variants.normal
         }
 
+        // The view might be reused, so if the previous post had an image, but this doesn't, then
+        // the old shouldn't appear
+        binding.thumbnail.setImageDrawable(null)
+
         when {
             bitmap != null -> {
                 binding.thumbnail.setImageBitmap(bitmap)
@@ -97,6 +97,10 @@ class ContentLink @JvmOverloads constructor(
 
             url != null -> {
                 val params = binding.thumbnail.layoutParams
+                // In case this view was used without an image previously
+                params.height = resources.getDimension(R.dimen.contentLinkThumbnailSize).toInt()
+                binding.thumbnail.layoutParams = params
+
                 Glide.with(binding.thumbnail)
                         .load(url)
                         .override(params.width, params.height)
@@ -113,12 +117,6 @@ class ContentLink @JvmOverloads constructor(
             }
         }
 
-        if (icon != null) {
-            binding.linkImage.setImageDrawable(icon)
-        } else {
-            binding.linkImage.setImageResource(R.drawable.ic_baseline_link_24)
-        }
-
         binding.link.text = redditPost.url
     }
 
@@ -126,11 +124,13 @@ class ContentLink @JvmOverloads constructor(
      * Updates the view for a simple view. This view uses only the thumbnail for the post, which
      * will be a smaller image and use less data
      */
-    private fun updateViewSimple(icon: Drawable?) {
+    private fun updateViewSimple() {
         binding as ContentLinkSimpleBinding
         binding.thumbnail.scaleType = ImageView.ScaleType.CENTER_CROP
 
         val thumbnail = redditPost.thumbnail
+
+        binding.thumbnail.setImageDrawable(null)
 
         when {
             bitmap != null -> {
@@ -155,12 +155,6 @@ class ContentLink @JvmOverloads constructor(
                 binding.thumbnail.scaleType = ImageView.ScaleType.CENTER
                 binding.thumbnail.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_link_24))
             }
-        }
-
-        if (icon != null) {
-            binding.linkImage.setImageDrawable(icon)
-        } else {
-            binding.linkImage.setImageResource(R.drawable.ic_baseline_link_24)
         }
 
         binding.link.text = redditPost.url

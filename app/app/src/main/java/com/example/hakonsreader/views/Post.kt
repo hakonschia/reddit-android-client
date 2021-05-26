@@ -13,6 +13,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.Pair
 import androidx.core.view.children
+import androidx.core.view.get
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -24,8 +25,8 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
+import com.example.hakonsreader.misc.generatePostContent
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForPost
-import com.example.hakonsreader.views.ContentVideo.Companion.isRedditPostVideoPlayable
 import com.example.hakonsreader.views.util.ViewUtil
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -49,6 +50,7 @@ class Post @JvmOverloads constructor(
 ) : Content(context, attrs, defStyleAttr) {
 
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "Post"
 
         /**
@@ -170,6 +172,8 @@ class Post @JvmOverloads constructor(
         }
     }
 
+    private var suppliedContent: Content? = null
+
     /**
      * Listener for layout changes for the content of the post, which is used to resize the content
      * based on [maxHeight]
@@ -250,27 +254,17 @@ class Post @JvmOverloads constructor(
     }
 
     /**
-     * Enables or disables layout animation for various views in the layout
-     *
-     * @param enable If set to true, layout animations will be enabled
-     */
-    fun enableLayoutAnimations(enable: Boolean) {
-       // binding.postInfo.enableLayoutAnimations(enable)
-        //binding.postFullBar.enableTickerAnimation(enable)
-    }
-
-    /**
      * Updates the information in the post without re-creating the content
      *
      * @param post The post with updated information
      */
     fun updatePostInfo(post: RedditPost) {
         redditPost = post
-        updatePostInfo2(post, updateAwards = false)
-        updatePostBar(post)
+        updateInfo(post, updateAwards = false)
+        updatePostBar(post, animateTickers = true)
     }
 
-    private fun updatePostInfo2(post: RedditPost, updateAwards: Boolean) {
+    private fun updateInfo(post: RedditPost, updateAwards: Boolean) {
         binding.post = post
         binding.isCrosspost = post.crosspostParentId != null
         if (updateAwards) {
@@ -286,17 +280,17 @@ class Post @JvmOverloads constructor(
         }
     }
 
-    private fun updatePostBar(post: RedditPost) {
+    private fun updatePostBar(post: RedditPost, animateTickers: Boolean) {
         // TODO this might be wrong as this function is used to both update only the post info and when creating the post
         binding.voteBar.listing = post
-        binding.voteBar.updateVoteStatus(animate = true)
+        binding.voteBar.updateVoteStatus(animateTickers)
 
         val comments = post.amountOfComments.toFloat()
 
         binding.numComments.setCharacterLists(TickerUtils.provideNumberList())
 
         // Above 10k comments, show "1.5k comments" instead
-        binding.numComments.text = if (comments > 1000) {
+        binding.numComments.setText(if (comments > 1000) {
             String.format(resources.getString(R.string.numCommentsThousands), comments / 1000f)
         } else {
             resources.getQuantityString(
@@ -304,7 +298,7 @@ class Post @JvmOverloads constructor(
                 post.amountOfComments,
                 post.amountOfComments
             )
-        }
+        }, animateTickers)
     }
 
     /**
@@ -329,16 +323,20 @@ class Post @JvmOverloads constructor(
      * The height of the post is resized to match [Post.maxHeight], if needed
      */
     private fun addContent() {
-        val hasTextContent = redditPost.getPostType() == PostType.TEXT
-                // If the post is a crosspost and the crosspost is a text post, it's seen as LINK
-                // post as the post is a "link" to the crosspost, so check here if it's a text post
-                // as it would be added for generatePostContent
-                || redditPost?.crossposts?.find { it.getPostType() == PostType.TEXT } != null
-        if (!showTextContent && hasTextContent) {
-            return
-        }
+        val content = suppliedContent ?: generatePostContent(context, redditPost, showTextContent, null)
+        content?.also { c ->
+            setBitmap(this@Post.bitmap)
+            postExtras?.let {
+                setExtras(it)
+            }
+            // Should only be used for this post, in case of a reuse
+            postExtras = null
 
-        val content = generatePostContent(redditPost, context)
+            if (c is ContentVideo) {
+                onVideoManuallyPaused?.let { c.setOnVideoManuallyPaused(it) }
+                onVideoFullscreenListener?.let { c.setOnVideoFullscreenListener(it) }
+            }
+        }
 
         if (content != null) {
             binding.content.addView(content)
@@ -359,95 +357,9 @@ class Post @JvmOverloads constructor(
                 binding.content.viewTreeObserver.addOnGlobalLayoutListener(contentOnGlobalLayoutListener)
             }
         }
-    }
 
-    /**
-     * Generates the content view for a post
-     *
-     * @param post The post to generate for
-     * @return A view with the content of the post
-     */
-    private fun generatePostContent(post: RedditPost, context: Context): Content? {
-        val margin = resources.getDimension(R.dimen.postMargin).toInt()
-        val marginParams = MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-            setMargins(margin, 0, margin, 0)
-        }
-
-        // If the post has been removed don't try to render the content as it can cause a crash later
-        // Just show that the post has been removed
-        // For instance, if the post is not uploaded to reddit the URL will still link to something (like an imgur gif)
-        // TODO maybe the only posts actually removed completely so they're not able ot be watched are videos? Even text/images uploaded
-        //  to reddit directly are still there
-        if (post.removedByCategory != null) {
-            return ContentPostRemoved(context).apply {
-                setRedditPost(post)
-                layoutParams = marginParams
-            }
-        }
-
-        // Generate the content based on the crosspost. Videos hosted on reddit aren't sent to the "child"
-        // post (this post) but it is in the parent
-        val crosspost = post.crossposts?.firstOrNull()
-        if (crosspost != null) {
-            return generatePostContent(crosspost, context)
-        }
-
-        return when (post.getPostType()) {
-            PostType.IMAGE -> {
-                ContentImage(context)
-            }
-
-            PostType.VIDEO, PostType.GIF, PostType.RICH_VIDEO -> {
-                // Ensure we know how to handle a video, otherwise it might not load
-                // Show as link content if we can't show it as a video
-                if (isRedditPostVideoPlayable(post)) {
-                    ContentVideo(context).apply {
-                        this@Post.onVideoManuallyPaused?.let { setOnVideoManuallyPaused(it) }
-                        this@Post.onVideoFullscreenListener?.let { setOnVideoFullscreenListener(it) }
-                    }
-                } else {
-                    ContentLink(context).apply {
-                        layoutParams = marginParams
-                    }
-                }
-            }
-
-            PostType.LINK -> {
-                ContentLink(context).apply {
-                    layoutParams = marginParams
-                }
-            }
-
-            PostType.TEXT -> {
-                // If there is no text on the post there is no point in creating a view for it
-                val selfText = post.selftext
-
-                if (selfText.isNotEmpty()) {
-                    ContentText(context).apply {
-                        layoutParams = marginParams
-                    }
-                } else {
-                    null
-                }
-            }
-
-            PostType.GALLERY -> {
-                ContentGallery(context)
-            }
-
-            else -> null
-        }?.apply {
-            postExtras?.let {
-                setExtras(it)
-
-                // This should only be for one post, so ensure that if this view is recycled
-                // it doesn't set extras for another post
-                postExtras = null
-            }
-            setBitmap(this@Post.bitmap)
-            setRedditPost(post)
-            transitionName = context.getString(R.string.transition_post_content)
-       }
+        // We don't want to keep this reference any longer than necessary
+        suppliedContent = null
     }
 
     /**
@@ -467,16 +379,13 @@ class Post @JvmOverloads constructor(
             v.release()
         }
 
-        binding.content.removeAllViewsInLayout()
+        binding.content.removeAllViews()
         // Make sure the view size resets
         binding.content.forceLayout()
     }
 
     /**
      * Gets the position of the contents Y position on the screen
-     *
-     * Crossposts is taken into account and will return the position of the actual content
-     * inside the crosspost
      *
      * @return The Y position of the content
      */
@@ -490,9 +399,6 @@ class Post @JvmOverloads constructor(
     /**
      * Gets the bottom position of the contents Y position on the screen
      *
-     * Crossposts is taken into account and will return the position of the actual content
-     * inside the crosspost
-     *
      * @return The Y position of the bottom of the content
      */
     fun getContentBottomY(): Int {
@@ -500,23 +406,44 @@ class Post @JvmOverloads constructor(
     }
 
     /**
-     * Gets the content view displayed in the post
+     * @return The content view displayed in the post, or null if no content is being displayed
      */
     fun getContent(): Content? {
-        return binding.content.getChildAt(0) as? Content
+        return if (binding.content.childCount > 0) binding.content[0] as Content else null
     }
 
+    /**
+     * Supply the view with a content and don't generate it automatically.
+     * This must be called before [setRedditPost]
+     *
+     * @param content The content to supply. If this View has a parent then it will be removed from
+     * the parent
+     */
+    fun supplyContent(content: Content?) {
+        suppliedContent = content
+    }
+
+    /**
+     * Retrieves the content currently displayed and removes it from the view hierarchy so that it
+     * can be reused later
+     *
+     * @return The content displayed, or null if no content is currently being displayed
+     */
+    fun getAndRemoveContent(): Content? {
+        val content = getContent()
+
+        binding.content.removeView(content)
+
+        return content
+    }
 
     /**
      * Updates the view
      */
     override fun updateView() {
-        // Ensure view is fresh if used in a RecyclerView
-        cleanUpContent()
-
-        updatePostInfo2(redditPost, updateAwards = true)
         addContent()
-        updatePostBar(redditPost)
+        updateInfo(redditPost, updateAwards = true)
+        updatePostBar(redditPost, animateTickers = false)
     }
 
     override fun setRedditPost(redditPost: RedditPost?) {
@@ -580,7 +507,7 @@ class Post @JvmOverloads constructor(
             }
         }
 
-        val content = binding.content.getChildAt(0) as Content?
+        val content = getContent()
 
         if (content != null) {
             // Not all subclasses add custom transition views, so if no custom view is found use the

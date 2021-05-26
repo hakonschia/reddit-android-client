@@ -221,7 +221,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
             commentChainShown = false
 
             post.bitmap = BITMAP
-            post.enableLayoutAnimations(false)
 
             post.lifecycleOwner = this@PostActivity
 
@@ -375,12 +374,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
         }
 
         binding.post.redditPost = newPost
-
-        // Enable animation after first time the post has loaded (it looks weird if animates when it goes
-        // from nothing to something)
-        binding.post.post {
-            binding.post.enableLayoutAnimations(true)
-        }
     }
 
     /**

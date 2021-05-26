@@ -1,7 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +12,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.RedditPost
+import com.example.hakonsreader.misc.generatePostContent
 import com.example.hakonsreader.recyclerviewadapters.diffutils.PostsDiffCallback
-import com.example.hakonsreader.views.ContentVideo
-import com.example.hakonsreader.views.ListDivider
-import com.example.hakonsreader.views.Post
+import com.example.hakonsreader.views.*
 
 /**
  * Adapter for recycler view of [RedditPost].
@@ -28,15 +26,25 @@ import com.example.hakonsreader.views.Post
  * [postExtras] will be set when this is done to store the states of the ViewHolders
  *
  * @param onEndOfListReached The callback that is invoked when the bottom of the list has almost been reached.
- * The threshold for what is seen as the bottom of the list is determined by [numRemainingPostsBeforeRun]. The
+ * The threshold for what is seen as the bottom of the list is determined by [numRemainingPostsBeforeEndOfList]. The
  * callback will be invoked when the [onBindViewHolder] is called for any position after the given position, and
  * will only be called once (reset with [resetOnEndOfList])
  */
 class PostsAdapter(
     private val onEndOfListReached: () -> Unit
 ) : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
+
+    companion object {
+        @Suppress("UNUSED")
+        private const val TAG = "PostsAdapter"
+    }
     
     private var posts: List<RedditPost> = ArrayList()
+
+    /**
+     * A list holding the currently unused content views from recycled posts
+     */
+    private val unusedContentViews: MutableList<Content> = ArrayList()
 
     /**
      * A list of the view holders this adapter has
@@ -80,7 +88,7 @@ class PostsAdapter(
     /**
      * The amount of posts left in the list before calling [onEndOfListReached]
      */
-    var numRemainingPostsBeforeRun = 10
+    var numRemainingPostsBeforeEndOfList = 10
 
     /**
      * The amount of items in the list at the last attempt at loading more posts
@@ -142,13 +150,6 @@ class PostsAdapter(
         notifyItemRangeRemoved(0, size)
     }
 
-    private fun saveExtras(post: Post) {
-        val previousPost = post.redditPost
-        if (previousPost != null) {
-            postExtras[previousPost.id] = post.extras
-        }
-    }
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         // Invoke the callback if the position is almost at the end, and only call it once for
         // each list size
@@ -160,27 +161,33 @@ class PostsAdapter(
 
         // position = 15
         // pos + numRemaining = 25, invoke it as we're now close to the end (if we haven't already)
-        if (position + numRemainingPostsBeforeRun >= posts.size && lastLoadAttemptCount < posts.size) {
+        if (position + numRemainingPostsBeforeEndOfList >= posts.size && lastLoadAttemptCount < posts.size) {
             lastLoadAttemptCount = posts.size
-            Log.d("PostsAdapter", "onBindViewHolder: invoking onEndOfList")
             onEndOfListReached.invoke()
         }
 
-        // Save the extras of the previous post
-        saveExtras(holder.post)
-
         val post = posts[position]
 
-        // Disable any animation to avoid it updating when scrolling, as this would animate changes from
-        // one post to another
-        holder.post.enableLayoutAnimations(false)
-        holder.post.redditPost = post
+        val content = generatePostContent(
+            holder.view.context,
+            post,
+            showTextContent = false,
+            unusedContentViews
+        )?.also { content ->
+            if (content is ContentVideo) {
+                onVideoManuallyPaused?.let { content.setOnVideoManuallyPaused(it) }
+                onVideoFullscreenListener?.let { content.setOnVideoFullscreenListener(it) }
+            }
 
-        val savedExtras = postExtras[post.id]
-        if (savedExtras != null) {
-            holder.post.extras = savedExtras
+            // TODO doesnt work
+            val savedExtras = postExtras[post.id]
+            if (savedExtras != null) {
+                content.extras = savedExtras
+            }
         }
-        holder.post.enableLayoutAnimations(true)
+
+        holder.addContent(content)
+        holder.post.redditPost = post
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -210,12 +217,20 @@ class PostsAdapter(
             it.destroy()
         }
 
-        // Not sure if this is strictly necessary, but it shouldn't cause any issues
         viewHolders.clear()
+        unusedContentViews.clear()
 
         lifecycleOwner = null
     }
 
+    override fun onViewRecycled(holder: ViewHolder) {
+        holder.saveExtras()
+        val content = holder.getAndRemoveContent()
+        // There is no point in storing remove post content as it is rare and a non-expensive view
+        if (content != null && content !is ContentPostRemoved) {
+            unusedContentViews.add(content)
+        }
+    }
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val post: Post = view.findViewById<Post>(R.id.post).apply {
@@ -226,9 +241,6 @@ class PostsAdapter(
             }
 
             lifecycleOwner = this@PostsAdapter.lifecycleOwner
-
-            onVideoManuallyPaused = this@PostsAdapter.onVideoManuallyPaused
-            onVideoFullscreenListener = this@PostsAdapter.onVideoFullscreenListener
 
             // Text posts shouldn't be shown in lists of posts
             showTextContent = false
@@ -260,9 +272,6 @@ class PostsAdapter(
         /**
          * Gets the position of the contents Y position on the screen
          *
-         * Crossposts is taken into account and will return the position of the actual content
-         * inside the crosspost
-         *
          * @return The Y position of the content
          */
         fun getContentY(): Int {
@@ -272,9 +281,6 @@ class PostsAdapter(
         /**
          * Gets the bottom position of the contents Y position on the screen
          *
-         * Crossposts is taken into account and will return the position of the actual content
-         * inside the crosspost
-         *
          * @return The Y position of the bottom of the content
          */
         fun getContentBottomY(): Int {
@@ -283,7 +289,6 @@ class PostsAdapter(
 
         /**
          * Gets a bundle of extras that include the ViewHolder state
-         *
          *
          * Use [ViewHolder.setExtras] to restore the state
          *
@@ -317,8 +322,23 @@ class PostsAdapter(
         fun saveExtras() {
             val rp = post.redditPost
             if (rp != null) {
-                postExtras[rp.id] = post.extras
+                val extras = post.extras
+                postExtras[rp.id] = extras
             }
+        }
+
+        /**
+         * Adds content to the post
+         */
+        fun addContent(content: Content?) {
+            post.supplyContent(content)
+        }
+
+        /**
+         * Retrieves the content from the post and removes the view from the view hierarchy
+         */
+        fun getAndRemoveContent(): Content? {
+            return post.getAndRemoveContent()
         }
     }
 

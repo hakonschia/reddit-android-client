@@ -22,6 +22,7 @@ class ContentVideo @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : Content(context, attrs, defStyleAttr) {
     companion object {
+        @Suppress("unused")
         private const val TAG = "PostContentVideo"
 
         /**
@@ -41,6 +42,8 @@ class ContentVideo @JvmOverloads constructor(
     private val player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
 
     override fun updateView() {
+        player.prepareForNewVideo()
+
         setThumbnail()
         setVideo()
 

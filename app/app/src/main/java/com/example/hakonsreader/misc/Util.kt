@@ -6,14 +6,17 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.enums.PostTimeSort
+import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.exceptions.ArchivedException
 import com.example.hakonsreader.api.exceptions.InvalidAccessTokenException
@@ -29,6 +32,7 @@ import com.example.hakonsreader.fragments.bottomsheets.PeekLinkBottomSheet
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.states.LoggedInState.PrivatelyBrowsing
 import com.example.hakonsreader.states.OAuthState
+import com.example.hakonsreader.views.*
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
@@ -152,6 +156,8 @@ class CreateIntentOptions(val openLinksInternally: Boolean = true, val openYoutu
 
 /**
  * Gets an apps icon based on what a URL resolves to
+ *
+ * Note: This function can induce sever jank when used in RecyclerViews as it is a fairly heavy operation
  *
  * @param context The context to retrieve application info from
  * @param url The URL to resolve. If this does not match http/https then "https://reddit.com" is assumed
@@ -851,4 +857,113 @@ fun toHours(time: Long): Long {
 fun toDays(time: Long): Long {
     // 60 * 60 * 24
     return time / 86400
+}
+
+/**
+ * Generates the content view for a post
+ *
+ * @param post The post to generate for
+ * @param showTextContent If false content will not be created if [post] is a text post
+ * @param reusableViews The list of reusable views that will be used instead of generating new views.
+ * If a view is reused from this list then it will also be removed automatically.
+ * @return A view with the content of the post
+ */
+fun generatePostContent(
+    context: Context,
+    post: RedditPost,
+    showTextContent: Boolean,
+    reusableViews: MutableList<Content>?
+): Content? {
+    val hasTextContent = post.getPostType() == PostType.TEXT
+            // If the post is a crosspost and the crosspost is a text post, it's seen as LINK
+            // post as the post is a "link" to the crosspost, so check here if it's a text post
+            // as it would be added for generatePostContent
+            || post.crossposts?.find { it.getPostType() == PostType.TEXT } != null
+    if (!showTextContent && hasTextContent) {
+        return null
+    }
+
+    val margin = context.resources.getDimension(R.dimen.postMargin).toInt()
+    val marginParams = ViewGroup.MarginLayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+    ).apply {
+        setMargins(margin, 0, margin, 0)
+    }
+
+    // If the post has been removed don't try to render the content as it can cause a crash later
+    // Just show that the post has been removed
+    // For instance, if the post is not uploaded to reddit the URL will still link to something (like an imgur gif)
+    // TODO maybe the only posts actually removed completely so they're not able ot be watched are videos? Even text/images uploaded
+    //  to reddit directly are still there
+    if (post.removedByCategory != null) {
+        return ContentPostRemoved(context).apply {
+            redditPost = post
+            layoutParams = marginParams
+        }
+    }
+
+    // Generate the content based on the crosspost. Videos hosted on reddit aren't sent to the "child"
+    // post (this post) but it is in the parent
+    val crosspost = post.crossposts?.firstOrNull()
+    if (crosspost != null) {
+        return generatePostContent(context, crosspost, showTextContent, reusableViews)
+    }
+
+    val contentType = when (post.getPostType()) {
+        PostType.IMAGE -> {
+            ContentImage::class.java
+        }
+
+        PostType.VIDEO, PostType.GIF, PostType.RICH_VIDEO -> {
+            // Ensure we know how to handle a video, otherwise it might not load
+            // Show as link content if we can't show it as a video
+            if (ContentVideo.isRedditPostVideoPlayable(post)) {
+                ContentVideo::class.java
+            } else {
+                ContentLink::class.java
+            }
+        }
+
+        PostType.LINK -> {
+            ContentLink::class.java
+        }
+
+        PostType.TEXT -> {
+            // If there is no text on the post there is no point in creating a view for it
+            if (post.selftext.isNotEmpty()) {
+                ContentText::class.java
+            } else {
+                null
+            }
+        }
+
+        PostType.GALLERY -> {
+            ContentGallery::class.java
+        }
+
+        else -> null
+    }
+
+    val reusedContentView = reusableViews?.find { it::class.java == contentType }
+
+    return when {
+        reusedContentView != null -> {
+            reusableViews.remove(reusedContentView)
+            reusedContentView
+        }
+
+        contentType != null -> {
+            (contentType.constructors[0].newInstance(context) as Content).also { content ->
+                // Text and Link content have margins, others fill the entire width
+                if (content is ContentText || content is ContentLink) {
+                    content.layoutParams = marginParams
+                }
+            }
+        }
+
+        else -> null
+    }?.apply {
+        redditPost = post
+    }
 }
