@@ -411,9 +411,11 @@ class VideoPlayer @JvmOverloads constructor(
         thumbnailUrl = ""
         thumbnailDrawable = -1
         isVideoSizeEstimated = false
-        // This will happen when the player is prepared again, but the bar might be visible before that
-        // It still shows how much the old video was buffered tho
-        exoPlayer.seekTo(0)
+        
+        // Ie. if a video has actually been played before we want to remove the old media item
+        if (exoPlayer.mediaItemCount > 0) {
+            exoPlayer.removeMediaItem(0)
+        }
         exoPlayer.playWhenReady = false
         thumbnail.visibility = VISIBLE
     }
@@ -443,29 +445,7 @@ class VideoPlayer @JvmOverloads constructor(
         player.addListener(object : Player.EventListener {
 
             override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
-                super.onTracksChanged(trackGroups, trackSelections)
-                var audioFound = false
-
-                for (i in 0 until trackGroups.length) {
-                    // We're only looking for audio tracks, so if we found one we don't have to look any more
-                    if (audioFound) {
-                        break
-                    }
-
-                    val trackGroup = trackGroups[i]
-                    for (j in 0 until trackGroup.length) {
-                        val track = trackGroup.getFormat(j)
-                        val mimeType = track.sampleMimeType
-                        if (mimeType?.contains("audio".toRegex()) == true) {
-                            audioFound = true
-                            break
-                        }
-                    }
-                }
-
-                // Don't set hasAudio directly as if we set it to false first then true in the loop
-                // it might cause the icon to flash for a split second
-                hasAudio = audioFound
+                hasAudio = audioTracksHaveAudio(trackGroups)
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -554,33 +534,6 @@ class VideoPlayer @JvmOverloads constructor(
     }
 
     /**
-     * Loads the thumbnail into [thumbnail]. If [thumbnailUrl] is not empty, then the URL will be loaded.
-     * Otherwise [thumbnailDrawable] will be loaded
-     */
-    fun loadThumbnail() {
-        // Set the background color for the controls as a filter here since the thumbnail is shown
-        // over the controls
-        thumbnail.setColorFilter(ContextCompat.getColor(context, R.color.videoControlBackground))
-
-        // When the thumbnail is shown, clicking it (ie. clicking on the video but not on the controls)
-        // "removes" the view so the view turns black
-        thumbnail.setOnClickListener(null)
-
-        if (thumbnailUrl.isNotEmpty()) {
-            Glide.with(thumbnail)
-                    .load(thumbnailUrl)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .override(layoutParams.width, layoutParams.height)
-                    .diskCacheStrategy(if (cacheVideo) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
-                    .into(thumbnail)
-        } else if (thumbnailDrawable != -1) {
-            Glide.with(thumbnail)
-                    .load(thumbnailDrawable)
-                    .into(thumbnail)
-        }
-    }
-
-    /**
      * Updates the size of the view (´this´) by the values in [videoHeight] and [videoWidth]
      */
     private fun updateSize() {
@@ -631,6 +584,51 @@ class VideoPlayer @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Checks if a [TrackGroupArray] has at least one track with audio
+     */
+    private fun audioTracksHaveAudio(trackGroupArray: TrackGroupArray): Boolean {
+        for (i in 0 until trackGroupArray.length) {
+            val trackGroup = trackGroupArray[i]
+            for (j in 0 until trackGroup.length) {
+                val track = trackGroup.getFormat(j)
+                val mimeType = track.sampleMimeType
+                if (mimeType?.contains("audio".toRegex()) == true) {
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
+
+    /**
+     * Loads the thumbnail into [thumbnail]. If [thumbnailUrl] is not empty, then the URL will be loaded.
+     * Otherwise [thumbnailDrawable] will be loaded
+     */
+    fun loadThumbnail() {
+        // Set the background color for the controls as a filter here since the thumbnail is shown
+        // over the controls
+        thumbnail.setColorFilter(ContextCompat.getColor(context, R.color.videoControlBackground))
+
+        // When the thumbnail is shown, clicking it (ie. clicking on the video but not on the controls)
+        // "removes" the view so the view turns black
+        thumbnail.setOnClickListener(null)
+
+        if (thumbnailUrl.isNotEmpty()) {
+            Glide.with(thumbnail)
+                .load(thumbnailUrl)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .override(layoutParams.width, layoutParams.height)
+                .diskCacheStrategy(if (cacheVideo) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
+                .into(thumbnail)
+        } else if (thumbnailDrawable != -1) {
+            Glide.with(thumbnail)
+                .load(thumbnailDrawable)
+                .into(thumbnail)
+        }
+    }
 
     /**
      * Prepares [exoPlayer] for playback
@@ -647,7 +645,6 @@ class VideoPlayer @JvmOverloads constructor(
         exoPlayer.prepare()
         isPrepared = true
     }
-
 
     /**
      * Releases the video to free up its resources

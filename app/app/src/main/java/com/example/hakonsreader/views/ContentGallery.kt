@@ -28,6 +28,7 @@ class ContentGallery @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : Content(context, attrs, defStyleAttr) {
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "ContentGallery"
 
         /**
@@ -50,6 +51,10 @@ class ContentGallery @JvmOverloads constructor(
     private var maxHeight = -1
 
     override fun updateView() {
+        // If the view is being reused
+        release()
+        binding.galleryImages.setCurrentItem(0, false)
+
         val images: List<GalleryImage> = if (redditPost.thirdPartyObject is ImgurAlbum) {
             (redditPost.thirdPartyObject as ImgurAlbum).images!!
         } else {
