@@ -5,7 +5,9 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.util.Pair
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.hakonsreader.api.interfaces.GalleryImage
@@ -137,6 +139,12 @@ class ContentGallery @JvmOverloads constructor(
             binding.activeImageText.visibility = GONE
         } else {
             binding.activeImageText.text = String.format(Locale.getDefault(), "%d / %d", activeImagePos + 1, size)
+        }
+    }
+
+    override fun getTransitionViews(): MutableList<Pair<View, String>> {
+        return super.getTransitionViews().also { pairs ->
+            pairs.add(Pair(binding.parent, binding.parent.transitionName))
         }
     }
 

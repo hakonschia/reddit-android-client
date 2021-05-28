@@ -278,6 +278,7 @@
     <string name="transition_content_image_image" translatable="false">transition_content_image_image</string>
     <string name="transition_content_image_hd_icon" translatable="false">transition_content_image_hd_icon</string>
     <string name="transition_image_fullscreen" translatable="false">transition_image_fullscreen</string>
+    <string name="transition_gallery" translatable="false">transition_gallery</string>
 
 
     <plurals name="filteredSubredditsSummary">
