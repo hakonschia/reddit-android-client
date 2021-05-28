@@ -179,7 +179,6 @@ class PostsAdapter(
                 onVideoFullscreenListener?.let { content.setOnVideoFullscreenListener(it) }
             }
 
-            // TODO doesnt work
             val savedExtras = postExtras[post.id]
             if (savedExtras != null) {
                 content.extras = savedExtras
@@ -323,7 +322,11 @@ class PostsAdapter(
             val rp = post.redditPost
             if (rp != null) {
                 val extras = post.extras
-                postExtras[rp.id] = extras
+
+                // No point in saving empty bundles (this also ensures extras wont be overridden)
+                if (!extras.isEmpty) {
+                    postExtras[rp.id] = extras
+                }
             }
         }
 

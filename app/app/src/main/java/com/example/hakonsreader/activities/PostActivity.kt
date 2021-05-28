@@ -269,11 +269,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
             post.observe(this@PostActivity) {
                 if (it != null) {
-                    if (savedExtras != null) {
-                        onNewPostInfo(it, savedExtras)
-                    } else {
-                        onNewPostInfo(it)
-                    }
+                    onNewPostInfo(it, savedExtras)
 
                     // We don't want to accidentally set this more than once, this is only for
                     // configuration changes (if we manually refreshed the comments this will trigger again)
@@ -369,11 +365,11 @@ class PostActivity : BaseActivity(), OnReplyListener {
     private fun onPostLoaded(newPost: RedditPost, extras: Bundle? = null) {
         binding.setPost(newPost)
 
+        binding.post.redditPost = newPost
+
         if (extras != null) {
             binding.post.extras = extras
         }
-
-        binding.post.redditPost = newPost
     }
 
     /**
