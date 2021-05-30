@@ -352,24 +352,32 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
         val activeFragment = getActiveFragment()
         // In an active subreddit
         if (activeFragment is SubredditFragment) {
-            // In a subreddit, and the last item was the list, go back to the list
-            if (lastShownFragment is SelectSubredditFragment) {
-                activeSubreddit = null
-
-                // If the fragment has been killed by the OS make a new one (after a while it might be killed)
-                if (selectSubredditFragment == null) {
-                    selectSubredditFragment = SelectSubredditFragment.newInstance()
+            when {
+                activeFragment.closeDrawerIfOpen() -> {
+                    // Do nothing, the drawer in the fragment was closed and no further action is needed
                 }
 
-                // Since we are in a way going back in the same nav bar item, use the close transition
-                supportFragmentManager.beginTransaction()
+                lastShownFragment is SelectSubredditFragment -> {
+                    // In a subreddit, and the last item was the list, go back to the list
+                    activeSubreddit = null
+
+                    // If the fragment has been killed by the OS make a new one (after a while it might be killed)
+                    if (selectSubredditFragment == null) {
+                        selectSubredditFragment = SelectSubredditFragment.newInstance()
+                    }
+
+                    // Since we are in a way going back in the same nav bar item, use the close transition
+                    supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainer, selectSubredditFragment!!)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
                         .addToBackStack(null)
                         .commit()
-            } else if (!activeFragment.closeDrawerIfOpen()) {
-                // The active subreddit didn't have a drawer open that it closed, go back to main menu
-                binding.bottomNav.selectedItemId = R.id.navHome
+                }
+
+                else -> {
+                    // The active subreddit didn't have a drawer open that it closed, go back to main menu
+                    binding.bottomNav.selectedItemId = R.id.navHome
+                }
             }
         } else if (activeFragment is InboxFragment && lastShownFragment is ProfileFragment) {
             // In the inbox, and the last active was the profile, go back to the profile
