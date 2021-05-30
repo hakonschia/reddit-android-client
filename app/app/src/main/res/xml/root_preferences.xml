@@ -330,6 +330,7 @@
             app:title="@string/prefs_title_third_party_load_gfycat_gifs"
             app:iconSpaceReserved="false"
             app:singleLineTitle="false"
+            app:summary="@string/prefs_summary_third_party_gifs"
             app:defaultValue="@bool/prefs_default_third_party_load_gfycat_gifs" />
 
         <SwitchPreference
@@ -337,6 +338,7 @@
             app:title="@string/prefs_title_third_party_load_imgur_gifs"
             app:iconSpaceReserved="false"
             app:singleLineTitle="false"
+            app:summary="@string/prefs_summary_third_party_gifs"
             app:defaultValue="@bool/prefs_default_third_party_load_imgur_gifs" />
 
         <SwitchPreference
@@ -344,6 +346,7 @@
             app:title="@string/prefs_title_third_party_load_imgur_albums"
             app:iconSpaceReserved="false"
             app:singleLineTitle="false"
+            app:summary="@string/prefs_summary_third_party_load_imgur_albums"
             app:defaultValue="@bool/prefs_default_third_party_load_imgur_albums" />
     </PreferenceCategory>
 </PreferenceScreen>

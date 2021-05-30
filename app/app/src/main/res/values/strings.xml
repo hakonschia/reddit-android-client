@@ -132,7 +132,9 @@
     <string name="prefs_title_comment_sidebar_colors">Sidebar colors</string>
     <string name="prefs_title_third_party_load_gfycat_gifs">Load Gfycat/Redgifs gifs</string>
     <string name="prefs_title_third_party_load_imgur_gifs">Load Imgur gifs</string>
+    <string name="prefs_summary_third_party_gifs">Required for these videos/gifs to provide audio</string>
     <string name="prefs_title_third_party_load_imgur_albums">Load Imgur albums/galleries</string>
+    <string name="prefs_summary_third_party_load_imgur_albums">With this enabled Imgur albums and galleries are shown as standard Reddit galleries</string>
 
 
     <!-- Preferences keys -->
