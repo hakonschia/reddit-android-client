@@ -265,15 +265,20 @@ class ContentImage @JvmOverloads constructor(
      * Loads an image from a URL
      */
     private fun loadImage(url: String) {
-        fun load(width: Int, height: Int){
-            Glide.with(binding.image)
+        fun load(width: Int? = null, height: Int? = null) {
+            val request = Glide.with(binding.image)
                 .load(url)
                 .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .placeholder(R.drawable.ic_wifi_tethering_150dp)
                 .error(R.drawable.ic_image_not_supported_200dp)
-                .override(width, height)
-                .into(binding.image)
+
+            if (width != null && height != null) {
+                request.override(width, height)
+                    .into(binding.image)
+            } else {
+                request.into(binding.image)
+            }
         }
 
         // post will run the runnable after the layout has been laid out, so we will have access to the
@@ -293,7 +298,7 @@ class ContentImage @JvmOverloads constructor(
         }
 
         if (!posted) {
-            load(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+            load()
         }
     }
 
