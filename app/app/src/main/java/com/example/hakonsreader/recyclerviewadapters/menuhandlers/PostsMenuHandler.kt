@@ -61,7 +61,7 @@ fun showPopupForPost(view: View, post: RedditPost?, postsDao: RedditPostsDao, ap
             item {
                 label = context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
                 icon = R.drawable.ic_filter_24px
-                callback = { filterSubredditOnClick(post.subreddit) }
+                callback = { filterSubredditOnClick(post.subreddit, view) }
             }
         }
 
@@ -339,8 +339,8 @@ private fun copyPostContentOnClick(view: View, post: RedditPost) {
     Snackbar.make(view, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
 }
 
-private fun filterSubredditOnClick(subredditName: String) {
-    Settings.addSubredditToPostFilters(subredditName)
+private fun filterSubredditOnClick(subredditName: String, view: View) {
+    Settings.addSubredditToPostFilters(subredditName, view)
 }
 
 /**

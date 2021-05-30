@@ -9,12 +9,14 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
+import android.view.View
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.R
 import com.example.hakonsreader.enums.ShowNsfwPreview
 import com.example.hakonsreader.misc.Settings.init
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
+import com.google.android.material.snackbar.Snackbar
 import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrPosition
 import java.util.*
@@ -301,17 +303,30 @@ object Settings {
      * Adds a subreddit to the filters
      *
      * @param subreddit The name of the subreddit to add
+     * @param view To show a snackbar pass the view to attach the snackbar to here
+     *
      * @see subredditsToFilterFromDefaultSubreddits
      */
-    fun addSubredditToPostFilters(subreddit: String) {
-        var previous = preferences.getString(resources.getString(R.string.prefs_key_filter_posts_from_default_subreddits), "")
-        // Only add newline before if necessary
-        if (previous!!.isNotBlank() && previous.takeLast(1) != "\n") {
-            previous += "\n"
-        }
-        previous += "$subreddit\n"
+    fun addSubredditToPostFilters(subreddit: String, view: View?) {
+        val previous = preferences.getString(resources.getString(R.string.prefs_key_filter_posts_from_default_subreddits), "")!!
 
-        preferences.edit().putString(resources.getString(R.string.prefs_key_filter_posts_from_default_subreddits), previous).apply()
+        val subs = previous.split("\n").toMutableList()
+
+        if (!subs.contains(subreddit)) {
+            subs.add(subreddit)
+
+            // Mostly if the user has manually entered empty lines we can remove those now
+            val asString = subs.filter { it.isNotBlank() }.joinToString(separator = "\n")
+
+            preferences.edit()
+                .putString(resources.getString(R.string.prefs_key_filter_posts_from_default_subreddits), asString)
+                .apply()
+        }
+
+        if (view != null) {
+            val snackbarString = view.context.getString(R.string.filterSubredditsSnackbar, subreddit)
+            Snackbar.make(view, snackbarString, Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     /**

@@ -674,4 +674,6 @@
 
     <string name="noMultis">No Multis found</string>
     <string name="multiNotAuthorized">If a Multi exists with this name, you\'re not allowed to view it</string>
+
+    <string name="filterSubredditsSnackbar">Filtering \'%s\'</string>
 </resources>

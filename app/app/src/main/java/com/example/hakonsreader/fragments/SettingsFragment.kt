@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -53,6 +55,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     var unreadMessagesBadgeSettingChanged: OnUnreadMessagesBadgeSettingChanged? = null
     var languageListener: LanguageListener? = null
+
+    // TODO the filtered subreddits dont update until the fragment is recreated, if you go to settings
+    //  then filter a subreddit then go back it wont appear since the fragment isn't recreated
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
