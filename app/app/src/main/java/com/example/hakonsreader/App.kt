@@ -26,7 +26,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import leakcanary.LeakCanary
 import java.util.*
 import javax.inject.Inject
 
@@ -92,8 +91,9 @@ class App : Application(), Configuration.Provider {
         updateTheme()
         removeOldValues()
 
-        LeakCanary.config = LeakCanary.config.copy(dumpHeap = false)
-        LeakCanary.showLeakDisplayActivityLauncherIcon(false)
+        // Must be commented out for release builds (as well as the import removed)
+        //LeakCanary.config = LeakCanary.config.copy(dumpHeap = false)
+        //LeakCanary.showLeakDisplayActivityLauncherIcon(false)
     }
 
 
