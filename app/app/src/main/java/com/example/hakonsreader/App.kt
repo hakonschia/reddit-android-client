@@ -90,6 +90,9 @@ class App : Application(), Configuration.Provider {
 
         updateTheme()
         removeOldValues()
+
+        //LeakCanary.config = LeakCanary.config.copy(dumpHeap = false)
+        //LeakCanary.showLeakDisplayActivityLauncherIcon(false)
     }
 
 
