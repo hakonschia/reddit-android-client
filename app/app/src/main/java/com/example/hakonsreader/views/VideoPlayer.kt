@@ -651,6 +651,7 @@ class VideoPlayer @JvmOverloads constructor(
      */
     fun release() {
         exoPlayer.release()
+        player = null
     }
 
     /**

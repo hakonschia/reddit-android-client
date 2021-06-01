@@ -44,6 +44,10 @@
         <variable
             name="showPeekParentButton"
             type="boolean" />
+
+        <variable
+            name="showAwards"
+            type="boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -228,7 +232,7 @@
             android:id="@+id/awards"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{comment != null &amp;&amp; comment.awardings.size() > 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{showAwards &amp;&amp; comment != null &amp;&amp; comment.awardings.size() > 0 ? View.VISIBLE : View.GONE}"
             app:marginEnd="@{comment.locked ? @dimen/commentLockedBorderPadding : 0}"
             android:layout_marginTop="2dp"
 

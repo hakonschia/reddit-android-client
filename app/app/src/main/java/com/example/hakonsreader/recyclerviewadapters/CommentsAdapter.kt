@@ -231,6 +231,7 @@ class CommentsAdapter constructor(
                     adapter = this@CommentsAdapter
                     viewModel = this@CommentsAdapter.viewModel
                     post = this@CommentsAdapter.post
+                    showAwards = Settings.showAwards()
                     onReportsIgnoreChange =  OnReportsIgnoreChangeListener { invalidateAll() }
                     showPeekParentButton = Settings.showPeekParentButtonInComments()
                     commentContent.setLongClickToPeekUrl {
@@ -272,7 +273,10 @@ class CommentsAdapter constructor(
                 this.comment = comment
                 this.highlight = highlight
                 isByLoggedInUser = byLoggedInUser
-                awards.listing = comment
+
+                if (showAwards) {
+                    awards.listing = comment
+                }
 
                 commentVoteBar.listing = comment
 
