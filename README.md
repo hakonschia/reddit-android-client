@@ -17,9 +17,9 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 
 ## Installation
 
-The downloadable [APK](apk/app-release.apk) contains the application at commit `bc865955c3a66de6fce20a30f40eb3d3da6c139f` (#1666). To install the app download the APK, open it on your phone, and follow the steps shown.
+The downloadable [APK](apk/app-release.apk) contains the application at commit `3c58a6d0a194ca18463378fb5d7802c9d9d6b73f` (#1706). To install the app download the APK, open it on your phone, and follow the steps shown. If the install fails you might have to temporarily [disable Google Play Protect](https://support.google.com/googleplay/answer/2812853) (remember to enable it again after the install).
 
-`minSdkVersion` is 21 (Android 5.0), although testing is limited below SDK 26.
+`minSdkVersion` is 21 (Android 5.0), although testing is limited below SDK 26 or above SDK 28.
 
 See also: [build](#build)
 
