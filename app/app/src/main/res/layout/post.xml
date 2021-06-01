@@ -16,8 +16,13 @@
         <variable
             name="crosspost"
             type="com.example.hakonsreader.api.model.RedditPost" />
+
         <variable
             name="isCrosspost"
+            type="boolean" />
+
+        <variable
+            name="showAwards"
             type="boolean" />
     </data>
 
@@ -341,7 +346,7 @@
             android:layout_marginTop="2dp"
             android:layout_marginEnd="@dimen/postMargin"
 
-            android:visibility="@{post != null &amp;&amp; post.awardings.size() > 0 ? View.VISIBLE : View.GONE}"
+            android:visibility="@{showAwards &amp;&amp; post != null &amp;&amp; post.awardings.size() > 0 ? View.VISIBLE : View.GONE}"
 
             android:transitionName="@string/transition_post_info_awards"
             app:layout_constrainedWidth="true"

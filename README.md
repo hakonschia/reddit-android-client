@@ -67,6 +67,7 @@ See also: [build](#build)
 
 - **Misc**
   - [Slide away](images/slide-away.gif) opened posts, subreddits, user, images and so on
+  - [Disable awards](images/show-awards.png) on posts and comments
 
 - **Third party integration** (All these options can be [toggled indepedently](images/settings-load-third-party.png))
   - Imgur albums/galleries [are shown as](images/imgur-album-as-gallery.png) other Reddit galleries

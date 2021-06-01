@@ -322,6 +322,19 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/prefs_group_awards"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="@string/prefs_key_show_awards"
+            app:title="@string/prefs_title_show_awards"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_show_awards" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         app:title="@string/prefs_group_third_party"
         app:iconSpaceReserved="false">
 

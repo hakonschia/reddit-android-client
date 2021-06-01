@@ -463,4 +463,6 @@
     <string name="filterSubredditsSnackbar">Filtrerer \'%s\'</string>
     <string name="prefs_summary_third_party_gifs">Kreves for at disse videoene/gifene har lyd</string>
     <string name="prefs_summary_third_party_load_imgur_albums">Med dette skrudd på vil Imgur albumer og gallerier vises likt som Reddit gallerier</string>
+    <string name="prefs_group_awards">Priser</string>
+    <string name="prefs_title_show_awards">Vis priser på poster og kommentarer</string>
 </resources>

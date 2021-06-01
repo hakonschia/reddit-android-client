@@ -494,4 +494,14 @@ object Settings {
         )
     }
 
+    /**
+     * @return True if awards should be shown on posts and comments
+     */
+    fun showAwards(): Boolean {
+        return preferences.getBoolean(
+            resources.getString(R.string.prefs_key_show_awards),
+            resources.getBoolean(R.bool.prefs_default_show_awards)
+        )
+    }
+
 }

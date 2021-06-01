@@ -25,6 +25,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.databinding.PostBinding
 import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.generatePostContent
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForPost
 import com.example.hakonsreader.views.util.ViewUtil
@@ -67,10 +68,17 @@ class Post @JvmOverloads constructor(
     @Inject
     lateinit var postsDao: RedditPostsDao
 
+    /**
+     * If true awards should be shown on the post
+     * */
+    private val showAwards = Settings.showAwards()
+
     private val binding = PostBinding.inflate(LayoutInflater.from(context), this, true).apply {
         postPopupMenu.setOnClickListener {
             showPopupForPost(it, redditPost, postsDao, api)
         }
+
+        this.showAwards = this@Post.showAwards
 
         setOnLongClickListener {
             redditPost?.let { post ->
@@ -267,7 +275,10 @@ class Post @JvmOverloads constructor(
     private fun updateInfo(post: RedditPost, updateAwards: Boolean) {
         binding.post = post
         binding.isCrosspost = post.crosspostParentId != null
-        if (updateAwards) {
+
+        // If we aren't going to show awards we should not set the listing as it will cause the
+        // view to update, even if the view isn't visible (and cause all the views to be created and images loaded)
+        if (showAwards && updateAwards) {
             binding.awards.listing = post
         }
         binding.userReportsTitle.setOnClickListener { ViewUtil.openReportsBottomSheet(post, context) { binding.invalidateAll() } }

@@ -34,5 +34,6 @@
     <bool name="prefs_default_third_party_load_gfycat_gifs">true</bool>
     <bool name="prefs_default_third_party_load_imgur_gifs">true</bool>
     <bool name="prefs_default_third_party_load_imgur_albums">true</bool>
+    <bool name="prefs_default_show_awards">true</bool>
 
 </resources>

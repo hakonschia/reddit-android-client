@@ -33,7 +33,7 @@ class ContentLink @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : Content(context, attrs, defStyleAttr) {
 
-    val binding: ViewBinding = getCorrectBinding()
+    private val binding: ViewBinding = getCorrectBinding()
 
     /**
      * Retrieves and inflates the correct binding to use for the layout based on the users
