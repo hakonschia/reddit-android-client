@@ -60,7 +60,9 @@ class ContentGallery @JvmOverloads constructor(
         val images: List<GalleryImage> = if (redditPost.thirdPartyObject is ImgurAlbum) {
             (redditPost.thirdPartyObject as ImgurAlbum).images!!
         } else {
-            redditPost.galleryImages!!
+            // Example, in the link below the last image failed (at the time of writing at least)
+            // https://www.reddit.com/r/RATS/comments/nqwcun/my_poor_gus_only_last_night_you_were_fishing_for/
+            redditPost.galleryImages!!.filter { it.status == RedditGalleryItem.STATUS_VALID }
         }
 
         val (maxWidth, maxHeight) = getMaxWidthAndHeight(images)
@@ -105,6 +107,10 @@ class ContentGallery @JvmOverloads constructor(
 
         // Find the largest height and width and set the layout to that
         for (image in galleryImages) {
+            if (image is RedditGalleryItem && image.mimeType == null) {
+                continue
+            }
+
             if (image is ImgurGif || (image is RedditGalleryItem && image.source.mp4Url != null)) {
                 hasVideo = true
             }
