@@ -10,6 +10,11 @@
       </map>
     </option>
   </component>
+  <component name="EntryPointsManager">
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="androidx.lifecycle.OnLifecycleEvent" />
+    </list>
+  </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" value="$USER_HOME$/keystores/ha" />
     <option name="HEAP_SIZE" value="654" />

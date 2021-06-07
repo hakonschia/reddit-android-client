@@ -1,7 +1,6 @@
 package com.example.hakonsreader.recyclerviewadapters.listeners;
 
 import android.content.res.Resources;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
@@ -10,9 +9,11 @@ import androidx.lifecycle.OnLifecycleEvent;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hakonsreader.api.model.RedditPost;
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter;
 import com.example.hakonsreader.views.Content;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -27,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
  * {@link Lifecycle.Event#ON_PAUSE} which will ensure the listener never listens to anything in a paused state
  */
 public class PostScrollListener extends RecyclerView.OnScrollListener implements LifecycleObserver {
-    private static final String TAG = "PostScrollListener";
 
     private final int SCREEN_HEIGHT = Resources.getSystem().getDisplayMetrics().heightPixels;
 
@@ -35,12 +35,19 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
     /**
      * The ID of the post to ignore when calling {@link PostsAdapter.ViewHolder#onSelected()}
      */
+    @NonNull
     private String postToIgnore = "";
 
     /**
      * If true the listener is in a paused state and should not listen to scroll changes
      */
     private boolean paused = false;
+
+    /**
+     * If true, the last call to {@link #onScrolled(RecyclerView, int, int)} was caused by a scrolling
+     * upwards in the list
+     */
+    private boolean scrollingUp = false;
 
     /**
      * Sets the ID of a post to ignore when calling {@link PostsAdapter.ViewHolder#onSelected()}, so that
@@ -58,8 +65,11 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
     }
 
     /**
-     * @return The ID of the post currently being ignored by the listener
+     * @return The ID of the post currently being ignored by the listener. This will be an empty string
+     * if no post is being ignored
      */
+    // This cannot be annotated with @NonNull since it messes up Kotlin integration since the setter
+    // allows for nulls
     public String getPostToIgnore() {
         return postToIgnore;
     }
@@ -75,20 +85,27 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
     }
 
     @Override
-    public void onScrolled(@NonNull RecyclerView posts, int dx, int dy) {
+    public void onScrollStateChanged(@NonNull @NotNull RecyclerView posts, int newState) {
         if (paused) {
             return;
         }
 
-        // Currently this listener only supports a LinearLayoutManager. This will cause issues later
-        // if we want to use a different one for future layouts, but currently it will work fine
-        LinearLayoutManager layoutManager = (LinearLayoutManager) posts.getLayoutManager();
+        // We don't want to select views when we're scrolling
+        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+            // This function is responsible for selecting views
+            this.checkSelectedPost(posts, false);
+        }
+    }
 
-        // Find the positions of first and last visible items to find all visible items
-        int posFirstItem = layoutManager.findFirstVisibleItemPosition();
-        int posLastItem = layoutManager.findLastVisibleItemPosition();
+    @Override
+    public void onScrolled(@NonNull RecyclerView posts, int dx, int dy) {
+        if (paused) {
+            return;
+        }
+        scrollingUp = dy < 0;
 
-        this.checkSelectedPost(posts, posFirstItem, posLastItem, dy < 0);
+        // This function is responsible for unselecting views
+        this.checkSelectedPost(posts, true);
     }
 
     /**
@@ -96,11 +113,11 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
      * and {@link PostsAdapter.ViewHolder#onUnselected()} based on if a post has been "selected" (ie. is the main
      * item on the screen) or "unselected" (ie. no longer the main item)
      *
-     * @param startPost The index of the post to start at
-     * @param endPost The index of the post to end at
-     * @param scrollingUp Whether or not we are scrolling up or down in the list
+     * @param posts The RecyclerView with the posts. If the layout manager for this is not a {@link LinearLayoutManager}
+     *              then nothing is done
+     * @param onlyUnselect If true only {@link PostsAdapter.ViewHolder#onUnselected()} will be called
      */
-    private void checkSelectedPost(RecyclerView posts, int startPost, int endPost, boolean scrollingUp) {
+    private void checkSelectedPost(RecyclerView posts, boolean onlyUnselect) {
         // The behavior is:
         // When scrolling UP:
         // 1. postToIgnore is reset when any view is UNSELECTED
@@ -111,9 +128,23 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
         // 2. If the bottom of the content is under the screen, the view is UNSELECTED
         // 3. If the top of the content is above 3/4th of the screen, the view is SELECTED
 
+        RecyclerView.LayoutManager layoutManager = posts.getLayoutManager();
+
+        // Currently this listener only supports a LinearLayoutManager. This will cause issues later
+        // if we want to use a different one for future layouts, but currently it will work fine
+        if (!(layoutManager instanceof LinearLayoutManager)) {
+            return;
+        }
+
+        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
+
+        // Find the positions of first and last visible items to find all visible items
+        int posFirstItem = linearLayoutManager.findFirstVisibleItemPosition();
+        int posLastItem = linearLayoutManager.findLastVisibleItemPosition();
+
 
         // Go through all visible views and select/un select the view holder based on where on the screen they are
-        for (int i = startPost; i <= endPost; i++) {
+        for (int i = posFirstItem; i <= posLastItem; i++) {
             PostsAdapter.ViewHolder viewHolder = (PostsAdapter.ViewHolder)posts.findViewHolderForLayoutPosition(i);
 
             // If we have no view holder there isn't anything we can do later
@@ -121,10 +152,15 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
                 continue;
             }
 
+            RedditPost post = viewHolder.getPost().getRedditPost();
+            if (post == null) {
+                return;
+            }
+
+
             // (0, 0) is top left
             int y = viewHolder.getContentY();
             int viewBottom = viewHolder.getContentBottomY();
-
 
             // If the view is above the screen (< 0) it is "unselected"
             // If the bottom of the view is above the screen height it is "unselected"
@@ -138,10 +174,8 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
                 if (scrollingUp) {
                     postToIgnore = "";
                 }
-            } else if (y < SCREEN_HEIGHT * 0.35f) {
-                if (!viewHolder.getPostId().equals(postToIgnore)) {
-                    viewHolder.onSelected();
-                }
+            } else if (y < SCREEN_HEIGHT * 0.35f && !onlyUnselect && !post.getId().equals(postToIgnore)) {
+                viewHolder.onSelected();
             }
         }
     }
