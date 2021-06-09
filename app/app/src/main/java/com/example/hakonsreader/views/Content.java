@@ -96,7 +96,10 @@ public abstract class Content extends FrameLayout {
     }
 
     /**
-     * Sets the post this content is for and updates the view
+     * Sets the post this content is for.
+     *
+     * This will automatically update the view of the content, and any bitmap and extras must be set
+     * before this is called to provide the expected behaviour
      *
      * @param redditPost The post to use in the view
      */

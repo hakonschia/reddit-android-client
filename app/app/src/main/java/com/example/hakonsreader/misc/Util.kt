@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -862,7 +861,8 @@ fun toDays(time: Long): Long {
 /**
  * Generates the content view for a post
  *
- * @param post The post to generate for
+ * @param post The post to generate for. Note that [Content.setRedditPost] is NOT called here
+ * as callers of this function might want to set extra values before this is called
  * @param showTextContent If false content will not be created if [post] is a text post
  * @param reusableViews The list of reusable views that will be used instead of generating new views.
  * If a view is reused from this list then it will also be removed automatically.
@@ -963,7 +963,5 @@ fun generatePostContent(
         }
 
         else -> null
-    }?.apply {
-        redditPost = post
     }
 }

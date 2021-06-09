@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.util.Pair
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
@@ -42,6 +43,7 @@ class ContentImage @JvmOverloads constructor(
     //  is loaded there, then we should also set that here in the list. Now the old low res image is shown
 
     companion object {
+        @Suppress("unused")
         private const val TAG = "ContentImage"
 
         /**
@@ -306,9 +308,8 @@ class ContentImage @JvmOverloads constructor(
      * Loads a high definition image
      */
     private fun loadHdImage(url: String) {
-        // currentBitmap will be the low res image. We need to store this as when we start a new load
-        // of the HD image, the low res will be removed, so save the low res bitmap and set it again
-        // after the load has started so that it isn't removed while the HD is loading
+        // currentBitmap will be the low res image, this will be used as the placeholder while loading
+        // the new image, as otherwise it will flash black since it is removed for until the new is loaded
         val currentBitmap = getBitmap()
 
         val width: Int
@@ -326,6 +327,7 @@ class ContentImage @JvmOverloads constructor(
 
         Glide.with(binding.image)
             .load(url)
+            .placeholder(currentBitmap?.toDrawable(resources))
             .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
             .override(width, height)
             .listener(object : RequestListener<Drawable>{
@@ -352,7 +354,5 @@ class ContentImage @JvmOverloads constructor(
                 }
             })
             .into(binding.image)
-
-        binding.image.setImageBitmap(currentBitmap)
     }
 }

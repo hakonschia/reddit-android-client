@@ -183,6 +183,8 @@ class PostsAdapter(
             if (savedExtras != null) {
                 content.extras = savedExtras
             }
+
+            content.redditPost = post
         }
 
         holder.addContent(content)
@@ -234,7 +236,7 @@ class PostsAdapter(
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val post: Post = view.findViewById<Post>(R.id.post).apply {
             setOnClickListener {
-                if (adapterPosition != RecyclerView.NO_POSITION) {
+                if (absoluteAdapterPosition != RecyclerView.NO_POSITION) {
                     onPostClicked?.postClicked(this)
                 }
             }
@@ -246,9 +248,8 @@ class PostsAdapter(
         }
 
         /**
-         * Gets the ID of the [RedditPost] this ViewHolder is currently holding
-         *
-         * @return A string ID
+         * @return The ID of the [RedditPost] this ViewHolder is currently holding, or null if no
+         * post is in this ViewHolder
          */
         fun getPostId(): String? {
             return post.redditPost?.id
@@ -289,21 +290,10 @@ class PostsAdapter(
         /**
          * Gets a bundle of extras that include the ViewHolder state
          *
-         * Use [ViewHolder.setExtras] to restore the state
-         *
          * @return The state of the ViewHolder
          */
         fun getExtras(): Bundle {
             return post.extras
-        }
-
-        /**
-         * Sets extras that have been saved to restore state.
-         *
-         * @param data The extras to set
-         */
-        fun setExtras(data: Bundle?) {
-            data?.let { post.extras = it }
         }
 
         /**

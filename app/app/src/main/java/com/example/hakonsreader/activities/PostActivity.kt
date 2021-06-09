@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -47,6 +46,7 @@ import javax.inject.Inject
 class PostActivity : BaseActivity(), OnReplyListener {
 
     companion object {
+        @Suppress("unused")
         private const val TAG = "PostActivity"
 
         /**
@@ -365,11 +365,11 @@ class PostActivity : BaseActivity(), OnReplyListener {
     private fun onPostLoaded(newPost: RedditPost, extras: Bundle? = null) {
         binding.setPost(newPost)
 
-        binding.post.redditPost = newPost
-
         if (extras != null) {
             binding.post.extras = extras
         }
+
+        binding.post.redditPost = newPost
     }
 
     /**
@@ -420,9 +420,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         return if (redditPost != null) {
             val postExtras: Bundle? = intent.extras?.getBundle(Content.EXTRAS)
-            postExtras?.keySet()?.forEach {
-                Log.d(TAG, "setPostFromJson: $it")
-            }
 
             when (redditPost.getPostType()) {
                 // Add a transition listener that sets the extras for videos after the enter transition is done,

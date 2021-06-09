@@ -336,18 +336,22 @@ class Post @JvmOverloads constructor(
     private fun addContent() {
         val content = suppliedContent ?: generatePostContent(context, redditPost, showTextContent, null)
         content?.also { c ->
-            setBitmap(this@Post.bitmap)
+            c.setBitmap(bitmap)
+
             postExtras?.let {
-                setExtras(it)
+                c.setExtras(it)
             }
-            // Should only be used for this post, in case of a reuse
-            postExtras = null
 
             if (c is ContentVideo) {
                 onVideoManuallyPaused?.let { c.setOnVideoManuallyPaused(it) }
                 onVideoFullscreenListener?.let { c.setOnVideoFullscreenListener(it) }
             }
+
+            c.setRedditPost(redditPost)
         }
+
+        // Should only be used for this post, in case of a reuse
+        postExtras = null
 
         if (content != null) {
             binding.content.addView(content)
