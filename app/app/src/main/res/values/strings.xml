@@ -352,7 +352,6 @@
     <string name="postRemovedByAuthor">The post has been removed by the author</string>
 
     <string name="noCommentsHeader">No comments on this post yet</string>
-    <string name="noCommentsContent">Be the one to start the conversation!</string>
 
     <string name="subredditBanned">r/%s has been banned</string>
     <string name="subredditPrivate">r/%s is private</string>
