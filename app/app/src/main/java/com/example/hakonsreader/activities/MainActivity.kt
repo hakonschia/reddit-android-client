@@ -258,7 +258,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
         } else {
             // Use empty string as default (ie. front page)
             val startSubreddit = intent.extras?.getString(EXTRAS_START_SUBREDDIT) ?: ""
+
             // Only setup the start fragment if we have no state to restore (as this is then a new activity)
+            // For testing purposes this can be hardcoded to a specific subreddit (which will not open a SubredditActivity
+            // but is opened in the subreddit nav bar)
             setupStartFragment(startSubreddit)
 
             // Trending subreddits aren't user specific so they don't have to be retrieved again
