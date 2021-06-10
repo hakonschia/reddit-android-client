@@ -99,6 +99,7 @@
 
                             android:background="@color/background"
                             android:src="@drawable/ic_emoji_emotions_200dp"
+                            app:subredditIcon="@{subreddit}"
 
                             app:layout_constraintBottom_toBottomOf="@+id/subredditTitle"
                             app:layout_constraintStart_toStartOf="parent"
