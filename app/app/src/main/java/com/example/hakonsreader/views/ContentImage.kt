@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.util.Pair
+import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -116,8 +117,8 @@ class ContentImage @JvmOverloads constructor(
 
             // If we add this when it is not visible it will become visible again, which
             // makes the icon flash for a split second, and will appear again when you exit
-            if (binding.hdImage.visibility == View.VISIBLE) {
-                it.add(Pair(binding.hdImage, binding.hdImage.transitionName))
+            if (binding.hdImageIcon.visibility == View.VISIBLE) {
+                it.add(Pair(binding.hdImageIcon, binding.hdImageIcon.transitionName))
             }
         }
     }
@@ -257,7 +258,7 @@ class ContentImage @JvmOverloads constructor(
      * Sets the listener for the HD image button
      */
     private fun setHdImageClickListener(imageUrl: String) {
-        binding.hdImage.setOnClickListener {
+        binding.hdImageIcon.setOnClickListener {
             loadHdImage(imageUrl)
         }
     }
@@ -266,13 +267,43 @@ class ContentImage @JvmOverloads constructor(
      * Loads an image from a URL
      */
     private fun loadImage(url: String) {
-        Glide.with(binding.image)
-            .load(url)
-            .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .placeholder(R.drawable.ic_wifi_tethering_150dp)
-            .error(R.drawable.ic_image_not_supported_200dp)
-            .into(binding.image)
+        fun load(width: Int? = null, height: Int? = null) {
+            val request = Glide.with(binding.image)
+                .load(url)
+                .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .error(R.drawable.ic_image_not_supported_200dp)
+
+            if (width != null && height != null) {
+                request.override(width, height)
+                    .into(binding.image)
+            } else {
+                request.into(binding.image)
+            }
+        }
+
+        // post will run the runnable after the layout has been laid out, so we will have access to the
+        // width, which can then be used to scale the image correctly
+        val posted = binding.image.post {
+            val height = wantedHeight
+            val width = binding.image.measuredWidth
+
+            // Set the image size now. Not strictly necessary as it will be set be Glide when the image
+            // is loaded, but looks weird if the image just suddenly appears and takes more space in the layout
+            // If we're scrolling down this makes it better if the connection is slow
+            // If we're scrolling up it might cause some weird jumps (which doesn't happen otherwise for some reason)
+            // Since most scrolling is downwards I'll keep this (or add it as a setting later)
+            binding.image.updateLayoutParams {
+                this.height = height
+                this.width = width
+            }
+
+            load(width, height)
+        }
+
+        if (!posted) {
+            load()
+        }
     }
 
     /**
