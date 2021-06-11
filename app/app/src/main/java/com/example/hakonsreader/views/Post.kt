@@ -519,7 +519,7 @@ class Post @JvmOverloads constructor(
             // We want to handle the content below manually
             // If the view isn't visible then it will appear in the new activity until it decides itself
             // that the view actually isn't visible and remove it
-            if (view !is Content && view.transitionName != null && view.visibility == View.VISIBLE) {
+            if (view !is Content && view != binding.content && view.transitionName != null && view.visibility == View.VISIBLE) {
                 pairs.add(Pair(view, view.transitionName))
             }
         }
@@ -536,6 +536,11 @@ class Post @JvmOverloads constructor(
             } else {
                 pairs.addAll(contentTransitionViews)
             }
+        } else {
+            // This is really only for if text content is not showing here, but might be in the new
+            // activity. If this is not added then no transition occurs and it just fades in, but with
+            // this the text content sort of comes out/in of the rest of the post
+            pairs.add(Pair(binding.content, binding.content.transitionName))
         }
 
         return pairs
