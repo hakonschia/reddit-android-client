@@ -210,10 +210,12 @@ class Post @JvmOverloads constructor(
         val contentHeight = binding.content.measuredHeight
         val totalHeight = binding.postsParentLayout.measuredHeight
 
+        val wantedContentHeight = content.wantedHeight
+
         // For some views making the measure with WRAP_CONTENT doesn't work, luckily those views
         // know the wanted height already, so we can use the wantedHeight to achieve the same functionality
-        val wantedHeight = if (content.wantedHeight >= 0) {
-            content.wantedHeight
+        val wantedHeight = if (wantedContentHeight >= 0) {
+            wantedContentHeight
         } else {
             // Measure what the content at most wants
             content.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)

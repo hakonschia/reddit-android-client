@@ -1045,20 +1045,20 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
         }
 
         with (binding.navDrawer) {
-            appState = AppState
             api = this@MainActivity.api
             userInfoDao = this@MainActivity.userInfoDao
             isDarkMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
 
             profilePicture.setOnClickListener { selectProfileNavBar() }
             username.setOnClickListener { selectProfileNavBar() }
-            settingsClicker.setOnClickListener { selectSettingsNavBar() }
+            privateBrowsingClicker.setOnClickListener { AppState.togglePrivateBrowsing() }
+            settingsLayout.root.setOnClickListener { selectSettingsNavBar() }
 
-            frontPageClicker.setOnClickListener { subredditSelected("") }
-            popularClicker.setOnClickListener { subredditSelected("popular") }
-            allClicker.setOnClickListener { subredditSelected("all") }
-            modClicker.setOnClickListener { subredditSelected("mod") }
-            randomClicker.setOnClickListener { subredditSelected("random") }
+            frontPageLayout.root.setOnClickListener { subredditSelected("") }
+            popularLayout.root.setOnClickListener { subredditSelected("popular") }
+            allLayout.root.setOnClickListener { subredditSelected("all") }
+            modLayout.root.setOnClickListener { subredditSelected("mod") }
+            randomLayout.root.setOnClickListener { subredditSelected("random") }
 
             darkModeIcon.setOnClickListener {
                 PreferenceManager.getDefaultSharedPreferences(this@MainActivity).run {
