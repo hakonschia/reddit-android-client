@@ -253,6 +253,7 @@
     <string name="content_description_nav_drawer_mod">Show subs you are moderating</string>
     <string name="content_description_nav_drawer_subreddit_refresh">Refresh subreddits</string>
     <string name="content_description_nav_drawer_trending_subreddit_refresh">Refresh trending subreddits</string>
+    <string name="content_description_video_playback_error_button">Video failed to load</string>
 
 
     <string name="transition_post_info_posted_in" translatable="false">transition_post_info_posted_in</string>
@@ -680,4 +681,10 @@
     <string name="multiNotAuthorized">If a Multi exists with this name, you\'re not allowed to view it</string>
 
     <string name="filterSubredditsSnackbar">Filtering \'%s\'</string>
+
+    <string name="videoPlaybackErrorTitle">The video failed to play</string>
+    <string name="videoPlaybackErrorBottomSheetUrlHeader">URL</string>
+    <string name="videoPlaybackErrorBottomSheetExceptionHeader">Exception</string>
+    <string name="videoPlaybackErrorBottomSheetUrlEmpty">No URL given</string>
+
 </resources>

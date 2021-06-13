@@ -14,16 +14,19 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.hakonsreader.R
+import com.example.hakonsreader.fragments.bottomsheets.VideoPlaybackErrorBottomSheet
 import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createVideoDuration
 import com.example.hakonsreader.views.util.VideoCache
+import com.example.hakonsreader.views.util.goneIf
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor
@@ -397,6 +400,15 @@ class VideoPlayer @JvmOverloads constructor(
      */
     private var isPrepared = false
 
+    /**
+     * If not null, this holds the playback error for the video
+     */
+    private var playbackError: ExoPlaybackException? = null
+        set(value) {
+            field = value
+            findViewById<ImageView>(R.id.playbackError).goneIf(value == null)
+        }
+
     init {
         controllerShowTimeoutMs = CONTROLLER_TIMEOUT
 
@@ -410,6 +422,7 @@ class VideoPlayer @JvmOverloads constructor(
         setFullscreenListener()
         setPauseButtonListener()
         setVolumeListener()
+        setPlaybackErrorListener()
     }
 
     /**
@@ -433,6 +446,8 @@ class VideoPlayer @JvmOverloads constructor(
         }
         exoPlayer.playWhenReady = false
         thumbnail.visibility = VISIBLE
+
+        playbackError = null
     }
 
     /**
@@ -490,6 +505,10 @@ class VideoPlayer @JvmOverloads constructor(
                 } else {
                     CONTROLLER_TIMEOUT
                 }
+            }
+
+            override fun onPlayerError(error: ExoPlaybackException) {
+                playbackError = error
             }
         })
 
@@ -592,9 +611,18 @@ class VideoPlayer @JvmOverloads constructor(
      * Sets the listener for the volume button
      */
     private fun setVolumeListener() {
-        findViewById<ImageButton>(R.id.volumeButton).apply {
-            setOnClickListener {
-                toggleVolume()
+        findViewById<ImageButton>(R.id.volumeButton).setOnClickListener {
+            toggleVolume()
+        }
+    }
+
+    /**
+     * Sets the listener for the error button
+     */
+    private fun setPlaybackErrorListener() {
+        findViewById<ImageView>(R.id.playbackError).setOnClickListener {
+            playbackError?.let {
+                showPlaybackErrorInformation(it)
             }
         }
     }
@@ -809,6 +837,15 @@ class VideoPlayer @JvmOverloads constructor(
         } else {
             // Probably unnecessary?
             pause()
+        }
+    }
+
+    private fun showPlaybackErrorInformation(error: ExoPlaybackException) {
+        if (context is AppCompatActivity) {
+            (context as AppCompatActivity).let { activity ->
+                val bottomSheet = VideoPlaybackErrorBottomSheet.newInstance(error, url)
+                bottomSheet.show(activity.supportFragmentManager, "videoPlaybackErrorBottomSheet")
+            }
         }
     }
 }
