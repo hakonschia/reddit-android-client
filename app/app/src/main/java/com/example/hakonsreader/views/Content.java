@@ -4,11 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
@@ -21,6 +21,11 @@ import java.util.List;
 
 /**
  * Generic superclass for a view displaying Reddit content
+ *
+ * This class is built around the idea of recycling views. Calling {@link #setRedditPost(RedditPost)}
+ * will automatically update the content view. When the view is no longer needed you should call
+ * {@link #recycle()} to ensure that any potential resources are freed up and is no longer connected
+ * to a post
  */
 public abstract class Content extends FrameLayout {
 
@@ -82,6 +87,7 @@ public abstract class Content extends FrameLayout {
      *
      * @param extras The extras to set
      */
+    @CallSuper
     public void setExtras(@NonNull Bundle extras) {
         this.extras = extras;
     }
@@ -164,7 +170,7 @@ public abstract class Content extends FrameLayout {
      *
      * @param bitmap The bitmap to set
      */
-    public void setBitmap(@org.jetbrains.annotations.Nullable Bitmap bitmap) {
+    public void setBitmap(@Nullable Bitmap bitmap) {
         this.bitmap = bitmap;
     }
 
@@ -174,5 +180,15 @@ public abstract class Content extends FrameLayout {
     @Nullable
     public Bitmap getBitmap() {
         return bitmap;
+    }
+
+    /**
+     * Recycles the content so that it can be reused with a new reddit post
+     */
+    @CallSuper
+    public void recycle() {
+        // We do not want to use clear() here, as the bundle might be stored somewhere for reuse later
+        extras = new Bundle();
+        setRedditPost(null);
     }
 }

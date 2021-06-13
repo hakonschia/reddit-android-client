@@ -91,49 +91,64 @@ class VideoPlayer @JvmOverloads constructor(
          *
          * The value stored with this key will be a `string`
          */
-        const val EXTRA_URL = "videoUrl"
+        const val EXTRA_URL = "extras_videoUrl"
 
         /**
          * The key used in extras for saying if the video displayed is a DASH video
          *
          * The value stored with this key will be a `boolean`
          */
-        const val EXTRA_IS_DASH = "videoIsDash"
+        const val EXTRA_IS_DASH = "extras_videoIsDash"
+
+        /**
+         * The key used in extras for saying if the video displayed is an MP4 video
+         *
+         * The value stored with this key will be a `boolean`
+         */
+        const val EXTRA_IS_MP4 = "extras_videoIsMp4"
+
 
         /**
          * The key used for extra information about the timestamp of the video
          *
          * The value stored with this key will be a `long`
          */
-        const val EXTRA_TIMESTAMP = "videoTimestamp"
+        const val EXTRA_TIMESTAMP = "extras_videoTimestamp"
 
         /**
          * The key used for extra information about the playback state of a video
          *
          * The value stored with this key will be a `boolean`
          */
-        const val EXTRA_IS_PLAYING = "isPlaying"
+        const val EXTRA_IS_PLAYING = "extras_isPlaying"
 
         /**
          * The key used for extra information about the volume of the video
          *
          * The value stored with this key will be a `boolean`
          */
-        const val EXTRA_VOLUME = "volume"
+        const val EXTRA_VOLUME = "extras_volume"
 
         /**
          * The key used for extra information about if the video being played has an audio track
          *
          * The value stored with this key will be a `boolean`
          */
-        const val EXTRA_HAS_AUDIO = "hasAudio"
+        const val EXTRA_HAS_AUDIO = "extras_hasAudio"
 
         /**
          * The key used for extra information about the size of the video (in bytes)
          *
          * The value stored with this key will be an `int`
          */
-        const val EXTRA_VIDEO_SIZE = "videoSize"
+        const val EXTRA_VIDEO_SIZE = "extras_videoSize"
+
+        /**
+         * The key used for extra information about the size of the video being an estimate
+         *
+         * The value stored with this key will be an `boolean`
+         */
+        const val EXTRA_VIDEO_SIZE_IS_ESTIMATE = "extras_videoSizeIsEstimate"
 
 
         /**
@@ -753,21 +768,30 @@ class VideoPlayer @JvmOverloads constructor(
             it.putBoolean(EXTRA_IS_PLAYING, isPlaying())
             it.putBoolean(EXTRA_VOLUME, isAudioOn())
 
-            // Probably have to pass thumbnail?
             it.putString(EXTRA_URL, url)
             it.putBoolean(EXTRA_IS_DASH, dashVideo)
+            it.putBoolean(EXTRA_IS_MP4, mp4Video)
             it.putBoolean(EXTRA_HAS_AUDIO, hasAudio)
+            it.putBoolean(EXTRA_VIDEO_SIZE_IS_ESTIMATE, isVideoSizeEstimated)
             it.putInt(EXTRA_VIDEO_SIZE, videoSize)
         }
     }
 
+    /**
+     * Sets the extras for the video. If the extras specify that a video has been played then
+     * [prepare] will be called
+     */
     fun setExtras(extras: Bundle) {
         val timestamp = extras.getLong(EXTRA_TIMESTAMP)
         val isPlaying = extras.getBoolean(EXTRA_IS_PLAYING)
         val volumeOn = extras.getBoolean(EXTRA_VOLUME)
 
-        hasAudio = extras.getBoolean(EXTRA_HAS_AUDIO)
-        videoSize = extras.getInt(EXTRA_VIDEO_SIZE)
+        mp4Video = extras.getBoolean(EXTRA_IS_MP4)
+        dashVideo = extras.getBoolean(EXTRA_IS_DASH)
+        hasAudio = extras.getBoolean(EXTRA_HAS_AUDIO, true)
+        isVideoSizeEstimated = extras.getBoolean(EXTRA_VIDEO_SIZE_IS_ESTIMATE)
+        videoSize = extras.getInt(EXTRA_VIDEO_SIZE, -1)
+        url = extras.getString(EXTRA_URL) ?: ""
 
         toggleVolume(volumeOn)
 

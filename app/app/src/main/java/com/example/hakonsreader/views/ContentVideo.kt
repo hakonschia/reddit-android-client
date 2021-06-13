@@ -42,16 +42,15 @@ class ContentVideo @JvmOverloads constructor(
     private val player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
 
     override fun updateView() {
-        player.prepareForNewVideo()
+        // This needs to be set before the extras as the extras might specify something other than the default
+        if (Settings.muteVideosByDefault()) {
+            player.toggleVolume(false)
+        }
 
         setThumbnail()
         setVideo()
 
         player.cacheVideo = cache
-
-        if (Settings.muteVideosByDefault()) {
-            player.toggleVolume(false)
-        }
 
         // Kind of a really bad way to make the video resize :)  When the post is opened
         // the video player won't automatically resize, so if the height of the view has been updated
@@ -63,6 +62,11 @@ class ContentVideo @JvmOverloads constructor(
                 player.layoutParams = layoutParams
             }
         }
+    }
+
+    override fun recycle() {
+        super.recycle()
+        player.prepareForNewVideo()
     }
 
     /**
@@ -107,6 +111,10 @@ class ContentVideo @JvmOverloads constructor(
             player.url = url
         } else {
             // Show some sort of error
+        }
+
+        if (!extras.isEmpty) {
+            player.setExtras(extras)
         }
     }
 
@@ -156,7 +164,10 @@ class ContentVideo @JvmOverloads constructor(
      * @param extras The bundle of data to use. This should be the same bundle as retrieved with
      * [ContentVideo.getExtras]
      */
-    override fun setExtras(extras: Bundle) = player.setExtras(extras)
+    override fun setExtras(extras: Bundle) {
+        super.setExtras(extras)
+        player.setExtras(extras)
+    }
 
     /**
      * Gets the resized height of the video player (ie. the size the video actually is when fully

@@ -53,10 +53,6 @@ class ContentGallery @JvmOverloads constructor(
     private var maxHeight = -1
 
     override fun updateView() {
-        // If the view is being reused
-        release()
-        binding.galleryImages.setCurrentItem(0, false)
-
         val images: List<GalleryImage> = if (redditPost.thirdPartyObject is ImgurAlbum) {
             (redditPost.thirdPartyObject as ImgurAlbum).images!!
         } else {
@@ -98,6 +94,12 @@ class ContentGallery @JvmOverloads constructor(
         // Set initial state
         val activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, 0)
         binding.galleryImages.setCurrentItem(activeImage, false)
+    }
+
+    override fun recycle() {
+        super.recycle()
+        release()
+        binding.galleryImages.setCurrentItem(0, false)
     }
 
     private fun getMaxWidthAndHeight(galleryImages: List<GalleryImage>): Coordinates {
@@ -167,12 +169,10 @@ class ContentGallery @JvmOverloads constructor(
     }
 
     override fun viewSelected() {
-        super.viewSelected()
         currentView?.viewSelected()
     }
 
     override fun viewUnselected() {
-        super.viewUnselected()
         galleryViews.forEach {
             it.viewUnselected()
         }
@@ -184,6 +184,7 @@ class ContentGallery @JvmOverloads constructor(
      * Releases all views in the gallery
      */
     fun release() {
+        binding.galleryImages.adapter = null
         galleryViews.forEach(Consumer { obj: ContentGalleryImage -> obj.destroy() })
         galleryViews.clear()
         currentView = null

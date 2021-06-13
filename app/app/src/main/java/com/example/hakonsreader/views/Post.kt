@@ -496,6 +496,7 @@ class Post @JvmOverloads constructor(
      * @param data The data to use for restoring the state
      */
     override fun setExtras(data: Bundle) {
+        super.setExtras(extras)
         val c = binding.content.getChildAt(0) as Content?
         if (c != null) {
             c.setExtras(data)

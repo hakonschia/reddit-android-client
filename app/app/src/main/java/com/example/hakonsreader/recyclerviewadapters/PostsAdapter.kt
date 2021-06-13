@@ -229,6 +229,7 @@ class PostsAdapter(
         val content = holder.getAndRemoveContent()
         // There is no point in storing remove post content as it is rare and a non-expensive view
         if (content != null && content !is ContentPostRemoved) {
+            content.recycle()
             unusedContentViews.add(content)
         }
     }
