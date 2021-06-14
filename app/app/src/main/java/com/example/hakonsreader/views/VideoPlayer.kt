@@ -430,20 +430,26 @@ class VideoPlayer @JvmOverloads constructor(
      */
     fun prepareForNewVideo() {
         isPrepared = false
+
         videoSize = -1
         videoDuration = -1
+
         dashVideo = false
         mp4Video = false
+
         hasAudio = true
         url = ""
         thumbnailUrl = ""
         thumbnailDrawable = -1
         isVideoSizeEstimated = false
-        
+
+        videoWidth = -1
+        videoHeight = -1
+        actualVideoHeight = -1
+
         // Ie. if a video has actually been played before we want to remove the old media item
-        if (exoPlayer.mediaItemCount > 0) {
-            exoPlayer.removeMediaItem(0)
-        }
+        exoPlayer.clearMediaItems()
+
         exoPlayer.playWhenReady = false
         thumbnail.visibility = VISIBLE
 

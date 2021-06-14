@@ -82,19 +82,20 @@ class Post @JvmOverloads constructor(
 
         setOnLongClickListener {
             redditPost?.let { post ->
+                val p = post.crossposts?.firstOrNull() ?: redditPost
                 // If we're already showing text content it's no point in showing this dialog
-                if (post.getPostType() == PostType.TEXT && !showTextContent) {
-                    val markdown: String = post.selftext
+                if (p.getPostType() == PostType.TEXT && !showTextContent) {
+                    val markdown: String = p.selftext
 
                     if (markdown.isNotEmpty()) {
                         if (context is AppCompatActivity) {
-                            PeekTextPostBottomSheet.newInstance(post).show(context.supportFragmentManager, "Text post")
+                            PeekTextPostBottomSheet.newInstance(p).show(context.supportFragmentManager, "Text post")
                         } else {
                             // Not sure if this will ever happen, but in case it does
                             // This would make the peek url in the post not work though, as it uses bottom sheet as well
                             AlertDialog.Builder(context)
                                     .setView(ContentText(context).apply {
-                                        setRedditPost(post)
+                                        setRedditPost(p)
                                     })
                                     .show()
                         }

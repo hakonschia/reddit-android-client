@@ -73,8 +73,10 @@ class ContentVideo @JvmOverloads constructor(
      * Sets the URL on [.player] and updates the size/duration if possible
      */
     private fun setVideo() {
+        val post = redditPost.crossposts?.firstOrNull() ?: redditPost
+
         // Get either the video, or the GIF
-        val video = redditPost.getVideo() ?: redditPost.getVideoGif()
+        val video = post.getVideo() ?: post.getVideoGif()
 
         val thirdParty = redditPost.thirdPartyObject
         var url: String? = null
@@ -99,9 +101,10 @@ class ContentVideo @JvmOverloads constructor(
             player.videoSize = video.duration * (video.bitrate / 8 * 1024)
             player.isVideoSizeEstimated = true
         } else {
-            val gif = redditPost.getMp4Source()
+            val gif = post.getMp4Source()
             if (gif != null) {
                 url = gif.url
+                player.mp4Video = true
                 player.videoWidth = gif.width
                 player.videoHeight = gif.height
             }

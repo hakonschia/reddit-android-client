@@ -1,11 +1,10 @@
 package com.example.hakonsreader.views.util
 
-import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.BitmapDrawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.example.hakonsreader.R
@@ -21,15 +20,16 @@ import com.example.hakonsreader.activities.SubredditActivity
  */
 fun openSubredditInActivity(view: View, subreddit: String) {
     val context = view.context
-    val activity = context as Activity
 
     // Send some data like what sub it is etc etc so it knows what to load
     Intent(context, SubredditActivity::class.java).run {
         putExtra(SubredditActivity.EXTRAS_SUBREDDIT_KEY, subreddit)
-        activity.startActivity(this)
+        context.startActivity(this)
 
         // Slide the activity in
-        activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        if (context is AppCompatActivity) {
+            context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
     }
 }
 
@@ -41,20 +41,22 @@ fun openSubredditInActivity(view: View, subreddit: String) {
  */
 fun openProfileInActivity(view: View, username: String?) {
     val context = view.context
-    val activity = context as Activity
 
     // Send some data like what sub it is etc etc so it knows what to load
     Intent(context, ProfileActivity::class.java).run {
         putExtra(ProfileActivity.EXTRAS_USERNAME_KEY, username)
-        activity.startActivity(this)
+        context.startActivity(this)
 
         // Slide the activity in
-        activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        if (context is AppCompatActivity) {
+            context.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
     }
 }
 
 /**
- * Opens an image in fullscreen with a SharedElementTransition
+ * Opens an image in fullscreen. If the context of [view] is an activity then the image
+ * is opened with a SharedElementTransition
  *
  * @param view The view to use. This should be an ImageView, but is defined as a View to be compatible
  * with usage in XML layouts
@@ -65,7 +67,6 @@ fun openProfileInActivity(view: View, username: String?) {
  */
 fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean, useBitmapFromView: Boolean) {
     val context = view.context
-    val activity = context as Activity
 
     Intent(context, ImageActivity::class.java).run {
         if (useBitmapFromView && view is ImageView) {
@@ -74,8 +75,13 @@ fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean, useBitm
 
         putExtra(ImageActivity.EXTRAS_IMAGE_URL, imageUrl)
         putExtra(ImageActivity.EXTRAS_CACHE_IMAGE, cache)
-        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, view, context.getString(R.string.transition_image_fullscreen))
-        activity.startActivity(this, options.toBundle())
+
+        if (context is AppCompatActivity) {
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(context, view, context.getString(R.string.transition_image_fullscreen))
+            context.startActivity(this, options.toBundle())
+        } else {
+            context.startActivity(this)
+        }
     }
 }
 
