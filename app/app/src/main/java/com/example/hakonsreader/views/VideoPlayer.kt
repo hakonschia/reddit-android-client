@@ -409,6 +409,11 @@ class VideoPlayer @JvmOverloads constructor(
             findViewById<ImageView>(R.id.playbackError).goneIf(value == null)
         }
 
+    /**
+     * If true the thumbnail has been set by a bitmap and should not be loaded via a URL
+     */
+    private var thumbnailLoadedFromBitmap = false
+
     init {
         controllerShowTimeoutMs = CONTROLLER_TIMEOUT
 
@@ -441,6 +446,7 @@ class VideoPlayer @JvmOverloads constructor(
         url = ""
         thumbnailUrl = ""
         thumbnailDrawable = -1
+        thumbnailLoadedFromBitmap = false
         isVideoSizeEstimated = false
 
         videoWidth = -1
@@ -654,9 +660,13 @@ class VideoPlayer @JvmOverloads constructor(
 
     /**
      * Loads the thumbnail into [thumbnail]. If [thumbnailUrl] is not empty, then the URL will be loaded.
-     * Otherwise [thumbnailDrawable] will be loaded
+     * Otherwise [thumbnailDrawable] will be loaded.
+     *
+     * If the thumbnail has been set with [setThumbnailBitmap] then a new image will not be loaded
      */
     fun loadThumbnail() {
+        if (thumbnailLoadedFromBitmap) return
+
         // Set the background color for the controls as a filter here since the thumbnail is shown
         // over the controls
         thumbnail.setColorFilter(ContextCompat.getColor(context, R.color.videoControlBackground))
@@ -782,17 +792,24 @@ class VideoPlayer @JvmOverloads constructor(
      * if the video hasn't played yet
      */
     fun getCurrentFrame(): Bitmap? {
-        val bitmap = if (videoSurfaceView is TextureView) {
-            (videoSurfaceView as TextureView).bitmap
-        } else null
+        return if (getPosition() == 0L) {
+            thumbnail.drawable?.toBitmap()
+        } else {
+            val bitmap = if (videoSurfaceView is TextureView) {
+                (videoSurfaceView as TextureView).bitmap
+            } else {
+                null
+            }
 
-        return bitmap ?: thumbnail.drawable?.toBitmap()
+            bitmap ?: thumbnail.drawable?.toBitmap()
+        }
     }
 
     /**
      * Sets a bitmap to the thumbnail
      */
     fun setThumbnailBitmap(bitmap: Bitmap) {
+        thumbnailLoadedFromBitmap = true
         thumbnail.setImageBitmap(bitmap)
     }
 
