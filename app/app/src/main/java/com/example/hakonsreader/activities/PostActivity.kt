@@ -437,8 +437,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
                         content.loadThumbnail()
                     }
 
-                    content.enableControllerTransitions(true)
-
                     content.setOnVideoFullscreenListener { contentVideo ->
                         val intent = Intent(this, VideoActivity::class.java).apply {
                             putExtra(VideoActivity.EXTRAS_EXTRAS, contentVideo.extras)
@@ -459,6 +457,10 @@ class PostActivity : BaseActivity(), OnReplyListener {
                     // animation the animation looks very choppy, so it should only be played at the end
                     setEnterSharedElementCallback(object : SharedElementCallback() {
                         override fun onSharedElementEnd(sharedElementNames: MutableList<String>?, sharedElements: MutableList<View>?, sharedElementSnapshots: MutableList<View>?) {
+                            // Enable this after the transition is over as the thumbnail kind of jumps sometimes if
+                            // animations are enabled
+                            content.enableControllerTransitions(true)
+
                             if (postExtras != null) {
                                 binding.post.extras = postExtras
                             }

@@ -840,8 +840,8 @@ class VideoPlayer @JvmOverloads constructor(
         mp4Video = extras.getBoolean(EXTRA_IS_MP4)
         dashVideo = extras.getBoolean(EXTRA_IS_DASH)
         hasAudio = extras.getBoolean(EXTRA_HAS_AUDIO, true)
-        isVideoSizeEstimated = extras.getBoolean(EXTRA_VIDEO_SIZE_IS_ESTIMATE)
         videoSize = extras.getInt(EXTRA_VIDEO_SIZE, -1)
+        isVideoSizeEstimated = extras.getBoolean(EXTRA_VIDEO_SIZE_IS_ESTIMATE)
         url = extras.getString(EXTRA_URL) ?: ""
 
         toggleVolume(volumeOn)
