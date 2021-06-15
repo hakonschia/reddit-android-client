@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -124,7 +125,7 @@ class ContentImage @JvmOverloads constructor(
     }
 
     override fun getWantedHeight(): Int {
-        val source = redditPost.getSourcePreview()
+        val source = redditPost?.getSourcePreview()
         val personWhoBroughtMeIntoTheWorld = parent
 
         if (source == null || personWhoBroughtMeIntoTheWorld !is View) {
