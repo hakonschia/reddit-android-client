@@ -24,7 +24,6 @@ import com.example.hakonsreader.broadcastreceivers.InboxNotificationReceiver
 import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_ID_INBOX_STATUS
 import com.example.hakonsreader.constants.DEVELOPER_NOTIFICATION_TAG_INBOX_STATUS
 import com.example.hakonsreader.misc.Settings
-import com.example.hakonsreader.states.AppState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.text.SimpleDateFormat
@@ -78,7 +77,7 @@ class InboxCheckerWorker @AssistedInject constructor(
 
         return when (response) {
             is ApiResponse.Success -> {
-                if (AppState.isDevMode) {
+                if (Settings.devShowInboxNotifications()) {
                     createDeveloperNotification(counter)
                 }
 
@@ -110,7 +109,7 @@ class InboxCheckerWorker @AssistedInject constructor(
             }
 
             is ApiResponse.Error -> {
-                if (AppState.isDevMode) {
+                if (Settings.devShowInboxNotifications()) {
                     createDeveloperNotification(counter, response.throwable)
                 }
                 Result.failure()
