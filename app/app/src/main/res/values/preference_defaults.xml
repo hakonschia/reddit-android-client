@@ -35,5 +35,7 @@
     <bool name="prefs_default_third_party_load_imgur_gifs">true</bool>
     <bool name="prefs_default_third_party_load_imgur_albums">true</bool>
     <bool name="prefs_default_show_awards">true</bool>
+    <bool name="prefs_default_dev_show_inbox_notification">true</bool>
+    <bool name="prefs_default_dev_highlight_selected_views">true</bool>
 
 </resources>

@@ -362,4 +362,23 @@
             app:summary="@string/prefs_summary_third_party_load_imgur_albums"
             app:defaultValue="@bool/prefs_default_third_party_load_imgur_albums" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/prefs_group_dev_options"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="@string/prefs_key_dev_show_inbox_notification"
+            app:title="@string/prefs_title_dev_show_inbox_notification"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_dev_show_inbox_notification" />
+
+        <SwitchPreference
+            app:key="@string/prefs_key_dev_highlight_selected_views"
+            app:title="@string/prefs_title_dev_highlight_selected_views"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_dev_highlight_selected_views" />
+    </PreferenceCategory>
 </PreferenceScreen>

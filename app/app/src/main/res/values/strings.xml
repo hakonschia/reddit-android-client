@@ -72,6 +72,7 @@
     <string name="prefs_group_subreddits">Subreddits</string>
     <string name="prefs_group_awards">Awards</string>
     <string name="prefs_group_third_party">Third party</string>
+    <string name="prefs_group_dev_options">Developer options</string>
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark mode</string>
@@ -137,6 +138,8 @@
     <string name="prefs_title_third_party_load_imgur_albums">Load Imgur albums/galleries</string>
     <string name="prefs_summary_third_party_load_imgur_albums">With this enabled Imgur albums and galleries are shown as standard Reddit galleries</string>
     <string name="prefs_title_show_awards">Show awards on posts and comments</string>
+    <string name="prefs_title_dev_show_inbox_notification">Show inbox notification</string>
+    <string name="prefs_title_dev_highlight_selected_views">Highlight selected posts</string>
 
 
     <!-- Preferences keys -->
@@ -193,6 +196,8 @@
     <string name="prefs_key_third_party_load_imgur_gifs" translatable="false">third_party_load_imgur_gifs</string>
     <string name="prefs_key_third_party_load_imgur_albums" translatable="false">third_party_load_imgur_albums</string>
     <string name="prefs_key_show_awards" translatable="false">show_awards</string>
+    <string name="prefs_key_dev_show_inbox_notification" translatable="false">dev_show_inbox_notification</string>
+    <string name="prefs_key_dev_highlight_selected_views" translatable="false">dev_highlight_selected_views</string>
 
 
     <string name="content_description_link_image">Link to website</string>

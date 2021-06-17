@@ -504,4 +504,28 @@ object Settings {
         )
     }
 
+
+
+    // ----------------------- Developer settings -----------------------
+
+    /**
+     * @return True if [AppState.isDevMode] is true and developer inbox notifications should be shown
+     */
+    fun devShowInboxNotifications(): Boolean {
+        return AppState.isDevMode && preferences.getBoolean(
+            resources.getString(R.string.prefs_key_dev_show_inbox_notification),
+            resources.getBoolean(R.bool.prefs_default_dev_show_inbox_notification)
+        )
+    }
+
+    /**
+     * @return True if [AppState.isDevMode] is true and selected posts should be highlighted
+     */
+    fun devHighlightSelectedPosts(): Boolean {
+        return AppState.isDevMode && preferences.getBoolean(
+            resources.getString(R.string.prefs_key_dev_highlight_selected_views),
+            resources.getBoolean(R.bool.prefs_default_dev_highlight_selected_views)
+        )
+    }
+
 }

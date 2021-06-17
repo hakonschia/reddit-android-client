@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.core.view.children
 import androidx.core.view.get
@@ -549,9 +550,16 @@ class Post @JvmOverloads constructor(
     }
 
     override fun viewSelected() {
-        (binding.content.getChildAt(0) as Content?)?.viewSelected()
+        if (Settings.devHighlightSelectedPosts()) {
+            binding.root.setBackgroundColor(ContextCompat.getColor(context, R.color.tagNSFWFill))
+        }
+        getContent()?.viewSelected()
     }
+
     override fun viewUnselected() {
-        (binding.content.getChildAt(0) as Content?)?.viewUnselected()
+        if (Settings.devHighlightSelectedPosts()) {
+            binding.root.setBackgroundColor(ContextCompat.getColor(context, R.color.background))
+        }
+        getContent()?.viewUnselected()
     }
 }
