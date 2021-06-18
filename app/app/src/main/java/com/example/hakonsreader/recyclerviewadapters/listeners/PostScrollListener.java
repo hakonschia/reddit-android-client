@@ -159,14 +159,15 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
 
 
             // (0, 0) is top left
-            int y = viewHolder.getContentY();
+            int viewTop = viewHolder.getContentY();
             int viewBottom = viewHolder.getContentBottomY();
 
-            // If the view is above the screen (< 0) it is "unselected"
             // If the bottom of the view is above the screen height it is "unselected"
-            // If the view is below 35% of the screen height it is "selected" (kind of backwards since 0 is at the top)
+            // If the top of the view is above the screen (< 0) it is "unselected"
+            // If the top of the view is below 35% of the screen height and the bottom is above 50 %
+            //  of the screen height (to not select small posts at the top of the screen) it is "selected"
 
-            if (y < 0 || viewBottom > SCREEN_HEIGHT) {
+            if (viewTop < 0 || viewBottom > SCREEN_HEIGHT) {
                 viewHolder.onUnselected();
 
                 // We only want to reset the post to ignore on scrolling up, otherwise we have to ensure
@@ -174,8 +175,11 @@ public class PostScrollListener extends RecyclerView.OnScrollListener implements
                 if (scrollingUp) {
                     postToIgnore = "";
                 }
-            } else if (y < SCREEN_HEIGHT * 0.35f && !onlyUnselect && !post.getId().equals(postToIgnore)) {
-                viewHolder.onSelected();
+            } else if (!onlyUnselect && !post.getId().equals(postToIgnore)) {
+                // This if could be merged with the one above, but I think it's easier to read if split
+                if (viewTop < SCREEN_HEIGHT * 0.35f && viewBottom > SCREEN_HEIGHT * 0.5f) {
+                    viewHolder.onSelected();
+                }
             }
         }
     }
