@@ -53,6 +53,7 @@ import kotlin.collections.HashMap
 class SubmitActivity : BaseActivity() {
 
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "SubmitActivity"
 
         /**
@@ -378,7 +379,7 @@ class SubmitActivity : BaseActivity() {
         var binding: SubmissionTextBinding? = null
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            binding = SubmissionTextBinding.inflate(layoutInflater)
+            binding = SubmissionTextBinding.inflate(LayoutInflater.from(requireActivity()))
             return binding?.root
         }
 
@@ -401,7 +402,7 @@ class SubmitActivity : BaseActivity() {
         var binding: SubmissionLinkBinding? = null
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            binding = SubmissionLinkBinding.inflate(layoutInflater)
+            binding = SubmissionLinkBinding.inflate(LayoutInflater.from(requireActivity()))
             return binding?.root
         }
 
@@ -436,7 +437,7 @@ class SubmitActivity : BaseActivity() {
         val postsMap = HashMap<String, RedditPost>()
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            binding = SubmissionCrosspostBinding.inflate(layoutInflater)
+            binding = SubmissionCrosspostBinding.inflate(LayoutInflater.from(requireActivity()))
             binding?.crosspostSubmission?.addTextChangedListener(textWatcher)
             return binding?.root
         }
