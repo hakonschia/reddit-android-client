@@ -140,7 +140,7 @@
 
             android:transitionName="@string/transition_post_info_stickied"
             android:src="@drawable/ic_pin_24dp"
-            android:visibility="@{post.stickied ? View.VISIBLE : View.GONE, default=gone}"
+            android:visibility="@{post.stickied ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="@+id/postedIn"
             app:layout_constraintTop_toBottomOf="@+id/crosspostIcon"
             tools:visibility="visible" />
@@ -155,7 +155,7 @@
             app:marginStart="@{post.stickied ? @dimen/defaultMarginHalf : @dimen/noMargin}"
 
             android:src="@drawable/ic_archive_24dp"
-            android:visibility="@{post.archived ? View.VISIBLE : View.GONE, default=gone}"
+            android:visibility="@{post.archived ? View.VISIBLE : View.GONE}"
 
             android:transitionName="@string/transition_post_info_archived"
 
@@ -175,7 +175,7 @@
             android:src="@drawable/ic_lock_24dp"
             android:transitionName="@string/transition_post_info_locked"
 
-            android:visibility="@{post.locked ? View.VISIBLE : View.GONE, default=gone}"
+            android:visibility="@{post.locked ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toEndOf="@+id/archived"
             app:layout_constraintTop_toTopOf="@+id/stickied"
             tools:visibility="visible" />
@@ -316,6 +316,7 @@
 
             android:text="@string/crosspostFrom"
             android:textSize="13sp"
+            android:textColor="@color/secondary_text_color"
             android:transitionName="@string/transition_post_info_crosspost_from"
 
             app:layout_constraintStart_toEndOf="@+id/crosspostText"
