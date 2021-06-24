@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Global app state. Must be initialized during startup be using [init]
+ * Global app state. Must be initialized during startup by using [init]
  */
 object AppState {
     private lateinit var database: RedditDatabase
@@ -64,7 +64,7 @@ object AppState {
             // This database allows for main thread queries, since this has to be set before anything
             // is started to ensure that the state is correct (this might be kind of bad, but the query
             // should be fast enough that it doesn't impact startup by any noticeable amount)
-            val info = userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token)
+            val info = userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token.userId)
             if (api.isPrivatelyBrowsing()) {
                 LoggedInState.PrivatelyBrowsing(info)
             } else {
@@ -91,7 +91,7 @@ object AppState {
     @Suppress("RedundantSuspendModifier")
     suspend fun addNewUser(token: AccessToken) {
         TokenManager.saveToken(token)
-        val userInfo = RedditUserInfo(token)
+        val userInfo = RedditUserInfo(token.userId)
 
         withContext(Dispatchers.Main) {
             _loggedInState.value = LoggedInState.LoggedIn(userInfo)
@@ -168,9 +168,8 @@ object AppState {
         if (token.userId != AccessToken.NO_USER_ID) {
             CoroutineScope(Dispatchers.IO).launch {
                 getUserInfoFromToken(token).apply {
-                    accessToken = token
+                    //accessToken = token
 
-                    // New token is for a user
                     if (userInfoDatabase.userInfo().userExists(userId)) {
                         userInfoDatabase.userInfo().update(this)
                     } else {
@@ -187,32 +186,35 @@ object AppState {
     // Database operations must be suspended
     @Suppress("RedundantSuspendModifier")
     private suspend fun getUserInfoFromToken(token: AccessToken) : RedditUserInfo {
-        return userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token)
+        return userInfoDatabase.userInfo().getById(token.userId) ?: RedditUserInfo(token.userId)
     }
 
     /**
      * Switches which account is the active account.
      *
-     * @param token The token to use for the new active account
+     * @param userId The ID of the user to switch to
      * @param activity The activity currently active. The activity will be recreated
      */
-    fun switchAccount(token: AccessToken, activity: AppCompatActivity) {
+    fun switchAccount(userId: String, activity: AppCompatActivity) {
         CoroutineScope(Dispatchers.IO).launch {
             // Ensure no user state from one account is used for the new one
             database.clearUserState()
 
-            api.switchAccessToken(token)
-            TokenManager.saveToken(token)
+            val token = TokenManager.getTokenByUserId(userId)
+            if (token != null) {
+                api.switchAccessToken(token)
+                TokenManager.saveToken(token)
 
-            SharedPreferencesManager.putNow(SharedPreferencesConstants.PRIVATELY_BROWSING, false)
+                SharedPreferencesManager.putNow(SharedPreferencesConstants.PRIVATELY_BROWSING, false)
 
-            withContext(Dispatchers.Main) {
-                _loggedInState.value = LoggedInState.LoggedIn(getUserInfoFromToken(token))
+                withContext(Dispatchers.Main) {
+                    _loggedInState.value = LoggedInState.LoggedIn(getUserInfoFromToken(token))
 
-                if (activity is MainActivity) {
-                    activity.recreateAsNewUser()
-                } else {
-                    activity.recreate()
+                    if (activity is MainActivity) {
+                        activity.recreateAsNewUser()
+                    } else {
+                        activity.recreate()
+                    }
                 }
             }
         }

@@ -7,25 +7,17 @@ import androidx.room.PrimaryKey
 /**
  * Wrapper object for storing generic information about a logger in user
  *
- * @param accessToken The access token this is for. This MUST be set, if [AccessToken.getUserId]
- * returns [AccessToken.NO_USER_ID] then this will throw an exception
+ * @param userId The user ID as retrieved from [AccessToken]
  */
 @Entity(tableName = "reddit_user_info")
 class RedditUserInfo(
-        @Embedded
-        var accessToken: AccessToken
-) {
-    init {
-        if (accessToken.userId == AccessToken.NO_USER_ID) {
-            throw IllegalStateException("Cannot create wrapper object without a valid user ID")
-        }
-    }
-
     /**
-     * The user ID as retrieved from [accessToken]. This should not be set manually
+     * The user ID as retrieved from [AccessToken]
      */
     @PrimaryKey
-    var userId: String = accessToken.userId
+    val userId: String
+
+) {
 
     /**
      * The user information about the user
