@@ -115,8 +115,15 @@ object Settings {
      * @return True if NSFW videos should be automatically played
      */
     fun autoPlayNsfwVideos(): Boolean {
-        return AppState.getUserInfo()?.nsfwAccount == true ||
-                preferences.getBoolean(resources.getString(R.string.prefs_key_auto_play_nsfw_videos), resources.getBoolean(R.bool.prefs_default_autoplay_nsfw_videos))
+        // If it's an NSFW account we want to use the normal auto play
+        return if (AppState.getUserInfo()?.nsfwAccount == true) {
+            autoPlayVideos()
+        } else {
+            preferences.getBoolean(
+                resources.getString(R.string.prefs_key_auto_play_nsfw_videos),
+                resources.getBoolean(R.bool.prefs_default_autoplay_nsfw_videos)
+            ) && !dataSavingEnabled()
+        }
     }
 
     /**
