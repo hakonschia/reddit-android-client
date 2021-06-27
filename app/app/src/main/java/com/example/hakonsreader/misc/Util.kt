@@ -37,6 +37,7 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.util.*
+import kotlin.math.min
 
 /**
  * Class for holding image URL variants for a [RedditPost]
@@ -366,9 +367,14 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
 
             val videoId = youtubeVideoId ?: pathSegments.first()
 
+            val timestamp = asUri.getQueryParameter("t")
+            val timeStampAsFloat = if (timestamp != null) {
+                parseYouTubeTimestamp(timestamp).toFloat()
+            } else 0F
+
             Intent(context, VideoYoutubeActivity::class.java).apply {
                 putExtra(VideoYoutubeActivity.EXTRAS_VIDEO_ID, videoId)
-                putExtra(VideoYoutubeActivity.EXTRAS_TIMESTAMP, asUri.getQueryParameter("t")?.toFloat())
+                putExtra(VideoYoutubeActivity.EXTRAS_TIMESTAMP, timeStampAsFloat)
             }
         }
 
@@ -417,6 +423,76 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
             } else {
                 baseIntent
             }
+        }
+    }
+}
+
+/**
+ * Parses a YouTube timestamp to an integer value
+ *
+ * @param timestamp The string timestamp extracted from the "t" query parameter of the YouTube URL
+ * @return The amount of seconds
+ */
+fun parseYouTubeTimestamp(timestamp: String): Int {
+    // The timestamp follows the format:
+    // 78 - Just a number saying the seconds
+    // 78s - Number with "s" to give the seconds
+    // 1m18s - Number in minutes and number in seconds
+    // 18s1m - Number in minutes and number in seconds, with seconds first
+    // 1m - Number given in minutes without additional seconds
+
+    return try {
+        // 78 - Just a number saying the seconds
+        // Try to parse it, if it works then great, otherwise find out why in the catch
+        timestamp.toInt()
+    } catch (e: NumberFormatException) {
+        // Split the string to a list of numbers
+        val parts = timestamp.split("\\D+".toRegex()).filter { it.isNotEmpty() }
+
+        when (parts.size) {
+            // 1 part, either "78", "78s", or "1m"
+            1 -> {
+                if (timestamp.matches("\\dm".toRegex())) {
+                    // 1m - Number given in minutes without additional seconds
+                    // Convert the minutes to seconds
+                    parts[0].toInt() * 60
+                } else {
+                    // 78s - Number with "s" to give the seconds
+                    parts[0].toInt()
+                }
+            }
+
+            // 2 parts, either "1m18s" or "18s1m"
+            2 -> {
+                val minutesIndex = timestamp.indexOf("m")
+                val secondsIndex = timestamp.indexOf("s")
+
+                when {
+                    // This is an error, the timestamp passed wasn't "1m18s" or "18s1m"
+                    minutesIndex == -1 || secondsIndex == -1 -> 0
+
+                    // 1m18s
+                    minutesIndex < secondsIndex -> {
+                        val minutes = parts[0].toInt() * 60
+                        val seconds = parts[1].toInt()
+
+                        minutes + seconds
+                    }
+
+                    // 18s1m
+                    minutesIndex > secondsIndex -> {
+                        val minutes = parts[1].toInt() * 60
+                        val seconds = parts[0].toInt()
+
+                        minutes + seconds
+                    }
+
+                    else -> 0
+                }
+            }
+
+            // This is really some sort of error
+            else -> 0
         }
     }
 }
