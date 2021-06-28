@@ -58,18 +58,21 @@ class InboxGroupFragment : Fragment() {
         private set
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentInboxGroupBinding.inflate(LayoutInflater.from(requireActivity())).also {
+            _binding = it
+        }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             val type = savedInstanceState.getInt(SAVED_INBOX_TYPE)
             inboxType = InboxFragment.InboxGroupTypes.values()[type]
         }
 
-        setupBinding()
         setupMessagesList()
 
         loadMessagesFromDb()
-
-        return binding.root
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -80,10 +83,6 @@ class InboxGroupFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun setupBinding() {
-        _binding = FragmentInboxGroupBinding.inflate(LayoutInflater.from(requireActivity()))
     }
 
     private fun setupMessagesList() {
