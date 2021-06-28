@@ -56,7 +56,7 @@ interface SubredditsRequest {
     /**
      * Retrieves the list of default subreddits
      *
-     * OAauth scope required: *read*
+     * OAuth scope required: *read*
      *
      * @param after For loading more subreddits, this is the ID of the last subreddit loaded. The new
      * subreddits will be loaded after this. Default to an empty string

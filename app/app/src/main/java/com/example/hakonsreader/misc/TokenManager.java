@@ -36,7 +36,9 @@ public class TokenManager {
     public static AccessToken getToken() {
         // If null, try to get from shared preferences
         if (token == null) {
-            token = gson.fromJson(prefs.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
+            if (prefs != null) {
+                token = gson.fromJson(prefs.getString(SharedPreferencesConstants.ACCESS_TOKEN, ""), AccessToken.class);
+            }
         }
 
         return token;

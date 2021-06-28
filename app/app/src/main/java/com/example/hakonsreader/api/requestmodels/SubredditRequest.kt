@@ -183,14 +183,14 @@ interface SubredditRequest {
      * @param flairId The ID of the flair to select (as from [RedditFlair.id]), or `null` to clear
      * the users flair
      */
-    suspend fun selectFlair(username: String, flairId: String?) : ApiResponse<Any?>
+    suspend fun selectFlair(username: String, flairId: String?) : ApiResponse<Unit>
 
     /**
      * Enables or disables user flairs on the subreddit
      *
      * @param enable True to enable flairs, false to disable
      */
-    suspend fun enableUserFlair(enable: Boolean) : ApiResponse<Any?>
+    suspend fun enableUserFlair(enable: Boolean) : ApiResponse<Unit>
 
     /**
      * Gets a wiki page for the subreddit
@@ -561,7 +561,7 @@ class SubredditRequestImpl(
         }
     }
 
-    override suspend fun selectFlair(username: String, flairId: String?) : ApiResponse<Any?> {
+    override suspend fun selectFlair(username: String, flairId: String?) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -577,7 +577,7 @@ class SubredditRequestImpl(
                     if (flairId != null) {
                         enableUserFlair(true)
                     }
-                    ApiResponse.Success(null)
+                    ApiResponse.Success(Unit)
                 } else {
                     apiListingErrors(body.errors() as List<List<String>>)
                 }
@@ -589,7 +589,7 @@ class SubredditRequestImpl(
         }
     }
 
-    override suspend fun enableUserFlair(enable: Boolean) : ApiResponse<Any?> {
+    override suspend fun enableUserFlair(enable: Boolean) : ApiResponse<Unit> {
         try {
             verifyLoggedInToken(accessToken)
         } catch (e: InvalidAccessTokenException) {
@@ -602,7 +602,7 @@ class SubredditRequestImpl(
 
             if (body != null) {
                 if (!body.hasErrors()) {
-                    ApiResponse.Success(null)
+                    ApiResponse.Success(Unit)
                 } else {
                     apiListingErrors(body.errors() as List<List<String>>)
                 }

@@ -52,19 +52,19 @@ class TestApiModule {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun vote(voteType: VoteType): ApiResponse<Nothing?> {
+                    override suspend fun vote(voteType: VoteType): ApiResponse<Unit> {
                         return if (postId == VOTE_FAIL) {
                             ApiResponse.Error(GenericError(403), Throwable("'$VOTE_FAIL' was passed as listing ID"))
                         } else {
-                            ApiResponse.Success(null)
+                            ApiResponse.Success(Unit)
                         }
                     }
 
-                    override suspend fun save(): ApiResponse<Nothing?> {
+                    override suspend fun save(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun unsave(): ApiResponse<Nothing?> {
+                    override suspend fun unsave(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
@@ -76,11 +76,11 @@ class TestApiModule {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun sticky(): ApiResponse<Any?> {
+                    override suspend fun sticky(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun unsticky(): ApiResponse<Any?> {
+                    override suspend fun unsticky(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
@@ -88,23 +88,23 @@ class TestApiModule {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun markNsfw(): ApiResponse<Any?> {
+                    override suspend fun markNsfw(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun unmarkNsfw(): ApiResponse<Any?> {
+                    override suspend fun unmarkNsfw(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun markSpoiler(): ApiResponse<Any?> {
+                    override suspend fun markSpoiler(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun unmarkSpoiler(): ApiResponse<Any?> {
+                    override suspend fun unmarkSpoiler(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun delete(): ApiResponse<Any?> {
+                    override suspend fun delete(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
@@ -112,19 +112,19 @@ class TestApiModule {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun ignoreReports(): ApiResponse<Any?> {
+                    override suspend fun ignoreReports(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun unignoreReports(): ApiResponse<Any?> {
+                    override suspend fun unignoreReports(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun lock(): ApiResponse<Any?> {
+                    override suspend fun lock(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun unlock(): ApiResponse<Any?> {
+                    override suspend fun unlock(): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
@@ -155,11 +155,11 @@ class TestApiModule {
                         return ApiResponse.Success(posts)
                     }
 
-                    override suspend fun subscribe(subscribe: Boolean): ApiResponse<Nothing?> {
+                    override suspend fun subscribe(subscribe: Boolean): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun favorite(favorite: Boolean): ApiResponse<Nothing?> {
+                    override suspend fun favorite(favorite: Boolean): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
@@ -183,11 +183,11 @@ class TestApiModule {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun selectFlair(username: String, flairId: String?): ApiResponse<Any?> {
+                    override suspend fun selectFlair(username: String, flairId: String?): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
-                    override suspend fun enableUserFlair(enable: Boolean): ApiResponse<Any?> {
+                    override suspend fun enableUserFlair(enable: Boolean): ApiResponse<Unit> {
                         TODO("Not yet implemented")
                     }
 
@@ -200,13 +200,13 @@ class TestApiModule {
 
             override fun subreditts(): SubredditsRequest {
                 return object : SubredditsRequest {
-                    override suspend fun getSubreddits(after: String, count: Int): ApiResponse<List<Subreddit>> {
+                    override suspend fun getSubreddits(after: String, fetchAll: Boolean): ApiResponse<List<Subreddit>> {
                         // The actual implementation of this calls either subscribedSubreddits or defaultSubreddits
                         // depending on if a user is logged in. For tests we can just use the default ones
-                        return defaultSubreddits(after, count)
+                        return defaultSubreddits(after, fetchAll)
                     }
 
-                    override suspend fun subscribedSubreddits(after: String, count: Int): ApiResponse<List<Subreddit>> {
+                    override suspend fun subscribedSubreddits(after: String, fetchAll: Boolean): ApiResponse<List<Subreddit>> {
                         val listTypeToken = object : TypeToken<List<Subreddit>>(){}.type
                         // This file includes a raw response from "/subreddits/mine/subscriber?raw_json=1" (only the "children: []" list)
                         // There are 12 subreddits in the list
@@ -216,7 +216,7 @@ class TestApiModule {
                         return ApiResponse.Success(subreddits)
                     }
 
-                    override suspend fun defaultSubreddits(after: String, count: Int): ApiResponse<List<Subreddit>> {
+                    override suspend fun defaultSubreddits(after: String, fetchAll: Boolean): ApiResponse<List<Subreddit>> {
                         val listTypeToken = object : TypeToken<List<Subreddit>>(){}.type
                         // This file includes a raw response from "/subreddits/default.json?raw_json=1&limit=10" (only the "children: []" list)
                         // The response was retrieved without a user context
@@ -264,6 +264,10 @@ class TestApiModule {
                         val user = Gson().fromJson(userData, RedditUser::class.java)
 
                         return ApiResponse.Success(user)
+                    }
+
+                    override suspend fun multis(): ApiResponse<List<RedditMulti>> {
+                        TODO("Not yet implemented")
                     }
                 }
             }
