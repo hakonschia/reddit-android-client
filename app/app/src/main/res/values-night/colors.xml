@@ -30,7 +30,7 @@
     <!-- Upvote/downvote button colors-->
     <color name="upvoted">#FF6130</color>
     <color name="downvoted">#2196F3</color>
-    <color name="noVote">#D3D3D3</color>
+    <color name="noVote">@color/text_color</color>
 
     <color name="commentHighlightBackground">#00273E</color>
 
