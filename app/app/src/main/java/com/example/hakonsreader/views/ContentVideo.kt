@@ -70,7 +70,7 @@ class ContentVideo @JvmOverloads constructor(
     }
 
     /**
-     * Sets the URL on [.player] and updates the size/duration if possible
+     * Sets the URL on [player] and updates the size/duration if possible
      */
     private fun setVideo() {
         val post = redditPost.crossposts?.firstOrNull() ?: redditPost
@@ -85,7 +85,10 @@ class ContentVideo @JvmOverloads constructor(
             url = thirdParty.mp4Url
             player.mp4Video = true
             player.hasAudio = thirdParty.hasAudio
+
             player.videoSize = thirdParty.mp4Size
+            player.isVideoSizeEstimated = false
+
             player.videoWidth = thirdParty.width
             player.videoHeight = thirdParty.height
         } else if (video != null) {
@@ -94,6 +97,7 @@ class ContentVideo @JvmOverloads constructor(
             // If we have a "RedditVideo" we can set the duration now
             player.videoDuration = video.duration
             player.dashVideo = true
+
             player.videoWidth = video.width
             player.videoHeight = video.height
 
@@ -101,10 +105,18 @@ class ContentVideo @JvmOverloads constructor(
             player.videoSize = video.duration * (video.bitrate / 8 * 1024)
             player.isVideoSizeEstimated = true
         } else {
+            // These videos are "gifs" but stored as MP4s since gif is a terrible video format
+            // The domain for these videos is "i.redd.it" (which is technically for images)
             val gif = post.getMp4Source()
             if (gif != null) {
                 url = gif.url
+
                 player.mp4Video = true
+
+                // These videos never have audio, so we can remove it now
+                // If by some chance it does, the audio button will be shown again when the video loads
+                player.hasAudio = false
+
                 player.videoWidth = gif.width
                 player.videoHeight = gif.height
             }
