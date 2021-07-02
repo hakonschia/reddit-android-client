@@ -101,6 +101,7 @@ class ContentGallery @JvmOverloads constructor(
         super.recycle()
         release()
         binding.galleryImages.setCurrentItem(0, false)
+        binding.activeImageText.visibility = VISIBLE
     }
 
     private fun getMaxWidthAndHeight(galleryImages: List<GalleryImage>): Coordinates {
