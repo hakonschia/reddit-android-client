@@ -337,11 +337,16 @@ class PostsFragment : Fragment(), SortableWithTime {
 
                 // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
                 // autoplay the video
-                val redditPost = post.redditPost
-                postsScrollListener.postToIgnore = redditPost?.id
+                val redditPost = post.redditPost ?: return@OnPostClicked
+                postsScrollListener.postToIgnore = redditPost.id
 
-                val b = post.getContent()?.bitmap
-                PostActivity.BITMAP = b
+                val bitmap = post.getContent()?.bitmap
+                if (bitmap != null) {
+                    PostActivity.BITMAP = PostActivity.BitmapWrapper(
+                        bitmap = bitmap,
+                        postId = redditPost.id
+                    )
+                }
 
                 val intent = Intent(context, PostActivity::class.java).apply {
                     putExtra(PostActivity.EXTRAS_POST_KEY, Gson().toJson(redditPost))

@@ -92,10 +92,20 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         /**
          * A Bitmap which can be used to hold an already loaded image. This should be set just before the
-         * activity is started and will be nulled when the activity is destroyed
+         * activity is started and will be nulled when the activity finishes
          */
-        var BITMAP: Bitmap? = null
+        var BITMAP: BitmapWrapper? = null
     }
+
+    /**
+     * Wrapper for passing a bitmap to [PostActivity] that ensures a bitmap is connected to the
+     * post it is meant to, in case a new [PostActivity] is opened through the comments
+     */
+    class BitmapWrapper(
+        val bitmap: Bitmap,
+        val postId: String
+    )
+
 
     @Inject
     lateinit var api: RedditApi
@@ -203,8 +213,16 @@ class PostActivity : BaseActivity(), OnReplyListener {
         // Ensure resources are freed when the activity exits
         binding.post.cleanUpContent()
         binding.post.lifecycleOwner = null
-        
-        BITMAP = null
+    }
+
+    override fun finish() {
+        super.finish()
+
+        post?.let {
+            if (it.id == BITMAP?.postId) {
+                BITMAP = null
+            }
+        }
     }
 
     /**
@@ -219,8 +237,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
             // have had a chance to load
             noComments = false
             commentChainShown = false
-
-            post.bitmap = BITMAP
 
             post.lifecycleOwner = this@PostActivity
 
@@ -363,6 +379,10 @@ class PostActivity : BaseActivity(), OnReplyListener {
      * @see updatePostInfo
      */
     private fun onPostLoaded(newPost: RedditPost, extras: Bundle? = null) {
+        if (newPost.id == BITMAP?.postId) {
+            binding.post.bitmap = BITMAP?.bitmap
+        }
+
         binding.setPost(newPost)
 
         if (extras != null) {
