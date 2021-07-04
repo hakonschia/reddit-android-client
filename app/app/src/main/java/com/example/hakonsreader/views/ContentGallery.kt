@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.Pair
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.hakonsreader.api.interfaces.GalleryImage
@@ -44,6 +45,10 @@ class ContentGallery @JvmOverloads constructor(
     //  with this view inside it the appbar wont be hidden (it hides when you "fling" the view, but not if you
     //  hold the entire time you scroll)
 
+    /**
+     * The lifecycle owner used to ensure videos in the gallery are automatically paused and released
+     */
+    var lifecycleOwner: LifecycleOwner? = null
 
     // This file and ContentImage is really coupled together, should be fixed to not be so terrible
     private val binding: ContentGalleryBinding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true)
@@ -206,6 +211,8 @@ class ContentGallery @JvmOverloads constructor(
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(ContentGalleryImage(parent.context).apply {
+                lifecycleOwner = this@ContentGallery.lifecycleOwner
+
                 post = redditPost
                 // With ViewPager2 the items have to be width=match_parent (although this is how it is in
                 // the xml, so not sure why I have to do it here as well)

@@ -349,6 +349,12 @@ class Post @JvmOverloads constructor(
             if (c is ContentVideo) {
                 onVideoManuallyPaused?.let { c.setOnVideoManuallyPaused(it) }
                 onVideoFullscreenListener?.let { c.setOnVideoFullscreenListener(it) }
+
+                lifecycleOwner?.let {
+                    c.observeVideoLifecycle(it)
+                }
+            } else if (c is ContentGallery) {
+                c.lifecycleOwner = lifecycleOwner
             }
 
             c.setRedditPost(redditPost)

@@ -62,6 +62,8 @@ class VideoActivity : BaseActivity() {
             }
 
             videoPlayer.run {
+                lifecycle.addObserver(this)
+
                 isFullscreen = true
                 transitionEnabled = true
                 dashVideo = extras.getBoolean(VideoPlayer.EXTRA_IS_DASH)
@@ -103,7 +105,6 @@ class VideoActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         videoPlayingWhenActivityPaused = videoPlayer.isPlaying()
-        videoPlayer.pause()
     }
 
     override fun onResume() {
@@ -113,15 +114,8 @@ class VideoActivity : BaseActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        videoPlayer.release()
-    }
-
     override fun finish() {
         super.finish()
-        videoPlayer.release()
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
-
 }

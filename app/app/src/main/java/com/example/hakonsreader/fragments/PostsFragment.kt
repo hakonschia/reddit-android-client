@@ -315,13 +315,9 @@ class PostsFragment : Fragment(), SortableWithTime {
                     putExtra(VideoActivity.EXTRAS_EXTRAS, contentVideo.extras)
                 }
 
-                // Pause the video here so it doesn't play both places
-                contentVideo.viewUnselected()
-                requireContext().run {
+                requireActivity().run {
                     startActivity(intent)
-                    if (this is AppCompatActivity) {
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-                    }
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
                 }
             }
 
@@ -353,9 +349,6 @@ class PostsFragment : Fragment(), SortableWithTime {
                     putExtra(Content.EXTRAS, post.extras)
                     putExtra(PostActivity.EXTRAS_HIDE_SCORE_KEY, post.hideScore)
                 }
-
-                // Only really applicable for videos, as they should be paused
-                post.viewUnselected()
 
                 val activity = requireActivity()
                 val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())

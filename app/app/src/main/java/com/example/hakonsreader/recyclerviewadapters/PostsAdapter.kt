@@ -215,7 +215,7 @@ class PostsAdapter(
         super.onDetachedFromRecyclerView(recyclerView)
         viewHolders.forEach {
             it.saveExtras()
-            it.destroy()
+           // it.destroy()
         }
 
         viewHolders.clear()

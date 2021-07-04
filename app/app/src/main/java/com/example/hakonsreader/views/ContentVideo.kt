@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.util.Pair
+import androidx.lifecycle.LifecycleOwner
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.example.hakonsreader.api.model.RedditPost
@@ -275,5 +276,12 @@ class ContentVideo @JvmOverloads constructor(
                 player.thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
             }
         }
+    }
+
+    /**
+     * Observes the video players lifecycle to automatically pause and release the player
+     */
+    fun observeVideoLifecycle(lifecycleOwner: LifecycleOwner) {
+        lifecycleOwner.lifecycle.addObserver(player)
     }
 }

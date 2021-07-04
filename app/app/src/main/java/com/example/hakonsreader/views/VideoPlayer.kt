@@ -17,6 +17,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -46,7 +49,12 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSource
  * Class for wrapping an [ExoPlayer] and a [PlayerView] in one class. The size of the video should
  * be set with [videoWidth] and [videoHeight]. This will automatically resize the video view to fit
  * within the screen in the best way possible. The controller for the video will always match the
- * width of the screen.
+ * width of the parent.
+ *
+ * This class implements [LifecycleObserver] and this can be taken advantage of to automatically pause videos
+ * when [Lifecycle.Event.ON_PAUSE] is retrieved, and more importantly resources are freed up when
+ * [Lifecycle.Event.ON_DESTROY] is retrieved. If this view is not added as a lifecycle observer
+ * [release] must be called manually when the view is no longer needed.
  *
  * To control if the video should be cached, use [cacheVideo]
  *
@@ -61,7 +69,8 @@ class VideoPlayer @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
-) : PlayerView(context, attrs, defStyleAttr) {
+) : PlayerView(context, attrs, defStyleAttr), LifecycleObserver {
+
     companion object {
         private const val TAG = "VideoPlayer"
 
@@ -434,6 +443,9 @@ class VideoPlayer @JvmOverloads constructor(
      * Prepares the VideoPlayer to be reused with a new video
      */
     fun prepareForNewVideo() {
+        // Ie. if a video has actually been played before we want to remove the old media item
+        exoPlayer.clearMediaItems()
+
         isPrepared = false
 
         videoSize = -1
@@ -452,9 +464,6 @@ class VideoPlayer @JvmOverloads constructor(
         videoWidth = -1
         videoHeight = -1
         actualVideoHeight = -1
-
-        // Ie. if a video has actually been played before we want to remove the old media item
-        exoPlayer.clearMediaItems()
 
         exoPlayer.playWhenReady = false
         thumbnail.visibility = VISIBLE
@@ -871,4 +880,16 @@ class VideoPlayer @JvmOverloads constructor(
             }
         }
     }
+
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    private fun paused() {
+        pause()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    private fun destroyed() {
+        release()
+    }
+
 }

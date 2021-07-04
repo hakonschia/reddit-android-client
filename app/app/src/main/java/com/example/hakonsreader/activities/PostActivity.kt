@@ -197,7 +197,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
         commentsViewModel.savedExtras = binding.post.extras
 
         videoPlayingWhenPaused = binding.post.extras.getBoolean(VideoPlayer.EXTRA_IS_PLAYING)
-        binding.post.viewUnselected()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -209,9 +208,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        // Ensure resources are freed when the activity exits
-        binding.post.cleanUpContent()
         binding.post.lifecycleOwner = null
     }
 
