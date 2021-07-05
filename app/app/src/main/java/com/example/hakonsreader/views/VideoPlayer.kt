@@ -208,26 +208,16 @@ class VideoPlayer @JvmOverloads constructor(
     /**
      * The URL linking to the thumbnail to use for the video. The thumbnail is shown
      * before the video has been prepared, and is removed afterwards.
-     *
-     * Setting this value will automatically load the thumbnail
      */
     var thumbnailUrl = ""
-        set(value) {
-            field = value
-            loadThumbnail()
-        }
 
     /**
      * The drawable to use for the thumbnail. If this and [thumbnailUrl] is set, [thumbnailUrl] has
-     * precedence. Setting this value will automatically load the thumbnail
+     * precedence
      *
      * By default, an "Image not found" drawable is used
      */
     var thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
-        set(value) {
-            field = value
-            loadThumbnail()
-        }
 
     /**
      * True if [url] points to a DASH format video. This must be set before an attempt to
@@ -261,11 +251,7 @@ class VideoPlayer @JvmOverloads constructor(
     var hasAudio = true
         set(value) {
             field = value
-            findViewById<View>(R.id.volumeButton).visibility = if (value) {
-                VISIBLE
-            } else {
-                GONE
-            }
+            findViewById<View>(R.id.volumeButton).goneIf(!value)
         }
 
     /**

@@ -48,7 +48,7 @@ class ContentVideo @JvmOverloads constructor(
             player.toggleVolume(false)
         }
 
-        setThumbnail()
+        setAndLoadThumbnail()
         setVideo()
 
         player.cacheVideo = cache
@@ -254,10 +254,10 @@ class ContentVideo @JvmOverloads constructor(
     }
 
     /**
-     * Sets the thumbnail on the player. [bitmap] will be used if not null, otherwise the image
+     * Sets and loads the thumbnail on the player. [bitmap] will be used if not null, otherwise the image
      * variants for the post will be used
      */
-    private fun setThumbnail() {
+    private fun setAndLoadThumbnail() {
         if (bitmap != null) {
             player.setThumbnailBitmap(bitmap!!)
         } else {
@@ -276,6 +276,8 @@ class ContentVideo @JvmOverloads constructor(
                 player.thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
             }
         }
+
+        loadThumbnail()
     }
 
     /**
