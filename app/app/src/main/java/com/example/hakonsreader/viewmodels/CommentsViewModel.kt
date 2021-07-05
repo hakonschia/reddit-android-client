@@ -103,6 +103,10 @@ class CommentsViewModel @Inject constructor(
             "postId not set"
         }
 
+        // This should be set before the request is started, or else very new comments can be
+        // incorrectly highlighted as new comments
+        val lastTimeOpened = System.currentTimeMillis() / 1000L
+
         _isLoading.value = true
 
         viewModelScope.launch {
@@ -115,10 +119,10 @@ class CommentsViewModel @Inject constructor(
                         resp.value.post.thirdPartyObject = thirdPartyObject
                     }
 
-                    preferences?.let {
+                    preferences?.let { prefs ->
                         // Update the value for when the post was opened
                         val lastTimeOpenedKey = postId + SharedPreferencesConstants.POST_LAST_OPENED_TIMESTAMP
-                        preferences!!.edit().putLong(lastTimeOpenedKey, System.currentTimeMillis() / 1000L).apply()
+                        prefs.edit().putLong(lastTimeOpenedKey, lastTimeOpened).apply()
                     }
 
                     allComments = resp.value.comments
