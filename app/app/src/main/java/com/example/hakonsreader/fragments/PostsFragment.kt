@@ -406,6 +406,7 @@ class PostsFragment : Fragment(), SortableWithTime {
      * Refreshes the posts in the fragment
      */
     fun refreshPosts() {
+        (binding.posts.adapter as PostsAdapter).resetOnEndOfList()
         postsViewModel.restart()
     }
 
