@@ -4,7 +4,7 @@
     <string name="prefs_group_videos">Videoer</string>
     <string name="profileAge">Bruker siden %s</string>
     <string name="btnSubscrubeUnsubscribe">- Avabonner</string>
-    <string name="tooManyRequestsError">For mange forespørsler sent. Prøv igjen om et par sekunder</string>
+    <string name="tooManyRequestsError">For mange forespørsler sent</string>
     <string name="threadLockedError">Tråden har blitt låst</string>
     <string name="prefs_group_appearance">Utseende</string>
     <string name="subredditMustBeBetweenLength">Subreddit navn må være imellom 3 og 21 bokstaver</string>

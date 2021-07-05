@@ -323,7 +323,7 @@
     <string name="notLoggedInError">Please log in to do that</string>
     <string name="privatelyBrowsingError">You are currently browsing privately</string>
     <string name="genericServerError">Can\'t connect to Reddit servers</string>
-    <string name="tooManyRequestsError">Too many request sent. Try again in a few seconds</string>
+    <string name="tooManyRequestsError">Too many request sent</string>
     <string name="errorLoggingIn">Error logging in</string>
     <string name="noInternetConnection">No internet connection</string>
     <string name="networkTimeout">The network timed out</string>
