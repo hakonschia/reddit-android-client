@@ -23,7 +23,9 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class InboxGroupFragment : Fragment() {
+
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "InboxGroupFragment"
 
 
@@ -36,7 +38,7 @@ class InboxGroupFragment : Fragment() {
 
         
         fun newInstance(type: InboxFragment.InboxGroupTypes) = InboxGroupFragment().apply {
-            // Should probably use arguments for this, but it doesn't get set before the tablayout
+            // Should probably use arguments for this, but it doesn't get set before the tab layout
             // using the value runs, so ¯\_(ツ)_/¯
             inboxType = type
         }
@@ -50,9 +52,6 @@ class InboxGroupFragment : Fragment() {
 
     private var _binding: FragmentInboxGroupBinding? = null
     private val binding get() = _binding!!
-
-    private var messageAdapter: InboxAdapter? = null
-    private var messageLayoutManager: LinearLayoutManager? = null
 
     lateinit var inboxType: InboxFragment.InboxGroupTypes
         private set
@@ -86,11 +85,8 @@ class InboxGroupFragment : Fragment() {
     }
 
     private fun setupMessagesList() {
-        messageLayoutManager = LinearLayoutManager(requireContext())
-        messageAdapter = InboxAdapter(api, messagesDao)
-
-        binding.messages.layoutManager = messageLayoutManager
-        binding.messages.adapter = messageAdapter
+        binding.messages.layoutManager = LinearLayoutManager(requireContext())
+        binding.messages.adapter = InboxAdapter(api, messagesDao)
     }
 
     /**
@@ -109,7 +105,8 @@ class InboxGroupFragment : Fragment() {
             withContext(Main) {
                 messages.observe(viewLifecycleOwner, { newMessages ->
                     binding.noMessages = newMessages.isEmpty()
-                    messageAdapter?.submitList(newMessages)
+
+                    (binding.messages.adapter as InboxAdapter).submitList(newMessages)
                 })
             }
         }

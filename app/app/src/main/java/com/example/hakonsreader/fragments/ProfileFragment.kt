@@ -153,6 +153,7 @@ class ProfileFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        (requireActivity() as AppCompatActivity).setSupportActionBar(null)
         _binding = null
     }
 
