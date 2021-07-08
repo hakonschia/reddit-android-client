@@ -82,4 +82,8 @@
     <dimen name="subredditToolbarWithoutBanner">190dp</dimen>
     <dimen name="subredditToolbarBannerLoaded">115dp</dimen>
     <dimen name="subredditToolbarBannerNotLoaded">75dp</dimen>
+
+    <!-- :) -->
+    <dimen name="dp0">0dp</dimen>
+    <dimen name="dp8">8dp</dimen>
 </resources>
