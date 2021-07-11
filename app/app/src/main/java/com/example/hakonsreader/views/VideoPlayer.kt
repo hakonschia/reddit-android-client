@@ -277,7 +277,10 @@ class VideoPlayer @JvmOverloads constructor(
     /**
      * The duration of the video. This should be set ahead of time if the video duration is known.
      * If the video duration is not known, the duration will be set when the video is loaded. If a negative
-     * value is set then the the same happens
+     * value (or 0) is set then the the same happens
+     *
+     * When the actual video is loaded this will be set to -1 to ensure the video duration is synced
+     * properly
      */
     var videoDuration = -1
         set(value) {
@@ -483,6 +486,7 @@ class VideoPlayer @JvmOverloads constructor(
 
             override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
                 hasAudio = audioTracksHaveAudio(trackGroups)
+                videoDuration = -1
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {

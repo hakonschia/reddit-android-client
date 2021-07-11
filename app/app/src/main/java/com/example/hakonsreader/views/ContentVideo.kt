@@ -82,9 +82,16 @@ class ContentVideo @JvmOverloads constructor(
         val thirdParty = redditPost.thirdPartyObject
         var url: String? = null
 
+        // Third party gifs might not give any audio info, so if reddit has that video saved
+        // and gives the duration then we can still use that even if we don't load the video from reddit
+        if (video != null) {
+            player.videoDuration = video.duration
+        }
+
         if (thirdParty is ThirdPartyGif) {
             url = thirdParty.mp4Url
             player.mp4Video = true
+
             player.hasAudio = thirdParty.hasAudio
 
             player.videoSize = thirdParty.mp4Size
@@ -94,9 +101,6 @@ class ContentVideo @JvmOverloads constructor(
             player.videoHeight = thirdParty.height
         } else if (video != null) {
             url = video.dashUrl
-
-            // If we have a "RedditVideo" we can set the duration now
-            player.videoDuration = video.duration
             player.dashVideo = true
 
             player.videoWidth = video.width
@@ -167,19 +171,8 @@ class ContentVideo @JvmOverloads constructor(
         player.pause()
     }
 
-    /**
-     * Retrieve a bundle of information that can be useful for saving the state of the post
-     *
-     * @return A bundle that might include state variables
-     */
     override fun getExtras() = player.getExtras()
 
-    /**
-     * Sets the extras for the video.
-     *
-     * @param extras The bundle of data to use. This should be the same bundle as retrieved with
-     * [ContentVideo.getExtras]
-     */
     override fun setExtras(extras: Bundle) {
         super.setExtras(extras)
         player.setExtras(extras)
@@ -192,7 +185,8 @@ class ContentVideo @JvmOverloads constructor(
     override fun getWantedHeight() = player.actualVideoHeight
 
     /**
-     * Gets a bitmap of the current frame displayed, or null if the video hasn't yet been loaded
+     * Gets a bitmap of the current frame displayed, or the thumbnail if the video hasn't yet been loaded
+     * (if one is shown)
      */
     override fun getBitmap() = player.getCurrentFrame()
 
