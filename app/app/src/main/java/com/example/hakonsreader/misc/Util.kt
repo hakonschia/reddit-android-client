@@ -1,17 +1,23 @@
 package com.example.hakonsreader.misc
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
+import com.bumptech.glide.RequestBuilder
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -1044,4 +1050,29 @@ fun generatePostContent(
 
         else -> null
     }
+}
+
+
+fun <T> RequestBuilder<T>.safeInto(imageView: ImageView) {
+
+}
+
+/**
+ * Return true if this [Context] is available.
+ * Availability is defined as the following:
+ * + [Context] is not null
+ * + [Context] is not destroyed (tested with [FragmentActivity.isDestroyed] or [Activity.isDestroyed])
+ */
+// Taken from: https://stackoverflow.com/a/50915146/7750841
+fun Context?.isAvailableForGlide(): Boolean {
+    if (this == null) {
+        return false
+    } else if (this !is Application) {
+        if (this is FragmentActivity) {
+            return !this.isDestroyed
+        } else if (this is Activity) {
+            return !this.isDestroyed
+        }
+    }
+    return true
 }

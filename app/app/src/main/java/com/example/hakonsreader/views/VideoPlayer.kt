@@ -28,6 +28,7 @@ import com.example.hakonsreader.fragments.bottomsheets.VideoPlaybackErrorBottomS
 import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createVideoDuration
+import com.example.hakonsreader.misc.isAvailableForGlide
 import com.example.hakonsreader.views.util.VideoCache
 import com.example.hakonsreader.views.util.goneIf
 import com.google.android.exoplayer2.*
@@ -664,6 +665,10 @@ class VideoPlayer @JvmOverloads constructor(
      * If the thumbnail has been set with [setThumbnailBitmap] then a new image will not be loaded
      */
     fun loadThumbnail() {
+        if (!context.isAvailableForGlide()) {
+            return
+        }
+
         if (thumbnailLoadedFromBitmap) return
 
         // Set the background color for the controls as a filter here since the thumbnail is shown

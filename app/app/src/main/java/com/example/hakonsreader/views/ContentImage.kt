@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +27,7 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentImageBinding
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
+import com.example.hakonsreader.misc.isAvailableForGlide
 import com.example.hakonsreader.views.util.openImageInFullscreen
 import com.google.android.material.snackbar.Snackbar
 
@@ -269,6 +269,10 @@ class ContentImage @JvmOverloads constructor(
      */
     private fun loadImage(url: String) {
         fun load(width: Int? = null, height: Int? = null) {
+            if (!context.isAvailableForGlide()) {
+                return
+            }
+
             val request = Glide.with(binding.image)
                 .load(url)
                 .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
@@ -311,6 +315,10 @@ class ContentImage @JvmOverloads constructor(
      * Loads a high definition image
      */
     private fun loadHdImage(url: String) {
+        if (!context.isAvailableForGlide()) {
+            return
+        }
+
         // currentBitmap will be the low res image, this will be used as the placeholder while loading
         // the new image, as otherwise it will flash black since it is removed for until the new is loaded
         val currentBitmap = getBitmap()
