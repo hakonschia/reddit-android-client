@@ -155,6 +155,13 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         val newComment = Gson().fromJson(data.getStringExtra(ReplyActivity.EXTRAS_LISTING), RedditComment::class.java)
         val parent = if (replyingTo is RedditComment) replyingTo as RedditComment else null
+
+        // Replying to the post, so the comment will be inserted at the top
+        // Scroll to the comment so the user doesn't think the comment wasn't added
+        if (parent == null) {
+            binding.comments.scrollToPosition(0)
+        }
+
         commentsViewModel.insertComment(newComment, parent)
     }
 
