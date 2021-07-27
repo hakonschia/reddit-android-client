@@ -223,7 +223,9 @@ class CommentsViewModel @Inject constructor(
     }
 
     /**
-     * Inserts a comment. Top-level comments are inserted at the start of the list
+     * Inserts a comment. Top-level comments are inserted at the start of the list.
+     *
+     * The local database will update [RedditPost.amountOfComments]
      *
      * @param newComment The comment to insert
      * @param parent The parent of the comment. If the comment is a top-level comment this should
@@ -234,6 +236,7 @@ class CommentsViewModel @Inject constructor(
 
         val posToInsert = if (parent != null) {
             // Insert after the parent
+            // If the parent isn't found, then this will still be 0 as indexOf returns -1
             dataSet.indexOf(parent) + 1
         } else {
             0
@@ -241,6 +244,16 @@ class CommentsViewModel @Inject constructor(
 
         dataSet.add(posToInsert, newComment)
         _comments.value = dataSet
+
+        _post.value?.let { redditPost ->
+            redditPost.amountOfComments++
+
+            viewModelScope.launch {
+                withContext(IO) {
+                    postsDao.update(redditPost)
+                }
+            }
+        }
     }
 
     /**
