@@ -1015,7 +1015,11 @@ fun generatePostContent(
         }
 
         PostType.GALLERY -> {
-            ContentGallery::class.java
+            if (ContentGallery.isRedditPostGalleryViewable(post)) {
+                ContentGallery::class.java
+            } else {
+                null
+            }
         }
 
         else -> null

@@ -12,6 +12,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.hakonsreader.api.interfaces.GalleryImage
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.images.RedditGalleryItem
 import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
 import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
@@ -38,6 +39,24 @@ class ContentGallery @JvmOverloads constructor(
          * The key for extras in [ContentGallery.getExtras] that tells which image is currently active.
          */
         const val EXTRAS_ACTIVE_IMAGE = "activeImage"
+
+
+        /**
+         * Checks if a reddit post is viewable and can be displayed as a gallery
+         */
+        fun isRedditPostGalleryViewable(redditPost: RedditPost): Boolean {
+            if (redditPost.thirdPartyObject is ImgurAlbum) {
+                return true
+            } else {
+                // Example, in the link below the last image failed (at the time of writing at least)
+                // https://www.reddit.com/r/RATS/comments/nqwcun/my_poor_gus_only_last_night_you_were_fishing_for/
+                val post = redditPost.crossposts?.firstOrNull() ?: redditPost
+                val galleryImages = post.galleryImages ?: return false
+                galleryImages.filter { it.status == RedditGalleryItem.STATUS_VALID }
+
+                return galleryImages.isNotEmpty()
+            }
+        }
     }
 
 
@@ -64,7 +83,9 @@ class ContentGallery @JvmOverloads constructor(
             // Example, in the link below the last image failed (at the time of writing at least)
             // https://www.reddit.com/r/RATS/comments/nqwcun/my_poor_gus_only_last_night_you_were_fishing_for/
             val post = redditPost.crossposts?.firstOrNull() ?: redditPost
-            post.galleryImages!!.filter { it.status == RedditGalleryItem.STATUS_VALID }
+            val galleryImages = post.galleryImages ?: return
+
+            galleryImages.filter { it.status == RedditGalleryItem.STATUS_VALID }
         }
 
         val (maxWidth, maxHeight) = getMaxWidthAndHeight(images)
