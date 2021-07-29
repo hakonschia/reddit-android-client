@@ -472,4 +472,5 @@
     <string name="videoPlaybackErrorBottomSheetExceptionHeader">Unntak</string>
     <string name="prefs_title_dev_show_inbox_notification">Vis inboks notifikasjon</string>
     <string name="prefs_title_dev_highlight_selected_views">Uthev valgte poster</string>
+    <string name="trendingSubredditsFailed">Kunne ikke laste trendene subredditer</string>
 </resources>

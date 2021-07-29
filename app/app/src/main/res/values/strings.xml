@@ -692,4 +692,5 @@
     <string name="videoPlaybackErrorBottomSheetExceptionHeader">Exception</string>
     <string name="videoPlaybackErrorBottomSheetUrlEmpty">No URL given</string>
 
+    <string name="trendingSubredditsFailed">Failed to load trending subreddits</string>
 </resources>

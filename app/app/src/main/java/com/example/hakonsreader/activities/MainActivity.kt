@@ -1022,8 +1022,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
                 binding.navDrawer.trendingSubredditsLoaderLayout.goneIf(!loading)
             }
 
-            error.observe(this@MainActivity) { error ->
-                handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable, binding.bottomNav)
+            error.observe(this@MainActivity) {
+                Snackbar.make(binding.bottomNav, R.string.trendingSubredditsFailed, Snackbar.LENGTH_SHORT)
+                    .setAnchorView(binding.bottomNav)
+                    .show()
             }
         }
 
