@@ -1,15 +1,13 @@
 
 # ![logo](/images/logo.png) An unofficial Reddit client for Android
 
-An unofficial Reddit client for Android. The application allows for users to log in with their Reddit account and perform actions such as voting, commenting, and retrieving customized front page posts. Mod support is limited.
-
-Includes an Android wrapper for the Reddit API (for installed OAuth applications only) that leverages Kotlin coroutines, as well as providing basic persistence with [Room](https://developer.android.com/training/data-storage/room).
+An unofficial Reddit client for Android. The application allows for users to log in with their Reddit account and perform actions such as voting, commenting, and retrieving customized front page posts, without any ads.
 
 
 ## Screenshots
 
 <div>
-  <img src="/images/everything.gif" alt="Subreddit" width="275"/>
+  <img src="/images/everything.gif" alt="Everything" width="275"/>
   <img src="/images/profile.gif" alt="User profile" width="275"/>
   <img src="/images/replying.gif" alt="Replying" width="275"/>
 </div>
@@ -17,7 +15,7 @@ Includes an Android wrapper for the Reddit API (for installed OAuth applications
 
 ## Installation
 
-The downloadable [APK](apk/app-release.apk) contains the application at commit `5ac62e64df99bc903969743656ef79f3cb6f70a9` (#1709). To install the app download the APK, open it on your phone, and follow the steps shown. If the install fails you might have to temporarily [disable Google Play Protect](https://support.google.com/googleplay/answer/2812853) (remember to enable it again after the install).
+The downloadable [APK](apk/app-release.apk) contains the application at commit `44401a3f6e8692ae9406fbe85d143135ec8ba0f3` (#1761). To install the app download the APK, open it on your phone, and follow the steps shown. If the install fails you might have to temporarily [disable Google Play Protect](https://support.google.com/googleplay/answer/2812853) (remember to enable it again after the install).
 
 `minSdkVersion` is 23 (Android 6.0), although testing is limited below SDK 26 or above SDK 28.
 
@@ -83,6 +81,8 @@ See also: [build](#build)
 
 
 ## Build
+
+The APK is built with Android Studio 4.2.2. Other versions might be incompatible.
 
 Create the file `secrets.properties` under [/app](app) and assign the following values:
 
