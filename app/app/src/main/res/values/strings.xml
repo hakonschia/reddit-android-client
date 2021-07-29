@@ -72,6 +72,7 @@
     <string name="prefs_group_subreddits">Subreddits</string>
     <string name="prefs_group_awards">Awards</string>
     <string name="prefs_group_third_party">Third party</string>
+    <string name="prefs_group_dev_options">Developer options</string>
 
     <!-- Preference titles/names -->
     <string name="prefs_title_theme">Dark mode</string>
@@ -137,6 +138,8 @@
     <string name="prefs_title_third_party_load_imgur_albums">Load Imgur albums/galleries</string>
     <string name="prefs_summary_third_party_load_imgur_albums">With this enabled Imgur albums and galleries are shown as standard Reddit galleries</string>
     <string name="prefs_title_show_awards">Show awards on posts and comments</string>
+    <string name="prefs_title_dev_show_inbox_notification">Show inbox notification</string>
+    <string name="prefs_title_dev_highlight_selected_views">Highlight selected posts</string>
 
 
     <!-- Preferences keys -->
@@ -193,6 +196,8 @@
     <string name="prefs_key_third_party_load_imgur_gifs" translatable="false">third_party_load_imgur_gifs</string>
     <string name="prefs_key_third_party_load_imgur_albums" translatable="false">third_party_load_imgur_albums</string>
     <string name="prefs_key_show_awards" translatable="false">show_awards</string>
+    <string name="prefs_key_dev_show_inbox_notification" translatable="false">dev_show_inbox_notification</string>
+    <string name="prefs_key_dev_highlight_selected_views" translatable="false">dev_highlight_selected_views</string>
 
 
     <string name="content_description_link_image">Link to website</string>
@@ -253,6 +258,7 @@
     <string name="content_description_nav_drawer_mod">Show subs you are moderating</string>
     <string name="content_description_nav_drawer_subreddit_refresh">Refresh subreddits</string>
     <string name="content_description_nav_drawer_trending_subreddit_refresh">Refresh trending subreddits</string>
+    <string name="content_description_video_playback_error_button">Video failed to load</string>
 
 
     <string name="transition_post_info_posted_in" translatable="false">transition_post_info_posted_in</string>
@@ -317,7 +323,7 @@
     <string name="notLoggedInError">Please log in to do that</string>
     <string name="privatelyBrowsingError">You are currently browsing privately</string>
     <string name="genericServerError">Can\'t connect to Reddit servers</string>
-    <string name="tooManyRequestsError">Too many request sent. Try again in a few seconds</string>
+    <string name="tooManyRequestsError">Too many request sent</string>
     <string name="errorLoggingIn">Error logging in</string>
     <string name="noInternetConnection">No internet connection</string>
     <string name="networkTimeout">The network timed out</string>
@@ -352,7 +358,6 @@
     <string name="postRemovedByAuthor">The post has been removed by the author</string>
 
     <string name="noCommentsHeader">No comments on this post yet</string>
-    <string name="noCommentsContent">Be the one to start the conversation!</string>
 
     <string name="subredditBanned">r/%s has been banned</string>
     <string name="subredditPrivate">r/%s is private</string>
@@ -681,4 +686,11 @@
     <string name="multiNotAuthorized">If a Multi exists with this name, you\'re not allowed to view it</string>
 
     <string name="filterSubredditsSnackbar">Filtering \'%s\'</string>
+
+    <string name="videoPlaybackErrorTitle">The video failed to play</string>
+    <string name="videoPlaybackErrorBottomSheetUrlHeader">URL</string>
+    <string name="videoPlaybackErrorBottomSheetExceptionHeader">Exception</string>
+    <string name="videoPlaybackErrorBottomSheetUrlEmpty">No URL given</string>
+
+    <string name="trendingSubredditsFailed">Failed to load trending subreddits</string>
 </resources>

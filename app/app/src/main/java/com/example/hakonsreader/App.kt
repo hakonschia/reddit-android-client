@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.preference.PreferenceManager
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import androidx.work.Configuration
 import com.example.hakonsreader.activities.InvalidAccessTokenActivity
 import com.example.hakonsreader.api.RedditApi
@@ -77,6 +79,7 @@ class App : Application(), Configuration.Provider {
         // must be set before the API is injected
         val prefs = getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, MODE_PRIVATE)
         SharedPreferencesManager.create(prefs)
+        TokenManager.init(createEncryptedSharedPreferences())
 
         super.onCreate()
 
@@ -86,10 +89,12 @@ class App : Application(), Configuration.Provider {
         createInboxNotificationChannel()
         createDeveloperNotificationChannel()
 
+        // Always restart the worker on startup (so that messages are retrieved on startup)
         InboxWorkerStartReceiver.startInboxWorker(this, Settings.inboxUpdateFrequency(), replace = true)
 
         updateTheme()
         removeOldValues()
+        removePrehistoricValues()
 
         // Must be commented out for release builds (as well as the import removed)
         //LeakCanary.config = LeakCanary.config.copy(dumpHeap = false)
@@ -149,6 +154,17 @@ class App : Application(), Configuration.Provider {
             // Calling this from the Coroutine because then we can pretend to be smart about performance :)
             removeOldPostOpenedPreferences()
         }
+    }
+
+    /**
+     * Removes various values from SharedPreferences and such that are no longer used and should be
+     * removed.
+     *
+     * Calling this ensures that those values aren't stored on the device when it is no longer needed
+     */
+    private fun removePrehistoricValues() {
+        // This has been moved to TokenManager with EncryptedSharedPreferences
+        SharedPreferencesManager.remove(SharedPreferencesConstants.ACCESS_TOKEN)
     }
 
     /**
@@ -235,6 +251,20 @@ class App : Application(), Configuration.Provider {
                 }
             }
         }
+    }
+
+    private fun createEncryptedSharedPreferences(): SharedPreferences {
+        val masterKey = MasterKey.Builder(this)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        return EncryptedSharedPreferences.create(
+            this,
+            "encrypted_shared_preferences",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
     }
 
     override fun getWorkManagerConfiguration(): Configuration {

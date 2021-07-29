@@ -7,9 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.hakonsreader.api.model.RedditMulti
 import com.example.hakonsreader.databinding.ListItemRedditMultiBinding
-import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.recyclerviewadapters.diffutils.RedditMultiDiffCallback
-import com.example.hakonsreader.views.SpaceDivider
 
 class RedditMultiAdapter : RecyclerView.Adapter<RedditMultiAdapter.ViewHolder>() {
 
@@ -44,10 +42,6 @@ class RedditMultiAdapter : RecyclerView.Adapter<RedditMultiAdapter.ViewHolder>()
         return ViewHolder(
                 ListItemRedditMultiBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.addItemDecoration(SpaceDivider(dpToPixels(8f, recyclerView.resources)))
     }
 
     override fun getItemCount() = multis.size

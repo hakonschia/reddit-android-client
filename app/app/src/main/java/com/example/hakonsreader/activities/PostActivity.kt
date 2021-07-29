@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -47,6 +46,7 @@ import javax.inject.Inject
 class PostActivity : BaseActivity(), OnReplyListener {
 
     companion object {
+        @Suppress("unused")
         private const val TAG = "PostActivity"
 
         /**
@@ -92,10 +92,20 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         /**
          * A Bitmap which can be used to hold an already loaded image. This should be set just before the
-         * activity is started and will be nulled when the activity is destroyed
+         * activity is started and will be nulled when the activity finishes
          */
-        var BITMAP: Bitmap? = null
+        var BITMAP: BitmapWrapper? = null
     }
+
+    /**
+     * Wrapper for passing a bitmap to [PostActivity] that ensures a bitmap is connected to the
+     * post it is meant to, in case a new [PostActivity] is opened through the comments
+     */
+    class BitmapWrapper(
+        val bitmap: Bitmap,
+        val postId: String
+    )
+
 
     @Inject
     lateinit var api: RedditApi
@@ -145,6 +155,13 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         val newComment = Gson().fromJson(data.getStringExtra(ReplyActivity.EXTRAS_LISTING), RedditComment::class.java)
         val parent = if (replyingTo is RedditComment) replyingTo as RedditComment else null
+
+        // Replying to the post, so the comment will be inserted at the top
+        // Scroll to the comment so the user doesn't think the comment wasn't added
+        if (parent == null) {
+            binding.comments.scrollToPosition(0)
+        }
+
         commentsViewModel.insertComment(newComment, parent)
     }
 
@@ -187,7 +204,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
         commentsViewModel.savedExtras = binding.post.extras
 
         videoPlayingWhenPaused = binding.post.extras.getBoolean(VideoPlayer.EXTRA_IS_PLAYING)
-        binding.post.viewUnselected()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -199,12 +215,17 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        // Ensure resources are freed when the activity exits
-        binding.post.cleanUpContent()
         binding.post.lifecycleOwner = null
-        
-        BITMAP = null
+    }
+
+    override fun finish() {
+        super.finish()
+
+        post?.let {
+            if (it.id == BITMAP?.postId) {
+                BITMAP = null
+            }
+        }
     }
 
     /**
@@ -219,8 +240,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
             // have had a chance to load
             noComments = false
             commentChainShown = false
-
-            post.bitmap = BITMAP
 
             post.lifecycleOwner = this@PostActivity
 
@@ -363,13 +382,17 @@ class PostActivity : BaseActivity(), OnReplyListener {
      * @see updatePostInfo
      */
     private fun onPostLoaded(newPost: RedditPost, extras: Bundle? = null) {
-        binding.setPost(newPost)
+        if (newPost.id == BITMAP?.postId) {
+            binding.post.bitmap = BITMAP?.bitmap
+        }
 
-        binding.post.redditPost = newPost
+        binding.setPost(newPost)
 
         if (extras != null) {
             binding.post.extras = extras
         }
+
+        binding.post.redditPost = newPost
     }
 
     /**
@@ -420,9 +443,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         return if (redditPost != null) {
             val postExtras: Bundle? = intent.extras?.getBundle(Content.EXTRAS)
-            postExtras?.keySet()?.forEach {
-                Log.d(TAG, "setPostFromJson: $it")
-            }
 
             when (redditPost.getPostType()) {
                 // Add a transition listener that sets the extras for videos after the enter transition is done,
@@ -439,8 +459,6 @@ class PostActivity : BaseActivity(), OnReplyListener {
                     if (BITMAP == null) {
                         content.loadThumbnail()
                     }
-
-                    content.enableControllerTransitions(true)
 
                     content.setOnVideoFullscreenListener { contentVideo ->
                         val intent = Intent(this, VideoActivity::class.java).apply {
@@ -462,6 +480,10 @@ class PostActivity : BaseActivity(), OnReplyListener {
                     // animation the animation looks very choppy, so it should only be played at the end
                     setEnterSharedElementCallback(object : SharedElementCallback() {
                         override fun onSharedElementEnd(sharedElementNames: MutableList<String>?, sharedElements: MutableList<View>?, sharedElementSnapshots: MutableList<View>?) {
+                            // Enable this after the transition is over as the thumbnail kind of jumps sometimes if
+                            // animations are enabled
+                            content.enableControllerTransitions(true)
+
                             if (postExtras != null) {
                                 binding.post.extras = postExtras
                             }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +21,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -56,6 +58,7 @@ import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.recyclerviewadapters.SubredditRulesAdapter
 import com.example.hakonsreader.viewmodels.*
 import com.example.hakonsreader.views.util.ViewUtil
+import com.example.hakonsreader.views.util.goneIf
 import com.example.hakonsreader.views.util.invisibleIf
 import com.example.hakonsreader.views.util.showPopupSortWithTime
 import dagger.hilt.android.AndroidEntryPoint
@@ -262,8 +265,11 @@ class SubredditFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        _binding = null
         super.onDestroyView()
+        binding.pager.adapter = null
+        // The toolbar is part of the fragment view, so if we don't null it here it will leak
+        (requireActivity() as AppCompatActivity).setSupportActionBar(null)
+        _binding = null
     }
 
     /**
@@ -347,8 +353,6 @@ class SubredditFragment : Fragment() {
                          }
 
                          setupSubmitPostFab(this)
-
-                         postsFragment = this
                      }
                  } else if (f is WikiFragment) {
                      wikiFragment = f.apply {
@@ -359,8 +363,6 @@ class SubredditFragment : Fragment() {
                          onRulesLinkClicked = {
                              binding.drawer.openDrawer(GravityCompat.END)
                          }
-
-                         wikiFragment = this
                      }
                  }
              }
@@ -755,11 +757,7 @@ class SubredditFragment : Fragment() {
         count += if (wikiFragment?.isLoading() == true) 1 else 0
         count += if (subredditViewModel?.isLoading?.value == true) 1 else 0
 
-        _binding?.progressBarLayout?.visibility = if (count > 0) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+        _binding?.progressBarLayout?.goneIf(count <= 0)
     }
 
     /**
@@ -976,11 +974,7 @@ class SubredditFragment : Fragment() {
                 page.observe(viewLifecycleOwner) {
                     binding.wikiPage = it
 
-                    binding.wikiGoBack.visibility = if (canGoBack()) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    }
+                    binding.wikiGoBack.goneIf(!canGoBack())
 
                     if (it.content.isBlank()) {
                         binding.wikiContent.text = getString(R.string.subredditWikiEmpty)

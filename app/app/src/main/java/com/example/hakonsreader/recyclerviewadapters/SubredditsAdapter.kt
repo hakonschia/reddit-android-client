@@ -24,7 +24,18 @@ import kotlin.collections.ArrayList
 class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     enum class SubredditViewType {
+        /**
+         * A smaller view type which has no description and smaller icon/subreddit name
+         *
+         * No space between the items are added to this view type
+         */
         SIMPLE,
+
+        /**
+         * Standard view type
+         *
+         * Space is added between these items
+         */
         STANDARD
     }
 
@@ -150,7 +161,9 @@ class SubredditsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.addItemDecoration(SpaceDivider(dpToPixels(8f, recyclerView.resources)))
+        if (viewType == SubredditViewType.STANDARD) {
+            recyclerView.addItemDecoration(SpaceDivider(dpToPixels(8f, recyclerView.resources)))
+        }
     }
 
     override fun getItemCount() = subreddits.size

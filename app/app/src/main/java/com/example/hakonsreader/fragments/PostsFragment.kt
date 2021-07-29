@@ -315,13 +315,9 @@ class PostsFragment : Fragment(), SortableWithTime {
                     putExtra(VideoActivity.EXTRAS_EXTRAS, contentVideo.extras)
                 }
 
-                // Pause the video here so it doesn't play both places
-                contentVideo.viewUnselected()
-                requireContext().run {
+                requireActivity().run {
                     startActivity(intent)
-                    if (this is AppCompatActivity) {
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-                    }
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
                 }
             }
 
@@ -337,20 +333,22 @@ class PostsFragment : Fragment(), SortableWithTime {
 
                 // Ignore the post when scrolling, so that when we return and scroll a bit it doesn't
                 // autoplay the video
-                val redditPost = post.redditPost
-                postsScrollListener.postToIgnore = redditPost?.id
+                val redditPost = post.redditPost ?: return@OnPostClicked
+                postsScrollListener.postToIgnore = redditPost.id
 
-                val b = post.getContent()?.bitmap
-                PostActivity.BITMAP = b
+                val bitmap = post.getContent()?.bitmap
+                if (bitmap != null) {
+                    PostActivity.BITMAP = PostActivity.BitmapWrapper(
+                        bitmap = bitmap,
+                        postId = redditPost.id
+                    )
+                }
 
                 val intent = Intent(context, PostActivity::class.java).apply {
                     putExtra(PostActivity.EXTRAS_POST_KEY, Gson().toJson(redditPost))
                     putExtra(Content.EXTRAS, post.extras)
                     putExtra(PostActivity.EXTRAS_HIDE_SCORE_KEY, post.hideScore)
                 }
-
-                // Only really applicable for videos, as they should be paused
-                post.viewUnselected()
 
                 val activity = requireActivity()
                 val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())
@@ -408,6 +406,7 @@ class PostsFragment : Fragment(), SortableWithTime {
      * Refreshes the posts in the fragment
      */
     fun refreshPosts() {
+        (binding.posts.adapter as PostsAdapter).resetOnEndOfList()
         postsViewModel.restart()
     }
 

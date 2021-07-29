@@ -1,5 +1,7 @@
 package com.example.hakonsreader.recyclerviewadapters
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.style.URLSpan
@@ -20,6 +22,8 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activities.DispatcherActivity
+import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.Thing
 import com.example.hakonsreader.api.model.RedditComment
@@ -29,8 +33,11 @@ import com.example.hakonsreader.databinding.ListItemHiddenCommentBinding
 import com.example.hakonsreader.databinding.ListItemMoreCommentBinding
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.interfaces.OnReportsIgnoreChangeListener
+import com.example.hakonsreader.misc.CreateIntentOptions
+import com.example.hakonsreader.misc.InternalLinkMovementMethod
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.misc.createIntent
 import com.example.hakonsreader.recyclerviewadapters.diffutils.CommentsDiffCallback
 import com.example.hakonsreader.recyclerviewadapters.menuhandlers.showPopupForComments
 import com.example.hakonsreader.viewmodels.CommentsViewModel
@@ -261,6 +268,33 @@ class CommentsAdapter constructor(
      * ViewHolder for comments that are shown as the entire comment
      */
     inner class NormalCommentViewHolder(private val binding: ListItemCommentBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            // This custom movement method checks if the link clicked is to the same post as we are showing
+            // and if it links to a comment in the post it sets that chain on the view model
+            binding.commentContent.movementMethod = InternalLinkMovementMethod { link: String, context: Context ->
+                val redditPost = post
+
+                // The options don't really matter as we only care about PostActivity links
+                val intent = createIntent(link, CreateIntentOptions(), context)
+
+                if (intent.component?.className == PostActivity::class.java.name
+                    && redditPost != null
+                    && intent.getStringExtra(PostActivity.EXTRAS_POST_ID_KEY) == redditPost.id
+                    && intent.hasExtra(PostActivity.EXTRAS_COMMENT_ID_CHAIN)) {
+                    viewModel.showChain(intent.getStringExtra(PostActivity.EXTRAS_COMMENT_ID_CHAIN)!!)
+                } else {
+                    // We could just start "intent" directly, but DispatcherActivity deals with animations
+                    // for some links
+                    Intent(context, DispatcherActivity::class.java).apply {
+                        putExtra(DispatcherActivity.EXTRAS_URL_KEY, link)
+                        context.startActivity(this)
+                    }
+                }
+
+                true
+            }
+        }
 
         /**
          * Binds the ViewHolder to a comment

@@ -5,10 +5,8 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.Resources
 import android.view.*
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -122,10 +120,10 @@ fun showAccountManagement(context: Context, api: RedditApi, userInfoDao: RedditU
                         else -> null
                     }
 
-                    if (currentId != userInfoClicked.accessToken.userId) {
+                    if (currentId != userInfoClicked.userId) {
                         // Not sure what we would do if not
                         if (context is AppCompatActivity) {
-                            app.switchAccount(userInfoClicked.accessToken, context)
+                            app.switchAccount(userInfoClicked.userId, context)
                         }
                     }
                 }
@@ -138,14 +136,21 @@ fun showAccountManagement(context: Context, api: RedditApi, userInfoDao: RedditU
                     }
 
                     // Don't remove the item if it's the currently active one
-                    if (currentId != userInfoClicked.accessToken.userId) {
-                        removeItem(userInfoClicked)
-                        CoroutineScope(IO).launch {
-                            userInfoDao.delete(userInfoClicked)
-                            api.accessToken().revoke(userInfoClicked.accessToken)
+                    if (currentId != userInfoClicked.userId) {
+                        val token = TokenManager.getTokenByUserId(userInfoClicked.userId)
+                        if (token != null) {
+                            removeItem(userInfoClicked)
+
+                            TokenManager.removeTokenByUserId(userInfoClicked.userId)
+
+                            CoroutineScope(IO).launch {
+                                userInfoDao.delete(userInfoClicked)
+                                api.accessToken().revoke(token)
+                            }
                         }
                     }
                 }
+
                 onNsfwClicked = { userInfoClicked, nsfwAccount ->
                     val currentId = when (val state = app.loggedInState.value) {
                         is LoggedInState.LoggedIn -> state.userInfo.userId
@@ -154,7 +159,7 @@ fun showAccountManagement(context: Context, api: RedditApi, userInfoDao: RedditU
                     }
 
                     // Another account than the active was clicked, update it in the database
-                    if (currentId != null && currentId != userInfoClicked.accessToken.userId) {
+                    if (currentId != null && currentId != userInfoClicked.userId) {
                         userInfoClicked.nsfwAccount = nsfwAccount
                         CoroutineScope(IO).launch {
                             userInfoDao.update(userInfoClicked)

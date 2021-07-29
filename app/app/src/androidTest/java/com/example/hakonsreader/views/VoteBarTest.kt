@@ -57,7 +57,7 @@ class VoteBarTest {
 
         // No score and no like, should be 0 score and noVote color
         onView(withId(R.id.score))
-                .check(matches(hasTextColorWithTicker(R.color.text_color)))
+                .check(matches(hasTextColorWithTicker(R.color.noVote)))
                 .check(matches(tickerViewHasText("0")))
         onView(withId(R.id.upvote))
                 .check(matches(imageHasColorInColorFilter(R.color.noVote)))
@@ -70,7 +70,7 @@ class VoteBarTest {
         }
         // 50 score and no like, should be 50 score and noVote color
         onView(withId(R.id.score))
-                .check(matches(hasTextColorWithTicker(R.color.text_color)))
+                .check(matches(hasTextColorWithTicker(R.color.noVote)))
                 .check(matches(tickerViewHasText("50")))
         onView(withId(R.id.upvote))
                 .check(matches(imageHasColorInColorFilter(R.color.noVote)))
@@ -132,7 +132,7 @@ class VoteBarTest {
         }
 
         onView(withId(R.id.score))
-                .check(matches(hasTextColorWithTicker(R.color.text_color)))
+                .check(matches(hasTextColorWithTicker(R.color.noVote)))
                 .check(matches(tickerViewHasText(context.getString(R.string.scoreHidden))))
 
         // Upvote the listing. When the score is hidden the hidden score icon should also be colored
@@ -161,7 +161,7 @@ class VoteBarTest {
         }
 
         onView(withId(R.id.score))
-                .check(matches(hasTextColorWithTicker(R.color.text_color)))
+                .check(matches(hasTextColorWithTicker(R.color.noVote)))
                 .check(matches(tickerViewHasText(context.getString(R.string.scoreHidden))))
 
         voteBar.listing = RedditPost().apply {
@@ -188,7 +188,7 @@ class VoteBarTest {
         }
 
         onView(withId(R.id.score))
-                .check(matches(hasTextColorWithTicker(R.color.text_color)))
+                .check(matches(hasTextColorWithTicker(R.color.noVote)))
                 .check(matches(tickerViewHasText("100")))
 
         onView(withId(R.id.upvote))
@@ -213,7 +213,7 @@ class VoteBarTest {
         }
 
         onView(withId(R.id.score))
-                .check(matches(hasTextColorWithTicker(R.color.text_color)))
+                .check(matches(hasTextColorWithTicker(R.color.noVote)))
                 .check(matches(tickerViewHasText("100")))
 
         onView(withId(R.id.downvote))
@@ -341,7 +341,7 @@ class VoteBarTest {
         }
 
         onView(withId(R.id.score))
-                .check(matches(hasTextColorWithTicker(R.color.text_color)))
+                .check(matches(hasTextColorWithTicker(R.color.noVote)))
                 .check(matches(tickerViewHasText("100")))
 
         onView(withId(R.id.upvote))
@@ -352,7 +352,7 @@ class VoteBarTest {
 
         // Still 100 score
         onView(withId(R.id.score))
-                .check(matches(hasTextColorWithTicker(R.color.text_color)))
+                .check(matches(hasTextColorWithTicker(R.color.noVote)))
                 .check(matches(tickerViewHasText("100")))
 
 
@@ -364,7 +364,7 @@ class VoteBarTest {
 
         // Still 100 score
         onView(withId(R.id.score))
-                .check(matches(hasTextColorWithTicker(R.color.text_color)))
+                .check(matches(hasTextColorWithTicker(R.color.noVote)))
                 .check(matches(tickerViewHasText("100")))
     }
 

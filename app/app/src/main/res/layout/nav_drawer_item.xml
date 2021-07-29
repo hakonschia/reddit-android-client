@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <data>
+        <variable
+            name="icon"
+            type="android.graphics.drawable.Drawable" />
+
+        <variable
+            name="text"
+            type="String" />
+
+    </data>
+    
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:background="?android:attr/selectableItemBackground">
+
+        <!-- Kind of weird to hardcode all 3 of these, but it's only 3 items and
+         creating a RecyclerView is definitely weird. Other option is creating another layout
+         and pass the values, but it uses different string resources so it isn't really easier-->
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+
+            android:src="@{icon}"
+            tools:src="@drawable/ic_emoji_emotions_24dp"
+
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+
+            android:ellipsize="end"
+            android:maxLines="1"
+            
+            android:text="@{text}"
+            android:textColor="@color/text_color"
+            android:textSize="16sp"
+
+            tools:text="Front page"
+
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@+id/icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/icon"
+            app:layout_constraintTop_toTopOf="@+id/icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

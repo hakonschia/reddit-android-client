@@ -14,7 +14,7 @@ import com.example.hakonsreader.api.model.RedditUserInfo
  * This database does allow for main thread queries, but should only be used when necessary (such
  * as when the application is starting)
  */
-@Database(version = 2, exportSchema = false, entities = [RedditUserInfo::class])
+@Database(version = 3, exportSchema = false, entities = [RedditUserInfo::class])
 @TypeConverters(PostConverter::class, EnumConverters::class)
 abstract class RedditUserInfoDatabase : RoomDatabase() {
     abstract fun userInfo() : RedditUserInfoDao

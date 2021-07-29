@@ -8,9 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.Pair
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.hakonsreader.api.interfaces.GalleryImage
+import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.images.RedditGalleryItem
 import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurAlbum
 import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
@@ -37,6 +39,24 @@ class ContentGallery @JvmOverloads constructor(
          * The key for extras in [ContentGallery.getExtras] that tells which image is currently active.
          */
         const val EXTRAS_ACTIVE_IMAGE = "activeImage"
+
+
+        /**
+         * Checks if a reddit post is viewable and can be displayed as a gallery
+         */
+        fun isRedditPostGalleryViewable(redditPost: RedditPost): Boolean {
+            if (redditPost.thirdPartyObject is ImgurAlbum) {
+                return true
+            } else {
+                // Example, in the link below the last image failed (at the time of writing at least)
+                // https://www.reddit.com/r/RATS/comments/nqwcun/my_poor_gus_only_last_night_you_were_fishing_for/
+                val post = redditPost.crossposts?.firstOrNull() ?: redditPost
+                val galleryImages = post.galleryImages ?: return false
+                galleryImages.filter { it.status == RedditGalleryItem.STATUS_VALID }
+
+                return galleryImages.isNotEmpty()
+            }
+        }
     }
 
 
@@ -44,6 +64,10 @@ class ContentGallery @JvmOverloads constructor(
     //  with this view inside it the appbar wont be hidden (it hides when you "fling" the view, but not if you
     //  hold the entire time you scroll)
 
+    /**
+     * The lifecycle owner used to ensure videos in the gallery are automatically paused and released
+     */
+    var lifecycleOwner: LifecycleOwner? = null
 
     // This file and ContentImage is really coupled together, should be fixed to not be so terrible
     private val binding: ContentGalleryBinding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true)
@@ -53,14 +77,15 @@ class ContentGallery @JvmOverloads constructor(
     private var maxHeight = -1
 
     override fun updateView() {
-        // If the view is being reused
-        release()
-        binding.galleryImages.setCurrentItem(0, false)
-
         val images: List<GalleryImage> = if (redditPost.thirdPartyObject is ImgurAlbum) {
             (redditPost.thirdPartyObject as ImgurAlbum).images!!
         } else {
-            redditPost.galleryImages!!
+            // Example, in the link below the last image failed (at the time of writing at least)
+            // https://www.reddit.com/r/RATS/comments/nqwcun/my_poor_gus_only_last_night_you_were_fishing_for/
+            val post = redditPost.crossposts?.firstOrNull() ?: redditPost
+            val galleryImages = post.galleryImages ?: return
+
+            galleryImages.filter { it.status == RedditGalleryItem.STATUS_VALID }
         }
 
         val (maxWidth, maxHeight) = getMaxWidthAndHeight(images)
@@ -98,6 +123,13 @@ class ContentGallery @JvmOverloads constructor(
         binding.galleryImages.setCurrentItem(activeImage, false)
     }
 
+    override fun recycle() {
+        super.recycle()
+        release()
+        binding.galleryImages.setCurrentItem(0, false)
+        binding.activeImageText.visibility = VISIBLE
+    }
+
     private fun getMaxWidthAndHeight(galleryImages: List<GalleryImage>): Coordinates {
         var maxHeight = -1
         var maxWidth = -1
@@ -105,6 +137,10 @@ class ContentGallery @JvmOverloads constructor(
 
         // Find the largest height and width and set the layout to that
         for (image in galleryImages) {
+            if (image is RedditGalleryItem && image.mimeType == null) {
+                continue
+            }
+
             if (image is ImgurGif || (image is RedditGalleryItem && image.source.mp4Url != null)) {
                 hasVideo = true
             }
@@ -161,12 +197,10 @@ class ContentGallery @JvmOverloads constructor(
     }
 
     override fun viewSelected() {
-        super.viewSelected()
         currentView?.viewSelected()
     }
 
     override fun viewUnselected() {
-        super.viewUnselected()
         galleryViews.forEach {
             it.viewUnselected()
         }
@@ -178,6 +212,7 @@ class ContentGallery @JvmOverloads constructor(
      * Releases all views in the gallery
      */
     fun release() {
+        binding.galleryImages.adapter = null
         galleryViews.forEach(Consumer { obj: ContentGalleryImage -> obj.destroy() })
         galleryViews.clear()
         currentView = null
@@ -197,6 +232,8 @@ class ContentGallery @JvmOverloads constructor(
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(ContentGalleryImage(parent.context).apply {
+                lifecycleOwner = this@ContentGallery.lifecycleOwner
+
                 post = redditPost
                 // With ViewPager2 the items have to be width=match_parent (although this is how it is in
                 // the xml, so not sure why I have to do it here as well)

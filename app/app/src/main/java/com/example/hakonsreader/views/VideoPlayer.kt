@@ -14,16 +14,23 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.hakonsreader.R
+import com.example.hakonsreader.fragments.bottomsheets.VideoPlaybackErrorBottomSheet
 import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createVideoDuration
+import com.example.hakonsreader.misc.isAvailableForGlide
 import com.example.hakonsreader.views.util.VideoCache
+import com.example.hakonsreader.views.util.goneIf
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor
@@ -43,7 +50,12 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSource
  * Class for wrapping an [ExoPlayer] and a [PlayerView] in one class. The size of the video should
  * be set with [videoWidth] and [videoHeight]. This will automatically resize the video view to fit
  * within the screen in the best way possible. The controller for the video will always match the
- * width of the screen.
+ * width of the parent.
+ *
+ * This class implements [LifecycleObserver] and this can be taken advantage of to automatically pause videos
+ * when [Lifecycle.Event.ON_PAUSE] is retrieved, and more importantly resources are freed up when
+ * [Lifecycle.Event.ON_DESTROY] is retrieved. If this view is not added as a lifecycle observer
+ * [release] must be called manually when the view is no longer needed.
  *
  * To control if the video should be cached, use [cacheVideo]
  *
@@ -58,7 +70,8 @@ class VideoPlayer @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
-) : PlayerView(context, attrs, defStyleAttr) {
+) : PlayerView(context, attrs, defStyleAttr), LifecycleObserver {
+
     companion object {
         private const val TAG = "VideoPlayer"
 
@@ -91,49 +104,64 @@ class VideoPlayer @JvmOverloads constructor(
          *
          * The value stored with this key will be a `string`
          */
-        const val EXTRA_URL = "videoUrl"
+        const val EXTRA_URL = "extras_videoUrl"
 
         /**
          * The key used in extras for saying if the video displayed is a DASH video
          *
          * The value stored with this key will be a `boolean`
          */
-        const val EXTRA_IS_DASH = "videoIsDash"
+        const val EXTRA_IS_DASH = "extras_videoIsDash"
+
+        /**
+         * The key used in extras for saying if the video displayed is an MP4 video
+         *
+         * The value stored with this key will be a `boolean`
+         */
+        const val EXTRA_IS_MP4 = "extras_videoIsMp4"
+
 
         /**
          * The key used for extra information about the timestamp of the video
          *
          * The value stored with this key will be a `long`
          */
-        const val EXTRA_TIMESTAMP = "videoTimestamp"
+        const val EXTRA_TIMESTAMP = "extras_videoTimestamp"
 
         /**
          * The key used for extra information about the playback state of a video
          *
          * The value stored with this key will be a `boolean`
          */
-        const val EXTRA_IS_PLAYING = "isPlaying"
+        const val EXTRA_IS_PLAYING = "extras_isPlaying"
 
         /**
          * The key used for extra information about the volume of the video
          *
          * The value stored with this key will be a `boolean`
          */
-        const val EXTRA_VOLUME = "volume"
+        const val EXTRA_VOLUME = "extras_volume"
 
         /**
          * The key used for extra information about if the video being played has an audio track
          *
          * The value stored with this key will be a `boolean`
          */
-        const val EXTRA_HAS_AUDIO = "hasAudio"
+        const val EXTRA_HAS_AUDIO = "extras_hasAudio"
 
         /**
          * The key used for extra information about the size of the video (in bytes)
          *
          * The value stored with this key will be an `int`
          */
-        const val EXTRA_VIDEO_SIZE = "videoSize"
+        const val EXTRA_VIDEO_SIZE = "extras_videoSize"
+
+        /**
+         * The key used for extra information about the size of the video being an estimate
+         *
+         * The value stored with this key will be an `boolean`
+         */
+        const val EXTRA_VIDEO_SIZE_IS_ESTIMATE = "extras_videoSizeIsEstimate"
 
 
         /**
@@ -181,26 +209,16 @@ class VideoPlayer @JvmOverloads constructor(
     /**
      * The URL linking to the thumbnail to use for the video. The thumbnail is shown
      * before the video has been prepared, and is removed afterwards.
-     *
-     * Setting this value will automatically load the thumbnail
      */
     var thumbnailUrl = ""
-        set(value) {
-            field = value
-            loadThumbnail()
-        }
 
     /**
      * The drawable to use for the thumbnail. If this and [thumbnailUrl] is set, [thumbnailUrl] has
-     * precedence. Setting this value will automatically load the thumbnail
+     * precedence
      *
      * By default, an "Image not found" drawable is used
      */
     var thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
-        set(value) {
-            field = value
-            loadThumbnail()
-        }
 
     /**
      * True if [url] points to a DASH format video. This must be set before an attempt to
@@ -234,11 +252,7 @@ class VideoPlayer @JvmOverloads constructor(
     var hasAudio = true
         set(value) {
             field = value
-            findViewById<View>(R.id.volumeButton).visibility = if (value) {
-                VISIBLE
-            } else {
-                GONE
-            }
+            findViewById<View>(R.id.volumeButton).goneIf(!value)
         }
 
     /**
@@ -264,7 +278,10 @@ class VideoPlayer @JvmOverloads constructor(
     /**
      * The duration of the video. This should be set ahead of time if the video duration is known.
      * If the video duration is not known, the duration will be set when the video is loaded. If a negative
-     * value is set then the the same happens
+     * value (or 0) is set then the the same happens
+     *
+     * When the actual video is loaded this will be set to -1 to ensure the video duration is synced
+     * properly
      */
     var videoDuration = -1
         set(value) {
@@ -382,6 +399,20 @@ class VideoPlayer @JvmOverloads constructor(
      */
     private var isPrepared = false
 
+    /**
+     * If not null, this holds the playback error for the video
+     */
+    private var playbackError: ExoPlaybackException? = null
+        set(value) {
+            field = value
+            findViewById<ImageView>(R.id.playbackError).goneIf(value == null)
+        }
+
+    /**
+     * If true the thumbnail has been set by a bitmap and should not be loaded via a URL
+     */
+    private var thumbnailLoadedFromBitmap = false
+
     init {
         controllerShowTimeoutMs = CONTROLLER_TIMEOUT
 
@@ -395,29 +426,39 @@ class VideoPlayer @JvmOverloads constructor(
         setFullscreenListener()
         setPauseButtonListener()
         setVolumeListener()
+        setPlaybackErrorListener()
     }
 
     /**
      * Prepares the VideoPlayer to be reused with a new video
      */
     fun prepareForNewVideo() {
+        // Ie. if a video has actually been played before we want to remove the old media item
+        exoPlayer.clearMediaItems()
+
         isPrepared = false
+
         videoSize = -1
         videoDuration = -1
+
         dashVideo = false
         mp4Video = false
+
         hasAudio = true
         url = ""
         thumbnailUrl = ""
         thumbnailDrawable = -1
+        thumbnailLoadedFromBitmap = false
         isVideoSizeEstimated = false
-        
-        // Ie. if a video has actually been played before we want to remove the old media item
-        if (exoPlayer.mediaItemCount > 0) {
-            exoPlayer.removeMediaItem(0)
-        }
+
+        videoWidth = -1
+        videoHeight = -1
+        actualVideoHeight = -1
+
         exoPlayer.playWhenReady = false
         thumbnail.visibility = VISIBLE
+
+        playbackError = null
     }
 
     /**
@@ -446,6 +487,7 @@ class VideoPlayer @JvmOverloads constructor(
 
             override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
                 hasAudio = audioTracksHaveAudio(trackGroups)
+                videoDuration = -1
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -475,6 +517,10 @@ class VideoPlayer @JvmOverloads constructor(
                 } else {
                     CONTROLLER_TIMEOUT
                 }
+            }
+
+            override fun onPlayerError(error: ExoPlaybackException) {
+                playbackError = error
             }
         })
 
@@ -577,9 +623,18 @@ class VideoPlayer @JvmOverloads constructor(
      * Sets the listener for the volume button
      */
     private fun setVolumeListener() {
-        findViewById<ImageButton>(R.id.volumeButton).apply {
-            setOnClickListener {
-                toggleVolume()
+        findViewById<ImageButton>(R.id.volumeButton).setOnClickListener {
+            toggleVolume()
+        }
+    }
+
+    /**
+     * Sets the listener for the error button
+     */
+    private fun setPlaybackErrorListener() {
+        findViewById<ImageView>(R.id.playbackError).setOnClickListener {
+            playbackError?.let {
+                showPlaybackErrorInformation(it)
             }
         }
     }
@@ -605,9 +660,17 @@ class VideoPlayer @JvmOverloads constructor(
 
     /**
      * Loads the thumbnail into [thumbnail]. If [thumbnailUrl] is not empty, then the URL will be loaded.
-     * Otherwise [thumbnailDrawable] will be loaded
+     * Otherwise [thumbnailDrawable] will be loaded.
+     *
+     * If the thumbnail has been set with [setThumbnailBitmap] then a new image will not be loaded
      */
     fun loadThumbnail() {
+        if (!context.isAvailableForGlide()) {
+            return
+        }
+
+        if (thumbnailLoadedFromBitmap) return
+
         // Set the background color for the controls as a filter here since the thumbnail is shown
         // over the controls
         thumbnail.setColorFilter(ContextCompat.getColor(context, R.color.videoControlBackground))
@@ -733,17 +796,24 @@ class VideoPlayer @JvmOverloads constructor(
      * if the video hasn't played yet
      */
     fun getCurrentFrame(): Bitmap? {
-        val bitmap = if (videoSurfaceView is TextureView) {
-            (videoSurfaceView as TextureView).bitmap
-        } else null
+        return if (getPosition() == 0L) {
+            thumbnail.drawable?.toBitmap()
+        } else {
+            val bitmap = if (videoSurfaceView is TextureView) {
+                (videoSurfaceView as TextureView).bitmap
+            } else {
+                null
+            }
 
-        return bitmap ?: thumbnail.drawable?.toBitmap()
+            bitmap ?: thumbnail.drawable?.toBitmap()
+        }
     }
 
     /**
      * Sets a bitmap to the thumbnail
      */
     fun setThumbnailBitmap(bitmap: Bitmap) {
+        thumbnailLoadedFromBitmap = true
         thumbnail.setImageBitmap(bitmap)
     }
 
@@ -753,21 +823,30 @@ class VideoPlayer @JvmOverloads constructor(
             it.putBoolean(EXTRA_IS_PLAYING, isPlaying())
             it.putBoolean(EXTRA_VOLUME, isAudioOn())
 
-            // Probably have to pass thumbnail?
             it.putString(EXTRA_URL, url)
             it.putBoolean(EXTRA_IS_DASH, dashVideo)
+            it.putBoolean(EXTRA_IS_MP4, mp4Video)
             it.putBoolean(EXTRA_HAS_AUDIO, hasAudio)
+            it.putBoolean(EXTRA_VIDEO_SIZE_IS_ESTIMATE, isVideoSizeEstimated)
             it.putInt(EXTRA_VIDEO_SIZE, videoSize)
         }
     }
 
+    /**
+     * Sets the extras for the video. If the extras specify that a video has been played then
+     * [prepare] will be called
+     */
     fun setExtras(extras: Bundle) {
         val timestamp = extras.getLong(EXTRA_TIMESTAMP)
         val isPlaying = extras.getBoolean(EXTRA_IS_PLAYING)
         val volumeOn = extras.getBoolean(EXTRA_VOLUME)
 
-        hasAudio = extras.getBoolean(EXTRA_HAS_AUDIO)
-        videoSize = extras.getInt(EXTRA_VIDEO_SIZE)
+        mp4Video = extras.getBoolean(EXTRA_IS_MP4)
+        dashVideo = extras.getBoolean(EXTRA_IS_DASH)
+        hasAudio = extras.getBoolean(EXTRA_HAS_AUDIO, true)
+        videoSize = extras.getInt(EXTRA_VIDEO_SIZE, -1)
+        isVideoSizeEstimated = extras.getBoolean(EXTRA_VIDEO_SIZE_IS_ESTIMATE)
+        url = extras.getString(EXTRA_URL) ?: ""
 
         toggleVolume(volumeOn)
 
@@ -787,4 +866,25 @@ class VideoPlayer @JvmOverloads constructor(
             pause()
         }
     }
+
+    private fun showPlaybackErrorInformation(error: ExoPlaybackException) {
+        if (context is AppCompatActivity) {
+            (context as AppCompatActivity).let { activity ->
+                val bottomSheet = VideoPlaybackErrorBottomSheet.newInstance(error, url)
+                bottomSheet.show(activity.supportFragmentManager, "videoPlaybackErrorBottomSheet")
+            }
+        }
+    }
+
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    private fun paused() {
+        pause()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    private fun destroyed() {
+        release()
+    }
+
 }

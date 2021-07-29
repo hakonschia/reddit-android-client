@@ -19,6 +19,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.databinding.ActivityImageBinding
 import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.misc.isAvailableForGlide
 import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.r0adkll.slidr.Slidr
@@ -112,6 +113,10 @@ class ImageActivity : BaseActivity() {
     }
 
     private fun loadImageByUrl(data: Bundle) {
+        if (!this.isAvailableForGlide()) {
+            return
+        }
+
         var imageUrl = data.getString(EXTRAS_IMAGE_URL)
         imageUrl = LinkUtils.convertToDirectUrl(imageUrl)
         binding.loadingIcon.visibility = View.VISIBLE

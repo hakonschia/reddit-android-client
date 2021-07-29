@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.core.view.children
 import androidx.core.view.get
@@ -82,19 +83,20 @@ class Post @JvmOverloads constructor(
 
         setOnLongClickListener {
             redditPost?.let { post ->
+                val p = post.crossposts?.firstOrNull() ?: redditPost
                 // If we're already showing text content it's no point in showing this dialog
-                if (post.getPostType() == PostType.TEXT && !showTextContent) {
-                    val markdown: String = post.selftext
+                if (p.getPostType() == PostType.TEXT && !showTextContent) {
+                    val markdown: String = p.selftext
 
                     if (markdown.isNotEmpty()) {
                         if (context is AppCompatActivity) {
-                            PeekTextPostBottomSheet.newInstance(post).show(context.supportFragmentManager, "Text post")
+                            PeekTextPostBottomSheet.newInstance(p).show(context.supportFragmentManager, "Text post")
                         } else {
                             // Not sure if this will ever happen, but in case it does
                             // This would make the peek url in the post not work though, as it uses bottom sheet as well
                             AlertDialog.Builder(context)
                                     .setView(ContentText(context).apply {
-                                        setRedditPost(post)
+                                        setRedditPost(p)
                                     })
                                     .show()
                         }
@@ -210,10 +212,12 @@ class Post @JvmOverloads constructor(
         val contentHeight = binding.content.measuredHeight
         val totalHeight = binding.postsParentLayout.measuredHeight
 
+        val wantedContentHeight = content.wantedHeight
+
         // For some views making the measure with WRAP_CONTENT doesn't work, luckily those views
         // know the wanted height already, so we can use the wantedHeight to achieve the same functionality
-        val wantedHeight = if (content.wantedHeight >= 0) {
-            content.wantedHeight
+        val wantedHeight = if (wantedContentHeight >= 0) {
+            wantedContentHeight
         } else {
             // Measure what the content at most wants
             content.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -336,18 +340,28 @@ class Post @JvmOverloads constructor(
     private fun addContent() {
         val content = suppliedContent ?: generatePostContent(context, redditPost, showTextContent, null)
         content?.also { c ->
-            setBitmap(this@Post.bitmap)
+            c.setBitmap(bitmap)
+
             postExtras?.let {
-                setExtras(it)
+                c.setExtras(it)
             }
-            // Should only be used for this post, in case of a reuse
-            postExtras = null
 
             if (c is ContentVideo) {
                 onVideoManuallyPaused?.let { c.setOnVideoManuallyPaused(it) }
                 onVideoFullscreenListener?.let { c.setOnVideoFullscreenListener(it) }
+
+                lifecycleOwner?.let {
+                    c.observeVideoLifecycle(it)
+                }
+            } else if (c is ContentGallery) {
+                c.lifecycleOwner = lifecycleOwner
             }
+
+            c.setRedditPost(redditPost)
         }
+
+        // Should only be used for this post, in case of a reuse
+        postExtras = null
 
         if (content != null) {
             binding.content.addView(content)
@@ -490,6 +504,7 @@ class Post @JvmOverloads constructor(
      * @param data The data to use for restoring the state
      */
     override fun setExtras(data: Bundle) {
+        super.setExtras(extras)
         val c = binding.content.getChildAt(0) as Content?
         if (c != null) {
             c.setExtras(data)
@@ -513,7 +528,7 @@ class Post @JvmOverloads constructor(
             // We want to handle the content below manually
             // If the view isn't visible then it will appear in the new activity until it decides itself
             // that the view actually isn't visible and remove it
-            if (view !is Content && view.transitionName != null && view.visibility == View.VISIBLE) {
+            if (view !is Content && view != binding.content && view.transitionName != null && view.visibility == View.VISIBLE) {
                 pairs.add(Pair(view, view.transitionName))
             }
         }
@@ -530,15 +545,27 @@ class Post @JvmOverloads constructor(
             } else {
                 pairs.addAll(contentTransitionViews)
             }
+        } else {
+            // This is really only for if text content is not showing here, but might be in the new
+            // activity. If this is not added then no transition occurs and it just fades in, but with
+            // this the text content sort of comes out/in of the rest of the post
+            pairs.add(Pair(binding.content, binding.content.transitionName))
         }
 
         return pairs
     }
 
     override fun viewSelected() {
-        (binding.content.getChildAt(0) as Content?)?.viewSelected()
+        if (Settings.devHighlightSelectedPosts()) {
+            binding.root.setBackgroundColor(ContextCompat.getColor(context, R.color.tagNSFWFill))
+        }
+        getContent()?.viewSelected()
     }
+
     override fun viewUnselected() {
-        (binding.content.getChildAt(0) as Content?)?.viewUnselected()
+        if (Settings.devHighlightSelectedPosts()) {
+            binding.root.setBackgroundColor(ContextCompat.getColor(context, R.color.background))
+        }
+        getContent()?.viewUnselected()
     }
 }

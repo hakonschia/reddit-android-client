@@ -258,7 +258,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
         } else {
             // Use empty string as default (ie. front page)
             val startSubreddit = intent.extras?.getString(EXTRAS_START_SUBREDDIT) ?: ""
+
             // Only setup the start fragment if we have no state to restore (as this is then a new activity)
+            // For testing purposes this can be hardcoded to a specific subreddit (which will not open a SubredditActivity
+            // but is opened in the subreddit nav bar)
             setupStartFragment(startSubreddit)
 
             // Trending subreddits aren't user specific so they don't have to be retrieved again
@@ -1019,8 +1022,10 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
                 binding.navDrawer.trendingSubredditsLoaderLayout.goneIf(!loading)
             }
 
-            error.observe(this@MainActivity) { error ->
-                handleGenericResponseErrors(binding.mainParentLayout, error.error, error.throwable, binding.bottomNav)
+            error.observe(this@MainActivity) {
+                Snackbar.make(binding.bottomNav, R.string.trendingSubredditsFailed, Snackbar.LENGTH_SHORT)
+                    .setAnchorView(binding.bottomNav)
+                    .show()
             }
         }
 
@@ -1042,20 +1047,20 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
         }
 
         with (binding.navDrawer) {
-            appState = AppState
             api = this@MainActivity.api
             userInfoDao = this@MainActivity.userInfoDao
             isDarkMode = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
 
             profilePicture.setOnClickListener { selectProfileNavBar() }
             username.setOnClickListener { selectProfileNavBar() }
-            settingsClicker.setOnClickListener { selectSettingsNavBar() }
+            privateBrowsingClicker.setOnClickListener { AppState.togglePrivateBrowsing() }
+            settingsLayout.root.setOnClickListener { selectSettingsNavBar() }
 
-            frontPageClicker.setOnClickListener { subredditSelected("") }
-            popularClicker.setOnClickListener { subredditSelected("popular") }
-            allClicker.setOnClickListener { subredditSelected("all") }
-            modClicker.setOnClickListener { subredditSelected("mod") }
-            randomClicker.setOnClickListener { subredditSelected("random") }
+            frontPageLayout.root.setOnClickListener { subredditSelected("") }
+            popularLayout.root.setOnClickListener { subredditSelected("popular") }
+            allLayout.root.setOnClickListener { subredditSelected("all") }
+            modLayout.root.setOnClickListener { subredditSelected("mod") }
+            randomLayout.root.setOnClickListener { subredditSelected("random") }
 
             darkModeIcon.setOnClickListener {
                 PreferenceManager.getDefaultSharedPreferences(this@MainActivity).run {

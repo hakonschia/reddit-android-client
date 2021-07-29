@@ -23,6 +23,7 @@ import com.example.hakonsreader.databinding.UserIsSuspendedBinding
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.misc.dpToPixels
 import com.example.hakonsreader.misc.handleGenericResponseErrors
+import com.example.hakonsreader.misc.isAvailableForGlide
 import com.example.hakonsreader.states.LoggedInState
 import com.example.hakonsreader.viewmodels.RedditUserViewModel
 import com.example.hakonsreader.viewmodels.assistedViewModel
@@ -153,6 +154,7 @@ class ProfileFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        (requireActivity() as AppCompatActivity).setSupportActionBar(null)
         _binding = null
     }
 
@@ -313,6 +315,10 @@ class ProfileFragment : Fragment() {
  */
 @BindingAdapter("profilePicture")
 fun setProfilePicture(imageView: RoundedImageView, user: RedditUser?) {
+    if (!imageView.context.isAvailableForGlide()) {
+        return
+    }
+
     user ?: return
 
     val url = if (user.snoovatarImage.isNotEmpty()) {

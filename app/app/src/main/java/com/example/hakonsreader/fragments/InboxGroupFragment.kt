@@ -23,7 +23,9 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class InboxGroupFragment : Fragment() {
+
     companion object {
+        @Suppress("UNUSED")
         private const val TAG = "InboxGroupFragment"
 
 
@@ -36,7 +38,7 @@ class InboxGroupFragment : Fragment() {
 
         
         fun newInstance(type: InboxFragment.InboxGroupTypes) = InboxGroupFragment().apply {
-            // Should probably use arguments for this, but it doesn't get set before the tablayout
+            // Should probably use arguments for this, but it doesn't get set before the tab layout
             // using the value runs, so ¯\_(ツ)_/¯
             inboxType = type
         }
@@ -51,25 +53,25 @@ class InboxGroupFragment : Fragment() {
     private var _binding: FragmentInboxGroupBinding? = null
     private val binding get() = _binding!!
 
-    private var messageAdapter: InboxAdapter? = null
-    private var messageLayoutManager: LinearLayoutManager? = null
-
     lateinit var inboxType: InboxFragment.InboxGroupTypes
         private set
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentInboxGroupBinding.inflate(LayoutInflater.from(requireActivity())).also {
+            _binding = it
+        }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             val type = savedInstanceState.getInt(SAVED_INBOX_TYPE)
             inboxType = InboxFragment.InboxGroupTypes.values()[type]
         }
 
-        setupBinding()
         setupMessagesList()
 
         loadMessagesFromDb()
-
-        return binding.root
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -82,16 +84,9 @@ class InboxGroupFragment : Fragment() {
         _binding = null
     }
 
-    private fun setupBinding() {
-        _binding = FragmentInboxGroupBinding.inflate(LayoutInflater.from(requireActivity()))
-    }
-
     private fun setupMessagesList() {
-        messageLayoutManager = LinearLayoutManager(requireContext())
-        messageAdapter = InboxAdapter(api, messagesDao)
-
-        binding.messages.layoutManager = messageLayoutManager
-        binding.messages.adapter = messageAdapter
+        binding.messages.layoutManager = LinearLayoutManager(requireContext())
+        binding.messages.adapter = InboxAdapter(api, messagesDao)
     }
 
     /**
@@ -110,7 +105,8 @@ class InboxGroupFragment : Fragment() {
             withContext(Main) {
                 messages.observe(viewLifecycleOwner, { newMessages ->
                     binding.noMessages = newMessages.isEmpty()
-                    messageAdapter?.submitList(newMessages)
+
+                    (binding.messages.adapter as InboxAdapter).submitList(newMessages)
                 })
             }
         }

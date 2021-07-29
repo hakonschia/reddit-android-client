@@ -1,18 +1,23 @@
 package com.example.hakonsreader.misc
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Bundle
+import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
+import com.bumptech.glide.RequestBuilder
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -38,6 +43,7 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.util.*
+import kotlin.math.min
 
 /**
  * Class for holding image URL variants for a [RedditPost]
@@ -367,9 +373,14 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
 
             val videoId = youtubeVideoId ?: pathSegments.first()
 
+            val timestamp = asUri.getQueryParameter("t")
+            val timeStampAsFloat = if (timestamp != null) {
+                parseYouTubeTimestamp(timestamp).toFloat()
+            } else 0F
+
             Intent(context, VideoYoutubeActivity::class.java).apply {
                 putExtra(VideoYoutubeActivity.EXTRAS_VIDEO_ID, videoId)
-                putExtra(VideoYoutubeActivity.EXTRAS_TIMESTAMP, asUri.getQueryParameter("t")?.toFloat())
+                putExtra(VideoYoutubeActivity.EXTRAS_TIMESTAMP, timeStampAsFloat)
             }
         }
 
@@ -418,6 +429,76 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
             } else {
                 baseIntent
             }
+        }
+    }
+}
+
+/**
+ * Parses a YouTube timestamp to an integer value
+ *
+ * @param timestamp The string timestamp extracted from the "t" query parameter of the YouTube URL
+ * @return The amount of seconds
+ */
+fun parseYouTubeTimestamp(timestamp: String): Int {
+    // The timestamp follows the format:
+    // 78 - Just a number saying the seconds
+    // 78s - Number with "s" to give the seconds
+    // 1m18s - Number in minutes and number in seconds
+    // 18s1m - Number in minutes and number in seconds, with seconds first
+    // 1m - Number given in minutes without additional seconds
+
+    return try {
+        // 78 - Just a number saying the seconds
+        // Try to parse it, if it works then great, otherwise find out why in the catch
+        timestamp.toInt()
+    } catch (e: NumberFormatException) {
+        // Split the string to a list of numbers
+        val parts = timestamp.split("\\D+".toRegex()).filter { it.isNotEmpty() }
+
+        when (parts.size) {
+            // 1 part, either "78", "78s", or "1m"
+            1 -> {
+                if (timestamp.matches("\\dm".toRegex())) {
+                    // 1m - Number given in minutes without additional seconds
+                    // Convert the minutes to seconds
+                    parts[0].toInt() * 60
+                } else {
+                    // 78s - Number with "s" to give the seconds
+                    parts[0].toInt()
+                }
+            }
+
+            // 2 parts, either "1m18s" or "18s1m"
+            2 -> {
+                val minutesIndex = timestamp.indexOf("m")
+                val secondsIndex = timestamp.indexOf("s")
+
+                when {
+                    // This is an error, the timestamp passed wasn't "1m18s" or "18s1m"
+                    minutesIndex == -1 || secondsIndex == -1 -> 0
+
+                    // 1m18s
+                    minutesIndex < secondsIndex -> {
+                        val minutes = parts[0].toInt() * 60
+                        val seconds = parts[1].toInt()
+
+                        minutes + seconds
+                    }
+
+                    // 18s1m
+                    minutesIndex > secondsIndex -> {
+                        val minutes = parts[1].toInt() * 60
+                        val seconds = parts[0].toInt()
+
+                        minutes + seconds
+                    }
+
+                    else -> 0
+                }
+            }
+
+            // This is really some sort of error
+            else -> 0
         }
     }
 }
@@ -862,7 +943,8 @@ fun toDays(time: Long): Long {
 /**
  * Generates the content view for a post
  *
- * @param post The post to generate for
+ * @param post The post to generate for. Note that [Content.setRedditPost] is NOT called here
+ * as callers of this function might want to set extra values before this is called
  * @param showTextContent If false content will not be created if [post] is a text post
  * @param reusableViews The list of reusable views that will be used instead of generating new views.
  * If a view is reused from this list then it will also be removed automatically.
@@ -939,7 +1021,11 @@ fun generatePostContent(
         }
 
         PostType.GALLERY -> {
-            ContentGallery::class.java
+            if (ContentGallery.isRedditPostGalleryViewable(post)) {
+                ContentGallery::class.java
+            } else {
+                null
+            }
         }
 
         else -> null
@@ -963,7 +1049,30 @@ fun generatePostContent(
         }
 
         else -> null
-    }?.apply {
-        redditPost = post
     }
+}
+
+
+fun <T> RequestBuilder<T>.safeInto(imageView: ImageView) {
+
+}
+
+/**
+ * Return true if this [Context] is available.
+ * Availability is defined as the following:
+ * + [Context] is not null
+ * + [Context] is not destroyed (tested with [FragmentActivity.isDestroyed] or [Activity.isDestroyed])
+ */
+// Taken from: https://stackoverflow.com/a/50915146/7750841
+fun Context?.isAvailableForGlide(): Boolean {
+    if (this == null) {
+        return false
+    } else if (this !is Application) {
+        if (this is FragmentActivity) {
+            return !this.isDestroyed
+        } else if (this is Activity) {
+            return !this.isDestroyed
+        }
+    }
+    return true
 }

@@ -50,12 +50,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_marginTop="4dp"
             android:layout_marginStart="@dimen/postMargin"
+            android:layout_marginTop="4dp"
 
-            android:textSize="13sp"
             android:text="@string/postedIn"
             android:textColor="@color/text_color"
+            android:textSize="13sp"
 
             android:transitionName="@string/transition_post_info_posted_in"
 
@@ -70,8 +70,8 @@
             android:onClick="@{(view) -> ClickHandlerKt.openSubredditInActivity(view, post.subreddit)}"
             android:text='@{post.subreddit != null ? @string/subreddit_prefixed(post.subreddit) : ""}'
             android:textColor="@color/link_color"
-            android:textStyle="bold"
             android:textSize="13sp"
+            android:textStyle="bold"
 
             android:transitionName="@string/transition_post_info_posted_in_subreddit"
 
@@ -98,19 +98,16 @@
             android:layout_height="wrap_content"
 
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text='@{post != null &amp;&amp; !post.self ? post.domain : ""}'
             android:textColor="@color/secondary_text_color"
             android:textSize="13sp"
-            android:visibility="@{post != null &amp;&amp; !post.self ? View.VISIBLE : View.GONE}"
-
             android:transitionName="@string/transition_post_info_domain"
 
+            android:visibility="@{post != null &amp;&amp; !post.self ? View.VISIBLE : View.GONE}"
+
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/age"
             app:layout_constraintTop_toTopOf="@+id/age"
             tools:text="domain.com" />
@@ -138,9 +135,9 @@
 
             android:contentDescription="@string/content_description_post_sticky"
 
-            android:transitionName="@string/transition_post_info_stickied"
             android:src="@drawable/ic_pin_24dp"
-            android:visibility="@{post.stickied ? View.VISIBLE : View.GONE, default=gone}"
+            android:transitionName="@string/transition_post_info_stickied"
+            android:visibility="@{post.stickied ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="@+id/postedIn"
             app:layout_constraintTop_toBottomOf="@+id/crosspostIcon"
             tools:visibility="visible" />
@@ -152,16 +149,16 @@
             android:layout_height="18dp"
 
             android:contentDescription="@string/content_description_post_archived"
-            app:marginStart="@{post.stickied ? @dimen/defaultMarginHalf : @dimen/noMargin}"
-
             android:src="@drawable/ic_archive_24dp"
-            android:visibility="@{post.archived ? View.VISIBLE : View.GONE, default=gone}"
 
             android:transitionName="@string/transition_post_info_archived"
+            android:visibility="@{post.archived ? View.VISIBLE : View.GONE}"
 
             app:layout_constraintHorizontal_chainStyle="packed"
+
             app:layout_constraintStart_toEndOf="@+id/stickied"
             app:layout_constraintTop_toTopOf="@+id/stickied"
+            app:marginStart="@{post.stickied ? @dimen/defaultMarginHalf : @dimen/noMargin}"
             tools:visibility="visible" />
 
         <ImageView
@@ -169,15 +166,15 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
 
-            app:marginStart="@{post.archived ? @dimen/defaultMarginHalf : @dimen/noMargin}"
-
             android:contentDescription="@string/content_description_post_locked"
+
             android:src="@drawable/ic_lock_24dp"
             android:transitionName="@string/transition_post_info_locked"
+            android:visibility="@{post.locked ? View.VISIBLE : View.GONE}"
 
-            android:visibility="@{post.locked ? View.VISIBLE : View.GONE, default=gone}"
             app:layout_constraintStart_toEndOf="@+id/archived"
             app:layout_constraintTop_toTopOf="@+id/stickied"
+            app:marginStart="@{post.archived ? @dimen/defaultMarginHalf : @dimen/noMargin}"
             tools:visibility="visible" />
 
         <TextView
@@ -209,67 +206,81 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="@dimen/postMargin"
 
-            app:authorFlair="@{post}"
+            android:layout_marginEnd="@dimen/postMargin"
             android:transitionName="@string/transition_post_info_author_flair"
 
+            app:authorFlair="@{post}"
             app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="@+id/author"
+            app:layout_constraintBottom_toBottomOf="@+id/age"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/author"
-            app:layout_constraintTop_toTopOf="@+id/author" />
+            app:layout_constraintStart_toEndOf="@+id/domain"
+            app:layout_constraintTop_toTopOf="@+id/age" />
 
         <com.example.hakonsreader.views.Tag
             android:id="@+id/nsfwTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_marginStart="8dp"
-            android:visibility="@{post.nsfw ? View.VISIBLE : View.GONE}"
+            android:layout_marginTop="2dp"
 
             android:transitionName="@string/transition_post_info_nsfw_tag"
 
-            app:fillColor="@color/tagNSFWFill"
-            app:text="@string/tagNSFW"
-            app:textColor="@color/tagNSFWText"
+            android:visibility="@{post.nsfw ? View.VISIBLE : View.GONE}"
 
-            app:layout_constraintStart_toEndOf="@+id/domain"
-            app:layout_constraintTop_toTopOf="@+id/domain" />
+            app:fillColor="@color/tagNSFWFill"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="@+id/postedIn"
+            app:layout_constraintTop_toBottomOf="@+id/age"
+            app:text="@string/tagNSFW"
+            app:textColor="@color/tagNSFWText" />
 
         <com.example.hakonsreader.views.Tag
             android:id="@+id/spoilerTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_marginStart="8dp"
-            android:visibility="@{post.spoiler ? View.VISIBLE : View.GONE}"
-
+            android:layout_marginTop="2dp"
             android:transitionName="@string/transition_post_info_spoiler_tag"
 
-            app:fillColor="@color/tagSpoilerFill"
-            app:layout_constraintStart_toEndOf="@+id/nsfwTag"
-            app:layout_constraintTop_toTopOf="@+id/nsfwTag"
+            android:visibility="@{post.spoiler ? View.VISIBLE : View.GONE}"
 
+            app:fillColor="@color/tagSpoilerFill"
+
+            app:layout_constraintStart_toEndOf="@+id/nsfwTag"
+            app:layout_constraintTop_toBottomOf="@+id/age"
+            app:marginStart="@{post.nsfw ? @dimen/dp8 : @dimen/dp0}"
             app:text="@string/tagSpoiler"
-            app:textColor="@color/tagSpoilerText" />
+            app:textColor="@color/tagSpoilerText"
+            tools:layout_marginStart="8dp" />
 
         <com.example.hakonsreader.views.Tag
             android:id="@+id/linkFlair"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+
+            android:layout_marginTop="2dp"
             android:layout_marginEnd="@dimen/postMargin"
 
             android:transitionName="@string/transition_post_info_link_flair"
-
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/spoilerTag"
-            app:layout_constraintTop_toTopOf="@+id/spoilerTag"
-            app:linkFlair="@{post}" />
+            app:layout_constraintTop_toBottomOf="@+id/age"
+            app:linkFlair="@{post}"
+            app:marginStart="@{post.nsfw || post.spoiler ? @dimen/dp8 : @dimen/dp0}"
+            tools:layout_marginStart="8dp"
+            tools:text="Link flair" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/tagBarrier"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="linkFlair, nsfwTag, spoilerTag" />
+
 
         <!-- Visibility group for the crosspost views -->
         <androidx.constraintlayout.widget.Group
@@ -277,7 +288,8 @@
             android:layout_height="wrap_content"
 
             android:visibility="@{isCrosspost ? View.VISIBLE : View.GONE, default=visible}"
-            app:constraint_referenced_ids="crosspostText, crosspostFrom, crosspostIcon, crosspostSubreddit"/>
+            app:constraint_referenced_ids="crosspostText, crosspostFrom, crosspostIcon, crosspostSubreddit"
+            tools:visibility="gone" />
 
         <ImageView
             android:id="@+id/crosspostIcon"
@@ -315,6 +327,7 @@
             android:layout_height="wrap_content"
 
             android:text="@string/crosspostFrom"
+            android:textColor="@color/secondary_text_color"
             android:textSize="13sp"
             android:transitionName="@string/transition_post_info_crosspost_from"
 
@@ -326,57 +339,56 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:textStyle="bold"
+            android:onClick="@{(view) -> ClickHandlerKt.openSubredditInActivity(view, crosspost.subreddit)}"
+            android:text='@{post.subreddit != null ? @string/subreddit_prefixed(crosspost.subreddit) : ""}'
             android:textColor="@color/link_color"
             android:textSize="13sp"
-            android:text='@{post.subreddit != null ? @string/subreddit_prefixed(crosspost.subreddit) : ""}'
 
-            android:onClick="@{(view) -> ClickHandlerKt.openSubredditInActivity(view, crosspost.subreddit)}"
+            android:textStyle="bold"
 
             android:transitionName="@string/transition_post_info_crosspost_subreddit"
             app:layout_constraintStart_toEndOf="@+id/crosspostFrom"
             app:layout_constraintTop_toTopOf="@+id/crosspostFrom"
 
-            tools:text="r/GlobalOffensive"/>
+            tools:text="r/GlobalOffensive" />
 
         <com.example.hakonsreader.views.AwardLayout
             android:id="@+id/awards"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+
             android:layout_marginEnd="@dimen/postMargin"
 
-            android:visibility="@{showAwards &amp;&amp; post != null &amp;&amp; post.awardings.size() > 0 ? View.VISIBLE : View.GONE}"
-
             android:transitionName="@string/transition_post_info_awards"
+            android:visibility="@{showAwards &amp;&amp; post != null &amp;&amp; post.awardings.size() > 0 ? View.VISIBLE : View.GONE}"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/postedIn"
-            app:layout_constraintTop_toBottomOf="@+id/age" />
+            app:layout_constraintTop_toBottomOf="@+id/tagBarrier" />
 
         <TextView
             android:id="@+id/userReportsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
             android:background="@{post.ignoreReports ? @drawable/reports_background_ignored : @drawable/reports_background}"
-
             android:foreground="@drawable/ripple_main_bg"
             android:paddingStart="0dp"
             android:paddingTop="1dp"
             android:paddingEnd="4dp"
+
             android:text="@{@plurals/userReportsTitle(post.numReports, post.numReports)}"
+
             android:textColor="@color/text_color"
+            android:transitionName="@string/transition_post_info_reports"
 
             android:visibility="@{post.numReports != 0 ? View.VISIBLE : View.GONE, default=gone}"
 
             app:drawableStartCompat="@drawable/ic_flag_24dp"
-            android:transitionName="@string/transition_post_info_reports"
-
             app:layout_constraintStart_toStartOf="@+id/postedIn"
-
             app:layout_constraintTop_toBottomOf="@+id/awards"
             tools:background="@drawable/reports_background"
             tools:text="5 user reports"
@@ -386,19 +398,19 @@
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/postMargin"
 
+            android:layout_marginEnd="@dimen/postMargin"
             android:text="@{post.title}"
             android:textColor="@color/text_color"
             android:textSize="15sp"
+
             android:textStyle="bold"
 
             android:transitionName="@string/transition_post_info_title"
-
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/postedIn"
 
+            app:layout_constraintStart_toStartOf="@+id/postedIn"
             app:layout_constraintTop_toBottomOf="@+id/userReportsTitle"
             tools:text="FaZe wins major /s. To show a long title I am adding a bunch of random text here Lorem ipsum etc etc" />
 
@@ -409,6 +421,7 @@
             android:layout_height="wrap_content"
 
             android:layout_marginTop="4dp"
+            android:transitionName="@string/transition_post_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title"
@@ -424,9 +437,9 @@
             android:layout_marginTop="4dp"
             android:contentDescription="@string/content_description_post_bar_comments"
 
-            android:transitionName="@string/transition_post_bar_comments_img"
             android:scaleX="-1"
             android:src="@drawable/ic_message_24dp"
+            android:transitionName="@string/transition_post_bar_comments_img"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/content" />
 
@@ -454,11 +467,11 @@
             android:background="@null"
             android:contentDescription="@string/content_description_post_menu"
 
-            android:transitionName="@string/transition_post_bar_post_menu"
-
             android:foreground="@drawable/ripple_main_bg"
 
             android:src="@drawable/ic_baseline_more_horiz_24"
+
+            android:transitionName="@string/transition_post_bar_post_menu"
             app:layout_constraintBottom_toBottomOf="@+id/postCommentsImg"
             app:layout_constraintEnd_toStartOf="@+id/voteBar"
             app:layout_constraintTop_toTopOf="@+id/postCommentsImg"

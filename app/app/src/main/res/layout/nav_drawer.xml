@@ -10,10 +10,6 @@
         <import type="com.example.hakonsreader.states.LoggedInState"/>
 
         <variable
-            name="appState"
-            type="com.example.hakonsreader.states.AppState" />
-
-        <variable
             name="api"
             type="com.example.hakonsreader.api.RedditApi" />
 
@@ -103,169 +99,84 @@
                 app:layout_constraintTop_toTopOf="@+id/profilePicture"
                 tools:text="Hakonschiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" />
 
-            <ImageView
-                android:id="@+id/accountsIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
 
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:src="@drawable/ic_baseline_person_24"
-                android:contentDescription="@string/content_description_nav_drawer_accounts"
-
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profilePicture"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
-                android:id="@+id/accountsText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-
-                android:maxLines="1"
-                android:text="@string/menuProfileManageAccounts"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"
-
-                app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="@+id/accountsIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/accountsIcon"
-                app:layout_constraintTop_toTopOf="@+id/accountsIcon" />
-
-            <View
-                android:id="@+id/accountsClicker"
+            <!-- Kind of annoying that these includes don't render with the given
+             values in the layout editor, but oh well-->
+            <include
+                android:id="@+id/accountsLayout"
+                layout="@layout/nav_drawer_item"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackground"
+
                 android:onClick="@{(view) -> MenuClickHandlerKt.showAccountManagement(view.context, api, userInfoDao)}"
-
-                app:layout_constraintBottom_toBottomOf="@id/accountsIcon"
+                app:text="@{@string/menuProfileManageAccounts}"
+                app:icon="@{@drawable/ic_baseline_person_24}"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/accountsIcon"
-                app:layout_constraintTop_toTopOf="@id/accountsIcon" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
 
-
-            <!-- Visibility group that is responsible for removing the private browsing option
-             when not logged in -->
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/privateBrowsingToggleGroup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:constraint_referenced_ids="privateBrowsingText, privateBrowsingClicker, privateBrowsingToggleIcon"
-                android:visibility="@{hasUser ? View.VISIBLE : View.GONE}" />
-
-            <!-- This is an icon I made and has no padding, so it has to be a bit smaller
-             to look like the others -->
-            <ImageView
-                android:id="@+id/privateBrowsingToggleIcon"
-                android:layout_width="21dp"
-                android:layout_height="21dp"
-
-                android:layout_marginTop="8dp"
-
-                android:src="@drawable/ic_incognito"
-                android:contentDescription="@string/content_description_nav_drawer_toggle_private_browsing"
-
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/accountsIcon"
-                app:layout_constraintStart_toStartOf="@+id/accountsIcon"
-                app:layout_constraintTop_toBottomOf="@+id/accountsIcon"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
-                android:id="@+id/privateBrowsingText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-
-                android:maxLines="1"
-                android:text="@{privatelyBrowsing ? @string/menuPrivateBrowsingDisable : @string/menuPrivateBrowsingEnable}"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"
-
-                app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="@+id/privateBrowsingToggleIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/accountsText"
-                app:layout_constraintTop_toTopOf="@+id/privateBrowsingToggleIcon"
-                tools:text="@string/menuPrivateBrowsingEnable" />
 
             <!-- Using '!privatelyBrowsing' in the onClick doesn't work as the data binding fails to build -->
-            <View
+            <LinearLayout
                 android:id="@+id/privateBrowsingClicker"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:onClick="@{() -> appState.togglePrivateBrowsing()}"
-
-                app:layout_constraintBottom_toBottomOf="@id/privateBrowsingToggleIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/privateBrowsingToggleIcon"
-                app:layout_constraintTop_toTopOf="@id/privateBrowsingToggleIcon" />
-
-            <com.makeramen.roundedimageview.RoundedImageView
-                android:id="@+id/settingsIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_settings_24dp"
-
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/privateBrowsingToggleIcon"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
-                android:id="@+id/settings"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-
-                android:maxLines="1"
-                android:text="@string/navbarSettings"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"
-
-                app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="@+id/settingsIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/settingsIcon"
-                app:layout_constraintTop_toTopOf="@+id/settingsIcon" />
-
-            <View
-                android:id="@+id/settingsClicker"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-
+                android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
-
-                app:layout_constraintBottom_toBottomOf="@id/settingsIcon"
+                android:orientation="horizontal"
+                android:visibility="@{hasUser ? View.VISIBLE : View.GONE}"
+                android:gravity="center_vertical"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/settingsIcon"
-                app:layout_constraintTop_toTopOf="@id/settingsIcon" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/accountsLayout">
 
-            <!-- To make this easier to click it has a bigger width -->
+                <!-- This is an icon I made and has no padding, so it has to be a bit smaller
+                to look like the others -->
+                <ImageView
+                    android:id="@+id/privateBrowsingToggleIcon"
+                    android:layout_width="19dp"
+                    android:layout_height="19dp"
+                    android:layout_marginStart="3dp"
+
+                    android:contentDescription="@string/content_description_nav_drawer_toggle_private_browsing"
+                    android:src="@drawable/ic_incognito" />
+
+                <TextView
+                    android:id="@+id/privateBrowsingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="16dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+
+                    android:text="@{privatelyBrowsing ? @string/menuPrivateBrowsingDisable : @string/menuPrivateBrowsingEnable}"
+                    android:textColor="@color/text_color"
+                    android:textSize="16sp"
+
+                    tools:text="@string/menuPrivateBrowsingEnable" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/settingsLayout"
+                layout="@layout/nav_drawer_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+
+                app:icon="@{@drawable/ic_settings_24dp}"
+                app:layout_constraintEnd_toStartOf="@+id/darkModeIcon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/privateBrowsingClicker"
+                app:text="@{@string/navbarSettings}" />
+
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/darkModeIcon"
                 android:layout_width="58dp"
@@ -273,17 +184,14 @@
 
                 android:src="@{isDarkMode ? @drawable/ic_baseline_wb_sunny_24 : @drawable/ic_dark_mode_24}"
 
-                app:layout_constraintBottom_toBottomOf="@+id/settingsIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/settingsLayout"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toEndOf="@+id/settings"
-                app:layout_constraintTop_toTopOf="@+id/settingsIcon"
-                app:layout_constraintVertical_bias="0.0"
+                app:layout_constraintTop_toTopOf="@+id/settingsLayout"
 
-                tools:src="@drawable/ic_dark_mode_24"/>
+                tools:src="@drawable/ic_dark_mode_24" />
 
             <View
-                android:id="@+id/divider2"
+                android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
 
@@ -295,256 +203,78 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/darkModeIcon" />
 
-            <!-- Kind of weird to hardcode all 3 of these, but it's only 3 items and
-             creating a RecyclerView is definitely weird. Other option is creating another layout
-             and pass the values, but it uses different string resources so it isn't really easier-->
-            <com.makeramen.roundedimageview.RoundedImageView
-                android:id="@+id/frontPageIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
 
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_emoji_emotions_24dp"
-
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider2"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
-                android:id="@+id/frontPage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-
-                android:maxLines="1"
-                android:text="@string/front_page"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"
-
-                app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="@+id/frontPageIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/frontPageIcon"
-                app:layout_constraintTop_toTopOf="@+id/frontPageIcon" />
-
-            <View
-                android:id="@+id/frontPageClicker"
+            <include
+                android:id="@+id/frontPageLayout"
+                layout="@layout/nav_drawer_item"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackground"
-
-                app:layout_constraintBottom_toBottomOf="@id/frontPageIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/frontPageIcon"
-                app:layout_constraintTop_toTopOf="@id/frontPageIcon" />
-
-            <com.makeramen.roundedimageview.RoundedImageView
-                android:id="@+id/popularIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_trending_up_24"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="4dp"
+
+                android:layout_marginEnd="16dp"
+                app:icon="@{@drawable/ic_emoji_emotions_24dp}"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/frontPageIcon"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toBottomOf="@+id/divider"
+                app:text="@{@string/front_page}" />
 
-            <TextView
-                android:id="@+id/popular"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-
-                android:maxLines="1"
-                android:text="@string/popular"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"
-
-                app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="@+id/popularIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/popularIcon"
-                app:layout_constraintTop_toTopOf="@+id/popularIcon" />
-
-            <View
-                android:id="@+id/popularClicker"
+            <include
+                android:id="@+id/popularLayout"
+                layout="@layout/nav_drawer_item"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackground"
-
-                app:layout_constraintBottom_toBottomOf="@id/popularIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/popularIcon"
-                app:layout_constraintTop_toTopOf="@id/popularIcon" />
-
-            <com.makeramen.roundedimageview.RoundedImageView
-                android:id="@+id/allIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_text_rotation_angleup_24"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="16dp"
+
+                app:text="@{@string/popular}"
+                app:icon="@{@drawable/ic_trending_up_24}"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/popularIcon"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toBottomOf="@+id/frontPageLayout" />
 
-            <TextView
-                android:id="@+id/all"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-
-                android:maxLines="1"
-                android:text="@string/all"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"
-
-                app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="@+id/allIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/allIcon"
-                app:layout_constraintTop_toTopOf="@+id/allIcon" />
-
-            <View
-                android:id="@+id/allClicker"
+            <include
+                android:id="@+id/allLayout"
+                layout="@layout/nav_drawer_item"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackground"
-
-                app:layout_constraintBottom_toBottomOf="@id/allIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/allIcon"
-                app:layout_constraintTop_toTopOf="@id/allIcon" />
-
-
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/modGroup"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+
+                app:text="@{@string/all}"
+                app:icon="@{@drawable/ic_text_rotation_angleup_24}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/popularLayout" />
+
+            <include
+                android:id="@+id/modLayout"
+                layout="@layout/nav_drawer_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
 
                 android:visibility="@{userIsModerator ? View.VISIBLE : View.GONE}"
-                app:constraint_referenced_ids="mod, modIcon, modClicker" />
-
-            <ImageView
-                android:id="@+id/modIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_admin_24px"
-                app:tint="@color/modTextColor"
-                android:contentDescription="@string/content_description_nav_drawer_mod"
-
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:text="@{@string/mod}"
+                app:icon="@{@drawable/ic_admin_24px}"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/allIcon"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toBottomOf="@+id/allLayout" />
 
-            <TextView
-                android:id="@+id/mod"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-
-                android:maxLines="1"
-                android:text="@string/mod"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"
-
-                app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="@+id/modIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/modIcon"
-                app:layout_constraintTop_toTopOf="@+id/modIcon" />
-
-            <View
-                android:id="@+id/modClicker"
+            <include
+                android:id="@+id/randomLayout"
+                layout="@layout/nav_drawer_item"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackground"
-
-                app:layout_constraintBottom_toBottomOf="@id/modIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/modIcon"
-                app:layout_constraintTop_toTopOf="@id/modIcon" />
-
-            <com.makeramen.roundedimageview.RoundedImageView
-                android:id="@+id/randomIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_help_24dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="16dp"
+
+                app:text="@{@string/random}"
+                app:icon="@{@drawable/ic_help_24dp}"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/modIcon"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
-                android:id="@+id/random"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-
-                android:layout_marginEnd="16dp"
-                android:ellipsize="end"
-
-                android:maxLines="1"
-                android:text="@string/random"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"
-
-                app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="@+id/randomIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/randomIcon"
-                app:layout_constraintTop_toTopOf="@+id/randomIcon" />
-
-            <View
-                android:id="@+id/randomClicker"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackground"
-
-                app:layout_constraintBottom_toBottomOf="@id/randomIcon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/randomIcon"
-                app:layout_constraintTop_toTopOf="@id/randomIcon" />
+                app:layout_constraintTop_toBottomOf="@+id/modLayout" />
 
             <!-- Only logged in users have the possibility of having multis, so remove this for non-users -->
             <androidx.constraintlayout.widget.Group
@@ -561,12 +291,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/multisHeader"
                 android:textColor="@color/text_color"
                 android:textSize="17sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/random" />
+                app:layout_constraintTop_toBottomOf="@id/randomLayout" />
 
             <ImageView
                 android:id="@+id/multisRefresh"
@@ -651,7 +381,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/subreddits"
                 android:textColor="@color/text_color"
                 android:textSize="17sp"

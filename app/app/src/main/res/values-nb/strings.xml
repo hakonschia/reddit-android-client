@@ -4,7 +4,7 @@
     <string name="prefs_group_videos">Videoer</string>
     <string name="profileAge">Bruker siden %s</string>
     <string name="btnSubscrubeUnsubscribe">- Avabonner</string>
-    <string name="tooManyRequestsError">For mange forespørsler sent. Prøv igjen om et par sekunder</string>
+    <string name="tooManyRequestsError">For mange forespørsler sent</string>
     <string name="threadLockedError">Tråden har blitt låst</string>
     <string name="prefs_group_appearance">Utseende</string>
     <string name="subredditMustBeBetweenLength">Subreddit navn må være imellom 3 og 21 bokstaver</string>
@@ -80,7 +80,6 @@
     <string name="subredditPrivate">r/%s er privat</string>
     <string name="subredditBanned">r/%s har blitt utestengt</string>
     <string name="noCommentsHeader">Ingen kommentar på denne posten enda</string>
-    <string name="noCommentsContent">Vær den som starter samtalen!</string>
     <string name="replyingTo">Svarer <b>%s</b></string>
     <string name="replyHint">Si noe hyggelig</string>
     <string name="preview">Forhåndsvisning</string>
@@ -465,4 +464,13 @@
     <string name="prefs_summary_third_party_load_imgur_albums">Med dette skrudd på vil Imgur albumer og gallerier vises likt som Reddit gallerier</string>
     <string name="prefs_group_awards">Priser</string>
     <string name="prefs_title_show_awards">Vis priser på poster og kommentarer</string>
+    <string name="content_description_video_playback_error_button">Kunne ikke laste inn video</string>
+    <string name="videoPlaybackErrorBottomSheetUrlHeader">URL</string>
+    <string name="videoPlaybackErrorBottomSheetUrlEmpty">Ingen URL gitt</string>
+    <string name="prefs_group_dev_options">Utvikler</string>
+    <string name="videoPlaybackErrorTitle">Kunne ikke spille av videoen</string>
+    <string name="videoPlaybackErrorBottomSheetExceptionHeader">Unntak</string>
+    <string name="prefs_title_dev_show_inbox_notification">Vis inboks notifikasjon</string>
+    <string name="prefs_title_dev_highlight_selected_views">Uthev valgte poster</string>
+    <string name="trendingSubredditsFailed">Kunne ikke laste trendene subredditer</string>
 </resources>

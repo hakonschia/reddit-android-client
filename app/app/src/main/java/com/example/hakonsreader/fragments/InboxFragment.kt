@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
@@ -39,18 +41,16 @@ class InboxFragment : Fragment() {
     private var _binding: FragmentInboxBinding? = null
     private val binding get() = _binding!!
 
-    /**
-     * The fragments holding the different inbox groups
-     */
-    private val inboxFragments = ArrayList<InboxGroupFragment>()
+    private var tabMediator: TabLayoutMediator? = null
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) : View {
+        return FragmentInboxBinding.inflate(LayoutInflater.from(requireActivity())).also {
+            _binding = it
+        }.root
+    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) : View? {
-        _binding = FragmentInboxBinding.inflate(LayoutInflater.from(requireActivity()))
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupTabs()
-
-        return binding.root
     }
 
     override fun onDestroyView() {
@@ -62,24 +62,35 @@ class InboxFragment : Fragment() {
             messagesDao.markAllRead()
         }
 
+        tabMediator?.detach()
+        tabMediator = null
+
+        binding.inboxPages.adapter = null
         _binding = null
     }
 
 
     private fun setupTabs() {
-        // If the fragment is shown multiple times, don't add the tabs multiple times as well
-        if (inboxFragments.isEmpty()) {
-            inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.ALL))
-            inboxFragments.add(InboxGroupFragment.newInstance(InboxGroupTypes.UNREAD))
-        }
+        val adapter = PagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+        binding.inboxPages.adapter = adapter
 
-        binding.inboxPages.adapter = PagerAdapter(requireActivity())
-        TabLayoutMediator(binding.inboxPagesTitle, binding.inboxPages) { tab, position ->
-            tab.text = when (inboxFragments[position].inboxType) {
+        tabMediator = TabLayoutMediator(binding.inboxPagesTitle, binding.inboxPages) { tab, position ->
+            tab.text = when (getInboxTypeForPosition(position)) {
                 InboxGroupTypes.ALL -> getString(R.string.inboxAllMessages)
                 InboxGroupTypes.UNREAD -> getString(R.string.inboxUnreadMessages)
             }
-        }.attach()
+        }.also { tabLayoutMediator ->
+            tabLayoutMediator.attach()
+        }
+    }
+
+    private fun getInboxTypeForPosition(position: Int): InboxGroupTypes {
+        return when (position) {
+            0 -> InboxGroupTypes.ALL
+            1 -> InboxGroupTypes.UNREAD
+
+            else -> throw IllegalStateException("Unexpected fragment position in InboxFragment adapter: $position")
+        }
     }
 
 
@@ -98,8 +109,14 @@ class InboxFragment : Fragment() {
         //  sent messages (private messages sent from me)
     }
 
-    inner class PagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
-        override fun getItemCount(): Int = inboxFragments.size
-        override fun createFragment(position: Int): Fragment = inboxFragments[position]
+    inner class PagerAdapter(
+        fragmentManager: FragmentManager,
+        lifecycle: Lifecycle
+    ) : FragmentStateAdapter(fragmentManager, lifecycle) {
+        override fun getItemCount(): Int = 2
+
+        override fun createFragment(position: Int): Fragment {
+            return InboxGroupFragment.newInstance(getInboxTypeForPosition(position))
+        }
     }
 }

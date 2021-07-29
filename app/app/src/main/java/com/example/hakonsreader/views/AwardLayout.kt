@@ -86,6 +86,7 @@ class AwardLayout @JvmOverloads constructor(
 
                 Glide.with(this)
                     .load(backupUrl)
+                    .error(R.drawable.ic_round_error_24)
                     .override(awardIconSize, awardIconSize)
                     .into(this)
 

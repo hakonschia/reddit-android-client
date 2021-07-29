@@ -69,7 +69,11 @@ public class ViewUtil {
                     break;
 
                 case "all":
-                    imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_text_rotation_angleup_24));
+                    imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_text_rotation_angleup_100));
+                    break;
+
+                case "mod":
+                    imageView.setImageDrawable(ContextCompat.getDrawable(imageView.getContext(), R.drawable.ic_admin_100));
                     break;
 
                 default:

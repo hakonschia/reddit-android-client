@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.model.Subreddit
@@ -26,6 +27,9 @@ import com.example.hakonsreader.viewmodels.SelectSubredditsViewModel
 import com.example.hakonsreader.views.util.goneIf
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -58,7 +62,7 @@ class SelectSubredditFragment : Fragment() {
     private val subredditsViewModel: SelectSubredditsViewModel by activityViewModels()
     private val searchSubredditsViewModel: SearchForSubredditsViewModel by viewModels()
 
-    private var searchTimerTask: TimerTask? = null
+    private var searchTimerJob: Job? = null
 
 
     /**
@@ -91,18 +95,17 @@ class SelectSubredditFragment : Fragment() {
         setupSubredditsViewModel()
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onPause() {
+        super.onPause()
 
-        // If there's text in the input field, returning to the fragment should not trigger another search
-        searchTimerTask?.cancel()
+        searchTimerJob?.cancel()
+        searchTimerJob = null
     }
 
     override fun onDestroyView() {
-        _binding = null
         super.onDestroyView()
+        _binding = null
     }
-
 
     /**
      * Inflates and sets up [binding]
@@ -116,11 +119,9 @@ class SelectSubredditFragment : Fragment() {
      * Sets up the list of subreddits (the "default" list shown with subscribed/default subreddits)
      */
     private fun setupSubredditsList() {
-        SubredditsAdapter().run {
+        binding.subreddits.adapter = SubredditsAdapter().apply {
             this.subredditSelected = this@SelectSubredditFragment.subredditSelected
             favoriteClicked = OnClickListener { subreddit -> subredditsViewModel.favorite(subreddit) }
-
-            binding.subreddits.adapter = this
         }
 
         binding.subreddits.layoutManager = LinearLayoutManager(context)
@@ -130,11 +131,9 @@ class SelectSubredditFragment : Fragment() {
      * Sets up the list of subreddits from search results
      */
     private fun setupSearchSubredditsList() {
-        SubredditsAdapter().run {
-            this.subredditSelected = this@SelectSubredditFragment.subredditSelected
+        binding.searchedSubreddits.adapter = SubredditsAdapter().apply {
+            subredditSelected = this@SelectSubredditFragment.subredditSelected
             favoriteClicked = OnClickListener { subreddit -> subredditsViewModel.favorite(subreddit) }
-
-            binding.searchedSubreddits.adapter = this
         }
 
         binding.searchedSubreddits.layoutManager = LinearLayoutManager(context)
@@ -212,7 +211,7 @@ class SelectSubredditFragment : Fragment() {
                 subredditSelected?.subredditSelected(subredditName)
 
                 // Ensure the search task is cancelled as it is no longer needed
-                searchTimerTask?.cancel()
+                searchTimerJob?.cancel()
             } else {
                 Snackbar.make(requireView(), getString(R.string.subredditMustBeBetweenLength), Snackbar.LENGTH_LONG).show()
             }
@@ -225,29 +224,25 @@ class SelectSubredditFragment : Fragment() {
     }
 
     /**
-     * TextWatcher that schedules [searchTimerTask] to run a task to search for subreddits. The task runs
+     * TextWatcher that schedules a job (saved to [searchTimerJob]) to run a task to search for subreddits. The task runs
      * when no text has been input for [SUBREDDIT_SEARCH_DELAY] milliseconds and is not canceled elsewhere.
      */
     private val automaticSearchListener = object : TextWatcher {
-        private val timer = Timer()
-
         override fun afterTextChanged(s: Editable?) {
             // Cancel the previous task
-            searchTimerTask?.cancel()
+            searchTimerJob?.cancel()
 
-            searchTimerTask = object : TimerTask() {
-                override fun run() {
-                    val searchQuery = s?.toString()
+            searchTimerJob = lifecycleScope.launch {
+                delay(SUBREDDIT_SEARCH_DELAY)
 
-                    if (searchQuery?.isNotBlank() == true) {
-                        searchSubredditsViewModel.search(searchQuery)
-                    } else {
-                        searchSubredditsViewModel.clearSearchResults()
-                    }
+                val searchQuery = s?.toString()
+
+                if (searchQuery?.isNotBlank() == true) {
+                    searchSubredditsViewModel.search(searchQuery)
+                } else {
+                    searchSubredditsViewModel.clearSearchResults()
                 }
             }
-
-            timer.schedule(searchTimerTask, SUBREDDIT_SEARCH_DELAY)
         }
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

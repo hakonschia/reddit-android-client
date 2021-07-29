@@ -19,7 +19,8 @@ class ContentText : Content {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     override fun updateView() {
-        val markdown: String = redditPost.selftext
+        val post = redditPost.crossposts?.firstOrNull() ?: redditPost
+        val markdown: String = post.selftext
         if (markdown.isNotEmpty()) {
             binding.content.setMarkdown(markdown)
         }

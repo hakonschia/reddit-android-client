@@ -95,8 +95,13 @@ class ThirdPartyRequest(
             // android.Uri I miss you :(
             val uri = URI(post.url)
 
+            // For a link like https://imgur.com/a/DtetPvg/ "paths" will be:
+            // "", "a", "DtetPvg", ""
+            // Where "DtetPvg" is the album hash
             val paths = uri.path.split("/".toRegex()).toTypedArray()
-            val albumHash = paths[paths.size - 1]
+            val albumHash = if (paths.size >= 3) {
+                paths[2]
+            } else return
 
             val response = imgurApi.getAlbum(albumHash)
             val album = response.body()

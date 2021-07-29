@@ -115,8 +115,15 @@ object Settings {
      * @return True if NSFW videos should be automatically played
      */
     fun autoPlayNsfwVideos(): Boolean {
-        return AppState.getUserInfo()?.nsfwAccount == true ||
-                preferences.getBoolean(resources.getString(R.string.prefs_key_auto_play_nsfw_videos), resources.getBoolean(R.bool.prefs_default_autoplay_nsfw_videos))
+        // If it's an NSFW account we want to use the normal auto play
+        return if (AppState.getUserInfo()?.nsfwAccount == true) {
+            autoPlayVideos()
+        } else {
+            preferences.getBoolean(
+                resources.getString(R.string.prefs_key_auto_play_nsfw_videos),
+                resources.getBoolean(R.bool.prefs_default_autoplay_nsfw_videos)
+            ) && !dataSavingEnabled()
+        }
     }
 
     /**
@@ -501,6 +508,30 @@ object Settings {
         return preferences.getBoolean(
             resources.getString(R.string.prefs_key_show_awards),
             resources.getBoolean(R.bool.prefs_default_show_awards)
+        )
+    }
+
+
+
+    // ----------------------- Developer settings -----------------------
+
+    /**
+     * @return True if [AppState.isDevMode] is true and developer inbox notifications should be shown
+     */
+    fun devShowInboxNotifications(): Boolean {
+        return AppState.isDevMode && preferences.getBoolean(
+            resources.getString(R.string.prefs_key_dev_show_inbox_notification),
+            resources.getBoolean(R.bool.prefs_default_dev_show_inbox_notification)
+        )
+    }
+
+    /**
+     * @return True if [AppState.isDevMode] is true and selected posts should be highlighted
+     */
+    fun devHighlightSelectedPosts(): Boolean {
+        return AppState.isDevMode && preferences.getBoolean(
+            resources.getString(R.string.prefs_key_dev_highlight_selected_views),
+            resources.getBoolean(R.bool.prefs_default_dev_highlight_selected_views)
         )
     }
 

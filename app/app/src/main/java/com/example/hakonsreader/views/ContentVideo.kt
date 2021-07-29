@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.util.Pair
+import androidx.lifecycle.LifecycleOwner
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.example.hakonsreader.api.model.RedditPost
@@ -42,16 +43,15 @@ class ContentVideo @JvmOverloads constructor(
     private val player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
 
     override fun updateView() {
-        player.prepareForNewVideo()
-
-        setThumbnail()
-        setVideo()
-
-        player.cacheVideo = cache
-
+        // This needs to be set before the extras as the extras might specify something other than the default
         if (Settings.muteVideosByDefault()) {
             player.toggleVolume(false)
         }
+
+        setAndLoadThumbnail()
+        setVideo()
+
+        player.cacheVideo = cache
 
         // Kind of a really bad way to make the video resize :)  When the post is opened
         // the video player won't automatically resize, so if the height of the view has been updated
@@ -65,29 +65,44 @@ class ContentVideo @JvmOverloads constructor(
         }
     }
 
+    override fun recycle() {
+        super.recycle()
+        player.prepareForNewVideo()
+    }
+
     /**
-     * Sets the URL on [.player] and updates the size/duration if possible
+     * Sets the URL on [player] and updates the size/duration if possible
      */
     private fun setVideo() {
+        val post = redditPost.crossposts?.firstOrNull() ?: redditPost
+
         // Get either the video, or the GIF
-        val video = redditPost.getVideo() ?: redditPost.getVideoGif()
+        val video = post.getVideo() ?: post.getVideoGif()
 
         val thirdParty = redditPost.thirdPartyObject
         var url: String? = null
 
+        // Third party gifs might not give any audio info, so if reddit has that video saved
+        // and gives the duration then we can still use that even if we don't load the video from reddit
+        if (video != null) {
+            player.videoDuration = video.duration
+        }
+
         if (thirdParty is ThirdPartyGif) {
             url = thirdParty.mp4Url
             player.mp4Video = true
+
             player.hasAudio = thirdParty.hasAudio
+
             player.videoSize = thirdParty.mp4Size
+            player.isVideoSizeEstimated = false
+
             player.videoWidth = thirdParty.width
             player.videoHeight = thirdParty.height
         } else if (video != null) {
             url = video.dashUrl
-
-            // If we have a "RedditVideo" we can set the duration now
-            player.videoDuration = video.duration
             player.dashVideo = true
+
             player.videoWidth = video.width
             player.videoHeight = video.height
 
@@ -95,9 +110,18 @@ class ContentVideo @JvmOverloads constructor(
             player.videoSize = video.duration * (video.bitrate / 8 * 1024)
             player.isVideoSizeEstimated = true
         } else {
-            val gif = redditPost.getMp4Source()
+            // These videos are "gifs" but stored as MP4s since gif is a terrible video format
+            // The domain for these videos is "i.redd.it" (which is technically for images)
+            val gif = post.getMp4Source()
             if (gif != null) {
                 url = gif.url
+
+                player.mp4Video = true
+
+                // These videos never have audio, so we can remove it now
+                // If by some chance it does, the audio button will be shown again when the video loads
+                player.hasAudio = false
+
                 player.videoWidth = gif.width
                 player.videoHeight = gif.height
             }
@@ -107,6 +131,10 @@ class ContentVideo @JvmOverloads constructor(
             player.url = url
         } else {
             // Show some sort of error
+        }
+
+        if (!extras.isEmpty) {
+            player.setExtras(extras)
         }
     }
 
@@ -143,20 +171,12 @@ class ContentVideo @JvmOverloads constructor(
         player.pause()
     }
 
-    /**
-     * Retrieve a bundle of information that can be useful for saving the state of the post
-     *
-     * @return A bundle that might include state variables
-     */
     override fun getExtras() = player.getExtras()
 
-    /**
-     * Sets the extras for the video.
-     *
-     * @param extras The bundle of data to use. This should be the same bundle as retrieved with
-     * [ContentVideo.getExtras]
-     */
-    override fun setExtras(extras: Bundle) = player.setExtras(extras)
+    override fun setExtras(extras: Bundle) {
+        super.setExtras(extras)
+        player.setExtras(extras)
+    }
 
     /**
      * Gets the resized height of the video player (ie. the size the video actually is when fully
@@ -165,7 +185,8 @@ class ContentVideo @JvmOverloads constructor(
     override fun getWantedHeight() = player.actualVideoHeight
 
     /**
-     * Gets a bitmap of the current frame displayed, or null if the video hasn't yet been loaded
+     * Gets a bitmap of the current frame displayed, or the thumbnail if the video hasn't yet been loaded
+     * (if one is shown)
      */
     override fun getBitmap() = player.getCurrentFrame()
 
@@ -227,10 +248,10 @@ class ContentVideo @JvmOverloads constructor(
     }
 
     /**
-     * Sets the thumbnail on the player. [bitmap] will be used if not null, otherwise the image
+     * Sets and loads the thumbnail on the player. [bitmap] will be used if not null, otherwise the image
      * variants for the post will be used
      */
-    private fun setThumbnail() {
+    private fun setAndLoadThumbnail() {
         if (bitmap != null) {
             player.setThumbnailBitmap(bitmap!!)
         } else {
@@ -249,5 +270,14 @@ class ContentVideo @JvmOverloads constructor(
                 player.thumbnailDrawable = R.drawable.ic_image_not_supported_200dp
             }
         }
+
+        loadThumbnail()
+    }
+
+    /**
+     * Observes the video players lifecycle to automatically pause and release the player
+     */
+    fun observeVideoLifecycle(lifecycleOwner: LifecycleOwner) {
+        lifecycleOwner.lifecycle.addObserver(player)
     }
 }
