@@ -2,10 +2,9 @@ package com.example.hakonsreader.fragments
 
 import android.app.Dialog
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.text.InputType
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -131,6 +130,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         findPreference<ListPreference>(getString(R.string.prefs_key_inbox_update_frequency))?.let {
             it.onPreferenceChangeListener = inboxFrequencyListener
+        }
+
+        // This setting shouldn't be changed when gestures is enabled (can we actually check if it is enabled?)
+        if (Build.VERSION.SDK_INT >= 29) {
+            findPreference<SwitchPreference>(getString(R.string.prefs_key_show_subreddit_info_button))?.isEnabled = false
         }
     }
 

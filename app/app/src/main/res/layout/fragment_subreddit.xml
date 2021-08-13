@@ -221,41 +221,53 @@
                         app:titleMarginEnd="84dp"
                         app:layout_collapseMode="pin" />
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end|bottom">
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginBottom="16dp">
 
+
+                        <!-- This should be on this side so it doesn't move the other buttons -->
                         <ImageButton
-                            android:id="@+id/subredditRefresh"
+                            android:id="@+id/openSubredditInfo"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
 
                             android:layout_marginEnd="8dp"
                             android:background="@drawable/ripple_main_bg"
+                            android:src="@drawable/ic_expand_less_24dp"
+                            android:contentDescription="@string/content_description_open_subreddit_info"
+
+                            tools:visibility="visible"
+                            android:rotation="270"
+                            app:tint="@color/text_color" />
+
+                        <ImageButton
+                            android:id="@+id/subredditRefresh"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="8dp"
+
+                            android:background="@drawable/ripple_main_bg"
                             android:src="@drawable/ic_refresh_24dp"
-                            android:tint="@color/text_color"
                             android:contentDescription="@string/content_description_refresh_posts"
 
-                            app:layout_constraintBottom_toBottomOf="@id/subredditSort"
-                            app:layout_constraintEnd_toStartOf="@id/subredditSort" />
+                            app:tint="@color/text_color" />
 
                         <ImageButton
                             android:id="@+id/subredditSort"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
+                            android:layout_marginEnd="8dp"
 
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginBottom="16dp"
                             android:background="@drawable/ripple_main_bg"
-                            android:tint="@color/text_color"
                             android:contentDescription="@string/content_description_sort_posts"
 
                             android:src="@drawable/ic_sort_24dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
+                            app:tint="@color/text_color" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
                 </com.google.android.material.appbar.CollapsingToolbarLayout>
             </com.google.android.material.appbar.AppBarLayout>
 

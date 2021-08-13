@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,7 +20,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -289,6 +287,13 @@ class SubredditFragment : Fragment() {
                 postsFragment?.let {
                     showPopupSortWithTime(it, view)
                 }
+            }
+            openSubredditInfo.setOnClickListener {
+                binding.drawer.openDrawer(GravityCompat.END)
+            }
+            // Default subs don't have any info
+            if (isDefaultSubreddit || !Settings.showSubredditInfoButton()) {
+                openSubredditInfo.visibility = View.GONE
             }
 
             subredditInfo.subscribe.setOnClickListener { subscribeOnclick() }

@@ -38,6 +38,14 @@
             app:entryValues="@array/fullscreen_swipe_values"
             app:defaultValue="@string/prefs_default_fullscreen_swipe_direction"/>
 
+        <SwitchPreference
+            app:key="@string/prefs_key_show_subreddit_info_button"
+            android:title="@string/prefs_title_show_subreddit_info_button"
+            android:summary="@string/prefs_summary_show_subreddit_info_button"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            android:defaultValue="@bool/prefs_default_show_subreddit_info_button" />
+
         <ListPreference
             android:title="@string/prefs_title_data_saving"
             app:key="@string/prefs_key_data_saving"
