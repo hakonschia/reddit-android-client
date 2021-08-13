@@ -3,9 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/layout/bottom_sheet_reports.xml" value="0.22" />
         <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/layout/fragment_subreddit.xml" value="0.12284701114488349" />
+        <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/layout/nav_drawer.xml" value="0.25" />
         <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/layout/preference_list_item_color.xml" value="0.21770833333333334" />
         <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/layout/preference_multi_color.xml" value="0.2359375" />
+        <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/layout/subreddit_info.xml" value="0.5" />
         <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/xml/root_preferences.xml" value="0.33" />
       </map>
     </option>
