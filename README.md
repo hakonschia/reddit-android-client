@@ -15,7 +15,7 @@ An unofficial Reddit client for Android. The application allows for users to log
 
 ## Installation
 
-The downloadable [APK](apk/app-release.apk) contains the application at commit `44401a3f6e8692ae9406fbe85d143135ec8ba0f3` (#1761). To install the app download the APK, open it on your phone, and follow the steps shown. If the install fails you might have to temporarily [disable Google Play Protect](https://support.google.com/googleplay/answer/2812853) (remember to enable it again after the install).
+The downloadable [APK](apk/app-release.apk) contains the application at commit `3b7d6f904fc5423e79f71e182c63de625c11a387` (#1769). To install the app download the APK, open it on your phone, and follow the steps shown. If the install fails you might have to temporarily [disable Google Play Protect](https://support.google.com/googleplay/answer/2812853) (remember to enable it again after the install).
 
 `minSdkVersion` is 23 (Android 6.0), although testing is limited below SDK 26 or above SDK 28.
 
@@ -82,7 +82,7 @@ See also: [build](#build)
 
 ## Build
 
-The APK is built with Android Studio 4.2.2. Other versions might be incompatible.
+The APK is built with Android Studio Arctic Fox (2020.3.1). Other versions might be incompatible.
 
 Create the file `secrets.properties` under [/app](app) and assign the following values:
 

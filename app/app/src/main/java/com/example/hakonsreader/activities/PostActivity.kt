@@ -15,6 +15,7 @@ import androidx.core.app.SharedElementCallback
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.enums.PostType
@@ -36,6 +37,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.r0adkll.slidr.Slidr
+import com.r0adkll.slidr.model.SlidrInterface
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -114,6 +116,8 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
     private val commentsViewModel: CommentsViewModel by viewModels()
 
+    private lateinit var slidr: SlidrInterface
+
     /**
      * The post shown in the activity
      */
@@ -167,7 +171,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Slidr.attach(this)
+        slidr = Slidr.attach(this)
 
         setupBinding()
         setupCommentsViewModel()
@@ -343,6 +347,16 @@ class PostActivity : BaseActivity(), OnReplyListener {
             comments.adapter = adapter
             comments.layoutManager = LinearLayoutManager(this@PostActivity)
             showAllComments.setOnClickListener { commentsViewModel.removeChain() }
+
+            comments.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        slidr.unlock()
+                    } else {
+                        slidr.lock()
+                    }
+                }
+            })
         }
     }
 

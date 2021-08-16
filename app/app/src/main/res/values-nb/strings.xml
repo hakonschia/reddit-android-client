@@ -473,4 +473,7 @@
     <string name="prefs_title_dev_show_inbox_notification">Vis inboks notifikasjon</string>
     <string name="prefs_title_dev_highlight_selected_views">Uthev valgte poster</string>
     <string name="trendingSubredditsFailed">Kunne ikke laste trendene subredditer</string>
+    <string name="content_description_open_subreddit_info">Vis subreddit info</string>
+    <string name="prefs_title_show_subreddit_info_button">Vis knapp for subreddit info</string>
+    <string name="prefs_summary_show_subreddit_info_button">Gjemt på telefoner uten gestnavigasjon</string>
 </resources>

@@ -511,6 +511,21 @@ object Settings {
         )
     }
 
+    /**
+     * @return True if the button to open the subreddit info drawer should be shown. This checks
+     * the system version code
+     */
+    fun showSubredditInfoButton(): Boolean {
+        if (Build.VERSION.SDK_INT >= 29) {
+            return true
+        }
+
+        return preferences.getBoolean(
+            resources.getString(R.string.prefs_key_show_subreddit_info_button),
+            resources.getBoolean(R.bool.prefs_default_show_subreddit_info_button)
+        )
+    }
+
 
 
     // ----------------------- Developer settings -----------------------

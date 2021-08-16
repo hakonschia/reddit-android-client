@@ -393,7 +393,14 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
 
             // To check if the intent matches an app we need to find the default browser
             val defaultBrowserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://plsdontesolvetoarealapp.com"))
-            val defaultBrowserPackageName = context.packageManager.queryIntentActivities(defaultBrowserIntent, PackageManager.MATCH_DEFAULT_ONLY)
+            val browserInfoList = context.packageManager.queryIntentActivities(defaultBrowserIntent, PackageManager.MATCH_DEFAULT_ONLY)
+
+            // On API 30 this is empty
+            if (browserInfoList.isEmpty()) {
+                return baseIntent
+            }
+
+            val defaultBrowserPackageName = browserInfoList
                     // There might be more browsers, so I'm assuming the list is ordered based on how
                     // they would resolve, so that the first is the default that it actually resolves to
                     .first().activityInfo.packageName

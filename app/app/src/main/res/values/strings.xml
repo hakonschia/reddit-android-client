@@ -140,6 +140,8 @@
     <string name="prefs_title_show_awards">Show awards on posts and comments</string>
     <string name="prefs_title_dev_show_inbox_notification">Show inbox notification</string>
     <string name="prefs_title_dev_highlight_selected_views">Highlight selected posts</string>
+    <string name="prefs_title_show_subreddit_info_button">Show subreddit info button</string>
+    <string name="prefs_summary_show_subreddit_info_button">Hidden by default on phones without gesture navigation</string>
 
 
     <!-- Preferences keys -->
@@ -198,6 +200,7 @@
     <string name="prefs_key_show_awards" translatable="false">show_awards</string>
     <string name="prefs_key_dev_show_inbox_notification" translatable="false">dev_show_inbox_notification</string>
     <string name="prefs_key_dev_highlight_selected_views" translatable="false">dev_highlight_selected_views</string>
+    <string name="prefs_key_show_subreddit_info_button" translatable="false">show_subreddit_info_button</string>
 
 
     <string name="content_description_link_image">Link to website</string>
@@ -215,6 +218,7 @@
     <string name="content_description_subreddit_icon_mod">Subreddit moderator</string>
     <string name="content_description_refresh_posts">Refresh posts</string>
     <string name="content_description_sort_posts">Sort posts</string>
+    <string name="content_description_open_subreddit_info">Show subreddit info</string>
     <string name="content_description_subreddit_submit_post">Submit post to the subreddit</string>
     <string name="content_description_expand_or_collapse_post_block">Post collapse is disabled</string>
     <string name="content_description_show_markdown_preview">Show Markdown preview</string>

@@ -265,7 +265,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
             setupStartFragment(startSubreddit)
 
             // Trending subreddits aren't user specific so they don't have to be retrieved again
-            trendingSubredditsViewModel.loadSubreddits()
+            // Trending subreddits have been removed or something, it always returns 404
+            // Only comment out the automatic retrieval, the user can manually update it themselves
+          //  trendingSubredditsViewModel.loadSubreddits()
         }
 
         observeUserState()
