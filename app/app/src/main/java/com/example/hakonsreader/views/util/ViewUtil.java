@@ -209,7 +209,7 @@ public class ViewUtil {
             return false;
         }
 
-        tag.clear();
+        tag.recycle();
 
         Context context = tag.getContext();
 
