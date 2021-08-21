@@ -140,6 +140,7 @@
     <string name="prefs_title_show_awards">Show awards on posts and comments</string>
     <string name="prefs_title_dev_show_inbox_notification">Show inbox notification</string>
     <string name="prefs_title_dev_highlight_selected_views">Highlight selected posts</string>
+    <string name="prefs_title_dev_show_content_info_on_long_press">Show content info on long press</string>
     <string name="prefs_title_show_subreddit_info_button">Show subreddit info button</string>
     <string name="prefs_summary_show_subreddit_info_button">Hidden by default on phones without gesture navigation</string>
 
@@ -200,6 +201,7 @@
     <string name="prefs_key_show_awards" translatable="false">show_awards</string>
     <string name="prefs_key_dev_show_inbox_notification" translatable="false">dev_show_inbox_notification</string>
     <string name="prefs_key_dev_highlight_selected_views" translatable="false">dev_highlight_selected_views</string>
+    <string name="prefs_key_dev_show_content_info_on_long_press" translatable="false">dev_show_content_info_on_long_press</string>
     <string name="prefs_key_show_subreddit_info_button" translatable="false">show_subreddit_info_button</string>
 
 
@@ -697,4 +699,6 @@
     <string name="videoPlaybackErrorBottomSheetUrlEmpty">No URL given</string>
 
     <string name="trendingSubredditsFailed">Failed to load trending subreddits</string>
+
+    <string name="bottomSheetContentInfoRecycleCount">Recycle count: %d</string>
 </resources>

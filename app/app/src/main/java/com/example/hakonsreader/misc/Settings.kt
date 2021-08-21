@@ -550,4 +550,15 @@ object Settings {
         )
     }
 
+    /**
+     * @return True if [AppState.isDevMode] is true and there should be shown content info on long presses
+     * on a post
+     */
+    fun devShowContentInfoOnLongPress(): Boolean {
+        return AppState.isDevMode && preferences.getBoolean(
+            resources.getString(R.string.prefs_key_dev_show_content_info_on_long_press),
+            resources.getBoolean(R.bool.prefs_default_dev_show_content_info_on_long_press)
+        )
+    }
+
 }
