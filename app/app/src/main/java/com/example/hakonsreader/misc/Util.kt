@@ -8,16 +8,13 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.bumptech.glide.RequestBuilder
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -43,7 +40,6 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.util.*
-import kotlin.math.min
 
 /**
  * Class for holding image URL variants for a [RedditPost]
@@ -954,7 +950,7 @@ fun toDays(time: Long): Long {
  * as callers of this function might want to set extra values before this is called
  * @param showTextContent If false content will not be created if [post] is a text post
  * @param reusableViews The list of reusable views that will be used instead of generating new views.
- * If a view is reused from this list then it will also be removed automatically.
+ * If a view is reused from this list it will be removed automatically, and [Content.recycle] will be called
  * @return A view with the content of the post
  */
 fun generatePostContent(
@@ -1043,10 +1039,12 @@ fun generatePostContent(
     return when {
         reusedContentView != null -> {
             reusableViews.remove(reusedContentView)
+            reusedContentView.recycle()
             reusedContentView
         }
 
         contentType != null -> {
+            // val content = ContentImage(context) etc.
             (contentType.constructors[0].newInstance(context) as Content).also { content ->
                 // Text and Link content have margins, others fill the entire width
                 if (content is ContentText || content is ContentLink) {
@@ -1059,10 +1057,6 @@ fun generatePostContent(
     }
 }
 
-
-fun <T> RequestBuilder<T>.safeInto(imageView: ImageView) {
-
-}
 
 /**
  * Return true if this [Context] is available.
