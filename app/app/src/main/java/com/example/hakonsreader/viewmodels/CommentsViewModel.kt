@@ -201,7 +201,7 @@ class CommentsViewModel @Inject constructor(
 
                     parent?.removeReply(comment)
 
-                    _comments.postValue(dataSet)
+                    _comments.postValue(checkAndSetHiddenComments(dataSet))
                 }
 
                 is ApiResponse.Error -> {
@@ -310,7 +310,7 @@ class CommentsViewModel @Inject constructor(
         // We have to create a new list of the replies to avoid modifying the comments replies (when adding the start)
         commnts.addAll(comment.replies)
 
-        _comments.postValue(commnts)
+        _comments.postValue(checkAndSetHiddenComments(commnts))
     }
 
     /**
