@@ -412,7 +412,7 @@ class CommentsViewModel @Inject constructor(
         val hideThreshold = Settings.getAutoHideScoreThreshold()
 
         comments.forEach { comment ->
-            if (hideThreshold >= comment.score || comment.isCollapsed) {
+            if (comment.kind != Thing.MORE.value && hideThreshold >= comment.score || comment.isCollapsed) {
                 // If we got here from the score threshold make sure collapsed is set to true
                 comment.isCollapsed = true
                 commentsToRemove.addAll(getShownReplies(comment))
