@@ -224,6 +224,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
     override fun finish() {
         super.finish()
+        // Sometimes video posts flash for a split second when closed by sliding away with Slidr
+        // Setting the alpha to 0 "fixes" it as the view wont be visible
+        binding.root.alpha = 0f
 
         post?.let {
             if (it.id == BITMAP?.postId) {
