@@ -7,7 +7,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -1076,4 +1079,18 @@ fun Context?.isAvailableForGlide(): Boolean {
         }
     }
     return true
+}
+
+/**
+ * Checks if the connectivity manager has WiFi available
+ *
+ * @return True if WiFi is available, otherwise false. Other network types might be available if this
+ * returns false
+ */
+fun ConnectivityManager.isWiFiAvailable(): Boolean {
+    return if (Build.VERSION.SDK_INT > 23) {
+        getNetworkCapabilities(activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+    } else {
+        getNetworkInfo(ConnectivityManager.TYPE_WIFI)?.isConnected == true
+    }
 }

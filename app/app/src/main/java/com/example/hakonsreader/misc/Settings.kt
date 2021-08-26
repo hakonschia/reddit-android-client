@@ -50,6 +50,16 @@ object Settings {
     }
 
     /**
+     * Force check if WiFi is available, which is used for data saving settings.
+     *
+     * @param context The context to use to retrieve a [ConnectivityManager]
+     */
+    fun forceWiFiCheck(context: Context) {
+        isWifiConnected = (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
+            .isWiFiAvailable()
+    }
+
+    /**
      * Registers network callbacks that modify [isWifiConnected] with API level in mind
      */
     private fun registerNetworkCallbacks(context: Context) {
@@ -62,19 +72,11 @@ object Settings {
             // is triggered we check if WiFi is still here
 
             override fun onAvailable(network: Network) {
-                isWifiConnected = if (Build.VERSION.SDK_INT > 23) {
-                    cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-                } else {
-                    cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI)?.isConnected == true
-                }
+                isWifiConnected = cm.isWiFiAvailable()
             }
 
             override fun onLost(network: Network) {
-                isWifiConnected = if (Build.VERSION.SDK_INT > 23) {
-                    cm.getNetworkCapabilities(cm.activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-                } else {
-                    cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI)?.isConnected == true
-                }
+                isWifiConnected = cm.isWiFiAvailable()
             }
         }
 
