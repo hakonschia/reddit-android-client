@@ -305,10 +305,7 @@
     <string name="requiresRedditPremium">Handlingen krever Reddit premium</string>
     <string name="subredditRequiresPremium">Du trenger Reddit premium for å aksessere r/%s</string>
     <string name="prefs_title_show_peek_parent_button_in_comments">Vis knapp for å vise foreldrekommentar</string>
-    <plurals name="subredditActiveUsers">
-        <item quantity="one">%d bruker online</item>
-        <item quantity="other">%,d brukere online</item>
-    </plurals>
+    <string name="subredditActiveUsers">%,d online</string>
     <string name="subredditRules">Regler</string>
     <string name="awardTotalCoinPrice">%s har mottatt %,d Reddit coins</string>
     <string name="awardTotalCoinPricePost">Posten</string>

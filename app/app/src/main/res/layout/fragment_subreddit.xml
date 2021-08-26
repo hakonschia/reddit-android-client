@@ -182,7 +182,7 @@
 
                             android:ellipsize="end"
                             android:maxLines="1"
-                            android:text="@{@plurals/subredditActiveUsers(subreddit.activeUsers, subreddit.activeUsers)}"
+                            android:text="@{@string/subredditActiveUsers(subreddit.activeUsers)}"
                             android:textColor="@color/text_color"
                             app:layout_constrainedWidth="true"
 
@@ -190,7 +190,7 @@
                             app:layout_constraintHorizontal_bias="0.0"
                             app:layout_constraintStart_toEndOf="@+id/subredditSubscribers"
                             app:layout_constraintTop_toBottomOf="@+id/subredditTitle"
-                            tools:text="123 users online" />
+                            tools:text="123 online" />
 
                         <com.robinhood.ticker.TickerView
                             android:id="@+id/subredditSubscribers"
