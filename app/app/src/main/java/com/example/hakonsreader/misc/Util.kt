@@ -63,19 +63,19 @@ data class PostImageVariants(val normal: String?, val normalLowRes: String?, val
  * @return A [PostImageVariants] that holds the images to use for if the post is normal, nsfw, or spoiler
  */
 fun getImageVariantsForRedditPost(post: RedditPost) : PostImageVariants {
-    return PostImageVariants(getNormal(post, lowRes = false), getNormal(post, lowRes = true), getNsfw(post), getObfuscated(post))
+    return PostImageVariants(post.getNormalImage(lowRes = false), post.getNormalImage(lowRes = true), getNsfw(post), getObfuscated(post))
 }
 
 /**
- * Gets the normal
+ * Gets the normal image for a reddit post
  */
-private fun getNormal(post: RedditPost, lowRes: Boolean) : String? {
+fun RedditPost.getNormalImage(lowRes: Boolean) : String? {
     val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
-    val images = post.preview?.images?.firstOrNull()?.resolutions ?: return null
+    val images = preview?.images?.firstOrNull()?.resolutions ?: return null
     if (images.isEmpty()) {
         // If there are images, but the resolutions are empty, then it's a low quality so just give the source
-        return post.getSourcePreview()?.url
+        return getSourcePreview()?.url
     }
 
     var index = 0
@@ -101,7 +101,7 @@ private fun getNormal(post: RedditPost, lowRes: Boolean) : String? {
  */
 private fun getNsfw(post: RedditPost) : String? {
     return when (Settings.showNsfwPreview()) {
-        ShowNsfwPreview.NORMAL -> getNormal(post, lowRes = false)
+        ShowNsfwPreview.NORMAL -> post.getNormalImage(lowRes = false)
         ShowNsfwPreview.BLURRED -> getObfuscated(post)
         ShowNsfwPreview.NO_IMAGE -> null
     }
@@ -232,6 +232,11 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
 
     val youtubeVideoId = asUri.getQueryParameter("v")
 
+    // The regexes are kind of messed up and might incorrectly match if "reddit.com/..." is a url parameter
+    // This is because the regexes have an incorrect matcher for "www.reddit.com" or "old.reddit.com" etc.
+    // And this is a lazy fix so we can check if we're actually on a reddit.com link
+    val host = asUri.host
+
     return when {
         // "reddit.com", which is in a sense front page, but it makes more sense to treat this
         // as a "start the app" intent
@@ -240,7 +245,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         }
 
         // Subreddits: https://reddit.com/r/GlobalOffensive
-        url.matches(LinkUtils.SUBREDDIT_REGEX_COMBINED.toRegex(RegexOption.IGNORE_CASE)) -> {
+        host == "reddit.com" &&  url.matches(LinkUtils.SUBREDDIT_REGEX_COMBINED.toRegex(RegexOption.IGNORE_CASE)) -> {
             // First is "r", second is the subreddit
             val subreddit = pathSegments[1].lowercase(Locale.getDefault())
 
@@ -258,7 +263,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         }
 
         // Subreddits with sort: https://reddit.com/r/GlobalOffensive/top?t=all
-        url.matches(LinkUtils.SUBREDDIT_SORT_REGEX_WITH_HTTPS.toRegex()) -> {
+        host == "reddit.com" && url.matches(LinkUtils.SUBREDDIT_SORT_REGEX_WITH_HTTPS.toRegex()) -> {
             // First is "r", second is the subreddit
             val subreddit = pathSegments[1]
 
@@ -281,7 +286,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         }
 
         // Subreddits with rules: https://reddit.com/r/GlobalOffensive/about/rules
-        url.matches(LinkUtils.SUBREDDIT_RULES_REGEX_WITH_HTTPS.toRegex()) -> {
+        host == "reddit.com" && url.matches(LinkUtils.SUBREDDIT_RULES_REGEX_WITH_HTTPS.toRegex()) -> {
             // First is "r", second is the subreddit
             val subreddit = pathSegments[1]
 
@@ -293,7 +298,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
 
 
         // Users: https://reddit.com/user/hakonschia OR https://reddit.com/u/hakonschia
-        url.matches(LinkUtils.USER_REGEX.toRegex()) -> {
+        host == "reddit.com" && url.matches(LinkUtils.USER_REGEX.toRegex()) -> {
             // Same as with subreddits, first is "u", second is the username
             val username = pathSegments[1]
             Intent(context, ProfileActivity::class.java).apply {
@@ -302,7 +307,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         }
 
         // Private messages: https://reddit.com/message/compose?to=hakonschia&subject=hello
-        url.matches("https://(.*\\.)?reddit.com/message/compose.*".toRegex()) -> {
+        host == "reddit.com" && url.matches("https://(.*\\.)?reddit.com/message/compose.*".toRegex()) -> {
             val recipient = asUri.getQueryParameter("to")
             val subject = asUri.getQueryParameter("subject")
             val message = asUri.getQueryParameter("message")
@@ -319,7 +324,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         //  https://www.reddit.com/message/compose/?to=RemindMeBot&subject=Reminder&message=%5Bhttps://www.reddit.com/r/AskHistorians/comments/ne8bcc/when_did_it_stop_being_acceptable_to_openly/%5D%0A%0ARemindMe!%202%20days
 
         // Posts: https://reddit.com/r/GlobalOffensive/comments/gwcxmm/....
-        url.matches("^${LinkUtils.POST_REGEX}".toRegex()) -> {
+        host == "reddit.com" && url.matches("^${LinkUtils.POST_REGEX}".toRegex()) -> {
             // The URL will look like: reddit.com/r/<subreddit>/comments/<postId/...
             val postId = pathSegments[3]
 
@@ -336,7 +341,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         }
 
         // https://reddit.com/comments/gwcxmm
-        url.matches(LinkUtils.POST_REGEX_NO_SUBREDDIT.toRegex()) -> {
+        host == "reddit.com" && url.matches(LinkUtils.POST_REGEX_NO_SUBREDDIT.toRegex()) -> {
             // The URL will look like: reddit.com/comments/<postId>
             val postId = pathSegments[1]
             Intent(context, PostActivity::class.java).apply {
@@ -345,7 +350,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         }
 
         // Posts from shortened urls: https://redd.it/gwcxmm
-        url.matches(LinkUtils.POST_SHORTENED_URL_REGEX.toRegex()) -> {
+        host == "redd.it" && url.matches(LinkUtils.POST_SHORTENED_URL_REGEX.toRegex()) -> {
             // The URL will look like: redd.it/<postId>
             val postId = pathSegments[0]
             Intent(context, PostActivity::class.java).apply {
