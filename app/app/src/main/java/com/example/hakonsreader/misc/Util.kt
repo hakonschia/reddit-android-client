@@ -63,19 +63,19 @@ data class PostImageVariants(val normal: String?, val normalLowRes: String?, val
  * @return A [PostImageVariants] that holds the images to use for if the post is normal, nsfw, or spoiler
  */
 fun getImageVariantsForRedditPost(post: RedditPost) : PostImageVariants {
-    return PostImageVariants(post.getNormalImage(lowRes = false), post.getNormalImage(lowRes = true), getNsfw(post), getObfuscated(post))
+    return PostImageVariants(getNormal(post, lowRes = false), getNormal(post, lowRes = true), getNsfw(post), getObfuscated(post))
 }
 
 /**
- * Gets the normal image for a reddit post
+ * Gets the normal
  */
-fun RedditPost.getNormalImage(lowRes: Boolean) : String? {
+private fun getNormal(post: RedditPost, lowRes: Boolean) : String? {
     val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
-    val images = preview?.images?.firstOrNull()?.resolutions ?: return null
+    val images = post.preview?.images?.firstOrNull()?.resolutions ?: return null
     if (images.isEmpty()) {
         // If there are images, but the resolutions are empty, then it's a low quality so just give the source
-        return getSourcePreview()?.url
+        return post.getSourcePreview()?.url
     }
 
     var index = 0
@@ -101,7 +101,7 @@ fun RedditPost.getNormalImage(lowRes: Boolean) : String? {
  */
 private fun getNsfw(post: RedditPost) : String? {
     return when (Settings.showNsfwPreview()) {
-        ShowNsfwPreview.NORMAL -> post.getNormalImage(lowRes = false)
+        ShowNsfwPreview.NORMAL -> getNormal(post, lowRes = false)
         ShowNsfwPreview.BLURRED -> getObfuscated(post)
         ShowNsfwPreview.NO_IMAGE -> null
     }
