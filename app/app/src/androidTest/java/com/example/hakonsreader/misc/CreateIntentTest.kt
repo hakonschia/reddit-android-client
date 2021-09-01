@@ -366,4 +366,25 @@ class CreateIntentTest {
         val intent: Intent = createIntent("https://www.nrk.no", options, instrumentationContext)
         assertIntentIsNotForClass(intent, clazz)
     }
+
+    /**
+     * Tests that [createIntent] does not create an intent to our app for urls that include a reddit link
+     * as a URL parameter
+     */
+    @Test
+    fun linkToRedditAsUrlParameterDoesNotMatchApp() {
+        // These should go to WebViewActivity (openLinksInternally = true)
+
+        val options = CreateIntentOptions(openLinksInternally = true)
+        val clazz = WebViewActivity::class.java
+        var intent: Intent = createIntent("https://redditsave.com/info?url=https://www.reddit.com/r/AbruptChaos/comments/pe4yfb/firework_show_airstrike/", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+
+        // No "www" in the URL parameter
+        intent = createIntent("https://redditsave.com/info?url=https://reddit.com/r/AbruptChaos/comments/pe4yfb/firework_show_airstrike/", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+
+        intent = createIntent("https://somewebsite.com/somepath?url=https://old.reddit.com/r/hakonschia", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+    }
 }
