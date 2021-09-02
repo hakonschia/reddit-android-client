@@ -261,6 +261,17 @@ class CreateIntentTest {
         assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_RECIPIENT, "hakonschia")
         assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_SUBJECT, "hello")
         assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_MESSAGE, "The post should be removed")
+
+        // old.reddit.com
+        intent = createIntent("https://old.reddit.com/message/compose?to=hakonschia&subject=hello&message=The post should be removed", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+        assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_RECIPIENT, "hakonschia")
+        assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_SUBJECT, "hello")
+        assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_MESSAGE, "The post should be removed")
+
+        // http (not https), np.reddit.com
+        intent = createIntent("http://np.reddit.com/message/compose?to=%23autotldr%20%22PM's%20and%20comments%20are%20monitored,%20constructive%20feedback%20is%20welcome.%22", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
     }
 
     /**
@@ -407,6 +418,7 @@ class CreateIntentTest {
         // With s
         intent = createIntent("https://np.reddit.com/user/hakonschia", options, instrumentationContext)
         assertIntentIsForClass(intent, ProfileActivity::class.java)
-
     }
+
+
 }

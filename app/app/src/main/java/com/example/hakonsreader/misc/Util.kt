@@ -302,7 +302,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         }
 
         // Private messages: https://reddit.com/message/compose?to=hakonschia&subject=hello
-        url.matches("https://(.*\\.)?reddit.com/message/compose.*".toRegex()) -> {
+        url.matches("http(s)?://([A-Za-z0-9]+\\.)?reddit.com/message/compose.*".toRegex()) -> {
             val recipient = asUri.getQueryParameter("to")
             val subject = asUri.getQueryParameter("subject")
             val message = asUri.getQueryParameter("message")
