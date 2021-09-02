@@ -98,7 +98,7 @@ public final class LinkUtils {
      * <li>/user/hakonschia-three</li>
      * </ol>
      */
-    public static final String USER_REGEX = "(^|\\s)(https://([A-Za-z0-9]+\\.)?reddit.com)?/?u(ser)?/[A-Za-z0-9_-]+/?(\\s|$)";
+    public static final String USER_REGEX = "(^|\\s)(http(s)?://([A-Za-z0-9]+\\.)?reddit.com)?/?u(ser)?/[A-Za-z0-9_-]+/?(\\s|$)";
 
     /**
      * Regex matching a post URL
@@ -112,7 +112,7 @@ public final class LinkUtils {
      * </ol>
      * </p>
      */
-    public static final String POST_REGEX = "http(s)://([A-Za-z0-9]+\\.)?reddit.com/" + BASE_SUBREDDIT_REGEX + "/comments/.+/?(\\s|$)";
+    public static final String POST_REGEX = "http(s)?://([A-Za-z0-9]+\\.)?reddit.com/" + BASE_SUBREDDIT_REGEX + "/comments/.+/?(\\s|$)";
 
     /**
      * Matches a post URL with only {@code https://reddit.com/comments/<postId>}
@@ -124,7 +124,7 @@ public final class LinkUtils {
      * </ol>
      * </p>
      */
-    public static final String POST_REGEX_NO_SUBREDDIT = "http(s)://([A-Za-z0-9]+\\.)?reddit.com/comments/.+";
+    public static final String POST_REGEX_NO_SUBREDDIT = "http(s)?://([A-Za-z0-9]+\\.)?reddit.com/comments/.+";
 
     /**
      * Matches a shortened URL for a post.
@@ -138,7 +138,7 @@ public final class LinkUtils {
     /**
      * Regex matching imgur image URLs
      */
-    public static final String IMGUR_IMAGE_REGEX = "^https://imgur.com/[A-Za-z0-9]{5,7}$";
+    public static final String IMGUR_IMAGE_REGEX = "^http(s)?://imgur.com/[A-Za-z0-9]{5,7}$";
 
     /**
      * Regex matching imgur GIF URLs.

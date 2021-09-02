@@ -387,4 +387,26 @@ class CreateIntentTest {
         intent = createIntent("https://somewebsite.com/somepath?url=https://old.reddit.com/r/hakonschia", options, instrumentationContext)
         assertIntentIsForClass(intent, clazz)
     }
+
+    /**
+     * Tests that the "s" in "https" is optional for reddit links
+     */
+    @Test
+    fun httpsOrHttp() {
+        val options = CreateIntentOptions(openLinksInternally = true)
+        val clazz = PostActivity::class.java
+
+        var intent: Intent = createIntent("http://np.reddit.com/r/autotldr/comments/31b9fm/faq_autotldr_bot", options, instrumentationContext)
+        assertIntentIsForClass(intent, PostActivity::class.java)
+        // With s
+        intent = createIntent("https://np.reddit.com/r/autotldr/comments/31b9fm/faq_autotldr_bot", options, instrumentationContext)
+        assertIntentIsForClass(intent, PostActivity::class.java)
+
+        intent = createIntent("http://np.reddit.com/user/hakonschia", options, instrumentationContext)
+        assertIntentIsForClass(intent, ProfileActivity::class.java)
+        // With s
+        intent = createIntent("https://np.reddit.com/user/hakonschia", options, instrumentationContext)
+        assertIntentIsForClass(intent, ProfileActivity::class.java)
+
+    }
 }
