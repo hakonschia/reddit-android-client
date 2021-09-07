@@ -119,6 +119,14 @@ class DoubleImageView @JvmOverloads constructor(
      * Set this bitmap to override everything else and not load an image with Glide
      */
     var bitmap: Bitmap? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                binding.image.setImageBitmap(value)
+            }
+        }
+
+    var extras: Bundle = Bundle()
 
 
     /**
@@ -224,6 +232,7 @@ class DoubleImageView @JvmOverloads constructor(
      */
     private fun asNoImage() {
         binding.hdImageIcon.visibility = GONE
+
         Glide.with(binding.image)
             .load(R.drawable.ic_image_not_supported_200dp)
             .into(binding.image)
@@ -234,7 +243,10 @@ class DoubleImageView @JvmOverloads constructor(
      */
     private fun asOneImage(imageState: DoubleImageState.OneImage) {
         binding.hdImageIcon.visibility = GONE
-        loadUrl(imageState.url)
+
+        if (bitmap == null) {
+            loadUrl(imageState.url)
+        }
 
         setOnClickListener {
             if (canOpenImage()) {
@@ -255,7 +267,9 @@ class DoubleImageView @JvmOverloads constructor(
     private fun asHdImage(imageState: DoubleImageState.HdImage) {
         binding.hdImageIcon.visibility = VISIBLE
 
-        loadUrl(imageState.lowRes)
+        if (bitmap == null) {
+            loadUrl(imageState.lowRes)
+        }
 
         // TODO this solution with click listeners is bad, fix later
         // TODO attempt to load the HD image from cache
@@ -321,7 +335,9 @@ class DoubleImageView @JvmOverloads constructor(
         binding.hdImageIcon.visibility = GONE
 
         if (imageState.previewUrl != null) {
-            loadUrl(imageState.previewUrl)
+            if (bitmap == null) {
+                loadUrl(imageState.previewUrl)
+            }
         } else {
             Glide.with(binding.image)
                 .load(R.drawable.ic_image_not_supported_200dp)
