@@ -51,6 +51,12 @@ class ContentGalleryImage @JvmOverloads constructor(
             updateView()
         }
 
+    /**
+     * The post the image is for. This is used only to check if the post is a spoiler/nsfw post
+     */
+    var post: RedditPost? = null
+
+
     fun destroy() {
         val view = binding.content.getChildAt(0)
 
