@@ -2,6 +2,7 @@ package com.example.hakonsreader.views
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -51,6 +52,16 @@ class ContentImage @JvmOverloads constructor(
         binding.root.recycle()
     }
 
+    override fun getTransitionViews(): MutableList<Pair<View, String>> {
+        return super.getTransitionViews().also {
+            it.addAll(binding.root.getTransitionViews())
+        }
+    }
+
+    override fun getExtras(): Bundle {
+        return binding.root.extras
+    }
+
     /**
      * Updates the view with the url from [ContentImage.post]
      */
@@ -59,6 +70,7 @@ class ContentImage @JvmOverloads constructor(
         val dataSavingEnabled = Settings.dataSavingEnabled()
 
         binding.root.cache = cache
+        binding.root.extras = extras
         binding.root.bitmap = bitmap
 
         // The normal URL will be used in all branches
@@ -117,12 +129,6 @@ class ContentImage @JvmOverloads constructor(
             withUrls()
         }
          */
-    }
-
-    override fun getTransitionViews(): MutableList<Pair<View, String>> {
-        return super.getTransitionViews().also {
-            it.addAll(binding.root.getTransitionViews())
-        }
     }
 
     override fun getWantedHeight(): Int {

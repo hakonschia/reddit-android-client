@@ -22,6 +22,7 @@ import com.bumptech.glide.request.target.Target
 import com.example.hakonsreader.R
 import com.example.hakonsreader.databinding.DoubleImageViewBinding
 import com.example.hakonsreader.misc.isAvailableForGlide
+import com.example.hakonsreader.views.util.goneIf
 import com.example.hakonsreader.views.util.openImageInFullscreen
 import com.google.android.material.snackbar.Snackbar
 
@@ -42,21 +43,13 @@ class DoubleImageView @JvmOverloads constructor(
          */
         private const val OPEN_TIMEOUT = 1250L
 
-
         /**
-         * The key for the extras that gives the HD image URL, if a low res image is shown
+         * The key for the extras that says if the HD image is loaded.
          *
-         * The value with this key is a [String]
+         * The value with this key is a [Boolean]. A value of `false` does not imply that
+         * [state] is [DoubleImageView.DoubleImageState.HdImage], but `true` does.
          */
-        //const val EXTRAS_HD_IMAGE_URL = "extras_hdImageUrl"
-
-        /**
-         * The key for the extras that gives the URL that should be opened in fullscreen. This is used
-         * to give a different URL to load when a bitmap is given
-         *
-         * The value with this key is a [String]
-         */
-        //const val EXTRAS_URL_TO_OPEN = "extras_urlToOpen"
+        const val EXTRAS_HD_IMAGE_LOADED = "extras_hdImageLoaded"
     }
 
     /**
@@ -247,7 +240,9 @@ class DoubleImageView @JvmOverloads constructor(
      * [DoubleImageState.HdImage.highRes] when clicked.
      */
     private fun asHdImage(imageState: DoubleImageState.HdImage) {
-        binding.hdImageIcon.visibility = VISIBLE
+        val hdImageLoaded = extras.getBoolean(EXTRAS_HD_IMAGE_LOADED)
+
+        binding.hdImageIcon.goneIf(hdImageLoaded)
 
         if (bitmap == null) {
             loadUrl(imageState.lowRes)
@@ -256,7 +251,7 @@ class DoubleImageView @JvmOverloads constructor(
         // TODO attempt to load the HD image from cache
 
         setClickListener(
-            url = imageState.lowRes,
+            url = if (hdImageLoaded) imageState.highRes else imageState.lowRes,
             useBitmapFromView = true
         )
 
@@ -284,6 +279,8 @@ class DoubleImageView @JvmOverloads constructor(
                     isFirstResource: Boolean
                 ): Boolean {
                     binding.hdImageIcon.visibility = GONE
+
+                    extras.putBoolean(EXTRAS_HD_IMAGE_LOADED, true)
 
                     setClickListener(
                         url = imageState.highRes,
