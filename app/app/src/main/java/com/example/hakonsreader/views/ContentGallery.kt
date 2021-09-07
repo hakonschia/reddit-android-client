@@ -234,7 +234,6 @@ class ContentGallery @JvmOverloads constructor(
             return ViewHolder(ContentGalleryImage(parent.context).apply {
                 lifecycleOwner = this@ContentGallery.lifecycleOwner
 
-                post = redditPost
                 // With ViewPager2 the items have to be width=match_parent (although this is how it is in
                 // the xml, so not sure why I have to do it here as well)
                 layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)

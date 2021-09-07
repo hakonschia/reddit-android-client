@@ -51,11 +51,6 @@ class ContentGalleryImage @JvmOverloads constructor(
             updateView()
         }
 
-    /**
-     * If [image] is an image, this should be set to the post the image is for
-     */
-    var post: RedditPost? = null
-
     fun destroy() {
         val view = binding.content.getChildAt(0)
 
@@ -88,7 +83,9 @@ class ContentGalleryImage @JvmOverloads constructor(
             val view = when (it) {
                 is RedditGalleryItem -> asRedditGalleryImage(it)
                 is ImgurImage -> asImgurGalleryImage(it)
-                is Image -> asImage(it)
+                is Image -> DoubleImageView(context).apply {
+                    state = DoubleImageView.DoubleImageState.OneImage(url = it.url)
+                }
 
                 // It is really an error if this happens, should potentially throw an exception
                 else -> return@let
@@ -99,9 +96,11 @@ class ContentGalleryImage @JvmOverloads constructor(
     }
 
     private fun asRedditGalleryImage(galleryItem: RedditGalleryItem): View {
-        val image = getGalleryImage(galleryItem)
-        return if (image.mp4Url != null) {
-            asVideo(image)
+        val images = getGalleryImages(galleryItem)
+
+        // For videos only the source will actually provide an MP4 URL
+        return if (galleryItem.source.mp4Url != null) {
+            asVideo(galleryItem.source)
         } else {
             with (binding) {
                 caption.text = galleryItem.caption
@@ -119,7 +118,16 @@ class ContentGalleryImage @JvmOverloads constructor(
                 outboundUrl.goneIf(galleryItem.outboundUrl == null)
             }
 
-            asImage(image)
+            DoubleImageView(context).apply {
+                state = if (!Settings.dataSavingEnabled()) {
+                    DoubleImageView.DoubleImageState.OneImage(url = images.second.url)
+                } else {
+                    DoubleImageView.DoubleImageState.HdImage(
+                        lowRes = images.second.url,
+                        highRes = images.first.url
+                    )
+                }
+            }
         }
     }
 
@@ -127,21 +135,9 @@ class ContentGalleryImage @JvmOverloads constructor(
         return if (image is ImgurGif) {
             asImgurVideo(image)
         } else {
-            asImage(image)
-        }
-    }
-
-    /**
-     * Returns a [ContentImage] for a given [Image]. The image should be a image (not a video)
-     *
-     * @param image The image to create an image view for
-     * @return A [ContentImage]
-     * @see asVideo
-     */
-    private fun asImage(image: Image): ContentImage {
-        // Use ContentImage as that already has listeners, NSFW caching etc already
-        return ContentImage(context).apply {
-            setWithImageUrl(post, image.url)
+            DoubleImageView(context).apply {
+                state = DoubleImageView.DoubleImageState.OneImage(url = image.url)
+            }
         }
     }
 
@@ -150,7 +146,6 @@ class ContentGalleryImage @JvmOverloads constructor(
      *
      * @param image The image to create a video for
      * @return A [VideoPlayer]
-     * @see asImage
      */
     private fun asVideo(image: RedditGalleryImage): VideoPlayer {
         val player = LayoutInflater.from(context).inflate(R.layout.video_player_texture_view, null) as VideoPlayer
@@ -172,7 +167,6 @@ class ContentGalleryImage @JvmOverloads constructor(
      *
      * @param imgurGif The imgur gif to create a video for
      * @return A [VideoPlayer]
-     * @see asImage
      */
     private fun asImgurVideo(imgurGif: ImgurGif): VideoPlayer {
         val player = LayoutInflater.from(context).inflate(R.layout.video_player_texture_view, null) as VideoPlayer
@@ -190,14 +184,10 @@ class ContentGalleryImage @JvmOverloads constructor(
     }
 
     /**
-     * Gets a gallery where the image width isn't higher than the screen of the device
+     * Gets a pair of gallery images where [Pair.first] image width isn't higher than the screen
+     * of the device and [Pair.second] is a low resolution image
      */
-    private fun getGalleryImage(galleryItem: RedditGalleryItem): RedditGalleryImage {
-        // For videos only the source will actually provide an MP4 URL
-        if (galleryItem.source.mp4Url != null) {
-            return galleryItem.source
-        }
-
+    private fun getGalleryImages(galleryItem: RedditGalleryItem): Pair<RedditGalleryImage, RedditGalleryImage> {
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
         var index = -1
@@ -209,6 +199,6 @@ class ContentGalleryImage @JvmOverloads constructor(
             }
         }
 
-        return images[index]
+        return images[index] to images[index / 2]
     }
 }
