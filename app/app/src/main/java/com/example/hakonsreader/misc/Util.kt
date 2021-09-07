@@ -146,6 +146,74 @@ private fun RedditPost.getObfuscatedImage(): String? {
 }
 
 /**
+ * Creates a [DoubleImageView.DoubleImageState] based on the post and urls passed. This also takes
+ * into account [Settings.showNsfwPreview] and data saving
+ *
+ * @param redditPost The post the state is for (this is only used to check for NSFW/spoiler)
+ * @param normalUrl The normal URL to use (also the URL for HD images)
+ * @param lowResUrl The low resolution URL to use. This can be null, but if it is null the state
+ * will be [DoubleImageView.DoubleImageState.OneImage] with only [normalUrl], if it otherwise would be used
+ * @param obfuscatedUrl The obfuscated URL to use (if this is null [DoubleImageView] will treat it as
+ * a "no image found" preview)
+ */
+fun createDoubleImageViewState(
+    redditPost: RedditPost,
+    normalUrl: String,
+    lowResUrl: String?,
+    obfuscatedUrl: String?
+): DoubleImageView.DoubleImageState {
+    val dataSavingEnabled = Settings.dataSavingEnabled()
+
+    return when {
+        // TODO spoiler and nsfw don't follow data saving since ImageActivity doesn't allow for two images
+
+        redditPost.isSpoiler -> {
+            DoubleImageView.DoubleImageState.PreviewImage(
+                previewUrl = obfuscatedUrl, url = normalUrl
+            )
+        }
+
+        redditPost.isNsfw -> {
+            when (Settings.showNsfwPreview()) {
+                ShowNsfwPreview.NORMAL -> if (dataSavingEnabled) {
+                    if (lowResUrl != null) {
+                        DoubleImageView.DoubleImageState.HdImage(
+                            lowRes = lowResUrl, highRes = normalUrl
+                        )
+                    } else {
+                        DoubleImageView.DoubleImageState.OneImage(url = normalUrl)
+                    }
+                } else {
+                    DoubleImageView.DoubleImageState.OneImage(url = normalUrl)
+                }
+
+                ShowNsfwPreview.BLURRED -> DoubleImageView.DoubleImageState.PreviewImage(
+                    previewUrl = obfuscatedUrl, url = normalUrl
+                )
+
+                ShowNsfwPreview.NO_IMAGE -> DoubleImageView.DoubleImageState.PreviewImage(
+                    previewUrl = null, url = normalUrl
+                )
+            }
+        }
+
+        else -> {
+            if (!dataSavingEnabled) {
+                DoubleImageView.DoubleImageState.OneImage(url = normalUrl)
+            } else {
+                if (lowResUrl != null) {
+                    DoubleImageView.DoubleImageState.HdImage(
+                        lowRes = lowResUrl, highRes = normalUrl
+                    )
+                } else {
+                    DoubleImageView.DoubleImageState.OneImage(url = normalUrl)
+                }
+            }
+        }
+    }
+}
+
+/**
  * Opens an intent to allow the user to log in. The OAuth state is generated with [OAuthState.generateAndGetOAuthState]
  * and will be stored there
  *

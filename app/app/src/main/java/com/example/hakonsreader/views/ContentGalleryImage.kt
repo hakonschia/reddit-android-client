@@ -19,6 +19,7 @@ import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
 import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurImage
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
 import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.misc.createDoubleImageViewState
 import com.example.hakonsreader.views.util.goneIf
 
 /**
@@ -102,7 +103,6 @@ class ContentGalleryImage @JvmOverloads constructor(
     }
 
     private fun asRedditGalleryImage(galleryItem: RedditGalleryItem): View {
-        val images = getGalleryImages(galleryItem)
 
         // For videos only the source will actually provide an MP4 URL
         return if (galleryItem.source.mp4Url != null) {
@@ -125,14 +125,20 @@ class ContentGalleryImage @JvmOverloads constructor(
             }
 
             DoubleImageView(context).apply {
-                state = if (!Settings.dataSavingEnabled()) {
-                    DoubleImageView.DoubleImageState.OneImage(url = images.second.url)
-                } else {
-                    DoubleImageView.DoubleImageState.HdImage(
-                        lowRes = images.second.url,
-                        highRes = images.first.url
-                    )
-                }
+                val redditPost = post
+                    ?: throw IllegalStateException("Cannot create an image state for a Reddit gallery without ContentGalleryImage#post set")
+
+                // Currently it seems only one obfuscated resolution is given here, otherwise this would be
+                // the lowest res image
+                val obfuscated = galleryItem.obfuscated?.firstOrNull()
+                val images = getGalleryImages(galleryItem)
+
+                state = createDoubleImageViewState(
+                    redditPost,
+                    normalUrl = images.first.url,
+                    lowResUrl = images.second.url,
+                    obfuscatedUrl = obfuscated?.url
+                )
             }
         }
     }
