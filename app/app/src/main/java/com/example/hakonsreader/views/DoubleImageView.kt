@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
@@ -136,6 +137,8 @@ class DoubleImageView @JvmOverloads constructor(
         state = DoubleImageState.NoImage
         cache = true
         bitmap = null
+        imageLastOpened = -1
+        extras = Bundle()
     }
 
     /**
@@ -213,21 +216,6 @@ class DoubleImageView @JvmOverloads constructor(
     }
 
     /**
-     * Checks if the image can be opened in fullscreen based on [imageLastOpened]. If this returns
-     * true then [imageLastOpened] will be updated with the current time
-     */
-    private fun canOpenImage(): Boolean {
-        val currentTime = System.currentTimeMillis()
-
-        val canOpen = imageLastOpened + OPEN_TIMEOUT <= currentTime
-        if (canOpen) {
-            imageLastOpened = currentTime
-        }
-
-        return canOpen
-    }
-
-    /**
      * Loads a "no image found" icon
      */
     private fun asNoImage() {
@@ -248,16 +236,10 @@ class DoubleImageView @JvmOverloads constructor(
             loadUrl(imageState.url)
         }
 
-        setOnClickListener {
-            if (canOpenImage()) {
-                openImageInFullscreen(
-                    binding.image,
-                    imageState.url,
-                    cache,
-                    useBitmapFromView = true
-                )
-            }
-        }
+        setClickListener(
+            url = imageState.url,
+            useBitmapFromView = true
+        )
     }
 
     /**
@@ -271,19 +253,12 @@ class DoubleImageView @JvmOverloads constructor(
             loadUrl(imageState.lowRes)
         }
 
-        // TODO this solution with click listeners is bad, fix later
         // TODO attempt to load the HD image from cache
 
-        setOnClickListener {
-            if (canOpenImage()) {
-                openImageInFullscreen(
-                    binding.image,
-                    imageState.lowRes,
-                    cache,
-                    useBitmapFromView = true
-                )
-            }
-        }
+        setClickListener(
+            url = imageState.lowRes,
+            useBitmapFromView = true
+        )
 
         binding.hdImageIcon.setOnClickListener {
             // Use the current bitmap (the low res image) as the placeholder, otherwise it will flash black
@@ -310,16 +285,11 @@ class DoubleImageView @JvmOverloads constructor(
                 ): Boolean {
                     binding.hdImageIcon.visibility = GONE
 
-                    setOnClickListener {
-                        if (canOpenImage()) {
-                            openImageInFullscreen(
-                                binding.image,
-                                imageState.lowRes,
-                                cache,
-                                useBitmapFromView = true
-                            )
-                        }
-                    }
+                    setClickListener(
+                        url = imageState.highRes,
+                        useBitmapFromView = true
+                    )
+
                     return false
                 }
             })
@@ -344,13 +314,33 @@ class DoubleImageView @JvmOverloads constructor(
                 .into(binding.image)
         }
 
+        setClickListener(
+            url = imageState.url,
+            // The bitmap will be the preview (the actual image should be opened)
+            useBitmapFromView = false
+        )
+    }
+
+    /**
+     * Sets the click listener for the view to open the image in fullscreen. The listener set
+     * ensures that the image cannot be opened multiple times in short succession
+     *
+     * @param url The URL of the image that should be opened
+     * @param useBitmapFromView If set to true the bitmap in the image will be used
+     * directly. If false then [url] will be used
+     */
+    private fun setClickListener(url: String, useBitmapFromView: Boolean) {
         setOnClickListener {
-            if (canOpenImage()) {
+            val currentTime = System.currentTimeMillis()
+
+            if (imageLastOpened + OPEN_TIMEOUT <= currentTime) {
+                imageLastOpened = currentTime
+
                 openImageInFullscreen(
                     binding.image,
-                    imageState.url,
+                    url,
                     cache,
-                    useBitmapFromView = false
+                    useBitmapFromView
                 )
             }
         }
