@@ -1,35 +1,15 @@
 package com.example.hakonsreader.views
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.drawable.toDrawable
 import androidx.core.util.Pair
-import androidx.core.view.updateLayoutParams
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
-import com.example.hakonsreader.R
-import com.example.hakonsreader.activities.ImageActivity
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentImageBinding
-import com.example.hakonsreader.misc.Settings
-import com.example.hakonsreader.misc.getImageVariantsForRedditPost
-import com.example.hakonsreader.misc.isAvailableForGlide
-import com.example.hakonsreader.views.util.openImageInFullscreen
-import com.google.android.material.snackbar.Snackbar
+import com.example.hakonsreader.enums.ShowNsfwPreview
+import com.example.hakonsreader.misc.*
 
 /**
  * Content view for Reddit images posts.
@@ -40,42 +20,7 @@ class ContentImage @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : Content(context, attrs, defStyleAttr) {
 
-    // TODO if an image is low res in a list of post, and the post is opened and the HD image
-    //  is loaded there, then we should also set that here in the list. Now the old low res image is shown
-
-    companion object {
-        @Suppress("unused")
-        private const val TAG = "ContentImage"
-
-        /**
-         * The key for the extras that gives the HD image URL, if a low res image is shown
-         *
-         * The value with this key is a [String]
-         */
-        const val EXTRAS_HD_IMAGE_URL = "extras_hdImageUrl"
-
-        /**
-         * The key for the extras that gives the URL that should be opened in fullscreen. This is used
-         * to give a different URL to load when a bitmap is given
-         *
-         * The value with this key is a [String]
-         */
-        const val EXTRAS_URL_TO_OPEN = "extras_urlToOpen"
-
-
-        /**
-         * The amount of milliseconds that should the used to wait to open the image when clicked, to avoid
-         * accidentally open the image twice by clicking fast
-         */
-        private const val OPEN_TIMEOUT = 1250L
-    }
-
     private val binding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true)
-
-    /**
-     * The timestamp the last time the image was opened (or -1 if no image has been opened)
-     */
-    private var imageLastOpened: Long = -1
 
     /**
      * The overridden image URL set with [setWithImageUrl]
@@ -98,29 +43,85 @@ class ContentImage @JvmOverloads constructor(
      * Gets a bitmap representation of the image being displayed
      */
     override fun getBitmap(): Bitmap? {
-        return binding.image.drawable?.toBitmap()
+        return binding.root.getImageBitmap()
+    }
+
+    override fun recycle() {
+        super.recycle()
+        binding.root.recycle()
     }
 
     /**
      * Updates the view with the url from [ContentImage.post]
      */
     override fun updateView() {
+        val (normal, normalLowRes, obfuscated) = getImageVariantsForRedditPost2(redditPost)
+        val dataSavingEnabled = Settings.dataSavingEnabled()
+
+        binding.root.cache = cache
+        binding.root.bitmap = bitmap
+
+        // The normal URL will be used in all branches
+        if (normal == null) {
+            return
+        }
+
+        // If no branch below matches then ImageState.NoImage is used by default (internally in DoubleImageView)
+        when {
+            // TODO spoiler and nsfw don't follow data saving since ImageActivity doesn't allow for two images
+
+            redditPost.isSpoiler -> {
+                binding.root.state = DoubleImageView.DoubleImageState.PreviewImage(
+                    previewUrl = obfuscated, url = normal
+                )
+            }
+
+            redditPost.isNsfw -> {
+                binding.root.state = when (Settings.showNsfwPreview()) {
+                    ShowNsfwPreview.NORMAL -> if (dataSavingEnabled && normalLowRes != null) {
+                        DoubleImageView.DoubleImageState.HdImage(
+                            lowRes = normalLowRes, highRes = normal
+                        )
+                    } else {
+                        DoubleImageView.DoubleImageState.OneImage(url = normal)
+                    }
+
+                    ShowNsfwPreview.BLURRED -> DoubleImageView.DoubleImageState.PreviewImage(
+                        previewUrl = obfuscated, url = normal
+                    )
+
+                    ShowNsfwPreview.NO_IMAGE -> DoubleImageView.DoubleImageState.PreviewImage(
+                        previewUrl = null, url = normal
+                    )
+                }
+            }
+
+            else -> {
+                if (!dataSavingEnabled) {
+                    binding.root.state = DoubleImageView.DoubleImageState.OneImage(url = normal)
+                } else {
+                    if (normalLowRes != null) {
+                        binding.root.state = DoubleImageView.DoubleImageState.HdImage(
+                            lowRes = normalLowRes,
+                            highRes = normal
+                        )
+                    }
+                }
+            }
+        }
+
+        /*
         if (bitmap != null) {
             withBitmap(bitmap!!)
         } else {
             withUrls()
         }
+         */
     }
 
     override fun getTransitionViews(): MutableList<Pair<View, String>> {
         return super.getTransitionViews().also {
-            it.add(Pair(binding.image, binding.image.transitionName))
-
-            // If we add this when it is not visible it will become visible again, which
-            // makes the icon flash for a split second, and will appear again when you exit
-            if (binding.hdImageIcon.visibility == View.VISIBLE) {
-                it.add(Pair(binding.hdImageIcon, binding.hdImageIcon.transitionName))
-            }
+            it.addAll(binding.root.getTransitionViews())
         }
     }
 
@@ -145,6 +146,7 @@ class ContentImage @JvmOverloads constructor(
      * Loads the image with a bitmap
      */
     private fun withBitmap(b: Bitmap) {
+        /*
         binding.image.setImageBitmap(b)
 
         val hdUrl = extras.getString(EXTRAS_HD_IMAGE_URL, null)
@@ -188,6 +190,7 @@ class ContentImage @JvmOverloads constructor(
                 }
             }
         }
+         */
     }
 
     /**
@@ -196,6 +199,7 @@ class ContentImage @JvmOverloads constructor(
     private fun withUrls() {
         val (normal, normalLowRes, nsfw, spoiler) = getImageVariantsForRedditPost(redditPost)
 
+        /*
         binding.showingHdImage = true
 
         val url: String? = when {
@@ -253,21 +257,23 @@ class ContentImage @JvmOverloads constructor(
 
             loadImage(url)
         }
+         */
     }
 
     /**
      * Sets the listener for the HD image button
      */
     private fun setHdImageClickListener(imageUrl: String) {
-        binding.hdImageIcon.setOnClickListener {
-            loadHdImage(imageUrl)
-        }
+        //binding.hdImageIcon.setOnClickListener {
+        //    loadHdImage(imageUrl)
+        //}
     }
 
     /**
      * Loads an image from a URL
      */
     private fun loadImage(url: String) {
+        /*
         fun load(width: Int? = null, height: Int? = null) {
             if (!context.isAvailableForGlide()) {
                 return
@@ -309,12 +315,15 @@ class ContentImage @JvmOverloads constructor(
         if (!posted) {
             load()
         }
+
+         */
     }
 
     /**
      * Loads a high definition image
      */
     private fun loadHdImage(url: String) {
+        /*
         if (!context.isAvailableForGlide()) {
             return
         }
@@ -365,5 +374,6 @@ class ContentImage @JvmOverloads constructor(
                 }
             })
             .into(binding.image)
+            */
     }
 }

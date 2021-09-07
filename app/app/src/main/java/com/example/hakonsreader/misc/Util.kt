@@ -55,6 +55,7 @@ import java.util.*
  * should be used
  */
 data class PostImageVariants(val normal: String?, val normalLowRes: String?, val nsfw: String?, val spoiler: String?)
+data class PostImageVariants2(val normal: String?, val normalLowRes: String?, val obfuscated: String?)
 
 /**
  * Gets image variants for a reddit post
@@ -62,20 +63,39 @@ data class PostImageVariants(val normal: String?, val normalLowRes: String?, val
  * @param post The post to get images for
  * @return A [PostImageVariants] that holds the images to use for if the post is normal, nsfw, or spoiler
  */
-fun getImageVariantsForRedditPost(post: RedditPost) : PostImageVariants {
-    return PostImageVariants(getNormal(post, lowRes = false), getNormal(post, lowRes = true), getNsfw(post), getObfuscated(post))
+fun getImageVariantsForRedditPost(post: RedditPost): PostImageVariants {
+    return PostImageVariants(
+        post.getNormalImage(lowRes = false),
+        post.getNormalImage(lowRes = true),
+        post.getNsfwImage(),
+        post.getObfuscatedImage()
+    )
 }
 
 /**
- * Gets the normal
+ * Gets image variants for a reddit post
+ *
+ * @param post The post to get images for
+ * @return A [PostImageVariants] that holds the images to use for if the post is normal, nsfw, or spoiler
  */
-private fun getNormal(post: RedditPost, lowRes: Boolean) : String? {
+fun getImageVariantsForRedditPost2(post: RedditPost): PostImageVariants2 {
+    return PostImageVariants2(
+        post.getNormalImage(lowRes = false),
+        post.getNormalImage(lowRes = true),
+        post.getObfuscatedImage()
+    )
+}
+
+/**
+ * Gets the normal image for a reddit post
+ */
+private fun RedditPost.getNormalImage(lowRes: Boolean): String? {
     val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
-    val images = post.preview?.images?.firstOrNull()?.resolutions ?: return null
+    val images = preview?.images?.firstOrNull()?.resolutions ?: return null
     if (images.isEmpty()) {
         // If there are images, but the resolutions are empty, then it's a low quality so just give the source
-        return post.getSourcePreview()?.url
+        return getSourcePreview()?.url
     }
 
     var index = 0
@@ -99,10 +119,10 @@ private fun getNormal(post: RedditPost, lowRes: Boolean) : String? {
  * @return A URL pointing to the image to use for a post, depending on [Settings.showNsfwPreview]. If this is null
  * then no image should be shown ([ShowNsfwPreview.NO_IMAGE])
  */
-private fun getNsfw(post: RedditPost) : String? {
+private fun RedditPost.getNsfwImage(): String? {
     return when (Settings.showNsfwPreview()) {
-        ShowNsfwPreview.NORMAL -> getNormal(post, lowRes = false)
-        ShowNsfwPreview.BLURRED -> getObfuscated(post)
+        ShowNsfwPreview.NORMAL -> this.getNormalImage(lowRes = false)
+        ShowNsfwPreview.BLURRED -> this.getObfuscatedImage()
         ShowNsfwPreview.NO_IMAGE -> null
     }
 }
@@ -112,8 +132,8 @@ private fun getNsfw(post: RedditPost) : String? {
  *
  * @return A URL pointing to an obfuscated image, or null if no image is available
  */
-private fun getObfuscated(post: RedditPost) : String? {
-    val obfuscatedPreviews: List<RedditImage>? = post.getObfuscatedPreviewImages()
+private fun RedditPost.getObfuscatedImage(): String? {
+    val obfuscatedPreviews: List<RedditImage>? = getObfuscatedPreviewImages()
 
     return if (obfuscatedPreviews?.isNotEmpty() == true) {
         // Obfuscated previews that are high res are still fairly showing sometimes, so
@@ -121,7 +141,7 @@ private fun getObfuscated(post: RedditPost) : String? {
         obfuscatedPreviews[0].url
     } else {
         // If there are no previews, it's a small image, so we can show the source
-        post.getObfuscatedSource()?.url
+        getObfuscatedSource()?.url
     }
 }
 
