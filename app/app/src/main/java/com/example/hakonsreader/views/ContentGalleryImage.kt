@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -61,6 +62,7 @@ class ContentGalleryImage @JvmOverloads constructor(
 
     var bitmap: Bitmap? = null
 
+    private var extras: Bundle? = null
 
     fun destroy() {
         val view = binding.content.getChildAt(0)
@@ -97,6 +99,23 @@ class ContentGalleryImage @JvmOverloads constructor(
             is VideoPlayer -> view.getCurrentFrame()
             else -> null
         }
+    }
+
+    /**
+     * Gets the extras for the view, or null
+     */
+    fun getExtras(): Bundle? {
+        val view = if (binding.content.childCount > 0) binding.content[0] else return null
+
+        return when (view) {
+            is DoubleImageView -> view.extras
+            is VideoPlayer -> view.getExtras()
+            else -> null
+        }
+    }
+
+    fun setExtras(bundle: Bundle) {
+        this.extras = bundle
     }
 
     private fun updateView() {
@@ -149,6 +168,9 @@ class ContentGalleryImage @JvmOverloads constructor(
                 val images = getGalleryImages(galleryItem)
 
                 bitmap = this@ContentGalleryImage.bitmap
+                this@ContentGalleryImage.extras?.let {
+                    extras = it
+                }
 
                 state = createDoubleImageViewState(
                     redditPost,
@@ -187,6 +209,7 @@ class ContentGalleryImage @JvmOverloads constructor(
             videoWidth = Resources.getSystem().displayMetrics.widthPixels
 
             bitmap?.let { setThumbnailBitmap(it) }
+            extras?.let { setExtras(it) }
 
             // This should only be called if the gallery image has an MP4 URL, otherwise it is an error
             url = image.mp4Url!!
