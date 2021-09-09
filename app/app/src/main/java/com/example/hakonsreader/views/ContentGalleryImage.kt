@@ -3,10 +3,12 @@ package com.example.hakonsreader.views
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.view.get
 import androidx.lifecycle.LifecycleOwner
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
@@ -57,6 +59,8 @@ class ContentGalleryImage @JvmOverloads constructor(
      */
     var post: RedditPost? = null
 
+    var bitmap: Bitmap? = null
+
 
     fun destroy() {
         val view = binding.content.getChildAt(0)
@@ -82,6 +86,18 @@ class ContentGalleryImage @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Gets a bitmap representation of the view, or null
+     */
+    fun getImageBitmap(): Bitmap? {
+        val view = if (binding.content.childCount > 0) binding.content[0] else return null
+
+        return when (view) {
+            is DoubleImageView -> view.getImageBitmap()
+            is VideoPlayer -> view.getCurrentFrame()
+            else -> null
+        }
+    }
 
     private fun updateView() {
         binding.content.removeAllViews()
@@ -103,7 +119,6 @@ class ContentGalleryImage @JvmOverloads constructor(
     }
 
     private fun asRedditGalleryImage(galleryItem: RedditGalleryItem): View {
-
         // For videos only the source will actually provide an MP4 URL
         return if (galleryItem.source.mp4Url != null) {
             asVideo(galleryItem.source)
@@ -132,6 +147,8 @@ class ContentGalleryImage @JvmOverloads constructor(
                 // the lowest res image
                 val obfuscated = galleryItem.obfuscated?.firstOrNull()
                 val images = getGalleryImages(galleryItem)
+
+                bitmap = this@ContentGalleryImage.bitmap
 
                 state = createDoubleImageViewState(
                     redditPost,
@@ -169,6 +186,8 @@ class ContentGalleryImage @JvmOverloads constructor(
             // than the screen, but I imagine it would scale down
             videoWidth = Resources.getSystem().displayMetrics.widthPixels
 
+            bitmap?.let { setThumbnailBitmap(it) }
+
             // This should only be called if the gallery image has an MP4 URL, otherwise it is an error
             url = image.mp4Url!!
         }
@@ -187,6 +206,8 @@ class ContentGalleryImage @JvmOverloads constructor(
 
             videoWidth = imgurGif.width
             videoHeight = imgurGif.height
+
+            bitmap?.let { setThumbnailBitmap(it) }
 
             // This should only be called if the gallery image has an MP4 URL, otherwise it is an error
             url = imgurGif.mp4Url

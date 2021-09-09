@@ -2,6 +2,7 @@ package com.example.hakonsreader.views
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -88,6 +89,7 @@ class ContentGallery @JvmOverloads constructor(
             galleryImages.filter { it.status == RedditGalleryItem.STATUS_VALID }
         }
 
+        val activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, -1)
         val (maxWidth, maxHeight) = getMaxWidthAndHeight(images)
         this.maxHeight = maxHeight
 
@@ -96,7 +98,7 @@ class ContentGallery @JvmOverloads constructor(
         val widthScale = screenWidth / maxWidth.toFloat()
         layoutParams = ViewGroup.LayoutParams(screenWidth, (maxHeight * widthScale).toInt())
 
-        binding.galleryImages.adapter = Adapter(images)
+        binding.galleryImages.adapter = Adapter(images, activeImage)
 
         // Keep a maximum of 5 items at a time, or 2 when data saving is enabled. This should probably
         // be enough to make large galleries not all load at once which potentially wastes data, and
@@ -119,8 +121,11 @@ class ContentGallery @JvmOverloads constructor(
         })
 
         // Set initial state
-        val activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, 0)
-        binding.galleryImages.setCurrentItem(activeImage, false)
+        if (activeImage == -1) {
+            binding.galleryImages.setCurrentItem(0, false)
+        } else {
+            binding.galleryImages.setCurrentItem(activeImage, false)
+        }
     }
 
     override fun recycle() {
@@ -206,6 +211,10 @@ class ContentGallery @JvmOverloads constructor(
         }
     }
 
+    override fun getBitmap(): Bitmap? {
+        return currentView?.getImageBitmap()
+    }
+
     override fun getWantedHeight() = maxHeight
 
     /**
@@ -213,16 +222,33 @@ class ContentGallery @JvmOverloads constructor(
      */
     fun release() {
         binding.galleryImages.adapter = null
-        galleryViews.forEach(Consumer { obj: ContentGalleryImage -> obj.destroy() })
+        galleryViews.forEach { obj ->
+            obj.destroy()
+        }
         galleryViews.clear()
         currentView = null
     }
 
-    private inner class Adapter(private val images: List<GalleryImage>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+
+    /**
+     * @param activeImagePos The position of the image that was active when this content view
+     * was opened. If this is not applicable a negative value should be used.
+     */
+    private inner class Adapter(
+        private val images: List<GalleryImage>,
+        private val activeImagePos: Int
+        ) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             with (holder.image) {
                 // Destroy previous image
                 destroy()
+
+                // If bitmap is a low res image and the high res is loaded then this would be out of sync
+                // but it's not a big issue so it should be fine
+                if (activeImagePos == position) {
+                    this.bitmap = this@ContentGallery.bitmap
+                }
 
                 val image = images[position]
                 this.image = image
