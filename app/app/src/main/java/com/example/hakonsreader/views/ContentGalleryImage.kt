@@ -255,6 +255,6 @@ class ContentGalleryImage @JvmOverloads constructor(
             }
         }
 
-        return images[index] to images[index / 2]
+        return images[index] to images.first()
     }
 }

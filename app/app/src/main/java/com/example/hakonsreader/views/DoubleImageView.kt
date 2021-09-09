@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
@@ -25,6 +24,8 @@ import com.example.hakonsreader.misc.isAvailableForGlide
 import com.example.hakonsreader.views.util.goneIf
 import com.example.hakonsreader.views.util.openImageInFullscreen
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 
 /**
@@ -182,12 +183,15 @@ class DoubleImageView @JvmOverloads constructor(
      * @param transition If true a cross fade transition will be used to load the image, otherwise no
      * transition will be used. Default to true
      * @param placeholder An optional drawable to use as the placeholder
+     * @param onlyLoadFromCache If true no network request will be made and the image will only be loaded
+     * if it has been previously loaded and is available from cache. Default to false
      * @param listener An optional request listener for when the image has been loaded/failed to load
      */
     private fun loadUrl(
         url: String,
         transition: Boolean = true,
         placeholder: Drawable? = null,
+        onlyLoadFromCache: Boolean = false,
         listener: RequestListener<Drawable>? = null
     ) {
         if (!context.isAvailableForGlide()) {
@@ -199,6 +203,7 @@ class DoubleImageView @JvmOverloads constructor(
             .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
             .error(R.drawable.ic_image_not_supported_200dp)
             .placeholder(placeholder)
+            .onlyRetrieveFromCache(onlyLoadFromCache)
             .listener(listener)
 
         if (transition) {
@@ -240,15 +245,54 @@ class DoubleImageView @JvmOverloads constructor(
      * [DoubleImageState.HdImage.highRes] when clicked.
      */
     private fun asHdImage(imageState: DoubleImageState.HdImage) {
+        /**
+         * Removes the HD icon, updates [extras], and sets the click listener to use the high res image
+         */
+        fun hdImageIsLoaded() {
+            binding.hdImageIcon.visibility = GONE
+
+            extras.putBoolean(EXTRAS_HD_IMAGE_LOADED, true)
+
+            setClickListener(
+                url = imageState.highRes,
+                useBitmapFromView = true
+            )
+        }
+
         val hdImageLoaded = extras.getBoolean(EXTRAS_HD_IMAGE_LOADED)
 
         binding.hdImageIcon.goneIf(hdImageLoaded)
 
         if (bitmap == null) {
-            loadUrl(imageState.lowRes)
-        }
+            // Attempt to load the high res image first from cache
+            loadUrl(imageState.highRes, onlyLoadFromCache = true, listener = object : RequestListener<Drawable>{
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    // Couldn't load high res from cache, load low res instead
+                    // Glide throws an exception if you initiate a load from inside a load, so call it
+                    // from the main thread
+                    MainScope().launch {
+                        loadUrl(imageState.lowRes)
+                    }
+                    return false
+                }
 
-        // TODO attempt to load the HD image from cache
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    hdImageIsLoaded()
+                    return false
+                }
+            })
+        }
 
         setClickListener(
             url = if (hdImageLoaded) imageState.highRes else imageState.lowRes,
@@ -278,15 +322,7 @@ class DoubleImageView @JvmOverloads constructor(
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    binding.hdImageIcon.visibility = GONE
-
-                    extras.putBoolean(EXTRAS_HD_IMAGE_LOADED, true)
-
-                    setClickListener(
-                        url = imageState.highRes,
-                        useBitmapFromView = true
-                    )
-
+                    hdImageIsLoaded()
                     return false
                 }
             })
