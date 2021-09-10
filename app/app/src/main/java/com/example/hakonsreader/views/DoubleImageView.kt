@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.util.Pair
@@ -201,7 +202,8 @@ class DoubleImageView @JvmOverloads constructor(
         var request = Glide.with(binding.image)
             .load(url)
             .diskCacheStrategy(if (cache) DiskCacheStrategy.AUTOMATIC else DiskCacheStrategy.NONE)
-            .error(R.drawable.ic_image_not_supported_200dp)
+            // We cannot just use the resource ID here, as it doesn't respect the theme
+            .error(ContextCompat.getDrawable(context, R.drawable.ic_image_not_supported_200dp))
             .placeholder(placeholder)
             .onlyRetrieveFromCache(onlyLoadFromCache)
             .listener(listener)
@@ -219,9 +221,7 @@ class DoubleImageView @JvmOverloads constructor(
     private fun asNoImage() {
         binding.hdImageIcon.visibility = GONE
 
-        Glide.with(binding.image)
-            .load(R.drawable.ic_image_not_supported_200dp)
-            .into(binding.image)
+        binding.image.setImageResource(R.drawable.ic_image_not_supported_200dp)
     }
 
     /**
