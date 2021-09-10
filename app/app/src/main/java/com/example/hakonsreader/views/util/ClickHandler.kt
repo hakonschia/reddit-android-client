@@ -74,7 +74,7 @@ fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean, useBitm
         if (useBitmapFromView && view is ImageView) {
             val isDrawableImageErrorDrawable = view
                 .drawable
-                .constantState
+                ?.constantState
                 ?.equals(ContextCompat.getDrawable(
                     view.context,
                     R.drawable.ic_image_not_supported_200dp
