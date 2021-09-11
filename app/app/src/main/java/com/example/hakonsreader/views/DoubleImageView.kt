@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.util.Pair
+import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -124,6 +125,13 @@ class DoubleImageView @JvmOverloads constructor(
 
     var extras: Bundle = Bundle()
 
+    /**
+     * If set to a positive value the height of the view will be set before the image is loaded.
+     * This can be used to avoid the issue of the image suddenly appearing and taking more space when
+     * an it is loaded with some network delay
+     */
+    var predefinedHeight: Int = -1
+
 
     /**
      * Recycles the view
@@ -134,6 +142,11 @@ class DoubleImageView @JvmOverloads constructor(
         bitmap = null
         imageLastOpened = -1
         extras = Bundle()
+        predefinedHeight = -1
+        binding.image.setImageResource(0)
+        binding.image.updateLayoutParams {
+            height = 0
+        }
     }
 
     /**
@@ -197,6 +210,12 @@ class DoubleImageView @JvmOverloads constructor(
     ) {
         if (!context.isAvailableForGlide()) {
             return
+        }
+
+        if (predefinedHeight >= 0) {
+            binding.image.updateLayoutParams {
+                height = predefinedHeight
+            }
         }
 
         var request = Glide.with(binding.image)

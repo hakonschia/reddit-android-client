@@ -5,6 +5,8 @@
     <option name="excludedDirectories">
       <list>
         <option value="$PROJECT_DIR$/app/src/main/java/com/r0adkll" />
+        <option value="$PROJECT_DIR$/app/src/androidTest" />
+        <option value="$PROJECT_DIR$/app/src/test" />
       </list>
     </option>
   </component>

@@ -50,17 +50,22 @@ class ContentImage @JvmOverloads constructor(
     override fun updateView() {
         val (normal, normalLowRes, obfuscated) = getImageVariantsForRedditPost2(redditPost)
 
-        binding.root.cache = cache
-        binding.root.extras = extras
-        binding.root.bitmap = bitmap
+        // getWantedHeight() needs access to the parent view to return anything useful, which might
+        // not be accessible instantly (but it is in post{})
+        post {
+            binding.root.cache = cache
+            binding.root.extras = extras
+            binding.root.bitmap = bitmap
+            binding.root.predefinedHeight = wantedHeight
 
-        if (normal != null) {
-            binding.root.state = createDoubleImageViewState(
-                redditPost,
-                normalUrl = normal,
-                lowResUrl = normalLowRes,
-                obfuscatedUrl = obfuscated
-            )
+            if (normal != null) {
+                binding.root.state = createDoubleImageViewState(
+                    redditPost,
+                    normalUrl = normal,
+                    lowResUrl = normalLowRes,
+                    obfuscatedUrl = obfuscated
+                )
+            }
         }
     }
 
@@ -72,7 +77,7 @@ class ContentImage @JvmOverloads constructor(
             return super.getWantedHeight()
         }
 
-        // This is how Picasso will scale it, which scales it to the match the width of the parent
+        // This is how Glide will scale it, which scales it to the match the width of the parent
         // Ie. layout_width=match_parent, and scale with the same aspect ratio to fit that
         val width = source.width
         val height = source.height
