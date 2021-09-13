@@ -3,6 +3,7 @@ package com.example.hakonsreader
 import android.app.*
 import android.content.*
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.hilt.work.HiltWorkerFactory
@@ -36,7 +37,7 @@ import javax.inject.Inject
  * Entry point for the application
  */
 @HiltAndroidApp
-class App : Application(), Configuration.Provider {
+class App : Application(), Configuration.Provider, Application.ActivityLifecycleCallbacks {
 
     companion object {
         private const val TAG = "App"
@@ -95,6 +96,8 @@ class App : Application(), Configuration.Provider {
         updateTheme()
         removeOldValues()
         removePrehistoricValues()
+
+        registerActivityLifecycleCallbacks(this)
 
         // Must be commented out for release builds (as well as the import removed)
         //LeakCanary.config = LeakCanary.config.copy(dumpHeap = false)
@@ -272,5 +275,35 @@ class App : Application(), Configuration.Provider {
                 .setWorkerFactory(workerFactory)
                 .setMinimumLoggingLevel(Log.DEBUG)
                 .build()
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+        // The problem this is fixing is that if WiFi goes on/off when the app is in the background
+        // the callback inside Settings might not be active, which means data saving settings can be out of sync
+        Settings.forceWiFiCheck(activity)
+    }
+
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        // Not implemented
+    }
+
+    override fun onActivityStarted(activity: Activity) {
+        // Not implemented
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+        // Not implemented
+    }
+
+    override fun onActivityStopped(activity: Activity) {
+        // Not implemented
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+        // Not implemented
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+        // Not implemented
     }
 }

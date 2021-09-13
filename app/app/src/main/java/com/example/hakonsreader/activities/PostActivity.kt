@@ -224,6 +224,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
     override fun finish() {
         super.finish()
+        // Sometimes video posts flash for a split second when closed by sliding away with Slidr
+        // Setting the alpha to 0 "fixes" it as the view wont be visible
+        binding.root.alpha = 0f
 
         post?.let {
             if (it.id == BITMAP?.postId) {
@@ -465,44 +468,47 @@ class PostActivity : BaseActivity(), OnReplyListener {
                     // Load the post, but don't set extras yet
                     onNewPostInfo(redditPost)
 
-                    val content = binding.post.getContent() as ContentVideo
+                    val content = binding.post.getContent()
 
-                    // If a thumbnail was passed to the activity it will be used as the thumbnail during
-                    // the transition
-                    // Otherwise we should love the default thumbnail
-                    if (BITMAP == null) {
-                        content.loadThumbnail()
-                    }
-
-                    content.setOnVideoFullscreenListener { contentVideo ->
-                        val intent = Intent(this, VideoActivity::class.java).apply {
-                            putExtra(VideoActivity.EXTRAS_EXTRAS, contentVideo.extras)
+                    // Normally true, but might be ContentPostRemoved
+                    if (content is ContentVideo) {
+                        // If a thumbnail was passed to the activity it will be used as the thumbnail during
+                        // the transition
+                        // Otherwise we should love the default thumbnail
+                        if (BITMAP == null) {
+                            content.loadThumbnail()
                         }
 
-                        // Pause the video here so it doesn't play both places
-                        contentVideo.viewUnselected()
-                        startActivity(intent)
-                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-                    }
-
-                    // We want to set this right away to ensure that the audio icon doesn't appear
-                    // and disappear when the extras are set
-                    val hasAudio = postExtras?.getBoolean(VideoPlayer.EXTRA_HAS_AUDIO) ?: true
-                    content.showAudioIcon(hasAudio)
-
-                    // For videos we don't want to set the extras right away. If a video is playing during the
-                    // animation the animation looks very choppy, so it should only be played at the end
-                    setEnterSharedElementCallback(object : SharedElementCallback() {
-                        override fun onSharedElementEnd(sharedElementNames: MutableList<String>?, sharedElements: MutableList<View>?, sharedElementSnapshots: MutableList<View>?) {
-                            // Enable this after the transition is over as the thumbnail kind of jumps sometimes if
-                            // animations are enabled
-                            content.enableControllerTransitions(true)
-
-                            if (postExtras != null) {
-                                binding.post.extras = postExtras
+                        content.setOnVideoFullscreenListener { contentVideo ->
+                            val intent = Intent(this, VideoActivity::class.java).apply {
+                                putExtra(VideoActivity.EXTRAS_EXTRAS, contentVideo.extras)
                             }
+
+                            // Pause the video here so it doesn't play both places
+                            contentVideo.viewUnselected()
+                            startActivity(intent)
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
                         }
-                    })
+
+                        // We want to set this right away to ensure that the audio icon doesn't appear
+                        // and disappear when the extras are set
+                        val hasAudio = postExtras?.getBoolean(VideoPlayer.EXTRA_HAS_AUDIO) ?: true
+                        content.showAudioIcon(hasAudio)
+
+                        // For videos we don't want to set the extras right away. If a video is playing during the
+                        // animation the animation looks very choppy, so it should only be played at the end
+                        setEnterSharedElementCallback(object : SharedElementCallback() {
+                            override fun onSharedElementEnd(sharedElementNames: MutableList<String>?, sharedElements: MutableList<View>?, sharedElementSnapshots: MutableList<View>?) {
+                                // Enable this after the transition is over as the thumbnail kind of jumps sometimes if
+                                // animations are enabled
+                                content.enableControllerTransitions(true)
+
+                                if (postExtras != null) {
+                                    binding.post.extras = postExtras
+                                }
+                            }
+                        })
+                    }
                 }
 
                 // Nothing special for the post, set the extras

@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.ImageActivity
@@ -63,14 +64,26 @@ fun openProfileInActivity(view: View, username: String?) {
  * @param imageUrl The URL to the image
  * @param cache True to cache the image once opened
  * @param useBitmapFromView If set to true [ImageActivity.BITMAP] will be set to the bitmap [view] holds,
- * if [view] is an ImageView with a BitmapDrawable
+ * if [view] is an ImageView with a BitmapDrawable. If the ImageView holds the drawable
+ * [R.drawable.ic_image_not_supported_200dp] then the bitmap will not be used.
  */
 fun openImageInFullscreen(view: View, imageUrl: String?, cache: Boolean, useBitmapFromView: Boolean) {
     val context = view.context
 
     Intent(context, ImageActivity::class.java).run {
         if (useBitmapFromView && view is ImageView) {
-            ImageActivity.BITMAP = view.drawable?.toBitmap()
+            val isDrawableImageErrorDrawable = view
+                .drawable
+                ?.constantState
+                ?.equals(ContextCompat.getDrawable(
+                    view.context,
+                    R.drawable.ic_image_not_supported_200dp
+                )?.constantState)
+
+            // Only use the bitmap if it isn't an "Error loading image" bitmap
+            if (isDrawableImageErrorDrawable == false) {
+                ImageActivity.BITMAP = view.drawable?.toBitmap()
+            }
         }
 
         putExtra(ImageActivity.EXTRAS_IMAGE_URL, imageUrl)

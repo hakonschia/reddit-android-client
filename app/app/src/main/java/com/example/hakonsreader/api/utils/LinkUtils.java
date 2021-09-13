@@ -1,8 +1,6 @@
 package com.example.hakonsreader.api.utils;
 
 
-import androidx.annotation.Nullable;
-
 /**
  * Utility class that contains various regex matchers and functions to deal with common problems for
  * links from Reddit
@@ -28,7 +26,7 @@ public final class LinkUtils {
      * @see LinkUtils#SUBREDDIT_REGEX_NO_HTTPS
      * @see LinkUtils#SUBREDDIT_REGEX_COMBINED
      */
-    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://(.*)?reddit.com/" + BASE_SUBREDDIT_REGEX + "/?(\\s|$)";
+    public static final String SUBREDDIT_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://([A-Za-z0-9]+\\.)?reddit.com/" + BASE_SUBREDDIT_REGEX + "/?(\\s|$)";
 
     /**
      * Regex for matching a subreddit URL with sorting. This will match with subpaths "hot", "new", "top", and "controversial"
@@ -41,7 +39,7 @@ public final class LinkUtils {
      * <li>https://old.reddit.com/r/test</li>
      * </ol>
      */
-    public static final String SUBREDDIT_SORT_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://(.*)?reddit.com/(r|R)/[A-Za-z0-9_]+/(hot|top|new|controversial)(/)?(\\?([A-Za-z0-9&=])*)?(\\s|$)";
+    public static final String SUBREDDIT_SORT_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://([A-Za-z0-9]+\\.)?reddit.com/(r|R)/[A-Za-z0-9_]+/(hot|top|new|controversial)(/)?(\\?([A-Za-z0-9&=])*)?(\\s|$)";
 
     /**
      * Regex for matching a subreddit URL linking to the subreddit rules
@@ -53,7 +51,7 @@ public final class LinkUtils {
      * <li>https://old.reddit.com/r/test/about/rules</li>
      * </ol>
      */
-    public static final String SUBREDDIT_RULES_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://(.*)?reddit.com/(r|R)/[A-Za-z0-9_]+/about/rules(\\/)?(\\s|$)";
+    public static final String SUBREDDIT_RULES_REGEX_WITH_HTTPS = "(^|\\s)http(s)?://([A-Za-z0-9]+\\.)?reddit.com/(r|R)/[A-Za-z0-9_]+/about/rules(\\/)?(\\s|$)";
 
     /**
      * Regex for matching a subreddit string with only the "/r/..." part (no https://reddit.com).
@@ -100,7 +98,7 @@ public final class LinkUtils {
      * <li>/user/hakonschia-three</li>
      * </ol>
      */
-    public static final String USER_REGEX = "(^|\\s)(https://(.*)?reddit.com)?/?u(ser)?/[A-Za-z0-9_-]+/?(\\s|$)";
+    public static final String USER_REGEX = "(^|\\s)(http(s)?://([A-Za-z0-9]+\\.)?reddit.com)?/?u(ser)?/[A-Za-z0-9_-]+/?(\\s|$)";
 
     /**
      * Regex matching a post URL
@@ -114,7 +112,7 @@ public final class LinkUtils {
      * </ol>
      * </p>
      */
-    public static final String POST_REGEX = "http(s)://(.*)?reddit.com/" + BASE_SUBREDDIT_REGEX + "+/comments/.+/?(\\s|$)";
+    public static final String POST_REGEX = "http(s)?://([A-Za-z0-9]+\\.)?reddit.com/" + BASE_SUBREDDIT_REGEX + "/comments/.+/?(\\s|$)";
 
     /**
      * Matches a post URL with only {@code https://reddit.com/comments/<postId>}
@@ -126,7 +124,7 @@ public final class LinkUtils {
      * </ol>
      * </p>
      */
-    public static final String POST_REGEX_NO_SUBREDDIT = "http(s)://(.*)?reddit.com/comments/.+";
+    public static final String POST_REGEX_NO_SUBREDDIT = "http(s)?://([A-Za-z0-9]+\\.)?reddit.com/comments/.+";
 
     /**
      * Matches a shortened URL for a post.
@@ -140,7 +138,7 @@ public final class LinkUtils {
     /**
      * Regex matching imgur image URLs
      */
-    public static final String IMGUR_IMAGE_REGEX = "^https://imgur.com/[A-Za-z0-9]{5,7}$";
+    public static final String IMGUR_IMAGE_REGEX = "^http(s)?://imgur.com/[A-Za-z0-9]{5,7}$";
 
     /**
      * Regex matching imgur GIF URLs.

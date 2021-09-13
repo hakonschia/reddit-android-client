@@ -388,5 +388,12 @@
             app:iconSpaceReserved="false"
             app:singleLineTitle="false"
             app:defaultValue="@bool/prefs_default_dev_highlight_selected_views" />
+
+        <SwitchPreference
+            app:key="@string/prefs_key_dev_show_content_info_on_long_press"
+            app:title="@string/prefs_title_dev_show_content_info_on_long_press"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:defaultValue="@bool/prefs_default_dev_show_content_info_on_long_press" />
     </PreferenceCategory>
 </PreferenceScreen>

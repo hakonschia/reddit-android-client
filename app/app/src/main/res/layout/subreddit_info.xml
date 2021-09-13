@@ -117,12 +117,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
 
-                android:text="@{@plurals/subredditActiveUsers(subreddit.activeUsers, subreddit.activeUsers)}"
+                android:text="@{@string/subredditActiveUsers(subreddit.activeUsers)}"
                 android:textColor="@color/secondary_text_color"
 
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/subredditSubscribers"
-                tools:text="123 users online" />
+                tools:text="123 online" />
 
             <com.example.hakonsreader.views.MarkdownTextView
                 android:id="@+id/description"

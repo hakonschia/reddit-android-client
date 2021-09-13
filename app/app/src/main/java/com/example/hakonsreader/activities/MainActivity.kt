@@ -217,8 +217,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
         if (savedInstanceState == null) {
             Intent(this, DispatcherActivity::class.java).run {
                 // Reddit gallery with video: https://www.reddit.com/r/GlobalOffensive/comments/lvv9dm/hey_hey_new_clear_polymer_skin_made_its_way_in/
-                putExtra(DispatcherActivity.EXTRAS_URL_KEY, "https://reddit.com/r/hakonschia/comments/k22ft8/dw4423/")
-                //startActivity(this)
+                putExtra(DispatcherActivity.EXTRAS_URL_KEY, "https://www.reddit.com/r/technology/comments/pfpl10/air_pollution_is_slashing_years_off_the_lives_of/hb5zebq?utm_source=share&utm_medium=web2x&context=3")
+               // startActivity(this)
             }
         }
 

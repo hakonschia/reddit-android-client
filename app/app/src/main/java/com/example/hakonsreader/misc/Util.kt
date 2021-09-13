@@ -7,17 +7,17 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.bumptech.glide.RequestBuilder
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -43,7 +43,6 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.util.*
-import kotlin.math.min
 
 /**
  * Class for holding image URL variants for a [RedditPost]
@@ -56,6 +55,7 @@ import kotlin.math.min
  * should be used
  */
 data class PostImageVariants(val normal: String?, val normalLowRes: String?, val nsfw: String?, val spoiler: String?)
+data class PostImageVariants2(val normal: String?, val normalLowRes: String?, val obfuscated: String?)
 
 /**
  * Gets image variants for a reddit post
@@ -63,20 +63,39 @@ data class PostImageVariants(val normal: String?, val normalLowRes: String?, val
  * @param post The post to get images for
  * @return A [PostImageVariants] that holds the images to use for if the post is normal, nsfw, or spoiler
  */
-fun getImageVariantsForRedditPost(post: RedditPost) : PostImageVariants {
-    return PostImageVariants(getNormal(post, lowRes = false), getNormal(post, lowRes = true), getNsfw(post), getObfuscated(post))
+fun getImageVariantsForRedditPost(post: RedditPost): PostImageVariants {
+    return PostImageVariants(
+        post.getNormalImage(lowRes = false),
+        post.getNormalImage(lowRes = true),
+        post.getNsfwImage(),
+        post.getObfuscatedImage()
+    )
 }
 
 /**
- * Gets the normal
+ * Gets image variants for a reddit post
+ *
+ * @param post The post to get images for
+ * @return A [PostImageVariants] that holds the images to use for if the post is normal, nsfw, or spoiler
  */
-private fun getNormal(post: RedditPost, lowRes: Boolean) : String? {
+fun getImageVariantsForRedditPost2(post: RedditPost): PostImageVariants2 {
+    return PostImageVariants2(
+        post.getNormalImage(lowRes = false),
+        post.getNormalImage(lowRes = true),
+        post.getObfuscatedImage()
+    )
+}
+
+/**
+ * Gets the normal image for a reddit post
+ */
+private fun RedditPost.getNormalImage(lowRes: Boolean): String? {
     val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
-    val images = post.preview?.images?.firstOrNull()?.resolutions ?: return null
+    val images = preview?.images?.firstOrNull()?.resolutions ?: return null
     if (images.isEmpty()) {
         // If there are images, but the resolutions are empty, then it's a low quality so just give the source
-        return post.getSourcePreview()?.url
+        return getSourcePreview()?.url
     }
 
     var index = 0
@@ -100,10 +119,10 @@ private fun getNormal(post: RedditPost, lowRes: Boolean) : String? {
  * @return A URL pointing to the image to use for a post, depending on [Settings.showNsfwPreview]. If this is null
  * then no image should be shown ([ShowNsfwPreview.NO_IMAGE])
  */
-private fun getNsfw(post: RedditPost) : String? {
+private fun RedditPost.getNsfwImage(): String? {
     return when (Settings.showNsfwPreview()) {
-        ShowNsfwPreview.NORMAL -> getNormal(post, lowRes = false)
-        ShowNsfwPreview.BLURRED -> getObfuscated(post)
+        ShowNsfwPreview.NORMAL -> this.getNormalImage(lowRes = false)
+        ShowNsfwPreview.BLURRED -> this.getObfuscatedImage()
         ShowNsfwPreview.NO_IMAGE -> null
     }
 }
@@ -113,8 +132,8 @@ private fun getNsfw(post: RedditPost) : String? {
  *
  * @return A URL pointing to an obfuscated image, or null if no image is available
  */
-private fun getObfuscated(post: RedditPost) : String? {
-    val obfuscatedPreviews: List<RedditImage>? = post.getObfuscatedPreviewImages()
+private fun RedditPost.getObfuscatedImage(): String? {
+    val obfuscatedPreviews: List<RedditImage>? = getObfuscatedPreviewImages()
 
     return if (obfuscatedPreviews?.isNotEmpty() == true) {
         // Obfuscated previews that are high res are still fairly showing sometimes, so
@@ -122,7 +141,75 @@ private fun getObfuscated(post: RedditPost) : String? {
         obfuscatedPreviews[0].url
     } else {
         // If there are no previews, it's a small image, so we can show the source
-        post.getObfuscatedSource()?.url
+        getObfuscatedSource()?.url
+    }
+}
+
+/**
+ * Creates a [DoubleImageView.DoubleImageState] based on the post and urls passed. This also takes
+ * into account [Settings.showNsfwPreview] and data saving
+ *
+ * @param redditPost The post the state is for (this is only used to check for NSFW/spoiler)
+ * @param normalUrl The normal URL to use (also the URL for HD images)
+ * @param lowResUrl The low resolution URL to use. This can be null, but if it is null the state
+ * will be [DoubleImageView.DoubleImageState.OneImage] with only [normalUrl], if it otherwise would be used
+ * @param obfuscatedUrl The obfuscated URL to use (if this is null [DoubleImageView] will treat it as
+ * a "no image found" preview)
+ */
+fun createDoubleImageViewState(
+    redditPost: RedditPost,
+    normalUrl: String,
+    lowResUrl: String?,
+    obfuscatedUrl: String?
+): DoubleImageView.DoubleImageState {
+    val dataSavingEnabled = Settings.dataSavingEnabled()
+
+    return when {
+        // TODO spoiler and nsfw don't follow data saving since ImageActivity doesn't allow for two images
+
+        redditPost.isSpoiler -> {
+            DoubleImageView.DoubleImageState.PreviewImage(
+                previewUrl = obfuscatedUrl, url = normalUrl
+            )
+        }
+
+        redditPost.isNsfw -> {
+            when (Settings.showNsfwPreview()) {
+                ShowNsfwPreview.NORMAL -> if (dataSavingEnabled) {
+                    if (lowResUrl != null) {
+                        DoubleImageView.DoubleImageState.HdImage(
+                            lowRes = lowResUrl, highRes = normalUrl
+                        )
+                    } else {
+                        DoubleImageView.DoubleImageState.OneImage(url = normalUrl)
+                    }
+                } else {
+                    DoubleImageView.DoubleImageState.OneImage(url = normalUrl)
+                }
+
+                ShowNsfwPreview.BLURRED -> DoubleImageView.DoubleImageState.PreviewImage(
+                    previewUrl = obfuscatedUrl, url = normalUrl
+                )
+
+                ShowNsfwPreview.NO_IMAGE -> DoubleImageView.DoubleImageState.PreviewImage(
+                    previewUrl = null, url = normalUrl
+                )
+            }
+        }
+
+        else -> {
+            if (!dataSavingEnabled) {
+                DoubleImageView.DoubleImageState.OneImage(url = normalUrl)
+            } else {
+                if (lowResUrl != null) {
+                    DoubleImageView.DoubleImageState.HdImage(
+                        lowRes = lowResUrl, highRes = normalUrl
+                    )
+                } else {
+                    DoubleImageView.DoubleImageState.OneImage(url = normalUrl)
+                }
+            }
+        }
     }
 }
 
@@ -303,7 +390,7 @@ private fun createIntentInternal(url: String, options: CreateIntentOptions, cont
         }
 
         // Private messages: https://reddit.com/message/compose?to=hakonschia&subject=hello
-        url.matches("https://(.*\\.)?reddit.com/message/compose.*".toRegex()) -> {
+        url.matches("http(s)?://([A-Za-z0-9]+\\.)?reddit.com/message/compose.*".toRegex()) -> {
             val recipient = asUri.getQueryParameter("to")
             val subject = asUri.getQueryParameter("subject")
             val message = asUri.getQueryParameter("message")
@@ -954,7 +1041,7 @@ fun toDays(time: Long): Long {
  * as callers of this function might want to set extra values before this is called
  * @param showTextContent If false content will not be created if [post] is a text post
  * @param reusableViews The list of reusable views that will be used instead of generating new views.
- * If a view is reused from this list then it will also be removed automatically.
+ * If a view is reused from this list it will be removed automatically, and [Content.recycle] will be called
  * @return A view with the content of the post
  */
 fun generatePostContent(
@@ -1043,10 +1130,12 @@ fun generatePostContent(
     return when {
         reusedContentView != null -> {
             reusableViews.remove(reusedContentView)
+            reusedContentView.recycle()
             reusedContentView
         }
 
         contentType != null -> {
+            // val content = ContentImage(context) etc.
             (contentType.constructors[0].newInstance(context) as Content).also { content ->
                 // Text and Link content have margins, others fill the entire width
                 if (content is ContentText || content is ContentLink) {
@@ -1059,10 +1148,6 @@ fun generatePostContent(
     }
 }
 
-
-fun <T> RequestBuilder<T>.safeInto(imageView: ImageView) {
-
-}
 
 /**
  * Return true if this [Context] is available.
@@ -1082,4 +1167,18 @@ fun Context?.isAvailableForGlide(): Boolean {
         }
     }
     return true
+}
+
+/**
+ * Checks if the connectivity manager has WiFi available
+ *
+ * @return True if WiFi is available, otherwise false. Other network types might be available if this
+ * returns false
+ */
+fun ConnectivityManager.isWiFiAvailable(): Boolean {
+    return if (Build.VERSION.SDK_INT > 23) {
+        getNetworkCapabilities(activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+    } else {
+        getNetworkInfo(ConnectivityManager.TYPE_WIFI)?.isConnected == true
+    }
 }

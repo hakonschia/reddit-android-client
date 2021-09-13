@@ -305,10 +305,7 @@
     <string name="requiresRedditPremium">Handlingen krever Reddit premium</string>
     <string name="subredditRequiresPremium">Du trenger Reddit premium for å aksessere r/%s</string>
     <string name="prefs_title_show_peek_parent_button_in_comments">Vis knapp for å vise foreldrekommentar</string>
-    <plurals name="subredditActiveUsers">
-        <item quantity="one">%d bruker online</item>
-        <item quantity="other">%,d brukere online</item>
-    </plurals>
+    <string name="subredditActiveUsers">%,d online</string>
     <string name="subredditRules">Regler</string>
     <string name="awardTotalCoinPrice">%s har mottatt %,d Reddit coins</string>
     <string name="awardTotalCoinPricePost">Posten</string>
@@ -476,4 +473,6 @@
     <string name="content_description_open_subreddit_info">Vis subreddit info</string>
     <string name="prefs_title_show_subreddit_info_button">Vis knapp for subreddit info</string>
     <string name="prefs_summary_show_subreddit_info_button">Gjemt på telefoner uten gestnavigasjon</string>
+    <string name="bottomSheetContentInfoRecycleCount">Antall ganger resirkulert: %d</string>
+    <string name="prefs_title_dev_show_content_info_on_long_press">Hold inne for å vise innholdsinformasjon</string>
 </resources>

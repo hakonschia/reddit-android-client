@@ -3,6 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/drawable/ic_image_not_supported_200dp.xml" value="0.39479166666666665" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/bottom_sheet_content_info.xml" value="0.25" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/content_image.xml" value="0.20625" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/double_image_view.xml" value="0.25729166666666664" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/fragment_subreddit.xml" value="0.25" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/post.xml" value="0.2609375" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/subreddit_banned.xml" value="0.2609375" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/subreddit_info.xml" value="0.2609375" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/xml/root_preferences.xml" value="0.21145833333333333" />
         <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/layout/activity_post.xml" value="0.37864583333333335" />
         <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/layout/bottom_sheet_reports.xml" value="0.22" />
         <entry key="..\:/Users/hakon/Desktop/hakonsreader/app/app/src/main/res/layout/fragment_subreddit.xml" value="0.33" />

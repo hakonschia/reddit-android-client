@@ -2,6 +2,7 @@ package com.example.hakonsreader.views
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -20,7 +21,6 @@ import com.example.hakonsreader.databinding.ContentGalleryBinding
 import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
 import java.util.*
-import java.util.function.Consumer
 import kotlin.collections.ArrayList
 
 /**
@@ -69,12 +69,27 @@ class ContentGallery @JvmOverloads constructor(
      */
     var lifecycleOwner: LifecycleOwner? = null
 
-    // This file and ContentImage is really coupled together, should be fixed to not be so terrible
     private val binding: ContentGalleryBinding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true)
-    private val galleryViews: MutableList<ContentGalleryImage> = ArrayList()
+
+    /**
+     * The list of the gallery ViewHolders created by the ViewPager adapter
+     */
+    private val galleryViewHolders: MutableList<Adapter.ViewHolder> = ArrayList()
+
+    /**
+     * The current view visible in the gallery
+     */
     private var currentView: ContentGalleryImage? = null
 
+    /**
+     * A map of the extras the gallery views have produced so far.
+     *
+     * The Int key should be the position of view
+     */
+    private var viewExtras = mutableMapOf<Int, Bundle>()
+
     private var maxHeight = -1
+
 
     override fun updateView() {
         val images: List<GalleryImage> = if (redditPost.thirdPartyObject is ImgurAlbum) {
@@ -88,6 +103,7 @@ class ContentGallery @JvmOverloads constructor(
             galleryImages.filter { it.status == RedditGalleryItem.STATUS_VALID }
         }
 
+        val activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, -1)
         val (maxWidth, maxHeight) = getMaxWidthAndHeight(images)
         this.maxHeight = maxHeight
 
@@ -96,7 +112,7 @@ class ContentGallery @JvmOverloads constructor(
         val widthScale = screenWidth / maxWidth.toFloat()
         layoutParams = ViewGroup.LayoutParams(screenWidth, (maxHeight * widthScale).toInt())
 
-        binding.galleryImages.adapter = Adapter(images)
+        binding.galleryImages.adapter = Adapter(images, activeImage)
 
         // Keep a maximum of 5 items at a time, or 2 when data saving is enabled. This should probably
         // be enough to make large galleries not all load at once which potentially wastes data, and
@@ -119,8 +135,11 @@ class ContentGallery @JvmOverloads constructor(
         })
 
         // Set initial state
-        val activeImage = extras.getInt(EXTRAS_ACTIVE_IMAGE, 0)
-        binding.galleryImages.setCurrentItem(activeImage, false)
+        if (activeImage == -1) {
+            binding.galleryImages.setCurrentItem(0, false)
+        } else {
+            binding.galleryImages.setCurrentItem(activeImage, false)
+        }
     }
 
     override fun recycle() {
@@ -187,6 +206,19 @@ class ContentGallery @JvmOverloads constructor(
     override fun getExtras(): Bundle {
         return super.getExtras().apply {
             putInt(EXTRAS_ACTIVE_IMAGE, binding.galleryImages.currentItem)
+
+            // Ensure this is up-to-date
+            galleryViewHolders.forEach {
+                val extras = it.image.getExtras()
+                if (extras != null) {
+                    viewExtras[it.absoluteAdapterPosition] = extras
+                }
+            }
+
+            // Use the position of the view (the key in the map) as the key in the bundle
+            viewExtras.forEach { (key, value) ->
+                putBundle(key.toString(), value)
+            }
         }
     }
 
@@ -201,9 +233,13 @@ class ContentGallery @JvmOverloads constructor(
     }
 
     override fun viewUnselected() {
-        galleryViews.forEach {
-            it.viewUnselected()
+        galleryViewHolders.forEach {
+            it.image.viewUnselected()
         }
+    }
+
+    override fun getBitmap(): Bitmap? {
+        return currentView?.getImageBitmap()
     }
 
     override fun getWantedHeight() = maxHeight
@@ -213,16 +249,42 @@ class ContentGallery @JvmOverloads constructor(
      */
     fun release() {
         binding.galleryImages.adapter = null
-        galleryViews.forEach(Consumer { obj: ContentGalleryImage -> obj.destroy() })
-        galleryViews.clear()
+        galleryViewHolders.forEach { obj ->
+            obj.image.destroy()
+        }
+        galleryViewHolders.clear()
         currentView = null
     }
 
-    private inner class Adapter(private val images: List<GalleryImage>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+
+    /**
+     * @param activeImagePos The position of the image that was active when this content view
+     * was opened. If this is not applicable a negative value should be used.
+     */
+    private inner class Adapter(
+        private val images: List<GalleryImage>,
+        private val activeImagePos: Int
+        ) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             with (holder.image) {
                 // Destroy previous image
                 destroy()
+
+                // If bitmap is a low res image and the high res is loaded then this would be out of sync
+                // but it's not a big issue so it should be fine
+                if (activeImagePos == position) {
+                    this.bitmap = this@ContentGallery.bitmap
+                }
+
+                // Prefer using the viewExtras, as that will be most up-to-date
+                val viewExtras = viewExtras[position] ?: extras.getBundle(position.toString())
+                if (viewExtras != null) {
+                    setExtras(viewExtras)
+                } else {
+                    // To ensure the old extras aren't stored
+                    setExtras(Bundle())
+                }
 
                 val image = images[position]
                 this.image = image
@@ -235,15 +297,22 @@ class ContentGallery @JvmOverloads constructor(
                 lifecycleOwner = this@ContentGallery.lifecycleOwner
 
                 post = redditPost
+
                 // With ViewPager2 the items have to be width=match_parent (although this is how it is in
                 // the xml, so not sure why I have to do it here as well)
                 layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                galleryViews.add(this)
-            })
+            }).apply {
+                galleryViewHolders.add(this)
+            }
+        }
+
+        override fun onViewRecycled(holder: ViewHolder) {
+            val extras = holder.image.getExtras() ?: return
+            viewExtras[holder.absoluteAdapterPosition] = extras
         }
 
         override fun getItemCount() = images.size
 
-        private inner class ViewHolder(val image: ContentGalleryImage) : RecyclerView.ViewHolder(image)
+        inner class ViewHolder(val image: ContentGalleryImage) : RecyclerView.ViewHolder(image)
     }
 }

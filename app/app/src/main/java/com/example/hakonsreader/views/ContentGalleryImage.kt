@@ -3,10 +3,13 @@ package com.example.hakonsreader.views
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.os.Bundle
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.view.get
 import androidx.lifecycle.LifecycleOwner
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
@@ -19,6 +22,7 @@ import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
 import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurImage
 import com.example.hakonsreader.databinding.ContentGalleryImageBinding
 import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.misc.createDoubleImageViewState
 import com.example.hakonsreader.views.util.goneIf
 
 /**
@@ -52,9 +56,13 @@ class ContentGalleryImage @JvmOverloads constructor(
         }
 
     /**
-     * If [image] is an image, this should be set to the post the image is for
+     * The post the image is for. This is used only to check if the post is a spoiler/nsfw post
      */
     var post: RedditPost? = null
+
+    var bitmap: Bitmap? = null
+
+    private var extras: Bundle? = null
 
     fun destroy() {
         val view = binding.content.getChildAt(0)
@@ -80,6 +88,35 @@ class ContentGalleryImage @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Gets a bitmap representation of the view, or null
+     */
+    fun getImageBitmap(): Bitmap? {
+        val view = if (binding.content.childCount > 0) binding.content[0] else return null
+
+        return when (view) {
+            is DoubleImageView -> view.getImageBitmap()
+            is VideoPlayer -> view.getCurrentFrame()
+            else -> null
+        }
+    }
+
+    /**
+     * Gets the extras for the view, or null
+     */
+    fun getExtras(): Bundle? {
+        val view = if (binding.content.childCount > 0) binding.content[0] else return null
+
+        return when (view) {
+            is DoubleImageView -> view.extras
+            is VideoPlayer -> view.getExtras()
+            else -> null
+        }
+    }
+
+    fun setExtras(bundle: Bundle) {
+        this.extras = bundle
+    }
 
     private fun updateView() {
         binding.content.removeAllViews()
@@ -88,7 +125,9 @@ class ContentGalleryImage @JvmOverloads constructor(
             val view = when (it) {
                 is RedditGalleryItem -> asRedditGalleryImage(it)
                 is ImgurImage -> asImgurGalleryImage(it)
-                is Image -> asImage(it)
+                is Image -> DoubleImageView(context).apply {
+                    state = DoubleImageView.DoubleImageState.OneImage(url = it.url)
+                }
 
                 // It is really an error if this happens, should potentially throw an exception
                 else -> return@let
@@ -99,9 +138,9 @@ class ContentGalleryImage @JvmOverloads constructor(
     }
 
     private fun asRedditGalleryImage(galleryItem: RedditGalleryItem): View {
-        val image = getGalleryImage(galleryItem)
-        return if (image.mp4Url != null) {
-            asVideo(image)
+        // For videos only the source will actually provide an MP4 URL
+        return if (galleryItem.source.mp4Url != null) {
+            asVideo(galleryItem.source)
         } else {
             with (binding) {
                 caption.text = galleryItem.caption
@@ -119,7 +158,27 @@ class ContentGalleryImage @JvmOverloads constructor(
                 outboundUrl.goneIf(galleryItem.outboundUrl == null)
             }
 
-            asImage(image)
+            DoubleImageView(context).apply {
+                val redditPost = post
+                    ?: throw IllegalStateException("Cannot create an image state for a Reddit gallery without ContentGalleryImage#post set")
+
+                // Currently it seems only one obfuscated resolution is given here, otherwise this would be
+                // the lowest res image
+                val obfuscated = galleryItem.obfuscated?.firstOrNull()
+                val images = getGalleryImages(galleryItem)
+
+                bitmap = this@ContentGalleryImage.bitmap
+                this@ContentGalleryImage.extras?.let {
+                    extras = it
+                }
+
+                state = createDoubleImageViewState(
+                    redditPost,
+                    normalUrl = images.first.url,
+                    lowResUrl = images.second.url,
+                    obfuscatedUrl = obfuscated?.url
+                )
+            }
         }
     }
 
@@ -127,21 +186,9 @@ class ContentGalleryImage @JvmOverloads constructor(
         return if (image is ImgurGif) {
             asImgurVideo(image)
         } else {
-            asImage(image)
-        }
-    }
-
-    /**
-     * Returns a [ContentImage] for a given [Image]. The image should be a image (not a video)
-     *
-     * @param image The image to create an image view for
-     * @return A [ContentImage]
-     * @see asVideo
-     */
-    private fun asImage(image: Image): ContentImage {
-        // Use ContentImage as that already has listeners, NSFW caching etc already
-        return ContentImage(context).apply {
-            setWithImageUrl(post, image.url)
+            DoubleImageView(context).apply {
+                state = DoubleImageView.DoubleImageState.OneImage(url = image.url)
+            }
         }
     }
 
@@ -150,7 +197,6 @@ class ContentGalleryImage @JvmOverloads constructor(
      *
      * @param image The image to create a video for
      * @return A [VideoPlayer]
-     * @see asImage
      */
     private fun asVideo(image: RedditGalleryImage): VideoPlayer {
         val player = LayoutInflater.from(context).inflate(R.layout.video_player_texture_view, null) as VideoPlayer
@@ -162,6 +208,9 @@ class ContentGalleryImage @JvmOverloads constructor(
             // than the screen, but I imagine it would scale down
             videoWidth = Resources.getSystem().displayMetrics.widthPixels
 
+            bitmap?.let { setThumbnailBitmap(it) }
+            extras?.let { setExtras(it) }
+
             // This should only be called if the gallery image has an MP4 URL, otherwise it is an error
             url = image.mp4Url!!
         }
@@ -172,7 +221,6 @@ class ContentGalleryImage @JvmOverloads constructor(
      *
      * @param imgurGif The imgur gif to create a video for
      * @return A [VideoPlayer]
-     * @see asImage
      */
     private fun asImgurVideo(imgurGif: ImgurGif): VideoPlayer {
         val player = LayoutInflater.from(context).inflate(R.layout.video_player_texture_view, null) as VideoPlayer
@@ -182,6 +230,8 @@ class ContentGalleryImage @JvmOverloads constructor(
             videoWidth = imgurGif.width
             videoHeight = imgurGif.height
 
+            bitmap?.let { setThumbnailBitmap(it) }
+
             // This should only be called if the gallery image has an MP4 URL, otherwise it is an error
             url = imgurGif.mp4Url
             mp4Video = true
@@ -190,14 +240,10 @@ class ContentGalleryImage @JvmOverloads constructor(
     }
 
     /**
-     * Gets a gallery where the image width isn't higher than the screen of the device
+     * Gets a pair of gallery images where [Pair.first] image width isn't higher than the screen
+     * of the device and [Pair.second] is a low resolution image
      */
-    private fun getGalleryImage(galleryItem: RedditGalleryItem): RedditGalleryImage {
-        // For videos only the source will actually provide an MP4 URL
-        if (galleryItem.source.mp4Url != null) {
-            return galleryItem.source
-        }
-
+    private fun getGalleryImages(galleryItem: RedditGalleryItem): Pair<RedditGalleryImage, RedditGalleryImage> {
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
         var index = -1
@@ -209,6 +255,6 @@ class ContentGalleryImage @JvmOverloads constructor(
             }
         }
 
-        return images[index]
+        return images[index] to images[index / 2]
     }
 }

@@ -261,6 +261,17 @@ class CreateIntentTest {
         assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_RECIPIENT, "hakonschia")
         assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_SUBJECT, "hello")
         assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_MESSAGE, "The post should be removed")
+
+        // old.reddit.com
+        intent = createIntent("https://old.reddit.com/message/compose?to=hakonschia&subject=hello&message=The post should be removed", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+        assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_RECIPIENT, "hakonschia")
+        assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_SUBJECT, "hello")
+        assertIntentHasExtras(intent, SendPrivateMessageActivity.EXTRAS_MESSAGE, "The post should be removed")
+
+        // http (not https), np.reddit.com
+        intent = createIntent("http://np.reddit.com/message/compose?to=%23autotldr%20%22PM's%20and%20comments%20are%20monitored,%20constructive%20feedback%20is%20welcome.%22", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
     }
 
     /**
@@ -366,4 +377,48 @@ class CreateIntentTest {
         val intent: Intent = createIntent("https://www.nrk.no", options, instrumentationContext)
         assertIntentIsNotForClass(intent, clazz)
     }
+
+    /**
+     * Tests that [createIntent] does not create an intent to our app for urls that include a reddit link
+     * as a URL parameter
+     */
+    @Test
+    fun linkToRedditAsUrlParameterDoesNotMatchApp() {
+        // These should go to WebViewActivity (openLinksInternally = true)
+
+        val options = CreateIntentOptions(openLinksInternally = true)
+        val clazz = WebViewActivity::class.java
+        var intent: Intent = createIntent("https://redditsave.com/info?url=https://www.reddit.com/r/AbruptChaos/comments/pe4yfb/firework_show_airstrike/", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+
+        // No "www" in the URL parameter
+        intent = createIntent("https://redditsave.com/info?url=https://reddit.com/r/AbruptChaos/comments/pe4yfb/firework_show_airstrike/", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+
+        intent = createIntent("https://somewebsite.com/somepath?url=https://old.reddit.com/r/hakonschia", options, instrumentationContext)
+        assertIntentIsForClass(intent, clazz)
+    }
+
+    /**
+     * Tests that the "s" in "https" is optional for reddit links
+     */
+    @Test
+    fun httpsOrHttp() {
+        val options = CreateIntentOptions(openLinksInternally = true)
+        val clazz = PostActivity::class.java
+
+        var intent: Intent = createIntent("http://np.reddit.com/r/autotldr/comments/31b9fm/faq_autotldr_bot", options, instrumentationContext)
+        assertIntentIsForClass(intent, PostActivity::class.java)
+        // With s
+        intent = createIntent("https://np.reddit.com/r/autotldr/comments/31b9fm/faq_autotldr_bot", options, instrumentationContext)
+        assertIntentIsForClass(intent, PostActivity::class.java)
+
+        intent = createIntent("http://np.reddit.com/user/hakonschia", options, instrumentationContext)
+        assertIntentIsForClass(intent, ProfileActivity::class.java)
+        // With s
+        intent = createIntent("https://np.reddit.com/user/hakonschia", options, instrumentationContext)
+        assertIntentIsForClass(intent, ProfileActivity::class.java)
+    }
+
+
 }

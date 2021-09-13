@@ -40,6 +40,12 @@ data class RedditGalleryItem(
     val resolutions: List<RedditGalleryImage>,
 
     /**
+     * A list of obfuscated images for the gallery item, or null if no obfuscated images are provided
+     */
+    @SerializedName("o")
+    val obfuscated: List<RedditGalleryImage>?,
+
+    /**
      * The optional caption for the gallery image
      */
     @SerializedName("caption")

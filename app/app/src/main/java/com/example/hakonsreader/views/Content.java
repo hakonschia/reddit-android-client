@@ -43,6 +43,12 @@ public abstract class Content extends FrameLayout {
     protected RedditPost redditPost;
 
     /**
+     * A list of the previous posts this view has displayed
+     */
+    private List<RedditPost> previousPosts = new ArrayList<>();
+
+
+    /**
      * If true, the content of {@link #redditPost} should be cached
      */
     protected boolean cache;
@@ -183,12 +189,23 @@ public abstract class Content extends FrameLayout {
     }
 
     /**
+     * @return The list of posts this view has previously displayed. Does not include the current post
+     */
+    public List<RedditPost> getPreviousPosts() {
+        return previousPosts;
+    }
+
+    /**
      * Recycles the content so that it can be reused with a new reddit post
      */
     @CallSuper
     public void recycle() {
         // We do not want to use clear() here, as the bundle might be stored somewhere for reuse later
         extras = new Bundle();
+
+        if (this.redditPost != null) {
+            previousPosts.add(this.redditPost);
+        }
         setRedditPost(null);
     }
 }

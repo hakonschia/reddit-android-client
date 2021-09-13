@@ -21,6 +21,18 @@ import com.example.hakonsreader.databinding.TagBinding
  *  text at the end if the view is constrained
  */
 class Tag @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context, attrs, defStyleAttr) {
+    companion object {
+        /**
+         * The default text color
+         */
+        const val DEFAULT_TEXT_COLOR = "#000000"
+
+        /**
+         * The default fill color (the background color of the flair)
+         */
+        const val DEFAULT_FILL_COLOR = "#EAEAEA"
+    }
+
     private val binding = TagBinding.inflate(LayoutInflater.from(context), this, true)
     private var textColor = 0
     private var textColorOverridden = false
@@ -28,11 +40,10 @@ class Tag @JvmOverloads constructor(context: Context, attrs: AttributeSet? = nul
     init {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.Tag, 0, 0)
         try {
-            val defaultTextColor = "#000000"
-            textColor = a.getColor(R.styleable.Tag_textColor, Color.parseColor(defaultTextColor))
-            val defaultFillColor = "#EAEAEA"
-            val fillColor = a.getColor(R.styleable.Tag_fillColor, Color.parseColor(defaultFillColor))
+            textColor = a.getColor(R.styleable.Tag_textColor, Color.parseColor(DEFAULT_TEXT_COLOR))
+            val fillColor = a.getColor(R.styleable.Tag_fillColor, Color.parseColor(DEFAULT_FILL_COLOR))
             setFillColor(fillColor)
+
             val text = a.getString(R.styleable.Tag_text)
             if (text != null) {
                 addText(text)
@@ -51,9 +62,14 @@ class Tag @JvmOverloads constructor(context: Context, attrs: AttributeSet? = nul
 
     /**
      * Clears all views from the tag
+     *
+     * This also resets the text and fill colors of the flair
      */
-    fun clear() {
+    fun recycle() {
         binding.tags.removeAllViews()
+        textColor = Color.parseColor(DEFAULT_TEXT_COLOR)
+        setFillColor(Color.parseColor(DEFAULT_FILL_COLOR))
+        textColorOverridden = false
     }
 
     /**
@@ -89,6 +105,9 @@ class Tag @JvmOverloads constructor(context: Context, attrs: AttributeSet? = nul
             // Getting the transparent value out of a color is apparently harder (if there is no transparent
             // it still returns 255? so set it here only, not in setFillColor(int))
             setFillColor(ContextCompat.getColor(context, R.color.background_with_alpha))
+
+            // With a transparent color the text color has to be the (app) default to ensure it's visible
+            // against the background (text_color is white on dark theme and black on light theme)
             textColor = ContextCompat.getColor(context, R.color.text_color)
             textColorOverridden = true
             // The elevation shadow will still be visible on light backgrounds
@@ -153,10 +172,10 @@ class Tag @JvmOverloads constructor(context: Context, attrs: AttributeSet? = nul
 
         ImageView(context).run {
             Glide.with(this)
-                    .load(imageURL)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .override(size, size)
-                    .into(this)
+                .load(imageURL)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .override(size, size)
+                .into(this)
             add(this)
         }
     }

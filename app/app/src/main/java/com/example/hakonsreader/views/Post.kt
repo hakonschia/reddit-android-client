@@ -25,6 +25,7 @@ import com.example.hakonsreader.api.enums.PostType
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.persistence.RedditPostsDao
 import com.example.hakonsreader.databinding.PostBinding
+import com.example.hakonsreader.fragments.bottomsheets.ContentInfoBottomSheet
 import com.example.hakonsreader.fragments.bottomsheets.PeekTextPostBottomSheet
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.generatePostContent
@@ -84,25 +85,35 @@ class Post @JvmOverloads constructor(
         setOnLongClickListener {
             redditPost?.let { post ->
                 val p = post.crossposts?.firstOrNull() ?: redditPost
-                // If we're already showing text content it's no point in showing this dialog
-                if (p.getPostType() == PostType.TEXT && !showTextContent) {
-                    val markdown: String = p.selftext
 
-                    if (markdown.isNotEmpty()) {
-                        if (context is AppCompatActivity) {
-                            PeekTextPostBottomSheet.newInstance(p).show(context.supportFragmentManager, "Text post")
+                // We never recycle text posts, so there is never any recycle info to show
+                if (p.getPostType() == PostType.TEXT) {
+                    // If we're already showing text content it's no point in showing this dialog
+                    if (!showTextContent) {
+                        val markdown: String = p.selftext
+
+                        if (markdown.isNotEmpty()) {
+                            if (context is AppCompatActivity) {
+                                PeekTextPostBottomSheet.newInstance(p).show(context.supportFragmentManager, "Text post")
+                            } else {
+                                // Not sure if this will ever happen, but in case it does
+                                // This would make the peek url in the post not work though, as it uses bottom sheet as well
+                                AlertDialog.Builder(context)
+                                        .setView(ContentText(context).apply {
+                                            setRedditPost(p)
+                                        })
+                                        .show()
+                            }
                         } else {
-                            // Not sure if this will ever happen, but in case it does
-                            // This would make the peek url in the post not work though, as it uses bottom sheet as well
-                            AlertDialog.Builder(context)
-                                    .setView(ContentText(context).apply {
-                                        setRedditPost(p)
-                                    })
-                                    .show()
+                            Snackbar.make(it, R.string.postHasNoText, Snackbar.LENGTH_SHORT).show()
                         }
-
-                    } else {
-                        Snackbar.make(it, R.string.postHasNoText, Snackbar.LENGTH_SHORT).show()
+                    }
+                } else if (Settings.devShowContentInfoOnLongPress()) {
+                    if (context is AppCompatActivity) {
+                        getContent()?.let {
+                            ContentInfoBottomSheet.newInstance(it::class.java, it.previousPosts)
+                                .show(context.supportFragmentManager, "bruh")
+                        }
                     }
                 }
             }

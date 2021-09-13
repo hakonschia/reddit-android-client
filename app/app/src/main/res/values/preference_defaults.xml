@@ -37,6 +37,7 @@
     <bool name="prefs_default_show_awards">true</bool>
     <bool name="prefs_default_dev_show_inbox_notification">true</bool>
     <bool name="prefs_default_dev_highlight_selected_views">true</bool>
+    <bool name="prefs_default_dev_show_content_info_on_long_press">true</bool>
     <bool name="prefs_default_show_subreddit_info_button">false</bool>
 
 </resources>
