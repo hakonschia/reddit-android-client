@@ -475,4 +475,5 @@
     <string name="prefs_summary_show_subreddit_info_button">Gjemt på telefoner uten gestnavigasjon</string>
     <string name="bottomSheetContentInfoRecycleCount">Antall ganger resirkulert: %d</string>
     <string name="prefs_title_dev_show_content_info_on_long_press">Hold inne for å vise innholdsinformasjon</string>
+    <string name="bottomSheetContentInfoCurrentPostTitle">Nåværende post:</string>
 </resources>

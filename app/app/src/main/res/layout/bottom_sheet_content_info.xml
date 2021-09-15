@@ -7,65 +7,116 @@
         <variable
             name="numPreviousPosts"
             type="int" />
+
+        <variable
+            name="currentPost"
+            type="com.example.hakonsreader.api.model.RedditPost" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="16dp">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/className"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="16dp">
 
-            android:layout_marginStart="16dp"
+            <TextView
+                android:id="@+id/className"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
 
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
 
-            android:textSize="16sp"
-            android:textColor="@color/text_color"
-            android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
 
-            app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="com.example.ContentVideo" />
+                android:textSize="16sp"
+                android:textColor="@color/text_color"
+                android:textStyle="bold"
 
-        <TextView
-            android:id="@+id/recycleCountText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="com.example.ContentVideo" />
 
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            <TextView
+                android:id="@+id/recycleCountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
 
-            android:text="@{@string/bottomSheetContentInfoRecycleCount(numPreviousPosts)}"
-            android:textColor="@color/text_color"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
 
-            app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/className"
-            app:layout_constraintTop_toBottomOf="@+id/className"
-            tools:text="Recycle count: 5" />
+                android:text="@{@string/bottomSheetContentInfoRecycleCount(numPreviousPosts)}"
+                android:textColor="@color/text_color"
+                android:textSize="14sp"
 
-        <!-- This is a list of titles, but currently we're just displaying the titles so
-         it's a bit overkill to use a RecyclerView (did someone say Jetpack Compose?) -->
-        <TextView
-            android:id="@+id/previousPostTitles"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/className"
+                app:layout_constraintTop_toBottomOf="@+id/className"
+                tools:text="Recycle count: 5" />
 
-            android:layout_marginTop="8dp"
-            android:textColor="@color/text_color"
+            <TextView
+                android:id="@+id/currentPostTextTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
 
-            app:layout_constraintStart_toStartOf="@+id/recycleCountText"
-            app:layout_constraintTop_toBottomOf="@+id/recycleCountText"
-            tools:text="Horse\nCat\nDog" />
+                android:text="@string/bottomSheetContentInfoCurrentPostTitle"
+                android:textColor="@color/text_color"
+                android:textSize="14sp"
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintStart_toStartOf="@+id/recycleCountText"
+                app:layout_constraintTop_toBottomOf="@+id/recycleCountText" />
+
+            <TextView
+                android:id="@+id/currentPostTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="4dp"
+                android:text="@{currentPost.title}"
+                android:textColor="@color/text_color"
+                android:textSize="14sp"
+                android:textStyle="bold"
+
+                app:layout_constraintStart_toStartOf="@+id/recycleCountText"
+                app:layout_constraintTop_toBottomOf="@+id/currentPostTextTitle"
+                tools:text="Some post title :)"/>
+
+            <FrameLayout
+                android:id="@+id/currentPostContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/currentPostTitle"
+                tools:background="#0FF"
+                tools:layout_height="150dp" />
+
+            <!-- This is a list of titles, but currently we're just displaying the titles so
+             it's a bit overkill to use a RecyclerView (did someone say Jetpack Compose?) -->
+            <TextView
+                android:id="@+id/previousPostTitles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="24dp"
+
+                android:textColor="@color/text_color"
+                app:layout_constraintStart_toStartOf="@+id/recycleCountText"
+                app:layout_constraintTop_toBottomOf="@+id/currentPostContent"
+                tools:text="Horse\nCat\nDog" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 </layout>

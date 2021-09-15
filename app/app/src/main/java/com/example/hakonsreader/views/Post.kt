@@ -111,8 +111,8 @@ class Post @JvmOverloads constructor(
                 } else if (Settings.devShowContentInfoOnLongPress()) {
                     if (context is AppCompatActivity) {
                         getContent()?.let {
-                            ContentInfoBottomSheet.newInstance(it::class.java, it.previousPosts)
-                                .show(context.supportFragmentManager, "bruh")
+                            ContentInfoBottomSheet.newInstance(it)
+                                .show(context.supportFragmentManager, "Content info")
                         }
                     }
                 }

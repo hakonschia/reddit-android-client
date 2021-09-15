@@ -4,7 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/drawable/ic_image_not_supported_200dp.xml" value="0.39479166666666665" />
-        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/bottom_sheet_content_info.xml" value="0.25" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/bottom_sheet_content_info.xml" value="0.33" />
+        <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/bottom_sheet_video_playback_error.xml" value="0.23697916666666666" />
         <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/content_image.xml" value="0.20625" />
         <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/double_image_view.xml" value="0.25729166666666664" />
         <entry key="..\:/Users/hakon/Desktop/Prosjekter/hakonsreader/app/app/src/main/res/layout/fragment_subreddit.xml" value="0.25" />

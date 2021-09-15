@@ -7,8 +7,12 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.BottomSheetContentInfoBinding
+import com.example.hakonsreader.misc.generatePostContent
 import com.example.hakonsreader.views.Content
+import com.example.hakonsreader.views.ContentGallery
+import com.example.hakonsreader.views.ContentVideo
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.gson.Gson
 
 
 /**
@@ -32,19 +36,25 @@ class ContentInfoBottomSheet : BottomSheetDialogFragment() {
          */
         private const val ARGS_LIST_OF_TITLES = "args_listOfTitles"
 
+        /**
+         * The key used in [getArguments] for a JSON representation of the current post the content
+         * is displaying
+         *
+         * The value with this key is a string
+         */
+        private const val ARGS_CURRENT_POST = "args_currentPost"
+
 
         /**
          * Creates a new bottom sheet to show information about a content view
-         *
-         * @param contentType The content class that is being shown
-         * @param posts The posts describing the content info
          */
-        fun newInstance(contentType: Class<out Content>, posts: List<RedditPost>) = ContentInfoBottomSheet().apply {
-            val postTitles = posts.map { it.title }
+        fun newInstance(content: Content) = ContentInfoBottomSheet().apply {
+            val postTitles = content.previousPosts.map { it.title }
 
             arguments = bundleOf(
-                Pair(ARGS_CONTENT_TYPE, contentType.canonicalName),
-                Pair(ARGS_LIST_OF_TITLES, postTitles.toTypedArray())
+                Pair(ARGS_CONTENT_TYPE, content.javaClass.canonicalName),
+                Pair(ARGS_LIST_OF_TITLES, postTitles.toTypedArray()),
+                Pair(ARGS_CURRENT_POST, Gson().toJson(content.redditPost))
             )
         }
     }
@@ -66,7 +76,27 @@ class ContentInfoBottomSheet : BottomSheetDialogFragment() {
                 binding.numPreviousPosts = postTitles.size
 
                 // Two newlines for some padding between
-                binding.previousPostTitles.text = postTitles.joinToString("\n\n")
+                // Reverse the list so the newest post is first in the list
+                binding.previousPostTitles.text = postTitles.reversed().joinToString("\n\n")
+            }
+
+            val currentPostJson = args.getString(ARGS_CURRENT_POST)
+            if (currentPostJson != null) {
+                val currentPost = Gson().fromJson(currentPostJson, RedditPost::class.java)
+
+                val contentView = generatePostContent(requireContext(), currentPost, showTextContent = false, reusableViews = null)
+                if (contentView != null) {
+                    if (contentView is ContentVideo) {
+                        contentView.observeVideoLifecycle(viewLifecycleOwner)
+                    } else if (contentView is ContentGallery) {
+                        contentView.lifecycleOwner = viewLifecycleOwner
+                    }
+
+                    contentView.redditPost = currentPost
+                    binding.currentPostContent.addView(contentView)
+                }
+
+                binding.currentPost = currentPost
             }
         }
     }
