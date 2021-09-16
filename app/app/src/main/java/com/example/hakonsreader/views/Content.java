@@ -45,7 +45,7 @@ public abstract class Content extends FrameLayout {
     /**
      * A list of the previous posts this view has displayed
      */
-    private List<RedditPost> previousPosts = new ArrayList<>();
+    private final List<RedditPost> previousPosts = new ArrayList<>();
 
 
     /**
@@ -111,11 +111,15 @@ public abstract class Content extends FrameLayout {
      * Sets the post this content is for.
      *
      * This will automatically update the view of the content, and any bitmap and extras must be set
-     * before this is called to provide the expected behaviour
+     * before this is called to provide the expected behaviour.
      *
      * @param redditPost The post to use in the view
      */
     public void setRedditPost(@Nullable RedditPost redditPost) {
+        if (this.redditPost != null) {
+            this.recycle();
+        }
+
         this.redditPost = redditPost;
         if (redditPost != null) {
             if (redditPost.isNsfw()) {
@@ -154,6 +158,7 @@ public abstract class Content extends FrameLayout {
      *
      * @return A list of {@link Pair} mapping a view to its transition name (this might be empty)
      */
+    @NonNull
     public List<Pair<View, String>> getTransitionViews() {
         return new ArrayList<>();
     }
@@ -172,7 +177,7 @@ public abstract class Content extends FrameLayout {
     }
 
     /**
-     * Sets a bitmap on the content. By default this has an empty implementation and does nothing.
+     * Sets a bitmap on the content
      *
      * @param bitmap The bitmap to set
      */
@@ -181,7 +186,9 @@ public abstract class Content extends FrameLayout {
     }
 
     /**
-     * @return The bitmap passed to {@link #setBitmap(Bitmap)}
+     * @return A bitmap representation of the view, if applicable. If a child class overrides this
+     * method it is up to the child to determine what makes sense to return. Otherwise, the bitmap
+     * passed to {@link #setBitmap(Bitmap)} is returned
      */
     @Nullable
     public Bitmap getBitmap() {
@@ -191,6 +198,7 @@ public abstract class Content extends FrameLayout {
     /**
      * @return The list of posts this view has previously displayed. Does not include the current post
      */
+    @NonNull
     public List<RedditPost> getPreviousPosts() {
         return previousPosts;
     }
@@ -199,13 +207,14 @@ public abstract class Content extends FrameLayout {
      * Recycles the content so that it can be reused with a new reddit post
      */
     @CallSuper
-    public void recycle() {
+    protected void recycle() {
         // We do not want to use clear() here, as the bundle might be stored somewhere for reuse later
         extras = new Bundle();
 
-        if (this.redditPost != null) {
-            previousPosts.add(this.redditPost);
+        if (redditPost != null) {
+            previousPosts.add(redditPost);
         }
-        setRedditPost(null);
+
+        redditPost = null;
     }
 }

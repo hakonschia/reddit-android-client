@@ -138,7 +138,7 @@ class ContentVideo @JvmOverloads constructor(
         }
     }
 
-    override fun getTransitionViews(): List<Pair<View, String>>? {
+    override fun getTransitionViews(): List<Pair<View, String>> {
         return super.getTransitionViews().also {
             it.add(Pair(player, player.transitionName))
         }

@@ -184,7 +184,9 @@ class PostsAdapter(
                 content.extras = savedExtras
             }
 
-            content.redditPost = post
+            // This is set in Post.kt, keeping this commented as a reminder to not
+            // think it's a good idea to put it back later :)
+            //content.redditPost = post
         }
 
         holder.addContent(content)

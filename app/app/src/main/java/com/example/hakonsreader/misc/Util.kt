@@ -1130,7 +1130,6 @@ fun generatePostContent(
     return when {
         reusedContentView != null -> {
             reusableViews.remove(reusedContentView)
-            reusedContentView.recycle()
             reusedContentView
         }
 
