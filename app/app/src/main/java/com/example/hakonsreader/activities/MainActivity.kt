@@ -593,11 +593,15 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
     fun recreateAsNewUser() {
         recreateAsNewUser = true
 
-        val transaction = supportFragmentManager.beginTransaction()
-        supportFragmentManager.fragments.forEach {
-            transaction.remove(it)
+        // If this is called multiple times in close succession this can cause a crash because the
+        // fragment manager is destroyed (is this really a fix? Or just treating the symptoms? You decide)
+        if (!supportFragmentManager.isDestroyed) {
+            val transaction = supportFragmentManager.beginTransaction()
+            supportFragmentManager.fragments.forEach {
+                transaction.remove(it)
+            }
+            transaction.commit()
         }
-        transaction.commit()
 
         recreate()
     }
