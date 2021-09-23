@@ -11,13 +11,17 @@ import com.example.hakonsreader.databinding.BottomSheetShowAwardBinding
 import com.example.hakonsreader.markwonplugins.EnlargeLinkPlugin
 import com.example.hakonsreader.markwonplugins.RedditLinkPlugin
 import com.example.hakonsreader.misc.InternalLinkMovementMethod
+import com.example.hakonsreader.misc.Settings
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
+import javax.inject.Inject
 
 /**
  * BottomSheet for displaying information about a [RedditAward]
  */
+@AndroidEntryPoint
 class ShowAwardBottomSheet : BottomSheetDialogFragment() {
     companion object {
         /**
@@ -41,6 +45,9 @@ class ShowAwardBottomSheet : BottomSheetDialogFragment() {
     private var _binding: BottomSheetShowAwardBinding? = null
     private val binding get() = _binding!!
 
+    @Inject
+    lateinit var settings: Settings
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = BottomSheetShowAwardBinding.inflate(LayoutInflater.from(requireActivity()))
@@ -56,7 +63,7 @@ class ShowAwardBottomSheet : BottomSheetDialogFragment() {
 
         // Some descriptions have subreddit links, so ensure those are linked
         // This text isn't markdown text, so using the default Markwon from App is unnecessary and inefficient
-        Markwon.builder(requireContext()).usePlugin(RedditLinkPlugin()).usePlugin(EnlargeLinkPlugin()).build().apply{
+        Markwon.builder(requireContext()).usePlugin(RedditLinkPlugin()).usePlugin(EnlargeLinkPlugin(settings)).build().apply {
             setMarkdown(binding.description, desc)
         }
 

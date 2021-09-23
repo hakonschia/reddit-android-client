@@ -112,6 +112,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
     @Inject
     lateinit var api: RedditApi
 
+    @Inject
+    lateinit var settings: Settings
+
     private lateinit var binding: ActivityPostBinding
 
     private val commentsViewModel: CommentsViewModel by viewModels()
@@ -187,7 +190,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
         } else {
             binding.parentLayout.progress = savedInstanceState.getFloat(SAVED_TRANSITION_STATE_KEY)
 
-            val transitionEnabled = savedInstanceState.getBoolean(SAVED_TRANSITION_ENABLED_KEY, Settings.collapsePostsByDefaultWhenScrollingComments())
+            val transitionEnabled = savedInstanceState.getBoolean(SAVED_TRANSITION_ENABLED_KEY, settings.collapsePostsByDefaultWhenScrollingComments())
             enableTransition(transitionEnabled, showSnackbar = false, updateHeight = false)
         }
     }
@@ -278,7 +281,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
             expandOrCollapsePost.setOnLongClickListener { toggleTransitionEnabled(); true }
         }
 
-        val collapsePostByDefault = Settings.collapsePostsByDefaultWhenScrollingComments()
+        val collapsePostByDefault = settings.collapsePostsByDefaultWhenScrollingComments()
         enableTransition(collapsePostByDefault, showSnackbar = false, updateHeight = !collapsePostByDefault)
     }
 
@@ -343,7 +346,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
      */
     private fun setupCommentsList() {
         with(binding) {
-            val adapter = CommentsAdapter(api, commentsViewModel).apply {
+            val adapter = CommentsAdapter(api, commentsViewModel, settings).apply {
                 replyListener = this@PostActivity
             }
 
@@ -598,7 +601,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
 
         // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
         binding.comments.stopScroll()
-        if (Settings.commentSmoothScrollThreshold() >= gapSize) {
+        if (settings.commentSmoothScrollThreshold() >= gapSize) {
             val smoothScroller = object : LinearSmoothScroller(this) {
                 override fun getVerticalSnapPreference(): Int {
                     return SNAP_TO_START
@@ -690,9 +693,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
         val height = if (portrait) Resources.getSystem().displayMetrics.heightPixels else Resources.getSystem().displayMetrics.widthPixels
 
         return if (forWhenCollapsedDisabled) {
-            (height * (Settings.getMaxPostSizePercentageWhenCollapseDisabled() / 100f)).toInt()
+            (height * (settings.getMaxPostSizePercentageWhenCollapseDisabled() / 100f)).toInt()
         } else {
-            (height * (Settings.getMaxPostSizePercentage() / 100f)).toInt()
+            (height * (settings.getMaxPostSizePercentage() / 100f)).toInt()
         }
     }
 

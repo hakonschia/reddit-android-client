@@ -35,6 +35,7 @@ import kotlin.collections.HashMap
 class PostsViewModel @AssistedInject constructor (
         @Assisted private var userOrSubredditName: String,
         @Assisted private val isUser: Boolean,
+        @Assisted private val settings: Settings,
         @Assisted private val savedStateHandle: SavedStateHandle,
         private val api: RedditApi,
         private val postsDao: RedditPostsDao,
@@ -68,6 +69,7 @@ class PostsViewModel @AssistedInject constructor (
         fun create(
                 userOrSubredditName: String,
                 isUser: Boolean,
+                settings: Settings,
                 savedStateHandle: SavedStateHandle
         ) : PostsViewModel
     }
@@ -261,7 +263,7 @@ class PostsViewModel @AssistedInject constructor (
      */
     private fun filterUserSelectedSubreddits(postsToFilter: List<RedditPost>): List<RedditPost> {
         return if (isDefaultSubreddit) {
-            val subsToFilter = Settings.subredditsToFilterFromDefaultSubreddits()
+            val subsToFilter = settings.subredditsToFilterFromDefaultSubreddits()
 
             postsToFilter.filter { post ->
                 // Keep the post if the subreddit it is in isn't found in subsToFilter

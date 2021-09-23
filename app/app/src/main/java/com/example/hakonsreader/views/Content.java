@@ -19,6 +19,10 @@ import com.example.hakonsreader.misc.Settings;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Generic superclass for a view displaying Reddit content
  *
@@ -27,6 +31,7 @@ import java.util.List;
  * {@link #recycle()} to ensure that any potential resources are freed up and is no longer connected
  * to a post
  */
+@AndroidEntryPoint
 public abstract class Content extends FrameLayout {
 
     /**
@@ -62,6 +67,9 @@ public abstract class Content extends FrameLayout {
 
     @Nullable
     protected Bitmap bitmap;
+
+    @Inject
+    Settings settings;
 
 
     public Content(Context context) {
@@ -123,7 +131,7 @@ public abstract class Content extends FrameLayout {
         this.redditPost = redditPost;
         if (redditPost != null) {
             if (redditPost.isNsfw()) {
-                cache = Settings.INSTANCE.cacheNsfw();
+                cache = settings.cacheNsfw();
             } else {
                 // Always cache non-NSFW posts
                 cache = true;

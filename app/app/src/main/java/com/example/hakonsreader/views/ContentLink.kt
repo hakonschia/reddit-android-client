@@ -22,16 +22,22 @@ import com.example.hakonsreader.databinding.ContentLinkBinding
 import com.example.hakonsreader.databinding.ContentLinkSimpleBinding
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * View for displaying links from a [RedditPost]. This will display different views depending on
  * [Settings.dataSavingEnabled]
  */
+@AndroidEntryPoint
 class ContentLink @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
 ) : Content(context, attrs, defStyleAttr) {
+
+    @Inject
+    lateinit var settings: Settings
 
     private val binding: ViewBinding = getCorrectBinding()
 
@@ -40,7 +46,7 @@ class ContentLink @JvmOverloads constructor(
      * data saving setting
      */
     private fun getCorrectBinding() : ViewBinding {
-        return if (Settings.dataSavingEnabled()) {
+        return if (settings.dataSavingEnabled()) {
             ContentLinkSimpleBinding.inflate(LayoutInflater.from(context), this, true)
         } else {
             ContentLinkBinding.inflate(LayoutInflater.from(context), this, true)
@@ -78,7 +84,7 @@ class ContentLink @JvmOverloads constructor(
     private fun updateViewNormal() {
         binding as ContentLinkBinding
 
-        val variants = getImageVariantsForRedditPost(redditPost)
+        val variants = getImageVariantsForRedditPost(redditPost, settings.showNsfwPreview())
 
         val url = when {
             redditPost.isNsfw -> variants.nsfw

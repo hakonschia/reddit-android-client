@@ -80,6 +80,9 @@ class SubmitActivity : BaseActivity() {
     @Inject
     lateinit var flairsDao: RedditFlairsDao
 
+    @Inject
+    lateinit var settings: Settings
+
     private lateinit var binding: ActivitySubmitBinding
 
     private lateinit var subreddit: Subreddit
@@ -228,7 +231,7 @@ class SubmitActivity : BaseActivity() {
 
             // Load flairs right away if data saving isn't enabled. If the list from the ViewModel
             // is empty, the observer will also trigger a load even if data saving is on
-            if (!Settings.dataSavingEnabled()) {
+            if (!settings.dataSavingEnabled()) {
                 CoroutineScope(IO).launch {
                     refresh()
                 }

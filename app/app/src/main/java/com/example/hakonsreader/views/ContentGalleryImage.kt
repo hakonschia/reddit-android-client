@@ -24,10 +24,13 @@ import com.example.hakonsreader.databinding.ContentGalleryImageBinding
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createDoubleImageViewState
 import com.example.hakonsreader.views.util.goneIf
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * View for displaying in a single gallery item in [ContentGallery]
  */
+@AndroidEntryPoint
 class ContentGalleryImage @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
@@ -62,6 +65,9 @@ class ContentGalleryImage @JvmOverloads constructor(
 
     var bitmap: Bitmap? = null
 
+    @Inject
+    lateinit var settings: Settings
+
     private var extras: Bundle? = null
 
     fun destroy() {
@@ -75,7 +81,7 @@ class ContentGalleryImage @JvmOverloads constructor(
     fun viewSelected() {
         val view = binding.content.getChildAt(0)
 
-        if (view is VideoPlayer && Settings.autoPlayVideos()) {
+        if (view is VideoPlayer && settings.autoPlayVideos()) {
             view.play()
         }
     }
@@ -176,7 +182,8 @@ class ContentGalleryImage @JvmOverloads constructor(
                     redditPost,
                     normalUrl = images.first.url,
                     lowResUrl = images.second.url,
-                    obfuscatedUrl = obfuscated?.url
+                    obfuscatedUrl = obfuscated?.url,
+                    settings
                 )
             }
         }

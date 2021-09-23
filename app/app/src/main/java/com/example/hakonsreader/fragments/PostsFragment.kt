@@ -20,6 +20,7 @@ import com.example.hakonsreader.api.enums.SortingMethods
 import com.example.hakonsreader.api.responses.GenericError
 import com.example.hakonsreader.databinding.FragmentPostsBinding
 import com.example.hakonsreader.interfaces.SortableWithTime
+import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.recyclerviewadapters.PostsAdapter
 import com.example.hakonsreader.recyclerviewadapters.listeners.PostScrollListener
 import com.example.hakonsreader.viewmodels.PostsViewModel
@@ -149,8 +150,11 @@ class PostsFragment : Fragment(), SortableWithTime {
     private val binding get() = _binding!!
 
     @Inject
+    lateinit var settings: Settings
+
+    @Inject
     lateinit var postsViewModelFactory: PostsViewModel.Factory
-    private val postsViewModel: PostsViewModel by assistedViewModel { postsViewModelFactory.create(name, isForUser, it) }
+    private val postsViewModel: PostsViewModel by assistedViewModel { postsViewModelFactory.create(name, isForUser, settings, it) }
 
     private val postsScrollListener: PostScrollListener = PostScrollListener()
 

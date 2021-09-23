@@ -24,12 +24,15 @@ import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.r0adkll.slidr.Slidr
 import com.r0adkll.slidr.model.SlidrInterface
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Activity to display an image in fullscreen
  *
  * The URL to the image should be passed to the activity with the key [EXTRAS_IMAGE_URL]
  */
+@AndroidEntryPoint
 class ImageActivity : BaseActivity() {
 
     companion object {
@@ -59,6 +62,9 @@ class ImageActivity : BaseActivity() {
         var BITMAP: Bitmap? = null
     }
 
+    @Inject
+    lateinit var settings: Settings
+
     private var slidrInterface: SlidrInterface? = null
     private lateinit var binding: ActivityImageBinding
 
@@ -73,7 +79,7 @@ class ImageActivity : BaseActivity() {
         // Offset 3 bytes and get the value there to find the alpha
         val alpha = color shr 8 * 3 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
-        val config = Settings.getVideoAndImageSlidrConfig() // To keep the background the same the entire way the alpha is always the same
+        val config = settings.getVideoAndImageSlidrConfig() // To keep the background the same the entire way the alpha is always the same
                 // Otherwise the background of the activity slides with, which looks weird
                 .scrimStartAlpha(alphaPercentage)
                 .scrimEndAlpha(alphaPercentage)

@@ -1,9 +1,7 @@
 package com.example.hakonsreader.activities
 
-import androidx.test.platform.app.InstrumentationRegistry
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.responses.ApiResponse
-import com.example.hakonsreader.misc.Settings
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
@@ -11,7 +9,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.Assert.*
-import org.junit.BeforeClass
 import javax.inject.Inject
 
 
@@ -27,11 +24,6 @@ class AppTest {
     @Before
     fun init() {
         hiltRule.inject()
-
-        // This can possibly be in @BeforeClass ?
-        // Note: This MUST use "targetContext", not "context" ("targetContext" is the application with the
-        // resources we use, "context" is the testing context)
-        Settings.init(InstrumentationRegistry.getInstrumentation().targetContext)
     }
 
     /**
@@ -87,13 +79,4 @@ class AppTest {
         }
     }
 
-
-    /**
-     * Tests that [Settings] can be used during tests without throwing errors
-     */
-    @Test
-    fun canUseSettings() {
-        // If Settings isn't initialized this will throw a "Variable not initialized" exception which makes the test fail
-        val someSetting = Settings.autoLoopVideos()
-    }
 }

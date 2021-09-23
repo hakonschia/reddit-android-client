@@ -61,13 +61,14 @@ data class PostImageVariants2(val normal: String?, val normalLowRes: String?, va
  * Gets image variants for a reddit post
  *
  * @param post The post to get images for
+ * @param showNsfwPreview How NSFW previews should be shown
  * @return A [PostImageVariants] that holds the images to use for if the post is normal, nsfw, or spoiler
  */
-fun getImageVariantsForRedditPost(post: RedditPost): PostImageVariants {
+fun getImageVariantsForRedditPost(post: RedditPost, showNsfwPreview: ShowNsfwPreview): PostImageVariants {
     return PostImageVariants(
         post.getNormalImage(lowRes = false),
         post.getNormalImage(lowRes = true),
-        post.getNsfwImage(),
+        post.getNsfwImage(showNsfwPreview),
         post.getObfuscatedImage()
     )
 }
@@ -119,8 +120,8 @@ private fun RedditPost.getNormalImage(lowRes: Boolean): String? {
  * @return A URL pointing to the image to use for a post, depending on [Settings.showNsfwPreview]. If this is null
  * then no image should be shown ([ShowNsfwPreview.NO_IMAGE])
  */
-private fun RedditPost.getNsfwImage(): String? {
-    return when (Settings.showNsfwPreview()) {
+private fun RedditPost.getNsfwImage(showNsfwPreview: ShowNsfwPreview): String? {
+    return when (showNsfwPreview) {
         ShowNsfwPreview.NORMAL -> this.getNormalImage(lowRes = false)
         ShowNsfwPreview.BLURRED -> this.getObfuscatedImage()
         ShowNsfwPreview.NO_IMAGE -> null
@@ -160,9 +161,10 @@ fun createDoubleImageViewState(
     redditPost: RedditPost,
     normalUrl: String,
     lowResUrl: String?,
-    obfuscatedUrl: String?
+    obfuscatedUrl: String?,
+    settings: Settings
 ): DoubleImageView.DoubleImageState {
-    val dataSavingEnabled = Settings.dataSavingEnabled()
+    val dataSavingEnabled = settings.dataSavingEnabled()
 
     return when {
         // TODO spoiler and nsfw don't follow data saving since ImageActivity doesn't allow for two images
@@ -174,7 +176,7 @@ fun createDoubleImageViewState(
         }
 
         redditPost.isNsfw -> {
-            when (Settings.showNsfwPreview()) {
+            when (settings.showNsfwPreview()) {
                 ShowNsfwPreview.NORMAL -> if (dataSavingEnabled) {
                     if (lowResUrl != null) {
                         DoubleImageView.DoubleImageState.HdImage(

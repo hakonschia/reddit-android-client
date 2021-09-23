@@ -13,7 +13,6 @@ import android.view.View
 import androidx.preference.PreferenceManager
 import com.example.hakonsreader.R
 import com.example.hakonsreader.enums.ShowNsfwPreview
-import com.example.hakonsreader.misc.Settings.init
 import com.example.hakonsreader.states.AppState
 import com.example.hakonsreader.views.preferences.multicolor.MultiColorFragCompat
 import com.google.android.material.snackbar.Snackbar
@@ -24,28 +23,21 @@ import kotlin.collections.ArrayList
 
 
 /**
- * The preferences for the application. The preferences must be initialized with [init] before used, otherwise
- * an exception will be thrown
+ * The custom user settings for the application
+ *
+ * @param context The context to retrieve resources and a default shared preferences that should be used
+ * to retrieve the settings
  */
-object Settings {
+class Settings(context: Context) {
 
     private var isWifiConnected = false
 
     // There doesn't seem to be an issue storing Resources in a static field (like with Context)
-    private lateinit var resources: Resources
-    private lateinit var preferences: SharedPreferences
+    private val resources: Resources = context.resources
+    private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
 
-    /**
-     * Initializes the preferences. This should only be called during startup.
-     *
-     * @param context The context to create the preferences with. The default shared preferences from this
-     * context will be used, as well as its resources
-     */
-    fun init(context: Context) {
-        preferences = PreferenceManager.getDefaultSharedPreferences(context)
-        resources = context.resources
-
+    init {
         registerNetworkCallbacks(context)
     }
 

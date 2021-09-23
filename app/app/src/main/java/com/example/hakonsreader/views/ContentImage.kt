@@ -9,15 +9,21 @@ import android.view.View
 import androidx.core.util.Pair
 import com.example.hakonsreader.databinding.ContentImageBinding
 import com.example.hakonsreader.misc.*
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Content view for Reddit images posts.
  */
+@AndroidEntryPoint
 class ContentImage @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
 ) : Content(context, attrs, defStyleAttr) {
+
+    @Inject
+    lateinit var settings: Settings
 
     private val binding = ContentImageBinding.inflate(LayoutInflater.from(context), this, true)
 
@@ -63,7 +69,8 @@ class ContentImage @JvmOverloads constructor(
                     redditPost,
                     normalUrl = normal,
                     lowResUrl = normalLowRes,
-                    obfuscatedUrl = obfuscated
+                    obfuscatedUrl = obfuscated,
+                    settings = settings
                 )
             }
         }

@@ -67,6 +67,12 @@ class App : Application(), Configuration.Provider, Application.ActivityLifecycle
     lateinit var database: RedditDatabase
 
     /**
+     * A [Settings] instance. Outside classes should inject this themselves
+     */
+    @Inject
+    lateinit var settings: Settings
+
+    /**
      * A [RedditUserInfoDatabase] instance. Outside classes should inject this themselves
      */
     @Inject
@@ -84,14 +90,13 @@ class App : Application(), Configuration.Provider, Application.ActivityLifecycle
 
         super.onCreate()
 
-        Settings.init(this)
         AppState.init(api, database, userInfoDatabase)
 
         createInboxNotificationChannel()
         createDeveloperNotificationChannel()
 
         // Always restart the worker on startup (so that messages are retrieved on startup)
-        InboxWorkerStartReceiver.startInboxWorker(this, Settings.inboxUpdateFrequency(), replace = true)
+        InboxWorkerStartReceiver.startInboxWorker(this, settings.inboxUpdateFrequency(), replace = true)
 
         updateTheme()
         removeOldValues()
@@ -280,7 +285,7 @@ class App : Application(), Configuration.Provider, Application.ActivityLifecycle
     override fun onActivityResumed(activity: Activity) {
         // The problem this is fixing is that if WiFi goes on/off when the app is in the background
         // the callback inside Settings might not be active, which means data saving settings can be out of sync
-        Settings.forceWiFiCheck(activity)
+        settings.forceWiFiCheck(activity)
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {

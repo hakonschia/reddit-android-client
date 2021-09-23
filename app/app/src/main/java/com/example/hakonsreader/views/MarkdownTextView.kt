@@ -45,6 +45,9 @@ class MarkdownTextView @JvmOverloads constructor(
     @Inject
     lateinit var adjusterWithoutImages: MarkdownAdjuster
 
+    @Inject
+    lateinit var settings: Settings
+
     init {
         val array = context.theme.obtainStyledAttributes(attrs, R.styleable.MarkdownTextView, 0, 0)
         try {
@@ -79,7 +82,7 @@ class MarkdownTextView @JvmOverloads constructor(
             movementMethod = InternalLinkMovementMethod()
         }
 
-        if (Settings.dataSavingEnabled()) {
+        if (settings.dataSavingEnabled()) {
             markwonWithoutImages.setMarkdown(this, adjusterWithoutImages.adjust(markdown))
         } else {
             markwon.setMarkdown(this, adjuster.adjust(markdown))

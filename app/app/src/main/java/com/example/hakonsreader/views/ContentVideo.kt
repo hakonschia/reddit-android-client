@@ -13,10 +13,13 @@ import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentVideoBinding
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * View for displaying videos from a [RedditPost]
  */
+@AndroidEntryPoint
 class ContentVideo @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
@@ -40,18 +43,22 @@ class ContentVideo @JvmOverloads constructor(
         }
     }
 
+    @Inject
+    lateinit var settings: Settings
+
     private val player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
 
     override fun updateView() {
         // This needs to be set before the extras as the extras might specify something other than the default
-        if (Settings.muteVideosByDefault()) {
+        if (settings.muteVideosByDefault()) {
             player.toggleVolume(false)
         }
 
+        player.cacheVideo = cache
+        player.loopVideo = settings.autoLoopVideos()
+
         setAndLoadThumbnail()
         setVideo()
-
-        player.cacheVideo = cache
 
         // Kind of a really bad way to make the video resize :)  When the post is opened
         // the video player won't automatically resize, so if the height of the view has been updated
@@ -156,10 +163,10 @@ class ContentVideo @JvmOverloads constructor(
             return
         }
         if (redditPost.isNsfw) {
-            if (Settings.autoPlayNsfwVideos()) {
+            if (settings.autoPlayNsfwVideos()) {
                 player.play()
             }
-        } else if (Settings.autoPlayVideos()) {
+        } else if (settings.autoPlayVideos()) {
             player.play()
         }
     }
@@ -255,12 +262,12 @@ class ContentVideo @JvmOverloads constructor(
         if (bitmap != null) {
             player.setThumbnailBitmap(bitmap!!)
         } else {
-            val variants = getImageVariantsForRedditPost(redditPost)
+            val variants = getImageVariantsForRedditPost(redditPost, settings.showNsfwPreview())
 
             val url = when {
                 redditPost.isNsfw -> variants.nsfw
                 redditPost.isSpoiler -> variants.spoiler
-                Settings.dataSavingEnabled() -> variants.normalLowRes
+                settings.dataSavingEnabled() -> variants.normalLowRes
                 else -> variants.normal
             }
 

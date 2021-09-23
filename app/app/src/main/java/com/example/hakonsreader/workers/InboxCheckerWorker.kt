@@ -36,6 +36,7 @@ import java.util.*
 class InboxCheckerWorker @AssistedInject constructor(
         @Assisted context: Context,
         @Assisted workerParams: WorkerParameters,
+        private val settings: Settings,
         private val api: RedditApi,
         private val messagesDao: RedditMessagesDao,
 ) : CoroutineWorker(context, workerParams) {
@@ -77,14 +78,14 @@ class InboxCheckerWorker @AssistedInject constructor(
 
         return when (response) {
             is ApiResponse.Success -> {
-                if (Settings.devShowInboxNotifications()) {
+                if (settings.devShowInboxNotifications()) {
                     createDeveloperNotification(counter)
                 }
 
                 val messages = response.value
                 removeNonNewNotifications(messages)
 
-                if (Settings.showInboxNotifications()) {
+                if (settings.showInboxNotifications()) {
                     // Retrieve the messages that we just retrieved from the local DB (if they have been retrieved earlier)
                     val previousMessages = messagesDao.getMessagesById(messages.map { it.id })
                     // Create notification for those messages not already seen
@@ -109,7 +110,7 @@ class InboxCheckerWorker @AssistedInject constructor(
             }
 
             is ApiResponse.Error -> {
-                if (Settings.devShowInboxNotifications()) {
+                if (settings.devShowInboxNotifications()) {
                     createDeveloperNotification(counter, response.throwable)
                 }
                 Result.failure()
@@ -120,36 +121,32 @@ class InboxCheckerWorker @AssistedInject constructor(
     /**
      * Removes notifications that are now marked as not new ([RedditMessage.isNew] is false)
      *
-     * Only works on API >= 23
-     *
      * @param messages The list of messages to check
      */
     private fun removeNonNewNotifications(messages: List<RedditMessage>) {
-        if (Build.VERSION.SDK_INT >= 23) {
-            val notificationManager = applicationContext.getSystemService(
-                    Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = applicationContext.getSystemService(
+                Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            notificationManager.activeNotifications
-                    .filter {
-                        // This is probably not strictly necessary, but just to be sure that if we later
-                        // add other channels which also use IDs as tags we don't want to remove those
-                        return@filter if (Build.VERSION.SDK_INT >= 26) {
-                            it.notification.channelId == App.NOTIFICATION_CHANNEL_INBOX_ID
-                        } else {
-                            // Channels are only a thing on >= 26, so on lower devices this won't filter anything
-                            true
-                        }
+        notificationManager.activeNotifications
+                .filter {
+                    // This is probably not strictly necessary, but just to be sure that if we later
+                    // add other channels which also use IDs as tags we don't want to remove those
+                    return@filter if (Build.VERSION.SDK_INT >= 26) {
+                        it.notification.channelId == App.NOTIFICATION_CHANNEL_INBOX_ID
+                    } else {
+                        // Channels are only a thing on >= 26, so on lower devices this won't filter anything
+                        true
                     }
-                    .forEach { notification ->
-                        val message = messages.find { it.id == notification.tag }
+                }
+                .forEach { notification ->
+                    val message = messages.find { it.id == notification.tag }
 
-                        // message != null means there is a notification for the message
-                        // !.isNew means it is now seen, so remove the notification
-                        if (message != null && !message.isNew) {
-                            notificationManager.cancel(message.id, notification.id)
-                        }
+                    // message != null means there is a notification for the message
+                    // !.isNew means it is now seen, so remove the notification
+                    if (message != null && !message.isNew) {
+                        notificationManager.cancel(message.id, notification.id)
                     }
-        }
+                }
     }
 
     /**

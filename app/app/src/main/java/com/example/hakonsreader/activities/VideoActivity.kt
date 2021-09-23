@@ -9,10 +9,13 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.views.VideoPlayer
 import com.r0adkll.slidr.Slidr
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Activity displaying a video from a reddit post, allowing for fullscreen
  */
+@AndroidEntryPoint
 class VideoActivity : BaseActivity() {
 
     companion object {
@@ -30,6 +33,9 @@ class VideoActivity : BaseActivity() {
          */
         const val EXTRAS_EXTRAS = "extras_VideoActivity_extras"
     }
+
+    @Inject
+    lateinit var settings: Settings
 
     private lateinit var videoPlayer: VideoPlayer
     private var videoPlayingWhenActivityPaused = false
@@ -57,7 +63,7 @@ class VideoActivity : BaseActivity() {
                 data.getBundle(EXTRAS_EXTRAS)
             } ?: return
 
-            if (!Settings.muteVideoByDefaultInFullscreen()) {
+            if (!settings.muteVideoByDefaultInFullscreen()) {
                 extras.putBoolean(VideoPlayer.EXTRA_VOLUME, true)
             }
 
@@ -84,7 +90,7 @@ class VideoActivity : BaseActivity() {
         val color = ContextCompat.getColor(this, R.color.imageVideoActivityBackground)
         val alpha = color shr 24 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
-        val config = Settings.getVideoAndImageSlidrConfig()
+        val config = settings.getVideoAndImageSlidrConfig()
                 // To keep the background the same the entire way the alpha is always the same
                 // Otherwise the background of the activity slides with, which looks weird
                 .scrimStartAlpha(alphaPercentage)

@@ -6,7 +6,6 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.AttributeSet
-import android.util.Log
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +25,6 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.hakonsreader.R
 import com.example.hakonsreader.fragments.bottomsheets.VideoPlaybackErrorBottomSheet
 import com.example.hakonsreader.misc.Coordinates
-import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createVideoDuration
 import com.example.hakonsreader.misc.isAvailableForGlide
 import com.example.hakonsreader.views.util.VideoCache
@@ -237,7 +235,7 @@ class VideoPlayer @JvmOverloads constructor(
     var mp4Video = false
 
     /**
-     * True if the video and thumbnail should be cached
+     * True if the video and thumbnail should be cached. This must be set before a video is loaded.
      *
      * Default to `true`
      */
@@ -372,6 +370,20 @@ class VideoPlayer @JvmOverloads constructor(
         }
 
     /**
+     * Set to true if videos should loop
+     */
+    var loopVideo: Boolean = false
+        set(value) {
+            field = value
+
+            exoPlayer.repeatMode = if (value) {
+                Player.REPEAT_MODE_ALL
+            } else {
+                Player.REPEAT_MODE_OFF
+            }
+        }
+
+    /**
      * Callback for when a video has been manually paused (ie. the pause button has been clicked)
      *
      * This will not be called when the video is paused by any other way (ie. calls to [pause])
@@ -450,6 +462,7 @@ class VideoPlayer @JvmOverloads constructor(
         thumbnailDrawable = -1
         thumbnailLoadedFromBitmap = false
         isVideoSizeEstimated = false
+        loopVideo = false
 
         videoWidth = -1
         videoHeight = -1
@@ -464,7 +477,7 @@ class VideoPlayer @JvmOverloads constructor(
     /**
      * Creates a new [ExoPlayer]
      */
-    private fun createExoPlayer() : ExoPlayer {
+    private fun createExoPlayer(): ExoPlayer {
         // The load control is responsible for how much to buffer at a time
         val loadControl: LoadControl = DefaultLoadControl.Builder()
                 // Buffer size between 2.5 and 7.5 seconds, with minimum of 1 second for playback to start
@@ -477,11 +490,8 @@ class VideoPlayer @JvmOverloads constructor(
                 .setTrackSelector(DefaultTrackSelector(context, AdaptiveTrackSelection.Factory()))
                 .build()
 
-        if (Settings.autoLoopVideos()) {
-            player.repeatMode = Player.REPEAT_MODE_ALL
-        }
-
         val loader: ProgressBar = findViewById(R.id.buffering)
+
         // Add listener for buffering changes, playback changes etc.
         player.addListener(object : Player.EventListener {
 
@@ -527,13 +537,12 @@ class VideoPlayer @JvmOverloads constructor(
         return player
     }
 
-    private fun createMediaSource() : MediaSource {
+    private fun createMediaSource(): MediaSource {
         // TODO on API 21 emulators, only videos directly from imgur load. Not sure if it's a problem
         //  on physical devices, as the ExoPlayer documentation says some emulators don't work.
         //  The official emulator don't support on API < 23
         //  https://google.github.io/ExoPlayer/supported-devices.html
 
-        // Data source is constant for all media sources
         val dataSourceFactory = if (cacheVideo) {
             CacheDataSource.Factory()
                     .setUpstreamDataSourceFactory(DefaultDataSourceFactory(context))
@@ -541,8 +550,6 @@ class VideoPlayer @JvmOverloads constructor(
         } else {
             DefaultDataSourceFactory(context)
         }
-
-        Log.d(TAG, "createMediaSource: loading $url")
 
         val mediaItem = MediaItem.Builder()
                 .setUri(url)

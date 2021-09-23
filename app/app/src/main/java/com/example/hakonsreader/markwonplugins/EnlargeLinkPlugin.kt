@@ -14,11 +14,11 @@ import io.noties.markwon.AbstractMarkwonPlugin
  *
  * The scale applied is the scale returned by [Settings.linkScale]
  */
-class EnlargeLinkPlugin : AbstractMarkwonPlugin() {
+class EnlargeLinkPlugin(private val settings: Settings) : AbstractMarkwonPlugin() {
     override fun afterSetText(textView: TextView) {
         super.afterSetText(textView)
 
-        val linkScale = Settings.linkScale()
+        val linkScale = settings.linkScale()
 
         // Default scale, don't do anything
         if (linkScale == 100) {

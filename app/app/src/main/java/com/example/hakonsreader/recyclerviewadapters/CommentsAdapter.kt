@@ -53,7 +53,8 @@ import com.example.hakonsreader.views.util.setLongClickToPeekUrl
  */
 class CommentsAdapter constructor(
         private val api: RedditApi,
-        private val viewModel: CommentsViewModel
+        private val viewModel: CommentsViewModel,
+        private val settings: Settings
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -84,7 +85,7 @@ class CommentsAdapter constructor(
      */
     // We only need to get this when loading the adapter, as it will be the same for all comments
     // and cannot change during the adapters life
-    private val sidebarColors = Settings.commentSidebarColors()
+    private val sidebarColors = settings.commentSidebarColors()
 
     /**
      * The list of comments shown in the adapter
@@ -208,14 +209,14 @@ class CommentsAdapter constructor(
         // Highlight the root comment in a chain
         val highlight = comment.id == viewModel.chainId
                 // User wants to highlight new comments, and the comment was added after the last time the post was opened
-                || (Settings.highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
+                || (settings.highlightNewComments() && (lastTimeOpened > 0 && comment.createdAt > lastTimeOpened))
 
         val byLoggedInUser = comment.author == AppState.getUserInfo()?.userInfo?.username
 
         when (holder.itemViewType) {
-            MORE_COMMENTS_TYPE -> (holder as MoreCommentsViewHolder).bind(comment)
-            HIDDEN_COMMENT_TYPE -> (holder as HiddenCommentViewHolder).bind(comment, highlight, byLoggedInUser)
-            NORMAL_COMMENT_TYPE -> (holder as NormalCommentViewHolder).bind(comment, highlight, byLoggedInUser)
+            MORE_COMMENTS_TYPE -> (holder as MoreCommentsViewHolder).bind(comment, settings.showAllSidebars())
+            HIDDEN_COMMENT_TYPE -> (holder as HiddenCommentViewHolder).bind(comment, highlight, byLoggedInUser, settings.showAllSidebars())
+            NORMAL_COMMENT_TYPE -> (holder as NormalCommentViewHolder).bind(comment, highlight, byLoggedInUser, settings.showAllSidebars())
         }
     }
 
@@ -238,9 +239,9 @@ class CommentsAdapter constructor(
                     adapter = this@CommentsAdapter
                     viewModel = this@CommentsAdapter.viewModel
                     post = this@CommentsAdapter.post
-                    showAwards = Settings.showAwards()
+                    showAwards = settings.showAwards()
                     onReportsIgnoreChange =  OnReportsIgnoreChangeListener { invalidateAll() }
-                    showPeekParentButton = Settings.showPeekParentButtonInComments()
+                    showPeekParentButton = settings.showPeekParentButtonInComments()
                     commentContent.setLongClickToPeekUrl {
                         comment?.let {
                             this@CommentsAdapter.viewModel.hideComments(it)
@@ -302,7 +303,7 @@ class CommentsAdapter constructor(
          * @param comment The comment to bind
          * @param highlight True if the comment should have a slight highlight around it
          */
-        fun bind(comment: RedditComment, highlight: Boolean, byLoggedInUser: Boolean) {
+        fun bind(comment: RedditComment, highlight: Boolean, byLoggedInUser: Boolean, showAllSidebars: Boolean) {
             with(binding) {
                 this.comment = comment
                 this.highlight = highlight
@@ -314,14 +315,14 @@ class CommentsAdapter constructor(
 
                 commentVoteBar.listing = comment
 
-                addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors)
+                addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors, showAllSidebars)
                 // Execute all the bindings now, or else scrolling/changes to the dataset will have a
                 // small, but noticeable delay, causing the old comment to still appear
                 // This needs to be called before the link previews are added, since the previews use
                 // the spans set with Markwon, and it might not (and probably wont) be set before the previews are added
                 executePendingBindings()
 
-                if (Settings.showLinkPreview()) {
+                if (settings.showLinkPreview()) {
                     showLinkPreviews()
                     executePendingBindings()
                 }
@@ -362,7 +363,7 @@ class CommentsAdapter constructor(
          * @param spans The array of URLSpans to show previews for
          */
         private fun setLinkPreviews(fullText: Spannable, spans: Array<URLSpan>) {
-            val showPreviewForIdenticalLinks = Settings.showLinkPreviewForIdenticalLinks()
+            val showPreviewForIdenticalLinks = settings.showLinkPreviewForIdenticalLinks()
 
             spans.forEach { span ->
                 val start = fullText.getSpanStart(span)
@@ -396,7 +397,7 @@ class CommentsAdapter constructor(
      * ViewHolder for comments that are hidden (the comments explicitly selected to be hidden)
      */
     inner class HiddenCommentViewHolder(private val binding: ListItemHiddenCommentBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(comment: RedditComment, highlight: Boolean, byLoggedInUser: Boolean) {
+        fun bind(comment: RedditComment, highlight: Boolean, byLoggedInUser: Boolean, showAllSidebars: Boolean) {
             with(binding) {
                 root.setOnClickListener {
                     this@CommentsAdapter.viewModel.showComments(comment)
@@ -404,7 +405,7 @@ class CommentsAdapter constructor(
                 this.comment = comment
                 this.highlight = highlight
                 isByLoggedInUser = byLoggedInUser
-                addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors)
+                addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors, showAllSidebars)
                 executePendingBindings()
             }
         }
@@ -415,10 +416,10 @@ class CommentsAdapter constructor(
      * when clicked
      */
     inner class MoreCommentsViewHolder(private val binding: ListItemMoreCommentBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(comment: RedditComment) {
+        fun bind(comment: RedditComment, showAllSidebars: Boolean) {
             with(binding) {
                 this.comment = comment
-                addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors)
+                addSidebars(sideBarsBarrier, comment.depth - getBaseDepth(), sidebarColors, showAllSidebars)
                 executePendingBindings()
             }
         }
@@ -486,8 +487,8 @@ private fun formatAuthorInternal(tv: TextView, comment: RedditComment, italic: B
 /**
  * Adds sidebars to a ConstraintLayout
  */
-fun addSidebars(barrier: Barrier, depth: Int, colors: List<Int>) {
-    if (Settings.showAllSidebars()) {
+fun addSidebars(barrier: Barrier, depth: Int, colors: List<Int>, showAllSidebars: Boolean) {
+    if (showAllSidebars) {
         addAllSidebars(barrier, depth, colors)
     } else {
         addOneSidebar(barrier, depth, colors)

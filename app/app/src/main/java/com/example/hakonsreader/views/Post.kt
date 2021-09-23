@@ -70,14 +70,17 @@ class Post @JvmOverloads constructor(
     @Inject
     lateinit var postsDao: RedditPostsDao
 
+    @Inject
+    lateinit var settings: Settings
+
     /**
      * If true awards should be shown on the post
      * */
-    private val showAwards = Settings.showAwards()
+    private val showAwards = settings.showAwards()
 
     private val binding = PostBinding.inflate(LayoutInflater.from(context), this, true).apply {
         postPopupMenu.setOnClickListener {
-            showPopupForPost(it, redditPost, postsDao, api)
+            showPopupForPost(it, redditPost, postsDao, api, settings)
         }
 
         this.showAwards = this@Post.showAwards
@@ -108,7 +111,7 @@ class Post @JvmOverloads constructor(
                             Snackbar.make(it, R.string.postHasNoText, Snackbar.LENGTH_SHORT).show()
                         }
                     }
-                } else if (Settings.devShowContentInfoOnLongPress()) {
+                } else if (settings.devShowContentInfoOnLongPress()) {
                     if (context is AppCompatActivity) {
                         getContent()?.let {
                             ContentInfoBottomSheet.newInstance(it)
@@ -567,14 +570,14 @@ class Post @JvmOverloads constructor(
     }
 
     override fun viewSelected() {
-        if (Settings.devHighlightSelectedPosts()) {
+        if (settings.devHighlightSelectedPosts()) {
             binding.root.setBackgroundColor(ContextCompat.getColor(context, R.color.tagNSFWFill))
         }
         getContent()?.viewSelected()
     }
 
     override fun viewUnselected() {
-        if (Settings.devHighlightSelectedPosts()) {
+        if (settings.devHighlightSelectedPosts()) {
             binding.root.setBackgroundColor(ContextCompat.getColor(context, R.color.background))
         }
         getContent()?.viewUnselected()

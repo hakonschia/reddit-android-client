@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
  * @param view The view clicked
  * @param post The post the popup is for
  */
-fun showPopupForPost(view: View, post: RedditPost?, postsDao: RedditPostsDao, api: RedditApi) {
+fun showPopupForPost(view: View, post: RedditPost?, postsDao: RedditPostsDao, api: RedditApi, settings: Settings) {
     // If the menu is clicked before the post loads, it will be passed as null
     if (post == null) {
         return
@@ -61,7 +61,7 @@ fun showPopupForPost(view: View, post: RedditPost?, postsDao: RedditPostsDao, ap
             item {
                 label = context.getString(R.string.postMenuAddSubredditToFilter, post.subreddit)
                 icon = R.drawable.ic_filter_24px
-                callback = { filterSubredditOnClick(post.subreddit, view) }
+                callback = { filterSubredditOnClick(post.subreddit, view, settings) }
             }
         }
 
@@ -339,8 +339,8 @@ private fun copyPostContentOnClick(view: View, post: RedditPost) {
     Snackbar.make(view, R.string.linkCopied, BaseTransientBottomBar.LENGTH_SHORT).show()
 }
 
-private fun filterSubredditOnClick(subredditName: String, view: View) {
-    Settings.addSubredditToPostFilters(subredditName, view)
+private fun filterSubredditOnClick(subredditName: String, view: View, settings: Settings) {
+    settings.addSubredditToPostFilters(subredditName, view)
 }
 
 /**

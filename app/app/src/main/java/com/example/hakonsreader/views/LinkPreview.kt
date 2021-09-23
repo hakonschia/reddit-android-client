@@ -4,19 +4,18 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.DispatcherActivity
 import com.example.hakonsreader.databinding.LinkPreviewBinding
-import com.example.hakonsreader.misc.CreateIntentOptions
 import com.example.hakonsreader.misc.Settings
-import com.example.hakonsreader.misc.createIntent
 import com.example.hakonsreader.misc.getAppIconFromUrl
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Class for displaying the preview of a link
@@ -24,24 +23,27 @@ import com.google.android.material.snackbar.Snackbar
  * This shows a text (the hyperlink text of the link) and a link together to show what a link
  * links to
  */
-class LinkPreview : FrameLayout {
+@AndroidEntryPoint
+class LinkPreview @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
     companion object {
         private const val TAG = "LinkPreview"
     }
+
+    @Inject
+    lateinit var settings: Settings
 
     private val binding = LinkPreviewBinding.inflate(LayoutInflater.from(context), this, true).apply {
         setOnClickListener { openLink() }
         setOnLongClickListener { copyLink(); return@setOnLongClickListener true }
 
-        if (!Settings.showEntireLinkInLinkPreview()) {
+        if (!settings.showEntireLinkInLinkPreview()) {
             linkLink.maxLines = 1
         }
     }
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
 
 
     /**

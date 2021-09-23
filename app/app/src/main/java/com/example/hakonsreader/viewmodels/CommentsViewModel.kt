@@ -31,7 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CommentsViewModel @Inject constructor(
     private val api: RedditApi,
-    private val postsDao: RedditPostsDao
+    private val postsDao: RedditPostsDao,
+    private val settings: Settings
 ) : ViewModel() {
 
     private val _post = MutableLiveData<RedditPost>()
@@ -409,7 +410,7 @@ class CommentsViewModel @Inject constructor(
      */
     private fun checkAndSetHiddenComments(comments: List<RedditComment>): List<RedditComment> {
         val commentsToRemove: MutableList<RedditComment> = ArrayList()
-        val hideThreshold = Settings.getAutoHideScoreThreshold()
+        val hideThreshold = settings.getAutoHideScoreThreshold()
 
         comments.forEach { comment ->
             if (comment.kind != Thing.MORE.value && hideThreshold >= comment.score || comment.isCollapsed) {

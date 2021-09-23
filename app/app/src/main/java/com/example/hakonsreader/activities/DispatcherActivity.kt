@@ -8,7 +8,10 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.CreateIntentOptions
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.createIntent
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class DispatcherActivity : AppCompatActivity() {
     companion object {
         private val TAG = "DispatcherActivity"
@@ -21,6 +24,8 @@ class DispatcherActivity : AppCompatActivity() {
         const val EXTRAS_URL_KEY = "url"
     }
 
+    @Inject
+    lateinit var settings: Settings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +54,8 @@ class DispatcherActivity : AppCompatActivity() {
         Log.d(TAG, "Dispatching $url")
 
         val options = CreateIntentOptions(
-                openLinksInternally = Settings.openLinksInApp(),
-                openYoutubeVideosInternally = Settings.openYouTubeVideosInApp()
+            openLinksInternally = settings.openLinksInApp(),
+            openYoutubeVideosInternally = settings.openYouTubeVideosInApp()
         )
 
         val intent = createIntent(url, options,this)

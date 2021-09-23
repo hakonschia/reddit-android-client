@@ -154,6 +154,9 @@ class SubredditFragment : Fragment() {
     @Inject
     lateinit var flairsDao: RedditFlairsDao
 
+    @Inject
+    lateinit var settings: Settings
+
     private var _binding: FragmentSubredditBinding? = null
     private val binding get() = _binding!!
 
@@ -292,7 +295,7 @@ class SubredditFragment : Fragment() {
                 binding.drawer.openDrawer(GravityCompat.END)
             }
             // Default subs don't have any info
-            if (isDefaultSubreddit || !Settings.showSubredditInfoButton()) {
+            if (isDefaultSubreddit || !settings.showSubredditInfoButton()) {
                 openSubredditInfo.visibility = View.GONE
             }
 
@@ -305,14 +308,14 @@ class SubredditFragment : Fragment() {
                         val rulesCount = binding.subredditInfo.rules.adapter?.itemCount ?: 0
                         // No rules, or we have rules and data saving is not on
                         // Ie. only load rules again from API if we're not on data saving
-                        if (rulesCount == 0 || (rulesCount != 0 && !Settings.dataSavingEnabled())) {
+                        if (rulesCount == 0 || (rulesCount != 0 && !settings.dataSavingEnabled())) {
                             rulesViewModel?.refresh()
                         }
 
                         val isLoggedIn = AppState.loggedInState.value is LoggedInState.LoggedIn
                         // The adapter will always have one more (for the "Select flair"), so the actual count is one less than the adapter count
                         val flairsCount = binding.subredditInfo.selectFlairSpinner.adapter?.count?.minus(1) ?: 0
-                        if (isLoggedIn && (it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !Settings.dataSavingEnabled()))) {
+                        if (isLoggedIn && (it.canAssignUserFlair || it.isModerator) && (flairsCount == 0 || (flairsCount != 0 && !settings.dataSavingEnabled()))) {
                             flairsViewModel?.refresh()
                         }
                     }
@@ -436,7 +439,7 @@ class SubredditFragment : Fragment() {
 
                 binding.subreddit = it
 
-                if (it.isNsfw && !nsfwWarningDismissedWithSuccess && Settings.warnNsfwSubreddits()) {
+                if (it.isNsfw && !nsfwWarningDismissedWithSuccess && settings.warnNsfwSubreddits()) {
                     // Only show warning once
                     if (!nsfwWarningShown) {
                         AlertDialog.Builder(requireContext())
@@ -639,11 +642,11 @@ class SubredditFragment : Fragment() {
             val imageView = binding.banner
             val bannerURL = it.bannerBackgroundImage
             if (bannerURL.isNotEmpty()) {
-                if (Settings.loadSubredditBanners()) {
+                if (settings.loadSubredditBanners()) {
                     Glide.with(this)
                         .load(bannerURL)
                         // Data saving on, only load if the image is already cached
-                        .onlyRetrieveFromCache(Settings.dataSavingEnabled())
+                        .onlyRetrieveFromCache(settings.dataSavingEnabled())
                         .listener(object : RequestListener<Drawable> {
                             override fun onLoadFailed(
                                 e: GlideException?,

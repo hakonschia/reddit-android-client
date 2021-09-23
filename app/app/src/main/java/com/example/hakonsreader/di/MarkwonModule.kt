@@ -3,6 +3,7 @@ package com.example.hakonsreader.di
 import android.content.Context
 import com.example.hakonsreader.api.utils.MarkdownAdjuster
 import com.example.hakonsreader.markwonplugins.*
+import com.example.hakonsreader.misc.Settings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -72,7 +73,7 @@ object MarkwonModule {
     /**
      * Returns a base Markwon builder that does not include any image plugins
      */
-    private fun baseMarkwon(context: Context) : Markwon.Builder {
+    private fun baseMarkwon(context: Context, settings: Settings) : Markwon.Builder {
         return Markwon.builder(context)
                 // Headers, blockquote etc. are a part of the core
                 .usePlugin(CorePlugin.create())
@@ -84,15 +85,15 @@ object MarkwonModule {
                 .usePlugin(RedditLinkPlugin())
                 .usePlugin(SuperscriptPlugin())
                 .usePlugin(LinkPlugin())
-                .usePlugin(EnlargeLinkPlugin())
+                .usePlugin(EnlargeLinkPlugin(settings))
                 .usePlugin(ThemePlugin(context))
     }
 
     @MarkwonWithImages
     @Singleton
     @Provides
-    fun provideMarkwonWithImages(@ApplicationContext context: Context) : Markwon {
-        return baseMarkwon(context)
+    fun provideMarkwonWithImages(@ApplicationContext context: Context, settings: Settings) : Markwon {
+        return baseMarkwon(context, settings)
                 .usePlugin(GlideImagesPlugin.create(context))
                 .usePlugin(object : AbstractMarkwonPlugin() {
                     override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
@@ -119,8 +120,8 @@ object MarkwonModule {
     @MarkwonWithoutImages
     @Singleton
     @Provides
-    fun provideMarkwonNoImages(@ApplicationContext context: Context) : Markwon {
-        return baseMarkwon(context).build()
+    fun provideMarkwonNoImages(@ApplicationContext context: Context, settings: Settings) : Markwon {
+        return baseMarkwon(context, settings).build()
     }
 
 

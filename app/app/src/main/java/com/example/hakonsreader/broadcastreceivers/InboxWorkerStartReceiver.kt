@@ -6,11 +6,14 @@ import android.content.Intent
 import androidx.work.*
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.workers.InboxCheckerWorker
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * Broadcast receiver which calls [startInboxWorker] to start
  */
+@AndroidEntryPoint
 class InboxWorkerStartReceiver : BroadcastReceiver() {
     companion object {
 
@@ -44,9 +47,12 @@ class InboxWorkerStartReceiver : BroadcastReceiver() {
         }
     }
 
+    @Inject
+    lateinit var settings: Settings
+
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
-            Intent.ACTION_BOOT_COMPLETED -> startInboxWorker(context, Settings.inboxUpdateFrequency(), replace = false)
+            Intent.ACTION_BOOT_COMPLETED -> startInboxWorker(context, settings.inboxUpdateFrequency(), replace = false)
         }
     }
 }

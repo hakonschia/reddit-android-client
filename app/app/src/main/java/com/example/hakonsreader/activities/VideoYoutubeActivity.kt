@@ -13,11 +13,14 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.r0adkll.slidr.Slidr
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 /**
  * Activity for displaying a YouTube video in fullscreen
  */
+@AndroidEntryPoint
 class VideoYoutubeActivity : AppCompatActivity() {
     companion object {
         @Suppress("UNUSED")
@@ -38,6 +41,9 @@ class VideoYoutubeActivity : AppCompatActivity() {
          */
         const val EXTRAS_TIMESTAMP = "extras_VideoYoutubeActivity_videoTimestamp"
     }
+
+    @Inject
+    lateinit var settings: Settings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +76,7 @@ class VideoYoutubeActivity : AppCompatActivity() {
         val color = ContextCompat.getColor(this, R.color.imageVideoActivityBackground)
         val alpha = color shr 24 and 0xFF
         val alphaPercentage = alpha.toFloat() / 0xFF
-        val config = Settings.getVideoAndImageSlidrConfig()
+        val config = settings.getVideoAndImageSlidrConfig()
                 // To keep the background the same the entire way the alpha is always the same
                 // Otherwise the background of the activity slides with, which looks weird
                 .scrimStartAlpha(alphaPercentage)

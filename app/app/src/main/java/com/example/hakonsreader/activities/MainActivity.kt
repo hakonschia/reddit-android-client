@@ -138,6 +138,9 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
     @Inject
     lateinit var userInfoDao: RedditUserInfoDao
 
+    @Inject
+    lateinit var settings: Settings
+
     private lateinit var binding: ActivityMainBinding
 
     /**
@@ -250,7 +253,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
             // recreatedAsNewUser will never be null if we get here
             // Restart any potential workers to update the inbox for the new user
             if (recreatedAsNewUser!!) {
-                InboxWorkerStartReceiver.startInboxWorker(this, Settings.inboxUpdateFrequency(), replace = true)
+                InboxWorkerStartReceiver.startInboxWorker(this, settings.inboxUpdateFrequency(), replace = true)
             }
 
             restoreFragmentStates(savedInstanceState, recreatedAsNewUser)
@@ -745,7 +748,7 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
         unread.observe(this, { m ->
             unreadMessages = m.size
 
-            if (Settings.showUnreadMessagesBadge()) {
+            if (settings.showUnreadMessagesBadge()) {
                 val profileItemId = binding.bottomNav.menu.findItem(R.id.navProfile).itemId
 
                 // No unread messages, remove the badge

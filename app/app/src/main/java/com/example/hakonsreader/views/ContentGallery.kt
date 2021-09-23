@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.core.util.Pair
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.hakonsreader.api.interfaces.GalleryImage
 import com.example.hakonsreader.api.model.RedditPost
@@ -20,12 +21,15 @@ import com.example.hakonsreader.api.model.thirdparty.imgur.ImgurGif
 import com.example.hakonsreader.databinding.ContentGalleryBinding
 import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 /**
  * Class for gallery posts. A gallery post is simply a collection of multiple images or videos
  */
+@AndroidEntryPoint
 class ContentGallery @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
@@ -68,6 +72,9 @@ class ContentGallery @JvmOverloads constructor(
      * The lifecycle owner used to ensure videos in the gallery are automatically paused and released
      */
     var lifecycleOwner: LifecycleOwner? = null
+
+    @Inject
+    lateinit var settings: Settings
 
     private val binding: ContentGalleryBinding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true)
 
@@ -114,11 +121,14 @@ class ContentGallery @JvmOverloads constructor(
 
         binding.galleryImages.adapter = Adapter(images, activeImage)
 
-        // Keep a maximum of 5 items at a time, or 2 when data saving is enabled. This should probably
-        // be enough to make large galleries not all load at once which potentially wastes data, and
-        // at the same time not have to load items when going through the gallery (unless data saving is on)
-        val offscreenLimit = if (Settings.dataSavingEnabled()) 2 else 5
-        binding.galleryImages.offscreenPageLimit = offscreenLimit
+        // On data saving use the default which won't load extra pages, so it doesn't waste data by loading
+        // images until they are actually selected. Otherwise allow some images to be loaded in advance
+        // to be more responsive
+        binding.galleryImages.offscreenPageLimit = if (settings.dataSavingEnabled()) {
+            ViewPager2.OFFSCREEN_PAGE_LIMIT_DEFAULT
+        } else {
+            2
+        }
 
         binding.galleryImages.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {

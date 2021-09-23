@@ -50,7 +50,6 @@ class SendPrivateMessageActivityTest {
                 .getSharedPreferences(SharedPreferencesConstants.PREFS_NAME, Application.MODE_PRIVATE)
         )
         AppState.init(api, database, userInfoDatabase)
-        Settings.init(InstrumentationRegistry.getInstrumentation().targetContext)
     }
 
 
