@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -759,6 +760,8 @@ class MainActivity : BaseActivity(), OnSubredditSelected, OnUnreadMessagesBadgeS
                     binding.bottomNav.getOrCreateBadge(profileItemId).apply {
                         isVisible = true
                         number = unreadMessages
+                        backgroundColor = ContextCompat.getColor(this@MainActivity, R.color.badgeBackgroundColor)
+                        badgeTextColor = ContextCompat.getColor(this@MainActivity, R.color.badgeTextColor)
                     }
                 }
             }

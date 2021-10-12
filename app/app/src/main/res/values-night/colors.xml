@@ -47,4 +47,7 @@
     <color name="awardsBottomSheetDivider">#5A5A5A</color>
 
     <color name="activeAccountHighlight">#001C2C</color>
+
+    <color name="badgeBackgroundColor">@color/iconColor</color>
+    <color name="badgeTextColor">#000000</color>
 </resources>

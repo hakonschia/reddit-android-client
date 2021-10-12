@@ -76,4 +76,6 @@
 
     <color name="activeAccountHighlight">#5E001C2C</color>
 
+    <color name="badgeBackgroundColor">@color/iconColor</color>
+    <color name="badgeTextColor">#FFFFFF</color>
 </resources>
