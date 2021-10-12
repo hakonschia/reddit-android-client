@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -28,6 +27,9 @@ import com.example.hakonsreader.viewmodels.assistedViewModel
 import com.example.hakonsreader.views.Content
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -353,10 +355,25 @@ class PostsFragment : Fragment(), SortableWithTime {
                     putExtra(Content.EXTRAS, post.extras)
                     putExtra(PostActivity.EXTRAS_HIDE_SCORE_KEY, post.hideScore)
                 }
+                
+                val transitionViews = post.transitionViews
 
                 val activity = requireActivity()
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *post.transitionViews.toTypedArray())
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, *transitionViews.toTypedArray())
                 activity.startActivity(intent, options.toBundle())
+
+                // Shared element transitions hide the views in the original activity by setting the alpha to 0
+                // With Slidr it looks better if the view is still there, otherwise it won't reappear before
+                // the other activity finishes
+                MainScope().launch {
+                    // We need some delay, presumably to give the framework time to set the alpha to 0
+                    // Ideally this would be done with a callback, but there is none (?)
+                    delay(750)
+
+                    transitionViews.forEach {
+                        it.first.alpha = 1f
+                    }
+                }
             }
         }
 
