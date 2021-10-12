@@ -51,7 +51,6 @@ See also: [build](#build)
 
 - **Comments**
   - [Navigate](images/navigate-top-level-comments.gif) between top level comments
-    - Optionally with an animation, with a customizable threshold for how many comments to at most smoothly navigate between
     - Long press to go to first/last
   - Show [all](images/sidebars-all.png) sidebars, or [only](images/sidebars-only-one.png) one
     - [Fully customizable colors](images/comment-sidebar-color-dialog.gif) - [Preview](images/comment-sidebar-color-preview.png)
