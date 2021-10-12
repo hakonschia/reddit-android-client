@@ -281,15 +281,6 @@ class Settings(context: Context) {
     }
 
     /**
-     * Gets the comment threshold for when navigating in comments should smoothly scroll
-     *
-     * @return The max amount of comments for smooth scrolling to happen
-     */
-    fun commentSmoothScrollThreshold(): Int {
-        return preferences.getInt(resources.getString(R.string.prefs_key_comment_smooth_scroll_threshold), resources.getInteger(R.integer.prefs_default_comment_smooth_scroll_threshold))
-    }
-
-    /**
      * Returns the array of subreddits the user has selected to filter from front page/popular/all
      *
      * @return An array of lowercased subreddit names
