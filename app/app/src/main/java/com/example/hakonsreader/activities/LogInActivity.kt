@@ -3,7 +3,9 @@ package com.example.hakonsreader.activities
 import android.os.Bundle
 import com.example.hakonsreader.R
 import com.example.hakonsreader.fragments.LogInFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LogInActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
