@@ -11,6 +11,8 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
+import android.util.DisplayMetrics
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +20,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 import com.example.hakonsreader.activities.*
 import com.example.hakonsreader.api.enums.PostTimeSort
@@ -1181,5 +1186,84 @@ fun ConnectivityManager.isWiFiAvailable(): Boolean {
         getNetworkCapabilities(activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
     } else {
         getNetworkInfo(ConnectivityManager.TYPE_WIFI)?.isConnected == true
+    }
+}
+
+/**
+ * Fast smooth scroll to any position. This function checks the distance between the current
+ * position and [scrollTo]. It does not take into account the size of the list items, and can
+ * therefore produce inconsistent results if the individual items differ in size.
+ *
+ * Note: The layout manager must be a [LinearLayoutManager]
+ *
+ * @param scrollTo The position to scroll to
+ */
+fun RecyclerView.fastSmoothScrollToPosition(scrollTo: Int) {
+    // TODO to improve this further we can create a "FastSmoothScrollingAdapter" interface that has a method to
+    //  estimate the size of a given element so that we can make the speed more consistent based on size
+    //  and not just how many elements are being scrolled. If this method returns a pixel count
+    //  we can make the scroll take x amount of seconds
+
+
+    // If we don't have an adapter there is nothing shown, so we cannot scroll anywhere
+    adapter ?: return
+
+    // Stop the current scroll to avoid messing anything up with the new scroll position
+    stopScroll()
+
+    (layoutManager as? LinearLayoutManager)?.let { lm ->
+        //val adapterCount = listAdapter.itemCount
+        val currentPos = lm.findFirstVisibleItemPosition()
+
+        val scrollAmount = if (currentPos > scrollTo) {
+            // Scrolling up
+            currentPos - scrollTo
+        } else {
+            // Scrolling down
+            scrollTo - currentPos
+        }
+
+        val smoothScroller = object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int {
+                return SNAP_TO_START
+            }
+
+            override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
+                // The value returned specifies how many ms we should spend at each pixel when scrolling.
+                // A large value indicates a slow scroll, and a low value indicates a fast scroll
+                // To speed the scroll up for large scrolls we therefore have to return a lower value
+                // when "scrollAmount" is high.
+                // The values used here are somewhat randomly chosen based on what feels good when scrolling
+
+                // The higher the numerator the more difference we will get from high to low
+                val offsetNumerator = 55F
+
+                val offset: Float = offsetNumerator / scrollAmount
+
+                // The higher this value is the slower it goes
+                val baseSpeed = 22F
+                val inverseScrollSpeed = baseSpeed + offset
+
+                // The examples below assumes baseSpeed=15 (I might change the value later without changing comments)
+                // Eg. with scrollAmount=1 and numerator=1:
+                // offset=1/1 = 1
+                // inverseScrollSpeed will be 16, it will be fast
+                // With numerator=2
+                // offset=2/1 = 2
+                // inverseScrollSpeed will be 17, it will be faster than with 1
+
+                // With scrollAmount=50 and numerator=1:
+                // offset=1/50 = 0.02
+                // inverseScrollSpeed will be 15.02, it will be fast
+                // With numerator=2
+                // offset=2/50 = 0.04
+                // inverseScrollSpeed will be 15.04, it will be faster than with 1, but also the difference
+                // between scrollAmount=1 and scrollAmount=50 is higher
+
+                return inverseScrollSpeed / displayMetrics.densityDpi
+            }
+        }.apply { targetPosition = scrollTo }
+
+        lm.startSmoothScroll(smoothScroller)
     }
 }

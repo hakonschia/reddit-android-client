@@ -14,7 +14,6 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.app.SharedElementCallback
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hakonsreader.R
 import com.example.hakonsreader.api.RedditApi
@@ -26,6 +25,7 @@ import com.example.hakonsreader.constants.SharedPreferencesConstants
 import com.example.hakonsreader.databinding.ActivityPostBinding
 import com.example.hakonsreader.interfaces.OnReplyListener
 import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.misc.fastSmoothScrollToPosition
 import com.example.hakonsreader.misc.handleGenericResponseErrors
 import com.example.hakonsreader.recyclerviewadapters.CommentsAdapter
 import com.example.hakonsreader.viewmodels.CommentsViewModel
@@ -273,7 +273,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
                 }
             }
             commentsSwipeRefresh.setProgressBackgroundColorSchemeColor(
-                    ContextCompat.getColor(this@PostActivity, R.color.colorAccent)
+                ContextCompat.getColor(this@PostActivity, R.color.colorAccent)
             )
 
             parentLayout.setTransitionListener(transitionListener)
@@ -530,12 +530,14 @@ class PostActivity : BaseActivity(), OnReplyListener {
      * @param view Ignored
      */
     fun goToNextTopLevelComment(@Suppress("UNUSED_PARAMETER")view: View) {
-        val layoutManager = binding.comments.layoutManager as LinearLayoutManager
+        val layoutManager = binding.comments.layoutManager as? LinearLayoutManager ?: return
+        // Currently it is an error for the adapter to be any other type of adapter
         val adapter = binding.comments.adapter as CommentsAdapter
 
         val currentPos = layoutManager.findFirstVisibleItemPosition()
         val next = adapter.getNextTopLevelCommentPos(currentPos + 1)
-        smoothScrollHelper(currentPos, next)
+
+        binding.comments.fastSmoothScrollToPosition(scrollTo = next)
     }
 
     /**
@@ -544,7 +546,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
      * @param view Ignored
      */
     fun goToPreviousTopLevelComment(@Suppress("UNUSED_PARAMETER")view: View) {
-        val layoutManager = binding.comments.layoutManager as LinearLayoutManager
+        val layoutManager = binding.comments.layoutManager as? LinearLayoutManager ?: return
         val adapter = binding.comments.adapter as CommentsAdapter
 
         val currentPos = layoutManager.findFirstVisibleItemPosition()
@@ -552,8 +554,9 @@ class PostActivity : BaseActivity(), OnReplyListener {
         if (currentPos == 0) {
             return
         }
+
         val previous = adapter.getPreviousTopLevelCommentPos(currentPos - 1)
-        smoothScrollHelper(currentPos, previous)
+        binding.comments.fastSmoothScrollToPosition(scrollTo = previous)
     }
 
     /**
@@ -563,8 +566,7 @@ class PostActivity : BaseActivity(), OnReplyListener {
      * @return Always true, as this function will be used to indicate a long click has been handled
      */
     private fun goToFirstComment(@Suppress("UNUSED_PARAMETER")view: View): Boolean {
-        binding.comments.stopScroll()
-        binding.comments.scrollToPosition(0)
+        binding.comments.fastSmoothScrollToPosition(scrollTo = 0)
         return true
     }
 
@@ -575,43 +577,8 @@ class PostActivity : BaseActivity(), OnReplyListener {
      * @return Always true, as this function will be used to indicate a long click has been handled
      */
     private fun goToLastComment(@Suppress("UNUSED_PARAMETER")view: View): Boolean {
-        binding.comments.stopScroll()
-        binding.comments.scrollToPosition(binding.comments.adapter!!.itemCount - 1)
+        binding.comments.fastSmoothScrollToPosition(scrollTo = binding.comments.adapter!!.itemCount - 1)
         return true
-    }
-
-
-    /**
-     * Scrolls [ActivityPostBinding.comments] to a given position, respecting the users
-     * setting for whether or not the scroll should be smooth or instant.
-     *
-     * @param currentPos The current scroll position
-     * @param scrollPos The position to scroll to
-     */
-    private fun smoothScrollHelper(currentPos: Int, scrollPos: Int) {
-        val layoutManager = binding.comments.layoutManager as LinearLayoutManager
-
-        // Scrolling up
-        val gapSize = if (currentPos > scrollPos) {
-            currentPos - scrollPos
-        } else {
-            // Scrolling down
-            scrollPos - currentPos
-        }
-
-        // Stop the current scroll (done manually by the user) to avoid scrolling past the comment navigated to
-        binding.comments.stopScroll()
-        if (settings.commentSmoothScrollThreshold() >= gapSize) {
-            val smoothScroller = object : LinearSmoothScroller(this) {
-                override fun getVerticalSnapPreference(): Int {
-                    return SNAP_TO_START
-                }
-            }.apply { targetPosition = scrollPos }
-
-            layoutManager.startSmoothScroll(smoothScroller)
-        } else {
-            layoutManager.scrollToPositionWithOffset(scrollPos, 0)
-        }
     }
 
     /**
