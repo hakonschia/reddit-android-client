@@ -369,7 +369,14 @@ class CommentsAdapter constructor(
                 val start = fullText.getSpanStart(span)
                 val end = fullText.getSpanEnd(span)
                 val text = fullText.substring(start, end).trim()
-                val url = span.url
+
+                // The url in the span might be empty if someone comments a link like:
+                // [https://whydidiputthelinkhere.com]()
+                // Such as: https://www.reddit.com/r/formula1/comments/rpmzl0/comment/hq56tny
+                // TODO this still causes some issues with Markdown, as Markdown and my LinkPlugin both
+                //  recognize the link, so two link previews will show up if the user has enabled
+                //  link previews for identical links. Not really a big issue though
+                val url = if (span.url.isNotEmpty()) span.url else text
 
                 // TODO "text" will actually include superscripts, since that text isn't actually removed
                 //  from the text, it uses a RelativeSizeSpan with 0f to "remove" the characters

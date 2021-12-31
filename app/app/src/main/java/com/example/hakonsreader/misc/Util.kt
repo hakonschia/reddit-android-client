@@ -261,12 +261,18 @@ class CreateIntentOptions(val openLinksInternally: Boolean = true, val openYoutu
  *
  * @param context The context to retrieve application info from
  * @param url The URL to resolve. If this does not match http/https then "https://reddit.com" is assumed
+ *
+ * @return A drawable of the icon the URL matches, or null if there is no icon found
  */
 fun getAppIconFromUrl(context: Context, url: String) : Drawable? {
+    if (url.isBlank()) {
+        return null
+    }
+
     // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
     // and add the full url so that links that our app resolves will be shown correctly
     val link = if (!url.matches("^http(s)?.*".toRegex())) {
-        "https://reddit.com" + (if (url[0] == '/') "" else "/") + url
+        "https://reddit.com" + (if (url.firstOrNull() == '/') "" else "/") + url
     } else url
 
     // Create the intent with internal links as false, otherwise any link would show our app
@@ -302,7 +308,7 @@ fun createIntent(url: String, options: CreateIntentOptions, context: Context) : 
     // and add the full url so it doesn't have to be handled separately, and potential links we don't
     // handle are sent out correctly to the browser
     if (!convertedUrl.matches("^http(s)?.*".toRegex())) {
-        convertedUrl = "https://reddit.com" + (if (convertedUrl[0] == '/') "" else "/") + convertedUrl
+        convertedUrl = "https://reddit.com" + (if (convertedUrl.firstOrNull() == '/') "" else "/") + convertedUrl
     }
 
     return createIntentInternal(convertedUrl, options, context)

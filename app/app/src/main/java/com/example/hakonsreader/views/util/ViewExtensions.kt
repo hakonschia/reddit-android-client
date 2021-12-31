@@ -59,7 +59,7 @@ fun TextView.setLongClickToPeekUrl(default: (() -> Unit)? = null) {
                 val span = spans.first()
 
                 val text = text.subSequence(start, end).toString()
-                val url = span.url
+                val url = if (span.url.isNotEmpty()) span.url else text
 
                 if (context is AppCompatActivity) {
                     showPeekUrlBottomSheet(context as AppCompatActivity, text, url)

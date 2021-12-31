@@ -35,12 +35,12 @@ class PeekLinkBottomSheet : BottomSheetDialogFragment() {
          * Creates a new bottom sheet
          *
          * @param text The text of the URL. This will be trimmed
-         * @param url The URL
+         * @param url The URL. If this is empty [text] will be used
          */
         fun newInstance(text: String, url: String) = PeekLinkBottomSheet().apply {
             arguments = Bundle().apply {
                 putString(ARGS_TEXT, text.trim())
-                putString(ARGS_URL, url)
+                putString(ARGS_URL, if (url.isNotEmpty()) url else text.trim())
             }
         }
     }
@@ -70,7 +70,7 @@ class PeekLinkBottomSheet : BottomSheetDialogFragment() {
 
         // URLs sent here might be of "/r/whatever", so assume those are links to within reddit.com
         val copyUrl = if (!url.matches("^http(s)?.*".toRegex())) {
-            ("https://reddit.com" + (if (url[0] == '/') "" else "/") + url).also {
+            ("https://reddit.com" + (if (url.firstOrNull() == '/') "" else "/") + url).also {
                 binding.inferredUrlValue = it
             }
         } else {
