@@ -139,6 +139,10 @@ class ContentGalleryImage @JvmOverloads constructor(
                 else -> return@let
             }
 
+            if (view is VideoPlayer) {
+                view.loopVideo = settings.autoLoopVideos()
+            }
+
             binding.content.addView(view)
         }
     }

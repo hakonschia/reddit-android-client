@@ -67,6 +67,7 @@ class VideoActivity : BaseActivity() {
             videoPlayer.run {
                 lifecycle.addObserver(this)
 
+                loopVideo = settings.autoLoopVideos()
                 isFullscreen = true
                 transitionEnabled = true
                 dashVideo = extras.getBoolean(VideoPlayer.EXTRA_IS_DASH)
