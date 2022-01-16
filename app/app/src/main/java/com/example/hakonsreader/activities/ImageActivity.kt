@@ -2,11 +2,8 @@ package com.example.hakonsreader.activities
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.view.WindowInsets
-import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
@@ -19,6 +16,7 @@ import com.example.hakonsreader.R
 import com.example.hakonsreader.api.utils.LinkUtils
 import com.example.hakonsreader.databinding.ActivityImageBinding
 import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.misc.asFullscreenActivity
 import com.example.hakonsreader.misc.isAvailableForGlide
 import com.example.hakonsreader.views.listeners.PhotoViewDoubleTapListener
 import com.github.chrisbanes.photoview.PhotoViewAttacher
@@ -89,13 +87,7 @@ class ImageActivity : BaseActivity() {
 
         val data = intent.extras
         if (data != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val controller = window.insetsController
-                controller?.hide(WindowInsets.Type.statusBars())
-            } else {
-                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                        WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            }
+            asFullscreenActivity()
 
             val attacher: PhotoViewAttacher = binding.image.attacher
             attacher.maximumScale = 7f

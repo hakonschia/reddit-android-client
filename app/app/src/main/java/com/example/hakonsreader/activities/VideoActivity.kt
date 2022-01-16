@@ -1,12 +1,11 @@
 package com.example.hakonsreader.activities
 
-import android.os.Build
 import android.os.Bundle
-import android.view.WindowInsets
-import android.view.WindowManager
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.hakonsreader.R
 import com.example.hakonsreader.misc.Settings
+import com.example.hakonsreader.misc.asFullscreenActivity
 import com.example.hakonsreader.views.VideoPlayer
 import com.r0adkll.slidr.Slidr
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,11 +49,9 @@ class VideoActivity : BaseActivity() {
 
         val data = intent.extras
         if (data != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.insetsController?.hide(WindowInsets.Type.statusBars())
-            } else {
-                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            }
+            asFullscreenActivity(
+                systemBarsBehaviour = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            )
 
             // Restore from the saved state if possible
             val extras = if (savedInstanceState != null) {

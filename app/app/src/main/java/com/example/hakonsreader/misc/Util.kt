@@ -12,13 +12,18 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.util.DisplayMetrics
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -1271,5 +1276,33 @@ fun RecyclerView.fastSmoothScrollToPosition(scrollTo: Int) {
         }.apply { targetPosition = scrollTo }
 
         lm.startSmoothScroll(smoothScroller)
+    }
+}
+
+/**
+ * Displays the activity as a fullscreen activity
+ *
+ * @param systemBarsBehaviour The behaviour of how the system bars should be shown again, such as
+ * [WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE]. Default is 0, which means
+ * no special behaviour should be applied (gestures work as normal without any additional user input)
+ */
+fun Activity.asFullscreenActivity(systemBarsBehaviour: Int = 0) {
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+
+    // To render the content in cutout areas as well (for phones with notches etc., and behind navigation views)
+    if (Build.VERSION.SDK_INT >= 28) {
+        window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+    }
+
+    @Suppress("DEPRECATION")
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        ViewCompat.getWindowInsetsController(window.decorView)?.let {  windowInsetsController ->
+            windowInsetsController.systemBarsBehavior = systemBarsBehaviour
+            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+        }
+    } else {
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
 }
