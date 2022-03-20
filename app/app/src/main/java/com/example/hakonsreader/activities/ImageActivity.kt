@@ -2,8 +2,10 @@ package com.example.hakonsreader.activities
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
@@ -87,7 +89,11 @@ class ImageActivity : BaseActivity() {
 
         val data = intent.extras
         if (data != null) {
-            asFullscreenActivity()
+            asFullscreenActivity(
+                layoutInDisplayCutoutMode = if (Build.VERSION.SDK_INT >= 28) {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                } else -1
+            )
 
             val attacher: PhotoViewAttacher = binding.image.attacher
             attacher.maximumScale = 7f

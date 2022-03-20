@@ -15,7 +15,6 @@ import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -1285,13 +1284,19 @@ fun RecyclerView.fastSmoothScrollToPosition(scrollTo: Int) {
  * @param systemBarsBehaviour The behaviour of how the system bars should be shown again, such as
  * [WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE]. Default is 0, which means
  * no special behaviour should be applied (gestures work as normal without any additional user input)
+ * @param layoutInDisplayCutoutMode For API >= 28 this sets the layout in display cutout mode, such as
+ * [WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT] (this is the default internally)
  */
-fun Activity.asFullscreenActivity(systemBarsBehaviour: Int = 0) {
+fun Activity.asFullscreenActivity(systemBarsBehaviour: Int = 0, layoutInDisplayCutoutMode: Int = -1) {
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
     // To render the content in cutout areas as well (for phones with notches etc., and behind navigation views)
     if (Build.VERSION.SDK_INT >= 28) {
-        window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        window.attributes.layoutInDisplayCutoutMode = if (layoutInDisplayCutoutMode == -1) {
+            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+        } else {
+            layoutInDisplayCutoutMode
+        }
     }
 
     @Suppress("DEPRECATION")

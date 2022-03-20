@@ -1,6 +1,8 @@
 package com.example.hakonsreader.activities
 
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.hakonsreader.R
@@ -50,7 +52,10 @@ class VideoActivity : BaseActivity() {
         val data = intent.extras
         if (data != null) {
             asFullscreenActivity(
-                systemBarsBehaviour = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                systemBarsBehaviour = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE,
+                layoutInDisplayCutoutMode = if (Build.VERSION.SDK_INT >= 28) {
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                } else -1
             )
 
             // Restore from the saved state if possible
