@@ -66,7 +66,6 @@ class ContentVideo @JvmOverloads constructor(
         if (context !is PostActivity) {
             contextAsLifecycle?.lifecycleScope?.launchWhenCreated {
                 extrasFlow.collect {
-                    println("ExtrasFlow collecting ContentVideo.. $it")
                     if (redditPost?.id == it.getString(EXTRAS_POST_ID, "invalid_id")) {
                         // TODO probably set playing to always be false here, to ensure it doesnt play multiple
                         //  places
@@ -79,7 +78,6 @@ class ContentVideo @JvmOverloads constructor(
                 // Only emit in PostActivity
                 // Yes, this is really bad code
                 repeat(Int.MAX_VALUE) {
-                    println("Emitting extras")
                     extrasFlow.tryEmit(getExtras())
                     delay(timeMillis = 500)
                 }
