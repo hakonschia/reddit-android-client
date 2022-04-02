@@ -285,7 +285,7 @@ class App : Application(), Configuration.Provider, Application.ActivityLifecycle
     override fun onActivityResumed(activity: Activity) {
         // The problem this is fixing is that if WiFi goes on/off when the app is in the background
         // the callback inside Settings might not be active, which means data saving settings can be out of sync
-        settings.forceWiFiCheck(activity)
+        settings.forceWiFiCheck(this)
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
