@@ -65,9 +65,9 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSource
  * "No thumbnail" is shown if no thumbnail URL or drawable is given
  */
 class VideoPlayer @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : PlayerView(context, attrs, defStyleAttr), LifecycleObserver {
 
     companion object {
@@ -361,12 +361,17 @@ class VideoPlayer @JvmOverloads constructor(
             field = value
 
             val drawable = if (field) {
-               R.drawable.ic_fullscreen_exit_24dp
+                R.drawable.ic_fullscreen_exit_24dp
             } else {
                 R.drawable.ic_fullscreen_24dp
             }
 
-            findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(ContextCompat.getDrawable(context, drawable))
+            findViewById<ImageButton>(R.id.fullscreen).setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    drawable
+                )
+            )
         }
 
     /**
@@ -480,22 +485,25 @@ class VideoPlayer @JvmOverloads constructor(
     private fun createExoPlayer(): ExoPlayer {
         // The load control is responsible for how much to buffer at a time
         val loadControl: LoadControl = DefaultLoadControl.Builder()
-                // Buffer size between 2.5 and 7.5 seconds, with minimum of 1 second for playback to start
-                .setBufferDurationsMs(2500, 7500, 1000, 500)
-                .build()
+            // Buffer size between 2.5 and 7.5 seconds, with minimum of 1 second for playback to start
+            .setBufferDurationsMs(2500, 7500, 1000, 500)
+            .build()
 
         val player = SimpleExoPlayer.Builder(context)
-                .setLoadControl(loadControl)
-                .setBandwidthMeter(DefaultBandwidthMeter.Builder(context).build())
-                .setTrackSelector(DefaultTrackSelector(context, AdaptiveTrackSelection.Factory()))
-                .build()
+            .setLoadControl(loadControl)
+            .setBandwidthMeter(DefaultBandwidthMeter.Builder(context).build())
+            .setTrackSelector(DefaultTrackSelector(context, AdaptiveTrackSelection.Factory()))
+            .build()
 
         val loader: ProgressBar = findViewById(R.id.buffering)
 
         // Add listener for buffering changes, playback changes etc.
         player.addListener(object : Player.EventListener {
 
-            override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
+            override fun onTracksChanged(
+                trackGroups: TrackGroupArray,
+                trackSelections: TrackSelectionArray
+            ) {
                 hasAudio = audioTracksHaveAudio(trackGroups)
                 videoDuration = -1
             }
@@ -545,15 +553,15 @@ class VideoPlayer @JvmOverloads constructor(
 
         val dataSourceFactory = if (cacheVideo) {
             CacheDataSource.Factory()
-                    .setUpstreamDataSourceFactory(DefaultDataSourceFactory(context))
-                    .setCache(VideoCache.getCache(context))
+                .setUpstreamDataSourceFactory(DefaultDataSourceFactory(context))
+                .setCache(VideoCache.getCache(context))
         } else {
             DefaultDataSourceFactory(context)
         }
 
         val mediaItem = MediaItem.Builder()
-                .setUri(url)
-                .build()
+            .setUri(url)
+            .build()
 
         return if (dashVideo) {
             DashMediaSource.Factory(dataSourceFactory)
@@ -591,7 +599,7 @@ class VideoPlayer @JvmOverloads constructor(
      */
     private fun updateSize() {
         val (_, height) = createResizedVideoSize(videoWidth, videoHeight)
-        
+
         actualVideoHeight = height
 
         // I don't even really know why this works, but the actual video player will be in the
@@ -726,7 +734,7 @@ class VideoPlayer @JvmOverloads constructor(
 
     /**
      * Plays the video
-     * 
+     *
      * @see pause
      */
     fun play() {
@@ -778,7 +786,10 @@ class VideoPlayer @JvmOverloads constructor(
             // Use value of "on" if not null, otherwise toggle
             val volumeOn = on ?: (volume.toInt() != 1)
 
-            val drawable = ContextCompat.getDrawable(context, if (volumeOn) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp)
+            val drawable = ContextCompat.getDrawable(
+                context,
+                if (volumeOn) R.drawable.ic_volume_up_24dp else R.drawable.ic_volume_off_24dp
+            )
             val button = findViewById<ImageButton>(R.id.volumeButton)
             button.setImageDrawable(drawable)
 
@@ -824,7 +835,7 @@ class VideoPlayer @JvmOverloads constructor(
         thumbnail.setImageBitmap(bitmap)
     }
 
-    fun getExtras() : Bundle {
+    fun getExtras(): Bundle {
         return Bundle().also {
             it.putLong(EXTRA_TIMESTAMP, getPosition())
             it.putBoolean(EXTRA_IS_PLAYING, isPlaying())
