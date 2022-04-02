@@ -493,6 +493,7 @@ class VideoPlayer @JvmOverloads constructor(
             .setLoadControl(loadControl)
             .setBandwidthMeter(DefaultBandwidthMeter.Builder(context).build())
             .setTrackSelector(DefaultTrackSelector(context, AdaptiveTrackSelection.Factory()))
+            .setHandleAudioBecomingNoisy(true)
             .build()
 
         val loader: ProgressBar = findViewById(R.id.buffering)
