@@ -163,7 +163,9 @@ class ContentGallery @JvmOverloads constructor(
                 currentView = findViewWithTag(position)
                 currentView?.viewSelected()
 
-                extrasFlow.tryEmit(getExtras())
+                if (context is PostActivity) {
+                    extrasFlow.tryEmit(getExtras())
+                }
             }
         })
 

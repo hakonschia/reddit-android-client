@@ -67,8 +67,6 @@ class ContentVideo @JvmOverloads constructor(
             contextAsLifecycle?.lifecycleScope?.launchWhenCreated {
                 extrasFlow.collect {
                     if (redditPost?.id == it.getString(EXTRAS_POST_ID, "invalid_id")) {
-                        // TODO probably set playing to always be false here, to ensure it doesnt play multiple
-                        //  places
                         setExtras(it.apply { putBoolean(VideoPlayer.EXTRA_IS_PLAYING, false) })
                     }
                 }
