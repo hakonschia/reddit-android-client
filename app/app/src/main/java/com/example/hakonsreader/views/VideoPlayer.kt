@@ -529,6 +529,8 @@ class VideoPlayer @JvmOverloads constructor(
                     prepare()
                 }
 
+                keepScreenOn = playWhenReady && (playbackState == Player.STATE_BUFFERING || playbackState == Player.STATE_READY)
+
                 controllerShowTimeoutMs = if (playbackState == Player.STATE_BUFFERING) {
                     // When buffering the controller shouldn't be auto hidden, as the thumbnail is part of
                     // the controller it might disappear on slow connections which makes the "video" black
