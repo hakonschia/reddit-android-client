@@ -9,10 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.Pair
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.api.interfaces.GalleryImage
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.api.model.images.RedditGalleryItem
@@ -22,9 +25,14 @@ import com.example.hakonsreader.databinding.ContentGalleryBinding
 import com.example.hakonsreader.misc.Coordinates
 import com.example.hakonsreader.misc.Settings
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import kotlin.concurrent.fixedRateTimer
 
 /**
  * Class for gallery posts. A gallery post is simply a collection of multiple images or videos
@@ -73,9 +81,6 @@ class ContentGallery @JvmOverloads constructor(
      */
     var lifecycleOwner: LifecycleOwner? = null
 
-    @Inject
-    lateinit var settings: Settings
-
     private val binding: ContentGalleryBinding = ContentGalleryBinding.inflate(LayoutInflater.from(context), this, true)
 
     /**
@@ -97,6 +102,22 @@ class ContentGallery @JvmOverloads constructor(
 
     private var maxHeight = -1
 
+    @Inject
+    lateinit var extrasFlow: MutableSharedFlow<Bundle>
+
+    init {
+        // Probably not needed, but this flow is only used to update views when the extras change
+        // inside an opened post, so it isn't necessary to set the extras where it's just been changed
+        if (context !is PostActivity) {
+            (context as? LifecycleOwner)?.lifecycleScope?.launchWhenCreated {
+                extrasFlow.collect {
+                    if (redditPost?.id == it.getString(EXTRAS_POST_ID, "invalid_id")) {
+                        setExtras(it)
+                    }
+                }
+            }
+        }
+    }
 
     override fun updateView() {
         val images: List<GalleryImage> = if (redditPost.thirdPartyObject is ImgurAlbum) {
@@ -141,6 +162,8 @@ class ContentGallery @JvmOverloads constructor(
                 // Set new and select that
                 currentView = findViewWithTag(position)
                 currentView?.viewSelected()
+
+                extrasFlow.tryEmit(getExtras())
             }
         })
 

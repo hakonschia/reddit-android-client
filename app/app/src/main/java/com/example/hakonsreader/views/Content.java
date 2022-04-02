@@ -40,6 +40,8 @@ public abstract class Content extends FrameLayout {
      */
     public static final String EXTRAS = "extras";
 
+    public static final String EXTRAS_POST_ID = "extras_postId";
+
 
     /**
      * The post the content is for. Children should use {@link #setRedditPost(RedditPost)} if the goal
@@ -93,6 +95,9 @@ public abstract class Content extends FrameLayout {
      */
     @NonNull
     public Bundle getExtras() {
+        if (redditPost != null) {
+            extras.putString(EXTRAS_POST_ID, redditPost.getId());
+        }
         return extras;
     }
 

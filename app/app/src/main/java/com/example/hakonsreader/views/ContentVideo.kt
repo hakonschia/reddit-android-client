@@ -7,23 +7,31 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.core.util.Pair
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.example.hakonsreader.R
+import com.example.hakonsreader.activities.PostActivity
 import com.example.hakonsreader.api.interfaces.ThirdPartyGif
 import com.example.hakonsreader.api.model.RedditPost
 import com.example.hakonsreader.databinding.ContentVideoBinding
 import com.example.hakonsreader.misc.Settings
 import com.example.hakonsreader.misc.getImageVariantsForRedditPost
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.concurrent.fixedRateTimer
 
 /**
  * View for displaying videos from a [RedditPost]
  */
 @AndroidEntryPoint
 class ContentVideo @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : Content(context, attrs, defStyleAttr) {
     companion object {
         @Suppress("unused")
@@ -46,7 +54,39 @@ class ContentVideo @JvmOverloads constructor(
     @Inject
     lateinit var settings: Settings
 
-    private val player = ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
+    @Inject
+    lateinit var extrasFlow: MutableSharedFlow<Bundle>
+
+    private val player =
+        ContentVideoBinding.inflate(LayoutInflater.from(context), this, true).player
+
+    init {
+        val contextAsLifecycle = context as? LifecycleOwner
+
+        if (context !is PostActivity) {
+            contextAsLifecycle?.lifecycleScope?.launchWhenCreated {
+                extrasFlow.collect {
+                    println("ExtrasFlow collecting ContentVideo.. $it")
+                    if (redditPost?.id == it.getString(EXTRAS_POST_ID, "invalid_id")) {
+                        // TODO probably set playing to always be false here, to ensure it doesnt play multiple
+                        //  places
+                        setExtras(it.apply { putBoolean(VideoPlayer.EXTRA_IS_PLAYING, false) })
+                    }
+                }
+            }
+        } else {
+            contextAsLifecycle?.lifecycleScope?.launchWhenCreated {
+                // Only emit in PostActivity
+                // Yes, this is really bad code
+                repeat(Int.MAX_VALUE) {
+                    println("Emitting extras")
+                    extrasFlow.tryEmit(getExtras())
+                    delay(timeMillis = 500)
+                }
+            }
+        }
+    }
+
 
     override fun updateView() {
         // This needs to be set before the extras as the extras might specify something other than the default
@@ -178,7 +218,8 @@ class ContentVideo @JvmOverloads constructor(
         player.pause()
     }
 
-    override fun getExtras() = player.getExtras()
+    override fun getExtras() =
+        player.getExtras().apply { redditPost?.let { putString(EXTRAS_POST_ID, it.id) } }
 
     override fun setExtras(extras: Bundle) {
         super.setExtras(extras)

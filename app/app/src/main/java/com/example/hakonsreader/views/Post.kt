@@ -354,7 +354,7 @@ class Post @JvmOverloads constructor(
     private fun addContent() {
         val content = suppliedContent ?: generatePostContent(context, redditPost, showTextContent, null)
         content?.also { c ->
-            c.setBitmap(bitmap)
+            c.bitmap = bitmap
 
             postExtras?.let {
                 c.setExtras(it)
