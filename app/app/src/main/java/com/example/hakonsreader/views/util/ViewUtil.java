@@ -213,7 +213,7 @@ public class ViewUtil {
 
         Context context = tag.getContext();
 
-        if (textColor.equals("dark")) {
+        if ("dark".equals(textColor)) {
             tag.setTextColor(ContextCompat.getColor(context, R.color.flairTextDark));
             tag.setFillColor(ContextCompat.getColor(context, R.color.flairBackgroundDark));
         } else {
