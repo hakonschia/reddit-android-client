@@ -21,7 +21,8 @@
             android:value="false" />
 
         <!-- TODO Doesn't work on my phone :) -->
-        <receiver android:name=".broadcastreceivers.InboxWorkerStartReceiver">
+        <receiver android:name=".broadcastreceivers.InboxWorkerStartReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
@@ -31,12 +32,20 @@
         <receiver android:name=".broadcastreceivers.InboxNotificationReceiver" />
 
         <provider
-            android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="${applicationId}.workmanager-init"
-            tools:node="remove"
-            android:exported="false" />
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
 
-        <activity android:name=".activities.MainActivity">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+
+        </provider>
+
+        <activity android:name=".activities.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -111,7 +120,8 @@
         <activity
             android:name=".activities.DispatcherActivity"
             android:theme="@style/AppTheme.DispatcherTheme"
-            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout">
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+            android:exported="true">
 
             <!--
             TODO it's kind of annoying to have to have a trailing slash on these. Since it's not a proper regex

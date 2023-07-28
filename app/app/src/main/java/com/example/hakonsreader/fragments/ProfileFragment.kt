@@ -142,6 +142,7 @@ class ProfileFragment : Fragment() {
                 is LoggedInState.PrivatelyBrowsing -> privateBrowsingStateChanged(true)
 
                 // This observer is only really for private browsing changes
+                else -> {}
             }
         }
         return binding.root

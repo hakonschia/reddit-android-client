@@ -27,7 +27,7 @@ class SubredditFlairsViewModel(
             private val dao: RedditFlairsDao
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SubredditFlairsViewModel(subredditName, flairType, api, dao) as T
         }
     }

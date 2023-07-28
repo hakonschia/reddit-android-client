@@ -251,6 +251,7 @@ class SubredditFragment : Fragment() {
                 is LoggedInState.PrivatelyBrowsing -> privateBrowsingStateChanged(true)
 
                 // This observer is only really for private browsing changes
+                else -> {}
             }
         }
 

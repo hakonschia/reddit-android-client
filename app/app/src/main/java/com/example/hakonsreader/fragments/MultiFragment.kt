@@ -104,6 +104,7 @@ class MultiFragment : Fragment() {
                 is LoggedInState.PrivatelyBrowsing -> binding.privatelyBrowsing = true
 
                 // This observer is only really for private browsing changes
+                else -> {}
             }
         }
     }

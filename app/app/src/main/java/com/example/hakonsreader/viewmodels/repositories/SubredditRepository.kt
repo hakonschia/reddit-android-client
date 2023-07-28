@@ -2,7 +2,7 @@ package com.example.hakonsreader.viewmodels.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.switchMap
 import com.example.hakonsreader.api.RedditApi
 import com.example.hakonsreader.api.model.Subreddit
 import com.example.hakonsreader.api.model.flairs.RedditFlair
@@ -41,7 +41,7 @@ class SubredditRepository(
             }
         }
 
-        return Transformations.switchMap(subredditNameObservable) {
+        return subredditNameObservable.switchMap {
             dao.getLive(it)
         }
     }

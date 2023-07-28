@@ -53,7 +53,7 @@ class SelectSubredditsViewModel @AssistedInject constructor(
     private val _error = MutableLiveData<ErrorWrapper>()
 
     val subreddits: LiveData<List<Subreddit>> get() {
-        return Transformations.switchMap(ids) {
+        return ids.switchMap {
             subredditsDao.getSubsById(it)
         }
     }
