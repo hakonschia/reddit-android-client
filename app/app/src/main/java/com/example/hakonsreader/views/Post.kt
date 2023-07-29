@@ -180,7 +180,7 @@ class Post @JvmOverloads constructor(
     /**
      * The observer [postLiveData] uses
      */
-    private var postObserver = Observer<RedditPost> {
+    private var postObserver = Observer<RedditPost?> {
         if (it != null) {
             // Crossposts aren't stored in the database, and the new post is from the database
             // so copy the old ones, if possible.
